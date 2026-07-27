@@ -373,12 +373,9 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
           <div className="mt-2 flex items-center gap-2 text-primary">
             <GraduationCap className="h-5 w-5" />
             <span className="font-headline-md text-xl font-extrabold text-on-surface">
-              {exam.academicClass?.nameEn ?? "Unassigned"}
+              {exam.academicClass?.name ?? "Unassigned"}
             </span>
           </div>
-          <p className="mt-1 text-xs text-on-surface-variant">
-            Level: {exam.academicClass?.level ?? "N/A"}
-          </p>
         </div>
 
         {/* Total Marks */}

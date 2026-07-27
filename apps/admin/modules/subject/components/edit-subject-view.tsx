@@ -85,9 +85,7 @@ export function EditSubjectView({ id }: EditSubjectViewProps) {
   const selectedClassIds = watch("academicClassIds") || []
 
   // Fetch available academic classes for mapping
-  const { data: availableClasses = [] } = useAcademicClassesForSelection(
-    selectedLevel && selectedLevel !== "" ? selectedLevel : undefined
-  )
+  const { data: availableClasses = [] } = useAcademicClassesForSelection(true)
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -369,10 +367,7 @@ export function EditSubjectView({ id }: EditSubjectViewProps) {
                         >
                           <div className="flex flex-col overflow-hidden">
                             <span className="text-sm font-semibold truncate">
-                              {ac.nameEn}
-                            </span>
-                            <span className="text-xs text-outline font-bengali truncate">
-                              {ac.nameBn}
+                              {ac.name}
                             </span>
                           </div>
                           <Badge

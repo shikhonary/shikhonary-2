@@ -150,10 +150,8 @@ export const safeExamSelect = {
   academicClass: {
     select: {
       id: true,
-      nameEn: true,
-      nameBn: true,
-      level: true,
-      position: true,
+      name: true,
+      isActive: true,
     },
   },
   examSubjects: {

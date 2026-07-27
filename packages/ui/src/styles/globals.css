@@ -1,85 +1,185 @@
 @import url("https://fonts.maateen.me/solaiman-lipi/font.css");
 @import url("https://fonts.maateen.me/kalpurush/font.css");
 @import url("https://fonts.maateen.me/adorsho-lipi/font.css");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-@source "../../../apps/**/*.{ts,tsx}";
-@source "../../../components/**/*.{ts,tsx}";
-@source "../**/*.{ts,tsx}";
+@source "../../../../apps/**/*.{ts,tsx}";
+@source "../../../../packages/**/*.{ts,tsx}";
 
 :root {
-  --background: #f8f9ff;
-  --foreground: #121c2a;
+  /* Colors - Clinical Excellence Design Tokens */
+  --surface: #f9f9ff;
+  --surface-dim: #c8dbff;
+  --surface-bright: #f9f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f0f3ff;
+  --surface-container: #e7eeff;
+  --surface-container-high: #dee8ff;
+  --surface-container-highest: #d5e3ff;
+  --on-surface: #001b3c;
+  --on-surface-variant: #5b403d;
+  --inverse-surface: #183153;
+  --inverse-on-surface: #ecf1ff;
+  --outline: #8f6f6c;
+  --outline-variant: #e4beba;
+  --surface-tint: #ba1a20;
+  --primary: #af101a;
+  --on-primary: #ffffff;
+  --primary-container: #d32f2f;
+  --on-primary-container: #fff2f0;
+  --inverse-primary: #ffb3ac;
+  --secondary: #2b6485;
+  --on-secondary: #ffffff;
+  --secondary-container: #a3d8fe;
+  --on-secondary-container: #255f80;
+  --tertiary: #2e5f61;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #48787a;
+  --on-tertiary-container: #d1fdff;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --primary-fixed: #ffdad6;
+  --primary-fixed-dim: #ffb3ac;
+  --on-primary-fixed: #410003;
+  --on-primary-fixed-variant: #930010;
+  --secondary-fixed: #c7e7ff;
+  --secondary-fixed-dim: #98cdf2;
+  --on-secondary-fixed: #001e2e;
+  --on-secondary-fixed-variant: #064c6b;
+  --tertiary-fixed: #b9ecee;
+  --tertiary-fixed-dim: #9ecfd1;
+  --on-tertiary-fixed: #002021;
+  --on-tertiary-fixed-variant: #1a4e50;
+  --background: #f9f9ff;
+  --on-background: #001b3c;
+  --surface-variant: #d5e3ff;
+
+  /* Shadcn / Standard UI Token Mappings */
+  --foreground: #001b3c;
   --card: #ffffff;
-  --card-foreground: #121c2a;
-  --popover: #eff4ff;
-  --popover-foreground: #121c2a;
-  --primary: #2a14b4;
+  --card-foreground: #001b3c;
+  --popover: #f0f3ff;
+  --popover-foreground: #001b3c;
   --primary-foreground: #ffffff;
-  --secondary: #0051d5;
   --secondary-foreground: #ffffff;
-  --muted: #d9e3f6;
-  --muted-foreground: #464554;
-  --accent: #e6eeff;
-  --accent-foreground: #121c2a;
+  --muted: #e7eeff;
+  --muted-foreground: #5b403d;
+  --accent: #dee8ff;
+  --accent-foreground: #001b3c;
   --destructive: #ba1a1a;
   --destructive-foreground: #ffffff;
-  --border: #c7c4d7;
-  --input: #c7c4d7;
-  --ring: #2a14b4;
-  --radius: 0.25rem;
+  --border: #e4beba;
+  --input: #e4beba;
+  --ring: #af101a;
+  --radius: 0.5rem;
+
   --chart-1: oklch(0.868 0.007 39.5);
   --chart-2: oklch(0.547 0.021 43.1);
   --chart-3: oklch(0.438 0.017 39.3);
   --chart-4: oklch(0.367 0.016 35.7);
   --chart-5: oklch(0.268 0.011 36.5);
-  --sidebar: #f8f9ff;
-  --sidebar-foreground: #121c2a;
-  --sidebar-primary: #2a14b4;
+
+  --sidebar: #f9f9ff;
+  --sidebar-foreground: #001b3c;
+  --sidebar-primary: #af101a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e6eeff;
-  --sidebar-accent-foreground: #121c2a;
-  --sidebar-border: #c7c4d7;
-  --sidebar-ring: #2a14b4;
+  --sidebar-accent: #dee8ff;
+  --sidebar-accent-foreground: #001b3c;
+  --sidebar-border: #e4beba;
+  --sidebar-ring: #af101a;
+
+  /* Radius Tokens */
+  --radius-sm: 0.25rem;
+  --radius-default: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .dark {
-  --background: #121c2a;
-  --foreground: #f8f9ff;
-  --card: #27313f;
-  --card-foreground: #f8f9ff;
-  --popover: #27313f;
-  --popover-foreground: #f8f9ff;
-  --primary: #c3c0ff;
-  --primary-foreground: #2a14b4;
-  --secondary: #b4c5ff;
-  --secondary-foreground: #00174b;
-  --muted: #464554;
-  --muted-foreground: #d9e3f6;
-  --accent: #27313f;
-  --accent-foreground: #f8f9ff;
+  --background: #001b3c;
+  --foreground: #f9f9ff;
+  --card: #183153;
+  --card-foreground: #f9f9ff;
+  --popover: #183153;
+  --popover-foreground: #f9f9ff;
+  --primary: #ffb3ac;
+  --primary-foreground: #410003;
+  --secondary: #98cdf2;
+  --secondary-foreground: #001e2e;
+  --muted: #5b403d;
+  --muted-foreground: #c8dbff;
+  --accent: #183153;
+  --accent-foreground: #f9f9ff;
   --destructive: #ffdad6;
   --destructive-foreground: #93000a;
-  --border: #777586;
-  --input: #777586;
-  --ring: #c3c0ff;
-  --chart-1: oklch(0.868 0.007 39.5);
-  --chart-2: oklch(0.547 0.021 43.1);
-  --chart-3: oklch(0.438 0.017 39.3);
-  --chart-4: oklch(0.367 0.016 35.7);
-  --chart-5: oklch(0.268 0.011 36.5);
-  --sidebar: #121c2a;
-  --sidebar-foreground: #f8f9ff;
-  --sidebar-primary: #c3c0ff;
-  --sidebar-primary-foreground: #2a14b4;
-  --sidebar-accent: #27313f;
-  --sidebar-accent-foreground: #f8f9ff;
-  --sidebar-border: #777586;
-  --sidebar-ring: #c3c0ff;
+  --border: #8f6f6c;
+  --input: #8f6f6c;
+  --ring: #ffb3ac;
+
+  --sidebar: #001b3c;
+  --sidebar-foreground: #f9f9ff;
+  --sidebar-primary: #ffb3ac;
+  --sidebar-primary-foreground: #410003;
+  --sidebar-accent: #183153;
+  --sidebar-accent-foreground: #f9f9ff;
+  --sidebar-border: #8f6f6c;
+  --sidebar-ring: #ffb3ac;
+}
+
+/* Clinical Excellence Specific Class Scopes */
+.theme-clinical-excellence,
+[data-theme="clinical-excellence"],
+.clinical-excellence {
+  --background: #f9f9ff;
+  --foreground: #001b3c;
+  --card: #ffffff;
+  --card-foreground: #001b3c;
+  --popover: #f0f3ff;
+  --popover-foreground: #001b3c;
+  --primary: #af101a;
+  --primary-foreground: #ffffff;
+  --primary-container: #d32f2f;
+  --on-primary-container: #fff2f0;
+  --secondary: #2b6485;
+  --secondary-foreground: #ffffff;
+  --secondary-container: #a3d8fe;
+  --on-secondary-container: #255f80;
+  --tertiary: #2e5f61;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #48787a;
+  --on-tertiary-container: #d1fdff;
+  --muted: #e7eeff;
+  --muted-foreground: #5b403d;
+  --accent: #dee8ff;
+  --accent-foreground: #001b3c;
+  --destructive: #ba1a1a;
+  --destructive-foreground: #ffffff;
+  --border: #e4beba;
+  --input: #e4beba;
+  --ring: #af101a;
+  --radius: 0.5rem;
+
+  --sidebar: #f9f9ff;
+  --sidebar-foreground: #001b3c;
+  --sidebar-primary: #af101a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dee8ff;
+  --sidebar-accent-foreground: #001b3c;
+  --sidebar-border: #e4beba;
+  --sidebar-ring: #af101a;
+
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 @theme inline {
@@ -91,8 +191,16 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -116,83 +224,56 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Extended Colors from Design System */
-  --color-surface: #f8f9ff;
-  --color-surface-dim: #d0dbed;
-  --color-surface-bright: #f8f9ff;
+  /* Clinical Excellence Color Palette Tokens */
+  --color-surface: #f9f9ff;
+  --color-surface-dim: #c8dbff;
+  --color-surface-bright: #f9f9ff;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container: #e6eeff;
-  --color-surface-container-high: #dee9fc;
-  --color-surface-container-highest: #d9e3f6;
-  --color-on-surface: #121c2a;
-  --color-on-surface-variant: #464554;
-  --color-inverse-surface: #27313f;
-  --color-inverse-on-surface: #eaf1ff;
-  --color-outline: #777586;
-  --color-outline-variant: #c7c4d7;
-  --color-surface-tint: #5148d7;
-  --color-primary-container: #4338ca;
-  --color-on-primary-container: #c1beff;
-  --color-inverse-primary: #c3c0ff;
-  --color-secondary-container: #316bf3;
-  --color-on-secondary-container: #fefcff;
-  --color-tertiary: #692400;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-container: #8f3400;
-  --color-on-tertiary-container: #ffb393;
+  --color-surface-container-low: #f0f3ff;
+  --color-surface-container: #e7eeff;
+  --color-surface-container-high: #dee8ff;
+  --color-surface-container-highest: #d5e3ff;
+  --color-on-surface: #001b3c;
+  --color-on-surface-variant: #5b403d;
+  --color-inverse-surface: #183153;
+  --color-inverse-on-surface: #ecf1ff;
+  --color-outline: #8f6f6c;
+  --color-outline-variant: #e4beba;
+  --color-surface-tint: #ba1a20;
+  --color-inverse-primary: #ffb3ac;
   --color-error: #ba1a1a;
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
+  --color-primary-fixed: #ffdad6;
+  --color-primary-fixed-dim: #ffb3ac;
+  --color-on-primary-fixed: #410003;
+  --color-on-primary-fixed-variant: #930010;
+  --color-secondary-fixed: #c7e7ff;
+  --color-secondary-fixed-dim: #98cdf2;
+  --color-on-secondary-fixed: #001e2e;
+  --color-on-secondary-fixed-variant: #064c6b;
+  --color-tertiary-fixed: #b9ecee;
+  --color-tertiary-fixed-dim: #9ecfd1;
+  --color-on-tertiary-fixed: #002021;
+  --color-on-tertiary-fixed-variant: #1a4e50;
+  --color-on-background: #001b3c;
+  --color-surface-variant: #d5e3ff;
 
-  /* Typography */
-  --font-sans: "SolaimanLipi", "Kalpurush", "AdorshoLipi", "Inter", sans-serif;
-  --font-heading:
-    "SolaimanLipi", "Kalpurush", "AdorshoLipi", "Manrope", sans-serif;
+  /* Typography Fonts */
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "SolaimanLipi", "Kalpurush", "AdorshoLipi", sans-serif;
+  --font-heading: "Plus Jakarta Sans", "SolaimanLipi", sans-serif;
   --font-bengali: "SolaimanLipi", "Kalpurush", "AdorshoLipi", sans-serif;
   --font-solaiman: "SolaimanLipi", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
 
-  --text-display-lg: 48px;
-  --text-display-lg--line-height: 1.2;
-  --text-display-lg--letter-spacing: -0.02em;
-  --text-display-lg--font-weight: 800;
-
-  --text-display-lg-mobile: 32px;
-  --text-display-lg-mobile--line-height: 1.2;
-  --text-display-lg-mobile--font-weight: 800;
-
-  --text-headline-md: 24px;
-  --text-headline-md--line-height: 1.4;
-  --text-headline-md--font-weight: 600;
-
-  --text-body-lg: 18px;
-  --text-body-lg--line-height: 1.6;
-  --text-body-lg--font-weight: 400;
-
-  --text-body-md: 16px;
-  --text-body-md--line-height: 1.5;
-  --text-body-md--font-weight: 400;
-
-  --text-label-sm: 12px;
-  --text-label-sm--line-height: 1.4;
-  --text-label-sm--letter-spacing: 0.05em;
-  --text-label-sm--font-weight: 500;
-
-  /* Rounded */
-  --radius-sm: 0.125rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-DEFAULT: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
   --radius-full: 9999px;
-
-  /* Spacing */
-  --spacing-unit: 4px;
-  --spacing-gutter: 24px;
-  --spacing-margin-mobile: 16px;
-  --spacing-margin-desktop: 48px;
-  --spacing-container-max: 1280px;
 }
 
 @layer base {
@@ -200,20 +281,218 @@
     @apply border-border outline-ring/50;
   }
   body {
-    font-family: "SolaimanLipi", "Kalpurush", "AdorshoLipi", "Inter", sans-serif;
+    font-family: "Plus Jakarta Sans", "SolaimanLipi", sans-serif;
     @apply bg-background text-foreground;
   }
 }
 
+.font-plus-jakarta,
+.font-headline-sm,
+.font-headline-md,
+.font-headline-lg,
+.font-headline-xl,
+.font-caption,
+.font-label-md,
+.font-body-lg,
+.font-body-md {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
 .font-solaiman {
   font-family: "SolaimanLipi", "Kalpurush", "AdorshoLipi", sans-serif;
 }
-
 .font-bengali {
   font-family: "SolaimanLipi", "Kalpurush", "AdorshoLipi", sans-serif;
 }
 
-/* Hide scrollbar while keeping scroll functionality */
+/* Clinical Excellence Typography Utility Classes */
+.text-headline-xl,
+.text-clinical-headline-xl {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  .text-headline-xl,
+  .text-clinical-headline-xl {
+    font-size: 32px;
+  }
+}
+
+.text-headline-xl-mobile,
+.text-clinical-headline-xl-mobile {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.text-headline-lg,
+.text-clinical-headline-lg {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.text-headline-md,
+.text-clinical-headline-md {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.text-headline-sm,
+.text-clinical-headline-sm {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-body-lg,
+.text-clinical-body-lg {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-body-md,
+.text-clinical-body-md {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-label-md,
+.text-clinical-label-md {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+}
+
+.text-caption,
+.text-clinical-caption {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Elevation & Depth */
+.shadow-level-0,
+.shadow-clinical-level-0 {
+  box-shadow: none;
+}
+
+.shadow-level-1,
+.shadow-clinical-level-1 {
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+}
+
+.shadow-level-2,
+.shadow-clinical-level-2 {
+  box-shadow: 0 8px 16px 0 rgba(43, 100, 133, 0.08);
+}
+
+/* Component Helper Classes */
+.btn-primary,
+.clinical-btn-primary {
+  background-color: #d32f2f;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  padding: 0.5rem 1rem;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+.btn-primary:hover,
+.clinical-btn-primary:hover {
+  background-color: #af101a;
+}
+
+.btn-secondary,
+.clinical-btn-secondary {
+  background-color: transparent;
+  border: 2px solid #457b9d;
+  color: #457b9d;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+.btn-secondary:hover,
+.clinical-btn-secondary:hover {
+  background-color: rgba(69, 123, 157, 0.05);
+}
+
+.btn-text,
+.clinical-btn-text {
+  background-color: transparent;
+  color: #001b3c;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  padding: 0.5rem 1rem;
+}
+.btn-text:hover,
+.clinical-btn-text:hover {
+  text-decoration: underline;
+}
+
+.input-clinical,
+.clinical-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  transition: border-color 0.2s ease;
+}
+.input-clinical:focus,
+.clinical-input:focus {
+  border-color: #457b9d;
+  outline: none;
+  box-shadow: 0 0 0 1px #457b9d;
+}
+
+.checkbox-clinical,
+.clinical-checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e2e8f0;
+  accent-color: #d32f2f;
+}
+
+.card-course,
+.clinical-card-course {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.card-teacher,
+.clinical-card-teacher {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Hide scrollbar utility */
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

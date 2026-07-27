@@ -79,9 +79,8 @@ export const safeStudentSelect = {
   academicClass: {
     select: {
       id: true,
-      nameBn: true,
-      nameEn: true,
-      level: true,
+      name: true,
+      isActive: true,
     },
   },
   userId: true,

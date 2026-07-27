@@ -24,27 +24,21 @@ export async function listAcademicClasses(
   input: ListAcademicClassesInput,
 ) {
   const where = {
-    ...(input.level ? { level: input.level } : {}),
+    ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
     ...(input.query
       ? {
-          OR: [
-            { nameEn: { contains: input.query, mode: "insensitive" as const } },
-            { nameBn: { contains: input.query, mode: "insensitive" as const } },
-          ],
+          name: { contains: input.query, mode: "insensitive" as const },
         }
       : {}),
   }
 
-  let orderBy: any = [{ position: "asc" }, { createdAt: "desc" }]
+  let orderBy: any = [{ createdAt: "desc" }]
   switch (input.sort) {
-    case "position_desc":
-      orderBy = [{ position: "desc" }, { createdAt: "desc" }]
-      break
     case "name_asc":
-      orderBy = [{ nameEn: "asc" }]
+      orderBy = [{ name: "asc" }]
       break
     case "name_desc":
-      orderBy = [{ nameEn: "desc" }]
+      orderBy = [{ name: "desc" }]
       break
     case "newest":
       orderBy = [{ createdAt: "desc" }]
@@ -52,10 +46,9 @@ export async function listAcademicClasses(
     case "oldest":
       orderBy = [{ createdAt: "asc" }]
       break
-    case "position_asc":
     case "All":
     default:
-      orderBy = [{ position: "asc" }, { createdAt: "desc" }]
+      orderBy = [{ createdAt: "desc" }]
       break
   }
 
@@ -89,16 +82,20 @@ export async function listAcademicClasses(
 }
 
 export async function getAcademicClassStats(db: PrismaClient) {
-  const [totalClassesCount, levelsGroup] = await Promise.all([
+  const [totalClassesCount, activeClassesCount, inactiveClassesCount] = await Promise.all([
     db.academicClass.count(),
-    db.academicClass.groupBy({
-      by: ["level"],
+    db.academicClass.count({
+      where: { isActive: true },
+    }),
+    db.academicClass.count({
+      where: { isActive: false },
     }),
   ])
 
   return {
     totalClassesCount,
-    activeLevelsCount: levelsGroup.length,
+    activeClassesCount,
+    inactiveClassesCount,
   }
 }
 
@@ -120,15 +117,13 @@ export async function getAcademicClassesForSelection(
   input: AcademicClassForSelectionInput,
 ) {
   return db.academicClass.findMany({
-    where: input.level ? { level: input.level } : undefined,
+    where: input.isActive !== undefined ? { isActive: input.isActive } : undefined,
     select: {
       id: true,
-      nameBn: true,
-      nameEn: true,
-      level: true,
-      position: true,
+      name: true,
+      isActive: true,
     },
-    orderBy: { position: "asc" },
+    orderBy: { name: "asc" },
   })
 }
 

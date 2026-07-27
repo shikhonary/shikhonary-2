@@ -221,12 +221,6 @@ export const auth = betterAuth({
       }
     },
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    },
-  },
   // Allow multiple domains to share the same auth package (including localhost:3000 & localhost:3001)
   trustedOrigins: Array.from(
     new Set([

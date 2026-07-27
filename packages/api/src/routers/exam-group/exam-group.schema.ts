@@ -218,9 +218,8 @@ export const safeExamGroupSelect = {
   academicClass: {
     select: {
       id: true,
-      nameEn: true,
-      nameBn: true,
-      level: true,
+      name: true,
+      isActive: true,
     },
   },
   items: {

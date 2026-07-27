@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface AcademicClassOption {
   id: string
-  nameEn: string
-  nameBn: string
+  name: string
+  isActive?: boolean
 }
 
 interface SubjectFiltersProps {
@@ -117,9 +117,9 @@ export function SubjectFilters({
                   <SelectItem
                     key={ac.id}
                     value={ac.id}
-                    label={`${ac.nameEn} (${ac.nameBn})`}
+                    label={ac.name}
                   >
-                    {ac.nameEn} ({ac.nameBn})
+                    {ac.name}
                   </SelectItem>
                 ))}
               </SelectContent>

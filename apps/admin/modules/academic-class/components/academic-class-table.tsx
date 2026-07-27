@@ -17,14 +17,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { MoreVertical, Pen, Trash } from "lucide-react"
+import { MoreVertical, Pen, Trash, GraduationCap } from "lucide-react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 
 export interface AcademicClassItem {
   id: string
-  nameEn: string
-  nameBn: string
-  level: string
-  position: number
+  name: string
+  isActive: boolean
   createdAt: string | Date
   updatedAt: string | Date
 }
@@ -41,6 +41,7 @@ interface AcademicClassTableProps {
   totalItems: number
   totalPages: number
   onPageChange: (page: number) => void
+  onLimitChange?: (limit: number) => void
 }
 
 export function AcademicClassTable({
@@ -55,6 +56,7 @@ export function AcademicClassTable({
   totalItems,
   totalPages,
   onPageChange,
+  onLimitChange,
 }: AcademicClassTableProps) {
   const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
   const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
@@ -62,11 +64,18 @@ export function AcademicClassTable({
   return (
     <div className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-xs">
       {isLoading ? (
-        <div className="flex items-center justify-center p-12 text-on-surface-variant">
-          <span className="material-symbols-outlined animate-spin text-3xl text-primary">
-            progress_activity
-          </span>
-          <span className="ml-3 font-body-md">Loading academic classes...</span>
+        <div className="p-4 md:p-12">
+          <div className="grid grid-cols-1 gap-3 md:hidden">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 w-full rounded-xl bg-surface-container-high animate-pulse" />
+            ))}
+          </div>
+          <div className="hidden md:flex items-center justify-center p-8 text-on-surface-variant">
+            <span className="material-symbols-outlined animate-spin text-3xl text-primary">
+              progress_activity
+            </span>
+            <span className="ml-3 font-body-md">Loading academic classes...</span>
+          </div>
         </div>
       ) : isError ? (
         <div className="p-8 text-center text-error">
@@ -74,7 +83,7 @@ export function AcademicClassTable({
           <p className="mt-2 font-body-md font-medium">Failed to load academic classes.</p>
         </div>
       ) : items.length === 0 ? (
-        <div className="p-12 text-center">
+        <div className="p-8 sm:p-12 text-center">
           <span className="material-symbols-outlined text-5xl text-outline">
             school
           </span>
@@ -82,7 +91,7 @@ export function AcademicClassTable({
             No Academic Classes Found
           </h3>
           <p className="mt-1 font-body-md text-sm text-on-surface-variant">
-            Get started by creating your first institutional academic class level.
+            Get started by creating your first institutional academic class.
           </p>
           <div className="mt-6">
             <Button
@@ -98,135 +107,231 @@ export function AcademicClassTable({
         </div>
       ) : (
         <div>
-          <Table className="w-full text-left font-body-md">
-            <TableHeader className="bg-surface-container-low border-b border-outline-variant">
-              <TableRow className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-low">
-                <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Class Name (EN / BN)
-                </TableHead>
-                <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Academic Level
-                </TableHead>
-                <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Position
-                </TableHead>
-                <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Added Date
-                </TableHead>
-                <TableHead className="px-6 py-4 text-right font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="divide-y divide-outline-variant/30">
-              {items.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="hover:bg-surface-container-low transition-all duration-200 ease-in-out group border-b border-outline-variant/30"
-                >
-                  {/* Class Name (EN / BN) */}
-                  <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                    <div className="flex flex-col">
-                      <span className="font-headline-md text-base font-bold text-on-surface">
-                        {item.nameEn}
-                      </span>
-                      <span className="font-body-md font-bengali text-sm font-medium text-on-surface-variant">
-                        {item.nameBn}
-                      </span>
+          {/* Mobile Card List View (< md) */}
+          <div className="grid grid-cols-1 gap-3 p-3 sm:p-4 md:hidden">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm"
+              >
+                {/* Header Row: Icon + Name + Badge + Actions */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                      <GraduationCap className="h-5 w-5" />
                     </div>
-                  </TableCell>
-
-                  {/* Academic Level */}
-                  <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                    <Badge className="inline-flex items-center rounded-full bg-secondary-container/10 px-3 py-1 font-label-sm text-xs font-bold uppercase text-secondary border-0 shadow-none">
-                      {item.level}
-                    </Badge>
-                  </TableCell>
-
-                  {/* Position */}
-                  <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded border border-outline-variant bg-surface-container-high px-3 py-1 font-label-sm text-xs font-medium">
-                        #{item.position < 10 ? `0${item.position}` : item.position}
-                      </span>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-headline-md text-base font-extrabold text-on-surface truncate">
+                        {item.name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <Badge
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-label-sm text-[10px] font-bold uppercase border-0 shadow-none ${item.isActive
+                              ? "bg-emerald-500/10 text-emerald-600"
+                              : "bg-surface-variant text-on-surface-variant"
+                            }`}
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </div>
                     </div>
-                  </TableCell>
-
-                  {/* Added Date */}
-                  <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                    <div className="flex flex-col">
-                      <span className="font-body-md text-sm text-on-surface">
-                        {new Date(item.createdAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </span>
-                      <span className="text-[12px] text-outline">
-                        Updated {new Date(item.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                      </span>
-                    </div>
-                  </TableCell>
+                  </div>
 
                   {/* Actions Dropdown */}
-                  <TableCell className="py-5 group-hover:py-6 px-6 text-right transition-all duration-200 ease-in-out">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-auto w-auto"
-                          title="Actions"
-                        >
-                          <MoreVertical />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px]">
-                        <DropdownMenuItem
-                          onClick={() => onEdit ? onEdit(item) : (window.location.href = `/academic-classes/${item.id}/edit`)}
-                          className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                        >
-                          <Pen />
-                          <span>Edit</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => onDelete(item.id, item.nameEn)}
-                          disabled={isDeleting}
-                          className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
-                        >
-                          <Trash />
-                          <span>Delete</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-8 w-8 shrink-0"
+                        title="Actions"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px]">
+                      <DropdownMenuItem
+                        onClick={() => onEdit ? onEdit(item) : (window.location.href = `/academic-classes/${item.id}/edit`)}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
+                      >
+                        <Pen />
+                        <span>Edit</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={() => onDelete(item.id, item.name)}
+                        disabled={isDeleting}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
+                      >
+                        <Trash />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Card Footer Info */}
+                <div className="flex items-center justify-between border-t border-outline-variant/20 pt-2.5 text-[11px] text-outline">
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-xs">calendar_today</span>
+                    <span>
+                      Added {new Date(item.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-outline/80">
+                    ID: {item.id.slice(0, 8)}...
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block">
+            <Table className="w-full text-left font-body-md">
+              <TableHeader className="bg-surface-container-low border-b border-outline-variant">
+                <TableRow className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-low">
+                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
+                    Class Name
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
+                    Status
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
+                    Added Date
+                  </TableHead>
+                  <TableHead className="px-6 py-4 text-right font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
+                    Actions
+                  </TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody className="divide-y divide-outline-variant/30">
+                {items.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    className="hover:bg-surface-container-low transition-all duration-200 ease-in-out group border-b border-outline-variant/30"
+                  >
+                    {/* Class Name */}
+                    <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
+                      <span className="font-headline-md text-base font-bold text-on-surface">
+                        {item.name}
+                      </span>
+                    </TableCell>
+
+                    {/* Status Badge */}
+                    <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
+                      <Badge
+                        className={`inline-flex items-center rounded-full px-3 py-1 font-label-sm text-xs font-bold uppercase border-0 shadow-none ${item.isActive
+                            ? "bg-emerald-500/10 text-emerald-600"
+                            : "bg-surface-variant text-on-surface-variant"
+                          }`}
+                      >
+                        {item.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+
+                    {/* Added Date */}
+                    <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
+                      <div className="flex flex-col">
+                        <span className="font-body-md text-sm text-on-surface">
+                          {new Date(item.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                        <span className="text-[12px] text-outline">
+                          Updated {new Date(item.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    {/* Actions Dropdown */}
+                    <TableCell className="py-5 group-hover:py-6 px-6 text-right transition-all duration-200 ease-in-out">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-auto w-auto"
+                            title="Actions"
+                          >
+                            <MoreVertical />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px]">
+                          <DropdownMenuItem
+                            onClick={() => onEdit ? onEdit(item) : (window.location.href = `/academic-classes/${item.id}/edit`)}
+                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
+                          >
+                            <Pen />
+                            <span>Edit</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => onDelete(item.id, item.name)}
+                            disabled={isDeleting}
+                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
+                          >
+                            <Trash />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Table Footer / Pagination */}
-          <div className="flex items-center justify-between border-t border-outline-variant bg-surface-container-low px-6 py-4">
-            <p className="font-body-md text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> classes
-            </p>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant bg-surface-container-low px-4 sm:px-6 py-4">
+            <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+              <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
+                Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> classes
+              </p>
+              {onLimitChange && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-outline font-medium">Rows per page:</span>
+                  <Select
+                    value={String(itemsPerPage)}
+                    onValueChange={(val) => onLimitChange(Number(val) || 10)}
+                  >
+                    <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1">
+                      <SelectValue placeholder="Per Page" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg min-w-[80px]">
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 disabled={currentPage === 1}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                className="size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30"
+                className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30"
               >
-                <span className="material-symbols-outlined">chevron_left</span>
+                <span className="material-symbols-outlined text-sm sm:text-base">chevron_left</span>
               </Button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                 <Button
                   key={pageNum}
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   onClick={() => onPageChange(pageNum)}
-                  className={`size-10 rounded-lg font-body-md text-sm transition-colors ${currentPage === pageNum
+                  className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors ${currentPage === pageNum
                     ? "bg-primary font-bold text-on-primary hover:bg-primary"
                     : "hover:bg-surface-container-high text-on-surface"
                     }`}
@@ -239,9 +344,9 @@ export function AcademicClassTable({
                 size="icon"
                 disabled={currentPage === totalPages}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-                className="size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30"
+                className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30"
               >
-                <span className="material-symbols-outlined">chevron_right</span>
+                <span className="material-symbols-outlined text-sm sm:text-base">chevron_right</span>
               </Button>
             </div>
           </div>

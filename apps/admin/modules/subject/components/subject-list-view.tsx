@@ -45,9 +45,7 @@ export function SubjectListView() {
   const { data: statsData } = useSubjectStats()
 
   // Query academic classes for filter dropdown
-  const { data: academicClasses = [] } = useAcademicClassesForSelection(
-    selectedLevel !== "All" ? selectedLevel : undefined
-  )
+  const { data: academicClasses = [] } = useAcademicClassesForSelection(true)
 
   const items = subjectsData?.items ?? []
   const totalItems = subjectsData?.totalItems ?? items.length

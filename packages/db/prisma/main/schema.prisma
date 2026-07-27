@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String?  @unique
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -24,6 +24,7 @@ model User {
   student             Student?
 
   @@index([email])
+  @@index([phoneNumber])
   @@map("user")
 }
 
@@ -89,11 +90,9 @@ model Role {
 }
 
 model AcademicClass {
-  id       String                 @id @default(uuid())
-  nameBn   String
-  nameEn   String
-  level    String
-  position Int                    @default(0)
+  id         String                 @id @default(uuid())
+  name       String
+  isActive   Boolean                @default(false)
   students   Student[]
   subjects   AcademicClassSubject[]
   exams      Exam[]
@@ -102,19 +101,15 @@ model AcademicClass {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([nameEn])
-  @@index([position])
-  @@index([level])
+  @@index([name])
+  @@index([isActive])
   @@map("academic_class")
 }
 
 model Subject {
-  id       String  @id @default(uuid())
+  id       String @id @default(uuid())
   name     String
-  nameBn   String
-  level    String
-  group    String?
-  position Int     @default(0)
+  position Int    @default(0)
 
   academicClasses AcademicClassSubject[]
   chapters        Chapter[]
@@ -124,9 +119,7 @@ model Subject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([level])
   @@index([position])
-  @@index([group])
 }
 
 model AcademicClassSubject {
@@ -405,18 +398,18 @@ model ExamSubject {
 }
 
 model ExamGroup {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   title           String
   code            String?
   description     String?
-  type            String   @default("MODEL_TEST")
-  calculationType String   @default("SUM")
+  type            String    @default("MODEL_TEST")
+  calculationType String    @default("SUM")
   bestOfNCount    Int?
   totalMarks      Float?
   passMarks       Float?
   startDate       DateTime?
   endDate         DateTime?
-  isPublished     Boolean  @default(false)
+  isPublished     Boolean   @default(false)
 
   academicClassId String?
   academicClass   AcademicClass? @relation(fields: [academicClassId], references: [id], onDelete: SetNull)
@@ -488,4 +481,3 @@ model ExamGroupResult {
   @@index([examGroupId, percentage])
   @@map("exam_group_result")
 }
-

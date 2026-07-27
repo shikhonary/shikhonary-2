@@ -1027,8 +1027,8 @@ export function ImportMcqView() {
                 <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
                   <SelectItem value="all" textValue="All Classes">All Classes</SelectItem>
                   {academicClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id} textValue={`${cls.nameBn} (${cls.nameEn})`}>
-                      {`${cls.nameBn} (${cls.nameEn})`}
+                    <SelectItem key={cls.id} value={cls.id} textValue={cls.name}>
+                      {cls.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

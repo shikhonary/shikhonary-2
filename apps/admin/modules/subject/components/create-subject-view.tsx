@@ -62,9 +62,7 @@ export function CreateSubjectView() {
   const selectedClassIds = watch("academicClassIds") || []
 
   // Fetch available academic classes for mapping
-  const { data: availableClasses = [] } = useAcademicClassesForSelection(
-    selectedLevel && selectedLevel !== "" ? selectedLevel : undefined
-  )
+  const { data: availableClasses = [] } = useAcademicClassesForSelection(true)
 
   const isSubmitting = createMutation.isPending || isFormSubmitting
 
@@ -325,7 +323,7 @@ export function CreateSubjectView() {
                             {isSelected ? "check_circle" : "add_circle"}
                           </span>
                           <span>
-                            {ac.nameEn} ({ac.nameBn})
+                            {ac.name}
                           </span>
                         </button>
                       )

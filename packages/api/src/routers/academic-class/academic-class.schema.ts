@@ -12,8 +12,6 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 
 export const academicClassSortEnum = z.enum([
   "All",
-  "position_asc",
-  "position_desc",
   "name_asc",
   "name_desc",
   "newest",
@@ -22,7 +20,7 @@ export const academicClassSortEnum = z.enum([
 export type AcademicClassSortOption = z.infer<typeof academicClassSortEnum>
 
 export const listAcademicClassesSchema = paginationSchema.extend({
-  level: z.string().optional(),
+  isActive: z.boolean().optional(),
   query: z.string().optional(),
   sort: academicClassSortEnum.optional(),
   page: z.number().int().min(1).optional(),
@@ -35,7 +33,7 @@ export const getAcademicClassSchema = idSchema
 export type GetAcademicClassInput = z.infer<typeof getAcademicClassSchema>
 
 export const academicClassForSelectionSchema = z.object({
-  level: z.string().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export type AcademicClassForSelectionInput = z.infer<
@@ -47,20 +45,16 @@ export type AcademicClassForSelectionInput = z.infer<
 // ---------------------------------------------------------------------------
 
 export const createAcademicClassSchema = z.object({
-  nameBn: z.string().min(1, "Bangla name is required"),
-  nameEn: z.string().min(1, "English name is required"),
-  level: z.string().min(1, "Level is required"),
-  position: z.number().int().default(0),
+  name: z.string().min(1, "Name is required"),
+  isActive: z.boolean().optional().default(false),
 })
 
 export type CreateAcademicClassInput = z.infer<typeof createAcademicClassSchema>
 
 export const updateAcademicClassSchema = z.object({
   id: z.string().min(1),
-  nameBn: z.string().min(1).optional(),
-  nameEn: z.string().min(1).optional(),
-  level: z.string().min(1).optional(),
-  position: z.number().int().optional(),
+  name: z.string().min(1).optional(),
+  isActive: z.boolean().optional(),
 })
 
 export type UpdateAcademicClassInput = z.infer<typeof updateAcademicClassSchema>
@@ -75,10 +69,8 @@ export type DeleteAcademicClassInput = z.infer<typeof deleteAcademicClassSchema>
 
 export const safeAcademicClassSelect = {
   id: true,
-  nameBn: true,
-  nameEn: true,
-  level: true,
-  position: true,
+  name: true,
+  isActive: true,
   createdAt: true,
   updatedAt: true,
 } as const

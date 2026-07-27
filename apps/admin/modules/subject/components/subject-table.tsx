@@ -33,10 +33,8 @@ export interface SubjectItem {
     academicClassId: string
     academicClass: {
       id: string
-      nameEn: string
-      nameBn: string
-      level: string
-      position: number
+      name: string
+      isActive?: boolean
     }
   }>
   _count?: {
@@ -63,6 +61,7 @@ export function SubjectTable({
   items,
   isLoading,
   isError,
+  isDeleting,
   onEdit,
   onDelete,
   currentPage,
@@ -97,12 +96,12 @@ export function SubjectTable({
             No Subjects Found
           </h3>
           <p className="mt-1 font-body-md text-sm text-on-surface-variant">
-            Get started by creating your first academic subject.
+            Get started by creating your first subject module.
           </p>
           <div className="mt-6">
             <Button
               asChild
-              className="inline-flex items-center space-x-2 rounded-lg bg-primary-container px-6 py-2.5 font-bold text-on-primary-container hover:bg-primary hover:text-white h-auto normal-case tracking-normal cursor-pointer"
+              className="inline-flex items-center space-x-2 rounded-lg bg-primary-container px-6 py-2.5 font-bold text-on-primary-container hover:bg-primary hover:text-white h-auto normal-case tracking-normal"
             >
               <Link href="/subjects/create">
                 <span className="material-symbols-outlined text-sm">add</span>
@@ -129,7 +128,7 @@ export function SubjectTable({
                   Position
                 </TableHead>
                 <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                  Chapters
+                  Added Date
                 </TableHead>
                 <TableHead className="px-6 py-4 text-right font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
                   Actions
@@ -177,7 +176,7 @@ export function SubjectTable({
                             key={acRel.id}
                             className="inline-flex items-center rounded-full bg-primary-container/10 px-3 py-1 font-label-sm text-xs font-bold uppercase text-primary border-0 shadow-none"
                           >
-                            {acRel.academicClass.nameEn}
+                            {acRel.academicClass.name}
                           </Badge>
                         ))
                       ) : (

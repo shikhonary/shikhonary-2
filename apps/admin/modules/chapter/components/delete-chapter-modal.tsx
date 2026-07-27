@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from "@workspace/ui/components/dialog"
 import { Button } from "@workspace/ui/components/button"
+import { AlertTriangle, Info, Loader2, Trash2 } from "lucide-react"
 
 export function DeleteChapterModal() {
   const { isOpen, chapterId, chapterName, closeModal } =
@@ -36,52 +37,50 @@ export function DeleteChapterModal() {
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
       <DialogContent
         showCloseButton={false}
-        className="w-full max-w-md overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest p-8 shadow-2xl sm:max-w-md"
+        className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white p-5 sm:p-6 shadow-xl text-left gap-4"
       >
-        {/* Warning Icon Section */}
-        <div className="mb-6 flex items-center justify-center sm:justify-start">
-          <div className="flex size-12 items-center justify-center rounded-full bg-error-container text-on-error-container">
-            <span
-              className="material-symbols-outlined text-2xl text-error"
-              style={{ fontVariationSettings: "'opsz' 32" }}
-            >
-              warning
-            </span>
+        {/* Warning Header Icon */}
+        <div className="flex items-center gap-3">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-red-500/10 text-red-600 shrink-0">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+          <div>
+            <DialogTitle className="font-headline-md text-lg font-bold tracking-tight text-on-surface normal-case">
+              Delete Chapter?
+            </DialogTitle>
+            <p className="text-xs text-outline mt-0.5">
+              This action requires confirmation
+            </p>
           </div>
         </div>
 
-        {/* Textual Content */}
-        <DialogHeader className="space-y-3 text-left">
-          <DialogTitle className="font-headline-md text-2xl font-bold tracking-tight text-on-surface normal-case">
-            Delete Chapter?
-          </DialogTitle>
+        {/* Textual Description */}
+        <DialogHeader className="pt-1">
           <DialogDescription className="font-body-md text-sm leading-relaxed text-on-surface-variant">
-            This action cannot be undone. Chapter{" "}
+            Are you sure you want to delete chapter{" "}
             <span className="font-bold text-on-surface">
               &quot;{chapterName || "selected chapter"}&quot;
-            </span>{" "}
-            will be permanently removed from the system.
+            </span>
+            ? All syllabus topics and curriculum records will be permanently removed.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Informational Alert */}
-        <div className="mt-6 flex items-start gap-3 rounded-r-lg border-l-4 border-error bg-surface-container-low p-4">
-          <span className="material-symbols-outlined text-[18px] text-error">
-            info
-          </span>
-          <p className="font-label-sm text-xs text-on-surface-variant">
-            Syllabus topics and curriculum breakdown related to this chapter will be removed.
+        {/* Informational Alert Box */}
+        <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/5 p-3 text-xs text-red-700">
+          <Info className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+          <p className="leading-snug">
+            This action cannot be undone. Associated questions and syllabus breakdowns will be affected.
           </p>
         </div>
 
         {/* Actions Footer */}
-        <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
           <Button
             type="button"
             variant="outline"
             disabled={deleteMutation.isPending}
             onClick={closeModal}
-            className="w-full rounded-lg border border-outline bg-transparent px-6 py-3 font-headline-md text-sm font-semibold text-on-surface-variant transition-all hover:bg-surface-container-high sm:w-auto h-auto cursor-pointer normal-case tracking-normal"
+            className="w-full sm:w-auto rounded-lg border border-outline-variant px-5 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container-high cursor-pointer h-10 normal-case tracking-normal"
           >
             Cancel
           </Button>
@@ -90,17 +89,18 @@ export function DeleteChapterModal() {
             variant="destructive"
             disabled={deleteMutation.isPending}
             onClick={handleConfirmDelete}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-error px-6 py-3 font-headline-md text-sm font-bold text-on-error transition-all hover:bg-on-error-container sm:w-auto h-auto cursor-pointer normal-case tracking-normal disabled:opacity-50"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-5 py-2 text-xs font-bold text-white hover:bg-red-700 cursor-pointer h-10 normal-case tracking-normal disabled:opacity-50"
           >
             {deleteMutation.isPending ? (
               <>
-                <span className="material-symbols-outlined animate-spin text-[18px]">
-                  progress_activity
-                </span>
+                <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Deleting...</span>
               </>
             ) : (
-              "Delete Chapter"
+              <>
+                <Trash2 className="h-4 w-4" />
+                <span>Delete Chapter</span>
+              </>
             )}
           </Button>
         </div>

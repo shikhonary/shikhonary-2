@@ -349,7 +349,7 @@ export function CreateExamView() {
                   <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
                     {academicClasses.map((cls) => (
                       <SelectItem key={cls.id} value={cls.id}>
-                        {cls.nameEn} ({cls.level})
+                        {cls.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

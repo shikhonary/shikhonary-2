@@ -24,26 +24,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="flex min-h-screen bg-background text-on-surface font-body-md">
+    <div className="bg-background text-on-background min-h-screen flex font-plus-jakarta">
       {/* Side Navigation (Desktop & Tablet) */}
       <SideNav
         isCollapsed={isCollapsed}
         onToggle={() => setIsCollapsed((prev) => !prev)}
       />
 
-      {/* Main Wrapper */}
+      {/* Main Content Wrapper */}
       <div
-        className={`flex flex-1 flex-col w-full min-h-screen transition-all duration-300 ${
+        className={`flex flex-1 flex-col min-h-screen transition-all duration-300 ${
           isCollapsed ? "md:ml-20" : "md:ml-64"
         }`}
       >
-        {/* Top Navigation (Sticky) */}
+        {/* Top Navigation (Sticky Header) */}
         <TopNav />
 
-        {/* Main Content Area Canvas */}
-        <main className="flex-1 bg-surface-bright p-6 pb-24 md:p-8 md:pb-8">
-          {children}
-        </main>
+        {/* Main Workspace Canvas */}
+        <main className="flex-1 p-4 sm:p-6 pb-24 md:pb-6">{children}</main>
       </div>
 
       {/* Mobile Navigation */}

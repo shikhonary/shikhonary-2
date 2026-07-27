@@ -31,8 +31,8 @@ export function useAcademicClassById(id: string, enabled = true) {
 /**
  * Hook to fetch academic classes for dropdown selection.
  */
-export function useAcademicClassesForSelection(level?: string) {
-  return useQuery(trpc.academicClass.forSelection.queryOptions({ level }))
+export function useAcademicClassesForSelection(isActive?: boolean) {
+  return useQuery(trpc.academicClass.forSelection.queryOptions({ isActive }))
 }
 
 /**

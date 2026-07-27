@@ -317,7 +317,7 @@ export function CreateExamGroupView() {
                     <SelectItem value="none">None / Global Group</SelectItem>
                     {academicClasses.map((cls) => (
                       <SelectItem key={cls.id} value={cls.id}>
-                        {cls.nameEn} ({cls.level})
+                        {cls.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

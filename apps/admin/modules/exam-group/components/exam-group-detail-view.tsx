@@ -219,7 +219,7 @@ export function ExamGroupDetailView({ id }: ExamGroupDetailViewProps) {
           <div>
             <span className="text-xs font-semibold text-outline uppercase tracking-wider">Class</span>
             <p className="mt-1 font-bold text-on-surface">
-              {groupData.academicClass?.nameEn || "Global / All Classes"}
+              {groupData.academicClass?.name || "Global / All Classes"}
             </p>
           </div>
 

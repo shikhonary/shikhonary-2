@@ -119,7 +119,7 @@ export function ExamGroupFilters({
               <SelectItem value="All">All Classes</SelectItem>
               {academicClasses.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
-                  {c.nameEn}
+                  {c.name}
                 </SelectItem>
               ))}
             </SelectContent>

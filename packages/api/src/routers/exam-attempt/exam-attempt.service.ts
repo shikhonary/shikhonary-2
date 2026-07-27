@@ -196,8 +196,7 @@ export async function listAvailableExams(
         academicClass: {
           select: {
             id: true,
-            nameEn: true,
-            nameBn: true,
+            name: true,
           },
         },
         examSubjects: {

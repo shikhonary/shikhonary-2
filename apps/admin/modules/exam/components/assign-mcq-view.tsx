@@ -555,7 +555,7 @@ export function AssignMcqView({ examId }: AssignMcqViewProps) {
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-outline">Academic Class</p>
-              <p className="text-sm font-bold text-on-surface">{exam.academicClass?.nameEn ?? "N/A"}</p>
+              <p className="text-sm font-bold text-on-surface">{exam.academicClass?.name ?? "N/A"}</p>
             </div>
           </div>
 

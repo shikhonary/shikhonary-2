@@ -170,21 +170,6 @@ function LoginContent() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setLoading(true);
-    try {
-      await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: '/',
-      });
-    } catch (err: any) {
-      setError(err?.message ?? "গুগল সাইন-ইনের সময়ে সমস্যা ঘটেছে।");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col font-body-md font-solaiman overflow-x-hidden">
       <style dangerouslySetInnerHTML={{
@@ -224,7 +209,6 @@ function LoginContent() {
               loading={loading}
               onResend={handleResend}
               onSubmit={handleSubmit(onSubmit)}
-              onGoogleSignIn={handleGoogleSignIn}
             />
           </div>
 
