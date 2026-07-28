@@ -5,17 +5,13 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Users,
-  Calendar,
   ClipboardList,
-  BarChart3,
 } from "lucide-react"
 
 const mobileNavItems = [
   { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/users", label: "Users", icon: Users },
-  { href: "/schedule", label: "Schedule", icon: Calendar },
   { href: "/exams", label: "Exams", icon: ClipboardList },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
 ]
 
 export function MobileNav() {

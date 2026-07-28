@@ -156,29 +156,12 @@ model Chapter {
 }
 
 model Student {
-  id          String    @id @default(uuid())
-  session     String?
-  studentId   Int
-  name        String
-  nameBn      String
-  fName       String?
-  mName       String?
-  gender      String?
-  dob         DateTime?
-  nationality String?
-  religion    String?
-  imageUrl    String?
-
-  section String?
-  shift   String?
-  group   String?
-  roll    Int?
-
-  fPhone String?
-  mPhone String
-
-  presentAddress   String?
-  permanentAddress String?
+  id               String  @id @default(uuid())
+  name             String
+  phone            String
+  institute        String
+  roll             Int?
+  isOfflineStudent Boolean @default(false)
 
   academicClassId String
   academicClass   AcademicClass @relation(fields: [academicClassId], references: [id], onDelete: Restrict)
@@ -192,7 +175,6 @@ model Student {
   examGroupResults ExamGroupResult[]
 
   @@index([userId])
-  @@index([studentId])
 }
 
 model Mcq {
@@ -243,6 +225,7 @@ model Exam {
   hasRandom       Boolean  @default(false)
   hasNegativeMark Boolean  @default(false)
   negativeMark    Float    @default(0)
+  isOffline       Boolean  @default(false)
   type            String
 
   status String @default("Pending")

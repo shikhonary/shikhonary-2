@@ -262,7 +262,7 @@ function EditableMcqCard({
   onDelete,
   onDuplicate,
 }: EditableMcqCardProps) {
-  const optionLetters = ["A", "B", "C", "D", "E", "F", "G", "H"]
+  const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
   const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"]
 
   const handleUpdateStatement = (stmtIdx: number, newText: string) => {

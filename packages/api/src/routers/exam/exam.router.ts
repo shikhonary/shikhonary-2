@@ -20,6 +20,7 @@ import {
   toggleExamStatusSchema,
   updateExamSchema,
   updateExamSubjectMcqsSchema,
+  mcqsForAssignmentSchema,
 } from "./exam.schema"
 import {
   addExamSubjects,
@@ -33,6 +34,7 @@ import {
   toggleExamStatus,
   updateExam,
   updateExamSubjectMcqs,
+  getMcqsForAssignment,
 } from "./exam.service"
 
 export const examRouter = createTRPCRouter({
@@ -112,4 +114,11 @@ export const examRouter = createTRPCRouter({
   updateSubjectMcqs: protectedProcedure
     .input(updateExamSubjectMcqsSchema)
     .mutation(({ input }) => updateExamSubjectMcqs(db, input)),
+
+  /**
+   * Fetch MCQs for assignment, supporting search, assignment status filtering, type filtering, and pagination.
+   */
+  mcqsForAssignment: protectedProcedure
+    .input(mcqsForAssignmentSchema)
+    .query(({ input }) => getMcqsForAssignment(db, input)),
 })

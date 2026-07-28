@@ -2,6 +2,7 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "../generated/main/client"
 
 export type { PrismaClient, Role, User } from "../generated/main/client"
+export { Prisma } from "../generated/main/client"
 
 const globalForPrisma = globalThis as unknown as {
   mainDb: PrismaClient | undefined

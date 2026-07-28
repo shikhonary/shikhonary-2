@@ -4,6 +4,7 @@
  * All database queries live here, decoupled from tRPC plumbing.
  */
 import type { PrismaClient } from "@workspace/db/main"
+import { Prisma } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
 import { notFound } from "../../utils/errors"
 import type {
@@ -16,6 +17,63 @@ import type {
   UpdateSubjectInput,
 } from "./subject.schema"
 import { safeSubjectSelect } from "./subject.schema"
+
+export type MappedSubject = Omit<
+  Prisma.SubjectGetPayload<{ select: typeof safeSubjectSelect }>,
+  "academicClasses"
+> & {
+  nameEn: string
+  nameBn: string
+  level: string
+  group: string
+  academicClasses: Array<{
+    id: string
+    academicClassId: string
+    academicClass: {
+      id: string
+      name: string
+      isActive: boolean
+      nameEn: string
+      nameBn: string
+    } | null
+  }>
+}
+
+// Helper to map database Subject record to the legacy shape expected by client applications.
+export function mapSubjectResponse(
+  subject: Prisma.SubjectGetPayload<{ select: typeof safeSubjectSelect }>
+): MappedSubject {
+  return {
+    id: subject.id,
+    name: subject.name,
+    position: subject.position,
+    createdAt: subject.createdAt,
+    updatedAt: subject.updatedAt,
+    _count: subject._count,
+    nameEn: subject.name,
+    nameBn: subject.name,
+    level: "",
+    group: "",
+    academicClasses: subject.academicClasses?.map((ac) => ({
+      id: ac.id,
+      academicClassId: ac.academicClassId,
+      academicClass: ac.academicClass ? {
+        id: ac.academicClass.id,
+        name: ac.academicClass.name,
+        isActive: ac.academicClass.isActive,
+        nameEn: ac.academicClass.name,
+        nameBn: ac.academicClass.name,
+      } : null,
+    })) || [],
+  }
+}
+
+export function mapSubjectResponseNullable(
+  subject: Prisma.SubjectGetPayload<{ select: typeof safeSubjectSelect }> | null
+): MappedSubject | null {
+  if (!subject) return null
+  return mapSubjectResponse(subject)
+}
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -88,7 +146,7 @@ export async function listSubjects(
     items.length === limit ? items[items.length - 1]?.id : undefined
 
   return {
-    items,
+    items: items.map(mapSubjectResponse),
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,
@@ -110,21 +168,29 @@ export async function getSubjectStats(db: PrismaClient) {
 export async function getSubjectById(
   db: PrismaClient,
   input: GetSubjectInput,
-) {
+): Promise<MappedSubject> {
   const item = await db.subject.findUnique({
     where: { id: input.id },
     select: safeSubjectSelect,
   })
 
   if (!item) throw notFound("Subject")
-  return item
+  return mapSubjectResponse(item)
+}
+
+export type MappedSubjectSelection = {
+  id: string
+  name: string
+  position: number
+  nameEn: string
+  nameBn: string
 }
 
 export async function getSubjectsForSelection(
   db: PrismaClient,
   input: SubjectForSelectionInput,
-) {
-  return db.subject.findMany({
+): Promise<MappedSubjectSelection[]> {
+  const items = await db.subject.findMany({
     where: {
       ...(input.academicClassId
         ? {
@@ -143,6 +209,14 @@ export async function getSubjectsForSelection(
     },
     orderBy: { position: "asc" },
   })
+
+  return items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    position: item.position,
+    nameEn: item.name,
+    nameBn: item.name,
+  }))
 }
 
 // ---------------------------------------------------------------------------

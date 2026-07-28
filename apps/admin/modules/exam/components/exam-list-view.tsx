@@ -79,8 +79,6 @@ export function ExamListView() {
         onAcademicClassChange={(c) => setSearchParams({ academicClassId: c, page: 1 })}
         selectedSort={sort}
         onSortChange={(st) => setSearchParams({ sort: st as any, page: 1 })}
-        selectedLimit={limit}
-        onLimitChange={(l) => setSearchParams({ limit: l, page: 1 })}
       />
 
       {/* View Data (Table View Only) */}
@@ -97,6 +95,7 @@ export function ExamListView() {
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(p) => setSearchParams({ page: p })}
+        onLimitChange={(l) => setSearchParams({ limit: l, page: 1 })}
       />
 
       {/* Global Delete Confirmation Dialog */}

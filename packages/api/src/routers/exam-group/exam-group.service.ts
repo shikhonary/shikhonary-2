@@ -611,12 +611,13 @@ export async function listExamGroupResults(db: PrismaClient, input: ListExamGrou
         student: {
           select: {
             id: true,
-            studentId: true,
             name: true,
-            nameBn: true,
             roll: true,
-            section: true,
-            imageUrl: true,
+            user: {
+              select: {
+                image: true,
+              },
+            },
           },
         },
       },
@@ -627,8 +628,24 @@ export async function listExamGroupResults(db: PrismaClient, input: ListExamGrou
   const nextCursor =
     items.length === limit ? items[items.length - 1]?.id : undefined
 
+  const mappedItems = items.map((item) => {
+    const student = item.student
+    return {
+      ...item,
+      student: student ? {
+        id: student.id,
+        name: student.name,
+        roll: student.roll,
+        studentId: student.roll || (parseInt(student.id.replace(/\D/g, '').slice(0, 6)) || 100000),
+        nameBn: student.name,
+        section: "",
+        imageUrl: student.user?.image || null,
+      } : null,
+    }
+  })
+
   return {
-    items,
+    items: mappedItems,
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,
@@ -652,10 +669,13 @@ export async function getStudentExamGroupResult(db: PrismaClient, input: GetStud
       student: {
         select: {
           id: true,
-          studentId: true,
           name: true,
-          nameBn: true,
           roll: true,
+          user: {
+            select: {
+              image: true,
+            },
+          },
         },
       },
     },
@@ -696,6 +716,14 @@ export async function getStudentExamGroupResult(db: PrismaClient, input: GetStud
 
   return {
     ...result,
+    student: result.student ? {
+      id: result.student.id,
+      name: result.student.name,
+      roll: result.student.roll,
+      studentId: result.student.roll || (parseInt(result.student.id.replace(/\D/g, '').slice(0, 6)) || 100000),
+      nameBn: result.student.name,
+      imageUrl: result.student.user?.image || null,
+    } : null,
     breakdown,
   }
 }
@@ -842,10 +870,7 @@ export async function getStudentGroupLeaderboard(
   const where: any = { examGroupId: input.examGroupId }
   if (input.query) {
     where.student = {
-      OR: [
-        { name: { contains: input.query, mode: "insensitive" } },
-        { nameBn: { contains: input.query, mode: "insensitive" } },
-      ],
+      name: { contains: input.query, mode: "insensitive" },
     }
   }
 
@@ -863,12 +888,13 @@ export async function getStudentGroupLeaderboard(
         student: {
           select: {
             id: true,
-            studentId: true,
             name: true,
-            nameBn: true,
-            imageUrl: true,
             roll: true,
-            section: true,
+            user: {
+              select: {
+                image: true,
+              },
+            },
           },
         },
       },
@@ -890,11 +916,11 @@ export async function getStudentGroupLeaderboard(
     calculatedAt: r.calculatedAt,
     student: {
       id: r.student.id,
-      studentId: r.student.studentId,
-      name: r.student.name || r.student.nameBn || "শিক্ষার্থী",
-      image: r.student.imageUrl,
+      studentId: r.student.roll || (parseInt(r.student.id.replace(/\D/g, '').slice(0, 6)) || 100000),
+      name: r.student.name || "শিক্ষার্থী",
+      image: r.student.user?.image || null,
       roll: r.student.roll,
-      section: r.student.section,
+      section: "",
     },
     isCurrentUser: student ? r.student.id === student.id : false,
   }))

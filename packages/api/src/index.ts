@@ -14,6 +14,7 @@ export type {
   AuthedTRPCContext,
   SuperAdminTRPCContext,
   TenantTRPCContext,
+  StudentTRPCContext,
 } from "./trpc"
 export { appRouter, createCaller } from "./root"
 export type { AppRouter } from "./root"
@@ -23,6 +24,8 @@ export type {
   UpdateUserInput,
   UpdateUserRolesInput,
   DeleteUserInput,
+  CreateUserInput,
+  UsersForSelectionInput,
 } from "./routers/user/user.schema"
 export type {
   RoleForSelectionInput,
@@ -83,6 +86,7 @@ export type {
   AddExamSubjectsInput,
   RemoveExamSubjectInput,
   ExamSortOption,
+  McqsForAssignmentInput,
 } from "./routers/exam/exam.schema"
 export type {
   ListExamGroupsInput,
@@ -111,4 +115,17 @@ export type {
   QuestionBankByChapterInput,
   QuestionBankSortOption,
 } from "./routers/question-bank/question-bank.schema"
+export type {
+  CompleteStudentOnboardingInput,
+  CreateStudentInput,
+  DeleteStudentInput,
+  GetStudentInput,
+  ListStudentsInput,
+  UpdateStudentAdminInput,
+  StudentSortOption,
+} from "./routers/student/student.schema"
+
+export type { MappedExam } from "./routers/exam/exam.service"
+export type { MappedSubject, MappedSubjectSelection } from "./routers/subject/subject.service"
+export type { MappedStudent } from "./routers/student/student.service"
 

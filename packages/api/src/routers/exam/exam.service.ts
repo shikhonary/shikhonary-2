@@ -4,6 +4,7 @@
  * All database queries and core calculations live here.
  */
 import type { PrismaClient } from "@workspace/db/main"
+import { Prisma } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
 import { badRequest, notFound } from "../../utils/errors"
 import type {
@@ -18,8 +19,64 @@ import type {
   ToggleExamStatusInput,
   UpdateExamInput,
   UpdateExamSubjectMcqsInput,
+  McqsForAssignmentInput,
 } from "./exam.schema"
 import { safeExamSelect } from "./exam.schema"
+
+export type MappedExam = Omit<
+  Prisma.ExamGetPayload<{ select: typeof safeExamSelect }>,
+  "academicClass"
+> & {
+  academicClass: {
+    id: string
+    name: string
+    isActive: boolean
+    nameEn: string
+    nameBn: string
+  } | null
+}
+
+// Helper to map database Exam record to the legacy shape expected by client applications.
+export function mapExamResponse(
+  exam: Prisma.ExamGetPayload<{ select: typeof safeExamSelect }>
+): MappedExam {
+  return {
+    id: exam.id,
+    title: exam.title,
+    total: exam.total,
+    duration: exam.duration,
+    totalMcq: exam.totalMcq,
+    startDate: exam.startDate,
+    endDate: exam.endDate,
+    hasSuffle: exam.hasSuffle,
+    hasRandom: exam.hasRandom,
+    hasNegativeMark: exam.hasNegativeMark,
+    negativeMark: exam.negativeMark,
+    isOffline: exam.isOffline,
+    type: exam.type,
+    status: exam.status,
+    academicClassId: exam.academicClassId,
+    createdAt: exam.createdAt,
+    updatedAt: exam.updatedAt,
+    examSubjects: exam.examSubjects,
+    examGroupItems: exam.examGroupItems,
+    _count: exam._count,
+    academicClass: exam.academicClass ? {
+      id: exam.academicClass.id,
+      name: exam.academicClass.name,
+      isActive: exam.academicClass.isActive,
+      nameEn: exam.academicClass.name,
+      nameBn: exam.academicClass.name,
+    } : null,
+  }
+}
+
+export function mapExamResponseNullable(
+  exam: Prisma.ExamGetPayload<{ select: typeof safeExamSelect }> | null
+): MappedExam | null {
+  if (!exam) return null
+  return mapExamResponse(exam)
+}
 
 // ---------------------------------------------------------------------------
 // Queries
@@ -30,6 +87,7 @@ export async function listExams(db: PrismaClient, input: ListExamsInput) {
     ...(input.status ? { status: input.status } : {}),
     ...(input.type ? { type: input.type } : {}),
     ...(input.academicClassId ? { academicClassId: input.academicClassId } : {}),
+    ...(input.isOffline !== undefined ? { isOffline: input.isOffline } : {}),
     ...(input.examGroupId
       ? { examGroupItems: { some: { examGroupId: input.examGroupId } } }
       : {}),
@@ -80,7 +138,7 @@ export async function listExams(db: PrismaClient, input: ListExamsInput) {
     items.length === limit ? items[items.length - 1]?.id : undefined
 
   return {
-    items,
+    items: items.map(mapExamResponse),
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,
@@ -89,14 +147,14 @@ export async function listExams(db: PrismaClient, input: ListExamsInput) {
   }
 }
 
-export async function getExamById(db: PrismaClient, input: GetExamInput) {
+export async function getExamById(db: PrismaClient, input: GetExamInput): Promise<MappedExam> {
   const item = await db.exam.findUnique({
     where: { id: input.id },
     select: safeExamSelect,
   })
 
   if (!item) throw notFound("Exam")
-  return item
+  return mapExamResponse(item)
 }
 
 export async function getExamStats(db: PrismaClient, input?: ExamStatsInput) {
@@ -104,6 +162,7 @@ export async function getExamStats(db: PrismaClient, input?: ExamStatsInput) {
     ...(input?.status ? { status: input?.status } : {}),
     ...(input?.type ? { type: input?.type } : {}),
     ...(input?.academicClassId ? { academicClassId: input?.academicClassId } : {}),
+    ...(input?.isOffline !== undefined ? { isOffline: input?.isOffline } : {}),
   }
 
   const [totalCount, statusGroup, typeGroup] = await Promise.all([
@@ -408,4 +467,113 @@ export async function updateExamSubjectMcqs(
     where: { id: examId },
     select: safeExamSelect,
   })
+}
+
+export async function getMcqsForAssignment(
+  db: PrismaClient,
+  input: McqsForAssignmentInput,
+) {
+  const { examId, subjectId, chapterId, board, query, type, assignedStatus, limit, page } = input
+
+  // Fetch the ExamSubject join record to get list of assigned MCQs
+  const examSubject = await db.examSubject.findFirst({
+    where: { examId, subjectId },
+    select: { mcqIds: true },
+  })
+
+  const assignedMcqIds = examSubject?.mcqIds ?? []
+
+  // Build prisma where clause
+  const whereClause: any = {
+    subjectId,
+  }
+
+  // Handle chapter filter
+  if (chapterId && chapterId !== "All") {
+    whereClause.chapterId = chapterId
+  }
+
+  // Handle board filter
+  if (board && board !== "All") {
+    whereClause.reference = {
+      hasSome: [board],
+    }
+  }
+
+  // Handle Assigned Status filter
+  if (assignedStatus === "Assigned") {
+    whereClause.id = { in: assignedMcqIds }
+  } else if (assignedStatus === "Unassigned") {
+    whereClause.id = { notIn: assignedMcqIds }
+  }
+
+  // Handle type filter
+  if (type && type !== "All") {
+    whereClause.type = type
+  }
+
+  // Handle search query
+  if (query && query.trim() !== "") {
+    const q = query.trim()
+    whereClause.OR = [
+      { question: { contains: q, mode: "insensitive" } },
+      { context: { contains: q, mode: "insensitive" } },
+    ]
+  }
+
+  // Pagination skip & take
+  const skip = (page - 1) * limit
+  const take = limit
+
+  const [items, totalItems] = await Promise.all([
+    db.mcq.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+        options: true,
+        statements: true,
+        type: true,
+        isMath: true,
+        reference: true,
+        explanation: true,
+        questionUrl: true,
+        context: true,
+        contextUrl: true,
+        subjectId: true,
+        chapterId: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        subject: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        chapter: {
+          select: {
+            id: true,
+            name: true,
+            position: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take,
+    }),
+    db.mcq.count({
+      where: whereClause,
+    }),
+  ])
+
+  return {
+    items,
+    totalItems,
+    totalPages: Math.ceil(totalItems / limit),
+    page,
+    limit,
+  }
 }

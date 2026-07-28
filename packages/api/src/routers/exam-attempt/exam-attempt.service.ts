@@ -251,6 +251,12 @@ export async function listAvailableExams(
     const attempt = attemptsByExamId.get(exam.id)
     return {
       ...exam,
+      academicClass: exam.academicClass ? {
+        id: exam.academicClass.id,
+        name: exam.academicClass.name,
+        nameEn: exam.academicClass.name,
+        nameBn: exam.academicClass.name,
+      } : null,
       studentAttempt: attempt
         ? {
             id: attempt.id,
@@ -915,10 +921,12 @@ export async function getExamLeaderboard(
           id: true,
           userId: true,
           name: true,
-          nameBn: true,
-          imageUrl: true,
           roll: true,
-          studentId: true,
+          user: {
+            select: {
+              image: true,
+            },
+          },
         },
       },
     },
@@ -946,10 +954,10 @@ export async function getExamLeaderboard(
     createdAt: att.createdAt,
     student: {
       id: att.student.id,
-      name: att.student.name || att.student.nameBn || "শিক্ষার্থী",
-      image: att.student.imageUrl,
+      name: att.student.name || "শিক্ষার্থী",
+      image: att.student.user?.image || null,
       roll: att.student.roll,
-      studentId: att.student.studentId,
+      studentId: att.student.roll || (parseInt(att.student.id.replace(/\D/g, '').slice(0, 6)) || 100000),
     },
     isCurrentUser: student ? att.student.id === student.id : false,
   }))

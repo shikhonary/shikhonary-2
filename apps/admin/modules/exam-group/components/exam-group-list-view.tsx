@@ -91,18 +91,12 @@ export function ExamGroupListView() {
       <ExamGroupFilters
         searchQuery={query}
         onSearchChange={(q) => setSearchParams({ query: q, page: 1 })}
-        selectedType={type}
-        onTypeChange={(t) => setSearchParams({ type: t, page: 1 })}
-        selectedCalculationType={calculationType}
-        onCalculationTypeChange={(c) => setSearchParams({ calculationType: c, page: 1 })}
         selectedAcademicClassId={academicClassId}
         onAcademicClassChange={(c) => setSearchParams({ academicClassId: c, page: 1 })}
         selectedIsPublished={isPublished}
         onIsPublishedChange={(p) => setSearchParams({ isPublished: p, page: 1 })}
         selectedSort={sort}
         onSortChange={(st) => setSearchParams({ sort: st as any, page: 1 })}
-        selectedLimit={limit}
-        onLimitChange={(l) => setSearchParams({ limit: l, page: 1 })}
       />
 
       {/* Table Data */}
@@ -120,6 +114,7 @@ export function ExamGroupListView() {
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(p) => setSearchParams({ page: p })}
+        onLimitChange={(l) => setSearchParams({ limit: l, page: 1 })}
       />
 
       {/* Delete Confirmation Modal */}

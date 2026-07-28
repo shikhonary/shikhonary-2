@@ -362,7 +362,9 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
               {exam.status}
             </span>
           </div>
-          <p className="mt-1 text-xs text-on-surface-variant">Type: {exam.type}</p>
+          <p className="mt-1 text-xs text-on-surface-variant">
+            Type: {exam.type} {(exam as any).isOffline ? "• Offline Exam" : "• Online Exam"}
+          </p>
         </div>
 
         {/* Target Academic Class */}

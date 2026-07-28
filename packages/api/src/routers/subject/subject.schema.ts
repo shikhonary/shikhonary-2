@@ -26,6 +26,7 @@ export const listSubjectsSchema = paginationSchema.extend({
   query: z.string().optional(),
   sort: subjectSortEnum.optional(),
   page: z.number().int().min(1).optional(),
+  group: z.string().optional(),
 })
 
 export type ListSubjectsInput = z.infer<typeof listSubjectsSchema>
@@ -36,6 +37,7 @@ export type GetSubjectInput = z.infer<typeof getSubjectSchema>
 
 export const subjectForSelectionSchema = z.object({
   academicClassId: z.string().optional(),
+  group: z.string().optional(),
 })
 
 export type SubjectForSelectionInput = z.infer<

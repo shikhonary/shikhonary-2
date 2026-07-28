@@ -1,7 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useSuspenseQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { authClient } from "@workspace/auth/client"
-import type { ListUsersInput, RoleForSelectionInput } from "@workspace/api"
+import type {
+  ListUsersInput,
+  GetUserInput,
+  UpdateUserInput,
+  DeleteUserInput,
+  UpdateUserRolesInput,
+  CreateUserInput,
+  UsersForSelectionInput,
+} from "@workspace/api"
 
 /**
  * Hook to get the currently authenticated user's session and assigned roles.
@@ -50,6 +58,34 @@ export function useUserById(id: string, enabled = true) {
 }
 
 /**
+ * Hook to fetch users for selection inputs.
+ */
+export function useUsersForSelection(input: UsersForSelectionInput = {}) {
+  return useQuery(trpc.user.forSelection.queryOptions(input))
+}
+
+/**
+ * Hook to fetch summary statistics for users using suspense.
+ */
+export function useUserStats() {
+  return useSuspenseQuery(trpc.user.stats.queryOptions())
+}
+
+/**
+ * Hook to create a new user record.
+ */
+export function useCreateUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.user.create.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.user.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to update a user's profile fields.
  */
 export function useUpdateUser() {
@@ -94,10 +130,9 @@ export function useDeleteUser() {
 /**
  * Hook to fetch roles for selection inputs (with optional name filter).
  */
-export function useRolesForSelection(input?: RoleForSelectionInput) {
+export function useRolesForSelection(input?: { name?: string }) {
   return useQuery(trpc.role.forSelection.queryOptions(input))
 }
 
 /** Alias for useRolesForSelection */
 export const useRoleForSelection = useRolesForSelection
-

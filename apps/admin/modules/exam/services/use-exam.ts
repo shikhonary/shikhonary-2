@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useSuspenseQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
-import type { ListExamsInput, ExamStatsInput } from "@workspace/api"
+import type { ListExamsInput, ExamStatsInput, McqsForAssignmentInput } from "@workspace/api"
 
 /**
  * Hook to list all exams with filtering & pagination.
@@ -23,6 +23,16 @@ export function useExamById(id: string, enabled = true) {
   return useQuery({
     ...trpc.exam.byId.queryOptions({ id }),
     enabled: Boolean(id) && enabled,
+  })
+}
+
+/**
+ * Hook to fetch MCQs for exam assignment with filtering & pagination.
+ */
+export function useExamMcqsForAssignment(input: McqsForAssignmentInput, enabled = true) {
+  return useQuery({
+    ...trpc.exam.mcqsForAssignment.queryOptions(input),
+    enabled,
   })
 }
 

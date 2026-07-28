@@ -39,7 +39,7 @@ export interface SubjectItem {
       id: string
       name: string
       isActive?: boolean
-    }
+    } | null
   }>
   _count?: {
     chapters: number
@@ -199,7 +199,7 @@ export function SubjectTable({
                         key={acRel.id}
                         className="inline-flex items-center rounded-full bg-primary-container/10 px-2.5 py-0.5 font-label-sm text-[10px] font-bold uppercase text-primary border-0 shadow-none"
                       >
-                        {acRel.academicClass.name}
+                        {acRel.academicClass?.name}
                       </Badge>
                     ))}
                   </div>
@@ -271,7 +271,7 @@ export function SubjectTable({
                               key={acRel.id}
                               className="inline-flex items-center rounded-full bg-primary-container/10 px-3 py-1 font-label-sm text-xs font-bold uppercase text-primary border-0 shadow-none"
                             >
-                              {acRel.academicClass.name}
+                              {acRel.academicClass?.name}
                             </Badge>
                           ))
                         ) : (

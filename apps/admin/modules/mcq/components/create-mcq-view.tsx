@@ -356,7 +356,7 @@ export function CreateMcqView() {
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {optionFields.map((field, idx) => {
-                  const optionLabel = String.fromCharCode(65 + idx) // A, B, C, D...
+                  const optionLabel = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"][idx] || String(idx + 1)
                   return (
                     <div key={field.id} className="space-y-1">
                       <div className="flex items-center justify-between">
@@ -413,7 +413,7 @@ export function CreateMcqView() {
                       <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
                         {currentOptions.map((opt, idx) => {
                           const val = opt.value.trim()
-                          const label = String.fromCharCode(65 + idx)
+                          const label = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"][idx] || String(idx + 1)
                           return (
                             <SelectItem
                               key={idx}

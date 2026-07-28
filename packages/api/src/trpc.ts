@@ -67,6 +67,14 @@ export type TenantTRPCContext = AuthedTRPCContext & {
   tenantDb: TenantPrismaClient
 }
 
+/**
+ * Context available inside `studentProcedure`.
+ */
+export type StudentTRPCContext = AuthedTRPCContext & {
+  db: PrismaClient
+  isOfflineStudent: boolean
+}
+
 // ---------------------------------------------------------------------------
 // Context factory
 // ---------------------------------------------------------------------------
@@ -266,7 +274,7 @@ export const tenantProcedure = protectedProcedure.use(({ ctx, next }) => {
  * Throws `FORBIDDEN` if the user does not have the Student role.
  * Safe case-insensitive role check supports both "STUDENT" and "Student".
  */
-export const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
+export const studentProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   const hasStudentRole = ctx.roles.some(
     (r) =>
       r.name === ROLES.STUDENT ||
@@ -281,11 +289,18 @@ export const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
     })
   }
 
+  const student = await db.student.findUnique({
+    where: { userId: ctx.session.user.id },
+    select: { isOfflineStudent: true },
+  })
+
   return next({
     ctx: {
       ...ctx,
       /** Main Prisma client — connected to the primary/management database. */
       db: db as PrismaClient,
+      /** Offline student status */
+      isOfflineStudent: student?.isOfflineStudent ?? false,
     },
   })
 })

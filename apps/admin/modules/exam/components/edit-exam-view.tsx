@@ -163,6 +163,7 @@ export function EditExamView({ examId }: EditExamViewProps) {
 
   // Form State
   const [academicClassId, setAcademicClassId] = useState("")
+  const [isOffline, setIsOffline] = useState(false)
   const [title, setTitle] = useState("")
   const [type, setType] = useState("MCQ")
   const [status, setStatus] = useState("Pending")
@@ -192,6 +193,7 @@ export function EditExamView({ examId }: EditExamViewProps) {
       setType(exam.type ?? "MCQ")
       setStatus(exam.status ?? "Pending")
       setAcademicClassId(exam.academicClassId ?? "")
+      setIsOffline(Boolean((exam as any).isOffline))
       setTotal(exam.total ?? 100)
       setDuration(exam.duration ?? 60)
       setTotalMcq(exam.totalMcq ?? 50)
@@ -268,6 +270,7 @@ export function EditExamView({ examId }: EditExamViewProps) {
         type,
         status,
         academicClassId,
+        isOffline,
         total: Number(total),
         duration: Number(duration),
         totalMcq: Number(totalMcq),
@@ -757,31 +760,64 @@ export function EditExamView({ examId }: EditExamViewProps) {
           </div>
         </div>
 
-        {/* Form Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSubmitting}
-            onClick={() => router.push("/exams")}
-            className="rounded-lg border border-outline px-8 py-3 font-bold text-primary transition-all active:scale-95 hover:bg-surface-container-low sm:flex-none cursor-pointer h-auto normal-case tracking-normal disabled:opacity-50"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-primary-container px-10 py-3 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 sm:flex-none cursor-pointer h-auto normal-case tracking-normal"
-          >
-            {isSubmitting ? (
-              <span className="material-symbols-outlined animate-spin text-[20px]">
-                progress_activity
-              </span>
-            ) : (
-              <span className="material-symbols-outlined text-[20px]">save</span>
-            )}
-            <span>{isSubmitting ? "Updating..." : "Update Exam"}</span>
-          </Button>
+        {/* Section 4: Exam Mode */}
+        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
+          <div className="flex items-center gap-2 mb-4 border-b border-outline-variant/30 pb-3">
+            <span className="material-symbols-outlined text-xl text-primary">lan</span>
+            <h2 className="font-headline-md text-lg font-bold text-on-surface">
+              Exam Mode & Audience
+            </h2>
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border border-outline-variant bg-white p-4">
+            <div>
+              <Label htmlFor="exam-is-offline" className="block text-sm font-semibold text-on-surface cursor-pointer select-none">
+                Offline Exam
+              </Label>
+              <p className="text-xs text-on-surface-variant">
+                Enable this option if the exam is to be conducted for offline students.
+              </p>
+            </div>
+            <Switch
+              id="exam-is-offline"
+              checked={isOffline}
+              onCheckedChange={setIsOffline}
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
+
+        {/* Meta & Actions */}
+        <div className="mt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-outline-variant pt-6 sm:pt-8">
+          <div className="flex items-center justify-center sm:justify-start space-x-2 text-on-surface-variant">
+            <span className="material-symbols-outlined text-sm">history</span>
+            <span className="text-[12px]">Last updated record</span>
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => router.push("/exams")}
+              className="w-full sm:w-auto rounded-lg border border-outline px-6 sm:px-8 py-2.5 sm:py-3 font-bold text-primary transition-all active:scale-95 hover:bg-surface-container-low cursor-pointer h-auto normal-case tracking-normal disabled:opacity-50 text-sm"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex w-full sm:w-auto items-center justify-center space-x-2 rounded-lg bg-primary-container px-8 sm:px-10 py-2.5 sm:py-3 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal text-sm"
+            >
+              {isSubmitting ? (
+                <span className="material-symbols-outlined animate-spin text-[18px] sm:text-[20px]">
+                  progress_activity
+                </span>
+              ) : (
+                <span className="material-symbols-outlined text-[18px] sm:text-[20px]">save</span>
+              )}
+              <span>{isSubmitting ? "Updating..." : "Update Exam"}</span>
+            </Button>
+          </div>
         </div>
       </form>
     </div>

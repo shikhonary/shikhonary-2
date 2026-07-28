@@ -27,6 +27,7 @@ export const listExamsSchema = paginationSchema.extend({
   query: z.string().optional(),
   sort: examSortEnum.optional(),
   page: z.number().int().min(1).optional(),
+  isOffline: z.boolean().optional(),
 })
 
 export type ListExamsInput = z.infer<typeof listExamsSchema>
@@ -39,6 +40,7 @@ export const examStatsSchema = z.object({
   status: z.string().optional(),
   type: z.string().optional(),
   academicClassId: z.string().optional(),
+  isOffline: z.boolean().optional(),
 })
 
 export type ExamStatsInput = z.infer<typeof examStatsSchema>
@@ -58,6 +60,7 @@ export const createExamSchema = z.object({
   hasRandom: z.boolean().default(false),
   hasNegativeMark: z.boolean().default(false),
   negativeMark: z.number().default(0),
+  isOffline: z.boolean().default(false),
   type: z.string().min(1, "Exam type is required"),
   status: z.string().default("Pending"),
   academicClassId: z.string().min(1, "Academic class is required"),
@@ -79,6 +82,7 @@ export const updateExamSchema = z.object({
   hasRandom: z.boolean().optional(),
   hasNegativeMark: z.boolean().optional(),
   negativeMark: z.number().optional(),
+  isOffline: z.boolean().optional(),
   type: z.string().min(1).optional(),
   status: z.string().optional(),
   academicClassId: z.string().min(1).optional(),
@@ -142,6 +146,7 @@ export const safeExamSelect = {
   hasRandom: true,
   hasNegativeMark: true,
   negativeMark: true,
+  isOffline: true,
   type: true,
   status: true,
   academicClassId: true,
@@ -193,3 +198,17 @@ export const safeExamSelect = {
     },
   },
 } as const
+
+export const mcqsForAssignmentSchema = z.object({
+  examId: z.string().min(1, "Exam ID is required"),
+  subjectId: z.string().min(1, "Subject ID is required"),
+  chapterId: z.string().optional(),
+  board: z.string().optional(),
+  query: z.string().optional(),
+  type: z.string().optional(),
+  assignedStatus: z.enum(["All", "Assigned", "Unassigned"]).default("All"),
+  limit: z.number().int().min(1).default(50),
+  page: z.number().int().min(1).default(1),
+})
+
+export type McqsForAssignmentInput = z.infer<typeof mcqsForAssignmentSchema>

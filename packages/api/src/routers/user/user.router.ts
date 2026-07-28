@@ -13,16 +13,21 @@ import {
 } from "../../trpc"
 import { db } from "@workspace/db/main"
 import {
+  createUserSchema,
   deleteUserSchema,
   getUserSchema,
   listUsersSchema,
   updateUserSchema,
   updateUserRolesSchema,
   updateContactSchema,
+  usersForSelectionSchema,
 } from "./user.schema"
 import {
+  createUser,
   deleteUser,
   getUserById,
+  getUsersForSelection,
+  getUserStats,
   listUsers,
   updateUser,
   updateUserRoles,
@@ -46,9 +51,29 @@ export const userRouter = createTRPCRouter({
   updateContact: protectedProcedure
     .input(updateContactSchema)
     .mutation(({ ctx, input }) => updateUserContact(db, ctx.session.user.id, input)),
+
   /**
-   * List all users with cursor-based pagination.
-   * Returns only safe fields (no passwords, tokens, etc.).
+   * Fetch summary statistics for users (total count, delta, verified, pending).
+   */
+  stats: superAdminProcedure.query(({ ctx }) => getUserStats(ctx.db)),
+
+  /**
+   * Fetch users formatted for selection dropdowns.
+   */
+  forSelection: superAdminProcedure
+    .input(usersForSelectionSchema)
+    .query(({ ctx, input }) => getUsersForSelection(ctx.db, input)),
+
+  /**
+   * Create a new user record.
+   */
+  create: superAdminProcedure
+    .input(createUserSchema)
+    .mutation(({ ctx, input }) => createUser(ctx.db, input)),
+
+  /**
+   * List all users with cursor-based or page-offset pagination.
+   * Returns only safe fields (no passwords, tokens, etc.) with roles.
    */
   list: superAdminProcedure
     .input(listUsersSchema)
