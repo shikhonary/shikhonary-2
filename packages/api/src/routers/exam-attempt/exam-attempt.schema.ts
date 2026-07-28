@@ -151,14 +151,12 @@ export const safeAnswerHistorySelect = {
         select: {
           id: true,
           name: true,
-          nameBn: true,
         },
       },
       chapter: {
         select: {
           id: true,
           name: true,
-          nameBn: true,
         },
       },
     },

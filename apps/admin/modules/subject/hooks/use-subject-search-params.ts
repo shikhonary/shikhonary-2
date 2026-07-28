@@ -13,8 +13,6 @@ export type SubjectSortOption = (typeof subjectSortOptions)[number]
 
 export const subjectSearchParamsParsers = {
   query: parseAsString.withDefault(""),
-  level: parseAsString.withDefault("All"),
-  group: parseAsString.withDefault("All"),
   academicClassId: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<SubjectSortOption>(Array.from(subjectSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),

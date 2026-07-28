@@ -56,7 +56,6 @@ export type ChapterForSelectionInput = z.infer<
 
 export const createChapterSchema = z.object({
   name: z.string().min(1, "English name is required"),
-  nameBn: z.string().min(1, "Bangla name is required"),
   subjectId: z.string().min(1, "Subject ID is required"),
   position: z.number().int().default(0),
 })
@@ -66,7 +65,6 @@ export type CreateChapterInput = z.infer<typeof createChapterSchema>
 export const updateChapterSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
-  nameBn: z.string().min(1).optional(),
   subjectId: z.string().min(1).optional(),
   position: z.number().int().optional(),
 })
@@ -91,7 +89,6 @@ export type ReorderChaptersInput = z.infer<typeof reorderChaptersSchema>
 export const safeChapterSelect = {
   id: true,
   name: true,
-  nameBn: true,
   position: true,
   subjectId: true,
   createdAt: true,
@@ -100,9 +97,6 @@ export const safeChapterSelect = {
     select: {
       id: true,
       name: true,
-      nameBn: true,
-      level: true,
-      group: true,
     },
   },
 } as const

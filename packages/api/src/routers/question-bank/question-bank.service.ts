@@ -196,7 +196,6 @@ export async function getQuestionBankByChapter(
     select: {
       id: true,
       name: true,
-      nameBn: true,
       position: true,
     },
     orderBy: { position: "asc" },

@@ -269,9 +269,9 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                           <SelectItem
                             key={sub.id}
                             value={sub.id}
-                            label={`${sub.nameBn} (${sub.name})`}
+                            label={sub.name}
                           >
-                            {sub.nameBn} ({sub.name})
+                            {sub.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -305,9 +305,9 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                           <SelectItem
                             key={ch.id}
                             value={ch.id}
-                            label={`${ch.nameBn} (${ch.name})`}
+                            label={ch.name}
                           >
-                            {ch.nameBn} ({ch.name})
+                            {ch.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

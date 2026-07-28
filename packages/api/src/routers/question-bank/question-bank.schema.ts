@@ -87,16 +87,12 @@ export const safeQuestionBankMcqSelect = {
     select: {
       id: true,
       name: true,
-      nameBn: true,
-      level: true,
-      group: true,
     },
   },
   chapter: {
     select: {
       id: true,
       name: true,
-      nameBn: true,
       position: true,
     },
   },

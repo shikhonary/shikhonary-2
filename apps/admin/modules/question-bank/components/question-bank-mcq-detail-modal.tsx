@@ -69,10 +69,10 @@ export function QuestionBankMcqDetailModal() {
             {/* Meta badges */}
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/10 font-bold text-xs">
-                {mcq.subject.nameBn || mcq.subject.name}
+                {mcq.subject.name}
               </Badge>
               <Badge variant="outline" className="font-semibold text-xs">
-                {mcq.chapter.nameBn || mcq.chapter.name}
+                {mcq.chapter.name}
               </Badge>
               <Badge className="bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-50 text-[11px] font-bold uppercase">
                 {mcq.type}

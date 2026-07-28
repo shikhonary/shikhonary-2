@@ -28,7 +28,6 @@ import {
 
 const chapterFormSchema = z.object({
   name: z.string().min(1, "English chapter name is required"),
-  nameBn: z.string().min(1, "Bengali chapter name is required"),
   subjectId: z.string().min(1, "Please select a parent subject"),
   position: z.coerce.number().int().min(0, "Position must be 0 or greater"),
 })
@@ -54,7 +53,6 @@ export function ChapterFormDialog() {
     resolver: zodResolver(chapterFormSchema),
     defaultValues: {
       name: "",
-      nameBn: "",
       subjectId: defaultSubjectId || "",
       position: 0,
     },
@@ -65,14 +63,12 @@ export function ChapterFormDialog() {
       if (chapter) {
         reset({
           name: chapter.name,
-          nameBn: chapter.nameBn,
           subjectId: chapter.subjectId,
           position: chapter.position,
         })
       } else {
         reset({
           name: "",
-          nameBn: "",
           subjectId: defaultSubjectId || (subjects[0]?.id ?? ""),
           position: 0,
         })
@@ -136,11 +132,10 @@ export function ChapterFormDialog() {
                       <SelectItem
                         key={sub.id}
                         value={sub.id}
-                        label={`${sub.name} (${sub.nameBn})`}
+                        label={sub.name}
                       >
                         <div className="flex items-center justify-between w-full gap-2">
-                          <span>{sub.name} ({sub.nameBn})</span>
-                          <span className="text-xs text-outline font-medium">[{sub.level}]</span>
+                          <span>{sub.name}</span>
                         </div>
                       </SelectItem>
                     ))}
@@ -169,21 +164,7 @@ export function ChapterFormDialog() {
             )}
           </div>
 
-          {/* Bangla Chapter Name */}
-          <div className="space-y-2">
-            <Label className="font-label-sm text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Chapter Name (Bangla) <span className="text-error">*</span>
-            </Label>
-            <Input
-              type="text"
-              placeholder="e.g. বল ও গতি"
-              {...register("nameBn")}
-              className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md font-bengali text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
-            />
-            {errors.nameBn && (
-              <p className="text-xs text-error">{errors.nameBn.message}</p>
-            )}
-          </div>
+
 
           {/* Position */}
           <div className="space-y-2">

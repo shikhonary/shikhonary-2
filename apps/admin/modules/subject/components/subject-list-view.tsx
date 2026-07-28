@@ -18,8 +18,6 @@ export function SubjectListView() {
   const [
     {
       query: searchQuery,
-      level: selectedLevel,
-      group: selectedGroup,
       academicClassId: selectedAcademicClassId,
       sort: selectedSort,
       page: currentPage,
@@ -35,8 +33,6 @@ export function SubjectListView() {
     limit,
     page: currentPage,
     query: searchQuery || undefined,
-    level: selectedLevel !== "All" ? selectedLevel : undefined,
-    group: selectedGroup !== "All" ? selectedGroup : undefined,
     academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     sort: selectedSort,
   })
@@ -58,9 +54,8 @@ export function SubjectListView() {
 
       {/* Stats Cards */}
       <SubjectStatsCards
-        totalSubjectsCount={statsData.totalSubjectsCount}
-        activeLevelsCount={statsData.activeLevelsCount}
-        activeGroupsCount={statsData.activeGroupsCount}
+        totalSubjectsCount={statsData?.totalSubjectsCount ?? 0}
+        isLoading={isLoading}
       />
 
       {/* Filters & Action Bar */}
@@ -68,14 +63,6 @@ export function SubjectListView() {
         searchQuery={searchQuery}
         onSearchChange={(query) => {
           setSearchParams({ query, page: 1 })
-        }}
-        selectedLevel={selectedLevel}
-        onLevelChange={(level) => {
-          setSearchParams({ level, page: 1 })
-        }}
-        selectedGroup={selectedGroup}
-        onGroupChange={(group) => {
-          setSearchParams({ group, page: 1 })
         }}
         selectedAcademicClassId={selectedAcademicClassId}
         onAcademicClassChange={(academicClassId) => {
@@ -86,9 +73,8 @@ export function SubjectListView() {
         onSortChange={(sort) => {
           setSearchParams({ sort: sort as any, page: 1 })
         }}
-        selectedLimit={limit}
-        onLimitChange={(newLimit) => {
-          setSearchParams({ limit: newLimit, page: 1 })
+        onResetAll={() => {
+          setSearchParams({ limit: 5, page: 1 })
         }}
       />
 
@@ -104,6 +90,7 @@ export function SubjectListView() {
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
+        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
     </div>
   )

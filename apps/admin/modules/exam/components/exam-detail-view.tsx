@@ -114,7 +114,7 @@ function SubjectMcqSection({
                   </span>
                   {item.chapter && (
                     <span className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-semibold">
-                      {item.chapter.nameBn || item.chapter.name}
+                      {item.chapter.name}
                     </span>
                   )}
                   <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold uppercase border border-blue-100">
@@ -549,17 +549,7 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
                   <span className="font-bold text-sm text-on-surface">
                     {es.subject?.name}
                   </span>
-                  {es.subject?.nameBn && (
-                    <span className="font-bengali text-xs text-on-surface-variant font-medium">
-                      {es.subject.nameBn}
-                    </span>
-                  )}
                 </div>
-                {es.subject?.level && (
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold">
-                    {es.subject.level}
-                  </Badge>
-                )}
               </div>
             ))}
           </div>
@@ -601,7 +591,6 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
                 key={es.id}
                 subjectId={es.subjectId}
                 subjectName={es.subject?.name ?? "Subject"}
-                subjectNameBn={es.subject?.nameBn}
                 assignedMcqIds={es.mcqIds ?? []}
               />
             ))}

@@ -163,9 +163,6 @@ export const safeExamSelect = {
         select: {
           id: true,
           name: true,
-          nameBn: true,
-          level: true,
-          group: true,
         },
       },
     },

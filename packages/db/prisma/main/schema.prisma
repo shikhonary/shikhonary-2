@@ -142,7 +142,6 @@ model AcademicClassSubject {
 model Chapter {
   id       String @id @default(uuid())
   name     String
-  nameBn   String
   position Int    @default(0)
 
   subjectId String

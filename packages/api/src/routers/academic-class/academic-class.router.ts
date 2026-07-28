@@ -7,7 +7,12 @@
  * All procedures are protected (require an authenticated session).
  */
 import { db } from "@workspace/db/main"
-import { createTRPCRouter, protectedProcedure } from "../../trpc"
+import {
+  adminProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+  teacherProcedure,
+} from "../../trpc"
 import {
   academicClassForSelectionSchema,
   createAcademicClassSchema,
@@ -30,19 +35,19 @@ export const academicClassRouter = createTRPCRouter({
   /**
    * Fetch summary statistics for academic classes (total count, active levels count).
    */
-  stats: protectedProcedure.query(() => getAcademicClassStats(db)),
+  stats: teacherProcedure.query(() => getAcademicClassStats(db)),
 
   /**
    * List academic classes with pagination, level filtering, and search query.
    */
-  list: protectedProcedure
+  list: teacherProcedure
     .input(listAcademicClassesSchema)
     .query(({ input }) => listAcademicClasses(db, input)),
 
   /**
    * Fetch a single academic class by id.
    */
-  byId: protectedProcedure
+  byId: teacherProcedure
     .input(getAcademicClassSchema)
     .query(({ input }) => getAcademicClassById(db, input)),
 
@@ -56,21 +61,21 @@ export const academicClassRouter = createTRPCRouter({
   /**
    * Create a new academic class record.
    */
-  create: protectedProcedure
+  create: adminProcedure
     .input(createAcademicClassSchema)
     .mutation(({ input }) => createAcademicClass(db, input)),
 
   /**
    * Update an existing academic class.
    */
-  update: protectedProcedure
+  update: adminProcedure
     .input(updateAcademicClassSchema)
     .mutation(({ input }) => updateAcademicClass(db, input)),
 
   /**
    * Permanently delete an academic class record.
    */
-  delete: protectedProcedure
+  delete: adminProcedure
     .input(deleteAcademicClassSchema)
     .mutation(({ input }) => deleteAcademicClass(db, input)),
 })

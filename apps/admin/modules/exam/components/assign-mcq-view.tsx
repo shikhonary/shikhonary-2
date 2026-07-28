@@ -278,13 +278,13 @@ function SubjectMcqSection({
 
                         {/* Subject Badge */}
                         <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                          {item.subject?.nameBn || item.subject?.name || subjectName}
+                          {item.subject?.name || subjectName}
                         </span>
 
                         {/* Chapter Badge */}
                         {item.chapter && (
                           <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                            {item.chapter.nameBn || item.chapter.name}
+                            {item.chapter.name}
                           </span>
                         )}
 
@@ -636,7 +636,6 @@ export function AssignMcqView({ examId }: AssignMcqViewProps) {
               examSubjectId={es.id}
               subjectId={es.subjectId}
               subjectName={es.subject?.name ?? "Subject"}
-              subjectNameBn={es.subject?.nameBn}
               academicClassId={exam.academicClassId}
               assignedMcqIds={es.mcqIds ?? []}
             />

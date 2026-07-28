@@ -289,3 +289,70 @@ export const studentProcedure = protectedProcedure.use(({ ctx, next }) => {
     },
   })
 })
+
+/**
+ * Admin procedure — requires a valid session with the ADMIN or SUPER_ADMIN role
+ * and injects the main Prisma database client.
+ * ctx: { headers, session, roles, db }
+ */
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  const hasAdminRole = ctx.roles.some(
+    (r) =>
+      r.name === ROLES.SUPER_ADMIN ||
+      r.name === ROLES.ADMIN ||
+      r.name?.toUpperCase() === "SUPER_ADMIN" ||
+      r.name?.toUpperCase() === "ADMIN" ||
+      r.name === "Admin" ||
+      r.name === "Super Admin",
+  )
+
+  if (!hasAdminRole) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You must have an Admin or Super Admin role to perform this action.",
+    })
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      /** Main Prisma client — connected to the primary/management database. */
+      db: db as PrismaClient,
+    },
+  })
+})
+
+/**
+ * Teacher procedure — requires a valid session with the TEACHER, ADMIN, or SUPER_ADMIN role
+ * and injects the main Prisma database client.
+ * ctx: { headers, session, roles, db }
+ */
+export const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
+  const hasTeacherRole = ctx.roles.some(
+    (r) =>
+      r.name === ROLES.SUPER_ADMIN ||
+      r.name === ROLES.ADMIN ||
+      r.name === ROLES.TEACHER ||
+      r.name?.toUpperCase() === "SUPER_ADMIN" ||
+      r.name?.toUpperCase() === "ADMIN" ||
+      r.name?.toUpperCase() === "TEACHER" ||
+      r.name === "Admin" ||
+      r.name === "Teacher" ||
+      r.name === "Super Admin",
+  )
+
+  if (!hasTeacherRole) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You must have a Teacher, Admin, or Super Admin role to perform this action.",
+    })
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      /** Main Prisma client — connected to the primary/management database. */
+      db: db as PrismaClient,
+    },
+  })
+})

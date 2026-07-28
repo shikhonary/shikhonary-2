@@ -230,9 +230,16 @@ function EditableField({
             <span className="flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed">
               <RenderMath text={value || placeholder} isMath={isMath} />
             </span>
-            <span className="opacity-0 group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 px-2 py-0.5 rounded-full select-none">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsEditing(true)
+              }}
+              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 hover:bg-primary/20 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden animate-fade-in"
+            >
               Edit
-            </span>
+            </button>
           </div>
         </div>
       )}
@@ -968,7 +975,7 @@ export function ImportMcqView() {
           type="button"
           variant="outline"
           onClick={() => setShowSample(!showSample)}
-          className="inline-flex items-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
+          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
         >
           <span className="material-symbols-outlined text-lg">code</span>
           <span>{showSample ? "Hide Template" : "View Sample JSON"}</span>
@@ -977,8 +984,8 @@ export function ImportMcqView() {
 
       {/* Sample JSON Template Card */}
       {showSample && (
-        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-6">
-          <div className="flex items-center justify-between mb-3">
+        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-4 sm:p-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
             <h4 className="font-headline-md text-base font-bold text-primary flex items-center gap-2">
               <span className="material-symbols-outlined">description</span>
               Expected JSON Structure
@@ -988,12 +995,12 @@ export function ImportMcqView() {
               size="xs"
               variant="outline"
               onClick={handleCopyTemplate}
-              className="font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+              className="w-full sm:w-auto font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer justify-center"
             >
               Copy Template
             </Button>
           </div>
-          <pre className="overflow-x-auto rounded-lg bg-surface-container-lowest p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
+          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-lg bg-surface-container-lowest p-3 sm:p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
             {sampleJsonTemplate}
           </pre>
         </Card>
@@ -1049,8 +1056,8 @@ export function ImportMcqView() {
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
                   {subjects.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id} textValue={`${sub.nameBn} (${sub.name})`}>
-                      {`${sub.nameBn} (${sub.name})`}
+                    <SelectItem key={sub.id} value={sub.id} textValue={sub.name}>
+                      {sub.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1078,8 +1085,8 @@ export function ImportMcqView() {
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
                   {chapters.map((ch) => (
-                    <SelectItem key={ch.id} value={ch.id} textValue={`${ch.nameBn} (${ch.name})`}>
-                      {`${ch.nameBn} (${ch.name})`}
+                    <SelectItem key={ch.id} value={ch.id} textValue={ch.name}>
+                      {ch.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1145,7 +1152,7 @@ export function ImportMcqView() {
           {/* Validation Status / Diagnostics */}
           {parseError && (
             <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-xl">error</span>
                   <p className="font-bold text-sm">JSON Parsing Diagnostic Error</p>
@@ -1154,7 +1161,7 @@ export function ImportMcqView() {
                   type="button"
                   size="xs"
                   onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs"
+                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
                 >
                   <Wand2Icon className="size-3.5 mr-1" />
                   Auto-Fix JSON Syntax
@@ -1199,7 +1206,7 @@ export function ImportMcqView() {
           )}
 
           {!parseError && parsedItems.length > 0 && (
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-xl text-emerald-600">check_circle</span>
                 <div>
@@ -1214,7 +1221,7 @@ export function ImportMcqView() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0"
+                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
               >
                 <PlusIcon className="size-3.5 mr-1" />
                 Add Question Card
@@ -1225,7 +1232,7 @@ export function ImportMcqView() {
           {/* Parsed Items Card-based MCQ Preview */}
           {parsedItems.length > 0 && (
             <div className="border-t border-outline-variant/30 pt-6 space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">view_carousel</span>
@@ -1233,18 +1240,16 @@ export function ImportMcqView() {
                   </h4>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddNewQuestionCard}
-                    className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
-                  >
-                    <PlusIcon className="size-3.5 mr-1" />
-                    Add Question
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddNewQuestionCard}
+                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center"
+                >
+                  <PlusIcon className="size-3.5 mr-1" />
+                  Add Question
+                </Button>
               </div>
 
               {/* Grid of MCQ Preview Cards */}
@@ -1264,12 +1269,12 @@ export function ImportMcqView() {
           )}
 
           {/* Submit Actions */}
-          <div className="flex items-center justify-between border-t border-outline-variant pt-6">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.push("/mcqs")}
-              className="rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
+              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
             >
               Cancel
             </Button>
@@ -1277,7 +1282,7 @@ export function ImportMcqView() {
               type="button"
               disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
               onClick={handleImport}
-              className="flex items-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
             >
               {importMutation.isPending ? (
                 <span className="material-symbols-outlined animate-spin text-lg">

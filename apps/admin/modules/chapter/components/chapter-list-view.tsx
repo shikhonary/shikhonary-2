@@ -1,7 +1,9 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { useChaptersList, useChapterStats } from "../services/use-chapter"
 import { useSubjectsForSelection } from "@/modules/subject/services/use-subject"
+import { useAcademicClassesForSelection } from "@/modules/academic-class/services/use-academic-class"
 import { useDeleteChapterModalStore } from "../store/use-delete-chapter-modal-store"
 import { ChapterListHeader } from "./chapter-list-header"
 import { ChapterStatsCards } from "./chapter-stats-cards"
@@ -23,6 +25,25 @@ export function ChapterListView() {
   ] = useChapterSearchParams()
 
   const openDeleteModal = useDeleteChapterModalStore((state) => state.openModal)
+  const [selectedClassId, setSelectedClassId] = useState<string>("All")
+
+  // Query academic classes for selection
+  const { data: academicClasses = [] } = useAcademicClassesForSelection(true)
+
+  // Query subjects list for dropdown filter, filtered by academic class if selected
+  const { data: subjects = [] } = useSubjectsForSelection(
+    selectedClassId !== "All" && selectedClassId ? { academicClassId: selectedClassId } : undefined
+  )
+
+  // Reset selected subject ID if it's no longer in the filtered subjects list
+  useEffect(() => {
+    if (selectedSubjectId !== "All" && subjects.length > 0) {
+      const isStillAvailable = subjects.some((sub) => sub.id === selectedSubjectId)
+      if (!isStillAvailable) {
+        setSearchParams({ subjectId: "All", page: 1 })
+      }
+    }
+  }, [subjects, selectedSubjectId, setSearchParams])
 
   // Query chapters list with search & filters
   const { data: chaptersData, isLoading, isError } = useChaptersList({
@@ -37,9 +58,6 @@ export function ChapterListView() {
   const { data: statsData } = useChapterStats(
     selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
   )
-
-  // Query subjects list for dropdown filter
-  const { data: subjects = [] } = useSubjectsForSelection()
 
   const items = chaptersData?.items ?? []
   const totalItems = chaptersData?.totalItems ?? items.length
@@ -65,8 +83,9 @@ export function ChapterListView() {
         subjects={subjects}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
-        selectedLimit={limit}
-        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+        selectedClassId={selectedClassId}
+        onClassChange={(classId) => setSelectedClassId(classId)}
+        academicClasses={academicClasses}
       />
 
       {/* Data Table */}
@@ -80,6 +99,7 @@ export function ChapterListView() {
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
+        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
       {/* Confirm Delete Modal */}

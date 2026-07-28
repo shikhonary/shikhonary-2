@@ -521,11 +521,6 @@ export function CreateExamView() {
                   >
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{subj.name}</span>
-                      {subj.nameBn && (
-                        <span className="text-xs font-bengali text-outline font-normal">
-                          {subj.nameBn}
-                        </span>
-                      )}
                     </div>
                     <Checkbox
                       id={`subject-check-${subj.id}`}

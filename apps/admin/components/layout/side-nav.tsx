@@ -6,6 +6,7 @@ import { authClient } from "@workspace/auth/client"
 import {
   LayoutDashboard,
   GraduationCap,
+  Shield,
   BookOpen,
   BookMarked,
   HelpCircle,
@@ -33,6 +34,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/academic-classes", label: "Classes", icon: GraduationCap },
+  { href: "/roles", label: "Roles", icon: Shield },
   { href: "/subjects", label: "Subjects", icon: BookOpen },
   { href: "/chapters", label: "Chapters", icon: BookMarked },
   { href: "/mcqs", label: "MCQs", icon: HelpCircle },

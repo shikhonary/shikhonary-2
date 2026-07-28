@@ -3,7 +3,6 @@ import { create } from "zustand"
 export interface ChapterItemData {
   id: string
   name: string
-  nameBn: string
   position: number
   subjectId: string
 }

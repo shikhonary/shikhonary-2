@@ -80,11 +80,12 @@ export function McqListView() {
 
       {/* Stats Cards */}
       <McqStatsCards
-        totalCount={statsData.totalCount}
-        activeCount={statsData.activeCount}
-        inactiveCount={statsData.inactiveCount}
-        mathCount={statsData.mathCount}
-        typeCounts={statsData.typeCounts}
+        totalCount={statsData?.totalCount}
+        activeCount={statsData?.activeCount}
+        inactiveCount={statsData?.inactiveCount}
+        mathCount={statsData?.mathCount}
+        typeCounts={statsData?.typeCounts}
+        isLoading={isLoading}
       />
 
       {/* Filters */}
@@ -105,8 +106,6 @@ export function McqListView() {
         onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
-        selectedLimit={limit}
-        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
       {/* Data Table */}
@@ -121,6 +120,7 @@ export function McqListView() {
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
+        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
       {/* Confirm Delete Modal */}

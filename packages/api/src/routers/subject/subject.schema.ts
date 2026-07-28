@@ -22,8 +22,6 @@ export const subjectSortEnum = z.enum([
 export type SubjectSortOption = z.infer<typeof subjectSortEnum>
 
 export const listSubjectsSchema = paginationSchema.extend({
-  level: z.string().optional(),
-  group: z.string().optional(),
   academicClassId: z.string().optional(),
   query: z.string().optional(),
   sort: subjectSortEnum.optional(),
@@ -37,8 +35,6 @@ export const getSubjectSchema = idSchema
 export type GetSubjectInput = z.infer<typeof getSubjectSchema>
 
 export const subjectForSelectionSchema = z.object({
-  level: z.string().optional(),
-  group: z.string().optional(),
   academicClassId: z.string().optional(),
 })
 
@@ -51,10 +47,7 @@ export type SubjectForSelectionInput = z.infer<
 // ---------------------------------------------------------------------------
 
 export const createSubjectSchema = z.object({
-  name: z.string().min(1, "English name is required"),
-  nameBn: z.string().min(1, "Bangla name is required"),
-  level: z.string().min(1, "Level is required"),
-  group: z.string().nullable().optional(),
+  name: z.string().min(1, "Name is required"),
   position: z.number().int().default(0),
   academicClassIds: z.array(z.string()).optional(),
 })
@@ -64,9 +57,6 @@ export type CreateSubjectInput = z.infer<typeof createSubjectSchema>
 export const updateSubjectSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).optional(),
-  nameBn: z.string().min(1).optional(),
-  level: z.string().min(1).optional(),
-  group: z.string().nullable().optional(),
   position: z.number().int().optional(),
   academicClassIds: z.array(z.string()).optional(),
 })
@@ -93,9 +83,6 @@ export type AssignAcademicClassesInput = z.infer<
 export const safeSubjectSelect = {
   id: true,
   name: true,
-  nameBn: true,
-  level: true,
-  group: true,
   position: true,
   createdAt: true,
   updatedAt: true,

@@ -12,13 +12,11 @@ import {
 interface SubjectOption {
   id: string
   name: string
-  nameBn: string
 }
 
 interface ChapterOption {
   id: string
   name: string
-  nameBn: string
   subjectId: string
 }
 

@@ -8,6 +8,13 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import "katex/dist/katex.min.css"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
 
 export interface McqItem {
   id: string
@@ -53,6 +60,7 @@ interface McqTableProps {
   totalItems: number
   totalPages: number
   onPageChange: (page: number) => void
+  onLimitChange?: (limit: number) => void
 }
 
 export function McqTable({
@@ -66,7 +74,10 @@ export function McqTable({
   totalItems,
   totalPages,
   onPageChange,
+  onLimitChange,
 }: McqTableProps) {
+  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
+  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const toggleActiveMutation = useToggleMcqActive()
 
@@ -400,34 +411,64 @@ export function McqTable({
       {/* Pagination Footer */}
       {!isLoading && !isError && totalItems > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <p className="font-label-sm text-xs text-outline">
-            Showing <span className="font-bold text-on-surface">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
-            <span className="font-bold text-on-surface">{Math.min(currentPage * itemsPerPage, totalItems)}</span> of{" "}
-            <span className="font-bold text-on-surface">{totalItems.toLocaleString()}</span> results
-          </p>
+          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
+              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> questions
+            </p>
+            {onLimitChange && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-outline font-medium">Rows per page:</span>
+                <Select
+                  value={String(itemsPerPage)}
+                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
+                >
+                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1">
+                    <SelectValue placeholder="Per Page" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg min-w-[80px]">
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(currentPage - 1)}
-              className="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg bg-white hover:bg-surface-container-high transition-colors disabled:opacity-30 cursor-pointer"
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage === 1}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30"
             >
-              <span className="material-symbols-outlined text-lg">chevron_left</span>
-            </button>
-
-            <span className="font-label-sm text-xs font-bold text-on-surface px-3">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <button
-              type="button"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(currentPage + 1)}
-              className="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg bg-white hover:bg-surface-container-high transition-colors disabled:opacity-30 cursor-pointer"
+              <span className="material-symbols-outlined text-sm sm:text-base">chevron_left</span>
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <Button
+                key={pageNum}
+                variant={currentPage === pageNum ? "default" : "ghost"}
+                onClick={() => onPageChange(pageNum)}
+                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors ${
+                  currentPage === pageNum
+                    ? "bg-primary font-bold text-on-primary hover:bg-primary"
+                    : "hover:bg-surface-container-high text-on-surface"
+                }`}
+              >
+                {pageNum}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30"
             >
-              <span className="material-symbols-outlined text-lg">chevron_right</span>
-            </button>
+              <span className="material-symbols-outlined text-sm sm:text-base">chevron_right</span>
+            </Button>
           </div>
         </div>
       )}

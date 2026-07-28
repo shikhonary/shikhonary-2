@@ -26,8 +26,6 @@ export async function listSubjects(
   input: ListSubjectsInput,
 ) {
   const where = {
-    ...(input.level ? { level: input.level } : {}),
-    ...(input.group ? { group: input.group } : {}),
     ...(input.academicClassId
       ? {
           academicClasses: {
@@ -41,7 +39,6 @@ export async function listSubjects(
       ? {
           OR: [
             { name: { contains: input.query, mode: "insensitive" as const } },
-            { nameBn: { contains: input.query, mode: "insensitive" as const } },
           ],
         }
       : {}),
@@ -101,20 +98,12 @@ export async function listSubjects(
 }
 
 export async function getSubjectStats(db: PrismaClient) {
-  const [totalSubjectsCount, levelsGroup, groupsGroup] = await Promise.all([
-    db.subject.count(),
-    db.subject.groupBy({
-      by: ["level"],
-    }),
-    db.subject.groupBy({
-      by: ["group"],
-    }),
-  ])
+  const totalSubjectsCount = await db.subject.count()
 
   return {
     totalSubjectsCount,
-    activeLevelsCount: levelsGroup.length,
-    activeGroupsCount: groupsGroup.filter((g) => g.group !== null).length,
+    activeLevelsCount: 0,
+    activeGroupsCount: 0,
   }
 }
 
@@ -137,8 +126,6 @@ export async function getSubjectsForSelection(
 ) {
   return db.subject.findMany({
     where: {
-      ...(input.level ? { level: input.level } : {}),
-      ...(input.group ? { group: input.group } : {}),
       ...(input.academicClassId
         ? {
             academicClasses: {
@@ -152,9 +139,6 @@ export async function getSubjectsForSelection(
     select: {
       id: true,
       name: true,
-      nameBn: true,
-      level: true,
-      group: true,
       position: true,
     },
     orderBy: { position: "asc" },

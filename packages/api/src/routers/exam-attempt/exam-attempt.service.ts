@@ -205,7 +205,6 @@ export async function listAvailableExams(
               select: {
                 id: true,
                 name: true,
-                nameBn: true,
               },
             },
           },
@@ -358,10 +357,10 @@ export async function getExamForAttempt(
       context: true,
       contextUrl: true,
       subject: {
-        select: { id: true, name: true, nameBn: true },
+        select: { id: true, name: true },
       },
       chapter: {
-        select: { id: true, name: true, nameBn: true },
+        select: { id: true, name: true },
       },
     },
   })

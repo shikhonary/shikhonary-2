@@ -2,13 +2,29 @@
 
 import { Input } from "@workspace/ui/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@workspace/ui/components/drawer"
+import { X, RotateCcw, SlidersHorizontal, ArrowUpDown, BookOpen, ListOrdered, GraduationCap } from "lucide-react"
 
 interface SubjectOption {
   id: string
   name: string
-  nameBn: string
-  level?: string
-  group?: string | null
+}
+
+interface AcademicClassOption {
+  id: string
+  name: string
+  isActive?: boolean
 }
 
 interface ChapterFiltersProps {
@@ -19,8 +35,10 @@ interface ChapterFiltersProps {
   subjects?: SubjectOption[]
   selectedSort: string
   onSortChange: (value: string) => void
-  selectedLimit: number
-  onLimitChange: (value: number) => void
+  selectedClassId: string
+  onClassChange: (value: string) => void
+  academicClasses?: AcademicClassOption[]
+  onResetAll?: () => void
 }
 
 export function ChapterFilters({
@@ -31,16 +49,144 @@ export function ChapterFilters({
   subjects = [],
   selectedSort,
   onSortChange,
-  selectedLimit,
-  onLimitChange,
+  selectedClassId,
+  onClassChange,
+  academicClasses = [],
+  onResetAll,
 }: ChapterFiltersProps) {
+  const hasActiveQuery = Boolean(searchQuery && searchQuery.trim() !== "")
+  const hasActiveSubject = Boolean(selectedSubjectId && selectedSubjectId !== "All")
+  const hasActiveSort = Boolean(selectedSort && selectedSort !== "All")
+  const hasActiveAcademicClass = Boolean(selectedClassId && selectedClassId !== "All")
+  const hasAnyFilter = hasActiveQuery || hasActiveSubject || hasActiveSort || hasActiveAcademicClass
+
+  const activeFilterCount =
+    (hasActiveSubject ? 1 : 0) +
+    (hasActiveSort ? 1 : 0) +
+    (hasActiveAcademicClass ? 1 : 0)
+
+  const handleResetAll = () => {
+    onSearchChange("")
+    onSubjectChange("All")
+    onSortChange("All")
+    onClassChange("All")
+    if (onResetAll) onResetAll()
+  }
+
+  const getSortLabel = (sort: string) => {
+    switch (sort) {
+      case "position_asc":
+        return "Position (Low to High)"
+      case "position_desc":
+        return "Position (High to Low)"
+      case "name_asc":
+        return "Name (A to Z)"
+      case "name_desc":
+        return "Name (Z to A)"
+      case "newest":
+        return "Newest Added"
+      case "oldest":
+        return "Oldest Added"
+      default:
+        return "Default Order"
+    }
+  }
+
+  const renderSelectFilters = (isMobile = false) => (
+    <>
+      {/* Academic Class Filter */}
+      {academicClasses.length > 0 && (
+        <div className={isMobile ? "space-y-1.5" : "min-w-[180px]"}>
+          {isMobile && (
+            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              <GraduationCap className="h-3.5 w-3.5 text-primary" />
+              Academic Class
+            </label>
+          )}
+          <Select
+            value={selectedClassId}
+            onValueChange={(val) => onClassChange(val ?? "All")}
+          >
+            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+              <SelectValue placeholder="All Classes" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+              <SelectItem value="All">All Classes</SelectItem>
+              {academicClasses.map((ac) => (
+                <SelectItem key={ac.id} value={ac.id}>
+                  {ac.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Subject Filter */}
+      {subjects.length > 0 && (
+        <div className={isMobile ? "space-y-1.5" : "min-w-[180px]"}>
+          {isMobile && (
+            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5 text-primary" />
+              Parent Subject
+            </label>
+          )}
+          <Select
+            value={selectedSubjectId}
+            onValueChange={(val) => onSubjectChange(val ?? "All")}
+          >
+            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+              <SelectValue placeholder="All Subjects" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+              <SelectItem value="All">All Subjects</SelectItem>
+              {subjects.map((sub) => (
+                <SelectItem key={sub.id} value={sub.id}>
+                  {sub.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Sort Select */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[180px]"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
+            Sort Order
+          </label>
+        )}
+        <Select
+          value={selectedSort}
+          onValueChange={(val) => onSortChange(val ?? "All")}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+            <SelectValue placeholder="All Sorts" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+            <SelectItem value="All">Default Order</SelectItem>
+            <SelectItem value="position_asc">Position (Low to High)</SelectItem>
+            <SelectItem value="position_desc">Position (High to Low)</SelectItem>
+            <SelectItem value="name_asc">Name (A to Z)</SelectItem>
+            <SelectItem value="name_desc">Name (Z to A)</SelectItem>
+            <SelectItem value="newest">Newest Added</SelectItem>
+            <SelectItem value="oldest">Oldest Added</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  )
+
   return (
-    <div className="mb-6 flex flex-col items-center gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 md:flex-row">
-      <div className="flex w-full flex-1 flex-wrap items-center gap-4">
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+    <div className="mb-6 space-y-3">
+      {/* Primary Filter Toolbar */}
+      <div className="flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-3 sm:p-4">
+        {/* Search Input Filter */}
+        <div className="relative flex-1 min-w-0">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">
-            search
+            filter_list
           </span>
           <Input
             type="text"
@@ -51,69 +197,164 @@ export function ChapterFilters({
           />
         </div>
 
-        {/* Subject Filter */}
-        <div className="min-w-[220px]">
-          <Select
-            value={selectedSubjectId}
-            onValueChange={(val) => onSubjectChange(val ?? "All")}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-              <SelectValue placeholder="All Subjects" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-              <SelectItem value="All" label="All Subjects">All Subjects</SelectItem>
-              {subjects.map((sub) => (
-                <SelectItem
-                  key={sub.id}
-                  value={sub.id}
-                  label={`${sub.name} (${sub.nameBn})`}
-                >
-                  {sub.name} ({sub.nameBn})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Mobile Filter Drawer Button */}
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button
+              variant="outline"
+              className="md:hidden flex items-center gap-2 h-10 px-3.5 bg-white border-outline-variant/40 text-sm font-medium shrink-0 rounded-lg cursor-pointer"
+              type="button"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-primary" />
+              {activeFilterCount > 0 && (
+                <span className="flex size-5 items-center justify-center rounded-full bg-primary text-white text-[11px] font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </DrawerTrigger>
 
-        {/* Sort Select */}
-        <div className="min-w-[170px]">
-          <Select
-            value={selectedSort}
-            onValueChange={(val) => onSortChange(val ?? "All")}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-              <SelectValue placeholder="All Sorts" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-              <SelectItem value="All" label="Default Order">Default Order</SelectItem>
-              <SelectItem value="position_asc" label="Position (Low to High)">Position (Low to High)</SelectItem>
-              <SelectItem value="position_desc" label="Position (High to Low)">Position (High to Low)</SelectItem>
-              <SelectItem value="name_asc" label="Name (A to Z)">Name (A to Z)</SelectItem>
-              <SelectItem value="name_desc" label="Name (Z to A)">Name (Z to A)</SelectItem>
-              <SelectItem value="newest" label="Newest Added">Newest Added</SelectItem>
-              <SelectItem value="oldest" label="Oldest Added">Oldest Added</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <DrawerContent className="p-6 space-y-5 bg-white border-t border-outline-variant/40">
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle className="text-base font-bold text-on-surface flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5 text-primary" />
+                Filter Chapters
+              </DrawerTitle>
+              <DrawerDescription className="text-xs text-on-surface-variant">
+                Select subject, sorting, and page size options to refine chapter records.
+              </DrawerDescription>
+            </DrawerHeader>
 
-        {/* Limit Select */}
-        <div className="min-w-[130px]">
-          <Select
-            value={String(selectedLimit)}
-            onValueChange={(val) => onLimitChange(Number(val) || 10)}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-              <SelectValue placeholder="Items Per Page" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-              <SelectItem value="5" label="5 per page">5 per page</SelectItem>
-              <SelectItem value="10" label="10 per page">10 per page</SelectItem>
-              <SelectItem value="20" label="20 per page">20 per page</SelectItem>
-              <SelectItem value="50" label="50 per page">50 per page</SelectItem>
-            </SelectContent>
-          </Select>
+            {/* Stacked Filter Selects */}
+            <div className="space-y-4 pt-1">
+              {renderSelectFilters(true)}
+            </div>
+
+            <DrawerFooter className="p-0 pt-3 flex flex-row items-center gap-3">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={handleResetAll}
+                className="flex-1 h-10 text-xs font-bold border-outline-variant/40 cursor-pointer"
+              >
+                <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                Reset
+              </Button>
+              <DrawerClose asChild>
+                <Button className="flex-1 h-10 text-xs font-bold bg-primary text-white cursor-pointer" type="button">
+                  Apply Filters
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+
+        {/* Desktop Filter Selects */}
+        <div className="hidden md:flex items-center gap-3">
+          {renderSelectFilters(false)}
         </div>
       </div>
+
+      {/* Active Filter Badges & Reset Row */}
+      {hasAnyFilter && (
+        <div className="flex flex-col gap-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:bg-transparent sm:border-0 sm:p-0 sm:px-1">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="font-semibold text-outline text-[11px] sm:text-xs uppercase tracking-wider">
+              Active Filters:
+            </span>
+
+            {/* Search Query Badge */}
+            {hasActiveQuery && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal max-w-[200px] truncate"
+              >
+                <span className="truncate">Search: &quot;{searchQuery}&quot;</span>
+                <button
+                  type="button"
+                  onClick={() => onSearchChange("")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove search filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {/* Academic Class Filter Badge */}
+            {hasActiveAcademicClass && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
+              >
+                <span>Class: {academicClasses.find(c => c.id === selectedClassId)?.name || selectedClassId}</span>
+                <button
+                  type="button"
+                  onClick={() => onClassChange("All")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove class filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {/* Subject Filter Badge */}
+            {hasActiveSubject && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
+              >
+                <span>Subject: {subjects.find(s => s.id === selectedSubjectId)?.name || selectedSubjectId}</span>
+                <button
+                  type="button"
+                  onClick={() => onSubjectChange("All")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove subject filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {/* Sort Filter Badge */}
+            {hasActiveSort && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
+              >
+                <span>Sort: {getSortLabel(selectedSort)}</span>
+                <button
+                  type="button"
+                  onClick={() => onSortChange("All")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove sort filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+          </div>
+
+          {/* Reset All Badge */}
+          <div className="flex justify-end border-t border-outline-variant/20 pt-2 sm:border-0 sm:pt-0">
+            <button
+              type="button"
+              onClick={handleResetAll}
+              className="cursor-pointer focus:outline-hidden"
+              title="Reset all active filters"
+            >
+              <Badge
+                variant="outline"
+                className="inline-flex items-center gap-1 rounded-md border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] sm:text-xs font-bold text-primary hover:bg-primary/20 transition-colors normal-case tracking-normal"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset All</span>
+              </Badge>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

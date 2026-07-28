@@ -32,7 +32,6 @@ export async function listChapters(
       ? {
           OR: [
             { name: { contains: input.query, mode: "insensitive" as const } },
-            { nameBn: { contains: input.query, mode: "insensitive" as const } },
           ],
         }
       : {}),
@@ -135,7 +134,6 @@ export async function getChaptersForSelection(
     select: {
       id: true,
       name: true,
-      nameBn: true,
       position: true,
       subjectId: true,
     },
