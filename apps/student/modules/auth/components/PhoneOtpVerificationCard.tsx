@@ -1,4 +1,5 @@
 import React from 'react';
+import { Smartphone, CheckCircle2, AlertCircle, Loader2, Hourglass, Send, ArrowRight } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import {
   InputOTP,
@@ -35,31 +36,31 @@ export default function PhoneOtpVerificationCard({
   error,
   countdown,
   formatTime,
-  title = "ফোন নম্বর ভেরিফাই করুন",
+  title = "Verify Phone Number",
   description,
-  backText = "&larr; পেছনে ফিরে যান",
-  verifyText = "ভেরিফাই করুন",
+  backText = "← Go Back",
+  verifyText = "Verify",
   onVerify,
   onResend,
   onBack,
 }: PhoneOtpVerificationCardProps) {
   return (
-    <div>
+    <div className="w-full">
       <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-          <span className="material-symbols-outlined text-[32px] text-primary">sms</span>
+        <div className="w-16 h-16 bg-[#c52828]/10 rounded-full flex items-center justify-center mb-6">
+          <Smartphone className="w-8 h-8 text-[#c52828]" />
         </div>
-        <h1 className="font-headline-md text-headline-md text-on-surface text-center mb-2">
+        <h1 className="text-2xl font-extrabold text-slate-900 text-center mb-3">
           {title}
         </h1>
-        <p className="font-body-md text-on-surface-variant text-center">
+        <p className="text-sm text-slate-500 text-center leading-relaxed">
           {description ? (
             description
           ) : (
             <>
-              আমরা এসএমএসের মাধ্যমে ৬ ডিজিটের একটি ওটিপি (OTP) পাঠিয়েছি: <br />
-              <span className="font-bold text-primary">{phoneNumber}</span>. <br />
-              রেজিস্ট্রেশন সম্পন্ন করতে নিচের কোডটি প্রবেশ করান।
+              We sent a 6-digit OTP code via SMS to: <br />
+              <span className="font-bold text-[#c52828] select-all">{phoneNumber}</span>. <br />
+              Enter the code below to complete registration.
             </>
           )}
         </p>
@@ -67,16 +68,16 @@ export default function PhoneOtpVerificationCard({
 
       {/* Resend Success Banner */}
       {resendSuccess && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">check_circle</span>
-          <span>আপনার ফোনে একটি নতুন ওটিপি (OTP) কোড পাঠানো হয়েছে।</span>
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3.5 text-xs text-emerald-800">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+          <span>A new OTP code has been sent to your phone.</span>
         </div>
       )}
 
       {/* Error Banner */}
       {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">error</span>
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800">
+          <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -91,8 +92,8 @@ export default function PhoneOtpVerificationCard({
         className="space-y-6"
       >
         <div className="space-y-3">
-          <label htmlFor="otpCode" className="block text-label-sm font-medium text-on-surface-variant text-center">
-            ভেরিফিকেশন কোড
+          <label htmlFor="otpCode" className="block text-xs font-semibold text-slate-400 tracking-wider text-center uppercase">
+            Verification Code
           </label>
           <div className="flex justify-center">
             <InputOTP
@@ -114,7 +115,7 @@ export default function PhoneOtpVerificationCard({
                   <InputOTPSlot
                     key={index}
                     index={index}
-                    className="w-11 h-14 sm:w-12 sm:h-14 text-2xl font-bold rounded-lg border border-outline-variant bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+                    className="w-11 h-14 sm:w-12 sm:h-14 text-2xl font-bold rounded-xl border border-slate-200 bg-white focus:border-[#c52828] focus:ring-2 focus:ring-[#c52828]/15 transition-all text-slate-800"
                   />
                 ))}
               </InputOTPGroup>
@@ -123,56 +124,56 @@ export default function PhoneOtpVerificationCard({
         </div>
 
         {/* Primary Action Button (Verify / Continue) */}
-        <Button
+        <button
           type="submit"
           disabled={loading || resending || otpCode.length < 6}
-          className="w-full h-14 bg-primary-container !text-white font-headline-md text-[18px] rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#d32f2f] to-[#b71c1c] hover:from-[#c62828] hover:to-[#a71919] text-white font-bold text-sm tracking-wider shadow-[0_6px_20px_rgba(197,40,40,0.35)] active:scale-[0.99] transition-all duration-200 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
-              <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
-              <span>ভেরিফাই করা হচ্ছে...</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Verifying...</span>
             </>
           ) : (
             <>
               <span>{verifyText}</span>
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              <ArrowRight className="w-4 h-4" />
             </>
           )}
-        </Button>
+        </button>
 
         {/* Resend OTP Section */}
         <div className="text-center pt-1">
           {resending ? (
-            <div className="flex items-center justify-center gap-2 text-sm text-primary">
-              <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
-              <span>ওটিপি পাঠানো হচ্ছে...</span>
+            <div className="flex items-center justify-center gap-2 text-sm text-[#c52828]">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Sending OTP...</span>
             </div>
           ) : countdown > 0 ? (
-            <div className="flex items-center justify-center gap-1.5 text-sm text-on-surface-variant">
-              <span className="material-symbols-outlined text-[18px]">hourglass_empty</span>
-              <span>{formatTime(countdown)} পর ওটিপি পুনরায় পাঠান</span>
+            <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <Hourglass className="w-4 h-4 text-slate-400 animate-pulse shrink-0" />
+              <span>Resend OTP in {formatTime(countdown)}</span>
             </div>
           ) : (
             <button
               type="button"
               onClick={onResend}
               disabled={loading || resending}
-              className="text-sm font-medium text-primary hover:underline cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1 mx-auto"
+              className="text-xs font-bold text-[#c52828] hover:underline cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 mx-auto"
             >
-              <span className="material-symbols-outlined text-[18px]">send</span>
-              <span>ওটিপি পুনরায় পাঠান</span>
+              <Send className="w-3.5 h-3.5" />
+              <span>Resend OTP</span>
             </button>
           )}
         </div>
       </form>
 
-      <div className="mt-6">
+      <div className="mt-6 border-t border-slate-100 pt-4">
         <button
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="w-full text-center text-sm font-medium text-on-surface-variant hover:text-primary transition-colors py-2 cursor-pointer disabled:opacity-50"
+          className="w-full text-center text-xs font-bold text-slate-500 hover:text-[#c52828] transition-colors py-2 cursor-pointer disabled:opacity-50"
         >
           {backText}
         </button>

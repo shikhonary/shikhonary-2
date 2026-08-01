@@ -208,17 +208,17 @@ export function McqTable({
               >
                 <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                   {/* Selection Checkbox & Main Info */}
-                  <div className="flex items-start gap-4 flex-1 min-w-0">
+                  <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
                       {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
                         {/* Global Index Badge */}
                         <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
                           #{globalIndex}

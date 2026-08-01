@@ -22,8 +22,7 @@ import {
   BookOpen,
   Bookmark,
   Layers,
-  Calculator,
-  CheckCircle2,
+  Award,
   Hash,
 } from "lucide-react"
 
@@ -47,12 +46,11 @@ interface McqFiltersProps {
   selectedChapterId: string
   onChapterChange: (value: string) => void
   chapters?: ChapterOption[]
+  selectedBoard: string
+  onBoardChange: (value: string) => void
+  boardYears?: any[]
   selectedType: string
   onTypeChange: (value: string) => void
-  selectedIsMath: string
-  onIsMathChange: (value: string) => void
-  selectedIsActive: string
-  onIsActiveChange: (value: string) => void
   selectedSort: string
   onSortChange: (value: string) => void
 }
@@ -66,12 +64,11 @@ export function McqFilters({
   selectedChapterId,
   onChapterChange,
   chapters = [],
+  selectedBoard,
+  onBoardChange,
+  boardYears = [],
   selectedType,
   onTypeChange,
-  selectedIsMath,
-  onIsMathChange,
-  selectedIsActive,
-  onIsActiveChange,
   selectedSort,
   onSortChange,
 }: McqFiltersProps) {
@@ -79,38 +76,36 @@ export function McqFilters({
     ? chapters.filter((c) => c.subjectId === selectedSubjectId)
     : chapters
 
+  const isBoardDisabled = !selectedSubjectId || selectedSubjectId === "All"
+
   const hasActiveQuery = Boolean(searchQuery && searchQuery.trim() !== "")
   const hasActiveSubject = Boolean(selectedSubjectId && selectedSubjectId !== "All")
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All")
+  const hasActiveBoard = Boolean(selectedBoard && selectedBoard !== "All")
   const hasActiveType = Boolean(selectedType && selectedType !== "All")
-  const hasActiveIsMath = Boolean(selectedIsMath && selectedIsMath !== "All")
-  const hasActiveIsActive = Boolean(selectedIsActive && selectedIsActive !== "All")
   const hasActiveSort = Boolean(selectedSort && selectedSort !== "All")
 
   const hasAnyFilter =
     hasActiveQuery ||
     hasActiveSubject ||
     hasActiveChapter ||
+    hasActiveBoard ||
     hasActiveType ||
-    hasActiveIsMath ||
-    hasActiveIsActive ||
     hasActiveSort
 
   const activeFilterCount =
     (hasActiveSubject ? 1 : 0) +
     (hasActiveChapter ? 1 : 0) +
+    (hasActiveBoard ? 1 : 0) +
     (hasActiveType ? 1 : 0) +
-    (hasActiveIsMath ? 1 : 0) +
-    (hasActiveIsActive ? 1 : 0) +
     (hasActiveSort ? 1 : 0)
 
   const handleResetAll = () => {
     onSearchChange("")
     onSubjectChange("All")
     onChapterChange("All")
+    onBoardChange("All")
     onTypeChange("All")
-    onIsMathChange("All")
-    onIsActiveChange("All")
     onSortChange("All")
   }
 
@@ -186,6 +181,33 @@ export function McqFilters({
         </Select>
       </div>
 
+      {/* Board Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] flex-1 md:flex-none"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <Award className="h-3.5 w-3.5 text-primary" />
+            Board / Year
+          </label>
+        )}
+        <Select
+          value={selectedBoard}
+          onValueChange={(val) => onBoardChange(val ?? "All")}
+          disabled={isBoardDisabled}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+            <SelectValue placeholder={isBoardDisabled ? "Select Subject First" : "All Boards"} />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All">All Boards</SelectItem>
+            {boardYears.map((item: any) => (
+              <SelectItem key={item.rawRef} value={item.rawRef}>
+                🎓 {item.boardName} ২০{item.year} ({item.count})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Type Filter */}
       <div className={isMobile ? "space-y-1.5" : "min-w-[140px] flex-1 md:flex-none"}>
         {isMobile && (
@@ -210,51 +232,7 @@ export function McqFilters({
         </Select>
       </div>
 
-      {/* Math Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[130px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <Calculator className="h-3.5 w-3.5 text-primary" />
-            Math Mode
-          </label>
-        )}
-        <Select
-          value={selectedIsMath}
-          onValueChange={(val) => onIsMathChange(val ?? "All")}
-        >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Math Modes" />
-          </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-            <SelectItem value="All">All Math Modes</SelectItem>
-            <SelectItem value="true">Math / LaTeX</SelectItem>
-            <SelectItem value="false">Standard Text</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      {/* Active Status Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[130px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-            Active Status
-          </label>
-        )}
-        <Select
-          value={selectedIsActive}
-          onValueChange={(val) => onIsActiveChange(val ?? "All")}
-        >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Status" />
-          </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-            <SelectItem value="All">All Status</SelectItem>
-            <SelectItem value="true">Active Only</SelectItem>
-            <SelectItem value="false">Inactive Only</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* Sort Select */}
       <div className={isMobile ? "space-y-1.5" : "min-w-[160px] flex-1 md:flex-none"}>
@@ -424,6 +402,30 @@ export function McqFilters({
               </Badge>
             )}
 
+            {/* Board Badge */}
+            {hasActiveBoard && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
+              >
+                <span>
+                  Board:{" "}
+                  {(() => {
+                    const matched = boardYears.find((item: any) => item.rawRef === selectedBoard)
+                    return matched ? `${matched.boardName} ২০${matched.year}` : selectedBoard
+                  })()}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onBoardChange("All")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove board filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
             {/* Type Badge */}
             {hasActiveType && (
               <Badge
@@ -442,41 +444,6 @@ export function McqFilters({
               </Badge>
             )}
 
-            {/* Math Badge */}
-            {hasActiveIsMath && (
-              <Badge
-                variant="secondary"
-                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
-              >
-                <span>Math: {selectedIsMath === "true" ? "Math/LaTeX" : "Standard Text"}</span>
-                <button
-                  type="button"
-                  onClick={() => onIsMathChange("All")}
-                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
-                  title="Remove math filter"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-
-            {/* Active Status Badge */}
-            {hasActiveIsActive && (
-              <Badge
-                variant="secondary"
-                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
-              >
-                <span>Status: {selectedIsActive === "true" ? "Active Only" : "Inactive Only"}</span>
-                <button
-                  type="button"
-                  onClick={() => onIsActiveChange("All")}
-                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
-                  title="Remove status filter"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
 
             {/* Sort Badge */}
             {hasActiveSort && (

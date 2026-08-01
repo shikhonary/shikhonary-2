@@ -53,7 +53,6 @@ const navGroups: NavGroup[] = [
     groupLabel: "Assessments",
     items: [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
-      { href: "/question-bank", label: "Question Bank", icon: Library },
       { href: "/exams", label: "Exams", icon: ClipboardList },
       { href: "/exam-groups", label: "Exam Groups", icon: Layers },
     ],
@@ -84,9 +83,8 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
 
   return (
     <nav
-      className={`h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${
-        isCollapsed ? "w-20" : "w-64"
-      }`}
+      className={`h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
+        }`}
     >
       {/* Header */}
       <div className={`flex items-center gap-3 px-4 mb-4 ${isCollapsed ? "justify-center" : "justify-between"}`}>
@@ -105,8 +103,8 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
               <h1 className="font-headline-sm text-headline-sm font-extrabold text-primary leading-tight">
                 Mr. Dr.
               </h1>
-              <p className="font-caption text-caption text-on-surface-variant">
-                Clinical Excellence
+              <p className="font-caption text-on-surface-variant text-[10px]">
+                Academic & Admission Care
               </p>
             </div>
           )}
@@ -144,13 +142,11 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
                   key={item.href}
                   href={item.href}
                   title={isCollapsed ? item.label : undefined}
-                  className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${
-                    isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2 rounded-r-lg border-l-4"
-                  } ${
-                    isActive
+                  className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2 rounded-r-lg border-l-4"
+                    } ${isActive
                       ? "bg-surface-container-high text-primary rounded-r-lg font-bold border-primary"
                       : "text-on-surface-variant hover:bg-surface-variant border-transparent"
-                  }`}
+                    }`}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   {!isCollapsed && (
@@ -177,9 +173,8 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
         <button
           onClick={handleSignOut}
           title={isCollapsed ? "Logout" : undefined}
-          className={`flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 transition-all duration-200 ease-in-out cursor-pointer ${
-            isCollapsed ? "justify-center px-2" : "px-3"
-          }`}
+          className={`flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 transition-all duration-200 ease-in-out cursor-pointer ${isCollapsed ? "justify-center px-2" : "px-3"
+            }`}
         >
           <LogOut className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span className="font-label-md text-label-md">Logout</span>}

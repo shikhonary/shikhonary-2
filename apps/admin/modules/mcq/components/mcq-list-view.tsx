@@ -1,5 +1,7 @@
 "use client"
 
+import { useQuery } from "@tanstack/react-query"
+import { trpc } from "@/trpc/client"
 import { useMcqsList, useMcqStats } from "../services/use-mcq"
 import { useSubjectsForSelection } from "@/modules/subject/services/use-subject"
 import { useChaptersForSelection } from "@/modules/chapter/services/use-chapter"
@@ -17,9 +19,8 @@ export function McqListView() {
       query: searchQuery,
       subjectId: selectedSubjectId,
       chapterId: selectedChapterId,
+      board: selectedBoard,
       type: selectedType,
-      isMath: selectedIsMath,
-      isActive: selectedIsActive,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -37,21 +38,20 @@ export function McqListView() {
     query: searchQuery || undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+    board: selectedBoard !== "All" ? selectedBoard : undefined,
     type: selectedType !== "All" ? selectedType : undefined,
-    isMath:
-      selectedIsMath === "true"
-        ? true
-        : selectedIsMath === "false"
-        ? false
-        : undefined,
-    isActive:
-      selectedIsActive === "true"
-        ? true
-        : selectedIsActive === "false"
-        ? false
-        : undefined,
     sort: selectedSort,
   })
+
+  // Fetch Board + Year combinations for this subject / chapter if selected
+  const { data: boardYearsData } = useQuery({
+    ...trpc.questionBank.boardYears.queryOptions({
+      subjectId: selectedSubjectId,
+      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+    }),
+    enabled: selectedSubjectId !== "All",
+  })
+  const boardYears = boardYearsData ?? []
 
   // Query MCQ stats
   const { data: statsData } = useMcqStats(
@@ -93,17 +93,16 @@ export function McqListView() {
         searchQuery={searchQuery}
         onSearchChange={(query) => setSearchParams({ query, page: 1 })}
         selectedSubjectId={selectedSubjectId}
-        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", page: 1 })}
+        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
         subjects={subjects}
         selectedChapterId={selectedChapterId}
-        onChapterChange={(chapterId) => setSearchParams({ chapterId, page: 1 })}
+        onChapterChange={(chapterId) => setSearchParams({ chapterId, board: "All", page: 1 })}
         chapters={chapters}
+        selectedBoard={selectedBoard}
+        onBoardChange={(board) => setSearchParams({ board, page: 1 })}
+        boardYears={boardYears}
         selectedType={selectedType}
         onTypeChange={(type) => setSearchParams({ type, page: 1 })}
-        selectedIsMath={selectedIsMath}
-        onIsMathChange={(isMath) => setSearchParams({ isMath, page: 1 })}
-        selectedIsActive={selectedIsActive}
-        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />

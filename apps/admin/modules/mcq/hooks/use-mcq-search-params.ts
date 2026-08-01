@@ -13,9 +13,8 @@ export const mcqSearchParamsParsers = {
   query: parseAsString.withDefault(""),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   type: parseAsString.withDefault("All"),
-  isMath: parseAsString.withDefault("All"), // "All" | "true" | "false"
-  isActive: parseAsString.withDefault("All"), // "All" | "true" | "false"
   sort: parseAsStringEnum<McqSortOption>(Array.from(mcqSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

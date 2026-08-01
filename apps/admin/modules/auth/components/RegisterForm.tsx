@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@workspace/ui/components/button';
-import { Input } from '@workspace/ui/components/input';
-import { Checkbox } from '@workspace/ui/components/checkbox';
 import { UseFormRegister, FieldErrors, UseFormSetValue, Control, useWatch } from 'react-hook-form';
+import { User, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { RegisterInput } from '../pages/RegisterPage';
 
 interface RegisterFormProps {
@@ -34,174 +31,167 @@ export default function RegisterForm({
   });
 
   return (
-    <div>
-      {/* Logo & Header */}
-      <div className="flex flex-col items-center mb-10">
-        <Image
-          alt="Basic Education Care Logo"
-          src="/logo.jpg"
-          width={200}
-          height={64}
-          priority
-          className="h-16 w-auto mb-8 object-contain"
-        />
-        <h1 className="font-headline-md text-headline-md text-on-surface text-center mb-2">
-          Create an Account
-        </h1>
-        <p className="font-body-md text-on-surface-variant text-center">
-          Join <span className="font-bold text-primary">BEC</span> workstation
-        </p>
+    <div className="w-full">
+      {/* Header Row */}
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Sign Up
+        </h2>
+        <span className="px-3 py-1 bg-[#e2e8f0]/80 text-[#5c6b79] text-[10px] font-extrabold tracking-wider rounded-full uppercase">
+          CREATE ACCOUNT
+        </span>
       </div>
 
-      {/* Server Error Banner */}
+      {/* Error Banner */}
       {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">error</span>
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800">
+          <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Register Form */}
-      <form className="space-y-6" onSubmit={onSubmit} noValidate>
-        {/* Full Name Input */}
-        <div className="space-y-1">
-          <div className="floating-label-group relative">
-            <Input
+      <form onSubmit={onSubmit} noValidate className="space-y-4">
+        
+        {/* Full Name Field */}
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.name
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <User className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
               {...register('name')}
               disabled={loading}
-              className={`w-full h-14 px-4 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                }`}
               id="fullName"
-              placeholder="Full Name"
               type="text"
+              placeholder="Full Name"
               autoComplete="name"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent"
             />
-            <label
-              className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-              htmlFor="fullName"
-            >
-              Full Name
-            </label>
           </div>
           {errors.name && (
-            <p className="text-xs text-red-500 pl-1">{errors.name.message}</p>
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.name.message}</p>
           )}
         </div>
 
-        {/* Email Input */}
-        <div className="space-y-1">
-          <div className="floating-label-group relative">
-            <Input
+        {/* Email Field */}
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.email
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Mail className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
               {...register('email')}
               disabled={loading}
-              className={`w-full h-14 px-4 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                }`}
               id="email"
-              placeholder="Email Address"
               type="email"
+              placeholder="Email Address"
               autoComplete="email"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent"
             />
-            <label
-              className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-              htmlFor="email"
-            >
-              Email Address
-            </label>
           </div>
           {errors.email && (
-            <p className="text-xs text-red-500 pl-1">{errors.email.message}</p>
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.email.message}</p>
           )}
         </div>
 
-        {/* Password Input */}
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <div className="floating-label-group relative">
-              <Input
-                {...register('password')}
-                disabled={loading}
-                className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                  }`}
-                id="password"
-                placeholder="Password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-              />
-              <label
-                className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface select-none focus:outline-none flex items-center justify-center cursor-pointer disabled:opacity-50"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </span>
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-xs text-red-500 pl-1">{errors.password.message}</p>
-            )}
+        {/* Password Field */}
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.password
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Lock className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
+              {...register('password')}
+              disabled={loading}
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password (Min. 8 characters)"
+              autoComplete="new-password"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent pr-8"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={loading}
+              className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer disabled:opacity-50"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
-
-          <div className="flex flex-col gap-1 mt-4">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <Checkbox
-                className="w-4 h-4 rounded border-outline text-primary-container data-checked:bg-primary-container data-checked:border-primary-container focus:ring-primary-container cursor-pointer"
-                checked={agreed}
-                disabled={loading}
-                onCheckedChange={(v) => setValue('agreed', v === true, { shouldValidate: true })}
-              />
-              <span className="text-label-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-                I agree to the <Link href="/terms-of-service" className='hover:underline'>Terms of Service</Link>
-              </span>
-            </label>
-            {errors.agreed && (
-              <p className="text-xs text-red-500 pl-1">{errors.agreed.message}</p>
-            )}
-          </div>
+          {errors.password && (
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.password.message}</p>
+          )}
         </div>
 
-        {/* Register Button */}
-        <Button
-          className="w-full h-14 bg-primary-container !text-white font-headline-md text-[18px] rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        {/* Terms Agreement Checkbox */}
+        <div className="pt-1">
+          <label className="flex items-start gap-2.5 cursor-pointer select-none group">
+            <input
+              type="checkbox"
+              checked={agreed}
+              disabled={loading}
+              onChange={(e) => setValue('agreed', e.target.checked, { shouldValidate: true })}
+              className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#c52828] accent-[#c52828] focus:ring-[#c52828]/30 cursor-pointer disabled:opacity-50"
+            />
+            <span className="text-xs font-medium text-slate-500 group-hover:text-slate-700 transition-colors leading-tight">
+              I agree to the{' '}
+              <Link href="/terms-of-service" className="text-[#c52828] font-bold hover:underline">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy-policy" className="text-[#c52828] font-bold hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+          {errors.agreed && (
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.agreed.message}</p>
+          )}
+        </div>
+
+        {/* SIGN UP Button */}
+        <button
           type="submit"
           disabled={loading}
-          variant="default"
+          className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#d32f2f] to-[#b71c1c] hover:from-[#c62828] hover:to-[#a71919] text-white font-bold text-sm tracking-widest uppercase shadow-[0_6px_20px_rgba(197,40,40,0.35)] active:scale-[0.99] transition-all duration-200 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 mt-6"
         >
           {loading ? (
             <>
-              <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
-              <span>Creating account...</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>CREATING ACCOUNT...</span>
             </>
           ) : (
-            <>
-              <span>Sign Up</span>
-              <span className="material-symbols-outlined text-[20px]">person_add</span>
-            </>
+            <span>SIGN UP</span>
           )}
-        </Button>
+        </button>
+
       </form>
 
-      {/* Login Link */}
-      <div className="mt-10 pt-6 border-t border-outline-variant/30 text-center">
-        <p className="font-body-md text-on-surface-variant">
-          Already have an account?
-          <Link
-            className={`text-primary font-bold hover:underline ml-1 ${loading ? 'pointer-events-none opacity-50' : ''
-              }`}
-            href="/auth/sign-in"
-            onClick={(e) => loading && e.preventDefault()}
-            prefetch
-          >
-            Log In
-          </Link>
-        </p>
+      {/* Card Footer: Log In */}
+      <div className="mt-8 text-center text-xs md:text-sm text-slate-500 font-medium">
+        <span>Already have an account? </span>
+        <Link
+          href="/auth/sign-in"
+          className={`font-extrabold text-slate-900 hover:underline ${
+            loading ? 'pointer-events-none opacity-50' : ''
+          }`}
+        >
+          Log In.
+        </Link>
       </div>
     </div>
   );

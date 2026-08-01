@@ -22,6 +22,7 @@ export type McqSortOption = z.infer<typeof mcqSortEnum>
 export const listMcqsSchema = paginationSchema.extend({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
+  board: z.string().optional(),
   type: z.string().optional(),
   isMath: z.boolean().optional(),
   isActive: z.boolean().optional(),

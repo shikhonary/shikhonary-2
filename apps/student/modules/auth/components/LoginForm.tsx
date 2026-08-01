@@ -1,10 +1,7 @@
-import React from 'react';
-import Image from 'next/image';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@workspace/ui/components/button';
-import { Input } from '@workspace/ui/components/input';
-import { Checkbox } from '@workspace/ui/components/checkbox';
-import { UseFormRegister, FieldErrors, UseFormSetValue, Control, useWatch } from 'react-hook-form';
+import { UseFormRegister, FieldErrors, UseFormSetValue, Control } from 'react-hook-form';
+import { Phone, Lock, Eye, EyeOff, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { LoginInput } from '../pages/LoginPage';
 
 interface LoginFormProps {
@@ -12,220 +9,164 @@ interface LoginFormProps {
   errors: FieldErrors<LoginInput>;
   setValue: UseFormSetValue<LoginInput>;
   control: Control<LoginInput>;
-  showVerifiedNotice: boolean;
   showResetSuccessNotice: boolean;
-  resendSuccess: boolean;
   error: string | null;
-  showResend: boolean;
-  resending: boolean;
   loading: boolean;
-  onResend: () => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
 export default function LoginForm({
   register,
   errors,
-  setValue,
-  control,
-  showVerifiedNotice,
   showResetSuccessNotice,
-  resendSuccess,
   error,
-  showResend,
-  resending,
   loading,
-  onResend,
   onSubmit,
 }: LoginFormProps) {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const rememberMe = useWatch({
-    control,
-    name: 'rememberMe',
-    defaultValue: false,
-  });
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div>
-      {/* Logo & Header */}
-      <div className="flex flex-col items-center mb-10">
-        <Image
-          alt="Basic Education Care Logo"
-          src="/logo.jpg"
-          width={200}
-          height={64}
-          priority
-          className="h-16 w-auto mb-8 object-contain"
-        />
-        <h1 className="font-headline-md text-headline-md text-on-surface text-center mb-2">
-          স্বাগতম
-        </h1>
-        <p className="font-body-md text-on-surface-variant text-center">
-          <span className="font-bold text-primary">BEC</span> স্টুডেন্ট পোর্টালে প্রবেশ করুন
-        </p>
+    <div className="w-full">
+      {/* Header Row */}
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Log In
+        </h2>
+        <span className="px-3 py-1 bg-[#e2e8f0]/80 text-[#5c6b79] text-[10px] font-extrabold tracking-wider rounded-full uppercase">
+          STUDENT ACCESS
+        </span>
       </div>
-
-      {/* Email Verified Banner */}
-      {showVerifiedNotice && !resendSuccess && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">check_circle</span>
-          <span>ইমেইল ভেরিফিকেশন সফল হয়েছে! এখন লগইন করতে পারেন।</span>
-        </div>
-      )}
 
       {/* Password Reset Success Banner */}
       {showResetSuccessNotice && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">check_circle</span>
-          <span>পাসওয়ার্ড সফলভাবে রিসেট হয়েছে! আপনার নতুন পাসওয়ার্ড দিয়ে লগইন করুন।</span>
-        </div>
-      )}
-
-      {/* Resend Success Banner */}
-      {resendSuccess && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">check_circle</span>
-          <span>আপনার ইমেইলে নতুন ভেরিফিকেশন লিঙ্ক পাঠানো হয়েছে।</span>
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3.5 text-xs text-emerald-800">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+          <span>Password reset successful! You can now log in with your new password.</span>
         </div>
       )}
 
       {/* Error Banner */}
       {error && (
-        <div className="mb-6 flex flex-col gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 flex flex-col gap-2 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800">
           <div className="flex items-start gap-3">
-            <span className="material-symbols-outlined text-[18px] mt-px shrink-0">error</span>
+            <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
-          {showResend && (
-            <button
-              type="button"
-              disabled={resending || loading}
-              onClick={onResend}
-              className="text-xs text-primary font-bold hover:underline self-start ml-7 mt-1 disabled:opacity-50"
-            >
-              {resending ? 'লিঙ্ক পুনরায় পাঠানো হচ্ছে...' : 'ভেরিফিকেশন লিঙ্ক পুনরায় পাঠান'}
-            </button>
-          )}
         </div>
       )}
 
       {/* Login Form */}
-      <form className="space-y-6" onSubmit={onSubmit} noValidate>
-        {/* Email or Phone Input */}
-        <div className="space-y-1">
-          <div className="floating-label-group relative">
-            <Input
-              {...register('identifier')}
+      <form onSubmit={onSubmit} noValidate className="space-y-4">
+        {/* Phone Field */}
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.phoneNumber
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Phone className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
+              {...register('phoneNumber')}
               disabled={loading}
-              className={`w-full h-14 px-4 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.identifier ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                }`}
-              id="identifier"
-              placeholder="ইমেইল অথবা ফোন নম্বর"
-              type="text"
-              autoComplete="email tel"
+              id="phoneNumber"
+              type="tel"
+              placeholder="Phone Number"
+              autoComplete="tel"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent"
             />
-            <label
-              className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-              htmlFor="identifier"
-            >
-              ইমেইল অথবা ফোন নম্বর
-            </label>
           </div>
-          {errors.identifier && (
-            <p className="text-xs text-red-500 pl-1">{errors.identifier.message}</p>
+          {errors.phoneNumber && (
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.phoneNumber.message}</p>
           )}
         </div>
 
-        {/* Password Input */}
-        <div className="space-y-2">
-          <div className="space-y-1">
-            <div className="floating-label-group relative">
-              <Input
-                {...register('password')}
-                disabled={loading}
-                className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                  }`}
-                id="password"
-                placeholder="পাসওয়ার্ড"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-              />
-              <label
-                className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-                htmlFor="password"
-              >
-                পাসওয়ার্ড
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface select-none focus:outline-none flex items-center justify-center cursor-pointer disabled:opacity-50"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </span>
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-xs text-red-500 pl-1">{errors.password.message}</p>
-            )}
+        {/* Password Field */}
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.password
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Lock className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
+              {...register('password')}
+              disabled={loading}
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              autoComplete="current-password"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent pr-8"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={loading}
+              className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer disabled:opacity-50"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <Checkbox
-                className="w-4 h-4 rounded border-outline text-primary-container data-checked:bg-primary-container data-checked:border-primary-container focus:ring-primary-container cursor-pointer"
-                checked={rememberMe}
-                disabled={loading}
-                onCheckedChange={(v) => setValue('rememberMe', v === true)}
-              />
-              <span className="text-label-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-                মনে রাখুন
-              </span>
-            </label>
-            <Link className={`text-label-sm text-primary hover:underline font-medium ${loading ? 'pointer-events-none opacity-50' : ''}`} href="/auth/forgot-password">
-              পাসওয়ার্ড ভুলে গেছেন?
-            </Link>
-          </div>
+          {errors.password && (
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.password.message}</p>
+          )}
         </div>
 
+        {/* Remember me + Forgot Password Row */}
+        <div className="flex items-center justify-between mt-1">
+          <label className="flex items-center gap-2 cursor-pointer select-none group">
+            <input
+              {...register('rememberMe')}
+              id="rememberMe"
+              type="checkbox"
+              disabled={loading}
+              className="w-4 h-4 rounded border-slate-300 text-[#c52828] accent-[#c52828] focus:ring-[#c52828]/30 cursor-pointer disabled:opacity-50"
+            />
+            <span className="text-xs font-medium text-slate-500 group-hover:text-slate-700 transition-colors">
+              Remember me
+            </span>
+          </label>
+          <Link
+            href="/auth/forgot-password"
+            className={`text-xs font-bold text-[#c52828] hover:underline inline-block ${
+              loading ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
-        {/* Login Button */}
-        <Button
-          className="w-full h-14 !text-white font-headline-md text-[18px] bg-primary-container rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        {/* LOG IN Button */}
+        <button
           type="submit"
           disabled={loading}
-          variant="default"
+          className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#d32f2f] to-[#b71c1c] hover:from-[#c62828] hover:to-[#a71919] text-white font-bold text-sm tracking-wider shadow-[0_6px_20px_rgba(197,40,40,0.35)] active:scale-[0.99] transition-all duration-200 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 mt-4"
         >
           {loading ? (
             <>
-              <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
-              <span>যাচাই করা হচ্ছে...</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>LOGGING IN...</span>
             </>
           ) : (
-            <>
-              <span>লগইন করুন</span>
-              <span className="material-symbols-outlined text-[20px]">login</span>
-            </>
+            <span>LOG IN</span>
           )}
-        </Button>
+        </button>
       </form>
 
-      {/* Sign Up Link */}
-      <div className="mt-10 pt-6 border-t border-outline-variant/30 text-center">
-        <p className="font-body-md text-on-surface-variant">
-          কোনো অ্যাকাউন্ট নেই?
-          <Link
-            className={`text-primary font-bold hover:underline ml-1 ${loading ? 'pointer-events-none opacity-50' : ''
-              }`}
-            href="/auth/sign-up"
-            onClick={(e) => loading && e.preventDefault()}
-            prefetch
-          >
-            সাইন আপ করুন
-          </Link>
-        </p>
+      {/* Card Footer: Sign Up */}
+      <div className="mt-8 text-center text-xs md:text-sm text-slate-500 font-medium">
+        <span>Don&apos;t have an account? </span>
+        <Link
+          href="/auth/sign-up"
+          className={`font-extrabold text-slate-900 hover:underline ${
+            loading ? 'pointer-events-none opacity-50' : ''
+          }`}
+        >
+          Sign Up.
+        </Link>
       </div>
     </div>
   );

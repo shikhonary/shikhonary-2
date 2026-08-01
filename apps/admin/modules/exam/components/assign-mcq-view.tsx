@@ -17,6 +17,16 @@ import { Input } from "@workspace/ui/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@workspace/ui/components/tabs"
 import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@workspace/ui/components/drawer"
+import {
   BookOpen,
   HelpCircle,
   Plus,
@@ -28,6 +38,9 @@ import {
   BookmarkCheck,
   X,
   RotateCcw,
+  Shuffle,
+  SlidersHorizontal,
+  Filter,
 } from "lucide-react"
 
 const romanNumerals = ["i.", "ii.", "iii.", "iv.", "v.", "vi."]
@@ -115,6 +128,107 @@ function SubjectMcqSection({
     setPage(1)
   }
 
+  const activeFilterCount =
+    (chapterFilter !== "All" ? 1 : 0) +
+    (boardFilter !== "All" ? 1 : 0) +
+    (typeFilter !== "All" ? 1 : 0)
+
+  const handleResetFiltersOnly = () => {
+    setChapterFilter("All")
+    setBoardFilter("All")
+    setTypeFilter("All")
+    setPage(1)
+  }
+
+  const renderSelectFilters = (isMobile = false) => (
+    <>
+      {/* Chapter Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] w-full md:w-auto"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5 text-primary" />
+            Chapter
+          </label>
+        )}
+        <Select
+          value={chapterFilter}
+          onValueChange={(val) => {
+            setChapterFilter(val)
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
+            <SelectValue placeholder="All Chapters" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+            <SelectItem value="All">All Chapters</SelectItem>
+            {chapters.map((ch: any) => (
+              <SelectItem key={ch.id} value={ch.id}>
+                {ch.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Board Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] w-full md:w-auto"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <SlidersHorizontal className="h-3.5 w-3.5 text-primary" />
+            Board / Year
+          </label>
+        )}
+        <Select
+          value={boardFilter}
+          onValueChange={(val) => {
+            setBoardFilter(val)
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
+            <SelectValue placeholder="All Boards" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-[300px]">
+            <SelectItem value="All">All Boards</SelectItem>
+            {boardYears.map((item: any) => (
+              <SelectItem key={item.rawRef} value={item.rawRef}>
+                🎓 {item.boardName} ২০{item.year} ({item.count})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Type Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] w-full md:w-auto"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <Filter className="h-3.5 w-3.5 text-primary" />
+            Question Type
+          </label>
+        )}
+        <Select
+          value={typeFilter}
+          onValueChange={(val) => {
+            setTypeFilter(val)
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+            <SelectItem value="All">All Types</SelectItem>
+            <SelectItem value="SINGLE">জ্ঞানমূলক (Single MCQ)</SelectItem>
+            <SelectItem value="MULTIPLE">বহুপদী (Multiple Response)</SelectItem>
+            <SelectItem value="CONTEXTUAL">অভিন্ন তথ্যভিত্তিক (Stimulus MCQ)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  )
+
   const unassignedMcqs = mcqs.filter((m: any) => !assignedMcqIds.includes(m.id))
   const allSelected = unassignedMcqs.length > 0 && unassignedMcqs.every((m: any) => selectedMcqIds.includes(m.id))
 
@@ -167,7 +281,7 @@ function SubjectMcqSection({
     const selectedSubset = shuffled.slice(0, countToSelect).map((m: any) => m.id)
 
     setSelectedMcqIds([...selectedMcqIds, ...selectedSubset])
-    
+
     if (countToSelect === remaining) {
       toast.success(`Randomly selected ${countToSelect} question(s) to reach the exam limit of ${examTotalMcq}.`)
     } else {
@@ -243,30 +357,11 @@ function SubjectMcqSection({
   }
 
   return (
-    <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs space-y-6">
-      {/* Header for Subject Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-outline-variant/30 pb-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="rounded-md bg-primary/10 p-1.5 text-primary">
-              <BookOpen className="h-4 w-4" />
-            </span>
-            <h3 className="font-headline-md text-lg font-bold text-on-surface">
-              {subjectName} {subjectNameBn && <span className="font-bengali text-sm text-outline font-normal">({subjectNameBn})</span>}
-            </h3>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-outline font-mono">
-            <span>Exam Subject ID: <strong className="text-on-surface-variant font-medium">{examSubjectId}</strong></span>
-            <span>•</span>
-            <span>Subject ID: <strong className="text-on-surface-variant font-medium">{subjectId}</strong></span>
-          </div>
-        </div>
-      </div>
-
+    <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-2 shadow-xs space-y-6">
       {/* Local Filter Toolbar */}
-      <div className="flex flex-col md:flex-row items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-3 sm:p-4">
+      <div className="flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-3 sm:p-4">
         {/* Search Input */}
-        <div className="relative flex-1 min-w-0 w-full">
+        <div className="relative flex-1 min-w-0">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">
             filter_list
           </span>
@@ -282,72 +377,60 @@ function SubjectMcqSection({
           />
         </div>
 
+        {/* Mobile Filter Drawer Button (Visible ONLY on mobile: md:hidden) */}
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button
+              variant="outline"
+              className="md:hidden flex items-center gap-2 h-10 px-3.5 bg-white border-outline-variant/40 text-sm font-medium shrink-0 rounded-lg cursor-pointer animate-in fade-in duration-200"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-primary" />
+              {activeFilterCount > 0 && (
+                <span className="flex size-5 items-center justify-center rounded-full bg-primary text-white text-[11px] font-bold">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </DrawerTrigger>
 
-        {/* Chapter Filter */}
-        <div className="min-w-[150px] w-full md:w-auto">
-          <Select
-            value={chapterFilter}
-            onValueChange={(val) => {
-              setChapterFilter(val)
-              setPage(1)
-            }}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
-              <SelectValue placeholder="All Chapters" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-              <SelectItem value="All">All Chapters</SelectItem>
-              {chapters.map((ch: any) => (
-                <SelectItem key={ch.id} value={ch.id}>
-                  {ch.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          <DrawerContent className="p-6 space-y-5 bg-white border-t border-outline-variant/40">
+            <DrawerHeader className="p-0 text-left">
+              <DrawerTitle className="text-base font-bold text-on-surface flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5 text-primary" />
+                Filter Questions
+              </DrawerTitle>
+              <DrawerDescription className="text-xs text-on-surface-variant">
+                Select chapter, board, or question type to refine visible items.
+              </DrawerDescription>
+            </DrawerHeader>
 
-        {/* Board Filter */}
-        <div className="min-w-[150px] w-full md:w-auto">
-          <Select
-            value={boardFilter}
-            onValueChange={(val) => {
-              setBoardFilter(val)
-              setPage(1)
-            }}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
-              <SelectValue placeholder="All Boards" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-[300px]">
-              <SelectItem value="All">All Boards</SelectItem>
-              {boardYears.map((item: any) => (
-                <SelectItem key={item.rawRef} value={item.rawRef}>
-                  🎓 {item.boardName} ২০{item.year} ({item.count})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            {/* Stacked Filter Selects */}
+            <div className="space-y-4 pt-1">
+              {renderSelectFilters(true)}
+            </div>
 
-        {/* Type Filter */}
-        <div className="min-w-[150px] w-full md:w-auto">
-          <Select
-            value={typeFilter}
-            onValueChange={(val) => {
-              setTypeFilter(val)
-              setPage(1)
-            }}
-          >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between cursor-pointer">
-              <SelectValue placeholder="All Types" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-              <SelectItem value="All">All Types</SelectItem>
-              <SelectItem value="SINGLE">জ্ঞানমূলক (Single MCQ)</SelectItem>
-              <SelectItem value="MULTIPLE">বহুপদী (Multiple Response)</SelectItem>
-              <SelectItem value="CONTEXTUAL">অভিন্ন তথ্যভিত্তিক (Stimulus MCQ)</SelectItem>
-            </SelectContent>
-          </Select>
+            <DrawerFooter className="p-0 pt-3 flex flex-row items-center gap-3">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={handleResetFiltersOnly}
+                className="flex-1 h-10 text-xs font-bold border-outline-variant/40 cursor-pointer"
+              >
+                <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                Reset
+              </Button>
+              <DrawerClose asChild>
+                <Button className="flex-1 h-10 text-xs font-bold bg-primary text-white cursor-pointer">
+                  Apply Filters
+                </Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+
+        {/* Desktop Filter Selects (Visible ONLY on desktop: hidden md:flex) */}
+        <div className="hidden md:flex items-center gap-3">
+          {renderSelectFilters(false)}
         </div>
       </div>
 
@@ -461,11 +544,11 @@ function SubjectMcqSection({
         </div>
       )}
       {/* Selection Actions (Below Filters) */}
-      <div className="flex flex-wrap items-center gap-3 border-t border-outline-variant/20 pt-4">
+      <div className="flex flex-row items-center gap-3 border-t border-outline-variant/20 pt-4 w-full">
         {mcqs.length > 0 && (
           <div
             onClick={() => handleSelectAll(!allSelected)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-white px-3.5 py-2 font-bold text-xs text-on-surface hover:bg-surface-container-high cursor-pointer h-8 select-none"
+            className="inline-flex items-center rounded-lg border border-outline-variant bg-white px-2 py-2 font-bold text-xs text-on-surface hover:bg-surface-container-high cursor-pointer h-9 select-none justify-center"
           >
             <Checkbox
               checked={allSelected}
@@ -482,69 +565,74 @@ function SubjectMcqSection({
             variant="outline"
             size="sm"
             onClick={handleRandomSelect}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-white px-3.5 py-2 font-bold text-xs text-on-surface hover:bg-surface-container-high cursor-pointer h-auto"
+            className="inline-flex items-center rounded-lg border border-outline-variant bg-white px-2 py-2 font-bold text-xs text-on-surface hover:bg-surface-container-high cursor-pointer h-9 justify-center"
           >
-            <span className="material-symbols-outlined text-[14px] text-outline shrink-0">shuffle</span>
-            <span>Random Selection</span>
+            <Shuffle />
+            <span>Random Select</span>
           </Button>
         )}
       </div>
 
       {/* Bulk Action Bar (When MCQs are Selected) */}
       {selectedMcqIds.length > 0 && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 p-4 text-primary">
-          <div className="flex items-center gap-2 justify-center sm:justify-start">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shrink-0">
-              {selectedMcqIds.length}
-            </span>
-            <span className="text-xs font-bold">
-              {selectedMcqIds.length} MCQ{selectedMcqIds.length === 1 ? "" : "s"} selected for bulk action
-            </span>
-          </div>
+        <>
+          <div className="fixed bottom-0 left-0 right-0 z-50 py-2 px-3 pb-3 border-t border-outline-variant/30 bg-surface-container-lowest/95 backdrop-blur-md shadow-lg flex flex-col gap-2 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:z-0 sm:p-4 sm:border sm:border-primary/30 sm:bg-primary/5 sm:rounded-xl sm:shadow-none sm:flex-row sm:items-center sm:justify-between sm:gap-4 text-primary">
+            <div className="flex items-center gap-1.5 justify-center sm:justify-start text-[11px] sm:text-xs font-bold">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shrink-0">
+                {selectedMcqIds.length}
+              </span>
+              <span>
+                {selectedMcqIds.length} MCQ{selectedMcqIds.length === 1 ? "" : "s"} selected for bulk action
+              </span>
+            </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleBulkAssignSelected}
-              disabled={actionType !== null}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 shadow-xs cursor-pointer h-auto disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
-            >
-              {actionType === "assign" ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                  <span>Assigning...</span>
-                </>
-              ) : (
-                <>
-                  <BookmarkCheck className="h-4 w-4" />
-                  <span>Assign {selectedMcqIds.length} MCQs to Exam</span>
-                </>
-              )}
-            </Button>
+            <div className="flex flex-row items-center gap-2 w-full sm:w-auto">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleBulkAssignSelected}
+                disabled={actionType !== null}
+                className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-700 shadow-xs cursor-pointer h-auto disabled:opacity-50 disabled:cursor-not-allowed w-1/2 sm:w-auto justify-center"
+              >
+                {actionType === "assign" ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                    <span>Assigning...</span>
+                  </>
+                ) : (
+                  <>
+                    <BookmarkCheck className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Assign {selectedMcqIds.length} MCQs to Exam</span>
+                    <span className="sm:hidden">Assign {selectedMcqIds.length} MCQs</span>
+                  </>
+                )}
+              </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleBulkUnassignSelected}
-              disabled={actionType !== null}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-outline-variant bg-white px-3 py-2 text-xs font-bold text-on-surface hover:bg-surface-container-high cursor-pointer h-auto disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
-            >
-              {actionType === "unassign" ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                  <span>Unassigning...</span>
-                </>
-              ) : (
-                <>
-                  <XCircle className="h-4 w-4 text-outline" />
-                  <span>Unassign Selected</span>
-                </>
-              )}
-            </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleBulkUnassignSelected}
+                disabled={actionType !== null}
+                className="inline-flex items-center gap-1 rounded-lg border border-outline-variant bg-white px-3 py-2 text-xs font-bold text-on-surface hover:bg-surface-container-high cursor-pointer h-auto disabled:opacity-50 disabled:cursor-not-allowed w-1/2 sm:w-auto justify-center"
+              >
+                {actionType === "unassign" ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                    <span>Unassigning...</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3.5 w-3.5 text-outline" />
+                    <span className="hidden sm:inline">Unassign Selected</span>
+                    <span className="sm:hidden">Unassign</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+          <div className="h-20 sm:hidden" />
+        </>
       )}
 
       {/* MCQs Card List for Subject */}
@@ -605,25 +693,25 @@ function SubjectMcqSection({
             return (
               <div
                 key={item.id}
-                className={`bg-white border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group ${isSelected
+                className={`bg-white border rounded-2xl p-1.5 transition-all hover:border-primary/40 hover:shadow-md relative group ${isSelected
                   ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                   : isAssigned
                     ? "border-emerald-300 bg-emerald-50/20"
                     : "border-outline-variant/60"
                   }`}
               >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-2 md:gap-4">
                   {/* Selection Checkbox & Main Content */}
-                  <div className="flex items-start gap-4 flex-1 min-w-0 w-full relative md:static">
+                  <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => handleToggleSelect(item.id)}
-                      className="absolute top-0.5 left-0 md:relative md:top-0 md:left-0 md:mt-1 rounded-md cursor-pointer shrink-0 border-outline-variant data-[state=checked]:border-primary data-[state=checked]:bg-primary"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 rounded-md cursor-pointer shrink-0 border-outline-variant data-[state=checked]:border-primary data-[state=checked]:bg-primary"
                     />
 
-                    <div className="flex-1 space-y-4 min-w-0 pl-8 md:pl-0">
+                    <div className="flex-1 space-y-2.5 sm:space-y-4 min-w-0">
                       {/* Badges Header Row */}
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5 md:gap-2 pl-7 md:pl-0">
                         {/* Index Badge */}
                         <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
                           #{idx + 1}
@@ -663,19 +751,11 @@ function SubjectMcqSection({
                         >
                           {item.isActive ? "Active" : "Inactive"}
                         </span>
-
-                        {/* Assigned Status Badge */}
-                        {isAssigned && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-bold text-[11px] shadow-xs">
-                            <CheckCircle2 className="h-3 w-3" />
-                            <span>Assigned to Exam</span>
-                          </span>
-                        )}
                       </div>
 
                       {/* Context / Comprehension Passage (If Present) */}
                       {item.context && (
-                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-3.5 text-xs text-on-surface-variant leading-relaxed">
+                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-2 sm:p-3.5 text-xs text-on-surface-variant leading-relaxed">
                           <div className="font-bold text-secondary flex items-center gap-1.5 mb-1 text-[11px] uppercase tracking-wider">
                             <span className="material-symbols-outlined text-sm">article</span>
                             Context / Passage:
@@ -689,14 +769,14 @@ function SubjectMcqSection({
                       {/* Question Title / Text */}
                       <Link
                         href={`/mcqs/${item.id}`}
-                        className="block font-headline-md text-base md:text-lg font-bold text-on-surface leading-snug hover:text-primary transition-colors"
+                        className="block font-headline-md text-sm sm:text-base md:text-lg font-bold text-on-surface leading-snug hover:text-primary transition-colors"
                       >
                         <RenderMath text={item.question} isMath={item.isMath} />
                       </Link>
 
                       {/* Statements / Sub-questions (If Present) */}
                       {Array.isArray(item.statements) && item.statements.length > 0 && (
-                        <div className="space-y-1.5 pl-3 border-l-2 border-primary/40 py-1 bg-surface-container-low/40 rounded-r-lg p-2.5">
+                        <div className="space-y-1.5 pl-3 border-l-2 border-primary/40 py-1 bg-surface-container-low/40 rounded-r-lg p-1.5 sm:p-2.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-outline block mb-1">
                             Statements:
                           </span>
@@ -715,11 +795,11 @@ function SubjectMcqSection({
 
                       {/* Option Choices Grid */}
                       {Array.isArray(item.options) && item.options.length > 0 && (
-                        <div className="space-y-1.5 pt-1">
+                        <div className="space-y-1.5 pt-0.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-outline block">
                             Option Choices ({item.options.length}):
                           </span>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                             {item.options.map((opt: any, optIdx: number) => {
                               const isCorrect = item.answer === opt
                               const letter = optionLetters[optIdx] || String(optIdx + 1)
@@ -727,7 +807,7 @@ function SubjectMcqSection({
                               return (
                                 <div
                                   key={optIdx}
-                                  className={`flex items-center gap-2.5 rounded-lg border p-2.5 text-xs transition-colors ${isCorrect
+                                  className={`flex items-center gap-2.5 rounded-lg border p-2 sm:p-2.5 text-xs transition-colors ${isCorrect
                                     ? "border-emerald-500 bg-emerald-50 text-emerald-950 font-bold ring-1 ring-emerald-500/20"
                                     : "border-outline-variant/40 bg-surface-container-lowest text-on-surface"
                                     }`}
@@ -757,14 +837,14 @@ function SubjectMcqSection({
 
                       {/* Explanation / Solution Notes (If Present) */}
                       {item.explanation && (
-                        <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low/60 p-3 text-xs text-on-surface-variant">
+                        <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low/60 p-2.5 sm:p-3 text-xs text-on-surface-variant">
                           <span className="font-bold text-on-surface block mb-0.5">Explanation:</span>
                           <p className="whitespace-pre-wrap">{item.explanation}</p>
                         </div>
                       )}
 
                       {/* Reference Tags & Actions Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2 sm:pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref: any, rIdx: number) => (
@@ -779,8 +859,6 @@ function SubjectMcqSection({
                             <span className="text-[11px] text-outline italic">No reference tags</span>
                           )}
                         </div>
-
-
                       </div>
                     </div>
                   </div>
@@ -845,9 +923,9 @@ export function AssignMcqView({ examId }: AssignMcqViewProps) {
   const totalSelectedCount = Object.values(selectedMcqIdsMap).flat().length
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
+    <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-8">
       {/* Header Section */}
-      <div className="mb-6 sm:mb-10 flex flex-col gap-4 md:flex-row md:items-end justify-between">
+      <div className="mb-4 sm:mb-10 flex flex-col gap-2 md:flex-row md:items-end justify-between">
         <div className="max-w-2xl">
           <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
             <Link
@@ -917,11 +995,6 @@ export function AssignMcqView({ examId }: AssignMcqViewProps) {
                   })}
                 </div>
               )}
-            </div>
-
-            <div className="flex items-center gap-1 shrink-0">
-              <span className="text-outline">Unselected:</span>
-              <span className="text-amber-600">{Math.max(0, exam.totalMcq - totalSelectedCount)}</span>
             </div>
           </div>
         </div>

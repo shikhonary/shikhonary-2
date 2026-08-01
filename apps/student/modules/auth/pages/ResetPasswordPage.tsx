@@ -1,20 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authClient } from '@workspace/auth/client';
+import { FileQuestion, GraduationCap, Users, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import ResetPasswordForm, { resetPasswordSchema, ResetPasswordInput } from '../components/ResetPasswordForm';
 
-
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(token ? null : 'পাসওয়ার্ড রিসেট টোকেন পাওয়া যায়নি। নতুন লিঙ্কের জন্য আবেদন করুন।');
+  const [error, setError] = useState<string | null>(
+    token ? null : 'Password reset token not found. Please request a new link.'
+  );
 
   const {
     register,
@@ -30,7 +32,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit: SubmitHandler<ResetPasswordInput> = async (values) => {
     if (!token) {
-      setError('পাসওয়ার্ড রিসেট টোকেন নেই। নতুন পাসওয়ার্ড রিসেট লিঙ্ক অনুরোধ করুন।');
+      setError('Password reset token is missing. Please request a new password reset link.');
       return;
     }
 
@@ -44,64 +46,127 @@ export default function ResetPasswordPage() {
       });
 
       if (resetError) {
-        setError(resetError.message ?? 'পাসওয়ার্ড রিসেট করা সম্ভব হয়নি। লিঙ্কটির মেয়াদ শেষ হয়ে গিয়ে থাকতে পারে।');
+        setError(resetError.message ?? 'Failed to reset password. The link might have expired.');
       } else {
         router.push('/auth/sign-in?resetSuccess=true');
       }
     } catch (err: any) {
-      setError(err?.message ?? 'একটি অপ্রত্যাশিত সমস্যা ঘটেছে।');
+      setError(err?.message ?? 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-surface text-on-surface min-h-screen flex flex-col font-body-md font-solaiman overflow-x-hidden">
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .material-symbols-outlined {
-          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-      `}} />
-      <main className="flex-grow flex items-center justify-center px-margin-mobile md:px-margin-desktop py-12 relative">
-        {/* Atmospheric Background Decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-fixed-dim/20 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary-fixed-dim/20 rounded-full blur-[100px] -ml-48 -mb-48"></div>
-        </div>
+    <div className="min-h-screen w-full bg-white font-sans text-slate-900">
+      <div className="min-h-screen flex items-center justify-center px-4 py-4 sm:px-6 lg:px-16">
+        <div className="w-full max-w-6xl flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
 
-        {/* Card Container */}
-        <div className="w-full max-w-[480px] fade-in">
-          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-8 md:p-12 shadow-[0_4px_20px_-2px_rgba(31,41,55,0.08)]">
-            <ResetPasswordForm
-              register={register}
-              errors={errors}
-              error={error}
-              loading={loading}
-              onSubmit={handleSubmit(onSubmit)}
-            />
+          {/* ── Mobile-only: Branding header (hidden on lg+) ── */}
+          <div className="flex lg:hidden flex-col items-center text-center mt-6 w-full">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl font-black text-slate-900 tracking-tight">
+                Mr. <span className="text-[#c52828]">Dr.</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#c52828]/10 text-[#c52828] tracking-wide uppercase">
+                Student
+              </span>
+            </div>
+            <p className="text-sm text-slate-500 font-medium">Basic Education Care</p>
           </div>
 
-          {/* Supplemental System Info */}
-          <div className="mt-8 flex justify-center gap-6">
-            <div className="flex items-center gap-2 text-on-surface-variant/60">
-              <span className="material-symbols-outlined text-[16px]">verified_user</span>
-              <span className="text-label-sm">এন্ড-টু-এন্ড এনক্রিপ্টেড</span>
+          {/* ── Left Column: Desktop Branding Panel (hidden on mobile) ── */}
+          <div className="hidden lg:flex flex-1 flex-col justify-center">
+            {/* Branding Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="text-4xl font-black text-slate-900 tracking-tighter">
+                Mr. <span className="text-[#c52828]">Dr.</span>
+              </div>
+              <div className="h-6 w-[1px] bg-slate-200" />
+              <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-[#c52828]/10 text-[#c52828] tracking-wider uppercase">
+                Student Portal
+              </span>
             </div>
-            <div className="flex items-center gap-2 text-on-surface-variant/60">
-              <span className="material-symbols-outlined text-[16px]">public</span>
-              <span className="text-label-sm">v2.4.1 (স্টেবল)</span>
+
+            {/* Title & Tagline */}
+            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-4">
+              Create your New <br />
+              <span className="bg-gradient-to-r from-[#c52828] to-[#991b1b] bg-clip-text text-transparent">
+                Secure Password.
+              </span>
+            </h1>
+            <p className="text-slate-500 text-base max-w-md mb-10 leading-relaxed font-medium">
+              Keep your credentials strong and updated. Make sure to use at least 8 characters.
+            </p>
+
+            {/* Feature List */}
+            <div className="space-y-6 max-w-md">
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shrink-0 text-slate-700">
+                  <ShieldCheck className="w-5 h-5 text-[#c52828]" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-950 text-sm mb-1">Encrypted Sessions</h3>
+                  <p className="text-xs text-slate-400 font-medium">All authentication routines are end-to-end protected.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shrink-0 text-slate-700">
+                  <FileQuestion className="w-5 h-5 text-[#c52828]" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-950 text-sm mb-1">Need help?</h3>
+                  <p className="text-xs text-slate-400 font-medium">Reach out to your batch supervisor for immediate recovery help.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Footer Info */}
+            <div className="mt-16 pt-6 border-t border-slate-100 flex items-center gap-6 text-slate-400 text-xs font-semibold">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                End-to-End Encrypted
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                v2.4.1 Stable
+              </div>
             </div>
           </div>
+
+          {/* ── Right: Card Container ── */}
+          <div className="w-full lg:w-[440px] shrink-0">
+            <div className="bg-white rounded-3xl p-8 md:p-10 border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
+              <ResetPasswordForm
+                register={register}
+                errors={errors}
+                error={error}
+                loading={loading}
+                onSubmit={handleSubmit(onSubmit)}
+              />
+            </div>
+          </div>
+
         </div>
-      </main>
+      </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-3 text-slate-500 text-sm">
+            <div className="w-6 h-6 border-2 border-[#c52828] border-t-transparent rounded-full animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

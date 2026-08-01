@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
-import * as z from 'zod';
-import { Button } from '@workspace/ui/components/button';
-import { Input } from '@workspace/ui/components/input';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 
 export const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, 'পাসওয়ার্ড অন্তত ৮ অক্ষরের হতে হবে'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "পাসওয়ার্ড দুটি মিলছে না",
+    message: "Passwords do not match",
     path: ['confirmPassword'],
   });
 
-export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+import * as z from 'zod';
 
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 interface ResetPasswordFormProps {
   register: UseFormRegister<ResetPasswordInput>;
@@ -39,135 +37,119 @@ export default function ResetPasswordForm({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div>
-      {/* Logo & Header */}
-      <div className="flex flex-col items-center mb-10">
-        <Image
-          alt="Basic Education Care Logo"
-          src="/logo.jpg"
-          width={200}
-          height={64}
-          priority
-          className="h-16 w-auto mb-8 object-contain"
-        />
-        <h1 className="font-headline-md text-headline-md text-on-surface text-center mb-2">
-          নতুন পাসওয়ার্ড
-        </h1>
-        <p className="font-body-md text-on-surface-variant text-center">
-          আপনার নতুন পাসওয়ার্ড প্রবেশ করান
+    <div className="w-full">
+      {/* Header Row */}
+      <div className="flex flex-col items-center mb-8 text-center">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+          New Password
+        </h2>
+        <p className="text-xs md:text-sm text-slate-500 font-medium max-w-xs">
+          Please enter and confirm your new password below.
         </p>
       </div>
 
       {/* Error Banner */}
       {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <span className="material-symbols-outlined text-[18px] mt-px shrink-0">error</span>
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-xs text-rose-800">
+          <AlertCircle className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Form */}
-      <form className="space-y-6" onSubmit={onSubmit} noValidate>
+      <form className="space-y-4" onSubmit={onSubmit} noValidate>
         {/* New Password Input */}
-        <div className="space-y-1">
-          <div className="floating-label-group relative">
-            <Input
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.password
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Lock className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
               {...register('password')}
               disabled={loading}
-              className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                }`}
               id="password"
-              placeholder="নতুন পাসওয়ার্ড"
               type={showPassword ? 'text' : 'password'}
+              placeholder="New Password (Min. 6 characters)"
               autoComplete="new-password"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent pr-8"
             />
-            <label
-              className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-              htmlFor="password"
-            >
-              নতুন পাসওয়ার্ড
-            </label>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               disabled={loading}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface select-none focus:outline-none flex items-center justify-center cursor-pointer disabled:opacity-50"
+              className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer disabled:opacity-50"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                {showPassword ? 'visibility_off' : 'visibility'}
-              </span>
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {errors.password && (
-            <p className="text-xs text-red-500 pl-1">{errors.password.message}</p>
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.password.message}</p>
           )}
         </div>
 
         {/* Confirm Password Input */}
-        <div className="space-y-1">
-          <div className="floating-label-group relative">
-            <Input
+        <div>
+          <div
+            className={`relative flex items-center border rounded-xl px-3.5 py-3 transition-all bg-white ${
+              errors.confirmPassword
+                ? 'border-rose-400 ring-2 ring-rose-400/10'
+                : 'border-slate-200 focus-within:border-[#c52828] focus-within:ring-2 focus-within:ring-[#c52828]/15'
+            }`}
+          >
+            <Lock className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+            <input
               {...register('confirmPassword')}
               disabled={loading}
-              className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
-                }`}
               id="confirmPassword"
-              placeholder="নতুন পাসওয়ার্ড নিশ্চিত করুন"
               type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm New Password"
               autoComplete="new-password"
+              className="w-full text-slate-800 placeholder:text-slate-400 text-sm outline-none bg-transparent pr-8"
             />
-            <label
-              className="absolute left-4 top-4 text-on-surface-variant transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:left-2 peer-focus:text-xs peer-focus:text-primary-container peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:left-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-primary-container peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1"
-              htmlFor="confirmPassword"
-            >
-              নতুন পাসওয়ার্ড নিশ্চিত করুন
-            </label>
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               disabled={loading}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface select-none focus:outline-none flex items-center justify-center cursor-pointer disabled:opacity-50"
+              className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer disabled:opacity-50"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                {showConfirmPassword ? 'visibility_off' : 'visibility'}
-              </span>
+              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-xs text-red-500 pl-1">{errors.confirmPassword.message}</p>
+            <p className="text-xs text-rose-500 mt-1 pl-1 font-medium">{errors.confirmPassword.message}</p>
           )}
         </div>
 
         {/* Submit Button */}
-        <Button
-          className="w-full h-14 !text-white font-headline-md text-[18px] bg-primary-container rounded-lg hover:opacity-90 active:scale-[0.98] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        <button
+          className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-[#d32f2f] to-[#b71c1c] hover:from-[#c62828] hover:to-[#a71919] text-white font-bold text-sm tracking-wider shadow-[0_6px_20px_rgba(197,40,40,0.35)] active:scale-[0.99] transition-all duration-200 disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 mt-6"
           type="submit"
           disabled={loading}
-          variant="default"
         >
           {loading ? (
             <>
-              <span className="material-symbols-outlined animate-spin text-[20px]">sync</span>
-              <span>আপডেট করা হচ্ছে...</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>UPDATING PASSWORD...</span>
             </>
           ) : (
-            <>
-              <span>পাসওয়ার্ড আপডেট করুন</span>
-              <span className="material-symbols-outlined text-[20px]">lock_reset</span>
-            </>
+            <span>UPDATE PASSWORD</span>
           )}
-        </Button>
+        </button>
       </form>
 
       {onBack && (
-        <div className="mt-6">
+        <div className="mt-6 text-center">
           <button
             type="button"
             onClick={onBack}
             disabled={loading}
-            className="w-full text-center text-sm font-medium text-on-surface-variant hover:text-primary transition-colors py-2 cursor-pointer disabled:opacity-50"
+            className="text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors py-1 cursor-pointer disabled:opacity-50"
           >
-            &larr; ওটিপি পেজে ফিরে যান
+            &larr; Back to OTP Verification
           </button>
         </div>
       )}

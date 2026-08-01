@@ -6,7 +6,7 @@ FROM node:22-alpine AS pruner
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 # Install turbo globally to use 'turbo prune'
-RUN npm install -g turbo@latest
+RUN npm install -g turbo@2.9.18
 COPY . .
 # Prune the workspace to only include the 'student' app and its dependencies
 RUN turbo prune student --docker
@@ -20,7 +20,7 @@ WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-RUN corepack prepare pnpm@10.4.1 --activate
+RUN corepack prepare pnpm@10.33.4 --activate
 
 # First copy the pruned workspace metadata to install dependencies with caching
 COPY --from=pruner /app/out/json/ .
@@ -34,31 +34,9 @@ COPY --from=pruner /app/out/full/ .
 COPY turbo.json turbo.json
 
 # Environment variables for build time (Next.js needs some of these at build time)
-ARG DATABASE_URL
-ARG MAIN_DATABASE_URL
-ARG TENANT_DATABASE_URL
-ARG BETTER_AUTH_SECRET
-ARG BETTER_AUTH_URL
 ARG NEXT_PUBLIC_APP_URL
-ARG RESEND_API_KEY
-ARG EMAIL_FROM
-ARG BDBULKSMS_API_KEY
-ARG GOOGLE_CLIENT_ID
-ARG GOOGLE_CLIENT_SECRET
-ARG UPLOADTHING_TOKEN
 
-ENV DATABASE_URL=$DATABASE_URL
-ENV MAIN_DATABASE_URL=$MAIN_DATABASE_URL
-ENV TENANT_DATABASE_URL=$TENANT_DATABASE_URL
-ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
-ENV BETTER_AUTH_URL=$BETTER_AUTH_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV RESEND_API_KEY=$RESEND_API_KEY
-ENV EMAIL_FROM=$EMAIL_FROM
-ENV BDBULKSMS_API_KEY=$BDBULKSMS_API_KEY
-ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-ENV UPLOADTHING_TOKEN=$UPLOADTHING_TOKEN
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 

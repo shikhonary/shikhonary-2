@@ -27,6 +27,13 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   const where = {
     ...(input.subjectId ? { subjectId: input.subjectId } : {}),
     ...(input.chapterId ? { chapterId: input.chapterId } : {}),
+    ...(input.board && input.board !== "All"
+      ? {
+          reference: {
+            hasSome: [input.board],
+          },
+        }
+      : {}),
     ...(input.type ? { type: input.type } : {}),
     ...(input.isMath !== undefined ? { isMath: input.isMath } : {}),
     ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),

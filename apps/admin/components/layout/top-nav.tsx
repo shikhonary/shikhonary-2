@@ -1,17 +1,187 @@
 "use client"
 
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import { authClient } from "@workspace/auth/client"
+import { useCurrentUser } from "@/modules/user/services/use-user"
+import {
+  Menu,
+  LayoutDashboard,
+  GraduationCap,
+  Shield,
+  BookOpen,
+  BookMarked,
+  HelpCircle,
+  Users,
+  ClipboardList,
+  Layers,
+  Settings,
+  LogOut,
+} from "lucide-react"
+import Image from "next/image"
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@workspace/ui/components/sheet"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@workspace/ui/components/dropdown-menu"
+
+const navGroups = [
+  {
+    groupLabel: "General",
+    items: [
+      { href: "/", label: "Overview", icon: LayoutDashboard },
+    ],
+  },
+  {
+    groupLabel: "Academic Hub",
+    items: [
+      { href: "/academic-classes", label: "Classes", icon: GraduationCap },
+      { href: "/students", label: "Students", icon: Users },
+      { href: "/subjects", label: "Subjects", icon: BookOpen },
+      { href: "/chapters", label: "Chapters", icon: BookMarked },
+    ],
+  },
+  {
+    groupLabel: "Assessments",
+    items: [
+      { href: "/mcqs", label: "MCQs", icon: HelpCircle },
+      { href: "/exams", label: "Exams", icon: ClipboardList },
+      { href: "/exam-groups", label: "Exam Groups", icon: Layers },
+    ],
+  },
+  {
+    groupLabel: "Administration",
+    items: [
+      { href: "/users", label: "Users", icon: Users },
+      { href: "/roles", label: "Roles", icon: Shield },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ],
+  },
+]
 
 export function TopNav() {
-  const { data: session } = authClient.useSession()
+  const { session, user, roles, isLoading } = useCurrentUser()
+  const pathname = usePathname()
+  const router = useRouter()
 
-  const defaultAvatar =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCdx-9r8l3Kjary3W-CX4s3KA9ZVUToc8px9mA4iQKYyOMJc--_uhARjvqeqCnV4gj2s3a_-P4D9LI4LUOh4eFkyHicXJmrUC3l5xIXSwZNG_Edf3QVyQI0pJvf_JhKEVKGSRaE01S8pyoD4Ce5_g3v-ZwLCZZtc36pL_oQnyjIJrHeoCGRdM5hAlB7EGrRao8FLvNNTF8QuVz0TXP2YBMD__KNvLAPrkWl40z-qOm1UfSTSx7hMot5jPikXeXy-xHx9yJkTuRD2b0"
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    router.push("/auth/sign-in")
+  }
+
+  // Helper to extract first character of the name, fallback to "U"
+  const getFirstLetter = () => {
+    if (user?.name) {
+      return user.name.trim().charAt(0).toUpperCase()
+    }
+    if (user?.email) {
+      return user.email.trim().charAt(0).toUpperCase()
+    }
+    return "U"
+  }
 
   return (
     <header className="w-full h-14 sticky top-0 bg-surface dark:bg-surface-container border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
-      {/* Left Side */}
-      <div></div>
+      
+      {/* Left Side: Sheet Drawer trigger on mobile, empty spacer on desktop */}
+      <div className="flex items-center">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              className="md:hidden w-9 h-9 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors cursor-pointer active:opacity-80"
+              title="Open Navigation"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </SheetTrigger>
+          
+          <SheetContent side="left" className="w-[280px] p-0 flex flex-col h-full bg-surface">
+            {/* Header / Brand */}
+            <SheetHeader className="p-4 border-b border-outline-variant flex flex-row items-center gap-3">
+              <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-outline-variant/40">
+                <Image
+                  alt="Medical Institution Logo"
+                  className="w-full h-full object-cover"
+                  src="/logo.jpg"
+                  width={36}
+                  height={36}
+                />
+              </div>
+              <div className="text-left">
+                <SheetTitle className="font-heading text-sm font-extrabold text-primary leading-tight">
+                  Mr. Dr.
+                </SheetTitle>
+                <SheetDescription className="text-[10px] text-on-surface-variant leading-none mt-0.5">
+                  Academic & Admission Care
+                </SheetDescription>
+              </div>
+            </SheetHeader>
+
+            {/* Navigation Lists */}
+            <div className="flex-grow overflow-y-auto px-2 py-4 select-none flex flex-col gap-4">
+              {navGroups.map((group, groupIdx) => (
+                <div key={groupIdx} className="flex flex-col gap-1">
+                  <span className="px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-outline block">
+                    {group.groupLabel}
+                  </span>
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href
+                    const Icon = item.icon
+                    return (
+                      <SheetClose asChild key={item.href}>
+                        <Link
+                          href={item.href}
+                          className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ease-in-out border-l-4 ${
+                            isActive
+                              ? "bg-surface-container-high text-primary rounded-r-lg font-bold border-primary"
+                              : "text-on-surface-variant hover:bg-surface-variant border-transparent"
+                          }`}
+                        >
+                          <Icon className="h-5 w-5 shrink-0" />
+                          <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                            {item.label}
+                          </span>
+                        </Link>
+                      </SheetClose>
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA & Footer */}
+            <div className="mt-auto flex flex-col gap-3 p-4 border-t border-outline-variant/30 bg-muted/20">
+              <SheetClose asChild>
+                <Link href="/students/create" className="w-full">
+                  <button className="w-full bg-primary-container text-on-primary-container font-semibold text-xs py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors duration-200 shadow-sm border border-transparent cursor-pointer">
+                    Enroll New Student
+                  </button>
+                </Link>
+              </SheetClose>
+              
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 px-3 transition-all duration-200 ease-in-out cursor-pointer"
+              >
+                <LogOut className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-medium">Logout</span>
+              </button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
       {/* Right Side Actions */}
       <div className="flex items-center gap-3">
@@ -40,16 +210,68 @@ export function TopNav() {
           <span className="material-symbols-outlined text-xl">help</span>
         </button>
 
-        <div
-          className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer active:opacity-80"
-          title={session?.user?.name || "Dr. User Profile"}
-        >
-          <img
-            alt={session?.user?.name || "Dr. User Profile"}
-            className="w-full h-full object-cover"
-            src={session?.user?.image || defaultAvatar}
-          />
-        </div>
+        {/* User dropdown menu trigger */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div
+              className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer active:opacity-80 hover:ring-2 hover:ring-primary/20 transition-all shrink-0 flex items-center justify-center"
+              title={user?.name || "Dr. User Profile"}
+            >
+              {user?.image ? (
+                <img
+                  alt={user?.name || "Dr. User Profile"}
+                  className={`w-full h-full object-cover ${isLoading ? "animate-pulse opacity-50" : ""}`}
+                  src={user.image}
+                />
+              ) : (
+                <div className={`w-full h-full bg-[#c52828]/10 text-[#c52828] font-extrabold flex items-center justify-center text-sm uppercase select-none ${isLoading ? "animate-pulse opacity-50" : ""}`}>
+                  {getFirstLetter()}
+                </div>
+              )}
+            </div>
+          </DropdownMenuTrigger>
+          
+          <DropdownMenuContent className="w-56 mt-1 rounded-xl bg-card border border-border" align="end">
+            <DropdownMenuLabel className="pb-1.5 pt-2">
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-bold text-foreground truncate">{user?.name || "Dr. User"}</span>
+                <span className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</span>
+                {roles && roles.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {roles.map((r) => (
+                      <span
+                        key={r.id}
+                        className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-md uppercase"
+                      >
+                        {r.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </DropdownMenuLabel>
+            
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="flex items-center gap-2 w-full cursor-pointer">
+                <Settings className="h-3.5 w-3.5" />
+                <span>Account Settings</span>
+              </Link>
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className="flex items-center gap-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Log Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
       </div>
     </header>
   )
