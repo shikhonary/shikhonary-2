@@ -165,11 +165,13 @@ export function CreateExamView() {
   const [hasRandom, setHasRandom] = useState(false)
   const [hasNegativeMark, setHasNegativeMark] = useState(false)
   const [negativeMark, setNegativeMark] = useState<number | "">(0.25)
-  const [examGroupId, setExamGroupId] = useState<string>("none")
+  const [examGroupId, setExamGroupId] = useState("none")
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([])
 
-  // Fetch exam groups for selection
-  const { data: examGroupsData } = useExamGroupsList({ limit: 100 })
+  // Fetch exam groups for selection (filtered by selected academic class)
+  const { data: examGroupsData } = useExamGroupsList(
+    academicClassId ? { academicClassId, limit: 100 } : { limit: 100 }
+  )
   const availableExamGroups = examGroupsData?.items ?? []
 
   // Fetch subjects based on selected academic class ID
@@ -184,8 +186,9 @@ export function CreateExamView() {
 
   const handleClassChange = (newClassId: string) => {
     setAcademicClassId(newClassId)
-    // Clear previously selected subject IDs when changing academic class
+    // Clear previously selected subject IDs and exam group when changing academic class
     setSelectedSubjectIds([])
+    setExamGroupId("none")
   }
 
   const toggleSubject = (subjectId: string) => {
@@ -434,7 +437,7 @@ export function CreateExamView() {
               </div>
             </div>
 
-            {/* Attach to Exam Group Select (Fifth Field) */}
+            {/* Attach to Exam Group Select */}
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="exam-group-select" className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                 Attach to Exam Group (Optional)
@@ -444,12 +447,12 @@ export function CreateExamView() {
                   layers
                 </span>
                 <Select
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !academicClassId}
                   value={examGroupId}
                   onValueChange={(val) => setExamGroupId(val ?? "none")}
                 >
-                  <SelectTrigger id="exam-group-select" className="w-full rounded-lg border border-outline-variant bg-white py-3 pl-10 pr-10 font-body-md text-on-surface transition-all cursor-pointer focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between">
-                    <SelectValue placeholder="None / Standalone Exam..." />
+                  <SelectTrigger id="exam-group-select" className="w-full rounded-lg border border-outline-variant bg-white py-3 pl-10 pr-10 font-body-md text-on-surface transition-all cursor-pointer focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between disabled:opacity-50">
+                    <SelectValue placeholder={!academicClassId ? "Please select academic class first..." : "None / Standalone Exam..."} />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
                     <SelectItem value="none">None / Standalone Exam</SelectItem>

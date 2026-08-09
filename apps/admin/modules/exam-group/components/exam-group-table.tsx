@@ -36,7 +36,7 @@ export interface ExamGroupItemData {
   academicClassId?: string | null
   academicClass?: {
     id: string
-    nameEn: string
+    name: string
     nameBn: string
   } | null
   items?: Array<{
@@ -273,7 +273,7 @@ export function ExamGroupTable({
                 <div className="flex justify-between gap-2">
                   <span className="text-outline font-medium">Class:</span>
                   <span className="font-semibold text-on-surface">
-                    {item.academicClass ? item.academicClass.nameEn : "Global / All"}
+                    {item.academicClass ? item.academicClass.name : "Global / All"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center gap-2">
@@ -381,7 +381,7 @@ export function ExamGroupTable({
                   <TableCell className="py-5 group-hover:py-6 px-4 transition-all duration-200 ease-in-out">
                     {item.academicClass ? (
                       <span className="inline-flex items-center rounded-md bg-secondary/10 px-2.5 py-1 text-xs font-semibold text-secondary">
-                        {item.academicClass.nameEn}
+                        {item.academicClass.name}
                       </span>
                     ) : (
                       <span className="text-xs text-outline italic">Global / All</span>

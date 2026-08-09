@@ -33,6 +33,7 @@ import {
   ExternalLink,
   Plus,
   CheckCircle2,
+  SlidersHorizontal,
 } from "lucide-react"
 
 const romanNumerals = ["i.", "ii.", "iii.", "iv.", "v.", "vi."]
@@ -53,17 +54,15 @@ function SubjectMcqSection({
 }: SubjectMcqSectionProps) {
   const { data: mcqsData, isLoading } = useMcqsList({
     subjectId,
-    limit: 50,
+    limit: 100,
   })
 
   const allMcqs = mcqsData?.items ?? []
-  const mcqs = assignedMcqIds.length > 0
-    ? allMcqs.filter((m) => assignedMcqIds.includes(m.id))
-    : allMcqs
-  const totalMcqs = assignedMcqIds.length > 0 ? mcqs.length : (mcqsData?.totalItems ?? mcqs.length)
+  const mcqs = allMcqs.filter((m) => assignedMcqIds.includes(m.id))
+  const totalMcqs = mcqs.length
 
   return (
-    <div className="space-y-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-5">
+    <div className="space-y-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-2">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-outline-variant/30 pb-3">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-primary" />
@@ -101,105 +100,155 @@ function SubjectMcqSection({
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {mcqs.map((item, idx) => (
+          {mcqs.map((item: any, idx: number) => (
             <div
               key={item.id}
-              className="rounded-xl border border-outline-variant/40 bg-white p-4 space-y-3 shadow-2xs"
+              className="bg-white border border-outline-variant/60 rounded-2xl p-4 sm:p-5 transition-all hover:border-primary/40 hover:shadow-md relative group"
             >
-              {/* Question Top Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/20 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                    #{idx + 1}
-                  </span>
-                  {item.chapter && (
-                    <span className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-semibold">
-                      {item.chapter.name}
+              <div className="space-y-2.5 sm:space-y-4">
+                {/* Badges Header Row */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/20 pb-2.5">
+                  <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+                    {/* Index Badge */}
+                    <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
+                      #{idx + 1}
                     </span>
-                  )}
-                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold uppercase border border-blue-100">
-                    {item.type}
-                  </span>
+
+                    {/* Chapter Badge */}
+                    {item.chapter && (
+                      <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
+                        {item.chapter.name}
+                      </span>
+                    )}
+
+                    {/* Type Badge */}
+                    <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
+                      {item.type}
+                    </span>
+
+                    {/* Math Badge */}
+                    {item.isMath && (
+                      <span className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded font-label-sm text-[11px] font-bold border border-amber-200">
+                        <span className="material-symbols-outlined text-[14px]">functions</span>
+                        <span>Math</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <Link
+                    href={`/mcqs/${item.id}`}
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 shrink-0"
+                  >
+                    <span>View Full Details</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </Link>
                 </div>
 
-                <Link
-                  href={`/mcqs/${item.id}`}
-                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
-                >
-                  <span>View Full Details</span>
-                  <ExternalLink className="h-3 w-3" />
-                </Link>
-              </div>
-
-              {/* Question Text */}
-              <p className="font-bold text-sm md:text-base text-on-surface leading-snug">
-                <RenderMath text={item.question} isMath={item.isMath} />
-              </p>
-
-              {/* Context if present */}
-              {item.context && (
-                <div className="rounded-lg border border-secondary/20 bg-secondary-container/10 p-3 text-xs text-on-surface-variant">
-                  <span className="font-bold text-secondary text-[11px] uppercase tracking-wider block mb-1">
-                    Passage / Context:
-                  </span>
-                  <p className="whitespace-pre-wrap">
-                    <RenderMath text={item.context} isMath={item.isMath} />
-                  </p>
-                </div>
-              )}
-
-              {/* Statements if present */}
-              {Array.isArray(item.statements) && item.statements.length > 0 && (
-                <div className="space-y-1 pl-3 border-l-2 border-primary/40 py-1 bg-surface-container-low/40 rounded-r-lg p-2 text-xs">
-                  {item.statements.map((stmt, sIdx) => (
-                    <div key={sIdx} className="flex items-start gap-2 text-on-surface-variant font-medium">
-                      <span className="font-mono font-bold text-secondary shrink-0">
-                        {romanNumerals[sIdx] || `${sIdx + 1}.`}
-                      </span>
-                      <span>
-                        <RenderMath text={stmt} isMath={item.isMath} />
-                      </span>
+                {/* Context / Passage if present */}
+                {item.context && (
+                  <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-2.5 sm:p-3.5 text-xs text-on-surface-variant leading-relaxed">
+                    <div className="font-bold text-secondary flex items-center gap-1.5 mb-1 text-[11px] uppercase tracking-wider">
+                      <span className="material-symbols-outlined text-sm">article</span>
+                      Context / Passage:
                     </div>
-                  ))}
+                    <p className="whitespace-pre-wrap">
+                      <RenderMath text={item.context} isMath={item.isMath} />
+                    </p>
+                  </div>
+                )}
+
+                {/* Question Title */}
+                <div className="font-headline-md text-sm sm:text-base md:text-lg font-bold text-on-surface leading-snug">
+                  <RenderMath text={item.question} isMath={item.isMath} />
                 </div>
-              )}
 
-              {/* Options Grid */}
-              {Array.isArray(item.options) && item.options.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                  {item.options.map((opt, optIdx) => {
-                    const isCorrect = item.answer === opt
-                    const letter = optionLetters[optIdx] || String(optIdx + 1)
-
-                    return (
-                      <div
-                        key={optIdx}
-                        className={`flex items-center gap-2 rounded-lg border p-2 text-xs ${isCorrect
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-950 font-bold"
-                            : "border-outline-variant/40 bg-surface-container-lowest text-on-surface"
-                          }`}
-                      >
-                        <span
-                          className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold ${isCorrect
-                              ? "bg-emerald-600 text-white"
-                              : "bg-surface-container-high text-on-surface-variant"
-                            }`}
-                        >
-                          {letter}
+                {/* Statements / Sub-questions if present */}
+                {Array.isArray(item.statements) && item.statements.length > 0 && (
+                  <div className="space-y-1.5 pl-3 border-l-2 border-primary/40 py-1 bg-surface-container-low/40 rounded-r-lg p-1.5 sm:p-2.5 text-xs">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-outline block mb-1">
+                      Statements:
+                    </span>
+                    {item.statements.map((stmt: any, sIdx: number) => (
+                      <div key={sIdx} className="flex items-start gap-2 text-on-surface-variant font-medium">
+                        <span className="font-mono font-bold text-secondary shrink-0">
+                          {romanNumerals[sIdx] || `${sIdx + 1}.`}
                         </span>
-                        <span className="flex-1 min-w-0">
-                          <RenderMath text={opt} isMath={item.isMath} />
+                        <span>
+                          <RenderMath text={stmt} isMath={item.isMath} />
                         </span>
-                        {isCorrect && (
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0">
-                            ✓ Correct
-                          </span>
-                        )}
                       </div>
-                    )
-                  })}
+                    ))}
+                  </div>
+                )}
+
+                {/* Option Choices Grid */}
+                {Array.isArray(item.options) && item.options.length > 0 && (
+                  <div className="space-y-1.5 pt-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-outline block">
+                      Option Choices ({item.options.length}):
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+                      {item.options.map((opt: any, optIdx: number) => {
+                        const isCorrect = item.answer === opt
+                        const letter = optionLetters[optIdx] || String(optIdx + 1)
+
+                        return (
+                          <div
+                            key={optIdx}
+                            className={`flex items-center gap-2.5 rounded-lg border p-2 sm:p-2.5 text-xs transition-colors ${isCorrect
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-950 font-bold ring-1 ring-emerald-500/20"
+                              : "border-outline-variant/40 bg-surface-container-lowest text-on-surface"
+                              }`}
+                          >
+                            <span
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold ${isCorrect
+                                ? "bg-emerald-600 text-white"
+                                : "bg-surface-container-high text-on-surface-variant"
+                                }`}
+                            >
+                              {letter}
+                            </span>
+                            <span className="flex-1 min-w-0 whitespace-normal break-words">
+                              <RenderMath text={opt} isMath={item.isMath} />
+                            </span>
+                            {isCorrect && (
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0">
+                                ✓ Correct
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Explanation / Solution Notes if present */}
+                {item.explanation && (
+                  <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low/60 p-2.5 sm:p-3 text-xs text-on-surface-variant">
+                    <span className="font-bold text-on-surface block mb-0.5">Explanation:</span>
+                    <p className="whitespace-pre-wrap">{item.explanation}</p>
+                  </div>
+                )}
+
+                {/* Reference Tags & Actions Footer */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2 sm:pt-3">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {Array.isArray(item.reference) && item.reference.length > 0 ? (
+                      item.reference.map((ref: any, rIdx: number) => (
+                        <span
+                          key={rIdx}
+                          className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
+                        >
+                          🏷️ {ref}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-outline italic">No reference tags</span>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -217,6 +266,7 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
   const { data: exam, isLoading, isError } = useExamById(examId)
   const openDeleteModal = useDeleteExamModalStore((state) => state.openModal)
   const toggleStatusMutation = useToggleExamStatus()
+  const [activeTab, setActiveTab] = useState<"questions" | "config">("questions")
 
   const handleToggleStatus = async (newStatus: string) => {
     try {
@@ -342,271 +392,199 @@ export function ExamDetailView({ examId }: ExamDetailViewProps) {
         </div>
       </div>
 
-      {/* Main Stats Summary Banner */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Status Card */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-xs">
-          <p className="font-label-sm text-xs font-semibold uppercase tracking-wider text-outline">
-            Exam Status
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${exam.status === "Published"
-                  ? "bg-emerald-500 animate-pulse"
-                  : exam.status === "Pending"
-                    ? "bg-amber-500"
-                    : "bg-slate-400"
-                }`}
-            />
-            <span className="font-headline-md text-xl font-extrabold text-on-surface">
-              {exam.status}
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-on-surface-variant">
-            Type: {exam.type} {(exam as any).isOffline ? "• Offline Exam" : "• Online Exam"}
-          </p>
-        </div>
-
-        {/* Target Academic Class */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-xs">
-          <p className="font-label-sm text-xs font-semibold uppercase tracking-wider text-outline">
-            Target Academic Class
-          </p>
-          <div className="mt-2 flex items-center gap-2 text-primary">
-            <GraduationCap className="h-5 w-5" />
-            <span className="font-headline-md text-xl font-extrabold text-on-surface">
+      {/* Main Metadata Details Header Card */}
+      <div className="rounded-xl border border-outline-variant/30 bg-surface p-6 shadow-xs space-y-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div>
+            <span className="text-xs font-semibold text-outline tracking-wider uppercase">Class</span>
+            <p className="mt-1 font-bold text-on-surface text-sm sm:text-base">
               {exam.academicClass?.name ?? "Unassigned"}
-            </span>
-          </div>
-        </div>
-
-        {/* Total Marks */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-xs">
-          <p className="font-label-sm text-xs font-semibold uppercase tracking-wider text-outline">
-            Total Marks & MCQs
-          </p>
-          <div className="mt-2 flex items-center gap-2 text-primary">
-            <Award className="h-5 w-5" />
-            <span className="font-headline-md text-2xl font-extrabold text-on-surface">
-              {exam.total} pts
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-on-surface-variant">{exam.totalMcq} MCQs total</p>
-        </div>
-
-        {/* Duration */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-xs">
-          <p className="font-label-sm text-xs font-semibold uppercase tracking-wider text-outline">
-            Time Limit
-          </p>
-          <div className="mt-2 flex items-center gap-2 text-amber-600">
-            <Clock className="h-5 w-5" />
-            <span className="font-headline-md text-2xl font-extrabold text-on-surface">
-              {exam.duration} mins
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-on-surface-variant">Per student attempt</p>
-        </div>
-      </div>
-
-      {/* Schedule & Rules Breakdown */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Schedule Info */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
-          <div className="flex items-center gap-2 mb-4 border-b border-outline-variant/30 pb-3">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h2 className="font-headline-md text-lg font-bold text-on-surface">
-              Availability Window
-            </h2>
-          </div>
-
-          <div className="space-y-4 text-sm">
-            <div className="flex justify-between items-center p-3 rounded-xl bg-surface-container-low">
-              <span className="font-semibold text-on-surface-variant">Start Time:</span>
-              <span className="font-bold text-on-surface">{startDateStr}</span>
-            </div>
-
-            <div className="flex justify-between items-center p-3 rounded-xl bg-surface-container-low">
-              <span className="font-semibold text-on-surface-variant">End Time:</span>
-              <span className="font-bold text-on-surface">{endDateStr}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Rules & Configuration */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
-          <div className="flex items-center gap-2 mb-4 border-b border-outline-variant/30 pb-3">
-            <HelpCircle className="h-5 w-5 text-primary" />
-            <h2 className="font-headline-md text-lg font-bold text-on-surface">
-              Rules & Features
-            </h2>
-          </div>
-
-          <div className="space-y-3 text-sm">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
-              <div className="flex items-center gap-2">
-                <Shuffle className="h-4 w-4 text-primary" />
-                <span className="font-medium text-on-surface">Shuffle Questions</span>
-              </div>
-              <Badge variant={exam.hasSuffle ? "default" : "outline"}>
-                {exam.hasSuffle ? "Enabled" : "Disabled"}
-              </Badge>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
-              <div className="flex items-center gap-2">
-                <Dices className="h-4 w-4 text-secondary" />
-                <span className="font-medium text-on-surface">Randomized MCQ Order</span>
-              </div>
-              <Badge variant={exam.hasRandom ? "default" : "outline"}>
-                {exam.hasRandom ? "Enabled" : "Disabled"}
-              </Badge>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <span className="font-medium text-on-surface">Negative Marking</span>
-              </div>
-              {exam.hasNegativeMark ? (
-                <Badge className="bg-error/10 text-error border-0 font-bold">
-                  -{exam.negativeMark} Marks / Incorrect
-                </Badge>
-              ) : (
-                <Badge variant="outline">Disabled</Badge>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Associated Exam Groups Card */}
-      <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4 border-b border-outline-variant/30 pb-3">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-xl text-primary">layers</span>
-            <h2 className="font-headline-md text-lg font-bold text-on-surface">
-              Associated Exam Groups & Model Tests
-            </h2>
-          </div>
-          <span className="text-xs font-semibold text-outline">
-            {exam.examGroupItems?.length ?? 0} group(s)
-          </span>
-        </div>
-
-        {!exam.examGroupItems || exam.examGroupItems.length === 0 ? (
-          <div className="p-4 rounded-xl bg-surface-container-low text-center text-xs text-outline">
-            This exam is standalone and not currently bundled into any Exam Group.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {exam.examGroupItems.map((item: any) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-outline-variant/40 bg-white"
-              >
-                <div>
-                  <Link
-                    href={`/exam-groups/${item.examGroup.id}`}
-                    className="font-bold text-sm text-on-surface hover:text-primary transition-colors flex items-center gap-1.5"
-                  >
-                    <span>{item.examGroup.title}</span>
-                    <ExternalLink className="h-3 w-3 text-outline" />
-                  </Link>
-                  <p className="text-xs text-outline mt-0.5">
-                    Mode: {item.examGroup.calculationType} | Weight: {item.weightage}%
-                  </p>
-                </div>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs">
-                  {item.examGroup.type.replace("_", " ")}
-                </Badge>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Linked Subjects Summary */}
-      <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4 border-b border-outline-variant/30 pb-3">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
-            <h2 className="font-headline-md text-lg font-bold text-on-surface">
-              Linked Academic Subjects
-            </h2>
-          </div>
-          <span className="text-xs font-semibold text-outline">
-            {exam.examSubjects?.length ?? 0} subject(s)
-          </span>
-        </div>
-
-        {exam.examSubjects && exam.examSubjects.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {exam.examSubjects.map((es) => (
-              <div
-                key={es.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-outline-variant/40 bg-surface-container-low"
-              >
-                <div className="flex flex-col">
-                  <span className="font-bold text-sm text-on-surface">
-                    {es.subject?.name}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-outline italic">No subjects currently linked to this exam.</p>
-        )}
-      </div>
-
-      {/* Assigned Exam MCQs Section */}
-      <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-outline-variant/30 pb-4">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="h-5 w-5 text-primary" />
-            <div>
-              <h2 className="font-headline-md text-lg font-bold text-on-surface">
-                Assigned Exam MCQs
-              </h2>
-              <p className="text-xs text-on-surface-variant">
-                Questions assigned to this exam module by subject ID
-              </p>
-            </div>
-          </div>
-
-          <Button
-            asChild
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-auto"
-          >
-            <Link href={`/exams/${examId}/mcq`}>
-              <Plus className="h-3.5 w-3.5" />
-              <span>Assign & Manage Questions</span>
-            </Link>
-          </Button>
-        </div>
-
-        {exam.examSubjects && exam.examSubjects.length > 0 ? (
-          <div className="space-y-6">
-            {exam.examSubjects.map((es) => (
-              <SubjectMcqSection
-                key={es.id}
-                subjectId={es.subjectId}
-                subjectName={es.subject?.name ?? "Subject"}
-                assignedMcqIds={es.mcqIds ?? []}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="p-8 text-center border border-dashed border-outline-variant/60 rounded-xl bg-surface-container-low/50">
-            <HelpCircle className="h-8 w-8 text-outline mx-auto mb-2" />
-            <h4 className="font-bold text-sm text-on-surface">No Subjects or Questions Linked</h4>
-            <p className="text-xs text-on-surface-variant mt-1 max-w-md mx-auto">
-              Please link subjects and assign MCQs to this exam to view questions here.
             </p>
           </div>
-        )}
+
+          <div>
+            <span className="text-xs font-semibold text-outline tracking-wider uppercase">Evaluation</span>
+            <p className="mt-1 font-bold text-on-surface text-sm sm:text-base">
+              {exam.total} Marks ({exam.totalMcq} MCQs)
+            </p>
+          </div>
+
+          <div>
+            <span className="text-xs font-semibold text-outline tracking-wider uppercase">Time Limit</span>
+            <p className="mt-1 font-bold text-on-surface text-sm sm:text-base">
+              {exam.duration} Mins
+            </p>
+          </div>
+
+          <div>
+            <span className="text-xs font-semibold text-outline tracking-wider uppercase">Type & Status</span>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <Badge variant="outline" className="bg-secondary-container/20 text-secondary border-secondary-container/30 text-[10px] font-bold py-0.5 shadow-none uppercase">
+                {exam.type} {(exam as any).isOffline ? "(Offline)" : "(Online)"}
+              </Badge>
+              <Badge
+                variant="outline"
+                className={`text-[10px] font-bold py-0.5 shadow-none ${exam.status === "Published"
+                  ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
+                  : exam.status === "Pending"
+                    ? "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                    : "bg-slate-500/10 text-slate-700 border-slate-500/20"
+                  }`}
+              >
+                {exam.status}
+              </Badge>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Tab Selectors */}
+      <div className="flex flex-wrap bg-surface-container-low p-1.5 rounded-xl border border-outline-variant/30 w-full sm:w-auto h-auto justify-start self-start gap-1.5">
+        <Button
+          variant={activeTab === "questions" ? "default" : "ghost"}
+          onClick={() => setActiveTab("questions")}
+          className={`flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs sm:text-sm font-bold cursor-pointer transition-all grow sm:grow-0 w-auto ${activeTab === "questions"
+            ? "bg-primary text-white hover:bg-primary shadow-xs"
+            : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high"
+            }`}
+        >
+          <HelpCircle className="h-4 w-4" />
+          <span>Questions</span>
+        </Button>
+        <Button
+          variant={activeTab === "config" ? "default" : "ghost"}
+          onClick={() => setActiveTab("config")}
+          className={`flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs sm:text-sm font-bold cursor-pointer transition-all grow sm:grow-0 w-auto ${activeTab === "config"
+            ? "bg-primary text-white hover:bg-primary shadow-xs"
+            : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high"
+            }`}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          <span>Configuration</span>
+        </Button>
+      </div>
+
+      {/* Tab Panels */}
+      {activeTab === "questions" ? (
+        /* Assigned Exam MCQs Section */
+        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-outline-variant/30 pb-4">
+            <div className="flex items-center gap-2">
+              <HelpCircle className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="font-headline-md text-lg font-bold text-on-surface">
+                  Assigned Exam MCQs
+                </h2>
+                <p className="text-xs text-on-surface-variant">
+                  Questions assigned to this exam module by subject ID
+                </p>
+              </div>
+            </div>
+
+            <Button
+              asChild
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-auto"
+            >
+              <Link href={`/exams/${examId}/mcq`}>
+                <Plus className="h-3.5 w-3.5" />
+                <span>Assign & Manage Questions</span>
+              </Link>
+            </Button>
+          </div>
+
+          {exam.examSubjects && exam.examSubjects.length > 0 ? (
+            <div className="space-y-6">
+              {exam.examSubjects.map((es) => (
+                <SubjectMcqSection
+                  key={es.id}
+                  subjectId={es.subjectId}
+                  subjectName={es.subject?.name ?? "Subject"}
+                  assignedMcqIds={es.mcqIds ?? []}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center border border-dashed border-outline-variant/60 rounded-xl bg-surface-container-low/50">
+              <HelpCircle className="h-8 w-8 text-outline mx-auto mb-2" />
+              <h4 className="font-bold text-sm text-on-surface">No Subjects or Questions Linked</h4>
+              <p className="text-xs text-on-surface-variant mt-1 max-w-md mx-auto">
+                Please link subjects and assign MCQs to this exam to view questions here.
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Configuration Panel */
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Schedule Info */}
+          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
+            <div className="flex items-center gap-2 mb-4 border-b border-outline-variant/30 pb-3">
+              <Calendar className="h-5 w-5 text-primary" />
+              <h2 className="font-headline-md text-lg font-bold text-on-surface">
+                Availability Window
+              </h2>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <div className="flex justify-between items-center p-3 rounded-xl bg-surface-container-low">
+                <span className="font-semibold text-on-surface-variant">Start Time:</span>
+                <span className="font-bold text-on-surface">{startDateStr}</span>
+              </div>
+
+              <div className="flex justify-between items-center p-3 rounded-xl bg-surface-container-low">
+                <span className="font-semibold text-on-surface-variant">End Time:</span>
+                <span className="font-bold text-on-surface">{endDateStr}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Rules & Configuration */}
+          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs">
+            <div className="flex items-center gap-2 mb-4 border-b border-outline-variant/30 pb-3">
+              <SlidersHorizontal className="h-5 w-5 text-primary" />
+              <h2 className="font-headline-md text-lg font-bold text-on-surface">
+                Rules & Features
+              </h2>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+                <div className="flex items-center gap-2">
+                  <Shuffle className="h-4 w-4 text-primary" />
+                  <span className="font-medium text-on-surface">Shuffle Questions</span>
+                </div>
+                <Badge variant={exam.hasSuffle ? "default" : "outline"}>
+                  {exam.hasSuffle ? "Enabled" : "Disabled"}
+                </Badge>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+                <div className="flex items-center gap-2">
+                  <Dices className="h-4 w-4 text-secondary" />
+                  <span className="font-medium text-on-surface">Randomized MCQ Order</span>
+                </div>
+                <Badge variant={exam.hasRandom ? "default" : "outline"}>
+                  {exam.hasRandom ? "Enabled" : "Disabled"}
+                </Badge>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <span className="font-medium text-on-surface">Negative Marking</span>
+                </div>
+                {exam.hasNegativeMark ? (
+                  <Badge className="bg-error/10 text-error border-0 font-bold">
+                    -{exam.negativeMark} Marks / Incorrect
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">Disabled</Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

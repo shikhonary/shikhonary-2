@@ -178,8 +178,10 @@ export function EditExamView({ examId }: EditExamViewProps) {
   const [negativeMark, setNegativeMark] = useState<number | "">(0.25)
   const [examGroupId, setExamGroupId] = useState<string>("none")
 
-  // Fetch exam groups for selection
-  const { data: examGroupsData } = useExamGroupsList({ limit: 100 })
+  // Fetch exam groups for selection (filtered by selected academic class)
+  const { data: examGroupsData } = useExamGroupsList(
+    academicClassId ? { academicClassId, limit: 100 } : { limit: 100 }
+  )
   const availableExamGroups = examGroupsData?.items ?? []
 
   // Fetch subjects assigned to selected academic class
@@ -385,7 +387,10 @@ export function EditExamView({ examId }: EditExamViewProps) {
                 <Select
                   disabled={isSubmitting || isClassesLoading}
                   value={academicClassId}
-                  onValueChange={setAcademicClassId}
+                  onValueChange={(val) => {
+                    setAcademicClassId(val)
+                    setExamGroupId("none")
+                  }}
                 >
                   <SelectTrigger id="edit-class-select" className="w-full rounded-lg border border-outline-variant bg-white py-3 pl-10 pr-10 font-body-md text-on-surface transition-all cursor-pointer focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between">
                     <SelectValue placeholder={isClassesLoading ? "Loading classes..." : "Select Class..."} />
@@ -488,12 +493,12 @@ export function EditExamView({ examId }: EditExamViewProps) {
                   layers
                 </span>
                 <Select
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !academicClassId}
                   value={examGroupId}
                   onValueChange={(val) => setExamGroupId(val ?? "none")}
                 >
-                  <SelectTrigger id="edit-exam-group-select" className="w-full rounded-lg border border-outline-variant bg-white py-3 pl-10 pr-10 font-body-md text-on-surface transition-all cursor-pointer focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between">
-                    <SelectValue placeholder="None / Standalone Exam..." />
+                  <SelectTrigger id="edit-exam-group-select" className="w-full rounded-lg border border-outline-variant bg-white py-3 pl-10 pr-10 font-body-md text-on-surface transition-all cursor-pointer focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between disabled:opacity-50">
+                    <SelectValue placeholder={!academicClassId ? "Please select academic class first..." : "None / Standalone Exam..."} />
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
                     <SelectItem value="none">None / Standalone Exam</SelectItem>

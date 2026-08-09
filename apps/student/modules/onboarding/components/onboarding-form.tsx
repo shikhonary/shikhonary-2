@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
@@ -11,7 +11,8 @@ import { trpc } from "@/trpc/client"
 import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
+import { Checkbox } from "@workspace/ui/components/checkbox"
+import { useCurrentUser } from "@/modules/user/services/use-user"
 import {
   Select,
   SelectContent,
@@ -20,49 +21,92 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
-// Regex pattern matching Bengali characters, whitespace, dots, and hyphens (\u0980-\u09FF)
-const BENGALI_REGEX = /^[\u0980-\u09FF\s.\-]+$/
-
-// Regex pattern matching English characters, whitespace, dots, and hyphens
 const ENGLISH_REGEX = /^[A-Za-z\s.\-]+$/
 
 const onboardingSchema = z.object({
-  studentId: z
-    .string()
-    .min(1, "শিক্ষার্থী আইডি প্রদান করা আবশ্যক")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "সঠিক সংখ্যাবাচক শিক্ষার্থী আইডি দিন",
-    }),
   name: z
     .string()
-    .min(1, "ইংরেজিতে নাম প্রদান করা আবশ্যক")
-    .regex(ENGLISH_REGEX, "শুধুমাত্র ইংরেজি বর্ণমালা ব্যবহার করুন (e.g. Abdullah Al Mamun)"),
-  nameBn: z
+    .min(1, "Full name is required")
+    .regex(ENGLISH_REGEX, "Please enter your name in English (e.g. Abdullah Al Mamun)"),
+  phone: z
     .string()
-    .min(1, "বাংলায় নাম প্রদান করা আবশ্যক")
-    .regex(BENGALI_REGEX, "শুধুমাত্র বাংলা বর্ণমালা ব্যবহার করুন (যেমন: আব্দুল্লাহ আল মামুন)"),
-  mPhone: z
-    .string()
-    .min(1, "মোবাইল নম্বর প্রদান করা আবশ্যক")
+    .min(1, "Phone number is required")
     .refine(
       (val) => {
         const digits = val.replace(/\D/g, "")
         return digits.length === 10 || digits.length === 11
       },
-      {
-        message: "সঠিক ১০ বা ১১ ডিজিটের মোবাইল নম্বর দিন",
-      }
+      { message: "Enter a valid 10 or 11-digit phone number" }
     ),
-  academicClassId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  institute: z.string().min(1, "Institute name is required"),
+  academicClassId: z.string().min(1, "Please select your class"),
+  roll: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || val.trim() === "") return true
+        const num = Number(val)
+        return !isNaN(num) && Number.isInteger(num) && num > 0
+      },
+      { message: "Roll number must be a positive integer" }
+    ),
+  isOfflineStudent: z.boolean(),
 })
 
 type OnboardingFormValues = z.infer<typeof onboardingSchema>
 
+// ─── Shared input / select classes using theme tokens ────────────────────────
+const inputCls =
+  "h-10 w-full rounded-lg border border-outline-variant bg-surface-container-low pl-9 pr-3 text-sm text-on-surface outline-none transition-all duration-150 placeholder:text-on-surface-variant/50 hover:border-outline focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+
+const selectTriggerCls =
+  "h-10 w-full min-w-0 rounded-lg border border-outline-variant bg-surface-container-low pl-9 pr-3 text-sm text-on-surface transition-all duration-150 hover:border-outline focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 data-[placeholder]:text-on-surface-variant/50 justify-between"
+
+// ─── Reusable field wrapper ───────────────────────────────────────────────────
+function Field({
+  label,
+  icon,
+  error,
+  required,
+  children,
+}: {
+  label: string
+  icon: string
+  error?: string
+  required?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="block text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">
+        {label}
+        {required && <span className="ml-0.5 text-error">*</span>}
+      </label>
+      <div className="group relative w-full min-w-0">
+        <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-outline transition-colors duration-150 group-focus-within:text-primary">
+          {icon}
+        </span>
+        {children}
+      </div>
+      {error && (
+        <p className="flex items-center gap-1 text-[11px] text-error">
+          <span className="material-symbols-outlined text-[13px]">error</span>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+// Steps for the sidebar progress
+const STEPS = ["Account", "Profile", "Class"]
+
 export function OnboardingForm() {
   const router = useRouter()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const { user } = useCurrentUser()
 
-  // Fetch academic classes for selection
   const academicClassesQuery = useQuery(
     trpc.academicClass.forSelection.queryOptions({})
   )
@@ -71,21 +115,49 @@ export function OnboardingForm() {
     register,
     handleSubmit,
     control,
+    reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<OnboardingFormValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      studentId: "",
       name: "",
-      nameBn: "",
-      mPhone: "",
+      phone: "",
+      institute: "",
       academicClassId: "",
+      roll: "",
+      isOfflineStudent: false,
     },
   })
 
+  const selectedClassId = watch("academicClassId")
+  const selectedClass = academicClassesQuery.data?.find(
+    (cls) => cls.id === selectedClassId
+  )
+  const shouldShowRoll = selectedClass?.name?.startsWith("SSC") || false
+
+  useEffect(() => {
+    if (!shouldShowRoll) {
+      setValue("roll", "")
+    }
+  }, [shouldShowRoll, setValue])
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        name: user.name || "",
+        phone: user.phoneNumber || "",
+        institute: "",
+        academicClassId: "",
+        roll: "",
+        isOfflineStudent: false,
+      })
+    }
+  }, [user, reset])
+
   const queryClient = useQueryClient()
 
-  // Mutation
   const completeMutation = useMutation(
     trpc.student.completeOnboarding.mutationOptions({
       onSuccess: async (data) => {
@@ -96,7 +168,7 @@ export function OnboardingForm() {
           queryClient.invalidateQueries(trpc.user.pathFilter()),
           queryClient.invalidateQueries(trpc.student.pathFilter()),
         ])
-        toast.success("প্রোফাইল অনবোর্ডিং সফল হয়েছে! ড্যাশবোর্ডে রিডাইরেক্ট করা হচ্ছে...")
+        toast.success("Profile created! Redirecting to your dashboard…")
         setErrorMsg(null)
         setTimeout(() => {
           router.push("/")
@@ -104,7 +176,7 @@ export function OnboardingForm() {
         }, 1200)
       },
       onError: (err) => {
-        const msg = err.message || "অনবোর্ডিং সম্পূর্ণ করতে ব্যর্থ হয়েছে। পুনরায় চেষ্টা করুন।"
+        const msg = err.message || "Failed to complete onboarding. Please try again."
         setErrorMsg(msg)
         toast.error(msg)
       },
@@ -116,216 +188,260 @@ export function OnboardingForm() {
   const onSubmit = (data: OnboardingFormValues) => {
     setErrorMsg(null)
     completeMutation.mutate({
-      studentId: parseInt(data.studentId, 10),
       name: data.name.trim(),
-      nameBn: data.nameBn.trim(),
-      mPhone: data.mPhone.trim(),
+      phone: data.phone.trim(),
+      institute: data.institute.trim(),
       academicClassId: data.academicClassId,
+      roll: shouldShowRoll && data.roll && data.roll.trim() !== "" ? parseInt(data.roll, 10) : null,
+      isOfflineStudent: data.isOfflineStudent,
     })
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface font-body-md text-on-surface">
-      <main className="flex flex-grow items-center justify-center p-4 py-8 sm:p-6 md:p-10">
-        <div className="w-full max-w-xl">
-          {/* Card Container */}
-          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-8 shadow-xs sm:p-10">
-            {/* Logo & Header like LoginPage */}
-            <div className="flex flex-col items-center mb-10">
-              <Image
-                alt="Basic Education Care Logo"
-                src="/logo.jpg"
-                width={200}
-                height={64}
-                priority
-                className="h-16 w-auto mb-8 object-contain"
-              />
-              <h1 className="font-headline-md text-headline-md text-on-surface text-center mb-2">
-                অনবোর্ডিং
-              </h1>
-              <p className="font-body-md text-on-surface-variant text-center">
-                <span className="font-bold text-primary">BEC</span> স্টুডেন্ট প্রোফাইল তৈরি সম্পূর্ণ করুন
-              </p>
-            </div>
+    <div className="flex min-h-screen bg-surface">
 
-            {errorMsg && (
-              <div className="mb-6 flex items-center gap-3 rounded-xl border border-error/30 bg-error-container/20 p-4 text-error">
-                <span className="material-symbols-outlined">error</span>
-                <span className="font-body-md text-sm font-medium">{errorMsg}</span>
+      {/* ── Left branding panel (desktop only) ─────────────────────────── */}
+      <aside className="hidden lg:flex lg:w-[360px] xl:w-[400px] flex-shrink-0 flex-col justify-between bg-primary p-10 text-white">
+        {/* Logo mark + brand name */}
+        <div>
+          <div className="mb-10 flex items-center gap-3">
+            <Image
+              src="/logo.jpg"
+              alt="Mr. Dr. Logo"
+              className="w-10 h-10 rounded-xl object-contain shadow-sm bg-white"
+              width={100}
+              height={100}
+              priority
+            />
+            <span className="text-2xl font-extrabold tracking-tight text-white">Mr. Dr.</span>
+          </div>
+
+          {/* Personalised headline */}
+          <h2 className="mb-3 text-3xl font-extrabold leading-tight text-white">
+            Welcome aboard,{" "}
+            <span className="text-white/85">
+              {user?.name?.split(" ")[0] || "Student"}!
+            </span>
+          </h2>
+          <p className="text-sm leading-relaxed text-white/80">
+            Complete your profile to unlock your personalised dashboard, track your progress, and access all learning materials.
+          </p>
+
+          {/* Step indicator */}
+          <div className="mt-10 space-y-4">
+            {STEPS.map((step, i) => (
+              <div key={step} className="flex items-center gap-3 text-white">
+                <div
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i === 1
+                      ? "bg-white text-primary"
+                      : "border border-white/30 text-white/50"
+                    }`}
+                >
+                  {i + 1}
+                </div>
+                <span
+                  className={`text-sm ${i === 1 ? "font-semibold text-white" : "text-white/60"
+                    }`}
+                >
+                  {step}
+                </span>
+                {i === 1 && (
+                  <span className="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                    Current
+                  </span>
+                )}
               </div>
-            )}
+            ))}
+          </div>
+        </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* 1. Academic Class (At the top) */}
-              <div className="space-y-2">
-                <Label className="block font-label-sm text-xs font-semibold tracking-wider text-on-surface-variant">
-                  শ্রেণি <span className="text-error">*</span>
-                </Label>
-                <Controller
-                  name="academicClassId"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="group relative">
-                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors z-10 pointer-events-none">
-                        school
-                      </span>
-                      <Select
-                        disabled={isPending}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full rounded-lg border border-outline-variant py-3 pl-10 pr-4 font-body-md text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto justify-between">
-                          <SelectValue placeholder="-- শ্রেণি নির্বাচন করুন --" />
+        {/* Bottom quote */}
+        <blockquote className="border-l-2 border-white/30 pl-4 text-sm italic text-white/80">
+          "Education is the most powerful weapon which you can use to change the world."
+          <footer className="mt-1 not-italic text-white/60">— Nelson Mandela</footer>
+        </blockquote>
+      </aside>
+
+      {/* ── Right form panel ────────────────────────────────────────────── */}
+      <main className="flex flex-1 items-center justify-center p-3 pt-6 pb-28 sm:p-8 lg:pb-8">
+        <div className="w-full max-w-lg min-w-0">
+
+          {/* Mobile logo (hidden on desktop since sidebar shows branding) */}
+          <div className="mb-6 flex flex-col items-center gap-2 lg:hidden">
+            <Image
+              src="/logo.jpg"
+              alt="Mr. Dr. Logo"
+              className="w-14 h-14 rounded-2xl object-cover shadow-md bg-white"
+              width={100}
+              height={100}
+              priority
+            />
+            <div className="text-center">
+              <div className="text-2xl font-extrabold text-primary tracking-tight leading-none">Mr. Dr.</div>
+              <div className="text-[10px] font-semibold text-on-surface-variant/60 tracking-widest uppercase mt-1">Student Portal</div>
+            </div>
+          </div>
+
+          {/* Card */}
+          <div className="w-full overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-level-2">
+
+            {/* Top accent stripe using primary + secondary */}
+            <div className="h-1 w-full bg-gradient-to-r from-primary via-primary-container to-secondary" />
+
+            <div className="p-4 sm:p-8">
+
+              {/* Header */}
+              <div className="mb-6">
+                <h1 className="text-xl font-bold text-on-surface">Complete your profile</h1>
+                <p className="mt-0.5 text-sm text-on-surface-variant">
+                  Fill in your details to get started with your learning journey.
+                </p>
+              </div>
+
+              {/* Error banner */}
+              {errorMsg && (
+                <div className="mb-5 flex items-start gap-3 rounded-xl border border-error/30 bg-error-container/20 p-3.5 text-error">
+                  <span className="material-symbols-outlined mt-0.5 shrink-0 text-[18px]">error</span>
+                  <p className="text-sm font-medium">{errorMsg}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+                {/* Row 1 — Name & Phone */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Field label="Full Name" icon="person" error={errors.name?.message} required>
+                    <Input
+                      type="text"
+                      disabled={isPending}
+                      placeholder="e.g. Abdullah Al Mamun"
+                      {...register("name")}
+                      className={inputCls}
+                    />
+                  </Field>
+
+                  <Field label="Phone Number" icon="call" error={errors.phone?.message} required>
+                    <Input
+                      type="tel"
+                      disabled={isPending}
+                      placeholder="e.g. 017XXXXXXXX"
+                      {...register("phone")}
+                      className={inputCls}
+                    />
+                  </Field>
+                </div>
+
+                {/* Row 2 — Class (full width) */}
+                <Field label="Academic Class" icon="school" error={errors.academicClassId?.message} required>
+                  <Controller
+                    name="academicClassId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select disabled={isPending} value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className={selectTriggerCls}>
+                          <SelectValue placeholder="Select your class" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                        <SelectContent className="w-[var(--radix-select-trigger-width)] rounded-xl border border-outline-variant bg-surface-container-lowest shadow-lg">
                           {academicClassesQuery.isLoading ? (
-                            <SelectItem value="" disabled>
-                              লোডিং হচ্ছে...
-                            </SelectItem>
+                            <SelectItem value="" disabled>Loading…</SelectItem>
                           ) : (
                             academicClassesQuery.data?.map((cls) => (
                               <SelectItem key={cls.id} value={cls.id}>
-                                {cls.nameBn}
+                                {cls.name}
                               </SelectItem>
                             ))
                           )}
                         </SelectContent>
                       </Select>
-                    </div>
+                    )}
+                  />
+                </Field>
+
+                {/* Row 3 — Institute & Roll */}
+                <div className={shouldShowRoll ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "block"}>
+                  <Field label="Institute / School" icon="account_balance" error={errors.institute?.message} required>
+                    <Input
+                      type="text"
+                      disabled={isPending}
+                      placeholder="e.g. Dhaka College"
+                      {...register("institute")}
+                      className={inputCls}
+                    />
+                  </Field>
+
+                  {shouldShowRoll && (
+                    <Field label="Roll Number" icon="badge" error={errors.roll?.message}>
+                      <Input
+                        type="number"
+                        disabled={isPending}
+                        placeholder="Optional"
+                        {...register("roll")}
+                        className={inputCls}
+                      />
+                    </Field>
+                  )}
+                </div>
+
+                {/* Offline student checkbox card */}
+                <Controller
+                  name="isOfflineStudent"
+                  control={control}
+                  render={({ field }) => (
+                    <label
+                      htmlFor="isOfflineStudent"
+                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-outline-variant bg-surface-container-low p-3.5 transition-colors hover:border-primary/40 hover:bg-primary-fixed/20"
+                    >
+                      <Checkbox
+                        id="isOfflineStudent"
+                        disabled={isPending}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-0.5 shrink-0"
+                      />
+                      <div>
+                        <p className="text-sm font-semibold text-on-surface">
+                          I attend classes physically at BEC
+                        </p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          Check this if you are an offline student at Basic Education Care.
+                        </p>
+                      </div>
+                    </label>
                   )}
                 />
-                {errors.academicClassId && (
-                  <p className="text-xs text-error">
-                    {errors.academicClassId.message}
-                  </p>
-                )}
-              </div>
 
-              {/* 2. Name EN & Name BN (Row of 2) */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-semibold tracking-wider text-on-surface-variant">
-                    শিক্ষার্থীর নাম (ইংরেজিতে) <span className="text-error">*</span>
-                  </Label>
-                  <div className="group relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors z-10">
-                      abc
-                    </span>
-                    <Input
-                      type="text"
+                {/* Submit button */}
+                <div className="fixed bottom-0 left-0 right-0 border-t border-outline-variant bg-surface-container-lowest p-3 z-20 sm:p-4 lg:relative lg:bottom-auto lg:left-auto lg:right-auto lg:border-t-0 lg:bg-transparent lg:p-0 lg:z-auto">
+                  <div className="mx-auto max-w-lg lg:max-w-none">
+                    <Button
+                      type="submit"
                       disabled={isPending}
-                      placeholder="Full Name in English"
-                      {...register("name")}
-                      className="w-full rounded-lg border border-outline-variant py-3 pl-10 pr-4 font-body-md text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
+                      className="group flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-on-primary shadow-md shadow-primary/25 transition-all hover:bg-primary-container hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+                    >
+                      {isPending ? (
+                        <>
+                          <span className="material-symbols-outlined animate-spin text-[18px]">
+                            progress_activity
+                          </span>
+                          <span>Saving…</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Complete Onboarding</span>
+                          <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5">
+                            arrow_forward
+                          </span>
+                        </>
+                      )}
+                    </Button>
                   </div>
-                  {errors.name && (
-                    <p className="text-xs text-error">{errors.name.message}</p>
-                  )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-semibold tracking-wider text-on-surface-variant">
-                    শিক্ষার্থীর নাম (বাংলায়) <span className="text-error">*</span>
-                  </Label>
-                  <div className="group relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors z-10">
-                      translate
-                    </span>
-                    <Input
-                      type="text"
-                      disabled={isPending}
-                      placeholder="বাংলায় সম্পূর্ণ নাম"
-                      {...register("nameBn")}
-                      className="w-full rounded-lg border border-outline-variant py-3 pl-10 pr-4 font-body-md font-bengali text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.nameBn && (
-                    <p className="text-xs text-error">{errors.nameBn.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* 3. Student ID & Mother's Phone (Row of 2) */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Student ID */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-semibold tracking-wider text-on-surface-variant">
-                    শিক্ষার্থী আইডি <span className="text-error">*</span>
-                  </Label>
-                  <div className="group relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors z-10">
-                      badge
-                    </span>
-                    <Input
-                      type="number"
-                      disabled={isPending}
-                      placeholder="যেমন: ১০২৫০"
-                      {...register("studentId")}
-                      className="w-full rounded-lg border border-outline-variant py-3 pl-10 pr-4 font-body-md text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.studentId && (
-                    <p className="text-xs text-error">{errors.studentId.message}</p>
-                  )}
-                </div>
-
-                {/* Mother's Phone */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-semibold tracking-wider text-on-surface-variant">
-                    গার্ডিয়ান মোবাইল নম্বর <span className="text-error">*</span>
-                  </Label>
-                  <div className="group relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors z-10">
-                      call
-                    </span>
-                    <Input
-                      type="tel"
-                      disabled={isPending}
-                      placeholder="1XXXXXXXXX"
-                      {...register("mPhone")}
-                      className="w-full rounded-lg border border-outline-variant py-3 pl-10 pr-4 font-body-md text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.mPhone && (
-                    <p className="text-xs text-error">{errors.mPhone.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Submit Action Button */}
-              <div className="pt-4">
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-container px-6 py-3.5 font-label-sm text-xs font-bold uppercase tracking-widest text-on-primary-container shadow-md transition-all hover:shadow-lg hover:shadow-primary-container/30 active:scale-98 h-auto cursor-pointer"
-                >
-                  {isPending ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-[18px]">
-                        progress_activity
-                      </span>
-                      <span>সংরক্ষণ করা হচ্ছে...</span>
-                    </>
-                  ) : (
-                    "অনবোর্ডিং সম্পূর্ণ করুন"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
-
-          {/* Supplemental System Info Footer like LoginPage */}
-          <div className="mt-8 flex justify-center gap-6">
-            <div className="flex items-center gap-2 text-on-surface-variant/60">
-              <span className="material-symbols-outlined text-[16px]">verified_user</span>
-              <span className="text-xs">এন্ড-টু-এন্ড এনক্রিপ্টেড</span>
-            </div>
-            <div className="flex items-center gap-2 text-on-surface-variant/60">
-              <span className="material-symbols-outlined text-[16px]">public</span>
-              <span className="text-xs">v2.4.1 (স্টেবল)</span>
+              </form>
             </div>
           </div>
+
+
         </div>
       </main>
     </div>

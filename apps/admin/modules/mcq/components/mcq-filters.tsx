@@ -24,6 +24,7 @@ import {
   Layers,
   Award,
   Hash,
+  GraduationCap,
 } from "lucide-react"
 
 interface SubjectOption {
@@ -37,9 +38,17 @@ interface ChapterOption {
   subjectId: string
 }
 
+interface AcademicClassOption {
+  id: string
+  name: string
+}
+
 interface McqFiltersProps {
   searchQuery: string
   onSearchChange: (value: string) => void
+  selectedAcademicClassId: string
+  onAcademicClassChange: (value: string) => void
+  academicClasses?: AcademicClassOption[]
   selectedSubjectId: string
   onSubjectChange: (value: string) => void
   subjects?: SubjectOption[]
@@ -58,6 +67,9 @@ interface McqFiltersProps {
 export function McqFilters({
   searchQuery,
   onSearchChange,
+  selectedAcademicClassId,
+  onAcademicClassChange,
+  academicClasses = [],
   selectedSubjectId,
   onSubjectChange,
   subjects = [],
@@ -91,7 +103,8 @@ export function McqFilters({
     hasActiveChapter ||
     hasActiveBoard ||
     hasActiveType ||
-    hasActiveSort
+    hasActiveSort ||
+    selectedAcademicClassId !== "All"
 
   const activeFilterCount =
     (hasActiveSubject ? 1 : 0) +
@@ -102,6 +115,7 @@ export function McqFilters({
 
   const handleResetAll = () => {
     onSearchChange("")
+    onAcademicClassChange("All")
     onSubjectChange("All")
     onChapterChange("All")
     onBoardChange("All")
@@ -126,6 +140,36 @@ export function McqFilters({
 
   const renderSelectFilters = (isMobile = false) => (
     <>
+      {/* Class Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] flex-1 md:flex-none"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <GraduationCap className="h-3.5 w-3.5 text-primary" />
+            Class
+          </label>
+        )}
+        <Select
+          value={selectedAcademicClassId}
+          onValueChange={(val) => {
+            onAcademicClassChange(val ?? "All")
+            onSubjectChange("All")
+            onChapterChange("All")
+          }}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+            <SelectValue placeholder="All Classes" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All">All Classes</SelectItem>
+            {academicClasses.map((cls) => (
+              <SelectItem key={cls.id} value={cls.id}>
+                {cls.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Subject Filter */}
       <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
         {isMobile && (
@@ -140,9 +184,10 @@ export function McqFilters({
             onSubjectChange(val ?? "All")
             onChapterChange("All")
           }}
+          disabled={selectedAcademicClassId === "All"}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Subjects" />
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+            <SelectValue placeholder={selectedAcademicClassId === "All" ? "Select Class First" : "All Subjects"} />
           </SelectTrigger>
           <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
             <SelectItem value="All">All Subjects</SelectItem>
@@ -166,9 +211,10 @@ export function McqFilters({
         <Select
           value={selectedChapterId}
           onValueChange={(val) => onChapterChange(val ?? "All")}
+          disabled={selectedSubjectId === "All"}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Chapters" />
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+            <SelectValue placeholder={selectedSubjectId === "All" ? "Select Subject First" : "All Chapters"} />
           </SelectTrigger>
           <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
             <SelectItem value="All">All Chapters</SelectItem>

@@ -17,6 +17,7 @@ import { studentRouter } from "./routers/student/student.router"
 import { subjectRouter } from "./routers/subject/subject.router"
 import { chapterRouter } from "./routers/chapter/chapter.router"
 import { mcqRouter } from "./routers/mcq/mcq.router"
+import { cqRouter } from "./routers/cq/cq.router"
 import { examRouter } from "./routers/exam/exam.router"
 import { examAttemptRouter } from "./routers/exam-attempt/exam-attempt.router"
 import { examGroupRouter } from "./routers/exam-group/exam-group.router"
@@ -33,6 +34,7 @@ export const appRouter = createTRPCRouter({
   subject: subjectRouter,
   chapter: chapterRouter,
   mcq: mcqRouter,
+  cq: cqRouter,
   exam: examRouter,
   examAttempt: examAttemptRouter,
   examGroup: examGroupRouter,

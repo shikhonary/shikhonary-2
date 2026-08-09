@@ -11,11 +11,11 @@ import {
 } from "lucide-react"
 
 const mobileNavItems = [
-  { href: "/", label: "হোম", icon: LayoutDashboard },
-  { href: "/question-bank", label: "প্রশ্নব্যাংক", icon: BookOpen },
-  { href: "/exams", label: "পরীক্ষা", icon: ClipboardList },
-  { href: "/leaderboard", label: "মেধা", icon: Trophy },
-  { href: "/profile", label: "প্রোফাইল", icon: User },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/question-bank", label: "Questions", icon: BookOpen },
+  { href: "/exams", label: "Exams", icon: ClipboardList },
+  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/profile", label: "Profile", icon: User },
 ]
 
 export function MobileNav() {

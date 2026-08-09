@@ -106,7 +106,6 @@ CREATE TABLE "AcademicClassSubject" (
 CREATE TABLE "Chapter" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "nameBn" TEXT NOT NULL,
     "position" INTEGER NOT NULL DEFAULT 0,
     "subjectId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -118,25 +117,11 @@ CREATE TABLE "Chapter" (
 -- CreateTable
 CREATE TABLE "Student" (
     "id" TEXT NOT NULL,
-    "session" TEXT,
-    "studentId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "nameBn" TEXT NOT NULL,
-    "fName" TEXT,
-    "mName" TEXT,
-    "gender" TEXT,
-    "dob" TIMESTAMP(3),
-    "nationality" TEXT,
-    "religion" TEXT,
-    "imageUrl" TEXT,
-    "section" TEXT,
-    "shift" TEXT,
-    "group" TEXT,
+    "phone" TEXT NOT NULL,
+    "institute" TEXT NOT NULL,
     "roll" INTEGER,
-    "fPhone" TEXT,
-    "mPhone" TEXT NOT NULL,
-    "presentAddress" TEXT,
-    "permanentAddress" TEXT,
+    "isOfflineStudent" BOOLEAN NOT NULL DEFAULT false,
     "academicClassId" TEXT NOT NULL,
     "userId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -181,6 +166,7 @@ CREATE TABLE "Exam" (
     "hasRandom" BOOLEAN NOT NULL DEFAULT false,
     "hasNegativeMark" BOOLEAN NOT NULL DEFAULT false,
     "negativeMark" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "isOffline" BOOLEAN NOT NULL DEFAULT false,
     "type" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'Pending',
     "academicClassId" TEXT NOT NULL,
@@ -377,9 +363,6 @@ CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 
 -- CreateIndex
 CREATE INDEX "Student_userId_idx" ON "Student"("userId");
-
--- CreateIndex
-CREATE INDEX "Student_studentId_idx" ON "Student"("studentId");
 
 -- CreateIndex
 CREATE INDEX "Mcq_chapterId_idx" ON "Mcq"("chapterId");

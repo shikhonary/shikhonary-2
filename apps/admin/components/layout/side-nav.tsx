@@ -53,6 +53,7 @@ const navGroups: NavGroup[] = [
     groupLabel: "Assessments",
     items: [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
+      { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/exams", label: "Exams", icon: ClipboardList },
       { href: "/exam-groups", label: "Exam Groups", icon: Layers },
     ],

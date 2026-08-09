@@ -64,7 +64,7 @@ export interface ExamItem {
   academicClassId: string
   academicClass?: {
     id: string
-    nameEn: string
+    name: string
     nameBn: string
     level: string
     position: number
@@ -202,7 +202,6 @@ export function ExamTable({
           <div className="grid grid-cols-1 gap-3 p-3 sm:p-4 md:hidden">
             {items.map((item) => {
               const subjects = item.examSubjects ?? []
-              const firstGroup = item.examGroupItems?.[0]?.examGroup
               const startDateStr = new Date(item.startDate).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -251,7 +250,7 @@ export function ExamTable({
                               className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold rounded-md px-2 py-0.5 inline-flex items-center gap-0.5 shadow-none"
                             >
                               <GraduationCap className="h-3 w-3" />
-                              <span>{item.academicClass.nameEn}</span>
+                              <span>{item.academicClass.name}</span>
                             </Badge>
                           )}
                         </div>
@@ -378,21 +377,15 @@ export function ExamTable({
           </div>
 
           {/* Desktop Table View (>= md) */}
-          <div className="hidden md:block">
-            <Table className="w-full text-left font-body-md">
+          <div className="hidden md:block overflow-x-auto rounded-xl border border-outline-variant/30 bg-white mb-4">
+            <Table className="w-full min-w-[800px] text-left font-body-md">
               <TableHeader className="bg-surface-container-low border-b border-outline-variant/30">
                 <TableRow className="hover:bg-surface-container-low border-b border-outline-variant/30">
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase text-xs h-auto">
-                    Exam & Type
+                    Exam Info
                   </TableHead>
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase text-xs h-auto">
-                    Class
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase text-xs h-auto">
-                    Linked Subjects
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase text-xs h-auto">
-                    Marks & Duration
+                    Evaluation
                   </TableHead>
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase text-xs h-auto">
                     Schedule
@@ -408,7 +401,6 @@ export function ExamTable({
               <TableBody className="divide-y divide-outline-variant/30">
                 {items.map((item) => {
                   const subjects = item.examSubjects ?? []
-                  const firstGroup = item.examGroupItems?.[0]?.examGroup
                   const startDateStr = new Date(item.startDate).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -429,78 +421,64 @@ export function ExamTable({
                       key={item.id}
                       className="hover:bg-surface-container-low transition-all duration-200 ease-in-out group border-b border-outline-variant/30"
                     >
-                      {/* Exam Title & Type */}
+                      {/* Exam Info (Title, Type, Class, Attempts, Subjects) */}
                       <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col max-w-[400px]">
                           <Link
                             href={`/exams/${item.id}`}
                             className="font-headline-md text-base font-bold text-on-surface hover:text-primary transition-colors"
                           >
                             {item.title}
                           </Link>
-                          <div className="flex flex-wrap items-center gap-2 mt-1">
-                            <span className="rounded-md bg-secondary-container/20 px-2 py-0.5 font-label-sm text-[11px] font-semibold text-secondary uppercase tracking-wider">
+                          
+                          {/* Metadata row */}
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                            {item.academicClass && (
+                              <Badge
+                                variant="outline"
+                                className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold rounded-md px-2 py-0.5 inline-flex items-center gap-0.5 shadow-none"
+                              >
+                                <GraduationCap className="h-3 w-3" />
+                                <span>{item.academicClass.name}</span>
+                              </Badge>
+                            )}
+
+                            <span className="rounded-md bg-secondary-container/20 px-2 py-0.5 font-label-sm text-[10px] font-bold text-secondary uppercase tracking-wider">
                               {item.type}
                             </span>
+
                             {item.isOffline && (
-                              <span className="rounded-md bg-orange-50 px-2 py-0.5 font-label-sm text-[11px] font-semibold text-orange-700 border border-orange-200 uppercase tracking-wider">
+                              <span className="rounded-md bg-orange-50 px-2 py-0.5 font-label-sm text-[10px] font-bold text-orange-700 border border-orange-200 uppercase tracking-wider">
                                 Offline
                               </span>
                             )}
-                            {firstGroup && (
-                              <Link
-                                href={`/exam-groups/${firstGroup.id}`}
-                                className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 font-label-sm text-[11px] font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors border border-indigo-200"
-                                title={`Part of Exam Group: ${firstGroup.title}`}
-                              >
-                                <span className="material-symbols-outlined text-xs">layers</span>
-                                <span>{firstGroup.title}</span>
-                              </Link>
-                            )}
+
                             {item._count?.examAttempts !== undefined && (
-                              <span className="text-[12px] text-outline flex items-center gap-1">
+                              <span className="text-[11px] text-outline">
                                 • {item._count.examAttempts} attempt{item._count.examAttempts === 1 ? "" : "s"}
                               </span>
                             )}
                           </div>
-                        </div>
-                      </TableCell>
 
-                      {/* Academic Class */}
-                      <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                        {item.academicClass ? (
-                          <Badge
-                            variant="outline"
-                            className="bg-primary/10 text-primary border-primary/20 text-[11px] font-bold rounded-md px-2.5 py-1 inline-flex items-center gap-1 shadow-none"
-                          >
-                            <GraduationCap className="h-3.5 w-3.5" />
-                            <span>{item.academicClass.nameEn}</span>
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-outline italic">Unassigned</span>
-                        )}
-                      </TableCell>
-
-                      {/* Linked Subjects */}
-                      <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                        <div className="flex flex-wrap gap-1.5 max-w-[200px]">
-                          {subjects.length > 0 ? (
-                            subjects.map((s) => (
-                              <Badge
-                                key={s.id}
-                                variant="outline"
-                                className="bg-surface-container-high/80 text-[11px] font-medium text-on-surface-variant border-outline-variant/40 rounded-md px-2 py-0.5"
-                              >
-                                {s.subject?.name}
-                              </Badge>
-                            ))
-                          ) : (
-                            <span className="text-xs text-outline italic">No subjects</span>
+                          {/* Subjects tags */}
+                          {subjects.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1 mt-2 border-t border-outline-variant/20 pt-1.5">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-outline">Subjects:</span>
+                              {subjects.map((s) => (
+                                <Badge
+                                  key={s.id}
+                                  variant="outline"
+                                  className="bg-surface-container-high/80 text-[10px] font-semibold text-on-surface-variant border-outline-variant/40 rounded-md px-1.5 py-0 shadow-none"
+                                >
+                                  {s.subject?.name}
+                                </Badge>
+                              ))}
+                            </div>
                           )}
                         </div>
                       </TableCell>
 
-                      {/* Marks & MCQ Count & Duration */}
+                      {/* Evaluation */}
                       <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
                         <div className="flex flex-col gap-1 text-xs">
                           <div className="flex items-center gap-1.5 font-semibold text-on-surface">
@@ -522,9 +500,9 @@ export function ExamTable({
 
                       {/* Schedule */}
                       <TableCell className="py-5 group-hover:py-6 px-6 transition-all duration-200 ease-in-out">
-                        <div className="flex flex-col text-xs text-on-surface-variant">
+                        <div className="flex flex-col text-xs text-on-surface-variant gap-0.5">
                           <div className="flex items-center gap-1 font-medium text-on-surface">
-                            <Calendar className="h-3.5 w-3.5 text-primary" />
+                            <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
                             <span>{startDateStr}</span>
                           </div>
                           <span className="text-[11px] text-outline pl-4">to {endDateStr}</span>
@@ -536,7 +514,7 @@ export function ExamTable({
                         {getStatusBadge(item.status)}
                       </TableCell>
 
-                      {/* Actions Dropdown */}
+                      {/* Actions */}
                       <TableCell className="py-5 group-hover:py-6 px-6 text-right transition-all duration-200 ease-in-out">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

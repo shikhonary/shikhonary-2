@@ -114,6 +114,7 @@ model Subject {
   academicClasses AcademicClassSubject[]
   chapters        Chapter[]
   mcqs            Mcq[]
+  cqs             Cq[]
   examSubjects    ExamSubject[]
 
   createdAt DateTime @default(now())
@@ -148,6 +149,7 @@ model Chapter {
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
   mcqs Mcq[]
+  cqs  Cq[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -462,4 +464,64 @@ model ExamGroupResult {
   @@index([examGroupId, meritPosition])
   @@index([examGroupId, percentage])
   @@map("exam_group_result")
+}
+
+model Cq {
+  id        String   @id @default(uuid())
+  questionA String
+  questionB String
+  questionC String
+  questionD String?
+  context   String?
+  reference String[] @default([])
+
+  subjectId String
+  chapterId String
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+
+  attachments CqAttachment[]
+  answer      CqAnswer?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@index([subjectId])
+  @@map("cq")
+}
+
+model CqAttachment {
+  id   String @id @default(uuid())
+  cqId String
+  cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
+
+  url      String
+  type     String  @default("image") // "image", "pdf", etc.
+  caption  String?
+  position Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cqId])
+  @@map("cq_attachment")
+}
+
+model CqAnswer {
+  id   String @id @default(uuid())
+  cqId String @unique
+  cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
+
+  answerA     String?
+  answerB     String?
+  answerC     String?
+  answerD     String?
+  explanation String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cq_answer")
 }

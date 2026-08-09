@@ -309,7 +309,7 @@ export default function RegisterPage() {
 
           {/* ── Right: Register/Verify Card ── */}
           <div className="w-full lg:w-[440px] shrink-0">
-            <div className="bg-white rounded-3xl p-8 md:p-10 border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
+            <div className="bg-white rounded-3xl p-5 sm:p-8 md:p-10 border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
               {isPhoneVerification ? (
                 <PhoneOtpVerificationCard
                   phoneNumber={phoneNumber}

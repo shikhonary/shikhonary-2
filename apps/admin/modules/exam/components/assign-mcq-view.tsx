@@ -46,6 +46,33 @@ import {
 const romanNumerals = ["i.", "ii.", "iii.", "iv.", "v.", "vi."]
 const optionLetters = ["A", "B", "C", "D", "E", "F"]
 
+function getPageNumbers(currentPage: number, totalPages: number) {
+  const delta = 1
+  const range: number[] = []
+  const rangeWithDots: (number | string)[] = []
+  let l: number | undefined
+
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
+      range.push(i)
+    }
+  }
+
+  for (const i of range) {
+    if (l !== undefined) {
+      if (i - l === 2) {
+        rangeWithDots.push(l + 1)
+      } else if (i - l !== 1) {
+        rangeWithDots.push("...")
+      }
+    }
+    rangeWithDots.push(i)
+    l = i
+  }
+
+  return rangeWithDots
+}
+
 interface SubjectMcqListProps {
   examId: string
   examSubjectId: string
@@ -276,7 +303,7 @@ function SubjectMcqSection({
       return
     }
 
-    const countToSelect = Math.min(10, remaining, unselectedMcqs.length)
+    const countToSelect = Math.min(remaining, unselectedMcqs.length)
     const shuffled = [...unselectedMcqs].sort(() => 0.5 - Math.random())
     const selectedSubset = shuffled.slice(0, countToSelect).map((m: any) => m.id)
 
@@ -866,6 +893,61 @@ function SubjectMcqSection({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {totalMcqs > 50 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant bg-surface-container-low px-4 sm:px-6 py-4 rounded-xl mt-6">
+          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
+            Showing <span className="font-bold">{(page - 1) * 50 + 1}-{Math.min(page * 50, totalMcqs)}</span> of <span className="font-bold">{totalMcqs}</span> MCQs
+          </p>
+
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm sm:text-base">chevron_left</span>
+            </Button>
+            {getPageNumbers(page, Math.ceil(totalMcqs / 50)).map((pageNum, idx) => {
+              if (pageNum === "...") {
+                return (
+                  <span
+                    key={`dots-${idx}`}
+                    className="inline-flex size-8 sm:size-10 items-center justify-center font-body-md text-xs sm:text-sm text-outline select-none"
+                  >
+                    ...
+                  </span>
+                )
+              }
+              return (
+                <Button
+                  key={`page-${pageNum}`}
+                  variant={page === pageNum ? "default" : "ghost"}
+                  onClick={() => setPage(Number(pageNum))}
+                  className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${page === pageNum
+                    ? "bg-primary font-bold text-on-primary hover:bg-primary"
+                    : "hover:bg-surface-container-high text-on-surface"
+                    }`}
+                >
+                  {pageNum}
+                </Button>
+              )
+            })}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={page >= Math.ceil(totalMcqs / 50)}
+              onClick={() => setPage((p) => Math.min(Math.ceil(totalMcqs / 50), p + 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm sm:text-base">chevron_right</span>
+            </Button>
+          </div>
         </div>
       )}
     </div>

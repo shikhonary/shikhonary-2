@@ -103,7 +103,13 @@ export const auth = betterAuth({
                   phoneNumberVerified: false,
                   emailVerified: true, // Skip email verification for phone users
                   roles: {
-                    connect: { name: "USER" },
+                    connectOrCreate: {
+                      where: { name: "USER" },
+                      create: {
+                        name: "USER",
+                        description: "Default standard user role",
+                      },
+                    },
                   },
                 },
               })
@@ -112,7 +118,13 @@ export const auth = betterAuth({
                 where: { id: user.id },
                 data: {
                   roles: {
-                    connect: { name: "USER" },
+                    connectOrCreate: {
+                      where: { name: "USER" },
+                      create: {
+                        name: "USER",
+                        description: "Default standard user role",
+                      },
+                    },
                   },
                 },
               })

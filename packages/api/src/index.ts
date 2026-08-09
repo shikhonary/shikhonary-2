@@ -75,6 +75,16 @@ export type {
   McqSortOption,
 } from "./routers/mcq/mcq.schema"
 export type {
+  ListCqsInput,
+  GetCqInput,
+  CreateCqInput,
+  UpdateCqInput,
+  DeleteCqInput,
+  BulkDeleteCqsInput,
+  CqSortOption,
+  ImportCqsInput,
+} from "./routers/cq/cq.schema"
+export type {
   ListExamsInput,
   GetExamInput,
   ExamStatsInput,

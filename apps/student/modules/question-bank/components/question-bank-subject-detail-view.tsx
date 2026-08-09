@@ -4,21 +4,11 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import {
-  Atom,
-  FlaskConical,
-  Calculator,
-  Dna,
-  BookOpen,
-  Languages,
-  Laptop,
-  Landmark,
-  Globe,
-  GraduationCap,
   ChevronRight,
   HelpCircle,
   FileText,
-  Clock,
   Sparkles,
+  Clock,
 } from "lucide-react"
 import {
   Breadcrumb,
@@ -37,65 +27,45 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@workspace/ui/components/tabs"
+import { cn } from "@workspace/ui/lib/utils"
 import { trpc } from "@/trpc/client"
+import { resolveSubjectTheme } from "../lib/subject-theme"
 import { QuestionBankMcqListView } from "./question-bank-mcq-list-view"
-
-function toBengaliNumerals(numStr: string | number): string {
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
-  return numStr
-    .toString()
-    .replace(/[0-9]/g, (digit) => bengaliDigits[parseInt(digit, 10)] ?? digit)
-}
-
-function resolveSubjectIcon(nameEn: string = "", nameBn: string = ""): React.ComponentType<{ className?: string }> {
-  const text = `${nameEn} ${nameBn}`.toLowerCase()
-  if (text.includes("physic") || text.includes("পদার্থ")) return Atom
-  if (text.includes("chem") || text.includes("রসায়ন") || text.includes("রসায়ন")) return FlaskConical
-  if (text.includes("math") || text.includes("গণিত")) return Calculator
-  if (text.includes("bio") || text.includes("জীব")) return Dna
-  if (text.includes("english") || text.includes("ইংরেজি")) return Languages
-  if (text.includes("bangla") || text.includes("বাংলা")) return BookOpen
-  if (text.includes("ict") || text.includes("computer") || text.includes("তথ্য")) return Laptop
-  if (text.includes("account") || text.includes("finance") || text.includes("হিসাব")) return Landmark
-  if (text.includes("history") || text.includes("ইতিহাস") || text.includes("islam")) return Globe
-  return GraduationCap
-}
+import { QuestionBankCqListView } from "./question-bank-cq-list-view"
 
 interface QuestionBankSubjectDetailViewProps {
   subjectId: string
 }
 
-export function QuestionBankSubjectDetailView({ subjectId }: QuestionBankSubjectDetailViewProps) {
+export function QuestionBankSubjectDetailView({
+  subjectId,
+}: QuestionBankSubjectDetailViewProps) {
   const [activeTab, setActiveTab] = useState<string>("mcq")
 
   const subjectQuery = useQuery(
-    trpc.subject.byId.queryOptions({
-      id: subjectId,
-    })
+    trpc.subject.byId.queryOptions({ id: subjectId })
   )
-
   const statsQuery = useQuery(
-    trpc.questionBank.stats.queryOptions({
-      subjectId,
-    })
+    trpc.questionBank.stats.queryOptions({ subjectId })
   )
 
   const subject = subjectQuery.data
   const stats = statsQuery.data
   const isLoading = subjectQuery.isLoading
 
-  const IconComponent = resolveSubjectIcon(subject?.name, subject?.nameBn)
+  const theme = resolveSubjectTheme(subject?.name, subject?.nameBn)
+  const IconComponent = theme.icon
   const totalMcqs = stats?.totalCount ?? 0
 
   return (
-    <div className="max-w-container-max mx-auto px-4 md:px-12 py-8 md:py-12 bg-background min-h-screen">
-      {/* Breadcrumbs */}
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList className="font-label-sm text-label-sm text-on-surface-variant">
+    <div className="max-w-container-max mx-auto px-4 py-6 md:px-8 md:py-10 bg-background min-h-screen">
+      {/* ── Breadcrumb ── */}
+      <Breadcrumb className="mb-5">
+        <BreadcrumbList className="text-xs text-on-surface-variant">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <Link href="/" className="hover:text-primary transition-colors">
-                ড্যাশবোর্ড
+                Dashboard
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -104,8 +74,11 @@ export function QuestionBankSubjectDetailView({ subjectId }: QuestionBankSubject
           </BreadcrumbSeparator>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/question-bank" className="hover:text-primary transition-colors">
-                প্রশ্নব্যাংক
+              <Link
+                href="/question-bank"
+                className="hover:text-primary transition-colors"
+              >
+                Question Bank
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
@@ -113,144 +86,144 @@ export function QuestionBankSubjectDetailView({ subjectId }: QuestionBankSubject
             <ChevronRight className="h-3.5 w-3.5" />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage className="text-on-background font-medium">
-              {subject?.nameBn || subject?.name || "বিষয় বিবরণী"}
+            <BreadcrumbPage className="font-medium text-on-background">
+              {subject?.name ?? subject?.nameBn ?? "Subject Details"}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header Info Banner */}
-      <header className="mb-8 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6 md:p-8 shadow-xs relative overflow-hidden">
-        {/* Background Decorative Element */}
-        <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none text-primary">
-          <IconComponent className="w-36 h-36" />
+      {/* ── Subject header card ── */}
+      <header className="relative mb-6 overflow-hidden rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-xs sm:p-7">
+        {/* Decorative watermark */}
+        <div className={cn("pointer-events-none absolute -right-4 -top-4 opacity-[0.04]", theme.watermarkColor)}>
+          <IconComponent className="h-44 w-44" />
         </div>
 
         {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <Skeleton className="h-8 w-64 rounded-lg" />
-            <Skeleton className="h-4 w-40 rounded" />
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-12 rounded-2xl" />
+            <Skeleton className="h-7 w-56 rounded" />
+            <Skeleton className="h-4 w-32 rounded" />
           </div>
         ) : (
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-primary-container/30 text-primary flex items-center justify-center shrink-0">
-                <IconComponent className="h-7 w-7" />
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <h1 className="font-headline-md text-2xl md:text-3xl font-extrabold text-on-background">
-                    {subject?.nameBn || subject?.name}
+          <div className="relative z-10">
+            {/* Mobile-first: stacked, desktop: side-by-side */}
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              {/* Icon + name */}
+              <div className="flex items-start gap-4">
+                <div
+                  className={cn(
+                    "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl sm:h-14 sm:w-14",
+                    theme.iconBgColor
+                  )}
+                >
+                  <IconComponent className="h-6 w-6 sm:h-7 sm:w-7" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-extrabold leading-tight text-on-background sm:text-2xl">
+                    {subject?.name ?? subject?.nameBn}
                   </h1>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {subject?.level && (
-                    <Badge variant="outline" className="bg-surface-container-low text-xs border-outline-variant/40 text-on-surface">
-                      {subject.level}
-                    </Badge>
+                  {subject?.nameBn && subject.name && (
+                    <p className="mt-0.5 text-sm text-on-surface-variant">
+                      {subject.nameBn}
+                    </p>
                   )}
-                  {subject?.group && (
-                    <Badge variant="secondary" className="bg-primary/10 text-primary text-xs font-semibold">
-                      {subject.group}
-                    </Badge>
-                  )}
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    {(subject as any)?.level && (
+                      <Badge
+                        variant="outline"
+                        className="border-outline-variant/40 bg-surface-container-low text-xs text-on-surface"
+                      >
+                        {(subject as any).level}
+                      </Badge>
+                    )}
+                    {(subject as any)?.group && (
+                      <Badge className="bg-primary/10 text-xs font-semibold text-primary">
+                        {(subject as any).group}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* MCQ Stats Summary Badge */}
-            <div className="flex items-center gap-3 bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30">
-              <HelpCircle className="h-5 w-5 text-primary shrink-0" />
-              <div>
-                <p className="text-xs text-on-surface-variant font-medium">মোট প্রোপ্ত প্রশ্ন</p>
-                <p className="text-sm font-bold text-on-background">
-                  {toBengaliNumerals(totalMcqs)} টি বহুনির্বাচনী প্রশ্ন
-                </p>
+              {/* MCQ count badge */}
+              <div className="flex items-center gap-3 self-start rounded-xl border border-outline-variant/30 bg-surface-container-low px-2 py-1">
+                <HelpCircle className="h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-bold text-on-background">
+                    {totalMcqs} MCQ
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Tabs Navigation Section */}
+      {/* ── Tabs Content ── */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        {/* Grid/Flex Tabs without scrollbar */}
-        <div className="border-b border-outline-variant/40 mb-6 w-full">
-          <TabsList className="bg-surface-container-low p-1 sm:p-1.5 rounded-xl gap-1 sm:gap-2 h-auto grid grid-cols-3 w-full sm:flex sm:w-fit">
+        {/* Tab nav */}
+        <div className="mb-5 border-b border-outline-variant/40">
+          <TabsList className="h-auto gap-1 rounded-none bg-transparent p-0">
             <TabsTrigger
               value="mcq"
-              className="py-2 sm:py-2.5 px-1.5 sm:px-5 rounded-lg text-xs sm:text-sm font-semibold tracking-normal normal-case data-[state=active]:bg-primary data-[state=active]:text-white transition-all cursor-pointer justify-center"
+              className="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-on-surface-variant transition-colors normal-case tracking-normal data-[state=active]:border-primary data-[state=active]:text-primary"
             >
-              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
-              <span>
-                <span className="sm:hidden">বহুনির্বাচনী</span>
-                <span className="hidden sm:inline">বহুনির্বাচনী প্রশ্ন (MCQ)</span>
-              </span>
+              <HelpCircle className="h-4 w-4 hidden md:block" />
+              <span className="hidden sm:inline">MCQ Questions</span>
+              <span className="sm:hidden">MCQ</span>
+              {totalMcqs > 0 && (
+                <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] font-bold text-primary">
+                  {totalMcqs}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger
               value="cq"
-              className="py-2 sm:py-2.5 px-1.5 sm:px-5 rounded-lg text-xs sm:text-sm font-semibold tracking-normal normal-case data-[state=active]:bg-primary data-[state=active]:text-white transition-all cursor-pointer justify-center"
+              className="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-on-surface-variant transition-colors normal-case tracking-normal data-[state=active]:border-primary data-[state=active]:text-primary"
             >
-              <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
-              <span>
-                <span className="sm:hidden">সৃজনশীল</span>
-                <span className="hidden sm:inline">সৃজনশীল প্রশ্ন (CQ)</span>
-              </span>
+              <FileText className="h-4 w-4 hidden md:block" />
+              <span className="hidden sm:inline">CQ Questions</span>
+              <span className="sm:hidden">CQ</span>
             </TabsTrigger>
             <TabsTrigger
               value="short"
-              className="py-2 sm:py-2.5 px-1.5 sm:px-5 rounded-lg text-xs sm:text-sm font-semibold tracking-normal normal-case data-[state=active]:bg-primary data-[state=active]:text-white transition-all cursor-pointer justify-center"
+              className="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-on-surface-variant transition-colors normal-case tracking-normal data-[state=active]:border-primary data-[state=active]:text-primary"
             >
-              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 shrink-0" />
-              <span>
-                <span className="sm:hidden">সংক্ষিপ্ত</span>
-                <span className="hidden sm:inline">সংক্ষিপ্ত প্রশ্ন (Short Q)</span>
-              </span>
+              <Sparkles className="h-4 w-4 hidden md:block" />
+              <span className="hidden sm:inline">Short Questions</span>
+              <span className="sm:hidden">Short Q</span>
             </TabsTrigger>
           </TabsList>
         </div>
 
-        {/* MCQ Tab Content */}
+        {/* MCQ tab — simple full-width layout */}
         <TabsContent value="mcq" className="focus-visible:outline-none">
-          <QuestionBankMcqListView subjectId={subjectId} />
+          <div className="min-w-0 flex-1">
+            <QuestionBankMcqListView subjectId={subjectId} />
+          </div>
         </TabsContent>
 
-        {/* CQ Tab Content (Coming Soon Placeholder) */}
+        {/* CQ tab */}
         <TabsContent value="cq" className="focus-visible:outline-none">
-          <Card className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-            <div className="w-14 h-14 rounded-full bg-amber-100/70 text-amber-700 flex items-center justify-center mb-4">
-              <Clock className="h-7 w-7" />
-            </div>
-            <h3 className="text-xl font-bold text-on-background mb-2">
-              সৃজনশীল প্রশ্ন (CQ) শীঘ্রই আসছে!
-            </h3>
-            <p className="text-sm text-on-surface-variant max-w-md mb-4 leading-relaxed">
-              এই বিষয়ের জন্য সৃজনশীল প্রশ্ন ও উত্তর সংকলনের কাজ চলমান রয়েছে। খুব শীঘ্রই আপনার জন্য এটি উন্মুক্ত করা হবে।
-            </p>
-            <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 px-3 py-1">
-              উন্নয়নাধীন (Under Development)
-            </Badge>
-          </Card>
+          <div className="min-w-0 flex-1">
+            <QuestionBankCqListView subjectId={subjectId} />
+          </div>
         </TabsContent>
 
-        {/* Short Question Tab Content (Coming Soon Placeholder) */}
+        {/* Short Q — coming soon */}
         <TabsContent value="short" className="focus-visible:outline-none">
-          <Card className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-            <div className="w-14 h-14 rounded-full bg-blue-100/70 text-blue-700 flex items-center justify-center mb-4">
+          <Card className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-outline-variant/40 bg-surface-container-lowest p-10 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100/70 text-blue-700">
               <Clock className="h-7 w-7" />
             </div>
-            <h3 className="text-xl font-bold text-on-background mb-2">
-              সংক্ষিপ্ত প্রশ্ন (Short Questions) শীঘ্রই আসছে!
-            </h3>
-            <p className="text-sm text-on-surface-variant max-w-md mb-4 leading-relaxed">
-              এক কথায় উত্তর ও গুরুত্বপূর্ণ সংক্ষিপ্ত প্রশ্নোত্তর সংকলন প্রস্তুত করা হচ্ছে।
+            <h3 className="mb-1.5 text-lg font-bold text-on-background">Short Questions Coming Soon</h3>
+            <p className="mb-4 max-w-sm text-sm leading-relaxed text-on-surface-variant">
+              One-word answers and important short Q&As are currently under development.
             </p>
-            <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200 px-3 py-1">
-              উন্নয়নাধীন (Under Development)
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 px-3 py-1 text-blue-800">
+              Under Development
             </Badge>
           </Card>
         </TabsContent>

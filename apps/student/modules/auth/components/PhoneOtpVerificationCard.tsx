@@ -46,11 +46,11 @@ export default function PhoneOtpVerificationCard({
 }: PhoneOtpVerificationCardProps) {
   return (
     <div className="w-full">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 bg-[#c52828]/10 rounded-full flex items-center justify-center mb-6">
-          <Smartphone className="w-8 h-8 text-[#c52828]" />
+      <div className="flex flex-col items-center mb-6 sm:mb-8">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#c52828]/10 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+          <Smartphone className="w-7 h-7 sm:w-8 sm:h-8 text-[#c52828]" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 text-center mb-3">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 text-center mb-3">
           {title}
         </h1>
         <p className="text-sm text-slate-500 text-center leading-relaxed">
@@ -110,12 +110,12 @@ export default function PhoneOtpVerificationCard({
               disabled={loading}
               autoFocus
             >
-              <InputOTPGroup className="gap-2 sm:gap-3">
+              <InputOTPGroup className="gap-1.5 min-[375px]:gap-2 sm:gap-3">
                 {[0, 1, 2, 3, 4, 5].map((index) => (
                   <InputOTPSlot
                     key={index}
                     index={index}
-                    className="w-11 h-14 sm:w-12 sm:h-14 text-2xl font-bold rounded-xl border border-slate-200 bg-white focus:border-[#c52828] focus:ring-2 focus:ring-[#c52828]/15 transition-all text-slate-800"
+                    className="w-9 h-12 min-[375px]:w-10 min-[375px]:h-13 sm:w-12 sm:h-14 text-xl min-[375px]:text-2xl font-bold rounded-xl border border-slate-200 bg-white focus:border-[#c52828] focus:ring-2 focus:ring-[#c52828]/15 transition-all text-slate-800"
                   />
                 ))}
               </InputOTPGroup>

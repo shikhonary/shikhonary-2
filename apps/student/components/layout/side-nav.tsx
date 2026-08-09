@@ -15,11 +15,11 @@ import {
 } from "lucide-react"
 
 const navItems = [
-  { href: "/", label: "ড্যাশবোর্ড", mobileLabel: "হোম", icon: LayoutDashboard },
-  { href: "/question-bank", label: "প্রশ্নব্যাংক", mobileLabel: "প্রশ্নব্যাংক", icon: BookOpen },
-  { href: "/exams", label: "পরীক্ষা", mobileLabel: "পরীক্ষা", icon: ClipboardList },
-  { href: "/leaderboard", label: "মেধা তালিকা", mobileLabel: "মেধা", icon: Trophy },
-  { href: "/profile", label: "প্রোফাইল", mobileLabel: "প্রোফাইল", icon: User },
+  { href: "/", label: "Dashboard", mobileLabel: "Home", icon: LayoutDashboard },
+  { href: "/question-bank", label: "Question Bank", mobileLabel: "Questions", icon: BookOpen },
+  { href: "/exams", label: "Exams", mobileLabel: "Exams", icon: ClipboardList },
+  { href: "/leaderboard", label: "Leaderboard", mobileLabel: "Leaderboard", icon: Trophy },
+  { href: "/profile", label: "Profile", mobileLabel: "Profile", icon: User },
 ]
 
 export function SideNav() {
@@ -46,11 +46,11 @@ export function SideNav() {
             />
           </div>
           <div className="flex flex-col">
-            <h2 className="font-extrabold text-xl text-on-surface leading-none tracking-tight">
-              বেসিক
+            <h2 className="font-extrabold text-xl text-primary leading-none tracking-wider">
+              Mr. Dr.
             </h2>
-            <span className="mt-1 text-xs font-semibold text-outline uppercase tracking-wider">
-              এডুকেশন কেয়ার
+            <span className="mt-1 text-[8px] font-semibold text-outline uppercase tracking-wider">
+              Academic & Admission Care
             </span>
           </div>
         </div>
@@ -71,14 +71,13 @@ export function SideNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group flex items-center gap-3.5 px-6 py-3.5 transition-all duration-200 ${
-                  isActive
-                    ? "sidebar-item-active font-bold text-primary border-r-4 border-primary bg-surface-container-high"
-                    : "text-on-surface-variant hover:bg-surface-container-high font-medium"
-                }`}
+                className={`group flex items-center gap-3.5 px-6 py-3.5 transition-all duration-200 ${isActive
+                  ? "sidebar-item-active font-bold text-primary border-r-4 border-primary bg-surface-container-high"
+                  : "text-on-surface-variant hover:bg-surface-container-high font-medium"
+                  }`}
               >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="text-base font-semibold">
+                <Icon className="h-[18px] w-[18px] shrink-0" />
+                <span className="text-sm font-semibold">
                   {item.label}
                 </span>
               </Link>
@@ -93,8 +92,8 @@ export function SideNav() {
           href="/settings"
           className="group flex items-center gap-3.5 px-6 py-3.5 text-on-surface-variant transition-all duration-200 hover:bg-surface-container-high font-medium"
         >
-          <Settings className="h-5 w-5 shrink-0" />
-          <span className="text-base font-semibold">
+          <Settings className="h-[18px] w-[18px] shrink-0" />
+          <span className="text-sm font-semibold">
             Settings
           </span>
         </Link>
@@ -103,8 +102,8 @@ export function SideNav() {
           onClick={handleSignOut}
           className="group flex w-full items-center gap-3.5 px-6 py-3.5 text-error transition-all duration-200 hover:bg-error-container/20 cursor-pointer font-medium"
         >
-          <LogOut className="h-5 w-5 shrink-0" />
-          <span className="text-base font-semibold">
+          <LogOut className="h-[18px] w-[18px] shrink-0" />
+          <span className="text-sm font-semibold">
             Logout
           </span>
         </button>

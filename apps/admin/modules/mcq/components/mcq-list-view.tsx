@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { useMcqsList, useMcqStats } from "../services/use-mcq"
+import { useAcademicClassesForSelection } from "@/modules/academic-class/services/use-academic-class"
 import { useSubjectsForSelection } from "@/modules/subject/services/use-subject"
 import { useChaptersForSelection } from "@/modules/chapter/services/use-chapter"
 import { useDeleteMcqModalStore } from "../store/use-delete-mcq-modal-store"
@@ -14,6 +16,9 @@ import { DeleteMcqModal } from "./delete-mcq-modal"
 import { useMcqSearchParams } from "../hooks/use-mcq-search-params"
 
 export function McqListView() {
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+
   const [
     {
       query: searchQuery,
@@ -64,7 +69,9 @@ export function McqListView() {
   )
 
   // Query subjects & chapters for dropdown filters
-  const { data: subjects = [] } = useSubjectsForSelection()
+  const { data: subjects = [] } = useSubjectsForSelection(
+    selectedAcademicClassId !== "All" ? { academicClassId: selectedAcademicClassId } : undefined
+  )
   const { data: chapters = [] } = useChaptersForSelection(
     selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
   )
@@ -92,6 +99,9 @@ export function McqListView() {
       <McqFilters
         searchQuery={searchQuery}
         onSearchChange={(query) => setSearchParams({ query, page: 1 })}
+        selectedAcademicClassId={selectedAcademicClassId}
+        onAcademicClassChange={setSelectedAcademicClassId}
+        academicClasses={academicClasses}
         selectedSubjectId={selectedSubjectId}
         onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
         subjects={subjects}

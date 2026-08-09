@@ -184,7 +184,7 @@ export function DashboardVerificationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-6 bg-surface text-on-surface border-outline-variant">
+      <DialogContent className="sm:max-w-md p-4 sm:p-6 bg-surface text-on-surface border-outline-variant">
         <DialogHeader className="sr-only">
           <DialogTitle>অ্যাকাউন্ট ভেরিফিকেশন</DialogTitle>
           <DialogDescription>আপনার অ্যাকাউন্ট ভেরিফাই করুন</DialogDescription>

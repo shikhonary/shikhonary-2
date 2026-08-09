@@ -23,11 +23,11 @@ export default function VerificationStatusCard({
 }: VerificationStatusCardProps) {
   return (
     <div className="w-full">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 bg-[#c52828]/10 rounded-full flex items-center justify-center mb-6">
-          <Mail className="w-8 h-8 text-[#c52828]" />
+      <div className="flex flex-col items-center mb-6 sm:mb-8">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#c52828]/10 rounded-full flex items-center justify-center mb-4 sm:mb-6">
+          <Mail className="w-7 h-7 sm:w-8 sm:h-8 text-[#c52828]" />
         </div>
-        <h1 className="text-2xl font-extrabold text-slate-900 text-center mb-3">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 text-center mb-3">
           Check your email
         </h1>
         <p className="text-sm text-slate-500 text-center leading-relaxed">
