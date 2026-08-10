@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { authClient } from "@workspace/auth/client";
-import { GoogleButton } from "../components/google-button";
 
 interface SignInProps {
   isLoading: boolean;
@@ -73,19 +72,7 @@ export const SignInForm = ({ isLoading, setIsLoading }: SignInProps) => {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
-      <GoogleButton isLoading={isLoading} />
-
-      {/* Divider */}
-      <div className="relative flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border/60" />
-        </div>
-        <span className="relative bg-card px-3 text-xs font-medium text-muted-foreground">
-          অথবা ইমেইল দিয়ে প্রবেশ করুন
-        </span>
-      </div>
-
+    <div className="animate-fade-in">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Email */}
         <div className="space-y-1.5">

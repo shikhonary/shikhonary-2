@@ -54,14 +54,7 @@ export const CardFront: React.FC<CardFrontProps> = ({ taxPayer, tenant, forExpor
   const wardName = taxPayer.ward?.nameBn || taxPayer.ward?.name || ""
   const logoUrl = tenant.logo || "/union-logo.png"
 
-  const qrData = [
-    unionName,
-    `মালিক- ${taxPayer.name}`,
-    `হোল্ডিং- ${taxPayer.holding}`,
-    `ওয়ার্ড- ${wardName}`,
-    `এলাকা- ${taxPayer.village}`,
-    `ধার্য্যকৃত ট্যাক্সঃ ${taxPayer.tax}/-`,
-  ].join("\n")
+  const qrData = `https://${tenant.slug || "uphub"}.bec-admin.cloud/print/tax-payer/${taxPayer.id}`
 
   return (
     <div

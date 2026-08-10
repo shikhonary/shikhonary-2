@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { authClient } from "@workspace/auth/client";
-import { GoogleButton } from "../components/google-button";
 
 interface SignUpProps {
   isLoading: boolean;
@@ -75,19 +74,7 @@ export const SignUpForm = ({ isLoading, setIsLoading }: SignUpProps) => {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
-      <GoogleButton isLoading={isLoading} />
-
-      {/* Divider */}
-      <div className="relative flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border/60" />
-        </div>
-        <span className="relative bg-card px-3 text-xs font-medium text-muted-foreground">
-          অথবা ইমেইল দিয়ে নিবন্ধন করুন
-        </span>
-      </div>
-
+    <div className="animate-fade-in">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Full Name */}
         <div className="space-y-1.5">

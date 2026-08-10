@@ -118,6 +118,16 @@ export const TaxPayerDetailView: React.FC<TaxPayerDetailViewProps> = ({ taxPayer
           <Button
             variant="outline"
             size="sm"
+            onClick={() => router.push(`/print/tax-payer/${taxPayer.id}`)}
+            className="flex-1 sm:flex-none gap-1.5 text-xs font-bold rounded-xl border-blue-600/30 bg-blue-50 text-blue-700 hover:bg-blue-100"
+          >
+            <Printer className="h-3.5 w-3.5 text-blue-600" />
+            <span>বিবরণী প্রিন্ট</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowCardModal(true)}
             className="flex-1 sm:flex-none gap-1.5 text-xs font-bold rounded-xl border-purple-600/30 bg-purple-50 text-purple-700 hover:bg-purple-100"
           >
