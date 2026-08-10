@@ -316,3 +316,62 @@ export const tenantMemberProcedure = protectedProcedure.use(
     })
   },
 )
+
+/**
+ * `publicTenantProcedure` — Resolves the tenant database using the request Host header.
+ * No session or auth required (useful for public verification/print pages).
+ */
+export const publicTenantProcedure = publicProcedure.use(
+  async ({ ctx, next }) => {
+    const host = ctx.headers.get("host") || ""
+    const parts = host.split(".")
+    let slug = ""
+
+    const firstPart = parts[0]
+    if (parts.length > 2 && firstPart) {
+      slug = firstPart
+    } else {
+      const firstTenant = await db.tenant.findFirst({
+        where: { isActive: true },
+        select: { slug: true }
+      })
+      if (firstTenant) {
+        slug = firstTenant.slug
+      }
+    }
+
+    const tenant = await db.tenant.findFirst({
+      where: {
+        slug,
+        isActive: true,
+        isSuspended: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        nameBn: true,
+        slug: true,
+        logo: true,
+        isActive: true,
+        isSuspended: true,
+      }
+    })
+
+    if (!tenant) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Tenant not found or inactive.",
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        db: db as PrismaClient,
+        tenantDb: getTenantDb(tenant.id) as TenantPrismaClient,
+        tenant,
+      },
+    })
+  },
+)
+

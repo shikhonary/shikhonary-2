@@ -1,4 +1,4 @@
-import { createTRPCRouter, tenantMemberProcedure } from "../../trpc"
+import { createTRPCRouter, tenantMemberProcedure, publicTenantProcedure } from "../../trpc"
 import {
   bulkCreateTaxPayerSchema,
   createTaxPayerSchema,
@@ -25,7 +25,7 @@ export const taxPayerRouter = createTRPCRouter({
     .input(listTaxPayersSchema)
     .query(({ ctx, input }) => listTaxPayers(ctx.tenantDb, input)),
 
-  byId: tenantMemberProcedure
+  byId: publicTenantProcedure
     .input(getTaxPayerSchema)
     .query(({ ctx, input }) => getTaxPayerById(ctx.tenantDb, input)),
 

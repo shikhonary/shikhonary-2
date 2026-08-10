@@ -1,56 +1,107 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { auth } from "@workspace/auth/server";
 import { db } from "@workspace/db/main";
 import { TenantProvider } from "@/modules/layout/ui/components/tenant-provider";
 
 /**
- * Print layout — Auth + TenantProvider only, no sidebar/dashboard shell.
+ * Print layout — TenantProvider only (Auth optional), no sidebar/dashboard shell.
  * Pages in this group render bare white — identical to print preview.
+ * This is public to allow scanning QR codes for verification.
  */
 const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
   const reqHeaders = await headers();
-  const session = await auth.api.getSession({ headers: reqHeaders });
+  
+  // 1. Resolve tenant from hostname
+  const host = reqHeaders.get("host") || "";
+  const parts = host.split(".");
+  let slug = "savar"; // default for local testing
 
-  if (!session) {
-    redirect("/auth/sign-in");
+  const firstPart = parts[0];
+  if (parts.length > 2 && firstPart) {
+    slug = firstPart;
+  } else {
+    const firstTenant = await db.tenant.findFirst({
+      where: { isActive: true },
+      select: { slug: true }
+    });
+    if (firstTenant) {
+      slug = firstTenant.slug;
+    }
   }
 
-  const membership = await db.tenantMember.findFirst({
+  const tenant = await db.tenant.findFirst({
     where: {
-      userId: session.user.id,
+      slug,
       isActive: true,
-      role: "ADMIN",
+      isSuspended: false,
     },
     select: {
       id: true,
-      role: true,
-      joinedAt: true,
-      tenant: {
-        select: {
-          id: true,
-          name: true,
-          nameBn: true,
-          slug: true,
-          logo: true,
-          isActive: true,
-          isSuspended: true,
-          upazilaName: true,
-          districtName: true,
-          divisionName: true,
-          unionName: true,
-          phone: true,
-          email: true,
-        },
-      },
+      name: true,
+      nameBn: true,
+      slug: true,
+      logo: true,
+      isActive: true,
+      isSuspended: true,
+      upazilaName: true,
+      districtName: true,
+      divisionName: true,
+      unionName: true,
+      phone: true,
+      email: true,
     },
   });
 
-  if (!membership || !membership.tenant.isActive || membership.tenant.isSuspended) {
-    redirect("/");
+  if (!tenant) {
+    notFound();
   }
 
-  const { tenant } = membership;
+  // 2. Resolve optional session if available (for UI/auth state)
+  const session = await auth.api.getSession({ headers: reqHeaders });
+  let membership = null;
+
+  if (session) {
+    membership = await db.tenantMember.findFirst({
+      where: {
+        userId: session.user.id,
+        tenantId: tenant.id,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        role: true,
+        joinedAt: true,
+      },
+    });
+  }
+
+  // Fallback / dummy session info for public access
+  const resolvedUser = session
+    ? {
+        id: session.user.id,
+        name: session.user.name ?? null,
+        email: session.user.email ?? null,
+        image: session.user.image ?? null,
+      }
+    : {
+        id: "public",
+        name: "Public Viewer",
+        email: null,
+        image: null,
+      };
+
+  const resolvedMembership = membership
+    ? {
+        id: membership.id,
+        role: membership.role,
+        joinedAt: membership.joinedAt,
+      }
+    : {
+        id: "public",
+        role: "PUBLIC",
+        joinedAt: new Date(),
+      };
 
   return (
     <TenantProvider
@@ -67,17 +118,8 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
         phone: tenant.phone,
         email: tenant.email,
       }}
-      membership={{
-        id: membership.id,
-        role: membership.role,
-        joinedAt: membership.joinedAt,
-      }}
-      user={{
-        id: session.user.id,
-        name: session.user.name ?? null,
-        email: session.user.email ?? null,
-        image: session.user.image ?? null,
-      }}
+      membership={resolvedMembership}
+      user={resolvedUser}
     >
       {children}
     </TenantProvider>
