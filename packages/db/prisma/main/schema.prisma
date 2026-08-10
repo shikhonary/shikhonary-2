@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String?  @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String         @id @default(cuid())
+  email               String?        @unique
+  name                String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 
-  emailVerified       Boolean   @default(false)
+  emailVerified       Boolean        @default(false)
   image               String?
-  phoneNumber         String?   @unique
-  phoneNumberVerified Boolean   @default(false)
+  phoneNumber         String?        @unique
+  phoneNumberVerified Boolean        @default(false)
   sessions            Session[]
   accounts            Account[]
   roles               Role[]
-  student             Student?
+  memberships         TenantMember[]
+  tenants             Tenant[]       @relation("TenantOwner")
 
   @@index([email])
   @@index([phoneNumber])
@@ -89,439 +90,270 @@ model Role {
   @@map("role")
 }
 
-model AcademicClass {
-  id         String                 @id @default(uuid())
-  name       String
-  isActive   Boolean                @default(false)
-  students   Student[]
-  subjects   AcademicClassSubject[]
-  exams      Exam[]
-  examGroups ExamGroup[]
+model Tenant {
+  id                   String  @id @default(cuid())
+  name                 String
+  nameBn               String?
+  slug                 String  @unique
+  description          String?
+  logo                 String?
+  type                 String  @default("UNION_PORISHOD")
+  email                String?
+  phone                String?
+  address              String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Bangladesh Geographical Hierarchy ────────────────────
+  divisionName         String?
+  districtName         String?
+  upazilaName          String?
+  unionName            String?
+  postalCode           String?
 
-  @@index([name])
+  // ── UP Officials ─────────────────────────────────────────
+  secretaryName        String?
+  chairmanName         String?
+
+  // ── Domain & Branding ────────────────────────────────────
+  subdomain            String? @unique
+  customDomain         String? @unique
+  customDomainVerified Boolean @default(false)
+
+  // ── Database Provisioning ────────────────────────────────
+  databaseName         String? @unique
+  connectionString     String?
+  databaseStatus       String  @default("PENDING")
+
+  // ── Usage Counters ───────────────────────────────────────
+  citizenCount         Int @default(0)
+  staffCount           Int @default(0)
+  certificateCount     Int @default(0)
+  storageUsedMB        Int @default(0)
+
+  // ── Status & Lifecycle ───────────────────────────────────
+  isActive             Boolean   @default(true)
+  isSuspended          Boolean   @default(false)
+  suspendReason        String?
+  metadata             Json      @default("{}")
+
+  // ── Fiscal Year Pointer ──────────────────────────────────
+  currentFiscalYearId  String?
+  currentFiscalYear    FiscalYear? @relation("CurrentFiscalYear", fields: [currentFiscalYearId], references: [id], onDelete: SetNull)
+
+  // ── Owner ────────────────────────────────────────────────
+  createdById          String?
+  owner                User?       @relation("TenantOwner", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
+
+  // ── Custom Overrides ─────────────────────────────────────
+  customCitizenLimit     Int?
+  customStaffLimit       Int?
+  customCertificateLimit Int?
+  customStorageLimit     Int?
+
+  // ── Relations ────────────────────────────────────────────
+  subscription         Subscription?
+  members              TenantMember[]
+  invitations          TenantInvitation[]
+  fiscalYears          FiscalYear[]
+
+  @@index([slug])
   @@index([isActive])
-  @@map("academic_class")
+  @@index([currentFiscalYearId])
+  @@map("tenant")
 }
 
-model Subject {
-  id       String @id @default(uuid())
-  name     String
-  position Int    @default(0)
-
-  academicClasses AcademicClassSubject[]
-  chapters        Chapter[]
-  mcqs            Mcq[]
-  cqs             Cq[]
-  examSubjects    ExamSubject[]
-
-  createdAt DateTime @default(now())
+model TenantMember {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  role      String   @default("MEMBER")
+  isActive  Boolean  @default(true)
+  joinedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([position])
-}
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-model AcademicClassSubject {
-  id String @id @default(uuid())
-
-  academicClassId String
-  academicClass   AcademicClass @relation(fields: [academicClassId], references: [id], onDelete: Restrict)
-
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([academicClassId, subjectId])
-  @@index([academicClassId])
-  @@index([subjectId])
-}
-
-model Chapter {
-  id       String @id @default(uuid())
-  name     String
-  position Int    @default(0)
-
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-
-  mcqs Mcq[]
-  cqs  Cq[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([subjectId])
-}
-
-model Student {
-  id               String  @id @default(uuid())
-  name             String
-  phone            String
-  institute        String
-  roll             Int?
-  isOfflineStudent Boolean @default(false)
-
-  academicClassId String
-  academicClass   AcademicClass @relation(fields: [academicClassId], references: [id], onDelete: Restrict)
-
-  userId String? @unique
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  examAttempts     ExamAttempt[]
-  examGroupResults ExamGroupResult[]
-
+  @@unique([userId, tenantId])
+  @@index([tenantId])
   @@index([userId])
+  @@map("tenant_member")
 }
 
-model Mcq {
-  id          String   @id @default(uuid())
-  question    String
-  answer      String
-  options     String[]
-  statements  String[] @default([])
-  type        String
-  isMath      Boolean  @default(false)
-  reference   String[] @default([])
-  explanation String?
-  questionUrl String?
-  context     String?
-  contextUrl  String?
+model TenantInvitation {
+  id         String    @id @default(cuid())
+  tenantId   String
+  email      String
+  role       String    @default("STAFF")
+  token      String    @unique
+  expiresAt  DateTime
+  invitedBy  String
+  acceptedAt DateTime?
+  acceptedBy String?
+  message    String?
+  name       String?
+  status     String    @default("PENDING")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  chapterId String
-  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
-
-  isActive Boolean @default(true)
-
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  answerHistories AnswerHistory[]
-
-  @@index([chapterId])
-  @@index([chapterId, type])
-  @@index([isMath])
-  @@index([subjectId, chapterId])
-  @@index([subjectId])
-  @@index([subjectId, type])
-  @@index([type])
-  @@map("Mcq")
-}
-
-model Exam {
-  id              String   @id @default(uuid())
-  title           String
-  total           Int
-  duration        Int
-  totalMcq        Int
-  startDate       DateTime
-  endDate         DateTime
-  hasSuffle       Boolean  @default(false)
-  hasRandom       Boolean  @default(false)
-  hasNegativeMark Boolean  @default(false)
-  negativeMark    Float    @default(0)
-  isOffline       Boolean  @default(false)
-  type            String
-
-  status String @default("Pending")
-
-  academicClassId String
-  academicClass   AcademicClass @relation(fields: [academicClassId], references: [id], onDelete: Restrict)
-
-  examSubjects   ExamSubject[]
-  examAttempts   ExamAttempt[]
-  examGroupItems ExamGroupItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([title])
+  @@unique([email, tenantId])
+  @@index([email])
   @@index([status])
-  @@index([academicClassId])
-  @@index([createdAt])
-  @@index([status, createdAt])
+  @@index([tenantId])
+  @@index([token])
+  @@map("tenant_invitation")
 }
 
-model ExamAttempt {
-  id   String @id @default(uuid())
-  type String
+model SubscriptionPlan {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  displayName String
+  description String?
 
-  // Answer tracking - store detailed answer information as JSON
-  // Format: [{mcqId, selectedOption, isCorrect, answeredAt, timeSpent}]
-  answers Json[] @default([])
+  monthlyPriceBDT Int @default(0)
+  yearlyPriceBDT  Int @default(0)
 
-  // Performance metrics - denormalized for fast queries
-  score            Float @default(0)
-  correctAnswers   Int   @default(0)
-  wrongAnswers     Int   @default(0)
-  skippedQuestions Int   @default(0)
+  features  Json    @default("{}")
+  isActive  Boolean @default(true)
+  isPopular Boolean @default(false)
 
-  // Streak tracking for gamification
-  currentStreak Int @default(0)
-  bestStreak    Int @default(0)
+  // ── Resource Limits ──────────────────────────────────────
+  defaultCitizenLimit     Int @default(1000)
+  defaultStaffLimit       Int @default(10)
+  defaultCertificateLimit Int @default(500)
+  defaultStorageLimit     Int @default(500)
 
-  // Timing information
-  startTime      DateTime?
-  endTime        DateTime?
-  duration       Int?      @default(0) // Total duration in seconds
-  lastActivityAt DateTime? // Last time user interacted (for monitoring)
-
-  // Question management
-  totalQuestions   Int // Total questions at attempt start
-  answeredCount    Int   @default(0) // Denormalized count
-  flaggedQuestions Int[] @default([])
-
-  // Exam status and behavior
-  status         String  @default("Not Started") // Not Started, In Progress, Submitted, Auto-Submitted, Abandoned
-  submissionType String? // Manual, Auto-TimeUp, Auto-TabSwitch
-
-  // Features and settings - snapshot at attempt creation
-  enableAiFeature Boolean @default(false)
-  hasNegativeMark Boolean @default(false) // Copy from exam at creation
-  negativeMark    Float   @default(0) // Copy from exam at creation
-  hasShuffle      Boolean @default(false)
-  hasRandom       Boolean @default(false)
-
-  // Anti-cheat tracking
-  tabSwitches    Int        @default(0)
-  tabSwitchTimes DateTime[] @default([])
-  warnings       Json[]     @default([]) // Store warning events
-
-  // Feedback and review
-  feedbackStatus String  @default("Pending") // Pending, Reviewed, Resolved
-  reviewNotes    String? // Admin notes
-
-  // Relations
-  examId String
-  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
-
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  answerHistory AnswerHistory[]
+  // ── Feature Flags ────────────────────────────────────────
+  canIssueCertificates  Boolean @default(true)
+  canCollectHoldingTax  Boolean @default(false)
+  canManageTradeLicense Boolean @default(false)
+  canSendSms            Boolean @default(false)
+  canUseCustomDomain    Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indexes for performance
-  @@index([studentId])
-  @@index([examId])
+  subscriptions Subscription[]
+
+  @@map("subscription_plan")
+}
+
+model Subscription {
+  id       String @id @default(cuid())
+  tenantId String @unique
+  planId   String
+
+  status String @default("ACTIVE")
+
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  trialEndsAt        DateTime?
+
+  billingCycle  String @default("YEARLY")
+  currency      String @default("BDT")
+  pricePerMonth Int    @default(0)
+  pricePerYear  Int?
+
+  paymentProvider String?
+  externalId      String?
+
+  cancelAtPeriodEnd Boolean   @default(false)
+  canceledAt        DateTime?
+  cancelReason      String?
+
+  customCitizenLimit     Int?
+  customStaffLimit       Int?
+  customCertificateLimit Int?
+  customStorageLimit     Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  history SubscriptionHistory[]
+
+  @@index([currentPeriodEnd])
+  @@index([planId])
   @@index([status])
-  @@index([score])
+  @@index([tenantId])
+  @@map("subscription")
+}
+
+model SubscriptionHistory {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  event          String
+  fromPlanId     String?
+  toPlanId       String?
+  fromStatus     String?
+  toStatus       String?
+  reason         String?
+  metadata       Json     @default("{}")
+  createdBy      String?
+  createdAt      DateTime @default(now())
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
   @@index([createdAt])
-  @@index([studentId, examId])
-  @@index([studentId, status])
-  @@index([studentId, createdAt])
-  @@index([examId, status])
-  @@index([status, createdAt])
-  @@index([studentId, score])
-  @@index([lastActivityAt])
-  @@index([submissionType])
-  @@index([bestStreak])
+  @@index([subscriptionId])
+  @@map("subscription_history")
 }
 
-model AnswerHistory {
-  id String @id @default(uuid())
+model Invoice {
+  id            String    @id @default(cuid())
+  tenantId      String
+  invoiceNumber String    @unique
+  amount        Int
+  currency      String    @default("BDT")
+  status        String    @default("PENDING")
 
-  attemptId String
-  attempt   ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  periodStart DateTime
+  periodEnd   DateTime
+  dueDate     DateTime?
+  paidAt      DateTime?
 
-  mcqId          String
-  mcq            Mcq    @relation(fields: [mcqId], references: [id], onDelete: Cascade)
-  questionNumber Int // Position in exam
+  paymentMethod    String?
+  paymentProvider  String?
+  paymentReference String?
 
-  // Answer details
-  selectedOption String
-  correctAnswer  String
-  isCorrect      Boolean
-
-  // Timing
-  answeredAt DateTime @default(now())
-  timeSpent  Int? // Seconds spent on this question
-
-  // Change tracking (if you allow answer changes)
-  previousAnswer String?
-  isChanged      Boolean @default(false)
-  changeCount    Int     @default(0)
+  pdfUrl      String? @map("invoicePdfUrl")
+  lineItems   Json    @default("[]")
+  description String?
+  notes       String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([attemptId])
-  @@index([mcqId])
-  @@index([attemptId, questionNumber])
-  @@index([answeredAt])
-  @@index([isCorrect])
+  @@index([dueDate])
+  @@index([invoiceNumber])
+  @@index([status])
+  @@index([tenantId])
+  @@map("invoice")
 }
 
-model ExamSubject {
-  id String @id @default(uuid())
+model FiscalYear {
+  id        String   @id @default(cuid())
+  year      String   // e.g. "2026"
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
 
-  examId String
-  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-
-  mcqIds String[] @default([])
+  currentForTenants Tenant[] @relation("CurrentFiscalYear")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([examId, subjectId])
-  @@index([examId])
-  @@index([subjectId])
-  @@map("exam_subject")
-}
-
-model ExamGroup {
-  id              String    @id @default(uuid())
-  title           String
-  code            String?
-  description     String?
-  type            String    @default("MODEL_TEST")
-  calculationType String    @default("SUM")
-  bestOfNCount    Int?
-  totalMarks      Float?
-  passMarks       Float?
-  startDate       DateTime?
-  endDate         DateTime?
-  isPublished     Boolean   @default(false)
-
-  academicClassId String?
-  academicClass   AcademicClass? @relation(fields: [academicClassId], references: [id], onDelete: SetNull)
-
-  items        ExamGroupItem[]
-  groupResults ExamGroupResult[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([title])
-  @@index([type])
-  @@index([academicClassId])
-  @@index([isPublished])
-  @@map("exam_group")
-}
-
-model ExamGroupItem {
-  id String @id @default(uuid())
-
-  examGroupId String
-  examGroup   ExamGroup @relation(fields: [examGroupId], references: [id], onDelete: Cascade)
-
-  examId String
-  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
-
-  position   Int     @default(0)
-  weightage  Float   @default(100.0)
-  isRequired Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([examGroupId, examId])
-  @@index([examGroupId])
-  @@index([examId])
-  @@index([examGroupId, position])
-  @@map("exam_group_item")
-}
-
-model ExamGroupResult {
-  id String @id @default(uuid())
-
-  examGroupId String
-  examGroup   ExamGroup @relation(fields: [examGroupId], references: [id], onDelete: Cascade)
-
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  totalObtainedMarks Float   @default(0)
-  totalMaxMarks      Float   @default(0)
-  percentage         Float   @default(0)
-  gpa                Float?
-  grade              String?
-  meritPosition      Int?
-
-  status            String @default("PASSED")
-  examsAttempted    Int    @default(0)
-  totalExamsInGroup Int    @default(0)
-
-  calculatedAt DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([examGroupId, studentId])
-  @@index([examGroupId])
-  @@index([studentId])
-  @@index([examGroupId, meritPosition])
-  @@index([examGroupId, percentage])
-  @@map("exam_group_result")
-}
-
-model Cq {
-  id        String   @id @default(uuid())
-  questionA String
-  questionB String
-  questionC String
-  questionD String?
-  context   String?
-  reference String[] @default([])
-
-  subjectId String
-  chapterId String
-
-  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
-
-  attachments CqAttachment[]
-  answer      CqAnswer?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([chapterId])
-  @@index([subjectId])
-  @@map("cq")
-}
-
-model CqAttachment {
-  id   String @id @default(uuid())
-  cqId String
-  cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
-
-  url      String
-  type     String  @default("image") // "image", "pdf", etc.
-  caption  String?
-  position Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([cqId])
-  @@map("cq_attachment")
-}
-
-model CqAnswer {
-  id   String @id @default(uuid())
-  cqId String @unique
-  cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
-
-  answerA     String?
-  answerB     String?
-  answerC     String?
-  answerD     String?
-  explanation String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("cq_answer")
+  @@index([tenantId])
+  @@index([isCurrent])
+  @@map("fiscal_year")
 }

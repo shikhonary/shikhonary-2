@@ -4,14 +4,16 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
+  Building2,
+  CreditCard,
   Users,
-  ClipboardList,
 } from "lucide-react"
 
 const mobileNavItems = [
   { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/tenants", label: "UPs", icon: Building2 },
+  { href: "/subscriptions", label: "Billing", icon: CreditCard },
   { href: "/users", label: "Users", icon: Users },
-  { href: "/exams", label: "Exams", icon: ClipboardList },
 ]
 
 export function MobileNav() {

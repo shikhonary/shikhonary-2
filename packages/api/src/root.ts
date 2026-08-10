@@ -12,34 +12,34 @@ import { healthRouter } from "./routers/health"
 import { userRouter } from "./routers/user/user.router"
 import { roleRouter } from "./routers/role/role.router"
 import { tenantRouter } from "./routers/tenant/tenant.router"
-import { academicClassRouter } from "./routers/academic-class/academic-class.router"
-import { studentRouter } from "./routers/student/student.router"
-import { subjectRouter } from "./routers/subject/subject.router"
-import { chapterRouter } from "./routers/chapter/chapter.router"
-import { mcqRouter } from "./routers/mcq/mcq.router"
-import { cqRouter } from "./routers/cq/cq.router"
-import { examRouter } from "./routers/exam/exam.router"
-import { examAttemptRouter } from "./routers/exam-attempt/exam-attempt.router"
-import { examGroupRouter } from "./routers/exam-group/exam-group.router"
-import { questionBankRouter } from "./routers/question-bank/question-bank.router"
+import { subscriptionRouter } from "./routers/subscription/subscription.router"
+import { subscriptionPlanRouter } from "./routers/subscription-plan/subscription-plan.router"
+import { fiscalYearRouter } from "./routers/fiscal-year/fiscal-year.router"
+import { tenantFiscalYearRouter } from "./routers/tenant-fiscal-year/tenant-fiscal-year.router"
+import { tenantWardRouter } from "./routers/tenant-ward/tenant-ward.router"
 import { dashboardRouter } from "./routers/dashboard/dashboard.router"
+import { invitationRouter } from "./routers/invitation/invitation.router"
+import { taxPayerRouter } from "./routers/tax-payer/tax-payer.router"
+import { taxPaymentRouter } from "./routers/tax-payment/tax-payment.router"
+import { generateTaxPaymentRouter } from "./routers/generate-tax-payment/generate-tax-payment.router"
+import { tenantDashboardRouter } from "./routers/tenant-dashboard/tenant-dashboard.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
   user: userRouter,
   role: roleRouter,
   tenant: tenantRouter,
-  academicClass: academicClassRouter,
-  student: studentRouter,
-  subject: subjectRouter,
-  chapter: chapterRouter,
-  mcq: mcqRouter,
-  cq: cqRouter,
-  exam: examRouter,
-  examAttempt: examAttemptRouter,
-  examGroup: examGroupRouter,
-  questionBank: questionBankRouter,
+  subscription: subscriptionRouter,
+  subscriptionPlan: subscriptionPlanRouter,
+  fiscalYear: fiscalYearRouter,
+  tenantFiscalYear: tenantFiscalYearRouter,
+  tenantWard: tenantWardRouter,
   dashboard: dashboardRouter,
+  invitation: invitationRouter,
+  taxPayer: taxPayerRouter,
+  taxPayment: taxPaymentRouter,
+  generateTaxPayment: generateTaxPaymentRouter,
+  tenantDashboard: tenantDashboardRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

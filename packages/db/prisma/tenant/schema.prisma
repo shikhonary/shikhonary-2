@@ -7,12 +7,76 @@ datasource db {
   provider = "postgresql"
 }
 
-model Tenant {
+model FiscalYear {
   id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
+  year      String   // e.g. "2026"
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+
+  tenantId  String?
+
+  taxPayments TaxPayment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([slug])
+  @@index([tenantId])
+  @@index([isCurrent])
+  @@map("fiscal_year")
+}
+
+model Ward {
+    id        String   @id @default(cuid())
+    name      String
+    nameBn    String
+    
+  taxPayers TaxPayer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TaxPayer {
+  id         String   @id @default(cuid())
+  holding    String
+  name       String
+  fatherName String?
+  phone      String?
+  nid        String?
+  wardId     String
+  ward       Ward     @relation(fields: [wardId], references: [id])
+  village    String
+  tax        Int      @default(0)
+
+  payments   TaxPayment[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([wardId])
+  @@index([nid])
+  @@index([phone])
+  @@index([holding])
+  @@map("tax_payer")
+}
+
+model TaxPayment {
+  id            String     @id @default(cuid())
+  taxPayerId    String
+  taxPayer      TaxPayer   @relation(fields: [taxPayerId], references: [id], onDelete: Cascade)
+  fiscalYearId  String
+  fiscalYear    FiscalYear @relation(fields: [fiscalYearId], references: [id])
+  amount        Int
+  receiptNo     String?
+  paymentDate   DateTime   @default(now())
+  paymentMethod String?
+  note          String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([taxPayerId])
+  @@index([fiscalYearId])
+  @@map("tax_payment")
 }

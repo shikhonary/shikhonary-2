@@ -14,9 +14,11 @@
     "seed:main": "node --loader ts-node/esm prisma/seed/main.seed.ts",
     "seed:tenant": "node --loader ts-node/esm prisma/seed/tenant.seed.ts",
     "assign-super-admin": "npx tsx prisma/seed/assign-super-admin.ts",
+    "seed:subscriptions": "npx tsx prisma/seed/seed-subscriptions.ts",
     "reset:main": "prisma migrate reset --force --config prisma/main/prisma.config.ts",
     "reset:tenant": "prisma migrate reset --force --config prisma/tenant/prisma.config.ts",
     "reset": "npx tsx prisma/seed/reset.ts",
+    "clean:databases": "npx tsx prisma/seed/clean-tenant-databases.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

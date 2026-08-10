@@ -5,15 +5,12 @@ import { usePathname, useRouter } from "next/navigation"
 import { authClient } from "@workspace/auth/client"
 import {
   LayoutDashboard,
-  GraduationCap,
-  Shield,
-  BookOpen,
-  BookMarked,
-  HelpCircle,
-  Users,
-  ClipboardList,
+  Building2,
+  Calendar,
+  CreditCard,
   Layers,
-  Library,
+  Users,
+  Shield,
   Settings,
   LogOut,
   ChevronLeft,
@@ -41,21 +38,17 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    groupLabel: "Academic Hub",
+    groupLabel: "UP Management",
     items: [
-      { href: "/academic-classes", label: "Classes", icon: GraduationCap },
-      { href: "/students", label: "Students", icon: Users },
-      { href: "/subjects", label: "Subjects", icon: BookOpen },
-      { href: "/chapters", label: "Chapters", icon: BookMarked },
+      { href: "/tenants", label: "Union Porishods", icon: Building2 },
+      { href: "/fiscal-years", label: "Fiscal Years", icon: Calendar },
     ],
   },
   {
-    groupLabel: "Assessments",
+    groupLabel: "SaaS Billing",
     items: [
-      { href: "/mcqs", label: "MCQs", icon: HelpCircle },
-      { href: "/cqs", label: "CQs", icon: HelpCircle },
-      { href: "/exams", label: "Exams", icon: ClipboardList },
-      { href: "/exam-groups", label: "Exam Groups", icon: Layers },
+      { href: "/subscriptions", label: "Subscriptions", icon: CreditCard },
+      { href: "/subscription-plans", label: "Subscription Plans", icon: Layers },
     ],
   },
   {
@@ -84,28 +77,23 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
 
   return (
     <nav
-      className={`h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${isCollapsed ? "w-20" : "w-64"
-        }`}
+      className={`h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${
+        isCollapsed ? "w-20" : "w-64"
+      }`}
     >
       {/* Header */}
       <div className={`flex items-center gap-3 px-4 mb-4 ${isCollapsed ? "justify-center" : "justify-between"}`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-outline-variant/40">
-            <Image
-              alt="Medical Institution Logo"
-              className="w-full h-full object-cover"
-              src="/logo.jpg"
-              width={40}
-              height={40}
-            />
+          <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-outline-variant/40 flex items-center justify-center bg-primary/10">
+            <Building2 className="w-6 h-6 text-primary" />
           </div>
           {!isCollapsed && (
             <div>
               <h1 className="font-headline-sm text-headline-sm font-extrabold text-primary leading-tight">
-                Mr. Dr.
+                UP Hub
               </h1>
               <p className="font-caption text-on-surface-variant text-[10px]">
-                Academic & Admission Care
+                Union Porishod SaaS
               </p>
             </div>
           )}
@@ -143,11 +131,13 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
                   key={item.href}
                   href={item.href}
                   title={isCollapsed ? item.label : undefined}
-                  className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2 rounded-r-lg border-l-4"
-                    } ${isActive
+                  className={`flex items-center gap-3 transition-all duration-200 ease-in-out ${
+                    isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2 rounded-r-lg border-l-4"
+                  } ${
+                    isActive
                       ? "bg-surface-container-high text-primary rounded-r-lg font-bold border-primary"
                       : "text-on-surface-variant hover:bg-surface-variant border-transparent"
-                    }`}
+                  }`}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   {!isCollapsed && (
@@ -156,7 +146,7 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
                     </span>
                   )}
                 </Link>
-              )
+              );
             })}
           </div>
         ))}
@@ -164,18 +154,12 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
 
       {/* CTA & Footer */}
       <div className="mt-auto flex flex-col gap-3 px-4 pt-4 border-t border-outline-variant/30">
-        {!isCollapsed && (
-          <Link href="/students/create" className="w-full block">
-            <button className="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-2 rounded-lg hover:bg-primary hover:text-white transition-colors duration-200 shadow-sm border border-transparent cursor-pointer">
-              Enroll New Student
-            </button>
-          </Link>
-        )}
         <button
           onClick={handleSignOut}
           title={isCollapsed ? "Logout" : undefined}
-          className={`flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 transition-all duration-200 ease-in-out cursor-pointer ${isCollapsed ? "justify-center px-2" : "px-3"
-            }`}
+          className={`flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 transition-all duration-200 ease-in-out cursor-pointer ${
+            isCollapsed ? "justify-center px-2" : "px-3"
+          }`}
         >
           <LogOut className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span className="font-label-md text-label-md">Logout</span>}
@@ -184,4 +168,3 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
     </nav>
   )
 }
-

@@ -1,12 +1,5 @@
 /**
  * Public barrel for @workspace/api.
- *
- * Only server-safe exports live here. Never import this in a Client Component.
- *
- * IMPORTANT: Procedure builders (publicProcedure, protectedProcedure, etc.)
- * are intentionally NOT exported from this barrel. They are internal to the
- * package and should only be imported within `packages/api/src/routers/`.
- * Consumers should only depend on `AppRouter`, `createTRPCContext`, and types.
  */
 export { createTRPCContext } from "./trpc"
 export type {
@@ -14,10 +7,11 @@ export type {
   AuthedTRPCContext,
   SuperAdminTRPCContext,
   TenantTRPCContext,
-  StudentTRPCContext,
+  TenantMemberTRPCContext,
 } from "./trpc"
 export { appRouter, createCaller } from "./root"
 export type { AppRouter } from "./root"
+
 export type {
   ListUsersInput,
   GetUserInput,
@@ -27,6 +21,7 @@ export type {
   CreateUserInput,
   UsersForSelectionInput,
 } from "./routers/user/user.schema"
+
 export type {
   RoleForSelectionInput,
   ListRolesInput,
@@ -35,107 +30,78 @@ export type {
   UpdateRoleInput,
   DeleteRoleInput,
 } from "./routers/role/role.schema"
-export type {
-  ListAcademicClassesInput,
-  GetAcademicClassInput,
-  AcademicClassForSelectionInput,
-  CreateAcademicClassInput,
-  UpdateAcademicClassInput,
-  DeleteAcademicClassInput,
-} from "./routers/academic-class/academic-class.schema"
-export type {
-  ListSubjectsInput,
-  GetSubjectInput,
-  SubjectForSelectionInput,
-  CreateSubjectInput,
-  UpdateSubjectInput,
-  DeleteSubjectInput,
-  AssignAcademicClassesInput,
-} from "./routers/subject/subject.schema"
-export type {
-  ListChaptersInput,
-  GetChapterInput,
-  ChapterForSelectionInput,
-  CreateChapterInput,
-  UpdateChapterInput,
-  DeleteChapterInput,
-  ReorderChaptersInput,
-  ChapterStatsInput,
-} from "./routers/chapter/chapter.schema"
-export type {
-  ListMcqsInput,
-  GetMcqInput,
-  McqStatsInput,
-  CreateMcqInput,
-  ImportMcqsInput,
-  UpdateMcqInput,
-  DeleteMcqInput,
-  BulkDeleteMcqsInput,
-  ToggleMcqActiveInput,
-  McqSortOption,
-} from "./routers/mcq/mcq.schema"
-export type {
-  ListCqsInput,
-  GetCqInput,
-  CreateCqInput,
-  UpdateCqInput,
-  DeleteCqInput,
-  BulkDeleteCqsInput,
-  CqSortOption,
-  ImportCqsInput,
-} from "./routers/cq/cq.schema"
-export type {
-  ListExamsInput,
-  GetExamInput,
-  ExamStatsInput,
-  CreateExamInput,
-  UpdateExamInput,
-  DeleteExamInput,
-  BulkDeleteExamsInput,
-  ToggleExamStatusInput,
-  AddExamSubjectsInput,
-  RemoveExamSubjectInput,
-  ExamSortOption,
-  McqsForAssignmentInput,
-} from "./routers/exam/exam.schema"
-export type {
-  ListExamGroupsInput,
-  GetExamGroupInput,
-  ExamGroupStatsInput,
-  CreateExamGroupInput,
-  UpdateExamGroupInput,
-  DeleteExamGroupInput,
-  BulkDeleteExamGroupsInput,
-  TogglePublishExamGroupInput,
-  AddExamGroupItemInput,
-  UpdateExamGroupItemInput,
-  RemoveExamGroupItemInput,
-  ReorderExamGroupItemsInput,
-  CalculateExamGroupResultsInput,
-  ListExamGroupResultsInput,
-  GetStudentExamGroupResultInput,
-  ExamGroupSortOption,
-  CalculationType,
-  ExamGroupType,
-} from "./routers/exam-group/exam-group.schema"
-export type {
-  ListQuestionBankInput,
-  QuestionBankStatsInput,
-  GetQuestionBankMcqInput,
-  QuestionBankByChapterInput,
-  QuestionBankSortOption,
-} from "./routers/question-bank/question-bank.schema"
-export type {
-  CompleteStudentOnboardingInput,
-  CreateStudentInput,
-  DeleteStudentInput,
-  GetStudentInput,
-  ListStudentsInput,
-  UpdateStudentAdminInput,
-  StudentSortOption,
-} from "./routers/student/student.schema"
 
-export type { MappedExam } from "./routers/exam/exam.service"
-export type { MappedSubject, MappedSubjectSelection } from "./routers/subject/subject.service"
-export type { MappedStudent } from "./routers/student/student.service"
+export type {
+  ListTenantsInput,
+  GetTenantInput,
+  GetTenantBySlugInput,
+  CreateTenantInput,
+  UpdateTenantInput,
+  DeleteTenantInput,
+  ToggleTenantStatusInput,
+  BulkTenantActionInput,
+} from "./routers/tenant/tenant.schema"
 
+export type {
+  ListSubscriptionsInput,
+  GetSubscriptionInput,
+  GetSubscriptionByTenantInput,
+  CreateSubscriptionInput,
+  UpdateSubscriptionInput,
+  ChangeSubscriptionPlanInput,
+  CancelSubscriptionInput,
+  DeleteSubscriptionInput,
+} from "./routers/subscription/subscription.schema"
+
+export type {
+  ListSubscriptionPlansInput,
+  GetSubscriptionPlanInput,
+  CreateSubscriptionPlanInput,
+  UpdateSubscriptionPlanInput,
+  DeleteSubscriptionPlanInput,
+} from "./routers/subscription-plan/subscription-plan.schema"
+
+export type {
+  ListFiscalYearsInput,
+  GetFiscalYearInput,
+  CreateFiscalYearInput,
+  UpdateFiscalYearInput,
+  DeleteFiscalYearInput,
+} from "./routers/fiscal-year/fiscal-year.schema"
+
+export type {
+  ListTenantFiscalYearsInput,
+  GetTenantFiscalYearInput,
+  CreateTenantFiscalYearInput,
+  UpdateTenantFiscalYearInput,
+  DeleteTenantFiscalYearInput,
+} from "./routers/tenant-fiscal-year/tenant-fiscal-year.schema"
+
+export type {
+  ListTenantWardsInput,
+  GetTenantWardInput,
+  CreateTenantWardInput,
+  UpdateTenantWardInput,
+  DeleteTenantWardInput,
+} from "./routers/tenant-ward/tenant-ward.schema"
+
+export type {
+  ListTaxPayersInput,
+  GetTaxPayerInput,
+  GetTaxPayerByHoldingInput,
+  TaxPayerStatsInput,
+  CreateTaxPayerInput,
+  BulkCreateTaxPayerInput,
+  UpdateTaxPayerInput,
+  DeleteTaxPayerInput,
+} from "./routers/tax-payer/tax-payer.schema"
+
+export type {
+  ListTaxPaymentsInput,
+  GetTaxPaymentInput,
+  GetPaymentByReceiptNoInput,
+  TaxPaymentStatsInput,
+  CreateTaxPaymentInput,
+  UpdateTaxPaymentInput,
+  DeleteTaxPaymentInput,
+} from "./routers/tax-payment/tax-payment.schema"

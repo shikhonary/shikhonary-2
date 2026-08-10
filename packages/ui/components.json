@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "base-sera",
+  "style": "default",
   "rsc": true,
   "tsx": true,
   "tailwind": {
     "config": "",
     "css": "src/styles/globals.css",
-    "baseColor": "neutral",
+    "baseColor": "green",
     "cssVariables": true
   },
   "iconLibrary": "lucide",

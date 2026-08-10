@@ -14,43 +14,23 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   console.log("Seeding main database...")
 
-  await prisma.role.upsert({
-    where: { name: "USER" },
-    update: {},
-    create: {
-      name: "USER",
-      description: "Default standard user role",
-    },
-  })
+  const roles = [
+    { name: "SUPER_ADMIN", description: "Super administrator role" },
+    { name: "Admin", description: "Union Parishad Secretary / Admin" },
+    { name: "Chairman", description: "Union Parishad Chairman" },
+    { name: "Member", description: "Union Parishad Ward Member" },
+    { name: "User", description: "General Citizen / User" },
+  ]
 
-  await prisma.role.upsert({
-    where: { name: "SUPER_ADMIN" },
-    update: {},
-    create: {
-      name: "SUPER_ADMIN",
-      description: "Super administrator role",
-    },
-  })
+  for (const r of roles) {
+    await prisma.role.upsert({
+      where: { name: r.name },
+      update: { description: r.description },
+      create: r,
+    })
+  }
 
-  await prisma.role.upsert({
-    where: { name: "STUDENT" },
-    update: {},
-    create: {
-      name: "STUDENT",
-      description: "Enrolled student role",
-    },
-  })
-
-  await prisma.role.upsert({
-    where: { name: "Student" },
-    update: {},
-    create: {
-      name: "Student",
-      description: "Enrolled student role",
-    },
-  })
-
-  console.log("Main database seeded successfully.")
+  console.log("Main database seeded successfully with UP roles.")
 }
 
 main()

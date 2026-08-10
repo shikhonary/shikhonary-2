@@ -5,4 +5,5 @@ export * from "./send";
 export * from "./emails/WelcomeEmail";
 export * from "./emails/VerificationEmail";
 export * from "./emails/ResetPasswordEmail";
+export * from "./emails/InvitationEmail";
 

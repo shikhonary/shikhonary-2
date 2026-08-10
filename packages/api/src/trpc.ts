@@ -1,24 +1,18 @@
 /**
  * tRPC server initialization.
  *
- * This file is SERVER ONLY. The `server-only` guard will cause a build-time
- * error if it is accidentally imported in a Client Component.
- *
  * Procedure hierarchy (each level narrows the context type):
- *  - `publicProcedure`      — no auth required (health checks, public APIs)
- *                             ctx: { headers }
- *  - `protectedProcedure`  — requires a valid Better Auth session
- *                             ctx: { headers, session }
- *  - `superAdminProcedure` — requires session + injects the main Prisma DB
- *                             ctx: { headers, session, db }
- *  - `tenantProcedure`     — requires session + injects main + tenant DBs
- *                             ctx: { headers, session, db, tenantDb }
- *  - `studentProcedure`    — requires session + STUDENT role check
- *
- * Context design:
- *  - `createTRPCContext` only forwards the raw `Headers` — it does NOT fetch
- *    the session eagerly. This keeps public procedures cheap.
- *  - Auth and DB are resolved lazily inside the respective middleware.
+ *  - `publicProcedure`        — no auth required (health checks, public APIs)
+ *                               ctx: { headers }
+ *  - `protectedProcedure`    — requires a valid Better Auth session
+ *                               ctx: { headers, session }
+ *  - `superAdminProcedure`   — requires session + injects the main Prisma DB
+ *                               ctx: { headers, session, db }
+ *  - `tenantProcedure`       — requires session + injects main + tenant DBs (header-based)
+ *                               ctx: { headers, session, db, tenantDb }
+ *  - `tenantMemberProcedure` — requires session + active ADMIN membership in a tenant
+ *                               ctx: { headers, session, db, tenant, membership }
+ *  - `adminProcedure`        — requires session + ADMIN / SUPER_ADMIN role check
  */
 import "server-only"
 
@@ -68,24 +62,34 @@ export type TenantTRPCContext = AuthedTRPCContext & {
 }
 
 /**
- * Context available inside `studentProcedure`.
+ * Context available inside `tenantMemberProcedure`.
+ * Resolved from the user's TenantMember record — no header needed.
  */
-export type StudentTRPCContext = AuthedTRPCContext & {
+export type TenantMemberTRPCContext = AuthedTRPCContext & {
   db: PrismaClient
-  isOfflineStudent: boolean
+  tenantDb: TenantPrismaClient
+  tenant: {
+    id: string
+    name: string
+    nameBn: string | null
+    slug: string
+    logo: string | null
+    isActive: boolean
+    isSuspended: boolean
+    suspendReason: string | null
+  }
+  membership: {
+    id: string
+    role: string
+    isActive: boolean
+    joinedAt: Date
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Context factory
 // ---------------------------------------------------------------------------
 
-/**
- * Creates the tRPC request context.
- *
- * Accepts raw `Headers` so it can be called from both:
- *  - The RSC server-side caller (via `next/headers`)
- *  - The Next.js fetch route handler (via `req.headers`)
- */
 export const createTRPCContext = async (opts: {
   headers: Headers
 }): Promise<TRPCContext> => {
@@ -99,20 +103,7 @@ export const createTRPCContext = async (opts: {
 // ---------------------------------------------------------------------------
 
 const t = initTRPC.context<TRPCContext>().create({
-  /**
-   * superjson allows tRPC to serialize/deserialize complex JS types (Date,
-   * Map, Set, BigInt, etc.) transparently across the network boundary.
-   *
-   * @see https://trpc.io/docs/server/data-transformers
-   */
   transformer: superjson,
-
-  /**
-   * Custom error formatter — attaches Zod validation details to the
-   * response so clients can display field-level errors.
-   *
-   * @see https://trpc.io/docs/server/error-formatting
-   */
   errorFormatter({ shape, error }) {
     return {
       ...shape,
@@ -129,10 +120,6 @@ const t = initTRPC.context<TRPCContext>().create({
 // Internal middleware
 // ---------------------------------------------------------------------------
 
-/**
- * Timing + outcome logger.
- * Dev: full error details. Prod: message only (no stack trace leakage).
- */
 const loggingMiddleware = t.middleware(async ({ path, type, next }) => {
   const start = Date.now()
   const result = await next()
@@ -157,33 +144,15 @@ const loggingMiddleware = t.middleware(async ({ path, type, next }) => {
 // Exported helpers
 // ---------------------------------------------------------------------------
 
-/** Create a new router. */
 export const createTRPCRouter = t.router
-
-/** Used to create server-side callers for RSC. */
 export const createCallerFactory = t.createCallerFactory
 
 // ---------------------------------------------------------------------------
 // Procedures
 // ---------------------------------------------------------------------------
 
-/**
- * Public procedure — no authentication required.
- * ctx: { headers }
- *
- * Safe to call from anyone (health checks, public APIs, etc.).
- */
 export const publicProcedure = t.procedure.use(loggingMiddleware)
 
-/**
- * Protected procedure — requires an authenticated Better Auth session.
- * ctx: { headers, session }
- *
- * Resolves the session lazily (only when this procedure runs), so public
- * procedures never pay the auth lookup cost.
- *
- * Throws `UNAUTHORIZED` if there is no valid session.
- */
 export const protectedProcedure = t.procedure
   .use(loggingMiddleware)
   .use(async ({ ctx, next }) => {
@@ -219,32 +188,15 @@ export const protectedProcedure = t.procedure
     })
   })
 
-/**
- * Super-admin procedure — requires a valid session AND injects the main
- * Prisma database client into the context.
- * ctx: { headers, session, db }
- *
- * Chains off `protectedProcedure` so the auth check always runs first.
- * Use for cross-tenant data, platform configuration, and management DB access.
- */
 export const superAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      /** Main Prisma client — connected to the primary/management database. */
       db: db as PrismaClient,
     },
   })
 })
 
-/**
- * Tenant procedure — requires a valid session AND injects both the main
- * and tenant Prisma clients into the context.
- * ctx: { headers, session, db, tenantDb }
- *
- * Chains off `protectedProcedure` so the auth check always runs first.
- * Use when a procedure needs both platform-level and tenant-specific data.
- */
 export const tenantProcedure = protectedProcedure.use(({ ctx, next }) => {
   const tenantId = ctx.headers.get("x-tenant-id")
   if (!tenantId) {
@@ -257,59 +209,12 @@ export const tenantProcedure = protectedProcedure.use(({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      /** Main Prisma client — connected to the primary/management database. */
       db: db as PrismaClient,
-      /** Tenant Prisma client — scoped to the specific tenant via extension. */
       tenantDb: getTenantDb(tenantId) as TenantPrismaClient,
     },
   })
 })
 
-/**
- * Student procedure — requires a valid session with the STUDENT role
- * AND injects the main Prisma database client into the context.
- * ctx: { headers, session, roles, db }
- *
- * Chains off `protectedProcedure` so the auth check always runs first.
- * Throws `FORBIDDEN` if the user does not have the Student role.
- * Safe case-insensitive role check supports both "STUDENT" and "Student".
- */
-export const studentProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  const hasStudentRole = ctx.roles.some(
-    (r) =>
-      r.name === ROLES.STUDENT ||
-      r.name?.toUpperCase() === "STUDENT" ||
-      r.name === "Student",
-  )
-
-  if (!hasStudentRole) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You must have the Student role to perform this action.",
-    })
-  }
-
-  const student = await db.student.findUnique({
-    where: { userId: ctx.session.user.id },
-    select: { isOfflineStudent: true },
-  })
-
-  return next({
-    ctx: {
-      ...ctx,
-      /** Main Prisma client — connected to the primary/management database. */
-      db: db as PrismaClient,
-      /** Offline student status */
-      isOfflineStudent: student?.isOfflineStudent ?? false,
-    },
-  })
-})
-
-/**
- * Admin procedure — requires a valid session with the ADMIN or SUPER_ADMIN role
- * and injects the main Prisma database client.
- * ctx: { headers, session, roles, db }
- */
 export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   const hasAdminRole = ctx.roles.some(
     (r) =>
@@ -331,43 +236,83 @@ export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      /** Main Prisma client — connected to the primary/management database. */
       db: db as PrismaClient,
     },
   })
 })
 
 /**
- * Teacher procedure — requires a valid session with the TEACHER, ADMIN, or SUPER_ADMIN role
- * and injects the main Prisma database client.
- * ctx: { headers, session, roles, db }
+ * `tenantMemberProcedure` — Tenant app authorization gate.
+ *
+ * Resolves the user's tenant membership from the main DB.
+ * Rules:
+ *  1. User must have an active TenantMember record with role "ADMIN".
+ *  2. The Tenant must be active and not suspended.
+ *
+ * Injects `tenant` and `membership` into context.
  */
-export const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
-  const hasTeacherRole = ctx.roles.some(
-    (r) =>
-      r.name === ROLES.SUPER_ADMIN ||
-      r.name === ROLES.ADMIN ||
-      r.name === ROLES.TEACHER ||
-      r.name?.toUpperCase() === "SUPER_ADMIN" ||
-      r.name?.toUpperCase() === "ADMIN" ||
-      r.name?.toUpperCase() === "TEACHER" ||
-      r.name === "Admin" ||
-      r.name === "Teacher" ||
-      r.name === "Super Admin",
-  )
-
-  if (!hasTeacherRole) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You must have a Teacher, Admin, or Super Admin role to perform this action.",
+export const tenantMemberProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const membership = await db.tenantMember.findFirst({
+      where: {
+        userId: ctx.session.user.id,
+        isActive: true,
+        role: "ADMIN",
+      },
+      select: {
+        id: true,
+        role: true,
+        isActive: true,
+        joinedAt: true,
+        tenant: {
+          select: {
+            id: true,
+            name: true,
+            nameBn: true,
+            slug: true,
+            logo: true,
+            isActive: true,
+            isSuspended: true,
+            suspendReason: true,
+          },
+        },
+      },
     })
-  }
 
-  return next({
-    ctx: {
-      ...ctx,
-      /** Main Prisma client — connected to the primary/management database. */
-      db: db as PrismaClient,
-    },
-  })
-})
+    if (!membership) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You do not have admin access to any tenant.",
+      })
+    }
+
+    if (!membership.tenant.isActive) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "This tenant is no longer active.",
+      })
+    }
+
+    if (membership.tenant.isSuspended) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `This tenant is suspended${membership.tenant.suspendReason ? `: ${membership.tenant.suspendReason}` : "."}`,
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        db: db as PrismaClient,
+        tenantDb: getTenantDb(membership.tenant.id) as TenantPrismaClient,
+        tenant: membership.tenant,
+        membership: {
+          id: membership.id,
+          role: membership.role,
+          isActive: membership.isActive,
+          joinedAt: membership.joinedAt,
+        },
+      },
+    })
+  },
+)

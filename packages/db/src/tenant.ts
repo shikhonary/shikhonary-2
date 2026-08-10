@@ -2,7 +2,14 @@ import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "../generated/tenant/client"
 import { withTenant } from "./extensions/withTenant"
 
-export type { PrismaClient as TenantPrismaClient }
+export type {
+  PrismaClient as TenantPrismaClient,
+  Ward,
+  TaxPayer,
+  TaxPayment,
+  FiscalYear as TenantFiscalYear,
+} from "../generated/tenant/client"
+export { Prisma as TenantPrisma } from "../generated/tenant/client"
 
 
 const globalForPrisma = globalThis as unknown as {

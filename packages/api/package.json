@@ -15,6 +15,7 @@
     "@trpc/server": "^11.0.0",
     "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
+    "@workspace/email": "workspace:*",
     "@workspace/utils": "workspace:*",
     "server-only": "^0.0.1",
     "superjson": "^2.2.2",

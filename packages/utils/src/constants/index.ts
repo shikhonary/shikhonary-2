@@ -1,16 +1,16 @@
 /**
  * Global application constants.
  */
-export const APP_NAME = "BEC Platform"
+export const APP_NAME = "UP Hub"
 
 export const DEFAULT_PAGE_SIZE = 20
 
 export const ROLES = {
   SUPER_ADMIN: "SUPER_ADMIN",
   ADMIN: "Admin",
-  TEACHER: "Teacher",
-  STUDENT: "Student",
-  PARENT: "Parent",
+  CHAIRMAN: "Chairman",
+  MEMBER: "Member",
+  USER: "User",
 } as const
 
 export const VERIFICATION_STATUS = {
@@ -43,49 +43,22 @@ export const SORT_OPTIONS = [
 ]
 
 // ---------------------------------------------------------------------------
-// Exam System
+// Subscription & Fiscal Year Systems
 // ---------------------------------------------------------------------------
 
-export const EXAM_STATUS = {
-  PENDING: "Pending",
-  PUBLISHED: "Published",
-  ARCHIVED: "Archived",
+export const SUBSCRIPTION_STATUS = {
+  ACTIVE: "ACTIVE",
+  EXPIRED: "EXPIRED",
+  SUSPENDED: "SUSPENDED",
+  CANCELLED: "CANCELLED",
 } as const
 
-export type ExamStatus = (typeof EXAM_STATUS)[keyof typeof EXAM_STATUS]
+export type SubscriptionStatus =
+  (typeof SUBSCRIPTION_STATUS)[keyof typeof SUBSCRIPTION_STATUS]
 
-export const ATTEMPT_STATUS = {
-  NOT_STARTED: "Not Started",
-  IN_PROGRESS: "In Progress",
-  SUBMITTED: "Submitted",
-  AUTO_SUBMITTED: "Auto-Submitted",
-  ABANDONED: "Abandoned",
+export const BILLING_CYCLE = {
+  MONTHLY: "MONTHLY",
+  YEARLY: "YEARLY",
 } as const
 
-export type AttemptStatus = (typeof ATTEMPT_STATUS)[keyof typeof ATTEMPT_STATUS]
-
-export const SUBMISSION_TYPE = {
-  MANUAL: "Manual",
-  AUTO_TIME_UP: "Auto-TimeUp",
-  AUTO_TAB_SWITCH: "Auto-TabSwitch",
-} as const
-
-export type SubmissionType =
-  (typeof SUBMISSION_TYPE)[keyof typeof SUBMISSION_TYPE]
-
-export const FEEDBACK_STATUS = {
-  PENDING: "Pending",
-  REVIEWED: "Reviewed",
-  RESOLVED: "Resolved",
-} as const
-
-export type FeedbackStatus =
-  (typeof FEEDBACK_STATUS)[keyof typeof FEEDBACK_STATUS]
-
-export const MCQ_TYPE = {
-  SINGLE: "SINGLE",
-  MULTIPLE: "MULTIPLE",
-  CONTEXTUAL: "CONTEXTUAL",
-} as const
-
-export type MCQType = (typeof MCQ_TYPE)[keyof typeof MCQ_TYPE]
+export type BillingCycle = (typeof BILLING_CYCLE)[keyof typeof BILLING_CYCLE]

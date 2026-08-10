@@ -1,18 +1,29 @@
 import { Prisma } from "../../generated/tenant/client"
 
+/**
+ * Checks if a model definition in the Prisma DMMF has a `tenantId` field.
+ */
+function modelHasTenantId(modelName?: string): boolean {
+  if (!modelName) return false
+  const dmmf = (Prisma as any).dmmf
+  const model = dmmf?.datamodel?.models?.find(
+    (m: any) => m.name.toLowerCase() === modelName.toLowerCase(),
+  )
+  return model ? model.fields.some((f: any) => f.name === "tenantId") : false
+}
+
 export const withTenant = (tenantId: string) =>
   Prisma.defineExtension((client) => {
     return client.$extends({
       query: {
         $allModels: {
           async $allOperations({ model, operation, args, query }) {
-            // The Tenant model itself doesn't have a tenantId, it IS the tenant.
-            // Other models in the tenant schema will have a tenantId.
-            if (model === "Tenant") {
+            // Only inject/enforce tenantId if the model actually has a tenantId field in schema
+            if (!modelHasTenantId(model as string)) {
               return query(args)
             }
 
-            // For all other operations on tenant models, enforce the tenantId.
+            // For models that have tenantId, enforce the tenantId filter / payload
             if (
               operation === "findUnique" ||
               operation === "findFirst" ||

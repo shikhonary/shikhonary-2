@@ -1,7 +1,0 @@
-export * from "./components/question-bank-subject-selection-view"
-export * from "./components/question-bank-subject-detail-view"
-export * from "./components/question-bank-mcq-list-view"
-export * from "./components/question-bank-mcq-card"
-export * from "./pages/question-bank-subject-selection-page"
-export * from "./pages/question-bank-subject-detail-page"
-export * from "./lib/subject-theme"

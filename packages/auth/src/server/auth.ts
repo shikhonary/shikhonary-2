@@ -114,9 +114,21 @@ export const auth = betterAuth({
                 },
               })
             } else {
+              // Auto-verify user if they registered via a valid invitation link
+              const hasPendingInvitation = user.email
+                ? await db.tenantInvitation.findFirst({
+                    where: {
+                      email: user.email,
+                      status: "PENDING",
+                      expiresAt: { gt: new Date() },
+                    },
+                  })
+                : null
+
               await db.user.update({
                 where: { id: user.id },
                 data: {
+                  ...(hasPendingInvitation ? { emailVerified: true } : {}),
                   roles: {
                     connectOrCreate: {
                       where: { name: "USER" },
@@ -205,6 +217,16 @@ export const auth = betterAuth({
       // Skip sending verification email for phone-based registrations
       if (user.email?.endsWith(`@${PHONE_EMAIL_DOMAIN}`)) {
         console.log(`[Better Auth/Email] Skipping verification email for internal phone email: ${user.email}`)
+        return
+      }
+
+      // Check if user is already verified
+      const existingUser = await db.user.findUnique({
+        where: { id: user.id },
+        select: { emailVerified: true },
+      })
+      if (existingUser?.emailVerified) {
+        console.log(`[Better Auth/Email] Skipping verification email for already verified user: ${user.email}`)
         return
       }
 
