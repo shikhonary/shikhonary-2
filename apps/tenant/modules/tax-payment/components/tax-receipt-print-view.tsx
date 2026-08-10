@@ -230,9 +230,14 @@ export function TaxReceiptPrintView({ paymentId }: TaxReceiptPrintViewProps) {
         /* ── Print ───────────────────────────────────────── */
         @media print {
           #action-bar { display: none !important; }
-          @page { size: A4 portrait; margin: 8mm 10mm; }
+          @page { size: A4 portrait; margin: 0 !important; }
           body, html { background: white !important; margin: 0; padding: 0; }
-          #receipt-container { padding: 0 !important; min-height: unset !important; }
+          #receipt-container {
+            padding: 6mm 8mm !important;
+            min-height: unset !important;
+            height: auto !important;
+            box-sizing: border-box !important;
+          }
         }
       `}</style>
 
