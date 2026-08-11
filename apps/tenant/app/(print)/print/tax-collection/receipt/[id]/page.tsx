@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { TaxReceiptPrintView } from "@/modules/tax-payment/components/tax-receipt-print-view"
+import { TaxReceiptPrintView } from "@/modules/tax-payment/ui/views/tax-receipt-print-view"
 
 interface PageProps {
   params: Promise<{ id: string }>

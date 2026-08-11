@@ -22,6 +22,219 @@ import type {
 // Queries
 // ---------------------------------------------------------------------------
 
+// Helper to flatten geographic relations into flat string attributes on Tenant
+function flattenTenantGeographics<T extends { division?: any; district?: any; upazila?: any; union?: any }>(tenant: T) {
+  if (!tenant) return tenant
+  const { division, district, upazila, union, ...rest } = tenant
+  return {
+    ...rest,
+    divisionId: division?.id ?? null,
+    divisionName: division?.name ?? null,
+    divisionNameBn: division?.nameBn ?? null,
+    districtId: district?.id ?? null,
+    districtName: district?.name ?? null,
+    districtNameBn: district?.nameBn ?? null,
+    upazilaId: upazila?.id ?? null,
+    upazilaName: upazila?.name ?? null,
+    upazilaNameBn: upazila?.nameBn ?? null,
+    unionId: union?.id ?? null,
+    unionName: union?.name ?? null,
+    unionNameBn: union?.nameBn ?? null,
+  }
+}
+
+// Helper to resolve name strings into DB model IDs (divisionId, districtId, upazilaId, unionId)
+async function resolveGeographicIds(
+  db: PrismaClient,
+  geography: {
+    divisionName?: string | null
+    districtName?: string | null
+    upazilaName?: string | null
+    unionName?: string | null
+  },
+) {
+  const { divisionName, districtName, upazilaName, unionName } = geography
+
+  const getCandidates = (name: string | null | undefined): string[] => {
+    if (!name) return []
+    const clean = name.trim()
+    const candidates = [clean]
+    if (/sadar$/i.test(clean)) {
+      candidates.push(clean.replace(/\s+sadar$/i, "").trim())
+    } else {
+      candidates.push(`${clean} Sadar`)
+    }
+    return candidates
+  }
+
+  const unionCandidates = getCandidates(unionName)
+  const upazilaCandidates = getCandidates(upazilaName)
+  const districtCandidates = getCandidates(districtName)
+  const divisionCandidates = getCandidates(divisionName)
+
+  // 1. Resolve union (and its parent structures)
+  if (unionCandidates.length > 0) {
+    const matchedUnion = await db.union.findFirst({
+      where: {
+        name: { in: unionCandidates, mode: "insensitive" },
+        upazila: upazilaCandidates.length > 0 ? {
+          name: { in: upazilaCandidates, mode: "insensitive" },
+          district: districtCandidates.length > 0 ? {
+            name: { in: districtCandidates, mode: "insensitive" },
+            division: divisionCandidates.length > 0 ? {
+              name: { in: divisionCandidates, mode: "insensitive" },
+            } : undefined,
+          } : undefined,
+        } : undefined,
+      },
+      select: {
+        id: true,
+        upazilaId: true,
+        upazila: {
+          select: {
+            districtId: true,
+            district: {
+              select: {
+                divisionId: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (matchedUnion) {
+      return {
+        unionId: matchedUnion.id,
+        upazilaId: matchedUnion.upazilaId,
+        districtId: matchedUnion.upazila.districtId,
+        divisionId: matchedUnion.upazila.district.divisionId,
+      }
+    }
+
+    // Try Bangla matching
+    const matchedUnionBn = await db.union.findFirst({
+      where: {
+        nameBn: { equals: unionName ? unionName.trim() : "" },
+        upazila: upazilaName ? {
+          nameBn: { equals: upazilaName.trim() },
+          district: districtName ? {
+            nameBn: { equals: districtName.trim() },
+            division: divisionName ? {
+              nameBn: { equals: divisionName.trim() },
+            } : undefined,
+          } : undefined,
+        } : undefined,
+      },
+      select: {
+        id: true,
+        upazilaId: true,
+        upazila: {
+          select: {
+            districtId: true,
+            district: {
+              select: {
+                divisionId: true,
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (matchedUnionBn) {
+      return {
+        unionId: matchedUnionBn.id,
+        upazilaId: matchedUnionBn.upazilaId,
+        districtId: matchedUnionBn.upazila.districtId,
+        divisionId: matchedUnionBn.upazila.district.divisionId,
+      }
+    }
+  }
+
+  // 2. Resolve upazila only if union isn't found/given
+  if (upazilaCandidates.length > 0) {
+    const matchedUpazila = await db.upazila.findFirst({
+      where: {
+        name: { in: upazilaCandidates, mode: "insensitive" },
+        district: districtCandidates.length > 0 ? {
+          name: { in: districtCandidates, mode: "insensitive" },
+          division: divisionCandidates.length > 0 ? {
+            name: { in: divisionCandidates, mode: "insensitive" },
+          } : undefined,
+        } : undefined,
+      },
+      select: {
+        id: true,
+        districtId: true,
+        district: {
+          select: {
+            divisionId: true,
+          },
+        },
+      },
+    })
+
+    if (matchedUpazila) {
+      return {
+        unionId: null,
+        upazilaId: matchedUpazila.id,
+        districtId: matchedUpazila.districtId,
+        divisionId: matchedUpazila.district.divisionId,
+      }
+    }
+  }
+
+  // 3. Resolve district only if upazila/union isn't found/given
+  if (districtCandidates.length > 0) {
+    const matchedDistrict = await db.district.findFirst({
+      where: {
+        name: { in: districtCandidates, mode: "insensitive" },
+        division: divisionCandidates.length > 0 ? {
+          name: { in: divisionCandidates, mode: "insensitive" },
+        } : undefined,
+      },
+      select: {
+        id: true,
+        divisionId: true,
+      },
+    })
+
+    if (matchedDistrict) {
+      return {
+        unionId: null,
+        upazilaId: null,
+        districtId: matchedDistrict.id,
+        divisionId: matchedDistrict.divisionId,
+      }
+    }
+  }
+
+  // 4. Resolve division only if district/upazila/union isn't found/given
+  if (divisionCandidates.length > 0) {
+    const matchedDivision = await db.division.findFirst({
+      where: { name: { in: divisionCandidates, mode: "insensitive" } },
+      select: { id: true },
+    })
+
+    if (matchedDivision) {
+      return {
+        unionId: null,
+        upazilaId: null,
+        districtId: null,
+        divisionId: matchedDivision.id,
+      }
+    }
+  }
+
+  return {
+    unionId: null,
+    upazilaId: null,
+    districtId: null,
+    divisionId: null,
+  }
+}
+
 export async function listTenants(
   db: PrismaClient,
   input: ListTenantsInput,
@@ -46,6 +259,10 @@ export async function listTenants(
       _count: {
         select: { members: true },
       },
+      division: true,
+      district: true,
+      upazila: true,
+      union: true,
     },
   })
 
@@ -54,7 +271,7 @@ export async function listTenants(
       ? tenants[tenants.length - 1]?.id
       : undefined
 
-  return { tenants, nextCursor }
+  return { tenants: tenants.map(flattenTenantGeographics), nextCursor }
 }
 
 export async function getTenantById(
@@ -72,10 +289,14 @@ export async function getTenantById(
       invitations: {
         orderBy: { createdAt: "desc" },
       },
+      division: true,
+      district: true,
+      upazila: true,
+      union: true,
     },
   })
   if (!tenant) throw notFound("Tenant")
-  return tenant
+  return flattenTenantGeographics(tenant)
 }
 
 export async function getTenantBySlug(
@@ -89,10 +310,14 @@ export async function getTenantBySlug(
         include: { plan: true },
       },
       currentFiscalYear: true,
+      division: true,
+      district: true,
+      upazila: true,
+      union: true,
     },
   })
   if (!tenant) throw notFound("Tenant")
-  return tenant
+  return flattenTenantGeographics(tenant)
 }
 
 export async function getTenantStats(db: PrismaClient) {
@@ -120,15 +345,42 @@ export async function createTenant(
     throw conflict(`Tenant with slug "${input.slug}" already exists.`)
   }
 
-  const { planId, ...tenantData } = input
+  const {
+    planId,
+    divisionName,
+    districtName,
+    upazilaName,
+    unionName,
+    divisionId,
+    districtId,
+    upazilaId,
+    unionId,
+    ...tenantData
+  } = input
+
+  const geoIds = (divisionId || districtId || upazilaId || unionId)
+    ? { divisionId, districtId, upazilaId, unionId }
+    : await resolveGeographicIds(db, {
+        divisionName,
+        districtName,
+        upazilaName,
+        unionName,
+      })
 
   // 1. Save tenant metadata (+ optional subscription) in main DB via transaction
   const tenant = await db.$transaction(async (tx) => {
     const createdTenant = await tx.tenant.create({
       data: {
         ...tenantData,
+        ...geoIds,
         databaseStatus: "PENDING",
       },
+      include: {
+        division: true,
+        district: true,
+        upazila: true,
+        union: true,
+      }
     })
 
     if (planId) {
@@ -162,38 +414,87 @@ export async function createTenant(
   // 2. Provision dedicated database instance for the tenant
   try {
     const res = await provisionTenantDb(tenant.slug)
-    await db.tenant.update({
+    const finalTenant = await db.tenant.update({
       where: { id: tenant.id },
       data: {
         databaseName: res.databaseName,
         connectionString: res.connectionString,
         databaseStatus: "READY",
       },
+      include: {
+        division: true,
+        district: true,
+        upazila: true,
+        union: true,
+      }
     })
+    return flattenTenantGeographics(finalTenant)
   } catch (err: any) {
     console.error(`Provisioning error for ${tenant.slug}:`, err)
-    await db.tenant.update({
+    const finalTenant = await db.tenant.update({
       where: { id: tenant.id },
       data: { databaseStatus: "FAILED" },
+      include: {
+        division: true,
+        district: true,
+        upazila: true,
+        union: true,
+      }
     })
+    return flattenTenantGeographics(finalTenant)
   }
-
-  return tenant
 }
 
 export async function updateTenant(
   db: PrismaClient,
   input: UpdateTenantInput,
 ) {
-  const { id, planId, ...data } = input
+  const {
+    id,
+    planId,
+    divisionName,
+    districtName,
+    upazilaName,
+    unionName,
+    divisionId,
+    districtId,
+    upazilaId,
+    unionId,
+    ...data
+  } = input
   const existing = await db.tenant.findUnique({
     where: { id },
     select: { id: true },
   })
   if (!existing) throw notFound("Tenant")
 
+  // Resolve geographic IDs
+  let geoIds = {}
+  if (divisionId !== undefined || districtId !== undefined || upazilaId !== undefined || unionId !== undefined) {
+    geoIds = { divisionId, districtId, upazilaId, unionId }
+  } else if (divisionName !== undefined || districtName !== undefined || upazilaName !== undefined || unionName !== undefined) {
+    geoIds = await resolveGeographicIds(db, {
+      divisionName,
+      districtName,
+      upazilaName,
+      unionName,
+    })
+  }
+
   return db.$transaction(async (tx) => {
-    const updated = await tx.tenant.update({ where: { id }, data })
+    const updated = await tx.tenant.update({
+      where: { id },
+      data: {
+        ...data,
+        ...geoIds,
+      },
+      include: {
+        division: true,
+        district: true,
+        upazila: true,
+        union: true,
+      }
+    })
 
     if (planId) {
       const plan = await tx.subscriptionPlan.findUnique({
@@ -235,7 +536,7 @@ export async function updateTenant(
       }
     }
 
-    return updated
+    return flattenTenantGeographics(updated)
   })
 }
 
@@ -476,10 +777,14 @@ export async function getTenantProfile(db: PrismaClient, tenantId: string) {
     where: { id: tenantId },
     include: {
       currentFiscalYear: true,
+      division: true,
+      district: true,
+      upazila: true,
+      union: true,
     },
   })
   if (!tenant) throw notFound("Tenant")
-  return tenant
+  return flattenTenantGeographics(tenant)
 }
 
 export async function updateTenantProfile(
@@ -487,9 +792,45 @@ export async function updateTenantProfile(
   tenantId: string,
   input: UpdateTenantProfileInput,
 ) {
-  return db.tenant.update({
+  const {
+    divisionName,
+    districtName,
+    upazilaName,
+    unionName,
+    divisionId,
+    districtId,
+    upazilaId,
+    unionId,
+    ...data
+  } = input
+
+  let geoIds = {}
+  if (divisionId !== undefined || districtId !== undefined || upazilaId !== undefined || unionId !== undefined) {
+    geoIds = { divisionId, districtId, upazilaId, unionId }
+  } else if (divisionName !== undefined || districtName !== undefined || upazilaName !== undefined || unionName !== undefined) {
+    geoIds = await resolveGeographicIds(db, {
+      divisionName,
+      districtName,
+      upazilaName,
+      unionName,
+    })
+  }
+
+  const updated = await db.tenant.update({
     where: { id: tenantId },
-    data: input,
+    data: {
+      ...data,
+      ...geoIds,
+    },
+    include: {
+      currentFiscalYear: true,
+      division: true,
+      district: true,
+      upazila: true,
+      union: true,
+    },
   })
+
+  return flattenTenantGeographics(updated)
 }
 

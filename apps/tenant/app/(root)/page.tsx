@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header";
-import { DashboardOverview } from "./_components/dashboard-overview";
+import { DashboardOverview } from "@/modules/dashboard/ui/views/dashboard-overview";
 
 export const metadata: Metadata = {
   title: "ড্যাশবোর্ড | ইউনিয়ন পরিষদ পোর্টাল",

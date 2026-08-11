@@ -24,7 +24,7 @@ import { tenantDb, getTenantDb } from "@workspace/db/tenant"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import superjson from "superjson"
 import { ZodError } from "zod"
-import { ROLES } from "@workspace/utils"
+import { ROLES, parseTenantHost } from "@workspace/utils"
 
 // ---------------------------------------------------------------------------
 // Context types
@@ -105,8 +105,17 @@ export const createTRPCContext = async (opts: {
 const t = initTRPC.context<TRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
+    // In production, never leak internal error details for unhandled errors.
+    // Only TRPCErrors (which we throw explicitly) carry safe messages.
+    const isSafeError = error instanceof TRPCError
+    const message =
+      isSafeError || process.env.NODE_ENV !== "production"
+        ? shape.message
+        : "Internal Server Error"
+
     return {
       ...shape,
+      message,
       data: {
         ...shape.data,
         zodError:
@@ -244,20 +253,49 @@ export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 /**
  * `tenantMemberProcedure` — Tenant app authorization gate.
  *
- * Resolves the user's tenant membership from the main DB.
+ * Resolves the user's tenant membership from the main DB, scoped to the
+ * specific tenant identified by the request Host header (subdomain or
+ * custom domain). This prevents a user who is admin on Tenant A from
+ * accessing Tenant B's data by visiting Tenant B's subdomain.
+ *
  * Rules:
- *  1. User must have an active TenantMember record with role "ADMIN".
- *  2. The Tenant must be active and not suspended.
+ *  1. Parse the tenant slug / custom domain from the Host header.
+ *  2. User must have an active TenantMember record with role "ADMIN"
+ *     for THAT specific tenant.
+ *  3. The Tenant must be active and not suspended.
+ *
+ * Falls back to "any admin tenant" only when running on bare localhost
+ * (no subdomain detected) — useful for Postman / integration tests.
  *
  * Injects `tenant` and `membership` into context.
  */
 export const tenantMemberProcedure = protectedProcedure.use(
   async ({ ctx, next }) => {
+    const { slug, customDomain } = parseTenantHost(
+      ctx.headers.get("host"),
+      process.env["NEXT_PUBLIC_APP_URL"],
+    )
+
+    // Build a tenant filter based on what was parsed from the Host header.
+    // When on bare localhost (no subdomain) we skip the filter so that local
+    // tooling / Postman still works — the first ADMIN membership is used.
+    type TenantFilter =
+      | { slug: string; isActive: true; isSuspended: false }
+      | { customDomain: string; customDomainVerified: true; isActive: true; isSuspended: false }
+      | undefined
+
+    const tenantFilter: TenantFilter = slug
+      ? { slug, isActive: true, isSuspended: false }
+      : customDomain
+        ? { customDomain, customDomainVerified: true, isActive: true, isSuspended: false }
+        : undefined
+
     const membership = await db.tenantMember.findFirst({
       where: {
         userId: ctx.session.user.id,
         isActive: true,
         role: "ADMIN",
+        ...(tenantFilter ? { tenant: tenantFilter } : {}),
       },
       select: {
         id: true,
@@ -274,6 +312,7 @@ export const tenantMemberProcedure = protectedProcedure.use(
             isActive: true,
             isSuspended: true,
             suspendReason: true,
+            connectionString: true,
           },
         },
       },
@@ -282,7 +321,9 @@ export const tenantMemberProcedure = protectedProcedure.use(
     if (!membership) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "You do not have admin access to any tenant.",
+        message: slug
+          ? `You do not have admin access to tenant "${slug}".`
+          : "You do not have admin access to any tenant.",
       })
     }
 
@@ -300,12 +341,14 @@ export const tenantMemberProcedure = protectedProcedure.use(
       })
     }
 
+    const { connectionString, ...tenantWithoutSecret } = membership.tenant
+
     return next({
       ctx: {
         ...ctx,
         db: db as PrismaClient,
-        tenantDb: getTenantDb(membership.tenant.id) as TenantPrismaClient,
-        tenant: membership.tenant,
+        tenantDb: getTenantDb(membership.tenant.id, connectionString) as TenantPrismaClient,
+        tenant: tenantWithoutSecret,
         membership: {
           id: membership.id,
           role: membership.role,
@@ -318,34 +361,32 @@ export const tenantMemberProcedure = protectedProcedure.use(
 )
 
 /**
- * `publicTenantProcedure` — Resolves the tenant database using the request Host header.
+ * `publicTenantProcedure` — Resolves the tenant from the request Host header.
  * No session or auth required (useful for public verification/print pages).
+ *
+ * Tenant resolution: uses parseTenantHost() to handle localhost subdomains,
+ * platform subdomains, and custom domains uniformly.
+ * If no tenant can be determined, the request is rejected immediately —
+ * there is NO fallback to a random tenant, which would be a data-leakage risk.
  */
 export const publicTenantProcedure = publicProcedure.use(
   async ({ ctx, next }) => {
-    const host = ctx.headers.get("host") || ""
-    const parts = host.split(".")
-    let slug = ""
+    const { slug, customDomain } = parseTenantHost(
+      ctx.headers.get("host"),
+      process.env["NEXT_PUBLIC_APP_URL"],
+    )
 
-    const firstPart = parts[0]
-    if (parts.length > 2 && firstPart) {
-      slug = firstPart
-    } else {
-      const firstTenant = await db.tenant.findFirst({
-        where: { isActive: true },
-        select: { slug: true }
+    if (!slug && !customDomain) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Could not resolve tenant from request host.",
       })
-      if (firstTenant) {
-        slug = firstTenant.slug
-      }
     }
 
     const tenant = await db.tenant.findFirst({
-      where: {
-        slug,
-        isActive: true,
-        isSuspended: false,
-      },
+      where: slug
+        ? { slug, isActive: true, isSuspended: false }
+        : { customDomain: customDomain!, customDomainVerified: true, isActive: true, isSuspended: false },
       select: {
         id: true,
         name: true,
@@ -354,6 +395,7 @@ export const publicTenantProcedure = publicProcedure.use(
         logo: true,
         isActive: true,
         isSuspended: true,
+        connectionString: true,
       }
     })
 
@@ -364,12 +406,14 @@ export const publicTenantProcedure = publicProcedure.use(
       })
     }
 
+    const { connectionString, ...tenantWithoutSecret } = tenant
+
     return next({
       ctx: {
         ...ctx,
         db: db as PrismaClient,
-        tenantDb: getTenantDb(tenant.id) as TenantPrismaClient,
-        tenant,
+        tenantDb: getTenantDb(tenant.id, connectionString) as TenantPrismaClient,
+        tenant: tenantWithoutSecret,
       },
     })
   },

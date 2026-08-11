@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { GenerateTaxPaymentView } from "@/modules/generate-tax-payment/components/generate-tax-payment-view"
+import { GenerateTaxPaymentView } from "@/modules/generate-tax-payment/ui/views/generate-tax-payment-view"
 
 export const metadata: Metadata = {
   title: "বাৎসরিক কর জেনারেশন | ইউনিয়ন পরিষদ পোর্টাল",

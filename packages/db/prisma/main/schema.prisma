@@ -100,18 +100,26 @@ model Tenant {
   type                 String  @default("UNION_PORISHOD")
   email                String?
   phone                String?
-  address              String?
 
   // ── Bangladesh Geographical Hierarchy ────────────────────
-  divisionName         String?
-  districtName         String?
-  upazilaName          String?
-  unionName            String?
+  divisionId           String?
+  division             Division?   @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  districtId           String?
+  district             District?   @relation(fields: [districtId], references: [id], onDelete: SetNull)
+  upazilaId            String?
+  upazila              Upazila?    @relation(fields: [upazilaId], references: [id], onDelete: SetNull)
+  unionId              String?
+  union                Union?      @relation(fields: [unionId], references: [id], onDelete: SetNull)
   postalCode           String?
 
   // ── UP Officials ─────────────────────────────────────────
   secretaryName        String?
+  secretarySignature   String?
   chairmanName         String?
+  chairmanSignature    String?
+
+  // ── Social & Branding ────────────────────────────────────
+  facebookUrl          String?
 
   // ── Domain & Branding ────────────────────────────────────
   subdomain            String? @unique
@@ -162,6 +170,10 @@ model Tenant {
   @@index([slug])
   @@index([isActive])
   @@index([currentFiscalYearId])
+  @@index([divisionId])
+  @@index([districtId])
+  @@index([upazilaId])
+  @@index([unionId])
   @@map("tenant")
 }
 
@@ -357,3 +369,69 @@ model FiscalYear {
   @@index([isCurrent])
   @@map("fiscal_year")
 }
+
+model Division {
+  id        String     @id
+  name      String     @unique
+  nameBn    String
+  url       String?
+  districts District[]
+  tenants   Tenant[]
+
+  @@map("division")
+}
+
+model District {
+  id         String     @id
+  name       String     @unique
+  nameBn     String
+  url        String?
+  divisionId String
+  division   Division   @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  upazilas   Upazila[]
+  tenants    Tenant[]
+
+  @@index([divisionId])
+  @@map("district")
+}
+
+model Upazila {
+  id         String   @id
+  name       String
+  nameBn     String
+  url        String?
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  unions     Union[]
+  posts      Post[]
+  tenants    Tenant[]
+
+  @@index([districtId])
+  @@map("upazila")
+}
+
+model Union {
+  id        String   @id
+  name      String
+  nameBn    String
+  url       String?
+  upazilaId String
+  upazila   Upazila  @relation(fields: [upazilaId], references: [id], onDelete: Cascade)
+  tenants   Tenant[]
+
+  @@index([upazilaId])
+  @@map("union")
+}
+
+model Post {
+  id           String  @id @default(cuid())
+  postOffice   String
+  postOfficeBn String?
+  postCode     String
+  upazilaId    String
+  upazila      Upazila @relation(fields: [upazilaId], references: [id], onDelete: Cascade)
+
+  @@index([upazilaId])
+  @@map("post")
+}
+

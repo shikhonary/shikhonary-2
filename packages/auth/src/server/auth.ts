@@ -23,7 +23,38 @@ export const PHONE_EMAIL_DOMAIN = "phone.bec.local"
  * The Prisma adapter points at the custom-generated client from
  * packages/db/generated/main — NOT @prisma/client — as required by Prisma 7+.
  */
+/**
+ * Builds a flat string[] of trusted origins for Better Auth.
+ * Must be a plain array — no spreads inside betterAuth() config,
+ * as Better Auth's plugin init code re-spreads this and will throw
+ * if it encounters a non-iterable value.
+ * Wildcards: * matches any host segment (e.g. "http://*.localhost:3001").
+ */
+function buildTrustedOrigins(): string[] {
+  const origins: string[] = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    // Any *.localhost subdomain — local dev (test.localhost:3001, etc.)
+    "http://*.localhost:3000",
+    "http://*.localhost:3001",
+  ]
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  if (appUrl) {
+    origins.push(appUrl)
+    const rootDomain = appUrl.replace(/^https?:\/\//, "")
+    origins.push(`https://*.${rootDomain}`)
+  }
+  if (process.env.TRUSTED_ORIGINS) {
+    process.env.TRUSTED_ORIGINS.split(",").forEach((o) => {
+      const trimmed = o.trim()
+      if (trimmed) origins.push(trimmed)
+    })
+  }
+  return origins
+}
+
 export const auth = betterAuth({
+
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
@@ -256,15 +287,22 @@ export const auth = betterAuth({
       }
     },
   },
-  // Allow multiple domains to share the same auth package (including localhost:3000 & localhost:3001)
-  trustedOrigins: Array.from(
-    new Set([
-      "http://localhost:3000",
-      "http://localhost:3001",
-      ...(process.env.TRUSTED_ORIGINS ? process.env.TRUSTED_ORIGINS.split(",") : []),
-      ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
-    ].filter(Boolean))
-  ),
+  // Better Auth v1.x: trustedOrigins must be a plain string[] or async function returning string[].
+  // Wildcards are supported: * matches any segment (e.g. "http://*.localhost:3001").
+  // Built as a flat array before the config object to avoid any spread issues.
+  trustedOrigins: buildTrustedOrigins(),
+
+  // Share the session cookie across ALL subdomains (only in production).
+  // In development, we disable this so that a host-only cookie is set on the specific
+  // subdomain (e.g. test.localhost). Browsers reject cookies with domain=".localhost".
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: process.env.NODE_ENV === "production",
+      domain: process.env.NODE_ENV === "production"
+        ? process.env.COOKIE_DOMAIN ?? undefined
+        : undefined,
+    },
+  },
 })
 
 export type Auth = typeof auth

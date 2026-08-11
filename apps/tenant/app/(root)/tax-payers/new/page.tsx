@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { CreateTaxPayerView } from "@/modules/tax-payer/components/create-tax-payer-view"
+import { CreateTaxPayerView } from "@/modules/tax-payer/ui/views/create-tax-payer-view"
 
 export const metadata: Metadata = {
   title: "নতুন করদাতা নিবন্ধন | ইউনিয়ন পরিষদ পোর্টাল",
@@ -20,3 +20,4 @@ export default function NewTaxPayerPage() {
     </div>
   )
 }
+

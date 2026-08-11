@@ -12,10 +12,21 @@ export interface TenantInfo {
   nameBn: string | null;
   slug: string;
   logo: string | null;
+  // Geographic IDs
+  divisionId?: string | null;
+  districtId?: string | null;
+  upazilaId?: string | null;
+  unionId?: string | null;
+  // Geographic Names (English)
   upazilaName?: string | null;
   districtName?: string | null;
   divisionName?: string | null;
   unionName?: string | null;
+  // Geographic Names (Bengali)
+  divisionNameBn?: string | null;
+  districtNameBn?: string | null;
+  upazilaNameBn?: string | null;
+  unionNameBn?: string | null;
   chairmanName?: string | null;
   phone?: string | null;
   email?: string | null;

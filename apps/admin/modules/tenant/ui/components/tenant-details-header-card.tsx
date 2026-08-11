@@ -6,6 +6,8 @@ import {
   Globe,
   CheckCircle,
   XCircle,
+  Calendar,
+  AlertTriangle,
 } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 
@@ -28,6 +30,19 @@ export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps
     <div className="bg-card/40 backdrop-blur-xl rounded-3xl border border-border/50 overflow-hidden shadow-soft">
       {/* Top gradient bar */}
       <div className="h-1 bg-gradient-to-r from-primary via-primary-container to-primary/30" />
+
+      {/* Suspension Alert Banner */}
+      {tenant.isSuspended && (
+        <div className="bg-destructive/10 border-b border-destructive/20 px-6 py-4 flex items-start gap-3">
+          <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-bold text-destructive">This Union Porishod is currently suspended</p>
+            {tenant.suspendReason && (
+              <p className="text-xs text-destructive/80 mt-1">Reason: {tenant.suspendReason}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="p-6 sm:p-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -96,7 +111,7 @@ export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps
             </div>
 
             {/* Info grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
               <InfoRow
                 icon={MapPin}
                 label="Division / District"
@@ -117,6 +132,11 @@ export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps
                 icon={CreditCard}
                 label="Plan"
                 value={tenant.subscription?.plan?.displayName ?? "Free Tier"}
+              />
+              <InfoRow
+                icon={Calendar}
+                label="Fiscal Year"
+                value={tenant.currentFiscalYear?.year ? `FY ${tenant.currentFiscalYear.year}` : "Not Set"}
               />
             </div>
           </div>

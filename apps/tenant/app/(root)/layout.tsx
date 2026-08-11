@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@workspace/auth/server";
 import { db } from "@workspace/db/main";
+import { parseTenantHost } from "@workspace/utils";
 import { DashboardLayout } from "@/modules/layout/ui/layout/dashboard-layout";
 import { TenantProvider } from "@/modules/layout/ui/components/tenant-provider";
 
@@ -30,12 +31,33 @@ const Layout = async ({ children }: RootLayoutProps) => {
     redirect("/auth/sign-in");
   }
 
-  // Resolve the user's active ADMIN membership
+  // Resolve the tenant from the Host header so that visiting
+  // savar.localhost:3001 always shows Savar's data, even if the user is
+  // also an admin of another tenant.
+  const host = reqHeaders.get("host");
+  const { slug, customDomain } = parseTenantHost(host, process.env["NEXT_PUBLIC_APP_URL"]);
+
+  // Build a tenant filter matching what the browser is actually requesting.
+  // When on bare localhost (no subdomain) fall back to the user's first
+  // ADMIN membership so that local tooling and curl still work.
+  type TenantFilter =
+    | { slug: string; isActive: true; isSuspended: false }
+    | { customDomain: string; customDomainVerified: true; isActive: true; isSuspended: false }
+    | undefined;
+
+  const tenantFilter: TenantFilter = slug
+    ? { slug, isActive: true, isSuspended: false }
+    : customDomain
+      ? { customDomain, customDomainVerified: true, isActive: true, isSuspended: false }
+      : undefined;
+
+  // Resolve the user's active ADMIN membership for THIS tenant
   const membership = await db.tenantMember.findFirst({
     where: {
       userId: session.user.id,
       isActive: true,
       role: "ADMIN",
+      ...(tenantFilter ? { tenant: tenantFilter } : {}),
     },
     select: {
       id: true,
@@ -51,83 +73,42 @@ const Layout = async ({ children }: RootLayoutProps) => {
           isActive: true,
           isSuspended: true,
           suspendReason: true,
-          upazilaName: true,
-          districtName: true,
-          divisionName: true,
-          unionName: true,
           chairmanName: true,
           phone: true,
           email: true,
+          divisionId: true,
+          districtId: true,
+          upazilaId: true,
+          unionId: true,
+          division: { select: { name: true, nameBn: true } },
+          district: { select: { name: true, nameBn: true } },
+          upazila: { select: { name: true, nameBn: true } },
+          union: { select: { name: true, nameBn: true } },
         },
       },
     },
   });
 
-  // No active admin membership → show no-membership screen
+  // No active admin membership → redirect to no-access page
   if (!membership) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md w-full text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto">
-            <span className="text-3xl">🔒</span>
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">প্রবেশাধিকার নেই</h1>
-          <p className="text-muted-foreground">
-            আপনার অ্যাকাউন্টে কোনো সক্রিয় ইউনিয়ন পরিষদের অ্যাডমিন সদস্যপদ পাওয়া যায়নি।
-            অনুগ্রহ করে প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেটরের সাথে যোগাযোগ করুন।
-          </p>
-          <a
-            href="/auth/sign-in"
-            className="inline-block mt-4 text-sm text-primary hover:underline"
-          >
-            ভিন্ন অ্যাকাউন্ট দিয়ে লগইন করুন
-          </a>
-        </div>
-      </div>
-    );
+    redirect("/no-access");
   }
+
 
   const { tenant } = membership;
 
-  // Tenant inactive
+  // Tenant inactive → redirect to suspended page
   if (!tenant.isActive) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md w-full text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto">
-            <span className="text-3xl">⚠️</span>
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">পোর্টাল নিষ্ক্রিয়</h1>
-          <p className="text-muted-foreground">
-            <strong>{tenant.nameBn ?? tenant.name}</strong>-এর পোর্টালটি বর্তমানে নিষ্ক্রিয় করা হয়েছে।
-            বিস্তারিত জানতে প্ল্যাটফর্ম অ্যাডমিনের সাথে যোগাযোগ করুন।
-          </p>
-        </div>
-      </div>
-    );
+    redirect("/suspended?reason=inactive");
   }
 
-  // Tenant suspended
+  // Tenant suspended → redirect to suspended page with reason
   if (tenant.isSuspended) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="max-w-md w-full text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto">
-            <span className="text-3xl">🚫</span>
-          </div>
-          <h1 className="text-2xl font-bold text-destructive">পোর্টাল স্থগিত</h1>
-          <p className="text-muted-foreground">
-            <strong>{tenant.nameBn ?? tenant.name}</strong>-এর পোর্টালটি সাময়িকভাবে স্থগিত করা হয়েছে।
-          </p>
-          {tenant.suspendReason && (
-            <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
-              কারণ: {tenant.suspendReason}
-            </p>
-          )}
-        </div>
-      </div>
-    );
+    const params = new URLSearchParams({ reason: "suspended" });
+    if (tenant.suspendReason) params.set("detail", tenant.suspendReason);
+    redirect(`/suspended?${params.toString()}`);
   }
+
 
   return (
     <TenantProvider
@@ -137,10 +118,18 @@ const Layout = async ({ children }: RootLayoutProps) => {
         nameBn: tenant.nameBn,
         slug: tenant.slug,
         logo: tenant.logo,
-        upazilaName: tenant.upazilaName,
-        districtName: tenant.districtName,
-        divisionName: tenant.divisionName,
-        unionName: tenant.unionName,
+        divisionId: tenant.divisionId,
+        districtId: tenant.districtId,
+        upazilaId: tenant.upazilaId,
+        unionId: tenant.unionId,
+        upazilaName: tenant.upazila?.name,
+        districtName: tenant.district?.name,
+        divisionName: tenant.division?.name,
+        unionName: tenant.union?.name,
+        divisionNameBn: tenant.division?.nameBn,
+        districtNameBn: tenant.district?.nameBn,
+        upazilaNameBn: tenant.upazila?.nameBn,
+        unionNameBn: tenant.union?.nameBn,
         chairmanName: tenant.chairmanName,
         phone: tenant.phone,
         email: tenant.email,

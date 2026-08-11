@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { auth } from "@workspace/auth/server";
 import { db } from "@workspace/db/main";
+import { parseTenantHost } from "@workspace/utils";
 import { TenantProvider } from "@/modules/layout/ui/components/tenant-provider";
 
 /**
@@ -12,30 +13,41 @@ import { TenantProvider } from "@/modules/layout/ui/components/tenant-provider";
 const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
   const reqHeaders = await headers();
   
-  // 1. Resolve tenant from hostname
-  const host = reqHeaders.get("host") || "";
-  const parts = host.split(".");
-  let slug = "savar"; // default for local testing
+  // 1. Resolve tenant from hostname using shared parseTenantHost helper.
+  //    Works correctly for:
+  //      - test.localhost:3001  (local dev subdomain)
+  //      - test.up-hub.com      (production subdomain)
+  //      - myunion.gov.bd       (custom domain)
+  const host = reqHeaders.get("host");
+  const { slug, customDomain } = parseTenantHost(host, process.env["NEXT_PUBLIC_APP_URL"]);
 
-  const firstPart = parts[0];
-  if (parts.length > 2 && firstPart) {
-    slug = firstPart;
+  let tenantWhere:
+    | { slug: string; isActive: boolean; isSuspended: boolean }
+    | { customDomain: string; customDomainVerified: boolean; isActive: boolean; isSuspended: boolean }
+    | null = null;
+
+  if (slug) {
+    tenantWhere = { slug, isActive: true, isSuspended: false };
+  } else if (customDomain) {
+    tenantWhere = { customDomain, customDomainVerified: true, isActive: true, isSuspended: false };
   } else {
+    // Bare localhost (no subdomain) — fall back to the first active tenant.
+    // This is safe here because the print layout is public/read-only.
     const firstTenant = await db.tenant.findFirst({
       where: { isActive: true },
-      select: { slug: true }
+      select: { slug: true },
     });
     if (firstTenant) {
-      slug = firstTenant.slug;
+      tenantWhere = { slug: firstTenant.slug, isActive: true, isSuspended: false };
     }
   }
 
+  if (!tenantWhere) {
+    notFound();
+  }
+
   const tenant = await db.tenant.findFirst({
-    where: {
-      slug,
-      isActive: true,
-      isSuspended: false,
-    },
+    where: tenantWhere,
     select: {
       id: true,
       name: true,
@@ -44,18 +56,23 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
       logo: true,
       isActive: true,
       isSuspended: true,
-      upazilaName: true,
-      districtName: true,
-      divisionName: true,
-      unionName: true,
       phone: true,
       email: true,
+      divisionId: true,
+      districtId: true,
+      upazilaId: true,
+      unionId: true,
+      division: { select: { name: true, nameBn: true } },
+      district: { select: { name: true, nameBn: true } },
+      upazila: { select: { name: true, nameBn: true } },
+      union: { select: { name: true, nameBn: true } },
     },
   });
 
   if (!tenant) {
     notFound();
   }
+
 
   // 2. Resolve optional session if available (for UI/auth state)
   const session = await auth.api.getSession({ headers: reqHeaders });
@@ -111,10 +128,18 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
         nameBn: tenant.nameBn,
         slug: tenant.slug,
         logo: tenant.logo,
-        upazilaName: tenant.upazilaName,
-        districtName: tenant.districtName,
-        divisionName: tenant.divisionName,
-        unionName: tenant.unionName,
+        divisionId: tenant.divisionId,
+        districtId: tenant.districtId,
+        upazilaId: tenant.upazilaId,
+        unionId: tenant.unionId,
+        upazilaName: tenant.upazila?.name,
+        districtName: tenant.district?.name,
+        divisionName: tenant.division?.name,
+        unionName: tenant.union?.name,
+        divisionNameBn: tenant.division?.nameBn,
+        districtNameBn: tenant.district?.nameBn,
+        upazilaNameBn: tenant.upazila?.nameBn,
+        unionNameBn: tenant.union?.nameBn,
         phone: tenant.phone,
         email: tenant.email,
       }}

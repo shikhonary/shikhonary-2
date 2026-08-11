@@ -67,6 +67,9 @@ RUN adduser --system --uid 1001 nextjs
 # Standard Next.js Standalone mode output includes all required node_modules and the monorepo structure
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
 
+# Copy the generated Prisma clients from the builder to ensure that query engines are present at runtime
+COPY --from=builder --chown=nextjs:nodejs /app/packages/db/generated ./packages/db/generated
+
 # Static files and public assets are not bundled in standalone mode
 # We copy them to both the monorepo root and the specific app folder to ensure compatibility
 # with all Next.js route resolution patterns in production.

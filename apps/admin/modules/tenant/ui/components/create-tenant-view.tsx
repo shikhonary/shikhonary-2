@@ -38,10 +38,9 @@ type ProvisionStatus = "idle" | "pending" | "success" | "error"
 
 const steps = [
   { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & official titles" },
-  { id: 2, title: "Geography", icon: MapPin, description: "Division & district boundaries" },
-  { id: 3, title: "Contact", icon: UserCheck, description: "Officials & office contact" },
-  { id: 4, title: "Subscription", icon: CreditCard, description: "SaaS plan & billing" },
-  { id: 5, title: "Limits", icon: Settings2, description: "Resource quota overrides" },
+  { id: 2, title: "Location & Contact", icon: MapPin, description: "Geographical hierarchy & office contact" },
+  { id: 3, title: "UP Officials", icon: UserCheck, description: "Officials & signature credentials" },
+  { id: 4, title: "Subscription & Limits", icon: CreditCard, description: "SaaS plan & custom resource limits" },
 ]
 
 const provisionSteps = [
@@ -82,29 +81,89 @@ export function CreateTenantView() {
   const [description, setDescription] = useState("")
   const [logo, setLogo] = useState("")
 
-  // Step 2: Geography
+  // Step 2: Geography & Contact (Cascading Dropdowns)
+  const [divisionId, setDivisionId] = useState("")
   const [divisionName, setDivisionName] = useState("")
+  const [districtId, setDistrictId] = useState("")
   const [districtName, setDistrictName] = useState("")
+  const [upazilaId, setUpazilaId] = useState("")
   const [upazilaName, setUpazilaName] = useState("")
+  const [unionId, setUnionId] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
-
-  // Step 3: Contact & Officials
-  const [secretaryName, setSecretaryName] = useState("")
-  const [chairmanName, setChairmanName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [address, setAddress] = useState("")
+  const [facebookUrl, setFacebookUrl] = useState("")
 
-  // Step 4: Subscription Plan
+  // Step 3: UP Officials & Signatures
+  const [secretaryName, setSecretaryName] = useState("")
+  const [chairmanName, setChairmanName] = useState("")
+  const [secretarySignature, setSecretarySignature] = useState("")
+  const [chairmanSignature, setChairmanSignature] = useState("")
+
+  // Step 4: Subscription Plan & Limits
   const [planId, setPlanId] = useState<string>("")
   const [isActive, setIsActive] = useState(true)
-
-  // Step 5: Custom Quotas
   const [customCitizenLimit, setCustomCitizenLimit] = useState<number | undefined>()
   const [customStaffLimit, setCustomStaffLimit] = useState<number | undefined>()
   const [customCertificateLimit, setCustomCertificateLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
+
+  // Cascading location queries
+  const { data: divisions = [] } = useQuery(
+    trpc.location.divisions.queryOptions()
+  )
+  const { data: districts = [] } = useQuery(
+    trpc.location.districts.queryOptions({ divisionId }, { enabled: !!divisionId })
+  )
+  const { data: upazilas = [] } = useQuery(
+    trpc.location.upazilas.queryOptions({ districtId }, { enabled: !!districtId })
+  )
+  const { data: unions = [] } = useQuery(
+    trpc.location.unions.queryOptions({ upazilaId }, { enabled: !!upazilaId })
+  )
+
+  const handleDivisionChange = (val: string) => {
+    setDivisionId(val)
+    const selected = divisions.find((d: any) => d.id === val)
+    setDivisionName(selected ? selected.name : "")
+
+    // Reset downstream
+    setDistrictId("")
+    setDistrictName("")
+    setUpazilaId("")
+    setUpazilaName("")
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleDistrictChange = (val: string) => {
+    setDistrictId(val)
+    const selected = districts.find((d: any) => d.id === val)
+    setDistrictName(selected ? selected.name : "")
+
+    // Reset downstream
+    setUpazilaId("")
+    setUpazilaName("")
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleUpazilaChange = (val: string) => {
+    setUpazilaId(val)
+    const selected = upazilas.find((u: any) => u.id === val)
+    setUpazilaName(selected ? selected.name : "")
+
+    // Reset downstream
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleUnionChange = (val: string) => {
+    setUnionId(val)
+    const selected = unions.find((u: any) => u.id === val)
+    setUnionName(selected ? selected.name : "")
+  }
 
   const { data: plansData } = useQuery(
     trpc.subscriptionPlan.forSelection.queryOptions()
@@ -117,7 +176,7 @@ export function CreateTenantView() {
     }
   }, [plansData, planId])
 
-  // Auto-fill Step 5 quota limits based on selected plan tier
+  // Auto-fill Step 4 quota limits based on selected plan tier
   useEffect(() => {
     if (planId && plansData) {
       const selectedPlan = plansData.find((p: any) => p.id === planId)
@@ -135,7 +194,11 @@ export function CreateTenantView() {
   )
 
   const isStep1Valid = slug.trim().length > 0 && name.trim().length > 0
-  const isStep2Valid = divisionName.trim().length > 0 && districtName.trim().length > 0
+  const isStep2Valid =
+    divisionId.trim().length > 0 &&
+    districtId.trim().length > 0 &&
+    upazilaId.trim().length > 0 &&
+    unionId.trim().length > 0
   const isEmailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const isPhoneValid = !phone.trim() || /^[+\d\s-]{8,20}$/.test(phone.trim())
 
@@ -144,13 +207,15 @@ export function CreateTenantView() {
       toast.error("Please enter a valid URL slug and English Name.")
       return
     }
-    if (currentStep === 2 && !isStep2Valid) {
-      toast.error("Please enter Division and District name.")
-      return
-    }
-    if (currentStep === 3 && (!isEmailValid || !isPhoneValid)) {
-      toast.error("Please enter a valid email address and phone number.")
-      return
+    if (currentStep === 2) {
+      if (!isStep2Valid) {
+        toast.error("Please select a Division, District, Upazila, and Union.")
+        return
+      }
+      if (!isEmailValid || !isPhoneValid) {
+        toast.error("Please enter a valid email address and phone number.")
+        return
+      }
     }
     if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1)
@@ -193,16 +258,22 @@ export function CreateTenantView() {
         type: type || undefined,
         description: description || undefined,
         logo: logo || undefined,
+        divisionId: divisionId || undefined,
         divisionName: divisionName || undefined,
+        districtId: districtId || undefined,
         districtName: districtName || undefined,
+        upazilaId: upazilaId || undefined,
         upazilaName: upazilaName || undefined,
+        unionId: unionId || undefined,
         unionName: unionName || undefined,
         postalCode: postalCode || undefined,
         secretaryName: secretaryName || undefined,
         chairmanName: chairmanName || undefined,
         phone: phone?.trim() || undefined,
         email: email && email.trim().length > 0 ? email.trim() : undefined,
-        address: address?.trim() || undefined,
+        secretarySignature: secretarySignature || undefined,
+        chairmanSignature: chairmanSignature || undefined,
+        facebookUrl: facebookUrl || undefined,
         planId: planId || undefined,
         isActive,
       },
@@ -223,7 +294,7 @@ export function CreateTenantView() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (currentStep < 5) {
+    if (currentStep < 4) {
       handleNext()
     } else {
       handleFinalSubmit()
@@ -429,7 +500,7 @@ export function CreateTenantView() {
             <span className="font-bold text-on-surface">{steps[currentStep - 1]?.title}</span>
           </div>
           <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-            <div className="bg-primary h-full transition-all duration-300" style={{ width: `${(currentStep / 5) * 100}%` }} />
+            <div className="bg-primary h-full transition-all duration-300" style={{ width: `${(currentStep / steps.length) * 100}%` }} />
           </div>
         </div>
       </div>
@@ -522,7 +593,7 @@ export function CreateTenantView() {
               </div>
             )}
 
-            {/* Step 2: Geography */}
+            {/* Step 2: Location & Contact */}
             {currentStep === 2 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -530,46 +601,145 @@ export function CreateTenantView() {
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       Division (বিভাগ) *
                     </Label>
-                    <Input
-                      value={divisionName}
-                      onChange={(e) => setDivisionName(e.target.value)}
-                      placeholder="Dhaka"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
+                    <Select value={divisionId} onValueChange={handleDivisionChange}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                        <SelectValue placeholder="Select Division" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {divisions.map((d: any) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       District (জেলা) *
                     </Label>
-                    <Input
-                      value={districtName}
-                      onChange={(e) => setDistrictName(e.target.value)}
-                      placeholder="Dhaka"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
+                    <Select
+                      value={districtId}
+                      onValueChange={handleDistrictChange}
+                      disabled={!divisionId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={divisionId ? "Select District" : "Select Division first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {districts.map((d: any) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Upazila (উপজেলা)
+                      Upazila (উপজেলা) *
+                    </Label>
+                    <Select
+                      value={upazilaId}
+                      onValueChange={handleUpazilaChange}
+                      disabled={!districtId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={districtId ? "Select Upazila" : "Select District first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {upazilas.map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Union Name (ইউনিয়ন) *
+                    </Label>
+                    <Select
+                      value={unionId}
+                      onValueChange={handleUnionChange}
+                      disabled={!upazilaId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={upazilaId ? "Select Union" : "Select Upazila first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {unions.map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Postal Code (ডাক কোড)
                     </Label>
                     <Input
-                      value={upazilaName}
-                      onChange={(e) => setUpazilaName(e.target.value)}
-                      placeholder="Savar"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      placeholder="e.g. 1230"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Union Name (ইউনিয়ন)
+                      Official Contact Phone
                     </Label>
                     <Input
-                      value={unionName}
-                      onChange={(e) => setUnionName(e.target.value)}
-                      placeholder="Savar Sadar"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+880 1700-000000"
+                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
+                        !isPhoneValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
+                      }`}
+                    />
+                    {!isPhoneValid && (
+                      <p className="text-xs text-error font-medium">Please enter a valid phone number (e.g. +880 1700-000000)</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Official Contact Email
+                    </Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="info@savar.uphub.gov.bd"
+                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
+                        !isEmailValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
+                      }`}
+                    />
+                    {!isEmailValid && (
+                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@savar.uphub.gov.bd)</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Official Facebook Page URL
+                    </Label>
+                    <Input
+                      value={facebookUrl}
+                      onChange={(e) => setFacebookUrl(e.target.value)}
+                      placeholder="https://facebook.com/your-union-porishod"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
@@ -577,7 +747,7 @@ export function CreateTenantView() {
               </div>
             )}
 
-            {/* Step 3: Contact */}
+            {/* Step 3: UP Officials & Signatures */}
             {currentStep === 3 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -608,36 +778,144 @@ export function CreateTenantView() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Phone
+                      Secretary Signature Image URL
                     </Label>
                     <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+880 1700-000000"
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isPhoneValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
+                      value={secretarySignature}
+                      onChange={(e) => setSecretarySignature(e.target.value)}
+                      placeholder="https://example.com/signatures/sec.png"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
-                    {!isPhoneValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid phone number (e.g. +880 1700-000000)</p>
-                    )}
                   </div>
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Email
+                      Chairman Signature Image URL
                     </Label>
                     <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="info@savar.uphub.gov.bd"
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isEmailValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
+                      value={chairmanSignature}
+                      onChange={(e) => setChairmanSignature(e.target.value)}
+                      placeholder="https://example.com/signatures/chair.png"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
-                    {!isEmailValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@savar.uphub.gov.bd)</p>
-                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Subscription & Limits */}
+            {currentStep === 4 && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <div className="space-y-4">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Select Subscription Plan *
+                  </Label>
+                  <div className="space-y-3">
+                    {plans.map((p: any) => {
+                      const isSelected = planId === p.id
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setPlanId(p.id)}
+                          className={`w-full p-4 rounded-xl border border-outline-variant text-left transition-all duration-200 relative group flex items-start gap-4 cursor-pointer ${
+                            isSelected
+                              ? "border-primary bg-primary/5 shadow-xs"
+                              : "bg-white hover:border-primary/40 hover:bg-surface-container-low"
+                          }`}
+                        >
+                          <div
+                            className={`size-5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0 transition-all ${
+                              isSelected ? "border-primary bg-primary text-white" : "border-outline-variant"
+                            }`}
+                          >
+                            {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-bold text-on-surface text-sm">{p.displayName}</h3>
+                              <div className="text-right">
+                                {p.yearlyPriceBDT === 0 ? (
+                                  <span className="text-sm font-extrabold text-primary">Free</span>
+                                ) : (
+                                  <div>
+                                    <span className="text-sm font-extrabold text-on-surface">
+                                      ৳{p.yearlyPriceBDT?.toLocaleString()}
+                                    </span>
+                                    <span className="text-[10px] text-outline font-medium">/year</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            {p.description && (
+                              <p className="text-xs text-on-surface-variant mt-0.5 font-medium">{p.description}</p>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-outline-variant/30">
+                  <div>
+                    <h4 className="text-sm font-bold text-on-surface">Custom Resource Quota Overrides</h4>
+                    <p className="text-xs text-outline mt-0.5">
+                      Optionally override default plan quotas specifically for this Union Porishod. Leave empty to use plan defaults.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Custom Citizen Limit
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customCitizenLimit ?? ""}
+                        onChange={(e) => setCustomCitizenLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="Default plan limit"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Custom Staff Seats
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customStaffLimit ?? ""}
+                        onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="Default plan seats"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Custom Certificate Quota
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customCertificateLimit ?? ""}
+                        onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="Default plan quota"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Custom Storage Quota (MB)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customStorageLimit ?? ""}
+                        onChange={(e) => setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="Default storage MB"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -656,122 +934,6 @@ export function CreateTenantView() {
               </div>
             )}
 
-            {/* Step 4: Subscription */}
-            {currentStep === 4 && (
-              <div className="space-y-4 animate-in fade-in duration-200">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Select Subscription Plan *
-                </Label>
-                <div className="space-y-3">
-                  {plans.map((p: any) => {
-                    const isSelected = planId === p.id
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlanId(p.id)}
-                        className={`w-full p-4 rounded-xl border border-outline-variant text-left transition-all duration-200 relative group flex items-start gap-4 cursor-pointer ${
-                          isSelected
-                            ? "border-primary bg-primary/5 shadow-xs"
-                            : "bg-white hover:border-primary/40 hover:bg-surface-container-low"
-                        }`}
-                      >
-                        <div
-                          className={`size-5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0 transition-all ${
-                            isSelected ? "border-primary bg-primary text-white" : "border-outline-variant"
-                          }`}
-                        >
-                          {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-on-surface text-sm">{p.displayName}</h3>
-                            <div className="text-right">
-                              {p.yearlyPriceBDT === 0 ? (
-                                <span className="text-sm font-extrabold text-primary">Free</span>
-                              ) : (
-                                <div>
-                                  <span className="text-sm font-extrabold text-on-surface">
-                                    ৳{p.yearlyPriceBDT?.toLocaleString()}
-                                  </span>
-                                  <span className="text-[10px] text-outline font-medium">/year</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          {p.description && (
-                            <p className="text-xs text-on-surface-variant mt-0.5 font-medium">{p.description}</p>
-                          )}
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Limits */}
-            {currentStep === 5 && (
-              <div className="space-y-4 animate-in fade-in duration-200">
-                <p className="text-xs text-on-surface-variant font-medium">
-                  Optionally override default plan quotas specifically for this Union Porishod. Leave empty to use plan defaults.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Citizen Limit
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customCitizenLimit ?? ""}
-                      onChange={(e) => setCustomCitizenLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default plan limit"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Staff Seats
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customStaffLimit ?? ""}
-                      onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default plan seats"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Certificate Quota
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customCertificateLimit ?? ""}
-                      onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default plan quota"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Storage Quota (MB)
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customStorageLimit ?? ""}
-                      onChange={(e) => setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default storage MB"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Actions Footer — Matched with Role Modal Footer */}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4 border-t border-outline-variant/30">
               <Button
@@ -784,7 +946,7 @@ export function CreateTenantView() {
                 {currentStep === 1 ? "Cancel" : "Previous Step"}
               </Button>
 
-              {currentStep < 5 ? (
+              {currentStep < 4 ? (
                 <Button
                   type="button"
                   onClick={handleNext}

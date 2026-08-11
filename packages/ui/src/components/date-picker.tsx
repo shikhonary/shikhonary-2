@@ -8,7 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Calendar } from "@workspace/ui/components/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
 
-interface DatePickerProps {
+interface DatePickerProps extends Omit<React.ComponentProps<typeof Calendar>, "mode" | "selected" | "onSelect"> {
   date: Date | undefined
   setDate: (date: Date | undefined) => void
   placeholder?: string
@@ -22,6 +22,7 @@ export function DatePicker({
   placeholder = "Pick a date",
   className,
   disabled = false,
+  ...props
 }: DatePickerProps) {
   return (
     <Popover>
@@ -45,6 +46,7 @@ export function DatePicker({
           selected={date}
           onSelect={setDate}
           autoFocus
+          {...props}
         />
       </PopoverContent>
     </Popover>

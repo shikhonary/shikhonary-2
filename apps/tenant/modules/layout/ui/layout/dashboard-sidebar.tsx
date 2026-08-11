@@ -96,6 +96,12 @@ const navSections: NavSection[] = [
       { title: "কর জেনারেট", url: "/generate-tax-payment", icon: Calculator },
     ],
   },
+  {
+    label: "নাগরিক সেবা",
+    items: [
+      { title: "নাগরিক আবেদন", url: "/citizen-applications", icon: ClipboardList },
+    ],
+  },
 ];
 
 

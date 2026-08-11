@@ -41,7 +41,9 @@ export function ProfileView() {
   const [logo, setLogo] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
-  const [address, setAddress] = useState("")
+  const [secretarySignature, setSecretarySignature] = useState("")
+  const [chairmanSignature, setChairmanSignature] = useState("")
+  const [facebookUrl, setFacebookUrl] = useState("")
   
   const [divisionName, setDivisionName] = useState("")
   const [districtName, setDistrictName] = useState("")
@@ -61,7 +63,9 @@ export function ProfileView() {
       setLogo(tenant.logo || "")
       setEmail(tenant.email || "")
       setPhone(tenant.phone || "")
-      setAddress(tenant.address || "")
+      setSecretarySignature(tenant.secretarySignature || "")
+      setChairmanSignature(tenant.chairmanSignature || "")
+      setFacebookUrl(tenant.facebookUrl || "")
       setDivisionName(tenant.divisionName || "")
       setDistrictName(tenant.districtName || "")
       setUpazilaName(tenant.upazilaName || "")
@@ -100,7 +104,9 @@ export function ProfileView() {
       logo: logo.trim() || null,
       email: email.trim() || null,
       phone: phone.trim() || null,
-      address: address.trim() || null,
+      secretarySignature: secretarySignature.trim() || null,
+      chairmanSignature: chairmanSignature.trim() || null,
+      facebookUrl: facebookUrl.trim() || null,
       divisionName: divisionName.trim() || null,
       districtName: districtName.trim() || null,
       upazilaName: upazilaName.trim() || null,
@@ -274,20 +280,19 @@ export function ProfileView() {
                 </div>
               </div>
 
-              {/* Address */}
+              {/* Facebook URL */}
               <div className="space-y-1.5">
                 <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                  কার্যালয়ের ঠিকানা
+                  অফিসিয়াল ফেসবুক পেজ লিংক
                 </Label>
                 <div className="relative group font-body">
-                  <MapPin className="absolute left-3.5 top-3 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
-                  <Textarea
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                  <Globe className="absolute left-3.5 top-3 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
+                  <Input
+                    value={facebookUrl}
+                    onChange={(e) => setFacebookUrl(e.target.value)}
                     disabled={updateMutation.isPending}
-                    rows={2}
-                    placeholder="ইউনিয়ন পরিষদ ভবনের সম্পূর্ণ ঠিকানা..."
-                    className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 pt-2.5 rounded-xl text-sm transition-all resize-none"
+                    placeholder="https://facebook.com/your-union-porishod"
+                    className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                   />
                 </div>
               </div>
@@ -475,6 +480,42 @@ export function ProfileView() {
                       onChange={(e) => setSecretaryName(e.target.value)}
                       disabled={updateMutation.isPending}
                       placeholder="যেমনঃ অমল চন্দ্র শর্মা"
+                      className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                {/* Chairman Signature */}
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-muted-foreground font-display">
+                    চেয়ারম্যানের স্বাক্ষরের ছবি (Image URL)
+                  </Label>
+                  <div className="relative group font-body">
+                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
+                    <Input
+                      value={chairmanSignature}
+                      onChange={(e) => setChairmanSignature(e.target.value)}
+                      disabled={updateMutation.isPending}
+                      placeholder="https://example.com/signatures/chair.png"
+                      className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Secretary Signature */}
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-muted-foreground font-display">
+                    সচিবের স্বাক্ষরের ছবি (Image URL)
+                  </Label>
+                  <div className="relative group font-body">
+                    <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
+                    <Input
+                      value={secretarySignature}
+                      onChange={(e) => setSecretarySignature(e.target.value)}
+                      disabled={updateMutation.isPending}
+                      placeholder="https://example.com/signatures/sec.png"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>

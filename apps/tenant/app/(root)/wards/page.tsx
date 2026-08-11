@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { WardListView } from "@/modules/ward/components/ward-list-view"
+import { WardsView } from "@/modules/ward/ui/views/wards-view"
 
 export const metadata: Metadata = {
   title: "ওয়ার্ড ব্যবস্থাপনা | ইউনিয়ন পরিষদ পোর্টাল",
@@ -15,8 +15,9 @@ export default function WardsPage() {
         subtitle="ইউনিয়ন পরিষদের বাৎসরিক ওয়ার্ড সংকলন ও পরিচালনা"
       />
       <main className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
-        <WardListView />
+        <WardsView />
       </main>
     </div>
   )
 }
+

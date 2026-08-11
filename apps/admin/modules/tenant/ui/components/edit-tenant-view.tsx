@@ -72,7 +72,9 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [chairmanName, setChairmanName] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [address, setAddress] = useState("")
+  const [secretarySignature, setSecretarySignature] = useState("")
+  const [chairmanSignature, setChairmanSignature] = useState("")
+  const [facebookUrl, setFacebookUrl] = useState("")
 
   // Step 4: Subscription Plan
   const [planId, setPlanId] = useState<string>("")
@@ -101,7 +103,9 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       setChairmanName(tenant.chairmanName || "")
       setPhone(tenant.phone || "")
       setEmail(tenant.email || "")
-      setAddress(tenant.address || "")
+      setSecretarySignature(tenant.secretarySignature || "")
+      setChairmanSignature(tenant.chairmanSignature || "")
+      setFacebookUrl(tenant.facebookUrl || "")
       setPlanId(tenant.subscription?.planId || "")
       setIsActive(tenant.isActive ?? true)
       if (tenant.customCitizenLimit !== null && tenant.customCitizenLimit !== undefined) {
@@ -195,7 +199,9 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       chairmanName: chairmanName || undefined,
       phone: phone?.trim() || undefined,
       email: email && email.trim().length > 0 ? email.trim() : undefined,
-      address: address?.trim() || undefined,
+      secretarySignature: secretarySignature || undefined,
+      chairmanSignature: chairmanSignature || undefined,
+      facebookUrl: facebookUrl || undefined,
       planId: planId || undefined,
       isActive,
     })
@@ -517,17 +523,43 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Secretary Signature Image URL
+                    </Label>
+                    <Input
+                      value={secretarySignature}
+                      onChange={(e) => setSecretarySignature(e.target.value)}
+                      placeholder="https://example.com/signatures/sec.png"
+                      disabled={isSubmitting}
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Chairman Signature Image URL
+                    </Label>
+                    <Input
+                      value={chairmanSignature}
+                      onChange={(e) => setChairmanSignature(e.target.value)}
+                      placeholder="https://example.com/signatures/chair.png"
+                      disabled={isSubmitting}
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    UP Office Address
+                    Official Facebook Page URL
                   </Label>
-                  <Textarea
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Union Porishod Complex, Savar, Dhaka"
-                    rows={2}
+                  <Input
+                    value={facebookUrl}
+                    onChange={(e) => setFacebookUrl(e.target.value)}
+                    placeholder="https://facebook.com/your-union-porishod"
                     disabled={isSubmitting}
-                    className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden min-h-[60px]"
+                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                   />
                 </div>
               </div>

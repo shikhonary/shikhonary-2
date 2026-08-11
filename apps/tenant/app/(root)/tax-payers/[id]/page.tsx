@@ -1,7 +1,7 @@
 import React from "react"
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { TaxPayerDetailView } from "@/modules/tax-payer/components/tax-payer-detail-view"
+import { TaxPayerDetailView } from "@/modules/tax-payer/ui/views/tax-payer-detail-view"
 
 interface TaxPayerDetailPageProps {
   params: Promise<{

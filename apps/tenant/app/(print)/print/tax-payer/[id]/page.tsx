@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { TaxPayerPrintView } from "@/modules/tax-payer/components/tax-payer-print-view"
+import { TaxPayerPrintView } from "@/modules/tax-payer/ui/views/tax-payer-print-view"
 
 interface PageProps {
   params: Promise<{ id: string }>

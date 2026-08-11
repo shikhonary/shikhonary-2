@@ -79,62 +79,147 @@ async function main() {
 
   console.log("Seeding Union Porishods (Tenants)...")
 
+  const findGeoIds = async (geography: {
+    division: string
+    district: string
+    upazila: string
+    union: string
+  }) => {
+    const matched = await prisma.union.findFirst({
+      where: {
+        name: { equals: geography.union, mode: "insensitive" },
+        upazila: {
+          name: { equals: geography.upazila, mode: "insensitive" },
+          district: {
+            name: { equals: geography.district, mode: "insensitive" },
+            division: {
+              name: { equals: geography.division, mode: "insensitive" },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        upazilaId: true,
+        upazila: {
+          select: {
+            districtId: true,
+            district: {
+              select: {
+                divisionId: true,
+              },
+            },
+          },
+        },
+      },
+    })
+    return matched
+      ? {
+          unionId: matched.id,
+          upazilaId: matched.upazilaId,
+          districtId: matched.upazila.districtId,
+          divisionId: matched.upazila.district.divisionId,
+        }
+      : {
+          unionId: null,
+          upazilaId: null,
+          districtId: null,
+          divisionId: null,
+        }
+  }
+
+  const savarGeo = await findGeoIds({
+    division: "Dhaka",
+    district: "Dhaka",
+    upazila: "Savar",
+    union: "Savar Sadar",
+  })
+
+  const dhamraiGeo = await findGeoIds({
+    division: "Dhaka",
+    district: "Dhaka",
+    upazila: "Dhamrai",
+    union: "Dhamrai Sadar",
+  })
+
+  const gazipurGeo = await findGeoIds({
+    division: "Dhaka",
+    district: "Gazipur",
+    upazila: "Gazipur Sadar",
+    union: "Gazipur Sadar",
+  })
+
   const savarTenant = await prisma.tenant.upsert({
     where: { slug: "savar-up" },
-    update: {},
+    update: {
+      ...savarGeo,
+      secretarySignature: "https://example.com/signatures/savar-sec.png",
+      chairmanSignature: "https://example.com/signatures/savar-chair.png",
+      facebookUrl: "https://facebook.com/savarup",
+    },
     create: {
       slug: "savar-up",
       name: "Savar Union Porishod",
       nameBn: "সাভার ইউনিয়ন পরিষদ",
       type: "UNION_PORISHOD",
-      divisionName: "Dhaka",
-      districtName: "Dhaka",
-      upazilaName: "Savar",
-      unionName: "Savar Sadar",
+      ...savarGeo,
       secretaryName: "Md. Rahim Uddin",
+      secretarySignature: "https://example.com/signatures/savar-sec.png",
+      chairmanName: "Chairman Savar",
+      chairmanSignature: "https://example.com/signatures/savar-chair.png",
+      facebookUrl: "https://facebook.com/savarup",
       email: "info@savar.uphub.gov.bd",
       phone: "+880 1700-000001",
-      address: "Savar UP Complex, Savar, Dhaka",
       isActive: true,
     },
   })
 
   const dhamraiTenant = await prisma.tenant.upsert({
     where: { slug: "dhamrai-up" },
-    update: {},
+    update: {
+      ...dhamraiGeo,
+      secretarySignature: "https://example.com/signatures/dhamrai-sec.png",
+      chairmanSignature: "https://example.com/signatures/dhamrai-chair.png",
+      facebookUrl: "https://facebook.com/dhamraiup",
+    },
     create: {
       slug: "dhamrai-up",
       name: "Dhamrai Union Porishod",
       nameBn: "ধামরাই ইউনিয়ন পরিষদ",
       type: "UNION_PORISHOD",
-      divisionName: "Dhaka",
-      districtName: "Dhaka",
-      upazilaName: "Dhamrai",
-      unionName: "Dhamrai Sadar",
+      ...dhamraiGeo,
       secretaryName: "Abul Kalam",
+      secretarySignature: "https://example.com/signatures/dhamrai-sec.png",
+      chairmanName: "Chairman Dhamrai",
+      chairmanSignature: "https://example.com/signatures/dhamrai-chair.png",
+      facebookUrl: "https://facebook.com/dhamraiup",
       email: "info@dhamrai.uphub.gov.bd",
       phone: "+880 1700-000002",
-      address: "Dhamrai UP Complex, Dhamrai, Dhaka",
       isActive: true,
     },
   })
 
   const gazipurTenant = await prisma.tenant.upsert({
     where: { slug: "gazipur-up" },
-    update: {},
+    update: {
+      ...gazipurGeo,
+      secretarySignature: "https://example.com/signatures/gazipur-sec.png",
+      chairmanSignature: "https://example.com/signatures/gazipur-chair.png",
+      facebookUrl: "https://facebook.com/gazipurup",
+    },
     create: {
       slug: "gazipur-up",
       name: "Gazipur Union Porishod",
       nameBn: "গাজীপুর ইউনিয়ন পরিষদ",
       type: "UNION_PORISHOD",
-      divisionName: "Dhaka",
-      districtName: "Gazipur",
-      upazilaName: "Gazipur Sadar",
-      unionName: "Gazipur Sadar",
+      ...gazipurGeo,
       secretaryName: "Fazlul Haque",
+      secretarySignature: "https://example.com/signatures/gazipur-sec.png",
+      chairmanName: "Chairman Gazipur",
+      chairmanSignature: "https://example.com/signatures/gazipur-chair.png",
+      facebookUrl: "https://facebook.com/gazipurup",
       email: "info@gazipur.uphub.gov.bd",
       phone: "+880 1700-000003",
-      address: "Gazipur UP Complex, Gazipur",
       isActive: true,
     },
   })

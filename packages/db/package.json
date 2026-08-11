@@ -13,12 +13,14 @@
     "studio:tenant": "prisma studio --config prisma/tenant/prisma.config.ts",
     "seed:main": "node --loader ts-node/esm prisma/seed/main.seed.ts",
     "seed:tenant": "node --loader ts-node/esm prisma/seed/tenant.seed.ts",
-    "assign-super-admin": "npx tsx prisma/seed/assign-super-admin.ts",
-    "seed:subscriptions": "npx tsx prisma/seed/seed-subscriptions.ts",
+    "assign-super-admin": "npx -y tsx prisma/seed/assign-super-admin.ts",
+    "seed:subscriptions": "npx -y tsx prisma/seed/seed-subscriptions.ts",
+    "seed:bd-geo": "npx -y tsx prisma/seed/seed-bd-geo.ts",
     "reset:main": "prisma migrate reset --force --config prisma/main/prisma.config.ts",
     "reset:tenant": "prisma migrate reset --force --config prisma/tenant/prisma.config.ts",
-    "reset": "npx tsx prisma/seed/reset.ts",
-    "clean:databases": "npx tsx prisma/seed/clean-tenant-databases.ts",
+    "reset": "npx -y tsx prisma/seed/reset.ts",
+    "clean:databases": "npx -y tsx prisma/seed/clean-tenant-databases.ts",
+    "clean:databases:except-mandori": "npx -y tsx prisma/seed/clean-except-mandori.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -32,6 +34,7 @@
     "@workspace/typescript-config": "workspace:*",
     "dotenv": "^16.5.0",
     "prisma": "^7.0.0",
+    "tsx": "^4.23.11",
     "typescript": "^5"
   },
   "exports": {

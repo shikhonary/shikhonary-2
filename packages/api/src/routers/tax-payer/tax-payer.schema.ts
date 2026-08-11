@@ -2,7 +2,7 @@ import { z } from "zod"
 import { idSchema, paginationSchema } from "../../schemas/common"
 
 export const listTaxPayersSchema = paginationSchema.extend({
-  search: z.string().optional(),
+  search: z.string().max(100).optional(),
   wardId: z.string().optional(),
   fiscalYearId: z.string().optional(),
   unpaidOnly: z.boolean().optional(),

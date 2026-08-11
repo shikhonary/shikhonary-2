@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { TaxPaymentListView } from "@/modules/tax-payment/components/tax-payment-list-view"
+import { TaxPaymentsView } from "@/modules/tax-payment/ui/views/tax-payments-view"
 
 export const metadata: Metadata = {
   title: "কর আদায় রেজিস্টার | ইউনিয়ন পরিষদ পোর্টাল",
@@ -15,8 +15,9 @@ export default function TaxCollectionPage() {
         subtitle="ইউনিয়ন পরিষদের বাৎসরিক কর সংগ্রহের রসিদ তৈরি, নথিভুক্তকরণ ও হিসাবনিকাশ"
       />
       <main className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
-        <TaxPaymentListView />
+        <TaxPaymentsView />
       </main>
     </div>
   )
 }
+

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { TaxPayerListView } from "@/modules/tax-payer/components/tax-payer-list-view"
+import { TaxPayersView } from "@/modules/tax-payer/ui/views/tax-payers-view"
 
 export const metadata: Metadata = {
   title: "করদাতা তালিকা | ইউনিয়ন পরিষদ পোর্টাল",
@@ -15,8 +15,9 @@ export default function TaxPayersPage() {
         subtitle="ইউনিয়ন পরিষদের হোল্ডিং করদাতাদের তালিকা, প্রোফাইল ও বাৎসরিক ট্যাক্স পরিচালনা"
       />
       <main className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
-        <TaxPayerListView />
+        <TaxPayersView />
       </main>
     </div>
   )
 }
+

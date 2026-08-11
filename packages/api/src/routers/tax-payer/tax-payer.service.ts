@@ -1,4 +1,5 @@
 import type { TenantPrismaClient } from "@workspace/db/tenant"
+import { TenantPrisma } from "@workspace/db/tenant"
 import { notFound } from "../../utils/errors"
 import type {
   BulkCreateTaxPayerInput,
@@ -15,7 +16,7 @@ export async function listTaxPayers(
   tenantDb: TenantPrismaClient,
   input: ListTaxPayersInput,
 ) {
-  const where: any = {}
+  const where: TenantPrisma.TaxPayerWhereInput = {}
 
   if (input.search && input.search.trim() !== "") {
     const query = input.search.trim()
@@ -50,7 +51,7 @@ export async function listTaxPayers(
     }
   }
 
-  let orderBy: any = { createdAt: "desc" }
+  let orderBy: TenantPrisma.TaxPayerOrderByWithRelationInput = { createdAt: "desc" }
   if (input.sort) {
     switch (input.sort) {
       case "name_asc":
@@ -153,7 +154,7 @@ export async function getTaxPayerByHolding(
   tenantDb: TenantPrismaClient,
   input: GetTaxPayerByHoldingInput,
 ) {
-  const where: any = { holding: input.holding }
+  const where: TenantPrisma.TaxPayerWhereInput = { holding: input.holding }
   if (input.wardId) {
     where.wardId = input.wardId
   }
@@ -176,7 +177,7 @@ export async function getTaxPayerStats(
   tenantDb: TenantPrismaClient,
   input: TaxPayerStatsInput,
 ) {
-  const where: any = {}
+  const where: TenantPrisma.TaxPayerWhereInput = {}
   if (input.wardId) {
     where.wardId = input.wardId
   }

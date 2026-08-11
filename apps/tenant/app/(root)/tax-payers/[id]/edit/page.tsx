@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header"
-import { EditTaxPayerView } from "@/modules/tax-payer/components/edit-tax-payer-view"
+import { EditTaxPayerView } from "@/modules/tax-payer/ui/views/edit-tax-payer-view"
 
 interface EditTaxPayerPageProps {
   params: Promise<{

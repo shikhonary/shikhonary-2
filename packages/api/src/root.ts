@@ -23,6 +23,9 @@ import { taxPayerRouter } from "./routers/tax-payer/tax-payer.router"
 import { taxPaymentRouter } from "./routers/tax-payment/tax-payment.router"
 import { generateTaxPaymentRouter } from "./routers/generate-tax-payment/generate-tax-payment.router"
 import { tenantDashboardRouter } from "./routers/tenant-dashboard/tenant-dashboard.router"
+import { locationRouter } from "./routers/location/location.router"
+import { citizenRouter } from "./routers/citizen/citizen.router"
+import { citizenApplicationRouter } from "./routers/citizen-application/citizen-application.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -40,6 +43,9 @@ export const appRouter = createTRPCRouter({
   taxPayment: taxPaymentRouter,
   generateTaxPayment: generateTaxPaymentRouter,
   tenantDashboard: tenantDashboardRouter,
+  location: locationRouter,
+  citizen: citizenRouter,
+  citizenApplication: citizenApplicationRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

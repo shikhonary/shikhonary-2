@@ -8,12 +8,19 @@ export type {
   TaxPayer,
   TaxPayment,
   FiscalYear as TenantFiscalYear,
+  Citizen,
+  CitizenAddress,
+  CitizenApplication,
+  CitizenApplicationAddress,
 } from "../generated/tenant/client"
 export { Prisma as TenantPrisma } from "../generated/tenant/client"
 
 
 const globalForPrisma = globalThis as unknown as {
   tenantDb: PrismaClient | undefined
+  // Cache dedicated PrismaClient instances keyed by connection string.
+  // This prevents spawning a new client (and pool) on every request.
+  tenantClientCache: Map<string, PrismaClient> | undefined
 }
 
 function createTenantDb() {
@@ -33,15 +40,48 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.tenantDb = tenantDb
 }
 
+// Initialise the dedicated-client cache once per process
+const tenantClientCache: Map<string, PrismaClient> =
+  globalForPrisma.tenantClientCache ?? new Map()
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.tenantClientCache = tenantClientCache
+}
+
 /**
  * Returns a tenant-scoped database client.
- * This client will automatically inject and enforce the `tenantId`
- * on all queries to ensure tenant isolation.
+ *
+ * If `connectionString` is provided (the tenant's dedicated database), a
+ * PrismaClient for that exact connection is returned, cached by connection
+ * string so we never open duplicate pools. This is the production path for
+ * fully isolated tenant databases.
+ *
+ * If no connection string is provided the function falls back to the shared
+ * `tenantDb` (pointed at TENANT_DATABASE_URL) with the `withTenant` Prisma
+ * extension applied, which enforces per-query tenantId filtering. This is
+ * the correct path for local development where all tenants share one DB.
+ *
+ * The `withTenant` extension is always applied regardless of path so that
+ * the tenantId is automatically injected/enforced on every query.
  */
-export function getTenantDb(tenantId: string) {
+export function getTenantDb(tenantId: string, connectionString?: string | null) {
   if (!tenantId) {
     throw new Error("getTenantDb requires a valid tenantId")
   }
+
+  if (connectionString) {
+    // Use/create a cached PrismaClient for this dedicated database
+    let client = tenantClientCache.get(connectionString)
+    if (!client) {
+      const adapter = new PrismaPg({ connectionString })
+      client = new PrismaClient({ adapter })
+      tenantClientCache.set(connectionString, client)
+    }
+    return client.$extends(withTenant(tenantId))
+  }
+
+  // Shared database fallback — withTenant extension enforces row-level isolation
   return tenantDb.$extends(withTenant(tenantId))
 }
+
 
