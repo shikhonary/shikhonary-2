@@ -80,6 +80,7 @@ export function CreateTenantView() {
   const [type, setType] = useState("UNION_PORISHOD")
   const [description, setDescription] = useState("")
   const [logo, setLogo] = useState("")
+  const [customDomain, setCustomDomain] = useState("")
 
   // Step 2: Geography & Contact (Cascading Dropdowns)
   const [divisionId, setDivisionId] = useState("")
@@ -91,6 +92,7 @@ export function CreateTenantView() {
   const [unionId, setUnionId] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
+  const [geoCode, setGeoCode] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [facebookUrl, setFacebookUrl] = useState("")
@@ -267,6 +269,7 @@ export function CreateTenantView() {
         unionId: unionId || undefined,
         unionName: unionName || undefined,
         postalCode: postalCode || undefined,
+        geoCode: geoCode || undefined,
         secretaryName: secretaryName || undefined,
         chairmanName: chairmanName || undefined,
         phone: phone?.trim() || undefined,
@@ -276,6 +279,11 @@ export function CreateTenantView() {
         facebookUrl: facebookUrl || undefined,
         planId: planId || undefined,
         isActive,
+        customDomain: customDomain || undefined,
+        customCitizenLimit: customCitizenLimit !== undefined ? Number(customCitizenLimit) : undefined,
+        customStaffLimit: customStaffLimit !== undefined ? Number(customStaffLimit) : undefined,
+        customCertificateLimit: customCertificateLimit !== undefined ? Number(customCertificateLimit) : undefined,
+        customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : undefined,
       },
       {
         onSuccess: () => {
@@ -566,6 +574,23 @@ export function CreateTenantView() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Custom Domain
+                    </Label>
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Input
+                        value={customDomain}
+                        onChange={(e) => setCustomDomain(e.target.value)}
+                        placeholder="e.g. savarup.gov.bd"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                     বাংলা নাম (Official Bangla Title)
@@ -698,6 +723,20 @@ export function CreateTenantView() {
                   </div>
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Geo Code (জিও কোড)
+                    </Label>
+                    <Input
+                      value={geoCode}
+                      onChange={(e) => setGeoCode(e.target.value)}
+                      placeholder="e.g. 3086"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       Official Contact Phone
                     </Label>
                     <Input
@@ -712,9 +751,6 @@ export function CreateTenantView() {
                       <p className="text-xs text-error font-medium">Please enter a valid phone number (e.g. +880 1700-000000)</p>
                     )}
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       Official Contact Email
@@ -732,17 +768,18 @@ export function CreateTenantView() {
                       <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@savar.uphub.gov.bd)</p>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Facebook Page URL
-                    </Label>
-                    <Input
-                      value={facebookUrl}
-                      onChange={(e) => setFacebookUrl(e.target.value)}
-                      placeholder="https://facebook.com/your-union-porishod"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Official Facebook Page URL
+                  </Label>
+                  <Input
+                    value={facebookUrl}
+                    onChange={(e) => setFacebookUrl(e.target.value)}
+                    placeholder="https://facebook.com/your-union-porishod"
+                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                  />
                 </div>
               </div>
             )}

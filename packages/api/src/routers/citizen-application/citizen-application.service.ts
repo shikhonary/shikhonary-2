@@ -1,6 +1,8 @@
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import { TenantPrisma } from "@workspace/db/tenant"
 import { notFound } from "../../utils/errors"
+import type { PrismaClient } from "@workspace/db/main"
+import { generateCitizenId } from "@workspace/utils"
 import type {
   ApproveCitizenApplicationInput,
   CreateCitizenApplicationInput,
@@ -39,7 +41,6 @@ export async function createApplication(
         postId: input.presentAddress.postId,
         postOfficeBn: input.presentAddress.postOfficeBn,
         postOfficeEn: input.presentAddress.postOfficeEn,
-        postCode: input.presentAddress.postCode,
       },
     })
 
@@ -71,7 +72,6 @@ export async function createApplication(
           postId: input.permanentAddress.postId,
           postOfficeBn: input.permanentAddress.postOfficeBn,
           postOfficeEn: input.permanentAddress.postOfficeEn,
-          postCode: input.permanentAddress.postCode,
         },
       })
       permanentAddrId = permAddr.id
@@ -224,7 +224,9 @@ export async function rejectApplication(
 }
 
 export async function approveApplication(
+  db: PrismaClient,
   tenantDb: TenantPrismaClient,
+  tenantId: string,
   input: ApproveCitizenApplicationInput,
 ) {
   // 1. Fetch the application including addresses
@@ -270,6 +272,13 @@ export async function approveApplication(
     }
   }
 
+  // Fetch tenant geoCode from main DB before transaction to keep locks minimal
+  const tenant = await db.tenant.findUnique({
+    where: { id: tenantId },
+    select: { geoCode: true },
+  })
+  const geoCode = tenant?.geoCode
+
   // 3. Atomically transfer records to the active Citizen registry in a transaction
   return await tenantDb.$transaction(async (tx) => {
     // 3a. Create present address record
@@ -296,7 +305,6 @@ export async function approveApplication(
         postId: application.presentAddress.postId,
         postOfficeBn: application.presentAddress.postOfficeBn,
         postOfficeEn: application.presentAddress.postOfficeEn,
-        postCode: application.presentAddress.postCode,
       },
     })
 
@@ -326,15 +334,22 @@ export async function approveApplication(
           postId: application.permanentAddress.postId,
           postOfficeBn: application.permanentAddress.postOfficeBn,
           postOfficeEn: application.permanentAddress.postOfficeEn,
-          postCode: application.permanentAddress.postCode,
         },
       })
       permanentAddrId = permAddr.id
     }
 
     // 3c. Create the final Citizen profile
+    const counter = await tx.counter.upsert({
+      where: { key: "CITIZEN" },
+      create: { key: "CITIZEN", value: 1 },
+      update: { value: { increment: 1 } },
+    })
+    const citizenId = generateCitizenId(geoCode, counter.value)
+
     const citizen = await tx.citizen.create({
       data: {
+        citizenId,
         nid: application.nid,
         birthRegNo: application.birthRegNo,
         passportNo: application.passportNo,

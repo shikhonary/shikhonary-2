@@ -110,7 +110,7 @@ export function TaxReceiptModal({
               asChild
               className="flex-1 h-11 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer shadow-md shadow-emerald-600/20 gap-2"
             >
-              <Link href={`/print/tax-collection/receipt/${finalPayment.id}`}>
+              <Link href={`/tax-collection/receipt/${finalPayment.id}/preview`} target="_blank">
                 <Printer className="w-4 h-4" />
                 <span>রসিদ প্রিন্ট পেজে যান</span>
               </Link>

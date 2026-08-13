@@ -17,6 +17,7 @@ import { subscriptionPlanRouter } from "./routers/subscription-plan/subscription
 import { fiscalYearRouter } from "./routers/fiscal-year/fiscal-year.router"
 import { tenantFiscalYearRouter } from "./routers/tenant-fiscal-year/tenant-fiscal-year.router"
 import { tenantWardRouter } from "./routers/tenant-ward/tenant-ward.router"
+import { tenantCounterRouter } from "./routers/tenant-counter/tenant-counter.router"
 import { dashboardRouter } from "./routers/dashboard/dashboard.router"
 import { invitationRouter } from "./routers/invitation/invitation.router"
 import { taxPayerRouter } from "./routers/tax-payer/tax-payer.router"
@@ -37,6 +38,7 @@ export const appRouter = createTRPCRouter({
   fiscalYear: fiscalYearRouter,
   tenantFiscalYear: tenantFiscalYearRouter,
   tenantWard: tenantWardRouter,
+  tenantCounter: tenantCounterRouter,
   dashboard: dashboardRouter,
   invitation: invitationRouter,
   taxPayer: taxPayerRouter,

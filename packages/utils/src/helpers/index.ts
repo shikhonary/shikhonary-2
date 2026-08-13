@@ -85,3 +85,17 @@ export function parseTenantHost(
   return { slug: null, customDomain: null }
 }
 
+/**
+ * Generates a unique Citizen ID: YY + 7-digit GeoCode + 6-digit incrementing counter.
+ */
+export function generateCitizenId(
+  geoCode: string | null | undefined,
+  counterValue: number,
+): string {
+  const yearSuffix = new Date().getFullYear().toString().slice(-2)
+  const cleanGeo = (geoCode || "").replace(/\D/g, "").padStart(7, "0").slice(0, 7)
+  const cleanCounter = counterValue.toString().padStart(6, "0")
+  return `${yearSuffix}${cleanGeo}${cleanCounter}`
+}
+
+

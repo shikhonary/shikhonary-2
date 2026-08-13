@@ -118,7 +118,7 @@ export const TaxPayerDetailView: React.FC<TaxPayerDetailViewProps> = ({ taxPayer
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.push(`/print/tax-payer/${taxPayer.id}`)}
+            onClick={() => window.open(`/tax-payers/${taxPayer.id}/preview`, "_blank")}
             className="flex-1 sm:flex-none gap-1.5 text-xs font-bold rounded-xl border-blue-600/30 bg-blue-50 text-blue-700 hover:bg-blue-100"
           >
             <Printer className="h-3.5 w-3.5 text-blue-600" />

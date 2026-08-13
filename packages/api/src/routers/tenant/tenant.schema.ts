@@ -47,6 +47,7 @@ export const createTenantSchema = z.object({
   upazilaId: z.string().optional(),
   unionId: z.string().optional(),
   postalCode: z.string().optional(),
+  geoCode: z.string().optional(),
   secretaryName: z.string().optional(),
   secretarySignature: z.string().optional(),
   chairmanName: z.string().optional(),
@@ -56,6 +57,10 @@ export const createTenantSchema = z.object({
   customDomain: z.string().optional(),
   isActive: z.boolean().default(true),
   planId: z.string().optional(), // Optional initial subscription plan ID
+  customCitizenLimit: z.number().int().optional().nullable(),
+  customStaffLimit: z.number().int().optional().nullable(),
+  customCertificateLimit: z.number().int().optional().nullable(),
+  customStorageLimit: z.number().int().optional().nullable(),
 })
 
 export type CreateTenantInput = z.infer<typeof createTenantSchema>
@@ -84,6 +89,7 @@ export const updateTenantSchema = z.object({
   upazilaId: z.string().optional(),
   unionId: z.string().optional(),
   postalCode: z.string().optional(),
+  geoCode: z.string().optional().nullable(),
   secretaryName: z.string().optional(),
   secretarySignature: z.string().optional(),
   chairmanName: z.string().optional(),
@@ -97,6 +103,10 @@ export const updateTenantSchema = z.object({
   suspendReason: z.string().optional(),
   currentFiscalYearId: z.string().optional(),
   planId: z.string().optional(),
+  customCitizenLimit: z.number().int().optional().nullable(),
+  customStaffLimit: z.number().int().optional().nullable(),
+  customCertificateLimit: z.number().int().optional().nullable(),
+  customStorageLimit: z.number().int().optional().nullable(),
 })
 
 export type UpdateTenantInput = z.infer<typeof updateTenantSchema>
@@ -160,6 +170,7 @@ export const updateTenantProfileSchema = z.object({
   upazilaId: z.string().optional().nullable(),
   unionId: z.string().optional().nullable(),
   postalCode: z.string().optional().nullable(),
+  geoCode: z.string().optional().nullable(),
   secretaryName: z.string().optional().nullable(),
   secretarySignature: z.string().optional().nullable(),
   chairmanName: z.string().optional().nullable(),

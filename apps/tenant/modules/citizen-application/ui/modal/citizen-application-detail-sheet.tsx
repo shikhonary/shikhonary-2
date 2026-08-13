@@ -399,9 +399,9 @@ export function CitizenApplicationDetailSheet({
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs text-muted-foreground block">পোষ্ট অফিস ও কোড</span>
+                    <span className="text-xs text-muted-foreground block">পোষ্ট অফিস</span>
                     <span className="text-sm font-semibold">
-                      {application.presentAddress.postOfficeBn} ({application.presentAddress.postCode})
+                      {application.presentAddress.postOfficeBn}
                     </span>
                   </div>
                   <div className="space-y-1">
@@ -455,9 +455,9 @@ export function CitizenApplicationDetailSheet({
                       </span>
                     </div>
                     <div className="space-y-1">
-                      <span className="text-xs text-muted-foreground block">পোষ্ট অফিস ও কোড</span>
+                      <span className="text-xs text-muted-foreground block">পোষ্ট অফিস</span>
                       <span className="text-sm font-semibold">
-                        {application.permanentAddress.postOfficeBn} ({application.permanentAddress.postCode})
+                        {application.permanentAddress.postOfficeBn}
                       </span>
                     </div>
                     <div className="space-y-1">

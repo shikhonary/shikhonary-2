@@ -105,3 +105,88 @@ export const CITIZEN_STATUSES = {
 } as const
 export type CitizenStatus = (typeof CITIZEN_STATUSES)[keyof typeof CITIZEN_STATUSES]
 
+// Localized UI Maps & Options
+export const GENDER_MAP: Record<Gender, string> = {
+  [GENDERS.MALE]: "পুরুষ",
+  [GENDERS.FEMALE]: "মহিলা",
+  [GENDERS.OTHER]: "অন্যান্য",
+}
+
+export const GENDER_OPTIONS = [
+  { value: GENDERS.MALE, label: "পুরুষ" },
+  { value: GENDERS.FEMALE, label: "মহিলা" },
+  { value: GENDERS.OTHER, label: "অন্যান্য" },
+] as const
+
+export const RELIGION_MAP: Record<Religion, string> = {
+  [RELIGIONS.ISLAM]: "ইসলাম",
+  [RELIGIONS.HINDU]: "হিন্দু",
+  [RELIGIONS.BUDDHIST]: "বৌদ্ধ",
+  [RELIGIONS.CHRISTIAN]: "খ্রিস্টান",
+  [RELIGIONS.OTHER]: "অন্যান্য",
+}
+
+export const RELIGION_OPTIONS = [
+  { value: RELIGIONS.ISLAM, label: "ইসলাম" },
+  { value: RELIGIONS.HINDU, label: "হিন্দু" },
+  { value: RELIGIONS.BUDDHIST, label: "বৌদ্ধ" },
+  { value: RELIGIONS.CHRISTIAN, label: "খ্রিস্টান" },
+  { value: RELIGIONS.OTHER, label: "অন্যান্য" },
+] as const
+
+export const MARITAL_STATUS_MAP: Record<MaritalStatus, string> = {
+  [MARITAL_STATUSES.UNMARRIED]: "অবিবাহিত",
+  [MARITAL_STATUSES.MARRIED]: "বিবাহিত",
+  [MARITAL_STATUSES.WIDOWED]: "বিপত্নীক/বিধবা",
+  [MARITAL_STATUSES.DIVORCED]: "তালাকপ্রাপ্ত",
+  [MARITAL_STATUSES.OTHER]: "অন্যান্য",
+}
+
+export const MARITAL_STATUS_OPTIONS = [
+  { value: MARITAL_STATUSES.UNMARRIED, label: "অবিবাহিত" },
+  { value: MARITAL_STATUSES.MARRIED, label: "বিবাহিত" },
+  { value: MARITAL_STATUSES.WIDOWED, label: "বিপত্নীক/বিধবা" },
+  { value: MARITAL_STATUSES.DIVORCED, label: "তালাকপ্রাপ্ত" },
+] as const
+
+export const RESIDENT_TYPE_MAP: Record<ResidentType, string> = {
+  [RESIDENT_TYPES.PERMANENT]: "স্থায়ী",
+  [RESIDENT_TYPES.TEMPORARY]: "অস্থায়ী",
+}
+
+export const RESIDENT_TYPE_OPTIONS = [
+  { value: RESIDENT_TYPES.PERMANENT, label: "স্থায়ী" },
+  { value: RESIDENT_TYPES.TEMPORARY, label: "অস্থায়ী" },
+] as const
+
+// ---------------------------------------------------------------------------
+// Counter System
+// ---------------------------------------------------------------------------
+
+export const COUNTER_KEYS = {
+  CITIZEN: "CITIZEN",
+  CERTIFICATE: "CERTIFICATE",
+  STAFF: "STAFF",
+  TAX_PAYER: "TAX_PAYER",
+  TAX_PAYMENT: "TAX_PAYMENT",
+} as const
+
+export type CounterKey = (typeof COUNTER_KEYS)[keyof typeof COUNTER_KEYS]
+
+export const COUNTER_KEY_MAP: Record<CounterKey, string> = {
+  [COUNTER_KEYS.CITIZEN]: "নাগরিক সংখ্যা",
+  [COUNTER_KEYS.CERTIFICATE]: "সনদ সংখ্যা",
+  [COUNTER_KEYS.STAFF]: "স্টাফ সংখ্যা",
+  [COUNTER_KEYS.TAX_PAYER]: "করদাতা সংখ্যা",
+  [COUNTER_KEYS.TAX_PAYMENT]: "কর আদায় সংখ্যা",
+}
+
+export const COUNTER_KEY_OPTIONS = [
+  { value: COUNTER_KEYS.CITIZEN, label: "নাগরিক সংখ্যা" },
+  { value: COUNTER_KEYS.CERTIFICATE, label: "সনদ সংখ্যা" },
+  { value: COUNTER_KEYS.STAFF, label: "স্টাফ সংখ্যা" },
+  { value: COUNTER_KEYS.TAX_PAYER, label: "করদাতা সংখ্যা" },
+  { value: COUNTER_KEYS.TAX_PAYMENT, label: "কর আদায় সংখ্যা" },
+] as const
+
+

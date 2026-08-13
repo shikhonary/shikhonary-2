@@ -185,12 +185,20 @@ export const TenantDetailsOverview = ({ tenant }: TenantDetailsOverviewProps) =>
                 )}
               </span>
             </div>
-            <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/50 col-span-2">
+            <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/50 col-span-1">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
                 Postal Code (পোস্ট কোড)
               </span>
               <span className="text-sm font-bold text-foreground mt-0.5 block font-mono">
                 {tenant.postalCode || "N/A"}
+              </span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/50 col-span-1">
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block">
+                Geo Code (জিও কোড)
+              </span>
+              <span className="text-sm font-bold text-foreground mt-0.5 block font-mono">
+                {tenant.geoCode || "N/A"}
               </span>
             </div>
           </div>

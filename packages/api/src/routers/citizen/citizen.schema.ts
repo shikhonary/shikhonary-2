@@ -41,7 +41,6 @@ export const updateAddressSchema = z.object({
   postId: z.string().min(1).optional(),
   postOfficeBn: z.string().min(1).optional(),
   postOfficeEn: z.string().optional(),
-  postCode: z.string().min(1).optional(),
 })
 
 export const updateCitizenSchema = z.object({

@@ -50,6 +50,7 @@ export function ProfileView() {
   const [upazilaName, setUpazilaName] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
+  const [geoCode, setGeoCode] = useState("")
   
   const [secretaryName, setSecretaryName] = useState("")
   const [chairmanName, setChairmanName] = useState("")
@@ -71,6 +72,7 @@ export function ProfileView() {
       setUpazilaName(tenant.upazilaName || "")
       setUnionName(tenant.unionName || "")
       setPostalCode(tenant.postalCode || "")
+      setGeoCode(tenant.geoCode || "")
       setSecretaryName(tenant.secretaryName || "")
       setChairmanName(tenant.chairmanName || "")
     }
@@ -112,6 +114,7 @@ export function ProfileView() {
       upazilaName: upazilaName.trim() || null,
       unionName: unionName.trim() || null,
       postalCode: postalCode.trim() || null,
+      geoCode: geoCode.trim() || null,
       secretaryName: secretaryName.trim() || null,
       chairmanName: chairmanName.trim() || null,
     })
@@ -391,7 +394,7 @@ export function ProfileView() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {/* Union Name */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
@@ -421,6 +424,23 @@ export function ProfileView() {
                       onChange={(e) => setPostalCode(e.target.value)}
                       disabled={updateMutation.isPending}
                       placeholder="যেমনঃ ১৭৪০"
+                      className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Geo Code */}
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-muted-foreground font-display">
+                    জিও কোড (Geo Code)
+                  </Label>
+                  <div className="relative group font-body">
+                    <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
+                    <Input
+                      value={geoCode}
+                      onChange={(e) => setGeoCode(e.target.value)}
+                      disabled={updateMutation.isPending}
+                      placeholder="যেমনঃ ৩০৮৬"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all font-mono"
                     />
                   </div>

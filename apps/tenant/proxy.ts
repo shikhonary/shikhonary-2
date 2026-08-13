@@ -18,7 +18,6 @@ const PUBLIC_ROUTES = [
   "/auth/sign-in",
   "/auth/sign-up",
   "/accept-invitation",
-  "/print",
 ] as const;
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const;
 const API_PREFIXES = ["/api/auth", "/api/trpc"] as const;
@@ -43,7 +42,10 @@ export async function proxy(req: NextRequest): Promise<NextResponse> {
   }
 
   // 4. Allow public pages for unauthenticated users
-  if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
+  if (
+    PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) ||
+    pathname.endsWith("/preview")
+  ) {
     return NextResponse.next();
   }
 

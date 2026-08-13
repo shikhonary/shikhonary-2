@@ -125,7 +125,8 @@ export function TaxPaymentList({
                     {isPaid ? (
                       <DropdownMenuItem asChild>
                         <Link
-                          href={`/print/tax-collection/receipt/${pm.id}`}
+                          href={`/tax-collection/receipt/${pm.id}/preview`}
+                          target="_blank"
                           className="cursor-pointer gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 focus:bg-emerald-500/10"
                         >
                           <Printer className="h-3.5 w-3.5" />
@@ -314,7 +315,8 @@ export function TaxPaymentList({
                         {isPaid ? (
                           <DropdownMenuItem asChild>
                             <Link
-                              href={`/print/tax-collection/receipt/${pm.id}`}
+                              href={`/tax-collection/receipt/${pm.id}/preview`}
+                              target="_blank"
                               className="cursor-pointer gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 focus:bg-emerald-500/10"
                             >
                               <Printer className="h-3.5 w-3.5" />

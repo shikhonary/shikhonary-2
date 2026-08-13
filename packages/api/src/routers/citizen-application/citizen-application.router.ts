@@ -31,7 +31,7 @@ export const citizenApplicationRouter = createTRPCRouter({
 
   approve: tenantMemberProcedure
     .input(approveCitizenApplicationSchema)
-    .mutation(({ ctx, input }) => approveApplication(ctx.tenantDb, input)),
+    .mutation(({ ctx, input }) => approveApplication(ctx.db, ctx.tenantDb, ctx.tenant.id, input)),
 
   reject: tenantMemberProcedure
     .input(rejectCitizenApplicationSchema)

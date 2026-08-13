@@ -145,7 +145,6 @@ export async function updateCitizen(
           postId: input.permanentAddress.postId ?? "",
           postOfficeBn: input.permanentAddress.postOfficeBn ?? "",
           postOfficeEn: input.permanentAddress.postOfficeEn,
-          postCode: input.permanentAddress.postCode ?? "",
         },
       })
       permanentAddressId = permAddr.id

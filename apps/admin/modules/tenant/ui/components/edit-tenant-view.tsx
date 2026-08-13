@@ -3,40 +3,39 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@workspace/ui/components/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import {
   Building2,
+  Globe,
   MapPin,
+  Tag,
   ArrowLeft,
   ArrowRight,
   Check,
   Loader2,
   UserCheck,
   CreditCard,
-  Settings2,
   Save,
-  CheckCircle2,
 } from "lucide-react"
+
+const steps = [
+  { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & official titles" },
+  { id: 2, title: "Location & Contact", icon: MapPin, description: "Geographical hierarchy & office contact" },
+  { id: 3, title: "UP Officials", icon: UserCheck, description: "Officials & signature credentials" },
+  { id: 4, title: "Subscription & Limits", icon: CreditCard, description: "SaaS plan & custom resource limits" },
+]
 
 interface EditTenantViewProps {
   tenantId: string
 }
-
-const steps = [
-  { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & official titles" },
-  { id: 2, title: "Geography", icon: MapPin, description: "Division & district boundaries" },
-  { id: 3, title: "Contact", icon: UserCheck, description: "Officials & office contact" },
-  { id: 4, title: "Subscription", icon: CreditCard, description: "SaaS plan & billing" },
-  { id: 5, title: "Limits", icon: Settings2, description: "Resource quota overrides" },
-]
 
 export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const router = useRouter()
@@ -44,10 +43,6 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
 
   const { data: tenant, isLoading: isLoadingTenant } = useQuery(
     trpc.tenant.byId.queryOptions({ id: tenantId })
-  )
-
-  const { data: plansData } = useQuery(
-    trpc.subscriptionPlan.forSelection.queryOptions()
   )
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -59,33 +54,99 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [type, setType] = useState("UNION_PORISHOD")
   const [description, setDescription] = useState("")
   const [logo, setLogo] = useState("")
+  const [customDomain, setCustomDomain] = useState("")
+  const [customDomainVerified, setCustomDomainVerified] = useState(false)
 
-  // Step 2: Geography
+  // Step 2: Geography & Contact (Cascading Dropdowns)
+  const [divisionId, setDivisionId] = useState("")
   const [divisionName, setDivisionName] = useState("")
+  const [districtId, setDistrictId] = useState("")
   const [districtName, setDistrictName] = useState("")
+  const [upazilaId, setUpazilaId] = useState("")
   const [upazilaName, setUpazilaName] = useState("")
+  const [unionId, setUnionId] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
-
-  // Step 3: Contacts & Officials
-  const [secretaryName, setSecretaryName] = useState("")
-  const [chairmanName, setChairmanName] = useState("")
+  const [geoCode, setGeoCode] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [secretarySignature, setSecretarySignature] = useState("")
-  const [chairmanSignature, setChairmanSignature] = useState("")
   const [facebookUrl, setFacebookUrl] = useState("")
 
-  // Step 4: Subscription Plan
+  // Step 3: UP Officials & Signatures
+  const [secretaryName, setSecretaryName] = useState("")
+  const [chairmanName, setChairmanName] = useState("")
+  const [secretarySignature, setSecretarySignature] = useState("")
+  const [chairmanSignature, setChairmanSignature] = useState("")
+
+  // Step 4: Subscription Plan & Limits
   const [planId, setPlanId] = useState<string>("")
   const [isActive, setIsActive] = useState(true)
-
-  // Step 5: Custom Quotas
   const [customCitizenLimit, setCustomCitizenLimit] = useState<number | undefined>()
   const [customStaffLimit, setCustomStaffLimit] = useState<number | undefined>()
   const [customCertificateLimit, setCustomCertificateLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
 
+  // Cascading location queries
+  const { data: divisions = [] } = useQuery(
+    trpc.location.divisions.queryOptions()
+  )
+  const { data: districts = [] } = useQuery(
+    trpc.location.districts.queryOptions({ divisionId }, { enabled: !!divisionId })
+  )
+  const { data: upazilas = [] } = useQuery(
+    trpc.location.upazilas.queryOptions({ districtId }, { enabled: !!districtId })
+  )
+  const { data: unions = [] } = useQuery(
+    trpc.location.unions.queryOptions({ upazilaId }, { enabled: !!upazilaId })
+  )
+
+  const handleDivisionChange = (val: string) => {
+    setDivisionId(val)
+    const selected = divisions.find((d: any) => d.id === val)
+    setDivisionName(selected ? selected.name : "")
+
+    // Reset downstream
+    setDistrictId("")
+    setDistrictName("")
+    setUpazilaId("")
+    setUpazilaName("")
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleDistrictChange = (val: string) => {
+    setDistrictId(val)
+    const selected = districts.find((d: any) => d.id === val)
+    setDistrictName(selected ? selected.name : "")
+
+    // Reset downstream
+    setUpazilaId("")
+    setUpazilaName("")
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleUpazilaChange = (val: string) => {
+    setUpazilaId(val)
+    const selected = upazilas.find((u: any) => u.id === val)
+    setUpazilaName(selected ? selected.name : "")
+
+    // Reset downstream
+    setUnionId("")
+    setUnionName("")
+  }
+
+  const handleUnionChange = (val: string) => {
+    setUnionId(val)
+    const selected = unions.find((u: any) => u.id === val)
+    setUnionName(selected ? selected.name : "")
+  }
+
+  const { data: plansData } = useQuery(
+    trpc.subscriptionPlan.forSelection.queryOptions()
+  )
+
+  // Initialize fields from tenant data
   useEffect(() => {
     if (tenant) {
       setSlug(tenant.slug || "")
@@ -94,11 +155,18 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       setType(tenant.type || "UNION_PORISHOD")
       setDescription(tenant.description || "")
       setLogo(tenant.logo || "")
+      
+      setDivisionId(tenant.divisionId || "")
       setDivisionName(tenant.divisionName || "")
+      setDistrictId(tenant.districtId || "")
       setDistrictName(tenant.districtName || "")
+      setUpazilaId(tenant.upazilaId || "")
       setUpazilaName(tenant.upazilaName || "")
+      setUnionId(tenant.unionId || "")
       setUnionName(tenant.unionName || "")
+
       setPostalCode(tenant.postalCode || "")
+      setGeoCode(tenant.geoCode || "")
       setSecretaryName(tenant.secretaryName || "")
       setChairmanName(tenant.chairmanName || "")
       setPhone(tenant.phone || "")
@@ -108,6 +176,8 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       setFacebookUrl(tenant.facebookUrl || "")
       setPlanId(tenant.subscription?.planId || "")
       setIsActive(tenant.isActive ?? true)
+      setCustomDomain(tenant.customDomain || "")
+      setCustomDomainVerified(tenant.customDomainVerified ?? false)
       if (tenant.customCitizenLimit !== null && tenant.customCitizenLimit !== undefined) {
         setCustomCitizenLimit(tenant.customCitizenLimit)
       }
@@ -138,7 +208,11 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const isSubmitting = updateMutation.isPending
 
   const isStep1Valid = slug.trim().length > 0 && name.trim().length > 0
-  const isStep2Valid = divisionName.trim().length > 0 && districtName.trim().length > 0
+  const isStep2Valid =
+    divisionId.trim().length > 0 &&
+    districtId.trim().length > 0 &&
+    upazilaId.trim().length > 0 &&
+    unionId.trim().length > 0
   const isEmailValid = !email.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const isPhoneValid = !phone.trim() || /^[+\d\s-]{8,20}$/.test(phone.trim())
 
@@ -147,13 +221,15 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       toast.error("Please enter a valid URL slug and English Name.")
       return
     }
-    if (currentStep === 2 && !isStep2Valid) {
-      toast.error("Please enter Division and District name.")
-      return
-    }
-    if (currentStep === 3 && (!isEmailValid || !isPhoneValid)) {
-      toast.error("Please enter a valid email address and phone number.")
-      return
+    if (currentStep === 2) {
+      if (!isStep2Valid) {
+        toast.error("Please select a Division, District, Upazila, and Union.")
+        return
+      }
+      if (!isEmailValid || !isPhoneValid) {
+        toast.error("Please enter a valid email address and phone number.")
+        return
+      }
     }
     if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1)
@@ -177,8 +253,8 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   }
 
   const handleFinalSubmit = () => {
-    if (!isStep1Valid || !isStep2Valid || !isEmailValid || !isPhoneValid) {
-      toast.error("Please fix all form validation errors before saving.")
+    if (!isStep1Valid || !isStep2Valid) {
+      toast.error("Please complete required basic info and geography fields.")
       return
     }
 
@@ -190,11 +266,16 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       type: type || undefined,
       description: description || undefined,
       logo: logo || undefined,
+      divisionId: divisionId || undefined,
       divisionName: divisionName || undefined,
+      districtId: districtId || undefined,
       districtName: districtName || undefined,
+      upazilaId: upazilaId || undefined,
       upazilaName: upazilaName || undefined,
+      unionId: unionId || undefined,
       unionName: unionName || undefined,
       postalCode: postalCode || undefined,
+      geoCode: geoCode || undefined,
       secretaryName: secretaryName || undefined,
       chairmanName: chairmanName || undefined,
       phone: phone?.trim() || undefined,
@@ -204,13 +285,19 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       facebookUrl: facebookUrl || undefined,
       planId: planId || undefined,
       isActive,
+      customDomain: customDomain || undefined,
+      customDomainVerified,
+      customCitizenLimit: customCitizenLimit !== undefined ? Number(customCitizenLimit) : null,
+      customStaffLimit: customStaffLimit !== undefined ? Number(customStaffLimit) : null,
+      customCertificateLimit: customCertificateLimit !== undefined ? Number(customCertificateLimit) : null,
+      customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : null,
     })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (currentStep < 5) {
+    if (currentStep < 4) {
       handleNext()
     } else {
       handleFinalSubmit()
@@ -245,74 +332,62 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
             Edit Union Porishod
           </h2>
           <p className="max-w-2xl font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">
-            Update metadata, administrative contacts, SaaS subscription plan, and quota limits.
+            Update portal configurations, location settings, officials, and quotas.
           </p>
         </div>
       </div>
 
-      {/* 5-Step Desktop Step Indicator matched 1:1 with Create Tenant View */}
-      <div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-xs relative">
-        <div className="hidden sm:flex justify-between items-center relative">
-          <div className="absolute top-5 left-0 w-full h-0.5 bg-outline-variant/30 -z-0" />
-          <div
-            className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500 -z-0"
-            style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
-          />
-
-          {steps.map((step) => {
-            const isActiveStep = currentStep === step.id
-            const isCompletedStep = currentStep > step.id
+      {/* Steps Navigation Bar */}
+      <div className="bg-card border border-outline-variant/60 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          {steps.map((step, idx) => {
             const StepIcon = step.icon
+            const isCompleted = currentStep > step.id
+            const isActiveStep = currentStep === step.id
 
             return (
-              <div
-                key={step.id}
-                onClick={() => handleStepClick(step.id)}
-                className="flex-1 flex flex-col items-center cursor-pointer z-10 group"
-              >
-                <div
-                  className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 border-2 bg-white ${
-                    isActiveStep
-                      ? "bg-primary text-white border-primary shadow-md scale-110"
-                      : isCompletedStep
-                      ? "bg-emerald-500 text-white border-emerald-500"
-                      : "text-outline border-outline-variant hover:border-primary/40"
-                  }`}
+              <div key={step.id} className="flex items-center flex-1 last:flex-initial">
+                <button
+                  type="button"
+                  onClick={() => handleStepClick(step.id)}
+                  className="flex items-center gap-2.5 text-left group focus:outline-hidden cursor-pointer"
                 >
-                  {isCompletedStep ? <Check className="h-5 w-5" /> : <StepIcon className="h-5 w-5" />}
-                </div>
-                <div className="mt-2 text-center hidden md:block">
-                  <span className={`text-[9px] font-bold uppercase tracking-wider ${isActiveStep ? "text-primary" : "text-outline"}`}>
-                    Step {step.id}
-                  </span>
-                  <p className={`text-xs font-bold ${isActiveStep ? "text-on-surface" : "text-outline"}`}>
-                    {step.title}
-                  </p>
-                </div>
+                  <div
+                    className={`size-8 sm:size-10 rounded-xl flex items-center justify-center border text-xs sm:text-sm font-bold transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-primary border-primary text-white shadow-xs"
+                        : isActiveStep
+                        ? "bg-primary/10 border-primary text-primary"
+                        : "bg-surface-variant/40 border-outline-variant text-outline-variant hover:border-outline"
+                    }`}
+                  >
+                    {isCompleted ? <Check className="h-4 w-4 sm:h-5 sm:w-5" /> : step.id}
+                  </div>
+                  <div className="hidden md:block">
+                    <p className={`text-xs font-bold leading-none ${isActiveStep ? "text-primary" : "text-on-surface-variant"}`}>
+                      {step.title}
+                    </p>
+                    <p className="text-[10px] text-outline mt-0.5 max-w-[130px] line-clamp-1">{step.description}</p>
+                  </div>
+                </button>
+
+                {idx < steps.length - 1 && (
+                  <div
+                    className={`h-0.5 flex-1 mx-3 sm:mx-4 rounded-full transition-all duration-500 ${
+                      isCompleted ? "bg-primary" : "bg-outline-variant/30"
+                    }`}
+                  />
+                )}
               </div>
             )
           })}
         </div>
-
-        {/* Mobile Progress Bar */}
-        <div className="sm:hidden space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-on-surface">
-            <span>Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.title}</span>
-            <span className="text-primary">{Math.round((currentStep / steps.length) * 100)}%</span>
-          </div>
-          <div className="w-full bg-outline-variant/30 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-primary h-full rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / steps.length) * 100}%` }}
-            />
-          </div>
-        </div>
       </div>
 
-      {/* Form Card — Matched 1:1 with Create Tenant View */}
-      <Card className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white p-5 sm:p-6 shadow-xl text-left gap-4">
-        <CardHeader className="p-0 pb-4 border-b border-outline-variant/30 flex flex-row items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+      {/* Main Step Panel View */}
+      <Card className="bg-card border border-outline-variant/60 shadow-md p-5 sm:p-6 md:p-8 rounded-3xl overflow-visible">
+        <CardHeader className="p-0 pb-5 border-b border-outline-variant/40 flex flex-row items-center gap-4">
+          <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
             {(() => {
               const StepIcon = steps[currentStep - 1]?.icon as any
               return <StepIcon className="h-5 w-5" />
@@ -320,11 +395,7 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
           </div>
           <div>
             <CardTitle className="font-headline-md text-lg font-bold tracking-tight text-on-surface normal-case">
-              {currentStep === 1 && "Step 1: Portal & Basic Details"}
-              {currentStep === 2 && "Step 2: Geographical Boundaries"}
-              {currentStep === 3 && "Step 3: Administration & Contact"}
-              {currentStep === 4 && "Step 4: SaaS Subscription Plan"}
-              {currentStep === 5 && "Step 5: Resource Quota Limits"}
+              Step {currentStep}: {steps[currentStep - 1]?.title}
             </CardTitle>
             <p className="text-xs text-outline mt-0.5">
               {steps[currentStep - 1]?.description}
@@ -340,42 +411,78 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Portal Slug *
+                      Portal Slug (URL Subdomain) *
                     </Label>
-                    <Input
-                      value={slug}
-                      onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                      placeholder="savar-up"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                    <span className="text-[10px] text-outline font-mono">
-                      Subdomain: https://{slug || "slug"}.uphub.gov.bd
-                    </span>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Input
+                        value={slug}
+                        onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                        placeholder="savar-up"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                    {slug && (
+                      <p className="text-[11px] text-primary font-mono flex items-center gap-1">
+                        <Globe className="h-3 w-3" /> https://{slug}.uphub.gov.bd
+                      </p>
+                    )}
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       English Name *
                     </Label>
-                    <Input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Savar Union Porishod"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Savar Union Porishod"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Custom Domain
+                    </Label>
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Input
+                        value={customDomain}
+                        onChange={(e) => setCustomDomain(e.target.value)}
+                        placeholder="e.g. savarup.gov.bd"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="checkbox"
+                        id="customDomainVerified"
+                        checked={customDomainVerified}
+                        onChange={(e) => setCustomDomainVerified(e.target.checked)}
+                        disabled={isSubmitting}
+                        className="rounded border-outline-variant text-primary focus:ring-primary/20 cursor-pointer"
+                      />
+                      <Label htmlFor="customDomainVerified" className="text-[11px] text-on-surface-variant cursor-pointer font-body-md">
+                        Custom Domain Verified
+                      </Label>
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Bangla Title (বাংলা নাম)
+                    বাংলা নাম (Official Bangla Title)
                   </Label>
                   <Input
                     value={nameBn}
                     onChange={(e) => setNameBn(e.target.value)}
                     placeholder="সাভার ইউনিয়ন পরিষদ"
-                    disabled={isSubmitting}
                     className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                   />
                 </div>
@@ -387,16 +494,15 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Brief description of this Union Porishod portal..."
+                    placeholder="Municipal government portal for Savar UP..."
                     rows={3}
-                    disabled={isSubmitting}
                     className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden min-h-[80px]"
                   />
                 </div>
               </div>
             )}
 
-            {/* Step 2: Geography */}
+            {/* Step 2: Location & Contact */}
             {currentStep === 2 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -404,122 +510,183 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       Division (বিভাগ) *
                     </Label>
-                    <Input
-                      value={divisionName}
-                      onChange={(e) => setDivisionName(e.target.value)}
-                      placeholder="Dhaka"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
+                    <Select value={divisionId} onValueChange={handleDivisionChange}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                        <SelectValue placeholder="Select Division" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {divisions.map((d: any) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       District (জেলা) *
                     </Label>
-                    <Input
-                      value={districtName}
-                      onChange={(e) => setDistrictName(e.target.value)}
-                      placeholder="Dhaka"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
+                    <Select
+                      value={districtId}
+                      onValueChange={handleDistrictChange}
+                      disabled={!divisionId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={divisionId ? "Select District" : "Select Division first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {districts.map((d: any) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Upazila (উপজেলা)
+                      Upazila (উপজেলা) *
+                    </Label>
+                    <Select
+                      value={upazilaId}
+                      onValueChange={handleUpazilaChange}
+                      disabled={!districtId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={districtId ? "Select Upazila" : "Select District first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {upazilas.map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Union (ইউনিয়ন) *
+                    </Label>
+                    <Select
+                      value={unionId}
+                      onValueChange={handleUnionChange}
+                      disabled={!upazilaId}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                        <SelectValue placeholder={upazilaId ? "Select Union" : "Select Upazila first"} />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {unions.map((u: any) => (
+                          <SelectItem key={u.id} value={u.id}>
+                            {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Postal Code
                     </Label>
                     <Input
-                      value={upazilaName}
-                      onChange={(e) => setUpazilaName(e.target.value)}
-                      placeholder="Savar"
-                      disabled={isSubmitting}
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      placeholder="e.g. 1340"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Union Name (ইউনিয়ন)
+                      Geo Code
                     </Label>
                     <Input
-                      value={unionName}
-                      onChange={(e) => setUnionName(e.target.value)}
-                      placeholder="Savar Sadar"
-                      disabled={isSubmitting}
+                      value={geoCode}
+                      onChange={(e) => setGeoCode(e.target.value)}
+                      placeholder="e.g. 3086"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
                 </div>
+
+                <hr className="border-outline-variant/40" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Office Telephone / Mobile
+                    </Label>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="e.g. +8801700000000"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Office Email Address
+                    </Label>
+                    <Input
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. info@savarup.gov.bd"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Facebook Page Link
+                  </Label>
+                  <Input
+                    value={facebookUrl}
+                    onChange={(e) => setFacebookUrl(e.target.value)}
+                    placeholder="https://facebook.com/savarup"
+                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                  />
+                </div>
               </div>
             )}
 
-            {/* Step 3: Contact */}
+            {/* Step 3: UP Officials */}
             {currentStep === 3 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      UP Secretary Name
+                      UP Secretary Name (সচিবের নাম)
                     </Label>
                     <Input
                       value={secretaryName}
                       onChange={(e) => setSecretaryName(e.target.value)}
-                      placeholder="Md. Rahim Uddin"
-                      disabled={isSubmitting}
+                      placeholder="সচিবের নাম"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      UP Chairman Name
+                      UP Chairman Name (চেয়ারম্যানের নাম)
                     </Label>
                     <Input
                       value={chairmanName}
                       onChange={(e) => setChairmanName(e.target.value)}
-                      placeholder="Chairman Name"
-                      disabled={isSubmitting}
+                      placeholder="চেয়ারম্যানের নাম"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Phone
-                    </Label>
-                    <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+880 1700-000000"
-                      disabled={isSubmitting}
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isPhoneValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
-                    />
-                    {!isPhoneValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid phone number (e.g. +880 1700-000000)</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Email
-                    </Label>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="info@savar.uphub.gov.bd"
-                      disabled={isSubmitting}
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isEmailValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
-                    />
-                    {!isEmailValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@savar.uphub.gov.bd)</p>
-                    )}
                   </div>
                 </div>
 
@@ -531,11 +698,11 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                     <Input
                       value={secretarySignature}
                       onChange={(e) => setSecretarySignature(e.target.value)}
-                      placeholder="https://example.com/signatures/sec.png"
-                      disabled={isSubmitting}
+                      placeholder="https://imgur.com/signature-sec.png"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
                       Chairman Signature Image URL
@@ -543,208 +710,162 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                     <Input
                       value={chairmanSignature}
                       onChange={(e) => setChairmanSignature(e.target.value)}
-                      placeholder="https://example.com/signatures/chair.png"
-                      disabled={isSubmitting}
+                      placeholder="https://imgur.com/signature-chair.png"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Official Facebook Page URL
-                  </Label>
-                  <Input
-                    value={facebookUrl}
-                    onChange={(e) => setFacebookUrl(e.target.value)}
-                    placeholder="https://facebook.com/your-union-porishod"
-                    disabled={isSubmitting}
-                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                  />
-                </div>
               </div>
             )}
 
-            {/* Step 4: Subscription */}
+            {/* Step 4: Subscription & Limits */}
             {currentStep === 4 && (
               <div className="space-y-4 animate-in fade-in duration-200">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Select Subscription Plan *
-                </Label>
-                <div className="space-y-3">
-                  {plans.map((p: any) => {
-                    const isSelected = planId === p.id
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlanId(p.id)}
-                        className={`w-full p-4 rounded-xl border border-outline-variant text-left transition-all duration-200 relative group flex items-start gap-4 cursor-pointer ${
-                          isSelected
-                            ? "bg-primary/10 border-primary shadow-xs"
-                            : "bg-white hover:border-primary/40 hover:bg-surface-container-low"
-                        }`}
-                      >
-                        <div
-                          className={`size-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 ${
-                            isSelected ? "border-primary bg-primary text-white" : "border-outline"
-                          }`}
-                        >
-                          {isSelected && <CheckCircle2 className="h-3.5 w-3.5" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-headline-md text-sm font-bold text-on-surface">
-                              {p.displayName}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              {p.isPopular && (
-                                <span className="bg-primary/10 text-primary text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-primary/20">
-                                  POPULAR
-                                </span>
-                              )}
-                              {p.yearlyPriceBDT === 0 ? (
-                                <span className="text-sm font-extrabold text-primary">Free</span>
-                              ) : (
-                                <div>
-                                  <span className="text-sm font-extrabold text-on-surface">
-                                    ৳{p.yearlyPriceBDT?.toLocaleString()}
-                                  </span>
-                                  <span className="text-[10px] text-outline font-medium">/year</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          {p.description && (
-                            <p className="text-xs text-on-surface-variant mt-0.5 font-medium">{p.description}</p>
-                          )}
-                        </div>
-                      </button>
-                    )
-                  })}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Subscription SaaS Plan
+                    </Label>
+                    <Select value={planId} onValueChange={setPlanId}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                        <SelectValue placeholder="Select Plan Tier" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        {plans.map((p: any) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name} ({p.monthlyPriceBDT} BDT/mo)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Portal Lifecycle State
+                    </Label>
+                    <Select value={isActive ? "active" : "disabled"} onValueChange={(val) => setIsActive(val === "active")}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant">
+                        <SelectItem value="active">Active & Provisioned</SelectItem>
+                        <SelectItem value="disabled">Suspended / Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <h4 className="font-headline-sm text-sm font-bold text-on-surface-variant border-b border-outline-variant/30 pb-2 mb-4">
+                    Custom Quota Resource Limits (Subscription Plan Overrides)
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Citizen Limit (নাগরিক নিবন্ধনের সীমা)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customCitizenLimit ?? ""}
+                        onChange={(e) => setCustomCitizenLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="e.g. 10000"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Staff Accounts Limit (ইউজার সীমা)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customStaffLimit ?? ""}
+                        onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="e.g. 50"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Certificate Limit (সনদ সংখ্যা সীমা)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customCertificateLimit ?? ""}
+                        onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="e.g. 2000"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                        Max Storage (MB)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={customStorageLimit ?? ""}
+                        onChange={(e) => setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        placeholder="e.g. 2048"
+                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Step 5: Limits */}
-            {currentStep === 5 && (
-              <div className="space-y-4 animate-in fade-in duration-200">
-                <p className="text-xs text-on-surface-variant font-medium">
-                  Optionally override default plan quotas specifically for this Union Porishod. Leave empty to use plan defaults.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Citizen Limit
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customCitizenLimit ?? ""}
-                      onChange={(e) => setCustomCitizenLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default citizen quota"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Staff Limit
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customStaffLimit ?? ""}
-                      onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default staff quota"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Certificate Limit
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customCertificateLimit ?? ""}
-                      onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default certificate quota"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Storage Limit (MB)
-                    </Label>
-                    <Input
-                      type="number"
-                      value={customStorageLimit ?? ""}
-                      onChange={(e) => setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)}
-                      placeholder="Default storage MB"
-                      disabled={isSubmitting}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 rounded-lg border border-outline-variant p-4 bg-surface-container-low">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    checked={isActive}
-                    disabled={isSubmitting}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                    className="size-4 rounded text-primary cursor-pointer"
-                  />
-                  <label htmlFor="isActive" className="text-xs font-bold text-on-surface cursor-pointer">
-                    Enable Union Porishod Portal Access
-                  </label>
-                </div>
-              </div>
-            )}
-
-            {/* Actions Footer — Matched 1:1 with Create Tenant View */}
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4 border-t border-outline-variant/30">
+            {/* Form Step Actions (Back / Next / Save) */}
+            <div className="flex items-center justify-between pt-5 border-t border-outline-variant/40 mt-6">
               <Button
                 type="button"
                 variant="outline"
-                disabled={isSubmitting}
                 onClick={handlePrevious}
-                className="w-full sm:w-auto rounded-lg border border-outline-variant px-5 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container-high cursor-pointer h-10 normal-case tracking-normal"
+                disabled={isSubmitting}
+                className="rounded-xl border-outline text-on-surface hover:bg-surface-variant/40 font-semibold px-5 py-2 cursor-pointer transition-all text-xs sm:text-sm h-10"
               >
-                <ArrowLeft className="h-4 w-4 mr-1.5" />
-                {currentStep === 1 ? "Cancel" : "Previous Step"}
+                {currentStep === 1 ? (
+                  "Cancel"
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <ArrowLeft className="h-4 w-4" />
+                    <span>Previous</span>
+                  </div>
+                )}
               </Button>
 
-              {currentStep < 5 ? (
+              {currentStep < steps.length ? (
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 normal-case tracking-normal shadow-sm"
+                  className="bg-primary text-white hover:bg-primary/90 font-bold rounded-xl px-6 py-2 cursor-pointer shadow-md shadow-primary/10 transition-all text-xs sm:text-sm h-10"
                 >
-                  <span>Next Step</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5">
+                    <span>Next Step</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
                 </Button>
               ) : (
                 <Button
-                  type="button"
-                  onClick={handleFinalSubmit}
-                  disabled={isSubmitting || !isStep1Valid || !isStep2Valid || !isEmailValid || !isPhoneValid}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 normal-case tracking-normal shadow-sm disabled:opacity-50"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-primary text-white hover:bg-primary/90 font-bold rounded-xl px-7 py-2 cursor-pointer shadow-md shadow-primary/10 transition-all text-xs sm:text-sm h-10"
                 >
                   {isSubmitting ? (
-                    <>
+                    <div className="flex items-center gap-1.5">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Saving Changes...</span>
-                    </>
+                    </div>
                   ) : (
-                    <>
+                    <div className="flex items-center gap-1.5">
                       <Save className="h-4 w-4" />
-                      <span>Save Union Porishod</span>
-                    </>
+                      <span>Save Changes</span>
+                    </div>
                   )}
                 </Button>
               )}

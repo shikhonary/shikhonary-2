@@ -56,7 +56,7 @@ export function CitizenApplicationFilter({
     setSearchParams({
       search: "",
       wardId: "all",
-      status: "PENDING",
+      status: "all",
       sort: "newest",
     })
   }

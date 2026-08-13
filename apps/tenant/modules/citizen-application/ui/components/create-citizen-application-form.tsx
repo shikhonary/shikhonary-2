@@ -21,6 +21,7 @@ import {
   UserCheck,
   LucideIcon,
   Users,
+  Loader2,
 } from "lucide-react"
 
 // Import modular steps
@@ -29,9 +30,6 @@ import { ContactIdentityStep } from "./steps/contact-identity-step"
 import { PresentAddressStep } from "./steps/present-address-step"
 import { PermanentAddressStep } from "./steps/permanent-address-step"
 import { ReviewStep } from "./steps/review-step"
-import { SubmissionProgress } from "./steps/submission-progress"
-
-type SubmissionStatus = "idle" | "pending" | "success" | "error"
 
 const steps = [
   { id: 1, title: "ব্যক্তিগত তথ্য", icon: User, description: "নাম, পিতা-মাতার নাম ও ব্যক্তিগত বিবরণ" },
@@ -46,9 +44,6 @@ export function CreateCitizenApplicationForm() {
   const queryClient = useQueryClient()
 
   const [currentStep, setCurrentStep] = useState(1)
-  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>("idle")
-  const [activeSubStep, setActiveSubStep] = useState(1)
-  const [submissionError, setSubmissionError] = useState<string | undefined>()
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [showEnglishFields, setShowEnglishFields] = useState(false)
@@ -93,7 +88,6 @@ export function CreateCitizenApplicationForm() {
   const [presUnionNameBn, setPresUnionNameBn] = useState("")
   const [presPostId, setPresPostId] = useState("")
   const [presPostOfficeBn, setPresPostOfficeBn] = useState("")
-  const [presPostCode, setPresPostCode] = useState("")
 
   // ── Step 4: Permanent Address ──────────────────────────────
   const [sameAsPresent, setSameAsPresent] = useState(false)
@@ -113,7 +107,6 @@ export function CreateCitizenApplicationForm() {
   const [permUnionNameBn, setPermUnionNameBn] = useState("")
   const [permPostId, setPermPostId] = useState("")
   const [permPostOfficeBn, setPermPostOfficeBn] = useState("")
-  const [permPostCode, setPermPostCode] = useState("")
 
   // Fetch Wards for selects
   const { data: wardsData } = useQuery(
@@ -184,7 +177,6 @@ export function CreateCitizenApplicationForm() {
     setPresUnionNameBn("")
     setPresPostId("")
     setPresPostOfficeBn("")
-    setPresPostCode("")
   }
 
   const handlePresDistrictChange = (val: string) => {
@@ -199,7 +191,6 @@ export function CreateCitizenApplicationForm() {
     setPresUnionNameBn("")
     setPresPostId("")
     setPresPostOfficeBn("")
-    setPresPostCode("")
   }
 
   const handlePresUpazilaChange = (val: string) => {
@@ -212,7 +203,6 @@ export function CreateCitizenApplicationForm() {
     setPresUnionNameBn("")
     setPresPostId("")
     setPresPostOfficeBn("")
-    setPresPostCode("")
   }
 
   const handlePresUnionChange = (val: string) => {
@@ -252,7 +242,6 @@ export function CreateCitizenApplicationForm() {
     setPermUnionNameBn("")
     setPermPostId("")
     setPermPostOfficeBn("")
-    setPermPostCode("")
   }
 
   const handlePermDistrictChange = (val: string) => {
@@ -267,7 +256,6 @@ export function CreateCitizenApplicationForm() {
     setPermUnionNameBn("")
     setPermPostId("")
     setPermPostOfficeBn("")
-    setPermPostCode("")
   }
 
   const handlePermUpazilaChange = (val: string) => {
@@ -280,7 +268,6 @@ export function CreateCitizenApplicationForm() {
     setPermUnionNameBn("")
     setPermPostId("")
     setPermPostOfficeBn("")
-    setPermPostCode("")
   }
 
   const handlePermUnionChange = (val: string) => {
@@ -315,7 +302,6 @@ export function CreateCitizenApplicationForm() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     const nidRegex = /^\d{10}$|^\d{13}$|^\d{17}$/
     const birthRegRegex = /^\d{17}$/
-    const postCodeRegex = /^\d{4}$/
 
     if (stepNum === 1) {
       // Required Checks
@@ -402,12 +388,6 @@ export function CreateCitizenApplicationForm() {
       } else if (!banglaRegex.test(presPostOfficeBn.trim())) {
         newErrors.presPostOfficeBn = "দয়া করে শুধুমাত্র বাংলা অক্ষর ব্যবহার করুন"
       }
-
-      if (!presPostCode.trim()) {
-        newErrors.presPostCode = "ডাক কোড আবশ্যক"
-      } else if (!postCodeRegex.test(presPostCode.trim())) {
-        newErrors.presPostCode = "ডাক কোড ৪ ডিজিটের হতে হবে"
-      }
     }
 
     if (stepNum === 4 && !sameAsPresent) {
@@ -435,12 +415,6 @@ export function CreateCitizenApplicationForm() {
         newErrors.permPostOfficeBn = "ডাকঘর আবশ্যক"
       } else if (!banglaRegex.test(permPostOfficeBn.trim())) {
         newErrors.permPostOfficeBn = "দয়া করে শুধুমাত্র বাংলা অক্ষর ব্যবহার করুন"
-      }
-
-      if (!permPostCode.trim()) {
-        newErrors.permPostCode = "ডাক কোড আবশ্যক"
-      } else if (!postCodeRegex.test(permPostCode.trim())) {
-        newErrors.permPostCode = "ডাক কোড ৪ ডিজিটের হতে হবে"
       }
     }
 
@@ -479,14 +453,6 @@ export function CreateCitizenApplicationForm() {
   }
 
   const handleFinalSubmit = () => {
-    setSubmissionStatus("pending")
-    setActiveSubStep(1)
-    setSubmissionError(undefined)
-
-    // Run simple animations for visual feedback
-    setTimeout(() => setActiveSubStep(2), 1000)
-    setTimeout(() => setActiveSubStep(3), 3500)
-
     const payload: any = {
       nid: nid.trim() || undefined,
       birthRegNo: birthRegNo.trim() || undefined,
@@ -525,7 +491,6 @@ export function CreateCitizenApplicationForm() {
         unionNameBn: presUnionNameBn,
         postId: presPostId.trim(),
         postOfficeBn: presPostOfficeBn.trim(),
-        postCode: presPostCode.trim(),
       },
     }
 
@@ -547,20 +512,19 @@ export function CreateCitizenApplicationForm() {
         unionNameBn: permUnionNameBn,
         postId: permPostId.trim(),
         postOfficeBn: permPostOfficeBn.trim(),
-        postCode: permPostCode.trim(),
       }
     }
 
     createMutation.mutate(payload, {
       onSuccess: () => {
-        setSubmissionStatus("success")
-        setActiveSubStep(4)
         queryClient.invalidateQueries(trpc.citizenApplication.pathFilter())
         toast.success("নাগরিক আবেদনপত্রটি সফলভাবে দাখিল হয়েছে!")
+        router.push("/citizen-applications")
       },
       onError: (err: any) => {
-        setSubmissionStatus("error")
-        setSubmissionError(err?.message || "আবেদনটি জমা দেওয়ার সময় ত্রুটি ঘটেছে।")
+        toast.error(err?.message || "আবেদনটি জমা দেওয়ার সময় ত্রুটি ঘটেছে।", {
+          position: "top-center"
+        })
       },
     })
   }
@@ -572,20 +536,6 @@ export function CreateCitizenApplicationForm() {
     } else {
       handleFinalSubmit()
     }
-  }
-
-  // Render Provisioning / Submission screen
-  if (submissionStatus !== "idle") {
-    return (
-      <SubmissionProgress
-        submissionStatus={submissionStatus}
-        activeSubStep={activeSubStep}
-        submissionError={submissionError}
-        nameBn={nameBn}
-        onRetry={() => setSubmissionStatus("idle")}
-        onBack={() => router.push("/citizen-applications")}
-      />
-    )
   }
 
   return (
@@ -752,37 +702,21 @@ export function CreateCitizenApplicationForm() {
             {/* Step 3: Present Address */}
             {currentStep === 3 && (
               <PresentAddressStep
-                presDivisionId={presDivisionId}
-                presDistrictId={presDistrictId}
-                presUpazilaId={presUpazilaId}
-                presUnionId={presUnionId}
                 presWardId={presWardId}
                 presVillageBn={presVillageBn}
                 presVillageEn={presVillageEn}
                 presHoldingNo={presHoldingNo}
                 presRoadBn={presRoadBn}
                 presRoadEn={presRoadEn}
-                presPostId={presPostId}
                 presPostOfficeBn={presPostOfficeBn}
-                presPostCode={presPostCode}
                 setPresPostOfficeBn={setPresPostOfficeBn}
                 setPresPostId={setPresPostId}
-                setPresPostCode={setPresPostCode}
                 setPresVillageBn={setPresVillageBn}
                 setPresVillageEn={setPresVillageEn}
                 setPresHoldingNo={setPresHoldingNo}
                 setPresRoadBn={setPresRoadBn}
                 setPresRoadEn={setPresRoadEn}
                 setPresWardId={setPresWardId}
-                handlePresDivisionChange={handlePresDivisionChange}
-                handlePresDistrictChange={handlePresDistrictChange}
-                handlePresUpazilaChange={handlePresUpazilaChange}
-                handlePresUnionChange={handlePresUnionChange}
-                presDivisions={presDivisions}
-                presDistricts={presDistricts}
-                presUpazilas={presUpazilas}
-                presUnions={presUnions}
-                presPosts={presPosts}
                 wards={wards}
                 showEnglishFields={showEnglishFields}
                 errors={errors}
@@ -795,37 +729,21 @@ export function CreateCitizenApplicationForm() {
               <PermanentAddressStep
                 sameAsPresent={sameAsPresent}
                 setSameAsPresent={setSameAsPresent}
-                permDivisionId={permDivisionId}
-                permDistrictId={permDistrictId}
-                permUpazilaId={permUpazilaId}
-                permUnionId={permUnionId}
                 permWardId={permWardId}
                 permVillageBn={permVillageBn}
                 permVillageEn={permVillageEn}
                 permHoldingNo={permHoldingNo}
                 permRoadBn={permRoadBn}
                 permRoadEn={permRoadEn}
-                permPostId={permPostId}
                 permPostOfficeBn={permPostOfficeBn}
-                permPostCode={permPostCode}
                 setPermPostOfficeBn={setPermPostOfficeBn}
                 setPermPostId={setPermPostId}
-                setPermPostCode={setPermPostCode}
                 setPermVillageBn={setPermVillageBn}
                 setPermVillageEn={setPermVillageEn}
                 setPermHoldingNo={setPermHoldingNo}
                 setPermRoadBn={setPermRoadBn}
                 setPermRoadEn={setPermRoadEn}
                 setPermWardId={setPermWardId}
-                handlePermDivisionChange={handlePermDivisionChange}
-                handlePermDistrictChange={handlePermDistrictChange}
-                handlePermUpazilaChange={handlePermUpazilaChange}
-                handlePermUnionChange={handlePermUnionChange}
-                permDivisions={permDivisions}
-                permDistricts={permDistricts}
-                permUpazilas={permUpazilas}
-                permUnions={permUnions}
-                permPosts={permPosts}
                 wards={wards}
                 showEnglishFields={showEnglishFields}
                 errors={errors}
@@ -859,9 +777,9 @@ export function CreateCitizenApplicationForm() {
                 presVillageBn={presVillageBn}
                 presVillageEn={presVillageEn}
                 presHoldingNo={presHoldingNo}
+                presRoadBn={presRoadBn}
                 presRoadEn={presRoadEn}
                 presPostOfficeBn={presPostOfficeBn}
-                presPostCode={presPostCode}
                 sameAsPresent={sameAsPresent}
                 permDivisionNameBn={permDivisionNameBn}
                 permDistrictNameBn={permDistrictNameBn}
@@ -871,9 +789,9 @@ export function CreateCitizenApplicationForm() {
                 permVillageBn={permVillageBn}
                 permVillageEn={permVillageEn}
                 permHoldingNo={permHoldingNo}
+                permRoadBn={permRoadBn}
                 permRoadEn={permRoadEn}
                 permPostOfficeBn={permPostOfficeBn}
-                permPostCode={permPostCode}
                 wards={wards}
                 showEnglishFields={showEnglishFields}
               />
@@ -885,7 +803,8 @@ export function CreateCitizenApplicationForm() {
                 type="button"
                 variant="outline"
                 onClick={handlePrevious}
-                className="rounded-xl border px-5 py-2 text-xs sm:text-sm font-semibold hover:bg-muted cursor-pointer h-10 transition-all"
+                disabled={createMutation.isPending}
+                className="rounded-xl border px-5 py-2 text-xs sm:text-sm font-semibold hover:bg-muted cursor-pointer h-10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 পূর্ববর্তী
@@ -893,13 +812,21 @@ export function CreateCitizenApplicationForm() {
 
               <Button
                 type="submit"
-                className="rounded-xl bg-primary px-6 py-2 text-xs sm:text-sm font-bold text-primary-foreground hover:bg-primary/90 cursor-pointer h-10 shadow-md shadow-primary/10 transition-all active:scale-95"
+                disabled={createMutation.isPending}
+                className="rounded-xl bg-primary px-6 py-2 text-xs sm:text-sm font-bold text-primary-foreground hover:bg-primary/90 cursor-pointer h-10 shadow-md shadow-primary/10 transition-all active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 {currentStep === 5 ? (
-                  <>
-                    <Check className="mr-2 h-4 w-4" />
-                    দাখিল করুন
-                  </>
+                  createMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      দাখিল হচ্ছে...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      দাখিল করুন
+                    </>
+                  )
                 ) : (
                   <>
                     পরবর্তী ধাপ

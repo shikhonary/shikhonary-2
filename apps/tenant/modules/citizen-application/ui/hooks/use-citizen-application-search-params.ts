@@ -3,7 +3,7 @@ import { useQueryStates, parseAsString } from "nuqs"
 export const citizenApplicationSearchParamsParsers = {
   search: parseAsString.withDefault(""),
   wardId: parseAsString.withDefault("all"),
-  status: parseAsString.withDefault("PENDING"),
+  status: parseAsString.withDefault("all"),
   sort: parseAsString.withDefault("newest"),
 }
 

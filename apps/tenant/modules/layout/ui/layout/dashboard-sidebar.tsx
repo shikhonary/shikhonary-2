@@ -86,6 +86,7 @@ const navSections: NavSection[] = [
       { title: "ড্যাশবোর্ড", url: "/", icon: LayoutDashboard },
       { title: "অর্থবছর", url: "/fiscal-years", icon: CalendarDays },
       { title: "ওয়ার্ড", url: "/wards", icon: MapPin },
+      { title: "কাউন্টার", url: "/counters", icon: Hash },
     ],
   },
   {
@@ -99,6 +100,7 @@ const navSections: NavSection[] = [
   {
     label: "নাগরিক সেবা",
     items: [
+      { title: "নাগরিক তালিকা", url: "/citizens", icon: Users },
       { title: "নাগরিক আবেদন", url: "/citizen-applications", icon: ClipboardList },
     ],
   },

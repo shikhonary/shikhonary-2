@@ -8,11 +8,11 @@ datasource db {
 }
 
 model User {
-  id                  String         @id @default(cuid())
-  email               String?        @unique
-  name                String?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   emailVerified       Boolean        @default(false)
   image               String?
@@ -91,35 +91,36 @@ model Role {
 }
 
 model Tenant {
-  id                   String  @id @default(cuid())
-  name                 String
-  nameBn               String?
-  slug                 String  @unique
-  description          String?
-  logo                 String?
-  type                 String  @default("UNION_PORISHOD")
-  email                String?
-  phone                String?
+  id          String  @id @default(cuid())
+  name        String
+  nameBn      String?
+  slug        String  @unique
+  description String?
+  logo        String?
+  type        String  @default("UNION_PORISHOD")
+  email       String?
+  phone       String?
+  geoCode     String?
 
   // ── Bangladesh Geographical Hierarchy ────────────────────
-  divisionId           String?
-  division             Division?   @relation(fields: [divisionId], references: [id], onDelete: SetNull)
-  districtId           String?
-  district             District?   @relation(fields: [districtId], references: [id], onDelete: SetNull)
-  upazilaId            String?
-  upazila              Upazila?    @relation(fields: [upazilaId], references: [id], onDelete: SetNull)
-  unionId              String?
-  union                Union?      @relation(fields: [unionId], references: [id], onDelete: SetNull)
-  postalCode           String?
+  divisionId String?
+  division   Division? @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  districtId String?
+  district   District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
+  upazilaId  String?
+  upazila    Upazila?  @relation(fields: [upazilaId], references: [id], onDelete: SetNull)
+  unionId    String?
+  union      Union?    @relation(fields: [unionId], references: [id], onDelete: SetNull)
+  postalCode String?
 
   // ── UP Officials ─────────────────────────────────────────
-  secretaryName        String?
-  secretarySignature   String?
-  chairmanName         String?
-  chairmanSignature    String?
+  secretaryName      String?
+  secretarySignature String?
+  chairmanName       String?
+  chairmanSignature  String?
 
   // ── Social & Branding ────────────────────────────────────
-  facebookUrl          String?
+  facebookUrl String?
 
   // ── Domain & Branding ────────────────────────────────────
   subdomain            String? @unique
@@ -127,33 +128,33 @@ model Tenant {
   customDomainVerified Boolean @default(false)
 
   // ── Database Provisioning ────────────────────────────────
-  databaseName         String? @unique
-  connectionString     String?
-  databaseStatus       String  @default("PENDING")
+  databaseName     String? @unique
+  connectionString String?
+  databaseStatus   String  @default("PENDING")
 
   // ── Usage Counters ───────────────────────────────────────
-  citizenCount         Int @default(0)
-  staffCount           Int @default(0)
-  certificateCount     Int @default(0)
-  storageUsedMB        Int @default(0)
+  citizenCount     Int @default(0)
+  staffCount       Int @default(0)
+  certificateCount Int @default(0)
+  storageUsedMB    Int @default(0)
 
   // ── Status & Lifecycle ───────────────────────────────────
-  isActive             Boolean   @default(true)
-  isSuspended          Boolean   @default(false)
-  suspendReason        String?
-  metadata             Json      @default("{}")
+  isActive      Boolean @default(true)
+  isSuspended   Boolean @default(false)
+  suspendReason String?
+  metadata      Json    @default("{}")
 
   // ── Fiscal Year Pointer ──────────────────────────────────
-  currentFiscalYearId  String?
-  currentFiscalYear    FiscalYear? @relation("CurrentFiscalYear", fields: [currentFiscalYearId], references: [id], onDelete: SetNull)
+  currentFiscalYearId String?
+  currentFiscalYear   FiscalYear? @relation("CurrentFiscalYear", fields: [currentFiscalYearId], references: [id], onDelete: SetNull)
 
   // ── Owner ────────────────────────────────────────────────
-  createdById          String?
-  owner                User?       @relation("TenantOwner", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+  owner       User?   @relation("TenantOwner", fields: [createdById], references: [id], onDelete: SetNull)
 
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  deletedAt            DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   // ── Custom Overrides ─────────────────────────────────────
   customCitizenLimit     Int?
@@ -162,10 +163,10 @@ model Tenant {
   customStorageLimit     Int?
 
   // ── Relations ────────────────────────────────────────────
-  subscription         Subscription?
-  members              TenantMember[]
-  invitations          TenantInvitation[]
-  fiscalYears          FiscalYear[]
+  subscription Subscription?
+  members      TenantMember[]
+  invitations  TenantInvitation[]
+  fiscalYears  FiscalYear[]
 
   @@index([slug])
   @@index([isActive])
@@ -319,12 +320,12 @@ model SubscriptionHistory {
 }
 
 model Invoice {
-  id            String    @id @default(cuid())
+  id            String @id @default(cuid())
   tenantId      String
-  invoiceNumber String    @unique
+  invoiceNumber String @unique
   amount        Int
-  currency      String    @default("BDT")
-  status        String    @default("PENDING")
+  currency      String @default("BDT")
+  status        String @default("PENDING")
 
   periodStart DateTime
   periodEnd   DateTime
@@ -352,13 +353,13 @@ model Invoice {
 
 model FiscalYear {
   id        String   @id @default(cuid())
-  year      String   // e.g. "2026"
+  year      String // e.g. "2026"
   startDate DateTime
   endDate   DateTime
   isCurrent Boolean  @default(false)
 
-  tenantId  String?
-  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   currentForTenants Tenant[] @relation("CurrentFiscalYear")
 
@@ -382,12 +383,12 @@ model Division {
 }
 
 model District {
-  id         String     @id
-  name       String     @unique
+  id         String    @id
+  name       String    @unique
   nameBn     String
   url        String?
   divisionId String
-  division   Division   @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  division   Division  @relation(fields: [divisionId], references: [id], onDelete: Cascade)
   upazilas   Upazila[]
   tenants    Tenant[]
 
@@ -434,4 +435,3 @@ model Post {
   @@index([upazilaId])
   @@map("post")
 }
-

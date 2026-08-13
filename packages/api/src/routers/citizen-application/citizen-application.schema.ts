@@ -28,7 +28,6 @@ export const createAddressSchema = z.object({
   postId: z.string().min(1, "Post office ID is required"),
   postOfficeBn: z.string().min(1, "Post office name in Bangla is required"),
   postOfficeEn: z.string().optional(),
-  postCode: z.string().min(1, "Postcode is required"),
 })
 
 export const createCitizenApplicationSchema = z.object({

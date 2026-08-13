@@ -1,6 +1,7 @@
 "use client"
 
 import { User, Phone, MapPin, AlertCircle } from "lucide-react"
+import { GENDER_MAP, RELIGION_MAP, RESIDENT_TYPE_MAP, Gender, Religion, ResidentType } from "@workspace/utils"
 
 interface ReviewStepProps {
   nameBn: string
@@ -26,9 +27,9 @@ interface ReviewStepProps {
   presVillageBn: string
   presVillageEn: string
   presHoldingNo: string
+  presRoadBn: string
   presRoadEn: string
   presPostOfficeBn: string
-  presPostCode: string
   sameAsPresent: boolean
   permDivisionNameBn: string
   permDistrictNameBn: string
@@ -38,9 +39,9 @@ interface ReviewStepProps {
   permVillageBn: string
   permVillageEn: string
   permHoldingNo: string
+  permRoadBn: string
   permRoadEn: string
   permPostOfficeBn: string
-  permPostCode: string
   wards: any[]
   showEnglishFields: boolean
 }
@@ -69,9 +70,9 @@ export function ReviewStep({
   presVillageBn,
   presVillageEn,
   presHoldingNo,
+  presRoadBn,
   presRoadEn,
   presPostOfficeBn,
-  presPostCode,
   sameAsPresent,
   permDivisionNameBn,
   permDistrictNameBn,
@@ -81,9 +82,9 @@ export function ReviewStep({
   permVillageBn,
   permVillageEn,
   permHoldingNo,
+  permRoadBn,
   permRoadEn,
   permPostOfficeBn,
-  permPostCode,
   wards,
   showEnglishFields,
 }: ReviewStepProps) {
@@ -129,12 +130,16 @@ export function ReviewStep({
             <span className="font-semibold text-foreground">{dob || "N/A"}</span>
             <span className="text-muted-foreground">লিঙ্গ:</span>
             <span className="font-semibold text-foreground">
-              {gender === "MALE" ? "पुरुष" : gender === "FEMALE" ? "মহিলা" : "অন্যান্য"}
+              {GENDER_MAP[gender as Gender] || gender}
             </span>
             <span className="text-muted-foreground">ধর্ম:</span>
-            <span className="font-semibold text-foreground">{religion}</span>
+            <span className="font-semibold text-foreground">
+              {RELIGION_MAP[religion as Religion] || religion}
+            </span>
             <span className="text-muted-foreground">বাসিন্দার ধরন:</span>
-            <span className="font-semibold text-foreground">{residentType === "PERMANENT" ? "স্থায়ী" : "অস্থায়ী"}</span>
+            <span className="font-semibold text-foreground">
+              {RESIDENT_TYPE_MAP[residentType as ResidentType] || residentType}
+            </span>
           </div>
         </div>
 
@@ -177,14 +182,16 @@ export function ReviewStep({
             <span className="font-semibold text-foreground">
               {presVillageBn} {showEnglishFields && presVillageEn ? `(${presVillageEn})` : ""} {presHoldingNo ? `(হোল্ডিং: ${presHoldingNo})` : ""}
             </span>
-            {showEnglishFields && presRoadEn && (
+            {(presRoadBn || presRoadEn) && (
               <>
                 <span className="text-muted-foreground">রাস্তা:</span>
-                <span className="font-semibold text-foreground">{presRoadEn}</span>
+                <span className="font-semibold text-foreground">
+                  {presRoadBn || ""} {showEnglishFields && presRoadEn ? `(${presRoadEn})` : ""}
+                </span>
               </>
             )}
-            <span className="text-muted-foreground">ডাকঘর ও কোড:</span>
-            <span className="font-semibold text-foreground">{presPostOfficeBn} ({presPostCode})</span>
+            <span className="text-muted-foreground">ডাকঘর:</span>
+            <span className="font-semibold text-foreground">{presPostOfficeBn}</span>
           </div>
         </div>
 
@@ -195,7 +202,7 @@ export function ReviewStep({
           </h4>
           {sameAsPresent ? (
             <div className="flex h-3/4 items-center justify-center text-muted-foreground text-xs italic font-body">
-              বর্তমান এবং স্থায়ী ঠিকানা একই
+              **বর্তমান এবং স্থায়ী ঠিকানা একই**
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-x-2 gap-y-2 font-body">
@@ -211,14 +218,16 @@ export function ReviewStep({
               <span className="font-semibold text-foreground">
                 {permVillageBn} {showEnglishFields && permVillageEn ? `(${permVillageEn})` : ""} {permHoldingNo ? `(হোল্ডিং: ${permHoldingNo})` : ""}
               </span>
-              {showEnglishFields && permRoadEn && (
+              {(permRoadBn || permRoadEn) && (
                 <>
                   <span className="text-muted-foreground">রাস্তা:</span>
-                  <span className="font-semibold text-foreground">{permRoadEn}</span>
+                  <span className="font-semibold text-foreground">
+                    {permRoadBn || ""} {showEnglishFields && permRoadEn ? `(${permRoadEn})` : ""}
+                  </span>
                 </>
               )}
-              <span className="text-muted-foreground">ডাকঘর ও কোড:</span>
-              <span className="font-semibold text-foreground">{permPostOfficeBn} ({permPostCode})</span>
+              <span className="text-muted-foreground">ডাকঘর:</span>
+              <span className="font-semibold text-foreground">{permPostOfficeBn}</span>
             </div>
           )}
         </div>

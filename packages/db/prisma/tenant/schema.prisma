@@ -9,12 +9,12 @@ datasource db {
 
 model FiscalYear {
   id        String   @id @default(cuid())
-  year      String   // e.g. "2026"
+  year      String // e.g. "2026"
   startDate DateTime
   endDate   DateTime
   isCurrent Boolean  @default(false)
 
-  tenantId  String?
+  tenantId String?
 
   taxPayments TaxPayment[]
 
@@ -86,179 +86,177 @@ model TaxPayment {
 }
 
 model CitizenAddress {
-  id                      String    @id @default(cuid())
-  villageEn               String?   // গ্রাম/মহল্লা (ইংরেজিতে)
-  villageBn               String    // গ্রাম/মহল্লা (বাংলায়)
-  roadEn                  String?   // রোড/ব্লক/সেক্টর (ইংরেজিতে)
-  roadBn                  String?   // রোড/ব্লক/সেক্টর (বাংলায়)
-  holdingNo               String?   // হোল্ডিং নং
+  id        String  @id @default(cuid())
+  villageEn String? // গ্রাম/মহল্লা (ইংরেজিতে)
+  villageBn String // গ্রাম/মহল্লা (বাংলায়)
+  roadEn    String? // রোড/ব্লক/সেক্টর (ইংরেজিতে)
+  roadBn    String? // রোড/ব্লক/সেক্টর (বাংলায়)
+  holdingNo String? // হোল্ডিং নং
 
   // Local Ward DB relation (Required)
-  wardId                  String
-  ward                    Ward      @relation(fields: [wardId], references: [id])
+  wardId String
+  ward   Ward   @relation(fields: [wardId], references: [id])
 
   // Flat Geo-location details (Required IDs and Bangla names, Optional English names)
-  divisionId              String
-  divisionNameBn          String
-  divisionNameEn          String?
+  divisionId     String
+  divisionNameBn String
+  divisionNameEn String?
 
-  districtId              String
-  districtNameBn          String
-  districtNameEn          String?
+  districtId     String
+  districtNameBn String
+  districtNameEn String?
 
-  upazilaId               String
-  upazilaNameBn           String
-  upazilaNameEn           String?
+  upazilaId     String
+  upazilaNameBn String
+  upazilaNameEn String?
 
-  unionId                 String
-  unionNameBn             String
-  unionNameEn             String?
+  unionId     String
+  unionNameBn String
+  unionNameEn String?
 
-  postId                  String
-  postOfficeBn            String
-  postOfficeEn            String?
-  postCode                String
+  postId       String
+  postOfficeBn String
+  postOfficeEn String?
 
   // Back relations to Citizen
-  presentCitizen          Citizen?  @relation("PresentAddress")
-  permanentCitizen        Citizen?  @relation("PermanentAddress")
+  presentCitizen   Citizen? @relation("PresentAddress")
+  permanentCitizen Citizen? @relation("PermanentAddress")
 
-  createdAt               DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@index([wardId])
   @@map("citizen_address")
 }
 
 model Citizen {
-  id                  String         @id @default(cuid())
-  status              String         @default("PENDING") // PENDING, APPROVED, REJECTED (defined in utils)
+  id        String @id @default(cuid())
+  citizenId String @unique
 
   // ── Identity / Search Section (Unique) ────────────────────
-  nid                 String?        @unique // ন্যাশনাল আইডি
-  birthRegNo          String?        @unique // জন্ম নিবন্ধন নং
-  passportNo          String?        @unique // পাসপোর্ট নং
+  nid        String? @unique // ন্যাশনাল আইডি
+  birthRegNo String? @unique // জন্ম নিবন্ধন নং
+  passportNo String? @unique // পাসপোর্ট নং
 
   // ── Personal Information ──────────────────────────────────
-  nameEn              String?        // নাম (ইংরেজিতে)
-  nameBn              String         // নাম (বাংলায়)
-  dob                 DateTime?      // জন্ম তারিখ
-  fatherNameEn        String?        // পিতার নাম (ইংরেজিতে)
-  fatherNameBn        String         // পিতার নাম (বাংলায়)
-  motherNameEn        String?        // মাতার নাম (ইংরেজিতে)
-  motherNameBn        String         // মাতার নাম (বাংলায়)
-  occupation          String?        // পেশা
-  residentType        String         // বাসিন্দা (TEMPORARY, PERMANENT)
-  education           String?        // শিক্ষাগত যোগ্যতা
-  religion            String         // ধর্ম
-  gender              String         // লিঙ্গ
-  maritalStatus       String         // বৈবাহিক সম্পর্ক
+  nameEn        String? // নাম (ইংরেজিতে)
+  nameBn        String // নাম (বাংলায়)
+  dob           DateTime? // জন্ম তারিখ
+  fatherNameEn  String? // পিতার নাম (ইংরেজিতে)
+  fatherNameBn  String // পিতার নাম (বাংলায়)
+  motherNameEn  String? // মাতার নাম (ইংরেজিতে)
+  motherNameBn  String // মাতার নাম (বাংলায়)
+  occupation    String? // পেশা
+  residentType  String // বাসিন্দা (TEMPORARY, PERMANENT)
+  education     String? // শিক্ষাগত যোগ্যতা
+  religion      String // ধর্ম
+  gender        String // লিঙ্গ
+  maritalStatus String // বৈবাহিক সম্পর্ক
 
   // ── Addresses (@unique enforces 1:1 ownership) ────────────
-  presentAddressId    String         @unique
-  presentAddress      CitizenAddress @relation("PresentAddress", fields: [presentAddressId], references: [id], onDelete: Cascade)
+  presentAddressId String         @unique
+  presentAddress   CitizenAddress @relation("PresentAddress", fields: [presentAddressId], references: [id], onDelete: Cascade)
 
-  sameAsPresent       Boolean        @default(false) // ঠিকানা একই হলে টিক দিন
-  permanentAddressId  String?        @unique
-  permanentAddress    CitizenAddress? @relation("PermanentAddress", fields: [permanentAddressId], references: [id], onDelete: Cascade)
+  sameAsPresent      Boolean         @default(false) // ঠিকানা একই হলে টিক দিন
+  permanentAddressId String?         @unique
+  permanentAddress   CitizenAddress? @relation("PermanentAddress", fields: [permanentAddressId], references: [id], onDelete: Cascade)
 
   // ── Contact Information ───────────────────────────────────
-  mobile              String         // মোবাইল
-  email               String?        // ইমেল
-  commentsEn          String?        // মন্তব্য দিন (ইংরেজিতে)
-  commentsBn          String?        // মন্তব্য দিন (বাংলায়)
+  mobile     String // মোবাইল
+  email      String? // ইমেল
+  commentsEn String? // মন্তব্য দিন (ইংরেজিতে)
+  commentsBn String? // মন্তব্য দিন (বাংলায়)
 
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([mobile])
   @@map("citizen")
 }
 
 model CitizenApplicationAddress {
-  id                      String               @id @default(cuid())
-  villageEn               String?
-  villageBn               String
-  roadEn                  String?
-  roadBn                  String?
-  holdingNo               String?
+  id        String  @id @default(cuid())
+  villageEn String?
+  villageBn String
+  roadEn    String?
+  roadBn    String?
+  holdingNo String?
 
   // Local Ward DB relation
-  wardId                  String
-  ward                    Ward                 @relation(fields: [wardId], references: [id])
+  wardId String
+  ward   Ward   @relation(fields: [wardId], references: [id])
 
   // Flat Geo-location details
-  divisionId              String
-  divisionNameBn          String
-  divisionNameEn          String?
+  divisionId     String
+  divisionNameBn String
+  divisionNameEn String?
 
-  districtId              String
-  districtNameBn          String
-  districtNameEn          String?
+  districtId     String
+  districtNameBn String
+  districtNameEn String?
 
-  upazilaId               String
-  upazilaNameBn           String
-  upazilaNameEn           String?
+  upazilaId     String
+  upazilaNameBn String
+  upazilaNameEn String?
 
-  unionId                 String
-  unionNameBn             String
-  unionNameEn             String?
+  unionId     String
+  unionNameBn String
+  unionNameEn String?
 
-  postId                  String
-  postOfficeBn            String
-  postOfficeEn            String?
-  postCode                String
+  postId       String
+  postOfficeBn String
+  postOfficeEn String?
 
   // Back relations to CitizenApplication
-  presentApplication      CitizenApplication?  @relation("PresentAddress")
-  permanentApplication    CitizenApplication?  @relation("PermanentAddress")
+  presentApplication   CitizenApplication? @relation("PresentAddress")
+  permanentApplication CitizenApplication? @relation("PermanentAddress")
 
-  createdAt               DateTime             @default(now())
+  createdAt DateTime @default(now())
 
   @@index([wardId])
   @@map("citizen_application_address")
 }
 
 model CitizenApplication {
-  id                  String                     @id @default(cuid())
-  status              String                     @default("PENDING") // PENDING, APPROVED, REJECTED
-  rejectionReason     String?
+  id              String  @id @default(cuid())
+  status          String  @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectionReason String?
 
   // ── Identity (Non-unique — allows re-application after rejection) ──
-  nid                 String?
-  birthRegNo          String?
-  passportNo          String?
+  nid        String?
+  birthRegNo String?
+  passportNo String?
 
   // ── Personal Information ──────────────────────────────────
-  nameEn              String?
-  nameBn              String
-  dob                 DateTime?
-  fatherNameEn        String?
-  fatherNameBn        String
-  motherNameEn        String?
-  motherNameBn        String
-  occupation          String?
-  residentType        String
-  education           String?
-  religion            String
-  gender              String
-  maritalStatus       String
+  nameEn        String?
+  nameBn        String
+  dob           DateTime?
+  fatherNameEn  String?
+  fatherNameBn  String
+  motherNameEn  String?
+  motherNameBn  String
+  occupation    String?
+  residentType  String
+  education     String?
+  religion      String
+  gender        String
+  maritalStatus String
 
   // ── Addresses (@unique enforces 1:1 ownership) ────────────
-  presentAddressId    String                     @unique
-  presentAddress      CitizenApplicationAddress  @relation("PresentAddress", fields: [presentAddressId], references: [id], onDelete: Cascade)
+  presentAddressId String                    @unique
+  presentAddress   CitizenApplicationAddress @relation("PresentAddress", fields: [presentAddressId], references: [id], onDelete: Cascade)
 
-  sameAsPresent       Boolean                    @default(false)
-  permanentAddressId  String?                    @unique
-  permanentAddress    CitizenApplicationAddress? @relation("PermanentAddress", fields: [permanentAddressId], references: [id], onDelete: Cascade)
+  sameAsPresent      Boolean                    @default(false)
+  permanentAddressId String?                    @unique
+  permanentAddress   CitizenApplicationAddress? @relation("PermanentAddress", fields: [permanentAddressId], references: [id], onDelete: Cascade)
 
   // ── Contact Information ───────────────────────────────────
-  mobile              String
-  email               String?
-  commentsEn          String?
-  commentsBn          String?
+  mobile     String
+  email      String?
+  commentsEn String?
+  commentsBn String?
 
-  createdAt           DateTime                   @default(now())
-  updatedAt           DateTime                   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([nid])
   @@index([birthRegNo])
@@ -268,5 +266,12 @@ model CitizenApplication {
   @@map("citizen_application")
 }
 
+model Counter {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-
+  @@map("counter")
+}

@@ -5,6 +5,12 @@ import { Input } from "@workspace/ui/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import { DatePicker } from "@workspace/ui/components/date-picker"
 import { User, Users, BookOpen, Heart, Home, Briefcase, GraduationCap } from "lucide-react"
+import {
+  GENDER_OPTIONS,
+  RELIGION_OPTIONS,
+  MARITAL_STATUS_OPTIONS,
+  RESIDENT_TYPE_OPTIONS,
+} from "@workspace/utils"
 
 interface PersonalInfoStepProps {
   nameBn: string
@@ -86,9 +92,8 @@ export function PersonalInfoStep({
                 clearError("nameBn")
               }}
               placeholder="যেমন: মোঃ আবদুর রহমান"
-              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                errors.nameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.nameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             />
           </div>
           {errors.nameBn && (
@@ -110,9 +115,8 @@ export function PersonalInfoStep({
                   clearError("nameEn")
                 }}
                 placeholder="e.g. Md. Abdur Rahman"
-                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                  errors.nameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-                }`}
+                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.nameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                  }`}
               />
             </div>
             {errors.nameEn && (
@@ -137,9 +141,8 @@ export function PersonalInfoStep({
                 clearError("fatherNameBn")
               }}
               placeholder="পিতার নাম"
-              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                errors.fatherNameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.fatherNameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             />
           </div>
           {errors.fatherNameBn && (
@@ -161,9 +164,8 @@ export function PersonalInfoStep({
                   clearError("fatherNameEn")
                 }}
                 placeholder="Father's Name"
-                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                  errors.fatherNameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-                }`}
+                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.fatherNameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                  }`}
               />
             </div>
             {errors.fatherNameEn && (
@@ -188,9 +190,8 @@ export function PersonalInfoStep({
                 clearError("motherNameBn")
               }}
               placeholder="মাতার নাম"
-              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                errors.motherNameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.motherNameBn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             />
           </div>
           {errors.motherNameBn && (
@@ -212,9 +213,8 @@ export function PersonalInfoStep({
                   clearError("motherNameEn")
                 }}
                 placeholder="Mother's Name"
-                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${
-                  errors.motherNameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-                }`}
+                className={`bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all ${errors.motherNameEn ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                  }`}
               />
             </div>
             {errors.motherNameEn && (
@@ -260,9 +260,8 @@ export function PersonalInfoStep({
             }}
           >
             <SelectTrigger
-              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${
-                errors.gender ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${errors.gender ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             >
               <div className="flex items-center gap-2.5 truncate">
                 <Users className="h-4 w-4 text-primary shrink-0" />
@@ -270,9 +269,11 @@ export function PersonalInfoStep({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-xl rounded-xl text-popover-foreground">
-              <SelectItem value="MALE">পুরুষ (Male)</SelectItem>
-              <SelectItem value="FEMALE">মহিলা (Female)</SelectItem>
-              <SelectItem value="OTHER">অন্যান্য (Other)</SelectItem>
+              {GENDER_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.gender && (
@@ -292,9 +293,8 @@ export function PersonalInfoStep({
             }}
           >
             <SelectTrigger
-              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${
-                errors.religion ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${errors.religion ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             >
               <div className="flex items-center gap-2.5 truncate">
                 <BookOpen className="h-4 w-4 text-primary shrink-0" />
@@ -302,11 +302,11 @@ export function PersonalInfoStep({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-xl rounded-xl text-popover-foreground">
-              <SelectItem value="ISLAM">ইসলাম</SelectItem>
-              <SelectItem value="HINDU">हिंदू</SelectItem>
-              <SelectItem value="BUDDHIST">বৌদ্ধ</SelectItem>
-              <SelectItem value="CHRISTIAN">খ্রিস্টান</SelectItem>
-              <SelectItem value="OTHER">অন্যান্য</SelectItem>
+              {RELIGION_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.religion && (
@@ -329,9 +329,8 @@ export function PersonalInfoStep({
             }}
           >
             <SelectTrigger
-              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${
-                errors.maritalStatus ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${errors.maritalStatus ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             >
               <div className="flex items-center gap-2.5 truncate">
                 <Heart className="h-4 w-4 text-primary shrink-0" />
@@ -339,10 +338,11 @@ export function PersonalInfoStep({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-xl rounded-xl text-popover-foreground">
-              <SelectItem value="SINGLE">অবিবাহিত</SelectItem>
-              <SelectItem value="MARRIED">বিবাহিত</SelectItem>
-              <SelectItem value="WIDOWED">বিপত্নীক/বিধবা</SelectItem>
-              <SelectItem value="DIVORCED">তালাকপ্রাপ্ত</SelectItem>
+              {MARITAL_STATUS_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.maritalStatus && (
@@ -362,9 +362,8 @@ export function PersonalInfoStep({
             }}
           >
             <SelectTrigger
-              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${
-                errors.residentType ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
-              }`}
+              className={`w-full rounded-xl border border-border bg-muted/30 py-2.5 px-4 font-body text-xs sm:text-sm text-foreground h-11 justify-between focus:border-primary/40 focus:ring-2 focus:ring-primary/20 cursor-pointer ${errors.residentType ? "border-destructive focus:border-destructive focus:ring-destructive/20" : ""
+                }`}
             >
               <div className="flex items-center gap-2.5 truncate">
                 <Home className="h-4 w-4 text-primary shrink-0" />
@@ -372,8 +371,11 @@ export function PersonalInfoStep({
               </div>
             </SelectTrigger>
             <SelectContent className="bg-popover border border-border shadow-xl rounded-xl text-popover-foreground">
-              <SelectItem value="PERMANENT">স্থায়ী</SelectItem>
-              <SelectItem value="TEMPORARY">অস্থায়ী</SelectItem>
+              {RESIDENT_TYPE_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.residentType && (

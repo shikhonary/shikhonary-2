@@ -6,18 +6,14 @@ import { parseTenantHost } from "@workspace/utils";
 import { TenantProvider } from "@/modules/layout/ui/components/tenant-provider";
 
 /**
- * Print layout — TenantProvider only (Auth optional), no sidebar/dashboard shell.
+ * Preview layout — TenantProvider only (Auth optional), no sidebar/dashboard shell.
  * Pages in this group render bare white — identical to print preview.
  * This is public to allow scanning QR codes for verification.
  */
-const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
+const PreviewLayout = async ({ children }: { children: React.ReactNode }) => {
   const reqHeaders = await headers();
   
   // 1. Resolve tenant from hostname using shared parseTenantHost helper.
-  //    Works correctly for:
-  //      - test.localhost:3001  (local dev subdomain)
-  //      - test.up-hub.com      (production subdomain)
-  //      - myunion.gov.bd       (custom domain)
   const host = reqHeaders.get("host");
   const { slug, customDomain } = parseTenantHost(host, process.env["NEXT_PUBLIC_APP_URL"]);
 
@@ -32,7 +28,6 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
     tenantWhere = { customDomain, customDomainVerified: true, isActive: true, isSuspended: false };
   } else {
     // Bare localhost (no subdomain) — fall back to the first active tenant.
-    // This is safe here because the print layout is public/read-only.
     const firstTenant = await db.tenant.findFirst({
       where: { isActive: true },
       select: { slug: true },
@@ -72,7 +67,6 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
   if (!tenant) {
     notFound();
   }
-
 
   // 2. Resolve optional session if available (for UI/auth state)
   const session = await auth.api.getSession({ headers: reqHeaders });
@@ -151,4 +145,4 @@ const PrintLayout = async ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default PrintLayout;
+export default PreviewLayout;
