@@ -30,9 +30,9 @@ function buildConnectionString(
 }
 
 export async function provisionTenantDb(tenantSlug: string) {
-  const masterConnectionString = process.env.DATABASE_URL
+  const masterConnectionString = process.env.MAIN_DATABASE_URL || process.env.DATABASE_URL
   if (!masterConnectionString) {
-    throw new Error("DATABASE_URL environment variable is not set")
+    throw new Error("MAIN_DATABASE_URL or DATABASE_URL environment variable is not set")
   }
 
   const tenantDbName = `tenant_${tenantSlug.replace(/-/g, "_")}`
@@ -42,7 +42,7 @@ export async function provisionTenantDb(tenantSlug: string) {
 
   // Connect to postgres system database with SSL fallback
   const systemPool = new Pool({
-    host: masterConfig.host,
+    host: masterConfig.host.replace("-pooler", ""),
     port: parseInt(masterConfig.port),
     user: masterConfig.user,
     password: masterConfig.password,
@@ -78,6 +78,15 @@ export async function provisionTenantDb(tenantSlug: string) {
     masterConfig.sslmode
   )
 
+  const directTenantConnectionString = buildConnectionString(
+    masterConfig.user,
+    masterConfig.password,
+    masterConfig.host.replace("-pooler", ""),
+    masterConfig.port,
+    tenantDbName,
+    masterConfig.sslmode
+  )
+
   const rootDir = process.cwd().includes("apps")
     ? path.join(process.cwd(), "../..")
     : process.cwd()
@@ -104,8 +113,8 @@ export async function provisionTenantDb(tenantSlug: string) {
     const { stdout, stderr } = await execAsync(migrateCmd, {
       env: {
         ...process.env,
-        DATABASE_URL: tenantConnectionString,
-        TENANT_DATABASE_URL: tenantConnectionString,
+        DATABASE_URL: directTenantConnectionString,
+        TENANT_DATABASE_URL: directTenantConnectionString,
       },
     })
     if (stdout) console.log(stdout)
@@ -126,9 +135,9 @@ export async function provisionTenantDb(tenantSlug: string) {
 }
 
 export async function deleteTenantDb(databaseName: string) {
-  const masterConnectionString = process.env.DATABASE_URL
+  const masterConnectionString = process.env.MAIN_DATABASE_URL || process.env.DATABASE_URL
   if (!masterConnectionString) {
-    throw new Error("DATABASE_URL environment variable is not set")
+    throw new Error("MAIN_DATABASE_URL or DATABASE_URL environment variable is not set")
   }
 
   const masterConfig = parseConnectionString(masterConnectionString)
@@ -136,7 +145,7 @@ export async function deleteTenantDb(databaseName: string) {
   console.log(`[Deprovisioning] Dropping database "${databaseName}"...`)
 
   const systemPool = new Pool({
-    host: masterConfig.host,
+    host: masterConfig.host.replace("-pooler", ""),
     port: parseInt(masterConfig.port),
     user: masterConfig.user,
     password: masterConfig.password,

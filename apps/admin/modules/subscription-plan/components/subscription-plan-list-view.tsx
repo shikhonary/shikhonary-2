@@ -154,16 +154,20 @@ export function SubscriptionPlanListView() {
                     <span className="font-bold text-on-surface">{p.defaultStudentLimit.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between font-medium">
-                    <span>Staff Seats:</span>
-                    <span className="font-bold text-on-surface">{p.defaultStaffLimit}</span>
+                    <span>Teacher Seats:</span>
+                    <span className="font-bold text-on-surface">{p.defaultTeacherLimit}</span>
                   </div>
                   <div className="flex justify-between font-medium">
-                    <span>Certificates:</span>
-                    <span className="font-bold text-on-surface">{p.defaultCertificateLimit.toLocaleString()}</span>
+                    <span>Exams:</span>
+                    <span className="font-bold text-on-surface">{p.defaultExamLimit.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between font-medium">
                     <span>Storage:</span>
                     <span className="font-bold text-on-surface">{p.defaultStorageLimit} MB</span>
+                  </div>
+                  <div className="flex justify-between font-medium">
+                    <span>Credits Limit:</span>
+                    <span className="font-bold text-on-surface">{p.defaultCreditLimit ?? 30}</span>
                   </div>
                 </div>
 
@@ -171,12 +175,20 @@ export function SubscriptionPlanListView() {
                 <div className="space-y-1.5 text-xs pt-2 border-t border-outline-variant/30">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-outline block mb-1">Module Features</span>
                   <div className="flex items-center gap-2">
-                    <FileText className={`h-3.5 w-3.5 ${p.canIssueCertificates ? "text-emerald-600" : "text-outline opacity-40"}`} />
-                    <span className={p.canIssueCertificates ? "text-on-surface font-medium" : "text-outline line-through"}>Certificates & Transcripts</span>
+                    <FileText className={`h-3.5 w-3.5 ${p.canCreateExams ? "text-emerald-600" : "text-outline opacity-40"}`} />
+                    <span className={p.canCreateExams ? "text-on-surface font-medium" : "text-outline line-through"}>Create Exams</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Receipt className={`h-3.5 w-3.5 ${p.canCollectOnlineFees ? "text-emerald-600" : "text-outline opacity-40"}`} />
-                    <span className={p.canCollectOnlineFees ? "text-on-surface font-medium" : "text-outline line-through"}>Online Fee Collection</span>
+                    <Receipt className={`h-3.5 w-3.5 ${p.canCollectFees ? "text-emerald-600" : "text-outline opacity-40"}`} />
+                    <span className={p.canCollectFees ? "text-on-surface font-medium" : "text-outline line-through"}>Fee Collection</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className={`h-3.5 w-3.5 ${p.canUseAiFeatures ? "text-emerald-600" : "text-outline opacity-40"}`} />
+                    <span className={p.canUseAiFeatures ? "text-on-surface font-medium" : "text-outline line-through"}>AI Features</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className={`h-3.5 w-3.5 ${p.canExportReports ? "text-emerald-600" : "text-outline opacity-40"}`} />
+                    <span className={p.canExportReports ? "text-on-surface font-medium" : "text-outline line-through"}>Export Reports</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <BookOpen className={`h-3.5 w-3.5 ${p.canUseLms ? "text-emerald-600" : "text-outline opacity-40"}`} />

@@ -30,9 +30,9 @@ export const createSubscriptionSchema = z.object({
   currentPeriodStart: z.coerce.date(),
   currentPeriodEnd: z.coerce.date(),
   trialEndsAt: z.coerce.date().optional(),
-  customCitizenLimit: z.number().int().min(0).optional(),
-  customStaffLimit: z.number().int().min(0).optional(),
-  customCertificateLimit: z.number().int().min(0).optional(),
+  customStudentLimit: z.number().int().min(0).optional(),
+  customTeacherLimit: z.number().int().min(0).optional(),
+  customExamLimit: z.number().int().min(0).optional(),
   customStorageLimit: z.number().int().min(0).optional(),
 })
 
@@ -46,9 +46,9 @@ export const updateSubscriptionSchema = z.object({
   pricePerYear: z.number().int().min(0).optional(),
   currentPeriodStart: z.coerce.date().optional(),
   currentPeriodEnd: z.coerce.date().optional(),
-  customCitizenLimit: z.number().int().min(0).optional(),
-  customStaffLimit: z.number().int().min(0).optional(),
-  customCertificateLimit: z.number().int().min(0).optional(),
+  customStudentLimit: z.number().int().min(0).optional(),
+  customTeacherLimit: z.number().int().min(0).optional(),
+  customExamLimit: z.number().int().min(0).optional(),
   customStorageLimit: z.number().int().min(0).optional(),
 })
 

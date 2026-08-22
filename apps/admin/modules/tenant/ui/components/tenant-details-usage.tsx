@@ -73,17 +73,17 @@ function UsageBar({
 export function TenantDetailsUsage({ tenant }: TenantDetailsUsageProps) {
   const plan = tenant.subscription?.plan
 
-  const defaultCitizens = plan?.defaultCitizenLimit ?? 1000
-  const maxCitizens = tenant.customCitizenLimit ?? defaultCitizens
-  const hasCitizensOverride = tenant.customCitizenLimit !== null && tenant.customCitizenLimit !== undefined
+  const defaultStudents = plan?.defaultStudentLimit ?? 1000
+  const maxStudents = tenant.customStudentLimit ?? defaultStudents
+  const hasStudentsOverride = tenant.customStudentLimit !== null && tenant.customStudentLimit !== undefined
 
-  const defaultStaff = plan?.defaultStaffLimit ?? 10
-  const maxStaff = tenant.customStaffLimit ?? defaultStaff
-  const hasStaffOverride = tenant.customStaffLimit !== null && tenant.customStaffLimit !== undefined
+  const defaultTeachers = plan?.defaultTeacherLimit ?? 10
+  const maxTeachers = tenant.customTeacherLimit ?? defaultTeachers
+  const hasTeachersOverride = tenant.customTeacherLimit !== null && tenant.customTeacherLimit !== undefined
 
-  const defaultCertificates = plan?.defaultCertificateLimit ?? 500
-  const maxCertificates = tenant.customCertificateLimit ?? defaultCertificates
-  const hasCertificatesOverride = tenant.customCertificateLimit !== null && tenant.customCertificateLimit !== undefined
+  const defaultExams = plan?.defaultExamLimit ?? 500
+  const maxExams = tenant.customExamLimit ?? defaultExams
+  const hasExamsOverride = tenant.customExamLimit !== null && tenant.customExamLimit !== undefined
 
   const defaultStorage = plan?.defaultStorageLimit ?? 500
   const maxStorage = tenant.customStorageLimit ?? defaultStorage
@@ -103,29 +103,29 @@ export function TenantDetailsUsage({ tenant }: TenantDetailsUsageProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <UsageBar
-              label="Registered Citizens"
-              used={tenant.citizenCount ?? 0}
-              max={maxCitizens}
-              defaultMax={defaultCitizens}
-              isOverridden={hasCitizensOverride}
+              label="Enrolled Students"
+              used={tenant.studentCount ?? 0}
+              max={maxStudents}
+              defaultMax={defaultStudents}
+              isOverridden={hasStudentsOverride}
               icon={Users}
               colorClass="bg-primary"
             />
             <UsageBar
-              label="Staff Seats"
-              used={tenant.staffCount ?? 0}
-              max={maxStaff}
-              defaultMax={defaultStaff}
-              isOverridden={hasStaffOverride}
+              label="Teacher Seats"
+              used={tenant.teacherCount ?? 0}
+              max={maxTeachers}
+              defaultMax={defaultTeachers}
+              isOverridden={hasTeachersOverride}
               icon={UserCheck}
               colorClass="bg-blue-500"
             />
             <UsageBar
-              label="Certificates Issued"
-              used={tenant.certificateCount ?? 0}
-              max={maxCertificates}
-              defaultMax={defaultCertificates}
-              isOverridden={hasCertificatesOverride}
+              label="Exams Created"
+              used={tenant.examCount ?? 0}
+              max={maxExams}
+              defaultMax={defaultExams}
+              isOverridden={hasExamsOverride}
               icon={FileText}
               colorClass="bg-purple-500"
             />

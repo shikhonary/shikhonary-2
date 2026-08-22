@@ -47,13 +47,13 @@ const provisionSteps = [
   {
     id: 1,
     label: "Creating tenant record",
-    description: "Saving Union Porishod metadata and subscription to master database",
+    description: "Saving institution metadata and subscription to master database",
     icon: Server,
   },
   {
     id: 2,
     label: "Provisioning database",
-    description: "Creating a dedicated PostgreSQL database instance for this Union Porishod",
+    description: "Creating a dedicated PostgreSQL database instance for this institution",
     icon: Database,
   },
   {
@@ -95,10 +95,9 @@ export function CreateTenantView() {
   const [unionId, setUnionId] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
-  const [geoCode, setGeoCode] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [facebookUrl, setFacebookUrl] = useState("")
+  const [website, setWebsite] = useState("")
 
   // Step 3: School Officials & Signatures
   const [principalName, setPrincipalName] = useState("")
@@ -110,8 +109,8 @@ export function CreateTenantView() {
   const [planId, setPlanId] = useState<string>("")
   const [isActive, setIsActive] = useState(true)
   const [customStudentLimit, setCustomStudentLimit] = useState<number | undefined>()
-  const [customStaffLimit, setCustomStaffLimit] = useState<number | undefined>()
-  const [customCertificateLimit, setCustomCertificateLimit] = useState<number | undefined>()
+  const [customTeacherLimit, setCustomTeacherLimit] = useState<number | undefined>()
+  const [customExamLimit, setCustomExamLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
 
   // Cascading location queries
@@ -187,8 +186,8 @@ export function CreateTenantView() {
       const selectedPlan = plansData.find((p: any) => p.id === planId)
       if (selectedPlan) {
         setCustomStudentLimit(selectedPlan.defaultStudentLimit)
-        setCustomStaffLimit(selectedPlan.defaultStaffLimit)
-        setCustomCertificateLimit(selectedPlan.defaultCertificateLimit)
+        setCustomTeacherLimit(selectedPlan.defaultTeacherLimit)
+        setCustomExamLimit(selectedPlan.defaultExamLimit)
         setCustomStorageLimit(selectedPlan.defaultStorageLimit)
       }
     }
@@ -275,20 +274,19 @@ export function CreateTenantView() {
         unionId: unionId || undefined,
         unionName: unionName || undefined,
         postalCode: postalCode || undefined,
-        geoCode: geoCode || undefined,
         principalName: principalName || undefined,
         vicePrincipalName: vicePrincipalName || undefined,
         phone: phone?.trim() || undefined,
         email: email && email.trim().length > 0 ? email.trim() : undefined,
         principalSignature: principalSignature || undefined,
         vicePrincipalSignature: vicePrincipalSignature || undefined,
-        facebookUrl: facebookUrl || undefined,
+        website: website || undefined,
         planId: planId || undefined,
         isActive,
         customDomain: customDomain || undefined,
         customStudentLimit: customStudentLimit !== undefined ? Number(customStudentLimit) : undefined,
-        customStaffLimit: customStaffLimit !== undefined ? Number(customStaffLimit) : undefined,
-        customCertificateLimit: customCertificateLimit !== undefined ? Number(customCertificateLimit) : undefined,
+        customTeacherLimit: customTeacherLimit !== undefined ? Number(customTeacherLimit) : undefined,
+        customExamLimit: customExamLimit !== undefined ? Number(customExamLimit) : undefined,
         customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : undefined,
       },
       {
@@ -330,10 +328,10 @@ export function CreateTenantView() {
               <div>
                 <CardTitle className="font-headline-md text-lg font-bold tracking-tight text-on-surface">
                   {provisionStatus === "success"
-                    ? "Union Porishod Live!"
+                    ? "Institution Live!"
                     : provisionStatus === "error"
                     ? "Provisioning Error"
-                    : "Setting Up Union Porishod Portal"}
+                    : "Setting Up Institution Portal"}
                 </CardTitle>
                 <CardDescription className="text-xs text-outline mt-0.5">
                   {provisionStatus === "success"
@@ -429,7 +427,7 @@ export function CreateTenantView() {
                   className="rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 shadow-sm"
                 >
                   <Check className="mr-2 h-4 w-4" />
-                  View All Union Porishods
+                  View All Institutions
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
@@ -450,15 +448,15 @@ export function CreateTenantView() {
           className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-outline hover:text-primary transition-colors w-fit"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Union Porishod List</span>
+          <span>Back to Institution List</span>
         </Link>
 
         <div>
           <h2 className="font-headline-md text-2xl sm:text-3xl font-extrabold text-primary md:text-4xl">
-            Register Union Porishod
+            Register Institution
           </h2>
           <p className="max-w-2xl font-body-md text-xs sm:text-sm md:text-base leading-relaxed text-on-surface-variant mt-1">
-            Setup a dedicated multi-tenant digital portal for local municipal government.
+            Setup a dedicated multi-tenant digital portal for an educational institution.
           </p>
         </div>
       </div>
@@ -559,7 +557,7 @@ export function CreateTenantView() {
                     </div>
                     {slug && (
                       <p className="text-[11px] text-primary font-mono flex items-center gap-1">
-                        <Globe className="h-3 w-3" /> https://{slug}.uphub.gov.bd
+                        <Globe className="h-3 w-3" /> https://{slug}.shikhonary.com
                       </p>
                     )}
                   </div>
@@ -573,7 +571,7 @@ export function CreateTenantView() {
                       <Input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Savar Union Porishod"
+                        placeholder="Savar High School"
                         className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
                     </div>
@@ -653,7 +651,7 @@ export function CreateTenantView() {
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Municipal government portal for Savar UP..."
+                    placeholder="A leading educational institution in Savar area..."
                     rows={3}
                     className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden min-h-[80px]"
                   />
@@ -766,12 +764,12 @@ export function CreateTenantView() {
                   </div>
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Geo Code (জিও কোড)
+                      Website
                     </Label>
                     <Input
-                      value={geoCode}
-                      onChange={(e) => setGeoCode(e.target.value)}
-                      placeholder="e.g. 3086"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://school.example.com"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
@@ -802,28 +800,18 @@ export function CreateTenantView() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="info@savar.uphub.gov.bd"
+                      placeholder="info@school.shikhonary.com"
                       className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
                         !isEmailValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
                       }`}
                     />
                     {!isEmailValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@savar.uphub.gov.bd)</p>
+                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@school.shikhonary.com)</p>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Official Facebook Page URL
-                  </Label>
-                  <Input
-                    value={facebookUrl}
-                    onChange={(e) => setFacebookUrl(e.target.value)}
-                    placeholder="https://facebook.com/your-union-porishod"
-                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                  />
-                </div>
+
               </div>
             )}
 
@@ -940,7 +928,7 @@ export function CreateTenantView() {
                   <div>
                     <h4 className="text-sm font-bold text-on-surface">Custom Resource Quota Overrides</h4>
                     <p className="text-xs text-outline mt-0.5">
-                      Optionally override default plan quotas specifically for this Union Porishod. Leave empty to use plan defaults.
+                      Optionally override default plan quotas specifically for this institution. Leave empty to use plan defaults.
                     </p>
                   </div>
 
@@ -959,12 +947,12 @@ export function CreateTenantView() {
                     </div>
                     <div className="space-y-2">
                       <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Staff Seats
+                        Custom Teacher Seats
                       </Label>
                       <Input
                         type="number"
-                        value={customStaffLimit ?? ""}
-                        onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        value={customTeacherLimit ?? ""}
+                        onChange={(e) => setCustomTeacherLimit(e.target.value ? Number(e.target.value) : undefined)}
                         placeholder="Default plan seats"
                         className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
@@ -974,12 +962,12 @@ export function CreateTenantView() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Certificate Quota
+                        Custom Exam Quota
                       </Label>
                       <Input
                         type="number"
-                        value={customCertificateLimit ?? ""}
-                        onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        value={customExamLimit ?? ""}
+                        onChange={(e) => setCustomExamLimit(e.target.value ? Number(e.target.value) : undefined)}
                         placeholder="Default plan quota"
                         className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
@@ -1008,7 +996,7 @@ export function CreateTenantView() {
                     className="size-4 rounded text-primary cursor-pointer"
                   />
                   <label htmlFor="isActive" className="text-xs font-bold text-on-surface cursor-pointer">
-                    Enable Union Porishod Portal Access Immediately
+                    Enable Institution Portal Access Immediately
                   </label>
                 </div>
               </div>
@@ -1043,7 +1031,7 @@ export function CreateTenantView() {
                   className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 normal-case tracking-normal shadow-sm disabled:opacity-50"
                 >
                   <Save className="h-4 w-4" />
-                  <span>Register & Provision UP</span>
+                  <span>Register & Provision Institution</span>
                 </Button>
               )}
             </div>

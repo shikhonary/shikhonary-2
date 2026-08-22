@@ -742,7 +742,7 @@ export async function resendTenantInvitation(
   try {
     await sendInvitationEmail({
       to: existing.email,
-      tenantName: existing.tenant?.name || "Union Porishod",
+      tenantName: existing.tenant?.name || "Institution",
       inviterName: "Super Admin",
       invitationLink,
       recipientName: existing.name || undefined,

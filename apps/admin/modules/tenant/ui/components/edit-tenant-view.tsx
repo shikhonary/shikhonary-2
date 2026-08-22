@@ -70,10 +70,9 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [unionId, setUnionId] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
-  const [geoCode, setGeoCode] = useState("")
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
-  const [facebookUrl, setFacebookUrl] = useState("")
+  const [website, setWebsite] = useState("")
 
   // Step 3: School Officials & Signatures
   const [principalName, setPrincipalName] = useState("")
@@ -85,8 +84,8 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [planId, setPlanId] = useState<string>("")
   const [isActive, setIsActive] = useState(true)
   const [customStudentLimit, setCustomStudentLimit] = useState<number | undefined>()
-  const [customStaffLimit, setCustomStaffLimit] = useState<number | undefined>()
-  const [customCertificateLimit, setCustomCertificateLimit] = useState<number | undefined>()
+  const [customTeacherLimit, setCustomTeacherLimit] = useState<number | undefined>()
+  const [customExamLimit, setCustomExamLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
 
   // Cascading location queries
@@ -172,14 +171,13 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       setUnionName(tenant.unionName || "")
 
       setPostalCode(tenant.postalCode || "")
-      setGeoCode(tenant.geoCode || "")
       setPrincipalName((tenant as any).principalName || "")
       setVicePrincipalName((tenant as any).vicePrincipalName || "")
       setPhone(tenant.phone || "")
       setEmail(tenant.email || "")
       setPrincipalSignature((tenant as any).principalSignature || "")
       setVicePrincipalSignature((tenant as any).vicePrincipalSignature || "")
-      setFacebookUrl(tenant.facebookUrl || "")
+      setWebsite(tenant.website || "")
       setPlanId(tenant.subscription?.planId || "")
       setIsActive(tenant.isActive ?? true)
       setCustomDomain(tenant.customDomain || "")
@@ -187,11 +185,11 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       if ((tenant as any).customStudentLimit !== null && (tenant as any).customStudentLimit !== undefined) {
         setCustomStudentLimit((tenant as any).customStudentLimit)
       }
-      if (tenant.customStaffLimit !== null && tenant.customStaffLimit !== undefined) {
-        setCustomStaffLimit(tenant.customStaffLimit)
+      if (tenant.customTeacherLimit !== null && tenant.customTeacherLimit !== undefined) {
+        setCustomTeacherLimit(tenant.customTeacherLimit)
       }
-      if (tenant.customCertificateLimit !== null && tenant.customCertificateLimit !== undefined) {
-        setCustomCertificateLimit(tenant.customCertificateLimit)
+      if (tenant.customExamLimit !== null && tenant.customExamLimit !== undefined) {
+        setCustomExamLimit(tenant.customExamLimit)
       }
       if (tenant.customStorageLimit !== null && tenant.customStorageLimit !== undefined) {
         setCustomStorageLimit(tenant.customStorageLimit)
@@ -203,11 +201,11 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
     ...trpc.tenant.update.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.tenant.pathFilter())
-      toast.success("Union Porishod account updated successfully.")
+      toast.success("Institution account updated successfully.")
       router.push(`/tenants/${tenantId}`)
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to update Union Porishod")
+      toast.error(err.message || "Failed to update Institution")
     },
   })
 
@@ -284,21 +282,20 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       unionId: unionId || undefined,
       unionName: unionName || undefined,
       postalCode: postalCode || undefined,
-      geoCode: geoCode || undefined,
       principalName: principalName || undefined,
       vicePrincipalName: vicePrincipalName || undefined,
       phone: phone?.trim() || undefined,
       email: email && email.trim().length > 0 ? email.trim() : undefined,
       principalSignature: principalSignature || undefined,
       vicePrincipalSignature: vicePrincipalSignature || undefined,
-      facebookUrl: facebookUrl || undefined,
+      website: website || undefined,
       planId: planId || undefined,
       isActive,
       customDomain: customDomain || undefined,
       customDomainVerified,
       customStudentLimit: customStudentLimit !== undefined ? Number(customStudentLimit) : null,
-      customStaffLimit: customStaffLimit !== undefined ? Number(customStaffLimit) : null,
-      customCertificateLimit: customCertificateLimit !== undefined ? Number(customCertificateLimit) : null,
+      customTeacherLimit: customTeacherLimit !== undefined ? Number(customTeacherLimit) : null,
+      customExamLimit: customExamLimit !== undefined ? Number(customExamLimit) : null,
       customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : null,
     })
   }
@@ -338,7 +335,7 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
 
         <div>
           <h2 className="font-headline-md text-2xl sm:text-3xl font-extrabold text-primary md:text-4xl">
-            Edit Union Porishod
+            Edit Institution
           </h2>
           <p className="max-w-2xl font-body-md text-xs sm:text-sm md:text-base text-on-surface-variant mt-1">
             Update portal configurations, location settings, officials, and quotas.
@@ -427,13 +424,13 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                       <Input
                         value={slug}
                         onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                        placeholder="savar-up"
+                        placeholder="savar-school"
                         className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
                     </div>
                     {slug && (
                       <p className="text-[11px] text-primary font-mono flex items-center gap-1">
-                        <Globe className="h-3 w-3" /> https://{slug}.uphub.gov.bd
+                        <Globe className="h-3 w-3" /> https://{slug}.shikhonary.com
                       </p>
                     )}
                   </div>
@@ -447,7 +444,7 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                       <Input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Savar Union Porishod"
+                        placeholder="Savar High School"
                         className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
                     </div>
@@ -654,12 +651,12 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
 
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Geo Code
+                      Website
                     </Label>
                     <Input
-                      value={geoCode}
-                      onChange={(e) => setGeoCode(e.target.value)}
-                      placeholder="e.g. 3086"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="e.g. https://savarschool.edu.bd"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
@@ -687,23 +684,13 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                     <Input
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. info@savarup.gov.bd"
+                      placeholder="e.g. info@school.shikhonary.com"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Facebook Page Link
-                  </Label>
-                  <Input
-                    value={facebookUrl}
-                    onChange={(e) => setFacebookUrl(e.target.value)}
-                    placeholder="https://facebook.com/savarup"
-                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                  />
-                </div>
+                
               </div>
             )}
 
@@ -779,7 +766,7 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                       <SelectContent className="bg-white border border-outline-variant">
                         {plans.map((p: any) => (
                           <SelectItem key={p.id} value={p.id}>
-                            {p.name} ({p.monthlyPriceBDT} BDT/mo)
+                            {p.displayName} ({p.monthlyPriceBDT} BDT/mo)
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -823,12 +810,12 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
 
                     <div className="space-y-2">
                       <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Staff Accounts Limit (ইউজার সীমা)
+                        Teacher Accounts Limit (শিক্ষক সীমা)
                       </Label>
                       <Input
                         type="number"
-                        value={customStaffLimit ?? ""}
-                        onChange={(e) => setCustomStaffLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        value={customTeacherLimit ?? ""}
+                        onChange={(e) => setCustomTeacherLimit(e.target.value ? Number(e.target.value) : undefined)}
                         placeholder="e.g. 50"
                         className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />
@@ -838,12 +825,12 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Certificate Limit (সনদ সংখ্যা সীমা)
+                        Exam Limit (পরীক্ষা সীমা)
                       </Label>
                       <Input
                         type="number"
-                        value={customCertificateLimit ?? ""}
-                        onChange={(e) => setCustomCertificateLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        value={customExamLimit ?? ""}
+                        onChange={(e) => setCustomExamLimit(e.target.value ? Number(e.target.value) : undefined)}
                         placeholder="e.g. 2000"
                         className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />

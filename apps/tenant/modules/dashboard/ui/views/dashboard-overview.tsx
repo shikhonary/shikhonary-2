@@ -86,18 +86,9 @@ export function DashboardOverview() {
             ড্যাশবোর্ড সারসংক্ষেপ
           </h2>
           <p className="max-w-2xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            ইউনিয়ন পরিষদের করদাতা, ধার্যকৃত কর ও আদায়ের সার্বিক চিত্র এক জায়গায় দেখুন।
+            প্রতিষ্ঠানের অর্থবছর ও সার্বিক সারসংক্ষেপ এক জায়গায় দেখুন।
           </p>
         </div>
-        <Button
-          asChild
-          className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 sm:py-3 font-display text-sm sm:text-base font-bold text-primary-foreground shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:scale-95 cursor-pointer overflow-hidden h-auto"
-        >
-          <Link href="/tax-payers/new">
-            <Plus className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 ease-out group-hover:scale-110" />
-            <span className="relative z-10">নতুন করদাতা নিবন্ধন</span>
-          </Link>
-        </Button>
       </section>
 
       {/* ── Fiscal Year Banner ──────────────────────────────────────── */}

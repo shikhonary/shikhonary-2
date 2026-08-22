@@ -217,11 +217,11 @@ async function main() {
     await prisma.union.createMany({ data: chunk })
   }
 
-  console.log(`- Seeding post offices (${postData.length})...`)
-  const postChunks = chunkArray(postData, 200)
-  for (const chunk of postChunks) {
-    await prisma.post.createMany({ data: chunk })
-  }
+  console.log(`- Seeding post offices (${postData.length}) [SKIPPED]...`)
+  // const postChunks = chunkArray(postData, 200)
+  // for (const chunk of postChunks) {
+  //   await prisma.post.createMany({ data: chunk })
+  // }
 
   console.log("\nLGDhaka Geographical seeding complete!")
 }

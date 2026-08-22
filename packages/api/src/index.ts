@@ -77,31 +77,4 @@ export type {
   DeleteTenantFiscalYearInput,
 } from "./routers/tenant-fiscal-year/tenant-fiscal-year.schema"
 
-export type {
-  ListTenantWardsInput,
-  GetTenantWardInput,
-  CreateTenantWardInput,
-  UpdateTenantWardInput,
-  DeleteTenantWardInput,
-} from "./routers/tenant-ward/tenant-ward.schema"
 
-export type {
-  ListTaxPayersInput,
-  GetTaxPayerInput,
-  GetTaxPayerByHoldingInput,
-  TaxPayerStatsInput,
-  CreateTaxPayerInput,
-  BulkCreateTaxPayerInput,
-  UpdateTaxPayerInput,
-  DeleteTaxPayerInput,
-} from "./routers/tax-payer/tax-payer.schema"
-
-export type {
-  ListTaxPaymentsInput,
-  GetTaxPaymentInput,
-  GetPaymentByReceiptNoInput,
-  TaxPaymentStatsInput,
-  CreateTaxPaymentInput,
-  UpdateTaxPaymentInput,
-  DeleteTaxPaymentInput,
-} from "./routers/tax-payment/tax-payment.schema"

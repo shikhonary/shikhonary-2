@@ -24,18 +24,21 @@ export const createSubscriptionPlanSchema = z.object({
   isPopular: z.boolean().default(false),
 
   defaultStudentLimit: z.number().int().min(0).default(1000),
-  defaultStaffLimit: z.number().int().min(0).default(10),
-  defaultCertificateLimit: z.number().int().min(0).default(500),
+  defaultTeacherLimit: z.number().int().min(0).default(10),
+  defaultExamLimit: z.number().int().min(0).default(500),
   defaultStorageLimit: z.number().int().min(0).default(500),
+  defaultCreditLimit: z.number().int().min(0).default(30),
 
-  canIssueCertificates: z.boolean().default(true),
-  canCollectOnlineFees: z.boolean().default(false),
+  canCreateExams: z.boolean().default(true),
+  canCollectFees: z.boolean().default(false),
   canUseLms: z.boolean().default(false),
   canManageAttendance: z.boolean().default(false),
   canManageLibrary: z.boolean().default(false),
   canManageTransport: z.boolean().default(false),
   canSendSms: z.boolean().default(false),
   canUseCustomDomain: z.boolean().default(false),
+  canUseAiFeatures: z.boolean().default(false),
+  canExportReports: z.boolean().default(true),
 })
 
 export type CreateSubscriptionPlanInput = z.infer<typeof createSubscriptionPlanSchema>
@@ -54,18 +57,21 @@ export const updateSubscriptionPlanSchema = z.object({
   isPopular: z.boolean().optional(),
 
   defaultStudentLimit: z.number().int().min(0).optional(),
-  defaultStaffLimit: z.number().int().min(0).optional(),
-  defaultCertificateLimit: z.number().int().min(0).optional(),
+  defaultTeacherLimit: z.number().int().min(0).optional(),
+  defaultExamLimit: z.number().int().min(0).optional(),
   defaultStorageLimit: z.number().int().min(0).optional(),
+  defaultCreditLimit: z.number().int().min(0).optional(),
 
-  canIssueCertificates: z.boolean().optional(),
-  canCollectOnlineFees: z.boolean().optional(),
+  canCreateExams: z.boolean().optional(),
+  canCollectFees: z.boolean().optional(),
   canUseLms: z.boolean().optional(),
   canManageAttendance: z.boolean().optional(),
   canManageLibrary: z.boolean().optional(),
   canManageTransport: z.boolean().optional(),
   canSendSms: z.boolean().optional(),
   canUseCustomDomain: z.boolean().optional(),
+  canUseAiFeatures: z.boolean().optional(),
+  canExportReports: z.boolean().optional(),
 })
 
 export type UpdateSubscriptionPlanInput = z.infer<typeof updateSubscriptionPlanSchema>

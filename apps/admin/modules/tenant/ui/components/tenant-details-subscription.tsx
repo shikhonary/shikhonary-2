@@ -31,14 +31,16 @@ export function TenantDetailsSubscription({ tenant }: TenantDetailsSubscriptionP
   }
 
   const features = [
-    { label: "Issue Certificates & Transcripts", enabled: plan.canIssueCertificates },
-    { label: "Online Fee Collection & Billing", enabled: plan.canCollectOnlineFees },
+    { label: "Create Exams & Question Papers", enabled: plan.canCreateExams },
+    { label: "Online Fee Collection & Billing", enabled: plan.canCollectFees },
     { label: "LMS & Homework Portal", enabled: plan.canUseLms },
     { label: "Digital/RFID Attendance System", enabled: plan.canManageAttendance },
     { label: "School Library Management", enabled: plan.canManageLibrary },
     { label: "Transport & Route Tracking", enabled: plan.canManageTransport },
     { label: "Automated SMS Notifications", enabled: plan.canSendSms },
     { label: "Use Custom Branding & Domain", enabled: plan.canUseCustomDomain },
+    { label: "AI Helper & Grading Features", enabled: plan.canUseAiFeatures },
+    { label: "Export PDF/Excel Reports", enabled: plan.canExportReports },
   ]
 
   const formattedPeriodEnd = new Date(sub.currentPeriodEnd).toLocaleDateString("en-US", {

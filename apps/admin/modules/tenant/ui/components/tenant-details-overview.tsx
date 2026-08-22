@@ -217,21 +217,21 @@ export const TenantDetailsOverview = ({ tenant }: TenantDetailsOverviewProps) =>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Chairman */}
+            {/* Principal */}
             <div className="p-4 rounded-2xl bg-muted/20 border border-border/40 flex flex-col justify-between min-h-[140px]">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block">
-                  UP Chairman
+                  Principal
                 </span>
                 <span className="text-sm font-black text-foreground block mt-1">
-                  {tenant.chairmanName || "Not Assigned"}
+                  {tenant.principalName || "Not Assigned"}
                 </span>
               </div>
               <div className="mt-4 border border-dashed border-border/60 rounded-xl p-3 bg-card/60 flex items-center justify-center min-h-[64px] relative overflow-hidden">
-                {tenant.chairmanSignature ? (
+                {tenant.principalSignature ? (
                   <img
-                    src={tenant.chairmanSignature}
-                    alt="Chairman Signature"
+                    src={tenant.principalSignature}
+                    alt="Principal Signature"
                     className="max-h-12 object-contain"
                   />
                 ) : (
@@ -242,14 +242,14 @@ export const TenantDetailsOverview = ({ tenant }: TenantDetailsOverviewProps) =>
               </div>
             </div>
 
-            {/* Secretary */}
+            {/* Vice Principal */}
             <div className="p-4 rounded-2xl bg-muted/20 border border-border/40 flex flex-col justify-between min-h-[140px]">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 block">
-                  UP Secretary
+                  Vice Principal
                 </span>
                 <span className="text-sm font-black text-foreground block mt-1">
-                  {tenant.secretaryName || "Not Assigned"}
+                  {tenant.vicePrincipalName || "Not Assigned"}
                 </span>
               </div>
               <div className="mt-4 border border-dashed border-border/60 rounded-xl p-3 bg-card/60 flex items-center justify-center min-h-[64px] relative overflow-hidden">

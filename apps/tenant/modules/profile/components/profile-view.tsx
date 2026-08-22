@@ -43,14 +43,14 @@ export function ProfileView() {
   const [phone, setPhone] = useState("")
   const [principalSignature, setPrincipalSignature] = useState("")
   const [vicePrincipalSignature, setVicePrincipalSignature] = useState("")
-  const [facebookUrl, setFacebookUrl] = useState("")
+
   
   const [divisionName, setDivisionName] = useState("")
   const [districtName, setDistrictName] = useState("")
   const [upazilaName, setUpazilaName] = useState("")
   const [unionName, setUnionName] = useState("")
   const [postalCode, setPostalCode] = useState("")
-  const [geoCode, setGeoCode] = useState("")
+  const [website, setWebsite] = useState("")
   
   const [principalName, setPrincipalName] = useState("")
   const [vicePrincipalName, setVicePrincipalName] = useState("")
@@ -66,13 +66,12 @@ export function ProfileView() {
       setPhone(tenant.phone || "")
       setPrincipalSignature((tenant as any).principalSignature || "")
       setVicePrincipalSignature((tenant as any).vicePrincipalSignature || "")
-      setFacebookUrl(tenant.facebookUrl || "")
       setDivisionName(tenant.divisionName || "")
       setDistrictName(tenant.districtName || "")
       setUpazilaName(tenant.upazilaName || "")
       setUnionName(tenant.unionName || "")
       setPostalCode(tenant.postalCode || "")
-      setGeoCode(tenant.geoCode || "")
+      setWebsite(tenant.website || "")
       setPrincipalName((tenant as any).principalName || "")
       setVicePrincipalName((tenant as any).vicePrincipalName || "")
     }
@@ -108,13 +107,12 @@ export function ProfileView() {
       phone: phone.trim() || null,
       principalSignature: principalSignature.trim() || null,
       vicePrincipalSignature: vicePrincipalSignature.trim() || null,
-      facebookUrl: facebookUrl.trim() || null,
       divisionName: divisionName.trim() || null,
       districtName: districtName.trim() || null,
       upazilaName: upazilaName.trim() || null,
       unionName: unionName.trim() || null,
       postalCode: postalCode.trim() || null,
-      geoCode: geoCode.trim() || null,
+      website: website.trim() || null,
       principalName: principalName.trim() || null,
       vicePrincipalName: vicePrincipalName.trim() || null,
     })
@@ -191,7 +189,7 @@ export function ProfileView() {
                       onChange={(e) => setName(e.target.value)}
                       required
                       disabled={updateMutation.isPending}
-                      placeholder="e.g. Sreepur Union Porishod"
+                      placeholder="e.g. Sreepur Institution"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>
@@ -283,22 +281,7 @@ export function ProfileView() {
                 </div>
               </div>
 
-              {/* Facebook URL */}
-              <div className="space-y-1.5">
-                <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                  অফিসিয়াল ফেসবুক পেজ লিংক
-                </Label>
-                <div className="relative group font-body">
-                  <Globe className="absolute left-3.5 top-3 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
-                  <Input
-                    value={facebookUrl}
-                    onChange={(e) => setFacebookUrl(e.target.value)}
-                    disabled={updateMutation.isPending}
-                    placeholder="https://facebook.com/your-union-porishod"
-                    className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
-                  />
-                </div>
-              </div>
+
 
               {/* Description */}
               <div className="space-y-1.5">
@@ -432,15 +415,15 @@ export function ProfileView() {
                 {/* Geo Code */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                    জিও কোড (Geo Code)
+                    ওয়েবসাইট (Website)
                   </Label>
                   <div className="relative group font-body">
                     <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
                     <Input
-                      value={geoCode}
-                      onChange={(e) => setGeoCode(e.target.value)}
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
                       disabled={updateMutation.isPending}
-                      placeholder="যেমনঃ ৩০৮৬"
+                      placeholder="https://example.com"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all font-mono"
                     />
                   </div>

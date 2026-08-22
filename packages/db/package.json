@@ -21,6 +21,7 @@
     "reset": "npx -y tsx prisma/seed/reset.ts",
     "clean:databases": "npx -y tsx prisma/seed/clean-tenant-databases.ts",
     "clean:databases:except-mandori": "npx -y tsx prisma/seed/clean-except-mandori.ts",
+    "clean:branches": "npx -y tsx scripts/delete-branches.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -130,7 +130,7 @@ const Layout = async ({ children }: RootLayoutProps) => {
         districtNameBn: tenant.district?.nameBn,
         upazilaNameBn: tenant.upazila?.nameBn,
         unionNameBn: tenant.union?.nameBn,
-        chairmanName: tenant.principalName,
+        principalName: tenant.principalName,
         phone: tenant.phone,
         email: tenant.email,
       }}

@@ -100,12 +100,15 @@ model Tenant {
   type        String  @default("SCHOOL")
   email       String?
   phone       String?
-  geoCode     String?
 
   // ── Educational Institution Details ──────────────────────
   eiin            String?
   board           String?
   address         String?
+  establishedYear Int?     // Year the institution was founded
+  curriculum      String?  // NATIONAL | ENGLISH_MEDIUM | MADRASA | CAMBRIDGE | IB | EDEXCEL
+  medium          String?  // BANGLA | ENGLISH | BOTH
+  shift           String?  // MORNING | DAY | BOTH
 
   // ── Bangladesh Geographical Hierarchy ────────────────────
   divisionId String?
@@ -125,7 +128,8 @@ model Tenant {
   vicePrincipalSignature String?
 
   // ── Social & Branding ────────────────────────────────────
-  facebookUrl String?
+  website     String?
+  socialLinks Json    @default("{}")
 
   // ── Domain & Branding ────────────────────────────────────
   subdomain            String? @unique
@@ -139,8 +143,8 @@ model Tenant {
 
   // ── Usage Counters ───────────────────────────────────────
   studentCount     Int @default(0)
-  staffCount       Int @default(0)
-  certificateCount Int @default(0)
+  teacherCount     Int @default(0)
+  examCount        Int @default(0)
   storageUsedMB    Int @default(0)
 
   // ── Status & Lifecycle ───────────────────────────────────
@@ -163,14 +167,19 @@ model Tenant {
 
   // ── Custom Overrides ─────────────────────────────────────
   customStudentLimit     Int?
-  customStaffLimit       Int?
-  customCertificateLimit Int?
+  customTeacherLimit     Int?
+  customExamLimit        Int?
   customStorageLimit     Int?
+
+  // ── Credit System ──────────────────────────────────────────
+  creditBalance     Int @default(0)
+  totalCreditsUsed  Int @default(0)
 
   // ── Relations ────────────────────────────────────────────
   subscription Subscription?
   members      TenantMember[]
   invitations  TenantInvitation[]
+  creditTransactions CreditTransaction[]
   fiscalYears  FiscalYear[]
 
   @@index([slug])
@@ -242,19 +251,22 @@ model SubscriptionPlan {
 
   // ── Resource Limits ──────────────────────────────────────
   defaultStudentLimit     Int @default(1000)
-  defaultStaffLimit       Int @default(10)
-  defaultCertificateLimit Int @default(500)
+  defaultTeacherLimit     Int @default(10)
+  defaultExamLimit        Int @default(500)
   defaultStorageLimit     Int @default(500)
+  defaultCreditLimit      Int @default(30)
 
   // ── Feature Flags ────────────────────────────────────────
-  canIssueCertificates  Boolean @default(true)
-  canCollectOnlineFees  Boolean @default(false)
+  canCreateExams        Boolean @default(true)
+  canCollectFees        Boolean @default(false)
   canUseLms             Boolean @default(false)
   canManageAttendance   Boolean @default(false)
   canManageLibrary      Boolean @default(false)
   canManageTransport    Boolean @default(false)
   canSendSms            Boolean @default(false)
   canUseCustomDomain    Boolean @default(false)
+  canUseAiFeatures      Boolean @default(false)
+  canExportReports      Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -288,8 +300,8 @@ model Subscription {
   cancelReason      String?
 
   customStudentLimit     Int?
-  customStaffLimit       Int?
-  customCertificateLimit Int?
+  customTeacherLimit     Int?
+  customExamLimit        Int?
   customStorageLimit     Int?
 
   createdAt DateTime @default(now())
@@ -305,6 +317,25 @@ model Subscription {
   @@index([status])
   @@index([tenantId])
   @@map("subscription")
+}
+
+model CreditTransaction {
+  id        String @id @default(cuid())
+  tenantId  String
+  tenant    Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  type      String   // SUBSCRIPTION_REFRESH | PURCHASE | USAGE | REFUND | ADMIN_ADJUSTMENT
+  amount    Int      // positive for credits in, negative for credits out
+  balance   Int      // Running balance after this transaction
+
+  description String
+
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("credit_transaction")
 }
 
 model SubscriptionHistory {

@@ -27,7 +27,7 @@ export interface TenantInfo {
   districtNameBn?: string | null;
   upazilaNameBn?: string | null;
   unionNameBn?: string | null;
-  chairmanName?: string | null;
+  principalName?: string | null;
   phone?: string | null;
   email?: string | null;
 }

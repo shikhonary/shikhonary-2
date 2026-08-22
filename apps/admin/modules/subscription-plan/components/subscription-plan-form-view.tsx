@@ -56,19 +56,22 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
   const [monthlyPriceBDT, setMonthlyPriceBDT] = useState(0)
   const [yearlyPriceBDT, setYearlyPriceBDT] = useState(0)
   const [defaultStudentLimit, setDefaultStudentLimit] = useState(1000)
-  const [defaultStaffLimit, setDefaultStaffLimit] = useState(10)
-  const [defaultCertificateLimit, setDefaultCertificateLimit] = useState(500)
+  const [defaultTeacherLimit, setDefaultTeacherLimit] = useState(10)
+  const [defaultExamLimit, setDefaultExamLimit] = useState(500)
   const [defaultStorageLimit, setDefaultStorageLimit] = useState(500)
+  const [defaultCreditLimit, setDefaultCreditLimit] = useState(30)
 
   // Feature Flags
-  const [canIssueCertificates, setCanIssueCertificates] = useState(true)
-  const [canCollectOnlineFees, setCanCollectOnlineFees] = useState(false)
+  const [canCreateExams, setCanCreateExams] = useState(true)
+  const [canCollectFees, setCanCollectFees] = useState(false)
   const [canUseLms, setCanUseLms] = useState(false)
   const [canManageAttendance, setCanManageAttendance] = useState(false)
   const [canManageLibrary, setCanManageLibrary] = useState(false)
   const [canManageTransport, setCanManageTransport] = useState(false)
   const [canSendSms, setCanSendSms] = useState(false)
   const [canUseCustomDomain, setCanUseCustomDomain] = useState(false)
+  const [canUseAiFeatures, setCanUseAiFeatures] = useState(false)
+  const [canExportReports, setCanExportReports] = useState(true)
   const [isPopular, setIsPopular] = useState(false)
   const [isActive, setIsActive] = useState(true)
 
@@ -81,17 +84,20 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
       setMonthlyPriceBDT(plan.monthlyPriceBDT)
       setYearlyPriceBDT(plan.yearlyPriceBDT)
       setDefaultStudentLimit(plan.defaultStudentLimit)
-      setDefaultStaffLimit(plan.defaultStaffLimit)
-      setDefaultCertificateLimit(plan.defaultCertificateLimit)
+      setDefaultTeacherLimit(plan.defaultTeacherLimit)
+      setDefaultExamLimit(plan.defaultExamLimit)
       setDefaultStorageLimit(plan.defaultStorageLimit)
-      setCanIssueCertificates(plan.canIssueCertificates)
-      setCanCollectOnlineFees(plan.canCollectOnlineFees)
+      setDefaultCreditLimit(plan.defaultCreditLimit ?? 30)
+      setCanCreateExams(plan.canCreateExams)
+      setCanCollectFees(plan.canCollectFees)
       setCanUseLms(plan.canUseLms)
       setCanManageAttendance(plan.canManageAttendance ?? false)
       setCanManageLibrary(plan.canManageLibrary ?? false)
       setCanManageTransport(plan.canManageTransport ?? false)
       setCanSendSms(plan.canSendSms)
       setCanUseCustomDomain(plan.canUseCustomDomain)
+      setCanUseAiFeatures(plan.canUseAiFeatures ?? false)
+      setCanExportReports(plan.canExportReports ?? true)
       setIsPopular(plan.isPopular)
       setIsActive(plan.isActive)
     }
@@ -139,17 +145,20 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
         monthlyPriceBDT,
         yearlyPriceBDT,
         defaultStudentLimit,
-        defaultStaffLimit,
-        defaultCertificateLimit,
+        defaultTeacherLimit,
+        defaultExamLimit,
         defaultStorageLimit,
-        canIssueCertificates,
-        canCollectOnlineFees,
+        defaultCreditLimit,
+        canCreateExams,
+        canCollectFees,
         canUseLms,
         canManageAttendance,
         canManageLibrary,
         canManageTransport,
         canSendSms,
         canUseCustomDomain,
+        canUseAiFeatures,
+        canExportReports,
         isPopular,
         isActive,
       })
@@ -161,17 +170,20 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
         monthlyPriceBDT,
         yearlyPriceBDT,
         defaultStudentLimit,
-        defaultStaffLimit,
-        defaultCertificateLimit,
+        defaultTeacherLimit,
+        defaultExamLimit,
         defaultStorageLimit,
-        canIssueCertificates,
-        canCollectOnlineFees,
+        defaultCreditLimit,
+        canCreateExams,
+        canCollectFees,
         canUseLms,
         canManageAttendance,
         canManageLibrary,
         canManageTransport,
         canSendSms,
         canUseCustomDomain,
+        canUseAiFeatures,
+        canExportReports,
         isPopular,
         isActive,
       })
@@ -341,13 +353,13 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="block text-[10px] uppercase font-bold text-on-surface-variant">Staff Seats</Label>
+                  <Label className="block text-[10px] uppercase font-bold text-on-surface-variant">Teacher Seats</Label>
                   <div className="group relative">
                     <UserCheck className="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-3.5 w-3.5" />
                     <Input
                       type="number"
-                      value={defaultStaffLimit}
-                      onChange={(e) => setDefaultStaffLimit(Number(e.target.value) || 0)}
+                      value={defaultTeacherLimit}
+                      onChange={(e) => setDefaultTeacherLimit(Number(e.target.value) || 0)}
                       disabled={isSubmitting}
                       className="w-full rounded-lg border border-outline-variant py-1.5 pl-8 pr-2 font-body-md text-xs text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-8 disabled:opacity-50 font-mono"
                     />
@@ -355,13 +367,27 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="block text-[10px] uppercase font-bold text-on-surface-variant">Certificates</Label>
+                  <Label className="block text-[10px] uppercase font-bold text-on-surface-variant">Exams</Label>
                   <div className="group relative">
                     <FileText className="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-3.5 w-3.5" />
                     <Input
                       type="number"
-                      value={defaultCertificateLimit}
-                      onChange={(e) => setDefaultCertificateLimit(Number(e.target.value) || 0)}
+                      value={defaultExamLimit}
+                      onChange={(e) => setDefaultExamLimit(Number(e.target.value) || 0)}
+                      disabled={isSubmitting}
+                      className="w-full rounded-lg border border-outline-variant py-1.5 pl-8 pr-2 font-body-md text-xs text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-8 disabled:opacity-50 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="block text-[10px] uppercase font-bold text-on-surface-variant">Credits Limit</Label>
+                  <div className="group relative">
+                    <RefreshCw className="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-3.5 w-3.5" />
+                    <Input
+                      type="number"
+                      value={defaultCreditLimit}
+                      onChange={(e) => setDefaultCreditLimit(Number(e.target.value) || 0)}
                       disabled={isSubmitting}
                       className="w-full rounded-lg border border-outline-variant py-1.5 pl-8 pr-2 font-body-md text-xs text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-8 disabled:opacity-50 font-mono"
                     />
@@ -392,36 +418,72 @@ export function SubscriptionPlanFormView({ planId }: SubscriptionPlanFormViewPro
                 <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-3 bg-surface-container-low">
                   <input
                     type="checkbox"
-                    id="canIssueCertificates"
-                    checked={canIssueCertificates}
+                    id="canCreateExams"
+                    checked={canCreateExams}
                     disabled={isSubmitting}
-                    onChange={(e) => setCanIssueCertificates(e.target.checked)}
+                    onChange={(e) => setCanCreateExams(e.target.checked)}
                     className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
                   />
                   <div className="grid gap-0.5 leading-none">
-                    <label htmlFor="canIssueCertificates" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
+                    <label htmlFor="canCreateExams" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
                       <FileText className="h-3.5 w-3.5 text-primary" />
-                      Certificates & Transcripts
+                      Create Exams
                     </label>
-                    <p className="text-[10px] text-on-surface-variant">Allow generating and printing academic certificates.</p>
+                    <p className="text-[10px] text-on-surface-variant">Allow creating exams and generating question papers.</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-3 bg-surface-container-low">
                   <input
                     type="checkbox"
-                    id="canCollectOnlineFees"
-                    checked={canCollectOnlineFees}
+                    id="canCollectFees"
+                    checked={canCollectFees}
                     disabled={isSubmitting}
-                    onChange={(e) => setCanCollectOnlineFees(e.target.checked)}
+                    onChange={(e) => setCanCollectFees(e.target.checked)}
                     className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
                   />
                   <div className="grid gap-0.5 leading-none">
-                    <label htmlFor="canCollectOnlineFees" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
+                    <label htmlFor="canCollectFees" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
                       <Receipt className="h-3.5 w-3.5 text-primary" />
-                      Online Fee Collection
+                      Fee Collection
                     </label>
                     <p className="text-[10px] text-on-surface-variant">Enable parents billing, invoices, and payment integration.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-3 bg-surface-container-low">
+                  <input
+                    type="checkbox"
+                    id="canUseAiFeatures"
+                    checked={canUseAiFeatures}
+                    disabled={isSubmitting}
+                    onChange={(e) => setCanUseAiFeatures(e.target.checked)}
+                    className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
+                  />
+                  <div className="grid gap-0.5 leading-none">
+                    <label htmlFor="canUseAiFeatures" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      AI Features
+                    </label>
+                    <p className="text-[10px] text-on-surface-variant">Enable AI helper modules and automatic grading helper.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-3 bg-surface-container-low">
+                  <input
+                    type="checkbox"
+                    id="canExportReports"
+                    checked={canExportReports}
+                    disabled={isSubmitting}
+                    onChange={(e) => setCanExportReports(e.target.checked)}
+                    className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
+                  />
+                  <div className="grid gap-0.5 leading-none">
+                    <label htmlFor="canExportReports" className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-primary" />
+                      Export Reports
+                    </label>
+                    <p className="text-[10px] text-on-surface-variant">Enable advanced Excel and PDF exports.</p>
                   </div>
                 </div>
 

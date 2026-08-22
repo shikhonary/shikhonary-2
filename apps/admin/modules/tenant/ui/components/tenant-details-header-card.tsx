@@ -17,8 +17,8 @@ interface TenantDetailsHeaderCardProps {
 
 export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps) {
   const domainDisplay = tenant.subdomain
-    ? `${tenant.subdomain}.uphub.gov.bd`
-    : tenant.customDomain || `${tenant.slug}.uphub.gov.bd`
+    ? `${tenant.subdomain}.shikhonary.com`
+    : tenant.customDomain || `${tenant.slug}.shikhonary.com`
 
   const formattedDate = new Date(tenant.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -36,7 +36,7 @@ export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps
         <div className="bg-destructive/10 border-b border-destructive/20 px-6 py-4 flex items-start gap-3">
           <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-bold text-destructive">This Union Porishod is currently suspended</p>
+            <p className="text-sm font-bold text-destructive">This institution is currently suspended</p>
             {tenant.suspendReason && (
               <p className="text-xs text-destructive/80 mt-1">Reason: {tenant.suspendReason}</p>
             )}
@@ -76,7 +76,7 @@ export function TenantDetailsHeaderCard({ tenant }: TenantDetailsHeaderCardProps
                     variant="outline"
                     className="bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-xl h-auto"
                   >
-                    {tenant.type || "UNION_PORISHOD"}
+                    {tenant.type || "SCHOOL"}
                   </Badge>
                   {tenant.isSuspended ? (
                     <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-xl h-auto border">

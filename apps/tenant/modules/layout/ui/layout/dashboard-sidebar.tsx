@@ -85,23 +85,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "ড্যাশবোর্ড", url: "/", icon: LayoutDashboard },
       { title: "অর্থবছর", url: "/fiscal-years", icon: CalendarDays },
-      { title: "ওয়ার্ড", url: "/wards", icon: MapPin },
       { title: "কাউন্টার", url: "/counters", icon: Hash },
-    ],
-  },
-  {
-    label: "কর ব্যবস্থাপনা",
-    items: [
-      { title: "করদাতা", url: "/tax-payers", icon: Users },
-      { title: "কর আদায়", url: "/tax-collection", icon: Coins },
-      { title: "কর জেনারেট", url: "/generate-tax-payment", icon: Calculator },
-    ],
-  },
-  {
-    label: "নাগরিক সেবা",
-    items: [
-      { title: "নাগরিক তালিকা", url: "/citizens", icon: Users },
-      { title: "নাগরিক আবেদন", url: "/citizen-applications", icon: ClipboardList },
     ],
   },
 ];

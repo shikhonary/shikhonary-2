@@ -78,9 +78,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = () => {
               {unionDisplayName}
             </h2>
           </div>
-          {tenant.chairmanName && (
+          {tenant.principalName && (
             <p className="text-[10px] sm:text-xs font-medium text-muted-foreground font-body truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
-              অধ্যক্ষ: <span className="font-semibold text-foreground/90">{tenant.chairmanName}</span>
+              অধ্যক্ষ: <span className="font-semibold text-foreground/90">{tenant.principalName}</span>
             </p>
           )}
         </div>
