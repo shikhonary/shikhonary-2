@@ -1,8 +1,8 @@
 import pkg from '../packages/db/node_modules/pg/lib/index.js';
 const { Client } = pkg;
 
-const sourceUrl = "postgresql://neondb_owner:npg_SBrkyE5VIj8d@ep-blue-dust-azx774g3-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
-const targetUrl = "postgresql://neondb_owner:npg_I8FsSLWx9ymG@ep-round-night-azalud9d-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
+const sourceUrl = "postgresql://neondb_owner:npg_SBrkyE5VIj8d@ep-blue-dust-azx774g3-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full";
+const targetUrl = "postgresql://neondb_owner:npg_I8FsSLWx9ymG@ep-round-night-azalud9d-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full";
 
 // List of tables in topological order (dependencies first)
 const tablesInOrder = [

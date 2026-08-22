@@ -14,7 +14,7 @@ import { getSessionCookie } from "better-auth/cookies"
  * in tRPC middleware (isTenantMember) and server components.
  */
 
-const PUBLIC_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const
+const PUBLIC_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/no-access"] as const
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const
 const API_PREFIXES = ["/api/auth", "/api/trpc", "/api/uploadthing"] as const
 

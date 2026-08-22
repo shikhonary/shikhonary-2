@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -38,9 +39,9 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    groupLabel: "UP Management",
+    groupLabel: "Directory",
     items: [
-      { href: "/tenants", label: "Union Porishods", icon: Building2 },
+      { href: "/tenants", label: "Schools & Colleges", icon: GraduationCap },
       { href: "/fiscal-years", label: "Fiscal Years", icon: Calendar },
     ],
   },
@@ -77,7 +78,7 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
 
   return (
     <nav
-      className={`h-screen fixed left-0 top-0 bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${
+      className={`h-screen fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant hidden md:flex flex-col py-4 z-50 transition-all duration-300 ${
         isCollapsed ? "w-20" : "w-64"
       }`}
     >
@@ -85,15 +86,15 @@ export function SideNav({ isCollapsed = false, onToggle }: SideNavProps) {
       <div className={`flex items-center gap-3 px-4 mb-4 ${isCollapsed ? "justify-center" : "justify-between"}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-outline-variant/40 flex items-center justify-center bg-primary/10">
-            <Building2 className="w-6 h-6 text-primary" />
+            <GraduationCap className="w-6 h-6 text-primary" />
           </div>
           {!isCollapsed && (
             <div>
               <h1 className="font-headline-sm text-headline-sm font-extrabold text-primary leading-tight">
-                UP Hub
+                Shikhonary
               </h1>
               <p className="font-caption text-on-surface-variant text-[10px]">
-                Union Porishod SaaS
+                Educational SaaS
               </p>
             </div>
           )}

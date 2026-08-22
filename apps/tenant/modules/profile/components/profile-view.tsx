@@ -41,8 +41,8 @@ export function ProfileView() {
   const [logo, setLogo] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
-  const [secretarySignature, setSecretarySignature] = useState("")
-  const [chairmanSignature, setChairmanSignature] = useState("")
+  const [principalSignature, setPrincipalSignature] = useState("")
+  const [vicePrincipalSignature, setVicePrincipalSignature] = useState("")
   const [facebookUrl, setFacebookUrl] = useState("")
   
   const [divisionName, setDivisionName] = useState("")
@@ -52,8 +52,8 @@ export function ProfileView() {
   const [postalCode, setPostalCode] = useState("")
   const [geoCode, setGeoCode] = useState("")
   
-  const [secretaryName, setSecretaryName] = useState("")
-  const [chairmanName, setChairmanName] = useState("")
+  const [principalName, setPrincipalName] = useState("")
+  const [vicePrincipalName, setVicePrincipalName] = useState("")
 
   // Populate form states when data is loaded
   useEffect(() => {
@@ -64,8 +64,8 @@ export function ProfileView() {
       setLogo(tenant.logo || "")
       setEmail(tenant.email || "")
       setPhone(tenant.phone || "")
-      setSecretarySignature(tenant.secretarySignature || "")
-      setChairmanSignature(tenant.chairmanSignature || "")
+      setPrincipalSignature((tenant as any).principalSignature || "")
+      setVicePrincipalSignature((tenant as any).vicePrincipalSignature || "")
       setFacebookUrl(tenant.facebookUrl || "")
       setDivisionName(tenant.divisionName || "")
       setDistrictName(tenant.districtName || "")
@@ -73,8 +73,8 @@ export function ProfileView() {
       setUnionName(tenant.unionName || "")
       setPostalCode(tenant.postalCode || "")
       setGeoCode(tenant.geoCode || "")
-      setSecretaryName(tenant.secretaryName || "")
-      setChairmanName(tenant.chairmanName || "")
+      setPrincipalName((tenant as any).principalName || "")
+      setVicePrincipalName((tenant as any).vicePrincipalName || "")
     }
   }, [tenant])
 
@@ -106,8 +106,8 @@ export function ProfileView() {
       logo: logo.trim() || null,
       email: email.trim() || null,
       phone: phone.trim() || null,
-      secretarySignature: secretarySignature.trim() || null,
-      chairmanSignature: chairmanSignature.trim() || null,
+      principalSignature: principalSignature.trim() || null,
+      vicePrincipalSignature: vicePrincipalSignature.trim() || null,
       facebookUrl: facebookUrl.trim() || null,
       divisionName: divisionName.trim() || null,
       districtName: districtName.trim() || null,
@@ -115,8 +115,8 @@ export function ProfileView() {
       unionName: unionName.trim() || null,
       postalCode: postalCode.trim() || null,
       geoCode: geoCode.trim() || null,
-      secretaryName: secretaryName.trim() || null,
-      chairmanName: chairmanName.trim() || null,
+      principalName: principalName.trim() || null,
+      vicePrincipalName: vicePrincipalName.trim() || null,
     })
   }
 
@@ -471,35 +471,35 @@ export function ProfileView() {
 
             <CardContent className="p-6 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Chairman Name */}
+                {/* Principal Name */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                    ইউনিয়ন পরিষদ চেয়ারম্যান
+                    অধ্যক্ষ (Principal)
                   </Label>
                   <div className="relative group font-body">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
                     <Input
-                      value={chairmanName}
-                      onChange={(e) => setChairmanName(e.target.value)}
+                      value={principalName}
+                      onChange={(e) => setPrincipalName(e.target.value)}
                       disabled={updateMutation.isPending}
-                      placeholder="যেমনঃ মোঃ আব্দুল জলিল"
+                      placeholder="যেমনঃ অধ্যক্ষ ড. মোঃ আবদুর রহমান"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Secretary Name */}
+                {/* Vice Principal Name */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                    ইউনিয়ন পরিষদ সচিব
+                    উপাধ্যক্ষ (Vice Principal)
                   </Label>
                   <div className="relative group font-body">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
                     <Input
-                      value={secretaryName}
-                      onChange={(e) => setSecretaryName(e.target.value)}
+                      value={vicePrincipalName}
+                      onChange={(e) => setVicePrincipalName(e.target.value)}
                       disabled={updateMutation.isPending}
-                      placeholder="যেমনঃ অমল চন্দ্র শর্মা"
+                      placeholder="যেমনঃ উপাধ্যক্ষ রিয়াজুল ইসলাম"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>
@@ -507,35 +507,35 @@ export function ProfileView() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                {/* Chairman Signature */}
+                {/* Principal Signature */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                    চেয়ারম্যানের স্বাক্ষরের ছবি (Image URL)
+                    অধ্যক্ষের স্বাক্ষরের ছবি (Image URL)
                   </Label>
                   <div className="relative group font-body">
                     <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
                     <Input
-                      value={chairmanSignature}
-                      onChange={(e) => setChairmanSignature(e.target.value)}
+                      value={principalSignature}
+                      onChange={(e) => setPrincipalSignature(e.target.value)}
                       disabled={updateMutation.isPending}
-                      placeholder="https://example.com/signatures/chair.png"
+                      placeholder="https://example.com/signatures/principal.png"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Secretary Signature */}
+                {/* Vice Principal Signature */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-semibold text-muted-foreground font-display">
-                    সচিবের স্বাক্ষরের ছবি (Image URL)
+                    উপাধ্যক্ষের স্বাক্ষরের ছবি (Image URL)
                   </Label>
                   <div className="relative group font-body">
                     <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
                     <Input
-                      value={secretarySignature}
-                      onChange={(e) => setSecretarySignature(e.target.value)}
+                      value={vicePrincipalSignature}
+                      onChange={(e) => setVicePrincipalSignature(e.target.value)}
                       disabled={updateMutation.isPending}
-                      placeholder="https://example.com/signatures/sec.png"
+                      placeholder="https://example.com/signatures/vp.png"
                       className="bg-muted/30 border-border text-foreground placeholder:text-muted-foreground focus:bg-muted/50 focus:border-primary/40 focus:ring-primary/20 focus:ring-2 pl-10 h-11 rounded-xl text-sm transition-all"
                     />
                   </div>

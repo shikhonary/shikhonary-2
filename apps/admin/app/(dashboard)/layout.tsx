@@ -42,8 +42,7 @@ export default async function DashboardLayout({
     userWithRoles?.roles?.some((r) => r.name === "SUPER_ADMIN") ?? false
 
   if (!isSuperAdmin) {
-    // Redirect with an error hint so the sign-in page can show a message
-    redirect("/auth/sign-in?error=unauthorized")
+    redirect("/no-access")
   }
 
   return <AdminShell>{children}</AdminShell>

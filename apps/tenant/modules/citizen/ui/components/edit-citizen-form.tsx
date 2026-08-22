@@ -186,7 +186,7 @@ export function EditCitizenForm({ citizen }: EditCitizenFormProps) {
   const handlePresPostChange = (val: string) => {
     setPresPostId(val)
     const selected = presPosts.find((p: any) => p.id === val)
-    setPresPostOfficeBn(selected ? selected.postOfficeBn || selected.nameBn : "")
+    setPresPostOfficeBn(selected ? selected.postOfficeBn || selected.postOffice : "")
   }
 
   const handlePermDivisionChange = (val: string) => {
@@ -234,7 +234,7 @@ export function EditCitizenForm({ citizen }: EditCitizenFormProps) {
   const handlePermPostChange = (val: string) => {
     setPermPostId(val)
     const selected = permPosts.find((p: any) => p.id === val)
-    setPermPostOfficeBn(selected ? selected.postOfficeBn || selected.nameBn : "")
+    setPermPostOfficeBn(selected ? selected.postOfficeBn || selected.postOffice : "")
   }
 
   // Form Mutation

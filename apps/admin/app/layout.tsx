@@ -33,6 +33,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
+      data-theme="shikhonary"
       className={cn(
         "antialiased",
         fontSans.variable,

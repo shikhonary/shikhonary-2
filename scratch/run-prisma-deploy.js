@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 
-const targetUrl = "postgresql://neondb_owner:npg_9t8HcoZjEDaJ@ep-falling-cherry-axiebimn-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const targetUrl = "postgresql://neondb_owner:npg_9t8HcoZjEDaJ@ep-falling-cherry-axiebimn-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=verify-full&channel_binding=require";
 
 console.log("Deploying Prisma migrations to target database...");
 console.log("Target URL:", targetUrl);

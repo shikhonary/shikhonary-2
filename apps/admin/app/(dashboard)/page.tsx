@@ -7,9 +7,9 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-5 lg:gap-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Union Porishod SaaS Overview</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Shikhonary Educational SaaS Overview</h1>
         <p className="text-muted-foreground text-sm">
-          Platform-wide metrics, tenants, subscriptions, and administrative tools.
+          Platform-wide metrics, educational institutions, subscriptions, and administrative tools.
         </p>
       </div>
 

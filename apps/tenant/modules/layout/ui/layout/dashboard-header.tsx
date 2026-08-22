@@ -80,7 +80,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = () => {
           </div>
           {tenant.chairmanName && (
             <p className="text-[10px] sm:text-xs font-medium text-muted-foreground font-body truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
-              চেয়ারম্যান: <span className="font-semibold text-foreground/90">{tenant.chairmanName}</span>
+              অধ্যক্ষ: <span className="font-semibold text-foreground/90">{tenant.chairmanName}</span>
             </p>
           )}
         </div>

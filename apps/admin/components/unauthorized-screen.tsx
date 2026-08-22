@@ -70,7 +70,7 @@ export function UnauthorizedScreen({
             </Button>
 
             <a
-              href="mailto:support@bec.edu"
+              href="mailto:support@shikhonary.com"
               className="h-12 w-full md:w-auto px-8 border border-outline text-primary font-medium text-body-md rounded-lg hover:bg-surface-container-high transition-all active:scale-95 flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined text-[20px]">support_agent</span>

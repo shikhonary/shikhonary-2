@@ -111,7 +111,7 @@ export async function listSelectionSubscriptionPlans(db: PrismaClient) {
       monthlyPriceBDT: true,
       yearlyPriceBDT: true,
       isPopular: true,
-      defaultCitizenLimit: true,
+      defaultStudentLimit: true,
       defaultStaffLimit: true,
       defaultCertificateLimit: true,
       defaultStorageLimit: true,

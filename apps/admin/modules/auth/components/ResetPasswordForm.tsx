@@ -41,7 +41,7 @@ export default function ResetPasswordForm({
       {/* Logo & Header */}
       <div className="flex flex-col items-center mb-10">
         <Image
-          alt="Basic Education Care Logo"
+          alt="Shikhonary Logo"
           src="/logo.jpg"
           width={200}
           height={64}
@@ -58,7 +58,7 @@ export default function ResetPasswordForm({
 
       {/* Error Banner */}
       {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <span className="material-symbols-outlined text-[18px] mt-px shrink-0">error</span>
           <span>{error}</span>
         </div>
@@ -72,7 +72,7 @@ export default function ResetPasswordForm({
             <Input
               {...register('password')}
               disabled={loading}
-              className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
+              className={`w-full h-14 pl-4 pr-12 border bg-card rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.password ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : 'border-outline-variant'
                 }`}
               id="password"
               placeholder="New Password"
@@ -97,7 +97,7 @@ export default function ResetPasswordForm({
             </button>
           </div>
           {errors.password && (
-            <p className="text-xs text-red-500 pl-1">{errors.password.message}</p>
+            <p className="text-xs text-destructive pl-1">{errors.password.message}</p>
           )}
         </div>
 
@@ -107,7 +107,7 @@ export default function ResetPasswordForm({
             <Input
               {...register('confirmPassword')}
               disabled={loading}
-              className={`w-full h-14 pl-4 pr-12 border bg-white rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-outline-variant'
+              className={`w-full h-14 pl-4 pr-12 border bg-card rounded-lg focus:ring-2 focus:ring-primary-container/20 focus:border-primary-container transition-all duration-200 outline-none text-on-surface peer placeholder:text-transparent ${errors.confirmPassword ? 'border-destructive focus:border-destructive focus:ring-destructive/20' : 'border-outline-variant'
                 }`}
               id="confirmPassword"
               placeholder="Confirm New Password"
@@ -132,7 +132,7 @@ export default function ResetPasswordForm({
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="text-xs text-red-500 pl-1">{errors.confirmPassword.message}</p>
+            <p className="text-xs text-destructive pl-1">{errors.confirmPassword.message}</p>
           )}
         </div>
 

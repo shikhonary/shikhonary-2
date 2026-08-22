@@ -80,14 +80,17 @@ CREATE TABLE "tenant" (
     "type" TEXT NOT NULL DEFAULT 'UNION_PORISHOD',
     "email" TEXT,
     "phone" TEXT,
-    "address" TEXT,
-    "divisionName" TEXT,
-    "districtName" TEXT,
-    "upazilaName" TEXT,
-    "unionName" TEXT,
+    "geoCode" TEXT,
+    "divisionId" TEXT,
+    "districtId" TEXT,
+    "upazilaId" TEXT,
+    "unionId" TEXT,
     "postalCode" TEXT,
     "secretaryName" TEXT,
+    "secretarySignature" TEXT,
     "chairmanName" TEXT,
+    "chairmanSignature" TEXT,
+    "facebookUrl" TEXT,
     "subdomain" TEXT,
     "customDomain" TEXT,
     "customDomainVerified" BOOLEAN NOT NULL DEFAULT false,
@@ -259,6 +262,60 @@ CREATE TABLE "fiscal_year" (
 );
 
 -- CreateTable
+CREATE TABLE "division" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nameBn" TEXT NOT NULL,
+    "url" TEXT,
+
+    CONSTRAINT "division_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "district" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nameBn" TEXT NOT NULL,
+    "url" TEXT,
+    "divisionId" TEXT NOT NULL,
+
+    CONSTRAINT "district_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "upazila" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nameBn" TEXT NOT NULL,
+    "url" TEXT,
+    "districtId" TEXT NOT NULL,
+
+    CONSTRAINT "upazila_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "union" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nameBn" TEXT NOT NULL,
+    "url" TEXT,
+    "upazilaId" TEXT NOT NULL,
+
+    CONSTRAINT "union_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "post" (
+    "id" TEXT NOT NULL,
+    "postOffice" TEXT NOT NULL,
+    "postOfficeBn" TEXT,
+    "postCode" TEXT NOT NULL,
+    "upazilaId" TEXT NOT NULL,
+
+    CONSTRAINT "post_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_RoleToUser" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
@@ -313,6 +370,18 @@ CREATE INDEX "tenant_isActive_idx" ON "tenant"("isActive");
 
 -- CreateIndex
 CREATE INDEX "tenant_currentFiscalYearId_idx" ON "tenant"("currentFiscalYearId");
+
+-- CreateIndex
+CREATE INDEX "tenant_divisionId_idx" ON "tenant"("divisionId");
+
+-- CreateIndex
+CREATE INDEX "tenant_districtId_idx" ON "tenant"("districtId");
+
+-- CreateIndex
+CREATE INDEX "tenant_upazilaId_idx" ON "tenant"("upazilaId");
+
+-- CreateIndex
+CREATE INDEX "tenant_unionId_idx" ON "tenant"("unionId");
 
 -- CreateIndex
 CREATE INDEX "tenant_member_tenantId_idx" ON "tenant_member"("tenantId");
@@ -387,6 +456,24 @@ CREATE INDEX "fiscal_year_tenantId_idx" ON "fiscal_year"("tenantId");
 CREATE INDEX "fiscal_year_isCurrent_idx" ON "fiscal_year"("isCurrent");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "division_name_key" ON "division"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "district_name_key" ON "district"("name");
+
+-- CreateIndex
+CREATE INDEX "district_divisionId_idx" ON "district"("divisionId");
+
+-- CreateIndex
+CREATE INDEX "upazila_districtId_idx" ON "upazila"("districtId");
+
+-- CreateIndex
+CREATE INDEX "union_upazilaId_idx" ON "union"("upazilaId");
+
+-- CreateIndex
+CREATE INDEX "post_upazilaId_idx" ON "post"("upazilaId");
+
+-- CreateIndex
 CREATE INDEX "_RoleToUser_B_index" ON "_RoleToUser"("B");
 
 -- AddForeignKey
@@ -394,6 +481,18 @@ ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tenant" ADD CONSTRAINT "tenant_divisionId_fkey" FOREIGN KEY ("divisionId") REFERENCES "division"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tenant" ADD CONSTRAINT "tenant_districtId_fkey" FOREIGN KEY ("districtId") REFERENCES "district"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tenant" ADD CONSTRAINT "tenant_upazilaId_fkey" FOREIGN KEY ("upazilaId") REFERENCES "upazila"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tenant" ADD CONSTRAINT "tenant_unionId_fkey" FOREIGN KEY ("unionId") REFERENCES "union"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "tenant" ADD CONSTRAINT "tenant_currentFiscalYearId_fkey" FOREIGN KEY ("currentFiscalYearId") REFERENCES "fiscal_year"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -421,6 +520,18 @@ ALTER TABLE "subscription_history" ADD CONSTRAINT "subscription_history_subscrip
 
 -- AddForeignKey
 ALTER TABLE "fiscal_year" ADD CONSTRAINT "fiscal_year_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "tenant"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "district" ADD CONSTRAINT "district_divisionId_fkey" FOREIGN KEY ("divisionId") REFERENCES "division"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "upazila" ADD CONSTRAINT "upazila_districtId_fkey" FOREIGN KEY ("districtId") REFERENCES "district"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "union" ADD CONSTRAINT "union_upazilaId_fkey" FOREIGN KEY ("upazilaId") REFERENCES "upazila"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "post" ADD CONSTRAINT "post_upazilaId_fkey" FOREIGN KEY ("upazilaId") REFERENCES "upazila"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_RoleToUser" ADD CONSTRAINT "_RoleToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE;

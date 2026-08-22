@@ -97,10 +97,15 @@ model Tenant {
   slug        String  @unique
   description String?
   logo        String?
-  type        String  @default("UNION_PORISHOD")
+  type        String  @default("SCHOOL")
   email       String?
   phone       String?
   geoCode     String?
+
+  // ── Educational Institution Details ──────────────────────
+  eiin            String?
+  board           String?
+  address         String?
 
   // ── Bangladesh Geographical Hierarchy ────────────────────
   divisionId String?
@@ -113,11 +118,11 @@ model Tenant {
   union      Union?    @relation(fields: [unionId], references: [id], onDelete: SetNull)
   postalCode String?
 
-  // ── UP Officials ─────────────────────────────────────────
-  secretaryName      String?
-  secretarySignature String?
-  chairmanName       String?
-  chairmanSignature  String?
+  // ── Institution Officials ─────────────────────────────────
+  principalName          String?
+  principalSignature     String?
+  vicePrincipalName      String?
+  vicePrincipalSignature String?
 
   // ── Social & Branding ────────────────────────────────────
   facebookUrl String?
@@ -133,7 +138,7 @@ model Tenant {
   databaseStatus   String  @default("PENDING")
 
   // ── Usage Counters ───────────────────────────────────────
-  citizenCount     Int @default(0)
+  studentCount     Int @default(0)
   staffCount       Int @default(0)
   certificateCount Int @default(0)
   storageUsedMB    Int @default(0)
@@ -157,7 +162,7 @@ model Tenant {
   deletedAt DateTime?
 
   // ── Custom Overrides ─────────────────────────────────────
-  customCitizenLimit     Int?
+  customStudentLimit     Int?
   customStaffLimit       Int?
   customCertificateLimit Int?
   customStorageLimit     Int?
@@ -236,15 +241,18 @@ model SubscriptionPlan {
   isPopular Boolean @default(false)
 
   // ── Resource Limits ──────────────────────────────────────
-  defaultCitizenLimit     Int @default(1000)
+  defaultStudentLimit     Int @default(1000)
   defaultStaffLimit       Int @default(10)
   defaultCertificateLimit Int @default(500)
   defaultStorageLimit     Int @default(500)
 
   // ── Feature Flags ────────────────────────────────────────
   canIssueCertificates  Boolean @default(true)
-  canCollectHoldingTax  Boolean @default(false)
-  canManageTradeLicense Boolean @default(false)
+  canCollectOnlineFees  Boolean @default(false)
+  canUseLms             Boolean @default(false)
+  canManageAttendance   Boolean @default(false)
+  canManageLibrary      Boolean @default(false)
+  canManageTransport    Boolean @default(false)
   canSendSms            Boolean @default(false)
   canUseCustomDomain    Boolean @default(false)
 
@@ -279,7 +287,7 @@ model Subscription {
   canceledAt        DateTime?
   cancelReason      String?
 
-  customCitizenLimit     Int?
+  customStudentLimit     Int?
   customStaffLimit       Int?
   customCertificateLimit Int?
   customStorageLimit     Int?

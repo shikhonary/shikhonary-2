@@ -205,7 +205,7 @@ export function SubscriptionListView() {
               <TableHeader className="bg-surface-container-low border-b border-outline-variant">
                 <TableRow className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-low">
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
-                    Union Porishod (Tenant)
+                    Institution (Tenant)
                   </TableHead>
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
                     Plan Tier
@@ -289,17 +289,17 @@ export function SubscriptionListView() {
               {editingSub ? "Change Subscription Plan" : "New Subscription"}
             </DialogTitle>
             <DialogDescription className="text-xs text-on-surface-variant">
-              Associate a Union Porishod with a SaaS subscription tier.
+              Associate an educational institution with a SaaS subscription tier.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             {!editingSub && (
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-outline block">Select Union Porishod *</label>
+                <label className="text-xs font-bold uppercase text-outline block">Select Institution *</label>
                 <Select value={tenantId} onValueChange={setTenantId}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Choose UP Tenant" />
+                    <SelectValue placeholder="Choose School Tenant" />
                   </SelectTrigger>
                   <SelectContent>
                     {tenants.map((t: any) => (

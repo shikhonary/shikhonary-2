@@ -31,10 +31,13 @@ export function TenantDetailsSubscription({ tenant }: TenantDetailsSubscriptionP
   }
 
   const features = [
-    { label: "Issue Official Certificates", enabled: plan.canIssueCertificates },
-    { label: "Collect Holding Tax", enabled: plan.canCollectHoldingTax },
-    { label: "Manage Trade Licenses", enabled: plan.canManageTradeLicense },
-    { label: "Send Automated SMS Notifications", enabled: plan.canSendSms },
+    { label: "Issue Certificates & Transcripts", enabled: plan.canIssueCertificates },
+    { label: "Online Fee Collection & Billing", enabled: plan.canCollectOnlineFees },
+    { label: "LMS & Homework Portal", enabled: plan.canUseLms },
+    { label: "Digital/RFID Attendance System", enabled: plan.canManageAttendance },
+    { label: "School Library Management", enabled: plan.canManageLibrary },
+    { label: "Transport & Route Tracking", enabled: plan.canManageTransport },
+    { label: "Automated SMS Notifications", enabled: plan.canSendSms },
     { label: "Use Custom Branding & Domain", enabled: plan.canUseCustomDomain },
   ]
 

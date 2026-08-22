@@ -157,7 +157,7 @@ export function FiscalYearListView() {
             Fiscal Year Management
           </h2>
           <p className="max-w-2xl font-body-md text-xs sm:text-sm md:text-base leading-relaxed text-on-surface-variant">
-            Manage annual financial and administrative periods across all Union Porishod portals.
+            Manage annual financial and administrative periods across all school portals.
           </p>
         </div>
         <Button

@@ -23,14 +23,17 @@ export const createSubscriptionPlanSchema = z.object({
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
 
-  defaultCitizenLimit: z.number().int().min(0).default(1000),
+  defaultStudentLimit: z.number().int().min(0).default(1000),
   defaultStaffLimit: z.number().int().min(0).default(10),
   defaultCertificateLimit: z.number().int().min(0).default(500),
   defaultStorageLimit: z.number().int().min(0).default(500),
 
   canIssueCertificates: z.boolean().default(true),
-  canCollectHoldingTax: z.boolean().default(false),
-  canManageTradeLicense: z.boolean().default(false),
+  canCollectOnlineFees: z.boolean().default(false),
+  canUseLms: z.boolean().default(false),
+  canManageAttendance: z.boolean().default(false),
+  canManageLibrary: z.boolean().default(false),
+  canManageTransport: z.boolean().default(false),
   canSendSms: z.boolean().default(false),
   canUseCustomDomain: z.boolean().default(false),
 })
@@ -50,14 +53,17 @@ export const updateSubscriptionPlanSchema = z.object({
   isActive: z.boolean().optional(),
   isPopular: z.boolean().optional(),
 
-  defaultCitizenLimit: z.number().int().min(0).optional(),
+  defaultStudentLimit: z.number().int().min(0).optional(),
   defaultStaffLimit: z.number().int().min(0).optional(),
   defaultCertificateLimit: z.number().int().min(0).optional(),
   defaultStorageLimit: z.number().int().min(0).optional(),
 
   canIssueCertificates: z.boolean().optional(),
-  canCollectHoldingTax: z.boolean().optional(),
-  canManageTradeLicense: z.boolean().optional(),
+  canCollectOnlineFees: z.boolean().optional(),
+  canUseLms: z.boolean().optional(),
+  canManageAttendance: z.boolean().optional(),
+  canManageLibrary: z.boolean().optional(),
+  canManageTransport: z.boolean().optional(),
   canSendSms: z.boolean().optional(),
   canUseCustomDomain: z.boolean().optional(),
 })

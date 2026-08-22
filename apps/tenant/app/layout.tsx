@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bn" suppressHydrationWarning>
+    <html lang="bn" suppressHydrationWarning data-theme="shikhonary">
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >

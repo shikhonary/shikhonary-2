@@ -7,18 +7,16 @@ import { useCurrentUser } from "@/modules/user/services/use-user"
 import {
   Menu,
   LayoutDashboard,
-  GraduationCap,
-  Shield,
-  BookOpen,
-  BookMarked,
-  HelpCircle,
-  Users,
-  ClipboardList,
+  Building2,
+  Calendar,
+  CreditCard,
   Layers,
+  Users,
+  Shield,
   Settings,
   LogOut,
+  GraduationCap,
 } from "lucide-react"
-import Image from "next/image"
 import {
   Sheet,
   SheetTrigger,
@@ -45,20 +43,17 @@ const navGroups = [
     ],
   },
   {
-    groupLabel: "Academic Hub",
+    groupLabel: "Directory",
     items: [
-      { href: "/academic-classes", label: "Classes", icon: GraduationCap },
-      { href: "/students", label: "Students", icon: Users },
-      { href: "/subjects", label: "Subjects", icon: BookOpen },
-      { href: "/chapters", label: "Chapters", icon: BookMarked },
+      { href: "/tenants", label: "Schools & Colleges", icon: GraduationCap },
+      { href: "/fiscal-years", label: "Fiscal Years", icon: Calendar },
     ],
   },
   {
-    groupLabel: "Assessments",
+    groupLabel: "SaaS Billing",
     items: [
-      { href: "/mcqs", label: "MCQs", icon: HelpCircle },
-      { href: "/exams", label: "Exams", icon: ClipboardList },
-      { href: "/exam-groups", label: "Exam Groups", icon: Layers },
+      { href: "/subscriptions", label: "Subscriptions", icon: CreditCard },
+      { href: "/subscription-plans", label: "Subscription Plans", icon: Layers },
     ],
   },
   {
@@ -93,7 +88,7 @@ export function TopNav() {
   }
 
   return (
-    <header className="w-full h-14 sticky top-0 bg-surface dark:bg-surface-container border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
+    <header className="w-full h-14 sticky top-0 bg-surface border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
       
       {/* Left Side: Sheet Drawer trigger on mobile, empty spacer on desktop */}
       <div className="flex items-center">
@@ -110,21 +105,15 @@ export function TopNav() {
           <SheetContent side="left" className="w-[280px] p-0 flex flex-col h-full bg-surface">
             {/* Header / Brand */}
             <SheetHeader className="p-4 border-b border-outline-variant flex flex-row items-center gap-3">
-              <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-outline-variant/40">
-                <Image
-                  alt="Medical Institution Logo"
-                  className="w-full h-full object-cover"
-                  src="/logo.jpg"
-                  width={36}
-                  height={36}
-                />
+              <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-outline-variant/40 flex items-center justify-center bg-primary/10">
+                <GraduationCap className="w-6 h-6 text-primary" />
               </div>
               <div className="text-left">
                 <SheetTitle className="font-heading text-sm font-extrabold text-primary leading-tight">
-                  Mr. Dr.
+                  Shikhonary
                 </SheetTitle>
                 <SheetDescription className="text-[10px] text-on-surface-variant leading-none mt-0.5">
-                  Academic & Admission Care
+                  Educational SaaS
                 </SheetDescription>
               </div>
             </SheetHeader>
@@ -163,14 +152,6 @@ export function TopNav() {
 
             {/* CTA & Footer */}
             <div className="mt-auto flex flex-col gap-3 p-4 border-t border-outline-variant/30 bg-muted/20">
-              <SheetClose asChild>
-                <Link href="/students/create" className="w-full">
-                  <button className="w-full bg-primary-container text-on-primary-container font-semibold text-xs py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors duration-200 shadow-sm border border-transparent cursor-pointer">
-                    Enroll New Student
-                  </button>
-                </Link>
-              </SheetClose>
-              
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant rounded-lg py-2 px-3 transition-all duration-200 ease-in-out cursor-pointer"
@@ -215,11 +196,11 @@ export function TopNav() {
           <DropdownMenuTrigger asChild>
             <div
               className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer active:opacity-80 hover:ring-2 hover:ring-primary/20 transition-all shrink-0 flex items-center justify-center"
-              title={user?.name || "Dr. User Profile"}
+              title={user?.name || "Shikhonary Admin Profile"}
             >
               {user?.image ? (
                 <img
-                  alt={user?.name || "Dr. User Profile"}
+                  alt={user?.name || "Shikhonary Admin Profile"}
                   className={`w-full h-full object-cover ${isLoading ? "animate-pulse opacity-50" : ""}`}
                   src={user.image}
                 />
@@ -234,7 +215,7 @@ export function TopNav() {
           <DropdownMenuContent className="w-56 mt-1 rounded-xl bg-card border border-border" align="end">
             <DropdownMenuLabel className="pb-1.5 pt-2">
               <div className="flex flex-col text-left">
-                <span className="text-sm font-bold text-foreground truncate">{user?.name || "Dr. User"}</span>
+                <span className="text-sm font-bold text-foreground truncate">{user?.name || "User"}</span>
                 <span className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</span>
                 {roles && roles.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1.5">

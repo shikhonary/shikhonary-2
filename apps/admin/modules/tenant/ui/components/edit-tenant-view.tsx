@@ -27,9 +27,9 @@ import {
 } from "lucide-react"
 
 const steps = [
-  { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & official titles" },
-  { id: 2, title: "Location & Contact", icon: MapPin, description: "Geographical hierarchy & office contact" },
-  { id: 3, title: "UP Officials", icon: UserCheck, description: "Officials & signature credentials" },
+  { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & school details" },
+  { id: 2, title: "Location & Contact", icon: MapPin, description: "Geographical hierarchy & contact" },
+  { id: 3, title: "Administration", icon: UserCheck, description: "Principal & Vice Principal details" },
   { id: 4, title: "Subscription & Limits", icon: CreditCard, description: "SaaS plan & custom resource limits" },
 ]
 
@@ -51,11 +51,14 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [slug, setSlug] = useState("")
   const [name, setName] = useState("")
   const [nameBn, setNameBn] = useState("")
-  const [type, setType] = useState("UNION_PORISHOD")
+  const [type, setType] = useState("SCHOOL")
   const [description, setDescription] = useState("")
   const [logo, setLogo] = useState("")
   const [customDomain, setCustomDomain] = useState("")
   const [customDomainVerified, setCustomDomainVerified] = useState(false)
+  const [eiin, setEiin] = useState("")
+  const [board, setBoard] = useState("")
+  const [address, setAddress] = useState("")
 
   // Step 2: Geography & Contact (Cascading Dropdowns)
   const [divisionId, setDivisionId] = useState("")
@@ -72,16 +75,16 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
   const [email, setEmail] = useState("")
   const [facebookUrl, setFacebookUrl] = useState("")
 
-  // Step 3: UP Officials & Signatures
-  const [secretaryName, setSecretaryName] = useState("")
-  const [chairmanName, setChairmanName] = useState("")
-  const [secretarySignature, setSecretarySignature] = useState("")
-  const [chairmanSignature, setChairmanSignature] = useState("")
+  // Step 3: School Officials & Signatures
+  const [principalName, setPrincipalName] = useState("")
+  const [vicePrincipalName, setVicePrincipalName] = useState("")
+  const [principalSignature, setPrincipalSignature] = useState("")
+  const [vicePrincipalSignature, setVicePrincipalSignature] = useState("")
 
   // Step 4: Subscription Plan & Limits
   const [planId, setPlanId] = useState<string>("")
   const [isActive, setIsActive] = useState(true)
-  const [customCitizenLimit, setCustomCitizenLimit] = useState<number | undefined>()
+  const [customStudentLimit, setCustomStudentLimit] = useState<number | undefined>()
   const [customStaffLimit, setCustomStaffLimit] = useState<number | undefined>()
   const [customCertificateLimit, setCustomCertificateLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
@@ -152,9 +155,12 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       setSlug(tenant.slug || "")
       setName(tenant.name || "")
       setNameBn(tenant.nameBn || "")
-      setType(tenant.type || "UNION_PORISHOD")
+      setType(tenant.type || "SCHOOL")
       setDescription(tenant.description || "")
       setLogo(tenant.logo || "")
+      setEiin((tenant as any).eiin || "")
+      setBoard((tenant as any).board || "")
+      setAddress((tenant as any).address || "")
       
       setDivisionId(tenant.divisionId || "")
       setDivisionName(tenant.divisionName || "")
@@ -167,19 +173,19 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
 
       setPostalCode(tenant.postalCode || "")
       setGeoCode(tenant.geoCode || "")
-      setSecretaryName(tenant.secretaryName || "")
-      setChairmanName(tenant.chairmanName || "")
+      setPrincipalName((tenant as any).principalName || "")
+      setVicePrincipalName((tenant as any).vicePrincipalName || "")
       setPhone(tenant.phone || "")
       setEmail(tenant.email || "")
-      setSecretarySignature(tenant.secretarySignature || "")
-      setChairmanSignature(tenant.chairmanSignature || "")
+      setPrincipalSignature((tenant as any).principalSignature || "")
+      setVicePrincipalSignature((tenant as any).vicePrincipalSignature || "")
       setFacebookUrl(tenant.facebookUrl || "")
       setPlanId(tenant.subscription?.planId || "")
       setIsActive(tenant.isActive ?? true)
       setCustomDomain(tenant.customDomain || "")
       setCustomDomainVerified(tenant.customDomainVerified ?? false)
-      if (tenant.customCitizenLimit !== null && tenant.customCitizenLimit !== undefined) {
-        setCustomCitizenLimit(tenant.customCitizenLimit)
+      if ((tenant as any).customStudentLimit !== null && (tenant as any).customStudentLimit !== undefined) {
+        setCustomStudentLimit((tenant as any).customStudentLimit)
       }
       if (tenant.customStaffLimit !== null && tenant.customStaffLimit !== undefined) {
         setCustomStaffLimit(tenant.customStaffLimit)
@@ -266,6 +272,9 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       type: type || undefined,
       description: description || undefined,
       logo: logo || undefined,
+      eiin: eiin || undefined,
+      board: board || undefined,
+      address: address || undefined,
       divisionId: divisionId || undefined,
       divisionName: divisionName || undefined,
       districtId: districtId || undefined,
@@ -276,18 +285,18 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
       unionName: unionName || undefined,
       postalCode: postalCode || undefined,
       geoCode: geoCode || undefined,
-      secretaryName: secretaryName || undefined,
-      chairmanName: chairmanName || undefined,
+      principalName: principalName || undefined,
+      vicePrincipalName: vicePrincipalName || undefined,
       phone: phone?.trim() || undefined,
       email: email && email.trim().length > 0 ? email.trim() : undefined,
-      secretarySignature: secretarySignature || undefined,
-      chairmanSignature: chairmanSignature || undefined,
+      principalSignature: principalSignature || undefined,
+      vicePrincipalSignature: vicePrincipalSignature || undefined,
       facebookUrl: facebookUrl || undefined,
       planId: planId || undefined,
       isActive,
       customDomain: customDomain || undefined,
       customDomainVerified,
-      customCitizenLimit: customCitizenLimit !== undefined ? Number(customCitizenLimit) : null,
+      customStudentLimit: customStudentLimit !== undefined ? Number(customStudentLimit) : null,
       customStaffLimit: customStaffLimit !== undefined ? Number(customStaffLimit) : null,
       customCertificateLimit: customCertificateLimit !== undefined ? Number(customCertificateLimit) : null,
       customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : null,
@@ -482,7 +491,44 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                   <Input
                     value={nameBn}
                     onChange={(e) => setNameBn(e.target.value)}
-                    placeholder="সাভার ইউনিয়ন পরিষদ"
+                    placeholder="যেমনঃ সাভার হাই স্কুল"
+                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      School EIIN Code
+                    </Label>
+                    <Input
+                      value={eiin}
+                      onChange={(e) => setEiin(e.target.value)}
+                      placeholder="e.g. 130456"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                      Education Board
+                    </Label>
+                    <Input
+                      value={board}
+                      onChange={(e) => setBoard(e.target.value)}
+                      placeholder="e.g. Dhaka"
+                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    School Physical Address
+                  </Label>
+                  <Input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="e.g. Majidpur, Savar, Dhaka"
                     className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                   />
                 </div>
@@ -661,30 +707,30 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
               </div>
             )}
 
-            {/* Step 3: UP Officials */}
+            {/* Step 3: School Officials */}
             {currentStep === 3 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      UP Secretary Name (সচিবের নাম)
+                      Principal Name (অধ্যক্ষের নাম)
                     </Label>
                     <Input
-                      value={secretaryName}
-                      onChange={(e) => setSecretaryName(e.target.value)}
-                      placeholder="সচিবের নাম"
+                      value={principalName}
+                      onChange={(e) => setPrincipalName(e.target.value)}
+                      placeholder="অধ্যক্ষের নাম"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      UP Chairman Name (চেয়ারম্যানের নাম)
+                      Vice Principal Name (উপাধ্যক্ষের নাম)
                     </Label>
                     <Input
-                      value={chairmanName}
-                      onChange={(e) => setChairmanName(e.target.value)}
-                      placeholder="চেয়ারম্যানের নাম"
+                      value={vicePrincipalName}
+                      onChange={(e) => setVicePrincipalName(e.target.value)}
+                      placeholder="উপাধ্যক্ষের নাম"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
@@ -693,24 +739,24 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Secretary Signature Image URL
+                      Principal Signature Image URL
                     </Label>
                     <Input
-                      value={secretarySignature}
-                      onChange={(e) => setSecretarySignature(e.target.value)}
-                      placeholder="https://imgur.com/signature-sec.png"
+                      value={principalSignature}
+                      onChange={(e) => setPrincipalSignature(e.target.value)}
+                      placeholder="https://imgur.com/signature-principal.png"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Chairman Signature Image URL
+                      Vice Principal Signature Image URL
                     </Label>
                     <Input
-                      value={chairmanSignature}
-                      onChange={(e) => setChairmanSignature(e.target.value)}
-                      placeholder="https://imgur.com/signature-chair.png"
+                      value={vicePrincipalSignature}
+                      onChange={(e) => setVicePrincipalSignature(e.target.value)}
+                      placeholder="https://imgur.com/signature-vp.png"
                       className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                     />
                   </div>
@@ -764,12 +810,12 @@ export function EditTenantView({ tenantId }: EditTenantViewProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Citizen Limit (নাগরিক নিবন্ধনের সীমা)
+                        Student Limit (ছাত্র-ছাত্রীর সীমা)
                       </Label>
                       <Input
                         type="number"
-                        value={customCitizenLimit ?? ""}
-                        onChange={(e) => setCustomCitizenLimit(e.target.value ? Number(e.target.value) : undefined)}
+                        value={customStudentLimit ?? ""}
+                        onChange={(e) => setCustomStudentLimit(e.target.value ? Number(e.target.value) : undefined)}
                         placeholder="e.g. 10000"
                         className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
                       />

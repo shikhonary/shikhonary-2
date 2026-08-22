@@ -5,7 +5,7 @@ import { authClient } from '@workspace/auth/client';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FileQuestion, GraduationCap, Users, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Building2, CreditCard, Users, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import RegisterForm from '../components/RegisterForm';
 import VerificationStatusCard from '../components/VerificationStatusCard';
@@ -123,7 +123,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white font-sans text-slate-900">
+    <div className="min-h-screen w-full bg-background font-sans text-foreground">
       <div className="min-h-screen flex items-center justify-center px-4 py-4 sm:px-6 lg:px-16">
         <div className="w-full max-w-6xl flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
 
@@ -131,14 +131,14 @@ export default function RegisterPage() {
           <div className="flex flex-col items-center gap-3 lg:hidden">
             <Image
               src="/logo.jpg"
-              alt="Mr. Dr. Logo"
+              alt="Shikhonary Logo"
               className="w-16 h-16 rounded-2xl object-cover shadow-md"
               width={100}
               height={100}
             />
             <div className="text-center">
-              <div className="text-2xl font-extrabold text-[#c52828] tracking-tight leading-none">Mr. Dr.</div>
-              <div className="text-xs font-semibold text-slate-400 tracking-widest uppercase mt-1">Medical Coaching Admin</div>
+              <div className="text-2xl font-extrabold text-primary tracking-tight leading-none">Shikhonary</div>
+              <div className="text-xs font-semibold text-muted-foreground tracking-widest uppercase mt-1">Educational SaaS Admin</div>
             </div>
           </div>
 
@@ -148,53 +148,53 @@ export default function RegisterPage() {
             <div className="flex items-center gap-3 mb-10">
               <Image
                 src="/logo.jpg"
-                alt="Mr. Dr. Logo"
+                alt="Shikhonary Logo"
                 className="w-10 h-10 rounded-xl object-cover shadow-sm"
                 width={100}
                 height={100}
               />
-              <span className="text-2xl font-extrabold text-[#c52828] tracking-tight">Mr. Dr.</span>
-              <span className="px-2.5 py-0.5 bg-rose-50 text-[#c52828] text-[11px] font-bold tracking-widest rounded-md border border-rose-100 uppercase">
+              <span className="text-2xl font-extrabold text-primary tracking-tight">Shikhonary</span>
+              <span className="px-2.5 py-0.5 bg-primary/5 text-primary text-[11px] font-bold tracking-widest rounded-md border border-primary/10 uppercase">
                 Admin Portal
               </span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-[#c52828] leading-tight tracking-tight mb-4">
-              Medical Coaching
+            <h1 className="text-5xl lg:text-6xl font-extrabold text-primary leading-tight tracking-tight mb-4">
+              Educational SaaS
               <br />
-              <span className="text-slate-900">Management</span>
+              <span className="text-foreground">Management</span>
             </h1>
 
             {/* Tagline */}
-            <p className="text-[#7a6565] font-medium text-lg mb-4">
-              Management & Operations Control
+            <p className="text-muted-foreground font-medium text-lg mb-4">
+              Platform Management & Operations
             </p>
 
             {/* Description */}
-            <p className="text-slate-500 text-sm leading-relaxed mb-8">
-              Centralized administrative workstation for managing medical question banks,
-              student examinations, academic class syllabi, and institutional metrics.
+            <p className="text-muted-foreground/80 text-sm leading-relaxed mb-8">
+              Centralized administrative workstation for managing institutions,
+              student enrollments, subscription plans, and platform metrics.
             </p>
 
             {/* Feature Pills */}
             <div className="flex flex-wrap gap-2 mb-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-[#c52828] text-xs font-semibold">
-                <FileQuestion className="w-3.5 h-3.5" />
-                Question Bank & MCQs
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold">
+                <Building2 className="w-3.5 h-3.5" />
+                Tenants & Institutions
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-[#c52828] text-xs font-semibold">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Exams & Assessments
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold">
+                <CreditCard className="w-3.5 h-3.5" />
+                Subscription Plans
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-[#c52828] text-xs font-semibold">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold">
                 <Users className="w-3.5 h-3.5" />
-                Class Rosters & Users
+                User Management
               </div>
             </div>
 
             {/* Trust bar */}
-            <div className="flex items-center gap-5 pt-6 border-t border-slate-100 text-xs text-slate-400 font-medium">
+            <div className="flex items-center gap-5 pt-6 border-t border-border/60 text-xs text-muted-foreground font-medium">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                 256-bit SSL Security
@@ -208,7 +208,7 @@ export default function RegisterPage() {
 
           {/* ── Right: Register Card ── */}
           <div className="w-full lg:w-[440px] shrink-0">
-            <div className="bg-white rounded-3xl p-8 md:p-10 border border-slate-200 shadow-[0_20px_60px_rgba(0,0,0,0.07)]">
+            <div className="bg-card rounded-3xl p-8 md:p-10 border border-border shadow-[0_20px_60px_rgba(0,0,0,0.05)] text-card-foreground">
               {signUpSuccess ? (
                 <VerificationStatusCard
                   registeredEmail={registeredEmail}

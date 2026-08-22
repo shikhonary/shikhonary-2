@@ -23,7 +23,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex font-plus-jakarta">
+    <div className="bg-background text-on-background min-h-screen flex font-sans">
       {/* Side Navigation (Desktop & Tablet) */}
       <SideNav
         isCollapsed={isCollapsed}
