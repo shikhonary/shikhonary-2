@@ -9,6 +9,10 @@ export const listTenantsSchema = paginationSchema.extend({
   type: z.string().optional(),
   planId: z.string().optional(),
   isActive: z.boolean().optional(),
+  status: z.string().optional(),
+  query: z.string().optional(),
+  sort: z.string().optional(),
+  page: z.number().int().min(1).optional(),
 })
 
 export type ListTenantsInput = z.infer<typeof listTenantsSchema>

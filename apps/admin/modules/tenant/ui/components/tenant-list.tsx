@@ -130,6 +130,7 @@ interface TenantListProps {
   onDeactivate: (id: string) => Promise<void>
   isLoading: boolean
   handleDelete: (id: string, name: string) => void
+  items?: any[]
 }
 
 function DatabaseStatusBadge({ status }: { status: string }) {
@@ -201,15 +202,10 @@ export function TenantList({
   onDeactivate,
   isLoading,
   handleDelete,
+  items = [],
 }: TenantListProps) {
   const openDeleteModal = useDeleteTenantModalStore((state) => state.openModal)
   const openInvitationModal = useInvitationModalStore((state) => state.openModal)
-
-  const { data: tenantData, isLoading: isQueryLoading } = useQuery(
-    trpc.tenant.list.queryOptions({ limit: 50 })
-  )
-
-  const items = tenantData?.tenants ?? []
 
   const handleToggleActiveStatus = (id: string, isActive: boolean) => {
     if (isActive) {
@@ -219,7 +215,7 @@ export function TenantList({
     }
   }
 
-  if (isQueryLoading || isLoading) {
+  if (isLoading) {
     return (
       <div className="p-4 md:p-12">
         <div className="grid grid-cols-1 gap-3 md:hidden">
@@ -283,6 +279,20 @@ export function TenantList({
                   <p className="font-body-md text-xs leading-relaxed text-on-surface-variant mt-0.5 truncate">
                     {item.slug}.uphub.gov.bd
                   </p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-primary/5 text-primary border-primary/20 font-bold text-[9px] uppercase tracking-wider rounded-md h-5 px-1.5 inline-flex items-center"
+                    >
+                      <Building className="w-2.5 h-2.5 mr-1" />
+                      {item.type || "SCHOOL"}
+                    </Badge>
+                    <Badge 
+                      className="bg-primary/10 text-primary border-primary/20 font-extrabold text-[9px] uppercase tracking-wider px-1.5 h-5 rounded-md border inline-flex items-center"
+                    >
+                      {item.subscription?.plan?.displayName || "FREE"}
+                    </Badge>
+                  </div>
                 </div>
               </div>
 

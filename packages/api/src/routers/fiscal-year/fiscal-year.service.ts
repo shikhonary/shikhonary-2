@@ -15,20 +15,49 @@ export async function listFiscalYears(
   const where: any = {}
   if (input.tenantId) where.tenantId = input.tenantId
 
-  const fiscalYears = await db.fiscalYear.findMany({
-    where,
-    take: input.limit,
-    skip: input.cursor ? 1 : 0,
-    cursor: input.cursor ? { id: input.cursor } : undefined,
-    orderBy: { startDate: "desc" },
-  })
+  if (input.query) {
+    where.year = { contains: input.query, mode: "insensitive" }
+  }
+
+  let orderBy: any = { startDate: "desc" }
+  if (input.sort === "name_asc") {
+    orderBy = { year: "asc" }
+  } else if (input.sort === "name_desc") {
+    orderBy = { year: "desc" }
+  } else if (input.sort === "newest") {
+    orderBy = { startDate: "desc" }
+  } else if (input.sort === "oldest") {
+    orderBy = { startDate: "asc" }
+  }
+
+  const page = input.page ?? 1
+  const limit = input.limit ?? 20
+  const skip = input.cursor ? 1 : (page - 1) * limit
+
+  const [fiscalYears, totalItems] = await Promise.all([
+    db.fiscalYear.findMany({
+      where,
+      take: limit,
+      skip,
+      cursor: input.cursor ? { id: input.cursor } : undefined,
+      orderBy,
+    }),
+    db.fiscalYear.count({ where }),
+  ])
 
   const nextCursor =
-    fiscalYears.length === input.limit
+    fiscalYears.length === limit
       ? fiscalYears[fiscalYears.length - 1]?.id
       : undefined
 
-  return { fiscalYears, nextCursor }
+  return {
+    fiscalYears,
+    totalItems,
+    totalPages: Math.ceil(totalItems / limit) || 1,
+    page,
+    limit,
+    nextCursor,
+  }
 }
 
 export async function getFiscalYearById(

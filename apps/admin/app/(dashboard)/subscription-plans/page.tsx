@@ -1,5 +1,15 @@
-import { SubscriptionPlanListView } from "@/modules/subscription-plan/components/subscription-plan-list-view"
+import { trpc, HydrateClient } from "@/trpc/server"
+import { getQueryClient } from "@/trpc/query-client"
+import { SubscriptionPlanListPage } from "@/modules/subscription-plan/pages/subscription-plan-list-page"
 
-export default function SubscriptionPlansPage() {
-  return <SubscriptionPlanListView />
+export default async function SubscriptionPlansPage() {
+  const queryClient = getQueryClient()
+  // Prefetch subscription plans list
+  void queryClient.prefetchQuery(trpc.subscriptionPlan.list.queryOptions({ limit: 50 }))
+
+  return (
+    <HydrateClient>
+      <SubscriptionPlanListPage />
+    </HydrateClient>
+  )
 }

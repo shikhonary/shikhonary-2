@@ -15,18 +15,51 @@ export async function listSubscriptionPlans(
   const where: any = {}
   if (input.isActive !== undefined) where.isActive = input.isActive
 
-  const plans = await db.subscriptionPlan.findMany({
-    where,
-    take: input.limit,
-    skip: input.cursor ? 1 : 0,
-    cursor: input.cursor ? { id: input.cursor } : undefined,
-    orderBy: { monthlyPriceBDT: "asc" },
-  })
+  if (input.query) {
+    where.OR = [
+      { name: { contains: input.query, mode: "insensitive" } },
+      { displayName: { contains: input.query, mode: "insensitive" } },
+      { description: { contains: input.query, mode: "insensitive" } },
+    ]
+  }
+
+  let orderBy: any = { monthlyPriceBDT: "asc" }
+  if (input.sort === "name_asc") {
+    orderBy = { displayName: "asc" }
+  } else if (input.sort === "name_desc") {
+    orderBy = { displayName: "desc" }
+  } else if (input.sort === "price_asc") {
+    orderBy = { yearlyPriceBDT: "asc" }
+  } else if (input.sort === "price_desc") {
+    orderBy = { yearlyPriceBDT: "desc" }
+  }
+
+  const page = input.page ?? 1
+  const limit = input.limit ?? 20
+  const skip = input.cursor ? 1 : (page - 1) * limit
+
+  const [plans, totalItems] = await Promise.all([
+    db.subscriptionPlan.findMany({
+      where,
+      take: limit,
+      skip,
+      cursor: input.cursor ? { id: input.cursor } : undefined,
+      orderBy,
+    }),
+    db.subscriptionPlan.count({ where }),
+  ])
 
   const nextCursor =
-    plans.length === input.limit ? plans[plans.length - 1]?.id : undefined
+    plans.length === limit ? plans[plans.length - 1]?.id : undefined
 
-  return { plans, nextCursor }
+  return {
+    plans,
+    totalItems,
+    totalPages: Math.ceil(totalItems / limit) || 1,
+    page,
+    limit,
+    nextCursor,
+  }
 }
 
 export async function getSubscriptionPlanById(

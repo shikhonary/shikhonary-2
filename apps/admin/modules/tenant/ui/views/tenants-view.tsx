@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
@@ -17,10 +17,24 @@ import { InviteAdminModal } from "../components/invite-admin-modal"
 
 export const TenantsView = () => {
   const queryClient = useQueryClient()
-  const [currentPage, setCurrentPage] = useState(1)
+  const searchParams = useSearchParams()
+
+  const search = searchParams?.get("search") || undefined
+  const status = searchParams?.get("status") || undefined
+  const type = searchParams?.get("type") || undefined
+  const sort = searchParams?.get("sort") || undefined
+  const page = Number(searchParams?.get("page") || 1)
+  const limit = Number(searchParams?.get("limit") || 10)
 
   const { data: tenantData, isLoading } = useQuery(
-    trpc.tenant.list.queryOptions({ limit: 50 })
+    trpc.tenant.list.queryOptions({
+      query: search || undefined,
+      status: status || undefined,
+      type: type || undefined,
+      sort: sort || undefined,
+      page,
+      limit,
+    })
   )
 
   const toggleStatusMutation = useMutation({
@@ -93,9 +107,10 @@ export const TenantsView = () => {
           onDeactivate={onDeactivate}
           isLoading={isLoading}
           handleDelete={handleDeleteTenant}
+          items={tenantData?.tenants ?? []}
         />
 
-        <Pagination totalItem={tenantData?.tenants?.length ?? 0} />
+        <Pagination totalItem={tenantData?.totalItems ?? 0} />
       </div>
 
       {/* Delete Tenant Modal matched 1:1 with User module */}

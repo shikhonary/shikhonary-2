@@ -115,8 +115,8 @@ export function TenantDetailsDatabase({ tenant }: TenantDetailsDatabaseProps) {
             <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
               Database Connection URI (Credentials)
             </p>
-            <div className="flex items-center gap-2 p-3.5 rounded-2xl bg-muted/20 border border-border/40 font-mono text-xs overflow-hidden relative">
-              <div className="flex-1 truncate pr-20 select-all font-semibold">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-muted/20 border border-border/40 font-mono text-xs overflow-hidden">
+              <div className="flex-1 break-all select-all font-semibold pr-2">
                 {tenant.connectionString ? (
                   showConnStr ? (
                     tenant.connectionString
@@ -131,7 +131,7 @@ export function TenantDetailsDatabase({ tenant }: TenantDetailsDatabaseProps) {
               </div>
 
               {tenant.connectionString && (
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 bg-background/80 backdrop-blur-md p-1 rounded-xl border border-border/50">
+                <div className="flex items-center gap-1.5 bg-background/80 backdrop-blur-md p-1 rounded-xl border border-border/50 self-end sm:self-auto shrink-0">
                   <Button
                     type="button"
                     variant="ghost"

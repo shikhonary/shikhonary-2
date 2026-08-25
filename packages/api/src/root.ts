@@ -21,6 +21,12 @@ import { dashboardRouter } from "./routers/dashboard/dashboard.router"
 import { invitationRouter } from "./routers/invitation/invitation.router"
 import { tenantDashboardRouter } from "./routers/tenant-dashboard/tenant-dashboard.router"
 import { locationRouter } from "./routers/location/location.router"
+import { academicClassRouter } from "./routers/academic-class/academic-class.router"
+import { academicSubjectRouter } from "./routers/academic-subject/academic-subject.router"
+import { academicChapterRouter } from "./routers/academic-chapter/academic-chapter.router"
+import { academicYearRouter } from "./routers/academic-year/academic-year.router"
+import { questionTypeRouter } from "./routers/question-type/question-type.router"
+import { mcqRouter } from "./routers/mcq/mcq.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -36,6 +42,12 @@ export const appRouter = createTRPCRouter({
   invitation: invitationRouter,
   tenantDashboard: tenantDashboardRouter,
   location: locationRouter,
+  academicClass: academicClassRouter,
+  academicSubject: academicSubjectRouter,
+  academicChapter: academicChapterRouter,
+  academicYear: academicYearRouter,
+  questionType: questionTypeRouter,
+  mcq: mcqRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

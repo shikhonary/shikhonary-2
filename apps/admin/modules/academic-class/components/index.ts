@@ -1,0 +1,8 @@
+export { AcademicClassListView } from "./academic-class-list-view"
+export { AcademicClassListHeader } from "./academic-class-list-header"
+export { AcademicClassFilters } from "./academic-class-filters"
+export { AcademicClassTable } from "./academic-class-table"
+export { CreateAcademicClassModal } from "./create-academic-class-modal"
+export { EditAcademicClassModal } from "./edit-academic-class-modal"
+export { DeleteAcademicClassModal } from "./delete-academic-class-modal"
+export { Pagination } from "./pagination"

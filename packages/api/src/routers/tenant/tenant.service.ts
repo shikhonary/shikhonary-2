@@ -240,38 +240,90 @@ export async function listTenants(
   input: ListTenantsInput,
 ) {
   const where: any = {}
-  if (input.type) where.type = input.type
+  if (input.type && input.type !== "all") where.type = input.type
   if (input.isActive !== undefined) where.isActive = input.isActive
   if (input.planId) {
     where.subscription = { planId: input.planId }
   }
 
-  const tenants = await db.tenant.findMany({
-    where,
-    take: input.limit,
-    skip: input.cursor ? 1 : 0,
-    cursor: input.cursor ? { id: input.cursor } : undefined,
-    orderBy: { createdAt: "desc" },
-    include: {
-      subscription: {
-        include: { plan: true },
+  if (input.status && input.status !== "all") {
+    if (input.status === "active") {
+      where.isActive = true
+      where.isSuspended = false
+    } else if (input.status === "inactive") {
+      where.isActive = false
+    } else if (input.status === "suspended") {
+      where.isSuspended = true
+    }
+  }
+
+  if (input.query) {
+    where.OR = [
+      { id: { contains: input.query, mode: "insensitive" } },
+      { name: { contains: input.query, mode: "insensitive" } },
+      { nameBn: { contains: input.query, mode: "insensitive" } },
+      { slug: { contains: input.query, mode: "insensitive" } },
+    ]
+  }
+
+  let orderBy: any = { createdAt: "desc" }
+  if (input.sort && input.sort !== "All") {
+    switch (input.sort) {
+      case "asc":
+      case "oldest":
+        orderBy = { createdAt: "asc" }
+        break
+      case "name_asc":
+        orderBy = { name: "asc" }
+        break
+      case "name_desc":
+        orderBy = { name: "desc" }
+        break
+      case "desc":
+      case "newest":
+      default:
+        orderBy = { createdAt: "desc" }
+        break
+    }
+  }
+
+  const page = input.page ?? 1
+  const limit = input.limit ?? 20
+  const skip = input.cursor ? 1 : (page - 1) * limit
+
+  const [tenants, totalItems] = await Promise.all([
+    db.tenant.findMany({
+      where,
+      take: limit,
+      skip,
+      cursor: input.cursor ? { id: input.cursor } : undefined,
+      orderBy,
+      include: {
+        subscription: {
+          include: { plan: true },
+        },
+        _count: {
+          select: { members: true },
+        },
+        division: true,
+        district: true,
+        upazila: true,
+        union: true,
       },
-      _count: {
-        select: { members: true },
-      },
-      division: true,
-      district: true,
-      upazila: true,
-      union: true,
-    },
-  })
+    }),
+    db.tenant.count({ where }),
+  ])
 
   const nextCursor =
-    tenants.length === input.limit
+    tenants.length === limit
       ? tenants[tenants.length - 1]?.id
       : undefined
 
-  return { tenants: tenants.map(flattenTenantGeographics), nextCursor }
+  return {
+    tenants: tenants.map(flattenTenantGeographics),
+    nextCursor,
+    totalItems,
+  }
 }
 
 export async function getTenantById(

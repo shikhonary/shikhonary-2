@@ -3,6 +3,7 @@
 import { toast } from "@workspace/ui/components/sonner"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
+import { usePathname, useRouter } from "next/navigation"
 import { useDeleteTenantModalStore } from "../store/use-delete-tenant-modal-store"
 import {
   Dialog,
@@ -16,6 +17,8 @@ import { AlertTriangle, Info, Loader2, Trash2 } from "lucide-react"
 
 export function DeleteTenantModal() {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const pathname = usePathname()
   const { isOpen, tenantId, tenantName, closeModal } = useDeleteTenantModalStore()
 
   const deleteMutation = useMutation({
@@ -24,6 +27,9 @@ export function DeleteTenantModal() {
       queryClient.invalidateQueries(trpc.tenant.pathFilter())
       toast.success(`Union Porishod "${tenantName || "Tenant"}" deleted successfully.`)
       closeModal()
+      if (pathname?.includes(`/tenants/${tenantId}`)) {
+        router.push("/tenants")
+      }
     },
     onError: (err: any) => {
       toast.error(err.message || "Failed to delete Union Porishod")

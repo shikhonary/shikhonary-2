@@ -16,6 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  BookOpen,
+  HelpCircle,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -33,21 +35,37 @@ type NavGroup = {
 
 const navGroups: NavGroup[] = [
   {
-    groupLabel: "General",
+    groupLabel: "Main",
     items: [
-      { href: "/", label: "Overview", icon: LayoutDashboard },
+      { href: "/", label: "Dashboard", icon: LayoutDashboard },
     ],
   },
   {
-    groupLabel: "Directory",
+    groupLabel: "Institutions",
     items: [
       { href: "/tenants", label: "Schools & Colleges", icon: GraduationCap },
-      { href: "/fiscal-years", label: "Fiscal Years", icon: Calendar },
     ],
   },
   {
-    groupLabel: "SaaS Billing",
+    groupLabel: "Academic Setup",
     items: [
+      { href: "/academic-years", label: "Academic Years", icon: Calendar },
+      { href: "/academic-classes", label: "Classes", icon: GraduationCap },
+      { href: "/subjects", label: "Subjects", icon: BookOpen },
+      { href: "/chapters", label: "Chapters", icon: Layers },
+    ],
+  },
+  {
+    groupLabel: "Question Bank",
+    items: [
+      { href: "/mcqs", label: "MCQs", icon: HelpCircle },
+      { href: "/question-types", label: "Question Types", icon: HelpCircle },
+    ],
+  },
+  {
+    groupLabel: "SaaS & Finance",
+    items: [
+      { href: "/fiscal-years", label: "Fiscal Years", icon: Calendar },
       { href: "/subscriptions", label: "Subscriptions", icon: CreditCard },
       { href: "/subscription-plans", label: "Subscription Plans", icon: Layers },
     ],

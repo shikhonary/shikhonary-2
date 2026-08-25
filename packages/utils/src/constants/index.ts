@@ -189,4 +189,63 @@ export const COUNTER_KEY_OPTIONS = [
   { value: COUNTER_KEYS.TAX_PAYMENT, label: "কর আদায় সংখ্যা" },
 ] as const
 
+// ---------------------------------------------------------------------------
+// Tenant/Institution Types
+// ---------------------------------------------------------------------------
+
+export const TENANT_TYPES = {
+  SCHOOL: "SCHOOL",
+  COLLEGE: "COLLEGE",
+  MADRASAH: "MADRASAH",
+  UNIVERSITY: "UNIVERSITY",
+} as const
+
+export type TenantType = (typeof TENANT_TYPES)[keyof typeof TENANT_TYPES]
+
+export const TENANT_TYPE_OPTIONS = [
+  { value: TENANT_TYPES.SCHOOL, label: "School" },
+  { value: TENANT_TYPES.COLLEGE, label: "College" },
+  { value: TENANT_TYPES.MADRASAH, label: "Madrasah" },
+  { value: TENANT_TYPES.UNIVERSITY, label: "University" },
+] as const
+
+// ---------------------------------------------------------------------------
+// Academic Subject Groups
+// ---------------------------------------------------------------------------
+
+export const ACADEMIC_SUBJECT_GROUPS = {
+  GENERAL: "General",
+  SCIENCE: "Science",
+  HUMANITIES: "Humanities",
+  COMMERCE: "Commerce",
+} as const
+
+export type AcademicSubjectGroup = (typeof ACADEMIC_SUBJECT_GROUPS)[keyof typeof ACADEMIC_SUBJECT_GROUPS]
+
+export const ACADEMIC_SUBJECT_GROUP_OPTIONS = [
+  { value: ACADEMIC_SUBJECT_GROUPS.GENERAL, label: "General" },
+  { value: ACADEMIC_SUBJECT_GROUPS.SCIENCE, label: "Science" },
+  { value: ACADEMIC_SUBJECT_GROUPS.HUMANITIES, label: "Humanities" },
+  { value: ACADEMIC_SUBJECT_GROUPS.COMMERCE, label: "Commerce" },
+] as const
+
+// ---------------------------------------------------------------------------
+// MCQ Difficulty
+// ---------------------------------------------------------------------------
+
+export const QUESTION_DIFFICULTY = {
+  EASY: "EASY",
+  MEDIUM: "MEDIUM",
+  HARD: "HARD",
+} as const
+
+export type QuestionDifficulty = (typeof QUESTION_DIFFICULTY)[keyof typeof QUESTION_DIFFICULTY]
+
+export const QUESTION_DIFFICULTY_OPTIONS = [
+  { value: QUESTION_DIFFICULTY.EASY, label: "Easy" },
+  { value: QUESTION_DIFFICULTY.MEDIUM, label: "Medium" },
+  { value: QUESTION_DIFFICULTY.HARD, label: "Hard" },
+] as const
+
+
 

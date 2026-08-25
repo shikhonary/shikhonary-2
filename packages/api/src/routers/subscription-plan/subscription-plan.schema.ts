@@ -3,6 +3,9 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 
 export const listSubscriptionPlansSchema = paginationSchema.extend({
   isActive: z.boolean().optional(),
+  query: z.string().optional(),
+  sort: z.string().optional(),
+  page: z.number().int().min(1).optional(),
 })
 
 export type ListSubscriptionPlansInput = z.infer<typeof listSubscriptionPlansSchema>

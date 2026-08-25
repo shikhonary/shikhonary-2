@@ -77,4 +77,58 @@ export type {
   DeleteTenantFiscalYearInput,
 } from "./routers/tenant-fiscal-year/tenant-fiscal-year.schema"
 
+// ── Academic Setup Exports ───────────────────────────────────
+export type {
+  ListAcademicSubjectsInput,
+  GetAcademicSubjectInput,
+  CreateAcademicSubjectInput,
+  UpdateAcademicSubjectInput,
+  DeleteAcademicSubjectInput,
+} from "./routers/academic-subject/academic-subject.schema"
+
+export type {
+  ListAcademicChaptersInput,
+  GetAcademicChapterInput,
+  CreateAcademicChapterInput,
+  UpdateAcademicChapterInput,
+  DeleteAcademicChapterInput,
+} from "./routers/academic-chapter/academic-chapter.schema"
+
+export type {
+  ListAcademicYearsInput,
+  GetAcademicYearInput,
+  CreateAcademicYearInput,
+  UpdateAcademicYearInput,
+  DeleteAcademicYearInput,
+} from "./routers/academic-year/academic-year.schema"
+
+export type {
+  ListAcademicClassesInput,
+  GetAcademicClassInput,
+  CreateAcademicClassInput,
+  UpdateAcademicClassInput,
+  DeleteAcademicClassInput,
+} from "./routers/academic-class/academic-class.schema"
+
+export type {
+  ListQuestionTypesInput,
+  GetQuestionTypeInput,
+  CreateQuestionTypeInput,
+  UpdateQuestionTypeInput,
+  DeleteQuestionTypeInput,
+} from "./routers/question-type/question-type.schema"
+
+export type {
+  ListMcqsInput,
+  McqStatsInput,
+  CreateMcqInput,
+  UpdateMcqInput,
+  DeleteMcqInput,
+  BulkDeleteMcqsInput,
+  ToggleMcqActiveInput,
+  ImportMcqsInput,
+} from "./routers/mcq/mcq.schema"
+
+
+
 

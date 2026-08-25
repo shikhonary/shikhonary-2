@@ -3,6 +3,9 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 
 export const listFiscalYearsSchema = paginationSchema.extend({
   tenantId: z.string().optional(),
+  query: z.string().optional(),
+  sort: z.string().optional(),
+  page: z.number().int().min(1).optional(),
 })
 
 export type ListFiscalYearsInput = z.infer<typeof listFiscalYearsSchema>

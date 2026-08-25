@@ -1,0 +1,7 @@
+export { AcademicYearListView } from "./academic-year-list-view"
+export { AcademicYearListHeader } from "./academic-year-list-header"
+export { AcademicYearFilters } from "./academic-year-filters"
+export { AcademicYearTable } from "./academic-year-table"
+export { CreateAcademicYearModal } from "./create-academic-year-modal"
+export { EditAcademicYearModal } from "./edit-academic-year-modal"
+export { DeleteAcademicYearModal } from "./delete-academic-year-modal"

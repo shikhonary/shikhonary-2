@@ -20,6 +20,7 @@ import { TenantDetailsSubscription } from "../components/tenant-details-subscrip
 import { TenantDetailsDatabase } from "../components/tenant-details-database"
 import { TenantDetailsInvitations } from "../components/tenant-details-invitations"
 import { InviteAdminModal } from "../components/invite-admin-modal"
+import { DeleteTenantModal } from "../components/delete-tenant-modal"
 
 interface TenantViewProps {
   tenantId: string
@@ -70,6 +71,7 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
     <div className="min-h-screen p-4 lg:p-6 space-y-8 animate-in fade-in duration-500">
       <div>
         <TenantDetailsHeader
+          isActive={tenant.isActive}
           isSuspended={tenant.isSuspended}
           tenantId={tenant.id}
           tenantName={tenant.name}
@@ -80,36 +82,36 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
         <TenantDetailsHeaderCard tenant={tenant as any} />
       </div>
 
-      <div>
-        <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="bg-muted/50 p-1.5 rounded-2xl border border-border/50 backdrop-blur-md h-auto inline-flex overflow-x-auto max-w-full">
+      <div className="pt-12 sm:pt-16">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="w-full flex flex-col gap-2 bg-muted/50 p-1.5 rounded-2xl border border-border/50 sm:flex-row sm:bg-transparent sm:border-0 sm:border-b sm:border-outline-variant/30 sm:rounded-none sm:p-0 sm:gap-6 h-auto mb-12 sm:mb-0">
             <TabsTrigger
               value="overview"
-              className="rounded-xl px-5 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary transition-all"
+              className="w-full sm:w-auto justify-start sm:justify-center rounded-xl sm:rounded-none px-4 sm:px-1 py-3 sm:pb-3 sm:pt-2 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary sm:data-[state=active]:border-b-2 sm:data-[state=active]:border-primary sm:data-[state=active]:bg-transparent sm:data-[state=active]:shadow-none text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all uppercase tracking-wider"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger
               value="usage"
-              className="rounded-xl px-5 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary transition-all"
+              className="w-full sm:w-auto justify-start sm:justify-center rounded-xl sm:rounded-none px-4 sm:px-1 py-3 sm:pb-3 sm:pt-2 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary sm:data-[state=active]:border-b-2 sm:data-[state=active]:border-primary sm:data-[state=active]:bg-transparent sm:data-[state=active]:shadow-none text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all uppercase tracking-wider"
             >
               Usage & Limits
             </TabsTrigger>
             <TabsTrigger
               value="subscription"
-              className="rounded-xl px-5 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary transition-all"
+              className="w-full sm:w-auto justify-start sm:justify-center rounded-xl sm:rounded-none px-4 sm:px-1 py-3 sm:pb-3 sm:pt-2 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary sm:data-[state=active]:border-b-2 sm:data-[state=active]:border-primary sm:data-[state=active]:bg-transparent sm:data-[state=active]:shadow-none text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all uppercase tracking-wider"
             >
               Subscription
             </TabsTrigger>
             <TabsTrigger
               value="invitations"
-              className="rounded-xl px-5 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary transition-all"
+              className="w-full sm:w-auto justify-start sm:justify-center rounded-xl sm:rounded-none px-4 sm:px-1 py-3 sm:pb-3 sm:pt-2 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary sm:data-[state=active]:border-b-2 sm:data-[state=active]:border-primary sm:data-[state=active]:bg-transparent sm:data-[state=active]:shadow-none text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all uppercase tracking-wider"
             >
               Invitations
             </TabsTrigger>
             <TabsTrigger
               value="database"
-              className="rounded-xl px-5 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary transition-all"
+              className="w-full sm:w-auto justify-start sm:justify-center rounded-xl sm:rounded-none px-4 sm:px-1 py-3 sm:pb-3 sm:pt-2 data-[state=active]:bg-background data-[state=active]:shadow-soft data-[state=active]:text-primary sm:data-[state=active]:border-b-2 sm:data-[state=active]:border-primary sm:data-[state=active]:bg-transparent sm:data-[state=active]:shadow-none text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap shrink-0 transition-all uppercase tracking-wider"
             >
               Database
             </TabsTrigger>
@@ -156,6 +158,9 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
 
       {/* Invite Admin Modal */}
       <InviteAdminModal />
+
+      {/* Delete Tenant Modal */}
+      <DeleteTenantModal />
     </div>
   )
 }
