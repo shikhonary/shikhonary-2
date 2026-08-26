@@ -4,7 +4,6 @@ import { withTenant } from "./extensions/withTenant"
 
 export type {
   PrismaClient as TenantPrismaClient,
-  FiscalYear as TenantFiscalYear,
 } from "../generated/tenant/client"
 export { Prisma as TenantPrisma } from "../generated/tenant/client"
 

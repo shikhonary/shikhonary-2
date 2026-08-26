@@ -19,8 +19,8 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ইউনিয়ন পরিষদ পোর্টাল",
-  description: "ইউনিয়ন পরিষদ বাৎসরিক পরিকল্পনা ও ডিজিটাল সেবা ড্যাশবোর্ড",
+  title: "শিখনারী পোর্টাল",
+  description: "শিখনারী বাৎসরিক পরিকল্পনা ও ডিজিটাল শিক্ষা সেবা ড্যাশবোর্ড",
 };
 
 export default function RootLayout({
@@ -30,6 +30,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn" suppressHydrationWarning data-theme="shikhonary">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >

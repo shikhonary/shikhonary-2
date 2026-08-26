@@ -83,6 +83,8 @@ export const AcceptInvitationView = () => {
   // Accept mutation (tRPC v11 / TanStack Query pattern)
   const acceptMutation = useMutation(trpc.invitation.accept.mutationOptions());
 
+  const isDisabled = isSubmitting || acceptMutation.isPending;
+
   const newUserForm = useForm<NewUserFormValues>({
     resolver: zodResolver(newUserSchema),
     defaultValues: { name: "", password: "", confirmPassword: "" },
@@ -279,8 +281,8 @@ export const AcceptInvitationView = () => {
             <strong>
               {invitation.tenant.nameBn ?? invitation.tenant.name}
             </strong>
-            -এর ইউনিয়ন পরিষদ পোর্টালের অ্যাডমিনিস্ট্রেটর হিসেবে যুক্ত হওয়ার
-            আমন্ত্রণ জানানো হয়েছে।
+            -এর এডুকেশনাল পোর্টালের অ্যাডমিন হিসেবে যুক্ত হওয়ার
+            আমন্ত্রণ জানানো হয়েছে।
           </p>
           {invitation.message && (
             <p className="text-sm opacity-80 mt-2 italic">
@@ -308,6 +310,7 @@ export const AcceptInvitationView = () => {
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
               type="button"
+              disabled={isDisabled}
               onClick={() => setMode("new")}
               className={`flex-1 py-2 text-sm font-semibold transition-colors ${
                 mode === "new"
@@ -319,6 +322,7 @@ export const AcceptInvitationView = () => {
             </button>
             <button
               type="button"
+              disabled={isDisabled}
               onClick={() => setMode("existing")}
               className={`flex-1 py-2 text-sm font-semibold transition-colors ${
                 mode === "existing"
@@ -355,6 +359,7 @@ export const AcceptInvitationView = () => {
                   <Input
                     placeholder="আপনার সম্পূর্ণ নাম লিখুন"
                     className="pl-10 h-12"
+                    disabled={isDisabled}
                     {...newUserForm.register("name")}
                   />
                 </div>
@@ -375,6 +380,7 @@ export const AcceptInvitationView = () => {
                     type="password"
                     placeholder="কমপক্ষে ৮ অক্ষর (বড় হাত, ছোট হাত ও সংখ্যা সহ)"
                     className="pl-10 h-12"
+                    disabled={isDisabled}
                     {...newUserForm.register("password")}
                   />
                 </div>
@@ -395,6 +401,7 @@ export const AcceptInvitationView = () => {
                     type="password"
                     placeholder="আপনার পাসওয়ার্ডটি পুনরায় নিশ্চিত করুন"
                     className="pl-10 h-12"
+                    disabled={isDisabled}
                     {...newUserForm.register("confirmPassword")}
                   />
                 </div>
@@ -408,9 +415,9 @@ export const AcceptInvitationView = () => {
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-semibold gap-2"
-                disabled={isSubmitting || acceptMutation.isPending}
+                disabled={isDisabled}
               >
-                {isSubmitting || acceptMutation.isPending ? (
+                {isDisabled ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
@@ -438,6 +445,7 @@ export const AcceptInvitationView = () => {
                     type="password"
                     placeholder="আপনার বিদ্যমান পাসওয়ার্ড লিখুন"
                     className="pl-10 h-12"
+                    disabled={isDisabled}
                     {...existingUserForm.register("password")}
                   />
                 </div>
@@ -451,9 +459,9 @@ export const AcceptInvitationView = () => {
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-semibold gap-2"
-                disabled={isSubmitting || acceptMutation.isPending}
+                disabled={isDisabled}
               >
-                {isSubmitting || acceptMutation.isPending ? (
+                {isDisabled ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>

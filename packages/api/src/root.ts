@@ -15,8 +15,7 @@ import { tenantRouter } from "./routers/tenant/tenant.router"
 import { subscriptionRouter } from "./routers/subscription/subscription.router"
 import { subscriptionPlanRouter } from "./routers/subscription-plan/subscription-plan.router"
 import { fiscalYearRouter } from "./routers/fiscal-year/fiscal-year.router"
-import { tenantFiscalYearRouter } from "./routers/tenant-fiscal-year/tenant-fiscal-year.router"
-import { tenantCounterRouter } from "./routers/tenant-counter/tenant-counter.router"
+import { questionPaperRouter } from "./routers/question-paper/question-paper.router"
 import { dashboardRouter } from "./routers/dashboard/dashboard.router"
 import { invitationRouter } from "./routers/invitation/invitation.router"
 import { tenantDashboardRouter } from "./routers/tenant-dashboard/tenant-dashboard.router"
@@ -27,6 +26,8 @@ import { academicChapterRouter } from "./routers/academic-chapter/academic-chapt
 import { academicYearRouter } from "./routers/academic-year/academic-year.router"
 import { questionTypeRouter } from "./routers/question-type/question-type.router"
 import { mcqRouter } from "./routers/mcq/mcq.router"
+import { cqRouter } from "./routers/cq/cq.router"
+import { shortAnswerRouter } from "./routers/short-answer/short-answer.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -36,8 +37,7 @@ export const appRouter = createTRPCRouter({
   subscription: subscriptionRouter,
   subscriptionPlan: subscriptionPlanRouter,
   fiscalYear: fiscalYearRouter,
-  tenantFiscalYear: tenantFiscalYearRouter,
-  tenantCounter: tenantCounterRouter,
+  questionPaper: questionPaperRouter,
   dashboard: dashboardRouter,
   invitation: invitationRouter,
   tenantDashboard: tenantDashboardRouter,
@@ -48,6 +48,8 @@ export const appRouter = createTRPCRouter({
   academicYear: academicYearRouter,
   questionType: questionTypeRouter,
   mcq: mcqRouter,
+  cq: cqRouter,
+  shortAnswer: shortAnswerRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

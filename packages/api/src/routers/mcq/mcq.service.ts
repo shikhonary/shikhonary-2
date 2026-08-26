@@ -15,6 +15,7 @@ import type {
 export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   const where: any = {}
   
+  if (input.classId) where.classId = input.classId
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
   if (input.type) where.type = input.type
@@ -59,6 +60,13 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
       skip,
       orderBy,
       include: {
+        academicClass: {
+          select: {
+            id: true,
+            nameBn: true,
+            nameEn: true,
+          },
+        },
         subject: {
           select: {
             id: true,
@@ -85,6 +93,7 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
             mark: true,
           },
         },
+        attachments: true,
       },
     }),
     db.mcq.count({ where }),
@@ -103,6 +112,7 @@ export async function getMcqById(db: PrismaClient, input: GetMcqInput) {
   const mcq = await db.mcq.findUnique({
     where: { id: input.id },
     include: {
+      academicClass: true,
       subject: true,
       chapter: true,
       questionType: true,
@@ -131,8 +141,45 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
     })
   }
 
+  let resolvedQuestionTypeId = data.questionTypeId
+  if (!resolvedQuestionTypeId) {
+    const qt = await db.questionType.findFirst({
+      where: {
+        OR: [
+          { label: { contains: "MCQ", mode: "insensitive" } },
+          { nameEn: { contains: "MCQ", mode: "insensitive" } },
+        ],
+        isActive: true,
+        subjects: {
+          some: {
+            subjectId: data.subjectId,
+          },
+        },
+      },
+      select: { id: true },
+    })
+    if (qt) {
+      resolvedQuestionTypeId = qt.id
+    } else {
+      const defaultMcqQt = await db.questionType.findFirst({
+        where: {
+          OR: [
+            { label: { contains: "MCQ", mode: "insensitive" } },
+            { nameEn: { contains: "MCQ", mode: "insensitive" } },
+          ],
+          isActive: true,
+        },
+        select: { id: true },
+      })
+      if (defaultMcqQt) {
+        resolvedQuestionTypeId = defaultMcqQt.id
+      }
+    }
+  }
+
   return db.mcq.create({
     data: {
+      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       question: data.question,
@@ -148,7 +195,7 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
       difficulty: data.difficulty,
       year: data.year,
       source: data.source,
-      questionTypeId: data.questionTypeId,
+      questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0 ? {
         create: allAttachments.map((att) => ({
@@ -178,9 +225,46 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
     })
   }
 
+  let resolvedQuestionTypeId = data.questionTypeId
+  if (!resolvedQuestionTypeId) {
+    const qt = await db.questionType.findFirst({
+      where: {
+        OR: [
+          { label: { contains: "MCQ", mode: "insensitive" } },
+          { nameEn: { contains: "MCQ", mode: "insensitive" } },
+        ],
+        isActive: true,
+        subjects: {
+          some: {
+            subjectId: data.subjectId,
+          },
+        },
+      },
+      select: { id: true },
+    })
+    if (qt) {
+      resolvedQuestionTypeId = qt.id
+    } else {
+      const defaultMcqQt = await db.questionType.findFirst({
+        where: {
+          OR: [
+            { label: { contains: "MCQ", mode: "insensitive" } },
+            { nameEn: { contains: "MCQ", mode: "insensitive" } },
+          ],
+          isActive: true,
+        },
+        select: { id: true },
+      })
+      if (defaultMcqQt) {
+        resolvedQuestionTypeId = defaultMcqQt.id
+      }
+    }
+  }
+
   return db.mcq.update({
     where: { id },
     data: {
+      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       question: data.question,
@@ -196,7 +280,7 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
       difficulty: data.difficulty,
       year: data.year,
       source: data.source,
-      questionTypeId: data.questionTypeId,
+      questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments ? {
         deleteMany: {},
@@ -238,49 +322,100 @@ export async function toggleMcqActive(db: PrismaClient, input: ToggleMcqActiveIn
 }
 
 export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
+  // Query for the default MCQ question type once to avoid querying inside the transaction loop if possible
+  const defaultMcqQt = await db.questionType.findFirst({
+    where: {
+      OR: [
+        { label: { contains: "MCQ", mode: "insensitive" } },
+        { nameEn: { contains: "MCQ", mode: "insensitive" } },
+      ],
+      isActive: true,
+    },
+    select: { id: true },
+  })
+
+  const subjectQtCache: Record<string, string> = {}
+
   // Use transaction to support nested attachments with a timeout limit
   const created = await db.$transaction(
-    input.mcqs.map((mcq) => {
-      const { attachments, context, ...data } = mcq
-      const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-      if (context && context.trim()) {
-        allAttachments.push({
-          url: "text-context",
-          type: "text",
-          caption: context.trim(),
-          position: 99,
+    async (tx) => {
+      const results = []
+      for (const mcq of input.mcqs) {
+        const { attachments, context, ...data } = mcq
+        const allAttachments = Array.isArray(attachments) ? [...attachments] : []
+        if (context && context.trim()) {
+          allAttachments.push({
+            url: "text-context",
+            type: "text",
+            caption: context.trim(),
+            position: 99,
+          })
+        }
+
+        let resolvedQuestionTypeId = data.questionTypeId
+        if (!resolvedQuestionTypeId) {
+          const subId = data.subjectId
+          if (subjectQtCache[subId]) {
+            resolvedQuestionTypeId = subjectQtCache[subId]
+          } else {
+            const qt = await tx.questionType.findFirst({
+              where: {
+                OR: [
+                  { label: { contains: "MCQ", mode: "insensitive" } },
+                  { nameEn: { contains: "MCQ", mode: "insensitive" } },
+                ],
+                isActive: true,
+                subjects: {
+                  some: {
+                    subjectId: subId,
+                  },
+                },
+              },
+              select: { id: true },
+            })
+            if (qt) {
+              resolvedQuestionTypeId = qt.id
+              subjectQtCache[subId] = qt.id
+            } else if (defaultMcqQt) {
+              resolvedQuestionTypeId = defaultMcqQt.id
+            }
+          }
+        }
+
+        const createdMcq = await tx.mcq.create({
+          data: {
+            classId: data.classId,
+            subjectId: data.subjectId,
+            chapterId: data.chapterId,
+            question: data.question,
+            answer: data.answer,
+            options: data.options,
+            statements: data.statements || [],
+            type: data.type,
+            isMath: data.isMath ?? false,
+            reference: data.reference || [],
+            explanation: data.explanation,
+            questionUrl: data.questionUrl,
+            contextId: data.contextId,
+            difficulty: data.difficulty ?? "MEDIUM",
+            year: data.year,
+            source: data.source,
+            questionTypeId: resolvedQuestionTypeId || undefined,
+            isActive: data.isActive ?? true,
+            attachments: allAttachments.length > 0 ? {
+              create: allAttachments.map((att) => ({
+                url: att.url,
+                type: att.type ?? "image",
+                caption: att.caption ?? null,
+                position: att.position ?? 0,
+              })),
+            } : undefined,
+          } as any,
         })
+        results.push(createdMcq)
       }
-      return db.mcq.create({
-        data: {
-          subjectId: data.subjectId,
-          chapterId: data.chapterId,
-          question: data.question,
-          answer: data.answer,
-          options: data.options,
-          statements: data.statements || [],
-          type: data.type,
-          isMath: data.isMath ?? false,
-          reference: data.reference || [],
-          explanation: data.explanation,
-          questionUrl: data.questionUrl,
-          contextId: data.contextId,
-          difficulty: data.difficulty ?? "MEDIUM",
-          year: data.year,
-          source: data.source,
-          questionTypeId: data.questionTypeId,
-          isActive: data.isActive ?? true,
-          attachments: allAttachments.length > 0 ? {
-            create: allAttachments.map((att) => ({
-              url: att.url,
-              type: att.type ?? "image",
-              caption: att.caption ?? null,
-              position: att.position ?? 0,
-            })),
-          } : undefined,
-        } as any,
-      })
-    }),
+      return results
+    },
     {
       timeout: 30000, // 30 seconds maximum transaction timeout
     }
@@ -290,6 +425,7 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
 
 export async function getMcqStats(db: PrismaClient, input: McqStatsInput = {}) {
   const where: any = {}
+  if (input.classId) where.classId = input.classId
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
 

@@ -29,18 +29,21 @@ import {
 
 interface SubjectOption {
   id: string
-  name: string
+  nameEn: string
+  nameBn?: string
 }
 
 interface ChapterOption {
   id: string
-  name: string
+  nameEn: string
+  nameBn?: string
   subjectId: string
 }
 
 interface AcademicClassOption {
   id: string
-  name: string
+  nameEn: string
+  nameBn?: string
 }
 
 interface McqFiltersProps {
@@ -159,11 +162,11 @@ export function McqFilters({
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
             <SelectValue placeholder="All Classes" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All">All Classes</SelectItem>
+          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All" className="text-neutral-900">All Classes</SelectItem>
             {academicClasses.map((cls) => (
-              <SelectItem key={cls.id} value={cls.id}>
-                {cls.name}
+              <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
+                {cls.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
@@ -189,11 +192,11 @@ export function McqFilters({
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
             <SelectValue placeholder={selectedAcademicClassId === "All" ? "Select Class First" : "All Subjects"} />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All">All Subjects</SelectItem>
+          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All" className="text-neutral-900">All Subjects</SelectItem>
             {subjects.map((sub) => (
-              <SelectItem key={sub.id} value={sub.id}>
-                {sub.name}
+              <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
+                {sub.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
@@ -216,11 +219,11 @@ export function McqFilters({
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
             <SelectValue placeholder={selectedSubjectId === "All" ? "Select Subject First" : "All Chapters"} />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All">All Chapters</SelectItem>
+          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All" className="text-neutral-900">All Chapters</SelectItem>
             {filteredChapters.map((ch) => (
-              <SelectItem key={ch.id} value={ch.id}>
-                {ch.name}
+              <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
+                {ch.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
@@ -415,7 +418,7 @@ export function McqFilters({
                 variant="secondary"
                 className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
               >
-                <span>Subject: {subjects.find(s => s.id === selectedSubjectId)?.name || selectedSubjectId}</span>
+                <span>Subject: {subjects.find(s => s.id === selectedSubjectId)?.nameEn || selectedSubjectId}</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -436,7 +439,7 @@ export function McqFilters({
                 variant="secondary"
                 className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
               >
-                <span>Chapter: {chapters.find(c => c.id === selectedChapterId)?.name || selectedChapterId}</span>
+                <span>Chapter: {chapters.find(c => c.id === selectedChapterId)?.nameEn || selectedChapterId}</span>
                 <button
                   type="button"
                   onClick={() => onChapterChange("All")}

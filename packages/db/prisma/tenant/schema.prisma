@@ -7,32 +7,236 @@ datasource db {
   provider = "postgresql"
 }
 
-model FiscalYear {
-  id        String   @id @default(cuid())
-  year      String // e.g. "2026"
-  startDate DateTime
-  endDate   DateTime
-  isCurrent Boolean  @default(false)
+// ═══════════════════════════════════════════════════════════════
+// ██  Question Paper Models
+// ═══════════════════════════════════════════════════════════════
 
-  tenantId String?
+// ── Root entity: one row per question paper ────────────────────
+model QuestionPaper {
+    id          String  @id @default(uuid())
+    title       String
+    examName    String
+    description String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    // Logical reference to main.AcademicClass (no @relation — cross-DB)
+    classId   String
+    className String
 
-  @@index([tenantId])
-  @@index([isCurrent])
-  @@map("fiscal_year")
+    // Full paper-level settings JSON (layout, typography, header toggles, etc.)
+    settings Json @default("{}")
+
+    // Structured exam instructions shown on the paper
+    // e.g. [{ "text": "Read carefully", "position": "top" }, ...]
+    instructions Json @default("[]")
+
+    status   String  @default("Draft") // "Draft" | "Published"
+    isActive Boolean @default(true)
+
+    // ── Template support ────────────────────────────────────────
+    //    When true, this paper acts as a reusable template.
+    //    Duplicate it to create a real paper from the template.
+    isTemplate Boolean @default(false)
+
+    // ── Aggregate totals (denormalised for fast reads) ──────────
+    //    Recomputed whenever subjects / distributions change.
+    total         Float @default(0)
+    timeInMinutes Int   @default(0)
+
+    // Logical reference to main.User who created this paper
+    createdBy String?
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    // ── Relations (within tenant schema) ────────────────────────
+    questions QuestionPaperQuestion[]
+    subjects  QuestionPaperSubject[]
+    sections  QuestionPaperSection[]
+    history   QuestionPaperHistory[]
+
+    @@index([status])
+    @@index([isActive])
+    @@index([isTemplate])
+    @@index([createdAt])
+    @@index([classId])
+    @@map("question_paper")
 }
 
-model Counter {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ── Presentation sections ("Section A", "বিভাগ ক") ────────────
+//
+//    Optional grouping layer for questions on the printed paper.
+//    Sections sit alongside the subject/distribution structure —
+//    a question belongs to BOTH a distribution (marks logic) and
+//    optionally a section (presentation/layout).
+//
+model QuestionPaperSection {
+    id              String        @id @default(uuid())
+    questionPaperId String
+    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
-  @@map("counter")
+    title        String  // "Section A", "বিভাগ ক"
+    titleBn      String? // Bengali title (optional)
+    instructions String? // Per-section instructions, e.g. "Answer any 5"
+
+    orderIndex Int @default(0)
+
+    questions QuestionPaperQuestion[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([questionPaperId])
+    @@map("question_paper_section")
 }
 
+// ── One row per (paper × subject) ──────────────────────────────
+model QuestionPaperSubject {
+    id              String @id @default(uuid())
+    questionPaperId String
 
+    // Logical reference to main.AcademicSubject (no @relation — cross-DB)
+    subjectId   String
+    subjectName String
 
+    // Denormalised subject-level total (sum of all distributions below)
+    subjectTotal Float @default(0)
+
+    questionPaper QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+
+    // The per-question-type breakdown rows live here
+    distributions QuestionPaperSubjectMarkDistribution[]
+
+    @@unique([questionPaperId, subjectId])
+    @@index([questionPaperId])
+    @@index([subjectId])
+    @@map("question_paper_subject")
+}
+
+// ── One row per question-type within a subject ─────────────────
+//
+//  Question type examples (from main.QuestionType):
+//    "MCQ", "CQ", "Short", "Practical", "Viva",
+//    "Essay", "Fill-in-the-Blank", "True/False"
+//
+model QuestionPaperSubjectMarkDistribution {
+    id String @id @default(uuid())
+
+    // Logical reference to main.QuestionType (no @relation — cross-DB)
+    questionTypeId   String
+    questionTypeName String
+
+    paperSubjectId String
+    paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
+
+    // ── Marks ───────────────────────────────────────────────────
+    marksPerQuestion Float @default(0) // marks awarded per single question
+    questionCount    Int   @default(0) // total questions of this type
+
+    // Derived: totalMarks = marksPerQuestion × questionCount
+    // Stored for fast aggregation; kept in sync by the service layer.
+    totalMarks Float @default(0)
+
+    // ── Optional attempt rules ──────────────────────────────────
+    //    e.g. "answer 5 out of 8 questions"
+    questionsToAttempt Int? // null means all must be attempted
+
+    // ── Per-distribution ordering ───────────────────────────────
+    orderIndex Int                     @default(0)
+    questions  QuestionPaperQuestion[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([paperSubjectId])
+    @@index([questionTypeId])
+    @@map("question_paper_subject_mark_distribution")
+}
+
+// ── Junction: which questions belong to a paper, in what order ─
+//
+//    Exactly ONE of mcqId / cqId / shortAnswerId must be set.
+//    These are logical references to main.Mcq, main.Cq, main.ShortAnswer
+//    (no @relation — cross-DB). Enforced at the service layer.
+//
+model QuestionPaperQuestion {
+    id              String        @id @default(uuid())
+    questionPaperId String
+    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+
+    // Logical references to main-DB question bank (no @relation — cross-DB)
+    mcqId         String?
+    cqId          String?
+    shortAnswerId String?
+
+    // Associate with subject and distribution breakdown
+    distributionId String
+    distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+
+    // Optional section grouping (presentation layer)
+    sectionId String?
+    section   QuestionPaperSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+
+    orderIndex    Int    @default(0)
+    assignedMarks Float? // Override mark for this specific question
+    overrides     Json   @default("{}") // per-question style overrides
+
+    // ── Content snapshot ────────────────────────────────────────
+    //    Frozen copy of the question content at publish time.
+    //    Prevents silent changes if the source question is edited
+    //    after being added to a published paper.
+    //    e.g. { "question": "...", "options": [...], "answer": "..." }
+    contentSnapshot Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([questionPaperId, mcqId])
+    @@unique([questionPaperId, cqId])
+    @@unique([questionPaperId, shortAnswerId])
+    @@index([questionPaperId])
+    @@index([mcqId])
+    @@index([cqId])
+    @@index([shortAnswerId])
+    @@index([distributionId])
+    @@index([sectionId])
+    @@map("question_paper_question")
+}
+
+// ── Audit log for AI and user edits ────────────────────────────
+//
+//    Every mutation to a question paper creates a history row.
+//    Enables "undo last AI change", diff views, and accountability.
+//
+model QuestionPaperHistory {
+    id              String        @id @default(uuid())
+    questionPaperId String
+    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+
+    // What happened
+    action String // "CREATED" | "SETTINGS_UPDATED" | "QUESTION_ADDED"
+                  // | "QUESTION_REMOVED" | "QUESTION_REORDERED"
+                  // | "DISTRIBUTION_CHANGED" | "SECTION_ADDED"
+                  // | "SECTION_REMOVED" | "PUBLISHED" | "UNPUBLISHED"
+                  // | "MARKS_OVERRIDDEN" | "TEMPLATE_CREATED"
+
+    // Who did it
+    actorId   String? // Logical ref to main.User (null for system actions)
+    actorType String  @default("USER") // "USER" | "AI" | "SYSTEM"
+
+    // What changed — before/after diff
+    // e.g. { "field": "settings", "before": {...}, "after": {...} }
+    //   or { "questionId": "abc", "action": "added", "distributionId": "xyz" }
+    changes Json @default("{}")
+
+    // Optional full paper snapshot for major changes (publish, bulk edit)
+    // Allows complete rollback to a previous state
+    snapshot Json?
+
+    createdAt DateTime @default(now())
+
+    @@index([questionPaperId])
+    @@index([actorType])
+    @@index([createdAt])
+    @@map("question_paper_history")
+}

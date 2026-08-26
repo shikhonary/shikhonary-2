@@ -59,6 +59,8 @@ const navGroups: NavGroup[] = [
     groupLabel: "Question Bank",
     items: [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
+      { href: "/cqs", label: "CQs", icon: HelpCircle },
+      { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },

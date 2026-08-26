@@ -7,7 +7,7 @@ import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useMcqById, useUpdateMcq, useSubjectsForSelection, useChaptersForSelection } from "../services/use-mcq"
+import { useMcqById, useUpdateMcq } from "../services/use-mcq"
 import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
@@ -24,6 +24,7 @@ import {
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 
 const updateMcqFormSchema = z.object({
+  classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   chapterId: z.string().min(1, "Please select a chapter"),
   question: z.string().min(1, "Question text is required"),
@@ -55,7 +56,6 @@ export function EditMcqView({ id }: EditMcqViewProps) {
   const updateMutation = useUpdateMcq()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const { data: subjects = [] } = useSubjectsForSelection()
   const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
   const questionTypes = questionTypesData?.items ?? []
 
@@ -70,6 +70,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
   } = useForm<UpdateMcqFormData>({
     resolver: zodResolver(updateMcqFormSchema),
     defaultValues: {
+      classId: "",
       subjectId: "",
       chapterId: "",
       question: "",
@@ -95,14 +96,10 @@ export function EditMcqView({ id }: EditMcqViewProps) {
     },
   })
 
-  const selectedSubjectId = watch("subjectId")
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
-  )
-
   useEffect(() => {
     if (mcq) {
       reset({
+        classId: (mcq as any).classId || "",
         subjectId: mcq.subjectId,
         chapterId: mcq.chapterId,
         question: mcq.question,
@@ -157,6 +154,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
 
       await updateMutation.mutateAsync({
         id,
+        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         question: data.question.trim(),
@@ -258,81 +256,19 @@ export function EditMcqView({ id }: EditMcqViewProps) {
         </CardHeader>
         <CardContent className="p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Subject & Chapter Selection */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {/* Subject */}
-              <div className="space-y-2">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Subject *
-                </Label>
-                <Controller
-                  name="subjectId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      disabled={isSubmitting}
-                      value={field.value}
-                      onValueChange={(val) => {
-                        field.onChange(val)
-                        setValue("chapterId", "")
-                      }}
-                    >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:ring-2 focus:ring-primary/20 h-auto justify-between">
-                        <SelectValue placeholder="Select Subject..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-                        {subjects.map((sub) => (
-                          <SelectItem
-                            key={sub.id}
-                            value={sub.id}
-                            label={sub.name}
-                          >
-                            {sub.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.subjectId && (
-                  <p className="text-xs text-error">{errors.subjectId.message}</p>
-                )}
+            {/* Read-only Class, Subject & Chapter Info */}
+            <div className="bg-surface-container-low border border-outline-variant/60 rounded-xl p-5 flex flex-col sm:flex-row gap-6 text-xs sm:text-sm text-on-surface-variant font-medium">
+              <div className="flex-1">
+                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Academic Class</span>
+                <span className="font-semibold text-on-surface text-sm">{(mcq as any)?.academicClass?.nameEn || "N/A"}</span>
               </div>
-
-              {/* Chapter */}
-              <div className="space-y-2">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Chapter *
-                </Label>
-                <Controller
-                  name="chapterId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      disabled={isSubmitting || !selectedSubjectId}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:ring-2 focus:ring-primary/20 h-auto justify-between">
-                        <SelectValue placeholder="Select Chapter..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-                        {chapters.map((ch) => (
-                          <SelectItem
-                            key={ch.id}
-                            value={ch.id}
-                            label={ch.name}
-                          >
-                            {ch.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {errors.chapterId && (
-                  <p className="text-xs text-error">{errors.chapterId.message}</p>
-                )}
+              <div className="flex-1">
+                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Subject</span>
+                <span className="font-semibold text-on-surface text-sm">{(mcq as any)?.subject?.nameEn || "N/A"}</span>
+              </div>
+              <div className="flex-1">
+                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Chapter</span>
+                <span className="font-semibold text-on-surface text-sm">{(mcq as any)?.chapter?.nameEn || "N/A"}</span>
               </div>
             </div>
 
@@ -417,7 +353,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                   return (
                     <div key={field.id} className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs font-bold text-on-surface">
+                        <Label className={`text-xs font-bold text-on-surface ${/[\u0980-\u09FF]/.test(optionLabel) ? "font-solaiman" : ""}`}>
                           Option {optionLabel}
                         </Label>
                         {optionFields.length > 2 && (
@@ -599,7 +535,10 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                   {...register("referenceText")}
                   className="w-full rounded-lg border border-outline-variant bg-white p-2.5 font-body-md text-sm"
                 />
-                        {/* Enrichment & Academic Settings */}
+              </div>
+            </div>
+
+            {/* Enrichment & Academic Settings */}
             <div className="space-y-6 border-t border-outline-variant pt-6">
               <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
                 Enrichment & Context Settings
@@ -739,32 +678,32 @@ export function EditMcqView({ id }: EditMcqViewProps) {
             </div>
 
             {/* Form Actions */}
-            <div className="mt-8 flex flex-col items-center justify-between gap-6 border-t border-outline-variant pt-8 sm:flex-row">
-              <div className="flex items-center space-x-2 text-on-surface-variant">
+            <div className="mt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-outline-variant pt-6 sm:pt-8 mt-6">
+              <div className="flex items-center justify-center sm:justify-start space-x-2 text-on-surface-variant">
                 <span className="material-symbols-outlined text-sm">history</span>
                 <span className="text-[12px]">Last edited: Just now by Admin</span>
               </div>
-              <div className="flex w-full items-center space-x-4 sm:w-auto">
+              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   disabled={isSubmitting}
                   onClick={() => router.push("/mcqs")}
-                  className="flex-1 rounded-lg border border-outline px-8 py-3 font-bold text-primary transition-all hover:bg-surface-container-low sm:flex-none cursor-pointer h-auto text-sm"
+                  className="w-full sm:w-auto rounded-lg border border-outline px-6 sm:px-8 py-2.5 sm:py-3 font-bold !text-primary transition-all active:scale-95 hover:bg-surface-container-low hover:!text-primary cursor-pointer h-auto normal-case tracking-normal disabled:opacity-50 text-sm"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-primary-container px-10 py-3 font-bold text-on-primary-container shadow-md transition-all hover:bg-primary hover:text-white disabled:opacity-50 sm:flex-none cursor-pointer h-auto text-sm"
+                  className="flex w-full sm:w-auto items-center justify-center space-x-2 rounded-lg bg-primary-container px-8 sm:px-10 py-2.5 sm:py-3 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal text-sm"
                 >
                   {isSubmitting ? (
-                    <span className="material-symbols-outlined animate-spin text-[20px]">
+                    <span className="material-symbols-outlined animate-spin text-[18px] sm:text-[20px]">
                       progress_activity
                     </span>
                   ) : (
-                    <span className="material-symbols-outlined text-[20px]">save</span>
+                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]">save</span>
                   )}
                   <span>{isSubmitting ? "Updating..." : "Update MCQ Question"}</span>
                 </Button>

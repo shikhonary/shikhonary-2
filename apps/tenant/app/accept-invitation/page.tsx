@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { AcceptInvitationView } from "@/modules/invitation/ui/views/accept-invitation-view";
 
 export const metadata: Metadata = {
-  title: "আমন্ত্রণ গ্রহণ করুন | ইউনিয়ন পরিষদ পোর্টাল",
-  description: "ইউনিয়ন পরিষদ পোর্টালে যোগদানের জন্য আমন্ত্রণ পত্র গ্রহণ ও ভেরিফিকেশন প্রক্রিয়া",
+  title: "আমন্ত্রণ গ্রহণ করুন | শিখনারী এডুকেশনাল পোর্টাল",
+  description: "শিখনারী এডুকেশনাল পোর্টালে যোগদানের জন্য আমন্ত্রণ পত্র গ্রহণ ও ভেরিফিকেশন প্রক্রিয়া",
 };
 
 export default function AcceptInvitationPage() {

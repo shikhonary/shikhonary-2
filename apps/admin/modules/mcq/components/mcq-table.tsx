@@ -8,6 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import "katex/dist/katex.min.css"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -34,16 +35,29 @@ export interface McqItem {
   isActive: boolean
   createdAt: Date | string
   updatedAt: Date | string
+  difficulty?: string | null
+  attachments?: {
+    id: string
+    url: string
+    type: string
+    caption?: string | null
+    position: number
+  }[]
+  academicClass: {
+    id: string
+    nameEn: string
+    nameBn: string
+  }
   subject: {
     id: string
-    name: string
+    nameEn: string
     nameBn: string
-    level: string
+    code?: string | null
     group?: string | null
   }
   chapter: {
     id: string
-    name: string
+    nameEn: string
     nameBn: string
     position: number
   }
@@ -224,14 +238,21 @@ export function McqTable({
                           #{globalIndex}
                         </span>
 
+                        {/* Class Badge */}
+                        {item.academicClass && (
+                          <span className="px-2.5 py-0.5 bg-secondary/10 text-secondary rounded font-label-sm text-xs font-bold border border-secondary/20">
+                            {item.academicClass.nameBn || item.academicClass.nameEn}
+                          </span>
+                        )}
+
                         {/* Subject Badge */}
                         <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                          {item.subject.nameBn || item.subject.name}
+                          {item.subject.nameBn || item.subject.nameEn}
                         </span>
 
                         {/* Chapter Badge */}
                         <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                          {item.chapter.nameBn || item.chapter.name}
+                          {item.chapter.nameBn || item.chapter.nameEn}
                         </span>
 
                         {/* Type Badge */}
@@ -245,6 +266,18 @@ export function McqTable({
                             <span className="material-symbols-outlined text-[14px]">functions</span>
                             <span>Math</span>
                           </div>
+                        )}
+
+                        {/* Difficulty Badge */}
+                        {item.difficulty && (
+                          <span className={cn(
+                            "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
+                            item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
+                            item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
+                          )}>
+                            {item.difficulty}
+                          </span>
                         )}
 
                         {/* Active Status Badge Toggle */}
@@ -263,25 +296,73 @@ export function McqTable({
                       </div>
 
                       {/* Context / Comprehension Passage (If Present) */}
-                      {item.context && (
-                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-3.5 text-xs text-on-surface-variant leading-relaxed">
-                          <div className="font-bold text-secondary flex items-center gap-1.5 mb-1 text-[11px] uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-sm">article</span>
-                            Context / Passage:
+                      {(() => {
+                        const textAttachment = Array.isArray(item.attachments)
+                          ? item.attachments.find(
+                              (att: any) =>
+                                att &&
+                                (att.type === "text" ||
+                                  att.url === "text-context" ||
+                                  !att.url ||
+                                  String(att.type).toLowerCase() === "text" ||
+                                  String(att.url).toLowerCase() === "text-context")
+                            )
+                          : null;
+                        const displayContext =
+                          item.context ||
+                          (textAttachment
+                            ? textAttachment.caption || (textAttachment.url && textAttachment.url !== "text-context" ? textAttachment.url : "")
+                            : null);
+
+                        return displayContext ? (
+                          <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-3.5 text-xs text-on-surface-variant leading-relaxed">
+                            <div className="font-bold text-secondary flex items-center gap-1.5 mb-1 text-[11px] uppercase tracking-wider">
+                              <span className="material-symbols-outlined text-sm">article</span>
+                              Context / Passage:
+                            </div>
+                            <p className="whitespace-pre-wrap">
+                              <RenderMath text={displayContext} isMath={item.isMath} />
+                            </p>
                           </div>
-                          <p className="whitespace-pre-wrap">
-                            <RenderMath text={item.context} isMath={item.isMath} />
-                          </p>
-                        </div>
-                      )}
+                        ) : null;
+                      })()}
 
                       {/* Question Text */}
                       <Link
-                        href={`/mcqs/${item.id}`}
-                        className="block font-headline-md text-lg font-bold text-on-surface leading-snug group-hover:text-primary transition-colors"
+                        href={`/mcqs/${item.id}/edit`}
+                        className={cn(
+                          "block font-headline-md text-lg font-bold text-on-surface leading-snug group-hover:text-primary transition-colors",
+                          /[\u0980-\u09FF]/.test(item.question) && "font-solaiman"
+                        )}
                       >
                         <RenderMath text={item.question} isMath={item.isMath} />
                       </Link>
+
+                      {/* Attachments Section */}
+                      {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-4 mt-2">
+                          {item.attachments.map((att, attIdx) => {
+                            if (att.type === "image" || att.url) {
+                              const isImage = att.type === "image" || /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(att.url)
+                              if (isImage && att.url !== "text-context") {
+                                return (
+                                  <div key={attIdx} className="space-y-1 max-w-sm">
+                                    <img
+                                      src={att.url}
+                                      alt={att.caption || "Attachment"}
+                                      className="max-h-48 rounded-lg border border-outline-variant/60 object-contain bg-surface-container-low"
+                                    />
+                                    {att.caption && (
+                                      <p className="text-[10px] text-outline font-medium italic pl-1">{att.caption}</p>
+                                    )}
+                                  </div>
+                                )
+                              }
+                            }
+                            return null
+                          })}
+                        </div>
+                      )}
 
                       {/* Statements / Sub-questions (If Present) */}
                       {Array.isArray(item.statements) && item.statements.length > 0 && (
@@ -290,7 +371,10 @@ export function McqTable({
                             Statements:
                           </span>
                           {item.statements.map((stmt, sIdx) => (
-                            <div key={sIdx} className="flex items-start gap-2 text-xs text-on-surface-variant font-medium">
+                            <div key={sIdx} className={cn(
+                              "flex items-start gap-2 text-xs text-on-surface-variant font-medium",
+                              /[\u0980-\u09FF]/.test(stmt) && "font-solaiman"
+                            )}>
                               <span className="font-mono font-bold text-secondary shrink-0">
                                 {romanNumerals[sIdx] || `${sIdx + 1}.`}
                               </span>
@@ -320,12 +404,14 @@ export function McqTable({
                                     "flex items-center gap-2.5 rounded-lg border p-2.5 text-xs transition-colors",
                                     isCorrect
                                       ? "border-emerald-500 bg-emerald-50 text-emerald-950 font-bold ring-1 ring-emerald-500/20"
-                                      : "border-outline-variant/40 bg-surface-container-lowest text-on-surface"
+                                      : "border-outline-variant/40 bg-surface-container-lowest text-on-surface",
+                                    /[\u0980-\u09FF]/.test(opt) && "font-solaiman"
                                   )}
                                 >
                                   <span
                                     className={cn(
-                                      "flex size-5 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold",
+                                      "flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                                      /[\u0980-\u09FF]/.test(letter) ? "font-solaiman" : "font-mono",
                                       isCorrect
                                         ? "bg-emerald-600 text-white"
                                         : "bg-surface-container-high text-on-surface-variant"
@@ -352,7 +438,10 @@ export function McqTable({
                       {item.explanation && (
                         <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low/60 p-3 text-xs text-on-surface-variant">
                           <span className="font-bold text-on-surface block mb-0.5">Explanation:</span>
-                          <p className="whitespace-pre-wrap">
+                          <p className={cn(
+                            "whitespace-pre-wrap",
+                            /[\u0980-\u09FF]/.test(item.explanation) && "font-solaiman"
+                          )}>
                             <RenderMath text={item.explanation} isMath={item.isMath} />
                           </p>
                         </div>
@@ -383,22 +472,22 @@ export function McqTable({
                   </div>
 
                   {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0">
+                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
                     <Link
-                      href={`/mcqs/${item.id}`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40"
+                      href={`/mcqs/${item.id}/edit`}
+                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
                       title="Edit MCQ"
                     >
-                      <span className="material-symbols-outlined text-xl">edit</span>
+                      <span className="material-symbols-outlined text-xl block">edit</span>
                     </Link>
 
                     <button
                       type="button"
                       onClick={() => onDelete(item.id, item.question)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40"
+                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
                       title="Delete MCQ"
                     >
-                      <span className="material-symbols-outlined text-xl">delete</span>
+                      <span className="material-symbols-outlined text-xl block">delete</span>
                     </button>
                   </div>
                 </div>
@@ -422,14 +511,14 @@ export function McqTable({
                   value={String(itemsPerPage)}
                   onValueChange={(val) => onLimitChange(Number(val) || 10)}
                 >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1">
+                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
                     <SelectValue placeholder="Per Page" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
+                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
+                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
+                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
+                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
+                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -440,20 +529,20 @@ export function McqTable({
             <Button
               variant="outline"
               size="icon"
-              disabled={currentPage === 1}
+              disabled={currentPage <= 1}
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30"
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              <span className="material-symbols-outlined text-sm sm:text-base">chevron_left</span>
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
               <Button
                 key={pageNum}
                 variant={currentPage === pageNum ? "default" : "ghost"}
                 onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors ${
+                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
                   currentPage === pageNum
-                    ? "bg-primary font-bold text-on-primary hover:bg-primary"
+                    ? "bg-primary font-bold text-white hover:bg-primary"
                     : "hover:bg-surface-container-high text-on-surface"
                 }`}
               >
@@ -463,11 +552,11 @@ export function McqTable({
             <Button
               variant="outline"
               size="icon"
-              disabled={currentPage === totalPages}
+              disabled={currentPage >= totalPages}
               onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30"
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              <span className="material-symbols-outlined text-sm sm:text-base">chevron_right</span>
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useCreateMcq, useSubjectsForSelection, useChaptersForSelection } from "../services/use-mcq"
+import { useCreateMcq, useSubjectsForSelection, useChaptersForSelection, useAcademicClassesForSelection } from "../services/use-mcq"
 import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
@@ -25,6 +25,7 @@ import {
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 
 const createMcqFormSchema = z.object({
+  classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   chapterId: z.string().min(1, "Please select a chapter"),
   question: z.string().min(1, "Question text is required"),
@@ -51,7 +52,7 @@ export function CreateMcqView() {
   const createMutation = useCreateMcq()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const { data: subjects = [] } = useSubjectsForSelection()
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
   const questionTypes = questionTypesData?.items ?? []
 
@@ -65,6 +66,7 @@ export function CreateMcqView() {
   } = useForm<CreateMcqFormData>({
     resolver: zodResolver(createMcqFormSchema),
     defaultValues: {
+      classId: "",
       subjectId: "",
       chapterId: "",
       question: "",
@@ -90,6 +92,10 @@ export function CreateMcqView() {
     },
   })
 
+  const selectedClassId = watch("classId")
+  const { data: subjects = [] } = useSubjectsForSelection(
+    selectedClassId ? { academicClassId: selectedClassId } : undefined
+  )
   const selectedSubjectId = watch("subjectId")
   const { data: chapters = [] } = useChaptersForSelection(
     selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
@@ -127,6 +133,7 @@ export function CreateMcqView() {
       const parsedYear = data.year && !isNaN(Number(data.year)) ? Number(data.year) : null
 
       await createMutation.mutateAsync({
+        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         question: data.question.trim(),
@@ -208,8 +215,49 @@ export function CreateMcqView() {
         </CardHeader>
         <CardContent className="p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Subject & Chapter Selection */}
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {/* Class, Subject & Chapter Selection */}
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {/* Class */}
+              <div className="space-y-2">
+                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                  Academic Class *
+                </Label>
+                <Controller
+                  name="classId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
+                        <SelectValue placeholder="Select Class..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+                        {academicClasses.map((cls) => (
+                          <SelectItem
+                            key={cls.id}
+                            value={cls.id}
+                            label={cls.nameEn}
+                            className="text-neutral-900"
+                          >
+                            {cls.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.classId && (
+                  <p className="text-xs text-error">{errors.classId.message}</p>
+                )}
+              </div>
+
               {/* Subject */}
               <div className="space-y-2">
                 <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -220,24 +268,25 @@ export function CreateMcqView() {
                   control={control}
                   render={({ field }) => (
                     <Select
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !selectedClassId}
                       value={field.value}
                       onValueChange={(val) => {
                         field.onChange(val)
                         setValue("chapterId", "")
                       }}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
-                        <SelectValue placeholder="Select Subject..." />
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden disabled:opacity-50">
+                        <SelectValue placeholder={selectedClassId ? "Select Subject..." : "Select Class first"} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
                         {subjects.map((sub) => (
                           <SelectItem
                             key={sub.id}
                             value={sub.id}
-                            label={sub.name}
+                            label={sub.nameEn}
+                            className="text-neutral-900"
                           >
-                            {sub.name}
+                            {sub.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -263,7 +312,7 @@ export function CreateMcqView() {
                       value={field.value}
                       onValueChange={field.onChange}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden disabled:opacity-50">
                         <SelectValue
                           placeholder={
                             selectedSubjectId
@@ -272,14 +321,15 @@ export function CreateMcqView() {
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
                         {chapters.map((ch) => (
                           <SelectItem
                             key={ch.id}
                             value={ch.id}
-                            label={ch.name}
+                            label={ch.nameEn}
+                            className="text-neutral-900"
                           >
-                            {ch.name}
+                            {ch.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -373,7 +423,7 @@ export function CreateMcqView() {
                   return (
                     <div key={field.id} className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs font-bold text-on-surface">
+                        <Label className={`text-xs font-bold text-on-surface ${/[\u0980-\u09FF]/.test(optionLabel) ? "font-solaiman" : ""}`}>
                           Option {optionLabel}
                         </Label>
                         {optionFields.length > 2 && (

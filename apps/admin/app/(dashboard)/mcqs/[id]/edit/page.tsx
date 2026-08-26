@@ -10,9 +10,12 @@ export default async function EditMcqRoute({ params }: EditMcqRouteProps) {
   const { id } = await params
   const queryClient = getQueryClient()
 
-  // Prefetch details, subjects, and question type templates
+  // Prefetch details, classes, subjects, and question type templates
   void queryClient.prefetchQuery(
     trpc.mcq.byId.queryOptions({ id })
+  )
+  void queryClient.prefetchQuery(
+    trpc.academicClass.list.queryOptions({ limit: 100 })
   )
   void queryClient.prefetchQuery(
     trpc.academicSubject.list.queryOptions({ limit: 100 })

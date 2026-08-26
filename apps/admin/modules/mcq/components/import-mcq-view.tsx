@@ -75,6 +75,11 @@ export function repairJsonSyntax(raw: string): string {
   // 1. Strip markdown code fencing (```json ... ``` or ``` ...)
   cleaned = cleaned.replace(/^```(?:json)?\s*/gi, "").replace(/\s*```$/g, "").trim()
 
+  // Remove trailing comma at the end of the input (e.g. }, -> })
+  if (cleaned.endsWith(",")) {
+    cleaned = cleaned.slice(0, -1).trim()
+  }
+
   // 2. Normalize smart quotes to standard quotes
   cleaned = cleaned
     .replace(/[“”]/g, '"')
@@ -214,7 +219,10 @@ function EditableField({
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className="w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden"
+              className={cn(
+                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
+                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
+              )}
             />
           ) : (
             <Input
@@ -223,7 +231,10 @@ function EditableField({
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className="w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden"
+              className={cn(
+                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
+                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
+              )}
             />
           )}
           <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
@@ -251,7 +262,10 @@ function EditableField({
           )}
         >
           <div className="flex items-start justify-between gap-2">
-            <span className="flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed">
+            <span className={cn(
+              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
+              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
+            )}>
               <RenderMath text={value || placeholder} isMath={isMath} />
             </span>
             <button
@@ -286,6 +300,7 @@ function EditableMcqCard({
   onDelete,
   onDuplicate,
 }: EditableMcqCardProps) {
+  console.log("EditableMcqCard item:", item)
   const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
   const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"]
 
@@ -530,6 +545,16 @@ function EditableMcqCard({
 
       {/* Card Content */}
       <div className="p-5 space-y-4">
+        {/* Passage Context / Stimulus (Optional) */}
+        <EditableField
+          label="Passage Context / Stimulus (Optional)"
+          value={item.context || ""}
+          isMath={item.isMath}
+          multiline
+          placeholder="Enter stimulus/passage text (উদ্দীপক)..."
+          onSave={(newCtx) => onChange({ ...item, context: newCtx || undefined })}
+        />
+
         {/* Question Text */}
         <EditableField
           label="Question"
@@ -644,7 +669,8 @@ function EditableMcqCard({
                       "flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-all cursor-pointer",
                       isCorrect
                         ? "border-emerald-600 bg-emerald-600 text-white"
-                        : "border-outline text-outline group-hover/option:border-primary group-hover/option:text-primary"
+                        : "border-outline text-outline group-hover/option:border-primary group-hover/option:text-primary",
+                      /[\u0980-\u09FF]/.test(letter) && "font-solaiman"
                     )}
                   >
                     {isCorrect ? <CheckCircle2Icon className="size-4" /> : letter}
@@ -764,7 +790,6 @@ export function ImportMcqView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
-  const [selectedQuestionTypeId, setSelectedQuestionTypeId] = useState<string>("")
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<CreateMcqInput[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -779,16 +804,9 @@ export function ImportMcqView() {
   )
 
   // Chapters dropdown query filtered by selected Subject
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
-  )
-
-  // Question Types dropdown query
-  const { data: questionTypesData } = useQuestionTypesList({
-    limit: 100,
-    subjectId: selectedSubjectId || undefined,
+  const { data: chapters = [] } = useChaptersForSelection({
+    subjectId: selectedSubjectId,
   })
-  const questionTypes = questionTypesData?.items ?? []
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -799,7 +817,7 @@ export function ImportMcqView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedSubjectId, selectedChapterId, selectedQuestionTypeId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
       }
     }
     reader.readAsText(file)
@@ -807,9 +825,9 @@ export function ImportMcqView() {
 
   const validateAndParseJson = (
     text: string,
+    overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string,
-    overrideQuestionTypeId?: string
+    overrideChapterId: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -880,6 +898,49 @@ export function ImportMcqView() {
         let questionText = String(item.question || "").trim()
         let contextText = item.context ? String(item.context).trim() : undefined
 
+        // Extract context from attachments if type is text/text-context or if url is null/empty (implying text context)
+        const attachmentsArray = Array.isArray(item.attachments)
+          ? item.attachments
+          : Array.isArray(item.attachment)
+          ? item.attachment
+          : []
+        console.log("Item attachments array:", attachmentsArray)
+
+        if (!contextText && attachmentsArray.length > 0) {
+          const textAttachment = attachmentsArray.find(
+            (att: any) =>
+              att &&
+              (att.type === "text" ||
+                att.url === "text-context" ||
+                !att.url ||
+                String(att.type).toLowerCase() === "text" ||
+                String(att.url).toLowerCase() === "text-context")
+          )
+          console.log("Found textAttachment:", textAttachment)
+          if (textAttachment) {
+            const potentialText =
+              textAttachment.caption ||
+              textAttachment.content ||
+              textAttachment.text ||
+              (textAttachment.url && textAttachment.url !== "text-context" ? textAttachment.url : "")
+            console.log("Extracted potentialText:", potentialText)
+            if (potentialText) {
+              contextText = String(potentialText).trim()
+            }
+          }
+        }
+
+        // Filter out text attachments since they will be reconstructed from the context field on the backend
+        const filteredAttachments = attachmentsArray.filter(
+          (att: any) =>
+            att &&
+            att.type !== "text" &&
+            att.url !== "text-context" &&
+            att.url &&
+            String(att.type).toLowerCase() !== "text" &&
+            String(att.url).toLowerCase() !== "text-context"
+        )
+
         // Smart extraction of stimulus/context if embedded in the question stem
         if (!contextText && questionText.includes("\n\n")) {
           // Look for common separators like "প্রশ্ন:", "প্রশ্নঃ", "Question:", "Q:"
@@ -922,18 +983,17 @@ export function ImportMcqView() {
             : undefined,
           year: item.year !== undefined && item.year !== null && !isNaN(Number(item.year)) ? Number(item.year) : undefined,
           source: item.source ? String(item.source) : undefined,
-          questionTypeId: (item.questionTypeId ? String(item.questionTypeId) : overrideQuestionTypeId) || undefined,
+          questionTypeId: item.questionTypeId ? String(item.questionTypeId) : undefined,
+          classId: (item.classId ? String(item.classId) : overrideClassId) || undefined,
           subjectId,
           chapterId,
           isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
-          attachments: Array.isArray(item.attachments)
-            ? item.attachments.map((att: any) => ({
-              url: String(att.url || ""),
-              type: String(att.type || "image"),
-              caption: att.caption ? String(att.caption) : null,
-              position: att.position !== undefined ? Number(att.position) : 0,
-            }))
-            : [],
+          attachments: filteredAttachments.map((att: any) => ({
+            url: String(att.url || ""),
+            type: String(att.type || "image"),
+            caption: att.caption ? String(att.caption) : null,
+            position: att.position !== undefined ? Number(att.position) : 0,
+          })),
         } as any)
       })
 
@@ -951,7 +1011,7 @@ export function ImportMcqView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedSubjectId, selectedChapterId, selectedQuestionTypeId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -964,7 +1024,7 @@ export function ImportMcqView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedSubjectId, selectedChapterId, selectedQuestionTypeId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -973,7 +1033,7 @@ export function ImportMcqView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, "", "", selectedQuestionTypeId)
+      validateAndParseJson(jsonText, value, "", "")
     }
   }
 
@@ -982,7 +1042,7 @@ export function ImportMcqView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", selectedQuestionTypeId)
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
     }
   }
 
@@ -990,15 +1050,7 @@ export function ImportMcqView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedSubjectId, value, selectedQuestionTypeId)
-    }
-  }
-
-  const handleQuestionTypeChange = (val: string | null) => {
-    const value = val ?? ""
-    setSelectedQuestionTypeId(value)
-    if (jsonText) {
-      validateAndParseJson(jsonText, selectedSubjectId, selectedChapterId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
     }
   }
 
@@ -1135,7 +1187,7 @@ export function ImportMcqView() {
         </CardHeader>
         <CardContent className="p-6 space-y-6">
           {/* Academic Class, Subject & Chapter 3-Column Dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -1209,36 +1261,13 @@ export function ImportMcqView() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Default Question Type */}
-            <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Question Type
-              </Label>
-              <Select
-                value={selectedQuestionTypeId || "none"}
-                onValueChange={handleQuestionTypeChange}
-              >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Question Type..." />
-                </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  <SelectItem value="none" className="text-neutral-900">None (Ignore)</SelectItem>
-                  {questionTypes.map((qt) => (
-                    <SelectItem key={qt.id} value={qt.id} className="text-neutral-900">
-                      {qt.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
-          {/* Helper Warning if Subject & Chapter are not selected */}
-          {(!selectedSubjectId || !selectedChapterId) && (
+          {/* Helper Warning if Class, Subject & Chapter are not selected */}
+          {(!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId) && (
             <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs font-semibold">
               <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
-              <span>Please select a Default Subject and Chapter above to unlock JSON file upload and text input.</span>
+              <span>Please select a Default Class, Default Subject, and Default Chapter above to unlock JSON file upload and text input.</span>
             </div>
           )}
 
@@ -1250,7 +1279,7 @@ export function ImportMcqView() {
             <input
               type="file"
               accept=".json,application/json"
-              disabled={!selectedSubjectId || !selectedChapterId}
+              disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               onChange={handleFileUpload}
               className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
             />
@@ -1277,10 +1306,10 @@ export function ImportMcqView() {
             </div>
             <Textarea
               rows={6}
-              disabled={!selectedSubjectId || !selectedChapterId}
+              disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               placeholder={
-                !selectedSubjectId || !selectedChapterId
-                  ? "Select Subject and Chapter above first to enable JSON input..."
+                !selectedAcademicClassId || !selectedSubjectId || !selectedChapterId
+                  ? "Select Class, Subject, and Chapter above first to enable JSON input..."
                   : "Paste JSON array here..."
               }
               value={jsonText}

@@ -506,6 +506,9 @@ model AcademicClass {
   updatedAt DateTime @updatedAt
 
   classSubjects AcademicClassSubject[]
+  mcqs          Mcq[]
+  cqs           Cq[]
+  shortAnswers  ShortAnswer[]
 
   @@index([isActive])
   @@index([nameEn])
@@ -650,10 +653,12 @@ model Mcq {
   popularityCount Int     @default(0)
 
   // ── Academic Hierarchy (required, Restrict delete) ──
-  subjectId String
-  chapterId String
-  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter   AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+  classId       String
+  subjectId     String
+  chapterId     String
+  academicClass AcademicClass   @relation(fields: [classId], references: [id], onDelete: Restrict)
+  subject       AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter       AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
 
   // ── Question Type (optional, SetNull on delete) ──
   questionTypeId String?
@@ -667,6 +672,7 @@ model Mcq {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([classId])
   @@index([chapterId])
   @@index([chapterId, type])
   @@index([isMath])
@@ -695,10 +701,12 @@ model Cq {
   popularityCount Int     @default(0)
 
   // ── Academic Hierarchy ──
-  subjectId String
-  chapterId String
-  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter   AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+  classId       String
+  subjectId     String
+  chapterId     String
+  academicClass AcademicClass   @relation(fields: [classId], references: [id], onDelete: Restrict)
+  subject       AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter       AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
 
   // ── Question Type (optional) ──
   questionTypeId String?
@@ -713,6 +721,7 @@ model Cq {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([classId])
   @@index([chapterId])
   @@index([subjectId])
   @@index([difficulty])
@@ -774,10 +783,12 @@ model ShortAnswer {
   popularityCount Int     @default(0)
 
   // ── Academic Hierarchy ──
-  subjectId String
-  chapterId String
-  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter   AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+  classId       String
+  subjectId     String
+  chapterId     String
+  academicClass AcademicClass   @relation(fields: [classId], references: [id], onDelete: Restrict)
+  subject       AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter       AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
 
   // ── Question Type (optional) ──
   questionTypeId String?
@@ -791,6 +802,7 @@ model ShortAnswer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([classId])
   @@index([chapterId])
   @@index([subjectId])
   @@index([difficulty])

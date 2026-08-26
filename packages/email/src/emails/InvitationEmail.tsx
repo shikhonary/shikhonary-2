@@ -27,7 +27,7 @@ export const InvitationEmail = ({
   recipientName,
   message,
 }: InvitationEmailProps) => {
-  const previewText = `ইউপি-হাব সিস্টেমে ${tenantName}-এর পোর্টালে যুক্ত হওয়ার জন্য আপনাকে আমন্ত্রণ জানানো হয়েছে`
+  const previewText = `শিখনারী প্ল্যাটফর্মে ${tenantName}-এর এডুকেশনাল পোর্টালে যুক্ত হওয়ার জন্য আপনাকে আমন্ত্রণ জানানো হয়েছে`
 
   return (
     <Html lang="bn">
@@ -35,14 +35,14 @@ export const InvitationEmail = ({
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>প্রশাসনিক দলে যোগদানের আমন্ত্রণ</Heading>
+          <Heading style={h1}>শিখনারী এডুকেশনাল পোর্টালে যোগদানের আমন্ত্রণ</Heading>
           
           <Text style={text}>
-            প্রিয় {recipientName || "সম্মানিত কর্মকর্তা/সদস্য"},
+            প্রিয় {recipientName || "সম্মানিত শিক্ষক/প্রশাসক"},
           </Text>
 
           <Text style={text}>
-            আপনাকে ইউপি-হাব (UP-Hub) ডিজিটাল সার্ভিস প্ল্যাটফর্মে <strong>{tenantName}</strong>-এর ব্যবস্থাপনা টিম ও প্রশাসনিক পোর্টালে যুক্ত হওয়ার জন্য আমন্ত্রণ জানানো হয়েছে।
+            আপনাকে শিক্ষামূলক ক্লাউড প্ল্যাটফর্ম শিখনারী (Shikhonary)-তে <strong>{tenantName}</strong>-এর অ্যাডমিন বা ম্যানেজমেন্ট টিমে যুক্ত হওয়ার জন্য আমন্ত্রণ জানানো হয়েছে।
           </Text>
 
           {message && (
@@ -54,7 +54,7 @@ export const InvitationEmail = ({
 
           <Section style={btnContainer}>
             <Button style={button} href={invitationLink}>
-              আমন্ত্রণ গ্রহণ করুন এবং পোর্টালে যুক্ত হন
+              আমন্ত্রণ গ্রহণ করুন এবং পোর্টালে যুক্ত হোন
             </Button>
           </Section>
 
@@ -70,7 +70,7 @@ export const InvitationEmail = ({
             যদি আপনি এই আমন্ত্রণের প্রত্যাশা না করে থাকেন, তবে নির্দ্বিধায় এই বার্তাটি উপেক্ষা করতে পারেন।
           </Text>
           <Text style={subFooter}>
-            ইউপি-হাব — ইউনিয়ন পরিষদ স্মার্ট গভর্নেন্স সার্ভিসেস
+            শিখনারী — স্মার্ট এডুকেশন ইনস্টিটিউট ম্যানেজমেন্ট সিস্টেম
           </Text>
         </Container>
       </Body>

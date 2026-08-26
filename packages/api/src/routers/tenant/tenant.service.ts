@@ -734,7 +734,7 @@ export async function sendTenantInvitation(
 
   // Dispatch Invitation Email via Resend
   const baseUrl = process.env.NEXT_PUBLIC_TENANT_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001"
-  const invitationLink = `${baseUrl}/auth/accept-invitation?token=${token}`
+  const invitationLink = `${baseUrl}/accept-invitation?token=${token}`
 
   try {
     await sendInvitationEmail({

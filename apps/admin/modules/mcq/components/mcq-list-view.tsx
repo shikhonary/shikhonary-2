@@ -30,6 +30,16 @@ export function McqListView() {
     setSearchParams,
   ] = useMcqSearchParams()
 
+  const handleAcademicClassChange = (classId: string) => {
+    setSelectedAcademicClassId(classId)
+    setSearchParams({
+      subjectId: "All",
+      chapterId: "All",
+      board: "All",
+      page: 1,
+    })
+  }
+
   const openDeleteModal = useDeleteMcqModalStore((state) => state.openModal)
   const openBulkDeleteModal = useDeleteMcqModalStore((state) => state.openBulkModal)
 
@@ -38,6 +48,7 @@ export function McqListView() {
     limit,
     page: currentPage,
     query: searchQuery || undefined,
+    classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
@@ -57,8 +68,9 @@ export function McqListView() {
 
   // Query MCQ stats
   const { data: statsData } = useMcqStats(
-    selectedSubjectId !== "All" || selectedChapterId !== "All"
+    selectedAcademicClassId !== "All" || selectedSubjectId !== "All" || selectedChapterId !== "All"
       ? {
+          classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
           subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
           chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
         }
@@ -97,7 +109,7 @@ export function McqListView() {
         searchQuery={searchQuery}
         onSearchChange={(query) => setSearchParams({ query, page: 1 })}
         selectedAcademicClassId={selectedAcademicClassId}
-        onAcademicClassChange={setSelectedAcademicClassId}
+        onAcademicClassChange={handleAcademicClassChange}
         academicClasses={academicClasses}
         selectedSubjectId={selectedSubjectId}
         onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}

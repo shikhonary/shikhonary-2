@@ -70,12 +70,22 @@ export type {
 } from "./routers/fiscal-year/fiscal-year.schema"
 
 export type {
-  ListTenantFiscalYearsInput,
-  GetTenantFiscalYearInput,
-  CreateTenantFiscalYearInput,
-  UpdateTenantFiscalYearInput,
-  DeleteTenantFiscalYearInput,
-} from "./routers/tenant-fiscal-year/tenant-fiscal-year.schema"
+  ListQuestionPapersInput,
+  GetQuestionPaperInput,
+  CreateQuestionPaperInput,
+  UpdateQuestionPaperInput,
+  DeleteQuestionPaperInput,
+  DuplicateQuestionPaperInput,
+  AddQuestionPaperQuestionInput,
+  RemoveQuestionPaperQuestionInput,
+  ReorderQuestionPaperQuestionsInput,
+  UpsertQuestionPaperSectionInput,
+  DeleteQuestionPaperSectionInput,
+  UpsertQuestionPaperSubjectInput,
+  DeleteQuestionPaperSubjectInput,
+  UpsertQuestionPaperDistributionInput,
+  DeleteQuestionPaperDistributionInput,
+} from "./routers/question-paper/question-paper.schema"
 
 // ── Academic Setup Exports ───────────────────────────────────
 export type {
@@ -128,6 +138,28 @@ export type {
   ToggleMcqActiveInput,
   ImportMcqsInput,
 } from "./routers/mcq/mcq.schema"
+
+export type {
+  ListCqsInput,
+  CqStatsInput,
+  CreateCqInput,
+  UpdateCqInput,
+  DeleteCqInput,
+  BulkDeleteCqsInput,
+  ToggleCqActiveInput,
+  ImportCqsInput,
+} from "./routers/cq/cq.schema"
+
+export type {
+  ListShortAnswersInput,
+  ShortAnswerStatsInput,
+  CreateShortAnswerInput,
+  UpdateShortAnswerInput,
+  DeleteShortAnswerInput,
+  BulkDeleteShortAnswersInput,
+  ToggleShortAnswerActiveInput,
+  ImportShortAnswersInput,
+} from "./routers/short-answer/short-answer.schema"
 
 
 

@@ -18,6 +18,7 @@
     "assign-super-admin": "npx -y tsx prisma/seed/assign-super-admin.ts",
     "seed:subscriptions": "npx -y tsx prisma/seed/seed-subscriptions.ts",
     "seed:bd-geo": "npx -y tsx prisma/seed/seed-bd-geo.ts",
+    "tenants:migrate": "npx -y tsx prisma/seed/migrate-tenants.ts",
     "reset:main": "prisma migrate reset --force --config prisma/main/prisma.config.ts",
     "reset:tenant": "prisma migrate reset --force --config prisma/tenant/prisma.config.ts",
     "reset": "npx -y tsx prisma/seed/reset.ts",

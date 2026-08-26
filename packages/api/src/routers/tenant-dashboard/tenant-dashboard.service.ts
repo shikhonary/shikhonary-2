@@ -2,10 +2,7 @@ import type { TenantPrismaClient } from "@workspace/db/tenant"
 
 export async function getTenantDashboardStats(tenantDb: TenantPrismaClient) {
   // 1. Get current fiscal year
-  const currentFiscalYear = await tenantDb.fiscalYear.findFirst({
-    where: { isCurrent: true },
-    orderBy: { startDate: "desc" },
-  })
+  const currentFiscalYear = null
 
   return {
     currentFiscalYear,

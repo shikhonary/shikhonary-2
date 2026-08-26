@@ -21,36 +21,19 @@ export const SignUpView = () => {
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-[#c62828]/15 blur-3xl" />
         <div className="pointer-events-none absolute top-1/2 left-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-2xl" />
 
-        {/* National emblem watermark */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.04]">
-          <Image
-            src="/bd-national-emblem.png"
-            alt=""
-            width={480}
-            height={480}
-            className="object-contain"
-          />
-        </div>
-
         {/* Content */}
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center space-y-8 px-12 py-16 max-w-sm mx-auto">
           {/* Logo */}
           <div className="flex flex-col items-center gap-4">
-            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40 bg-white/5 backdrop-blur-sm">
-              <Image
-                src="/logo.png"
-                alt="ইউনিয়ন পরিষদ পোর্টাল"
-                fill
-                className="object-contain p-2"
-                priority
-              />
+            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40 bg-white/5 backdrop-blur-sm flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-[48px]">school</span>
             </div>
             <div>
               <h1 className="font-display text-2xl font-black text-white leading-tight">
-                ইউনিয়ন পরিষদ পোর্টাল
+                শিখনারী পোর্টাল
               </h1>
               <p className="mt-1 text-sm font-medium text-white/60 font-body">
-                ডিজিটাল বাংলাদেশ — স্মার্ট সরকার সেবা
+                স্মার্ট শিক্ষা প্রতিষ্ঠান ম্যানেজমেন্ট প্ল্যাটফর্ম
               </p>
             </div>
           </div>
@@ -58,9 +41,9 @@ export const SignUpView = () => {
           {/* Steps */}
           <div className="w-full space-y-3 text-left">
             {[
-              { step: "১", title: "অ্যাকাউন্ট তৈরি করুন", desc: "আপনার ইউনিয়ন পরিষদের জন্য প্রশাসক অ্যাকাউন্ট নিবন্ধন করুন" },
-              { step: "২", title: "ইউনিয়ন তথ্য যোগ করুন", desc: "ওয়ার্ড, করদাতা ও অর্থবছরের তথ্য পূরণ করুন" },
-              { step: "৩", title: "সেবা শুরু করুন", desc: "ডিজিটাল কর সংগ্রহ ও প্রতিবেদন পরিচালনা করুন" },
+              { step: "১", title: "অ্যাকাউন্ট তৈরি করুন", desc: "আপনার প্রতিষ্ঠানের জন্য প্রশাসক অ্যাকাউন্ট নিবন্ধন করুন" },
+              { step: "২", title: "প্রতিষ্ঠান তথ্য যোগ করুন", desc: "মৌলিক পরিচিতি, বিভাগ, জেলা ও অন্যান্য তথ্য পূরণ করুন" },
+              { step: "৩", title: "পোর্টাল ব্যবহার শুরু করুন", desc: "স্মার্ট এডুকেশন ম্যানেজমেন্ট ড্যাশবোর্ড পরিচালনা করুন" },
             ].map(({ step, title, desc }) => (
               <div
                 key={step}
@@ -70,15 +53,15 @@ export const SignUpView = () => {
                   {step}
                 </span>
                 <div>
-                  <p className="font-display text-sm font-bold text-white">{title}</p>
-                  <p className="text-xs text-white/55 font-body mt-0.5">{desc}</p>
+                  <p className="font-display text-sm font-bold text-white font-solaiman">{title}</p>
+                  <p className="text-xs text-white/55 font-body mt-0.5 font-solaiman">{desc}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <p className="text-xs text-white/40 font-body">
-            © ২০২৫ গণপ্রজাতন্ত্রী বাংলাদেশ সরকার
+            © ২০২৬ শিখনারী — সর্বস্বত্ব সংরক্ষিত
           </p>
         </div>
       </div>
@@ -88,17 +71,11 @@ export const SignUpView = () => {
         <div className="w-full max-w-md space-y-8">
           {/* Mobile header — logo + name */}
           <div className="flex items-center gap-3 lg:hidden">
-            <div className="relative w-12 h-12 shrink-0 rounded-xl overflow-hidden border border-border/60 shadow bg-card">
-              <Image
-                src="/logo.png"
-                alt="ইউনিয়ন পরিষদ পোর্টাল"
-                fill
-                className="object-contain p-1"
-                priority
-              />
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-border/60 shadow bg-primary flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-white text-xl">school</span>
             </div>
             <p className="font-display text-base font-black text-foreground leading-tight">
-              ইউনিয়ন পরিষদ পোর্টাল
+              শিখনারী পোর্টাল
             </p>
           </div>
 
@@ -108,7 +85,7 @@ export const SignUpView = () => {
               অ্যাকাউন্ট তৈরি করুন ✨
             </h2>
             <p className="text-sm text-muted-foreground font-body">
-              ইউনিয়ন পরিষদ পোর্টালে আপনার প্রশাসক অ্যাকাউন্ট নিবন্ধন করুন
+              শিখনারী পোর্টালে আপনার প্রতিষ্ঠান প্রশাসক অ্যাকাউন্ট নিবন্ধন করুন
             </p>
           </div>
 

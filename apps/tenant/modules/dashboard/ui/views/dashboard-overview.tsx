@@ -1,138 +1,79 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import { trpc } from "@/trpc/client"
-import Link from "next/link"
-import { Plus } from "lucide-react"
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import { Button } from "@workspace/ui/components/button"
-
-import { FiscalYearBanner } from "../components/fiscal-year-banner"
-import { KpiCards } from "../components/kpi-cards"
-import { CollectionProgress } from "../components/collection-progress"
-import { WardCollectionChart } from "../components/ward-collection-chart"
-import { QuickActions } from "../components/quick-actions"
-import { RecentPaymentsList } from "../components/recent-payments-list"
-
-// ─── Formatters ──────────────────────────────────────────────────────────────
-
-function formatTaka(amount: number): string {
-  if (amount >= 100000) return `৳${(amount / 100000).toFixed(1)}L`
-  if (amount >= 1000) return `৳${(amount / 1000).toFixed(1)}K`
-  return `৳${amount.toLocaleString()}`
-}
-
-function formatFullTaka(amount: number): string {
-  return `৳${amount.toLocaleString()}`
-}
-
-function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("bn-BD", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  })
-}
+import { useTenant } from "@/modules/layout/ui/components/tenant-provider"
+import { Building2, Mail, Phone, ShieldCheck } from "lucide-react"
 
 export function DashboardOverview() {
-  const { data, isLoading } = useQuery(trpc.tenantDashboard.stats.queryOptions())
-
-  if (isLoading) {
-    return (
-      <div className="w-full space-y-6 font-body p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto pb-24 lg:pb-8">
-        {/* Header skeleton */}
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-64 rounded-xl" />
-          <Skeleton className="h-4 w-96 rounded-xl" />
-        </div>
-        {/* Fiscal year skeleton */}
-        <Skeleton className="h-16 w-full rounded-xl" />
-        {/* KPI cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-[88px] rounded-xl" />
-          ))}
-        </div>
-        {/* Chart + actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          <Skeleton className="lg:col-span-2 h-72 rounded-2xl" />
-          <Skeleton className="h-72 rounded-2xl" />
-        </div>
-        {/* Recent payments */}
-        <Skeleton className="h-64 rounded-2xl" />
-      </div>
-    )
-  }
-
-  if (!data) return null
-
-  const {
-    currentFiscalYear,
-    totalTaxPayers,
-    totalAssessedTax,
-    totalCollectedTax,
-    paidPaymentCount,
-    collectionRate,
-    recentPayments,
-    wardBreakdown,
-  } = data
+  const { tenant, user } = useTenant()
 
   return (
-    <div className="w-full space-y-6 font-body p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto pb-24 lg:pb-8">
-      {/* ── Section Heading ─────────────────────────────────────────── */}
-      <section className="flex flex-col justify-between gap-4 sm:gap-6 md:flex-row md:items-end">
-        <div>
-          <h2 className="mb-1 font-display text-2xl sm:text-3xl font-extrabold text-foreground md:text-4xl">
-            ড্যাশবোর্ড সারসংক্ষেপ
-          </h2>
-          <p className="max-w-2xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
-            প্রতিষ্ঠানের অর্থবছর ও সার্বিক সারসংক্ষেপ এক জায়গায় দেখুন।
-          </p>
-        </div>
-      </section>
-
-      {/* ── Fiscal Year Banner ──────────────────────────────────────── */}
-      <FiscalYearBanner currentFiscalYear={currentFiscalYear} formatDate={formatDate} />
-
-      {/* ── KPI Stat Cards ──────────────────────────────────────────── */}
-      <KpiCards
-        totalTaxPayers={totalTaxPayers}
-        paidPaymentCount={paidPaymentCount}
-        totalAssessedTax={totalAssessedTax}
-        totalCollectedTax={totalCollectedTax}
-        collectionRate={collectionRate}
-        currentFiscalYear={currentFiscalYear}
-        formatFullTaka={formatFullTaka}
-      />
-
-      {/* ── Collection Progress ─────────────────────────────────────── */}
-      <CollectionProgress
-        collectionRate={collectionRate}
-        totalAssessedTax={totalAssessedTax}
-        currentFiscalYear={currentFiscalYear}
-        formatFullTaka={formatFullTaka}
-      />
-
-      {/* ── Chart + Quick Actions ───────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2">
-          <WardCollectionChart
-            wardBreakdown={wardBreakdown}
-            formatTaka={formatTaka}
-            formatFullTaka={formatFullTaka}
-          />
-        </div>
-        <div>
-          <QuickActions />
-        </div>
+    <div className="w-full space-y-6 max-w-6xl mx-auto py-6">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-2xl border border-primary/10">
+        <h2 className="text-xl sm:text-2xl font-bold text-primary mb-2 font-solaiman">
+          স্বাগতম, {user.name || "অ্যাডমিন"}!
+        </h2>
+        <p className="text-sm text-muted-foreground font-solaiman">
+          শিখনারী (Shikhonary) এডুকেশনাল ম্যানেজমেন্ট পোর্টালে আপনাকে স্বাগতম। এখান থেকে আপনার প্রতিষ্ঠানের সকল কার্যক্রম পরিচালনা করতে পারবেন।
+        </p>
       </div>
 
-      {/* ── Recent Payments ─────────────────────────────────────────── */}
-      <RecentPaymentsList
-        recentPayments={recentPayments}
-        formatFullTaka={formatFullTaka}
-        formatDate={formatDate}
-      />
+      {/* Institution Info Card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-card border border-border p-6 rounded-2xl shadow-xs">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground text-sm font-solaiman">প্রতিষ্ঠানের বিবরণ</h3>
+              <p className="text-xs text-muted-foreground font-solaiman">মৌলিক তথ্য ও পরিচিতি</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mt-4 text-sm font-solaiman">
+            <div className="flex justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">নাম (বাংলা):</span>
+              <span className="font-bold">{tenant.nameBn || "N/A"}</span>
+            </div>
+            <div className="flex justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">নাম (ইংরেজি):</span>
+              <span className="font-bold">{tenant.name}</span>
+            </div>
+            <div className="flex justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">ইউনিক স্ল্যাগ (Slug):</span>
+              <span className="font-mono text-xs font-bold">{tenant.slug}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-2xl shadow-xs">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground text-sm font-solaiman">যোগাযোগ ও অ্যাক্সেস</h3>
+              <p className="text-xs text-muted-foreground font-solaiman">অ্যাডমিন যোগাযোগের তথ্য</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 mt-4 text-sm font-solaiman">
+            <div className="flex items-center justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground flex items-center gap-1.5"><Mail className="w-4 h-4" /> ইমেইল:</span>
+              <span className="font-bold">{tenant.email || "N/A"}</span>
+            </div>
+            <div className="flex items-center justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground flex items-center gap-1.5"><Phone className="w-4 h-4" /> ফোন নম্বর:</span>
+              <span className="font-bold">{tenant.phone || "N/A"}</span>
+            </div>
+            <div className="flex justify-between border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">অধ্যক্ষ/প্রধান শিক্ষক:</span>
+              <span className="font-bold">{tenant.principalName || "N/A"}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

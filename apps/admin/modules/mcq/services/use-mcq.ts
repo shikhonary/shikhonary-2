@@ -148,5 +148,6 @@ export function useChaptersForSelection(input?: { subjectId?: string }) {
       subjectId,
     }),
     select: (data) => data.academicChapters ?? [],
+    enabled: input === undefined || (subjectId !== undefined && subjectId !== ""),
   })
 }
