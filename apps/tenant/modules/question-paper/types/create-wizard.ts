@@ -1,13 +1,5 @@
 // Shared types for the Create Question Paper multi-step wizard
 
-export interface WizardSection {
-  tempId: string
-  title: string
-  titleBn: string
-  instructions: string
-  orderIndex: number
-}
-
 export interface WizardDistribution {
   tempId: string
   questionTypeId: string
@@ -26,27 +18,21 @@ export interface WizardSubject {
 }
 
 export interface WizardData {
-  title: string
   examName: string
-  description: string
   classId: string
   className: string
+  timeInMinutes: number
   isTemplate: boolean
-  sections: WizardSection[]
   subjects: WizardSubject[]
-  instructions: string[]
 }
 
 export const INITIAL_WIZARD_DATA: WizardData = {
-  title: "",
   examName: "",
-  description: "",
   classId: "",
   className: "",
+  timeInMinutes: 0,
   isTemplate: false,
-  sections: [],
   subjects: [],
-  instructions: [],
 }
 
 export interface StepProps {
@@ -77,9 +63,7 @@ export interface QuestionTypeRef {
 // Step definitions for the indicator
 export const WIZARD_STEPS = [
   { id: "basic", label: "প্রাথমিক তথ্য" },
-  { id: "sections", label: "বিভাগ সমূহ" },
   { id: "subjects", label: "বিষয় ও নম্বর" },
-  { id: "instructions", label: "নির্দেশাবলী" },
   { id: "review", label: "পর্যালোচনা" },
 ] as const
 

@@ -24,10 +24,19 @@ export function QuestionPaperManagementView() {
   const openDeleteModal = useDeleteQuestionPaperModalStore((state) => state.openModal)
   const openDuplicateModal = useDuplicateQuestionPaperModalStore((state) => state.openModal)
 
-  // Fetch all question papers (we set a higher limit to handle client-side sorting/filtering)
+  // Fetch paginated, sorted, and filtered question papers for the table
   const { data: listData, isLoading, isError } = useQuestionPapersList({
-    limit: 100,
-    search: undefined,
+    limit,
+    page: currentPage,
+    search: searchQuery || undefined,
+    classId: selectedClassId === "All" ? undefined : selectedClassId,
+    status: selectedStatus === "All" ? undefined : (selectedStatus as any),
+    sort: selectedSort,
+  })
+
+  // Fetch all question papers for global stats
+  const { data: statsData } = useQuestionPapersList({
+    limit: 1000,
   })
 
   // Safely fetch classes list (using try-catch/fallback if the user is not superadmin)
@@ -38,37 +47,16 @@ export function QuestionPaperManagementView() {
   })
   const classes = classesData?.academicClasses ?? []
 
-  const papers = (listData?.papers as QuestionPaperItem[]) ?? []
-
-  // Process items (filter, sort) client-side
-  const processedItems = papers
-    .filter((item) => {
-      const matchesSearch = searchQuery
-        ? item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.examName.toLowerCase().includes(searchQuery.toLowerCase())
-        : true
-      const matchesClass = selectedClassId && selectedClassId !== "All" ? item.classId === selectedClassId : true
-      const matchesStatus = selectedStatus && selectedStatus !== "All" ? item.status === selectedStatus : true
-      return matchesSearch && matchesClass && matchesStatus
-    })
-    .sort((a, b) => {
-      if (selectedSort === "title_asc") return a.title.localeCompare(b.title)
-      if (selectedSort === "title_desc") return b.title.localeCompare(a.title)
-      if (selectedSort === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      if (selectedSort === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime() // default newest
-    })
-
-  // Pagination calculations
-  const totalItems = processedItems.length
+  const pagedItems = (listData?.papers as QuestionPaperItem[]) ?? []
+  const totalItems = listData?.totalItems ?? 0
   const totalPages = Math.ceil(totalItems / limit) || 1
-  const pagedItems = processedItems.slice((currentPage - 1) * limit, currentPage * limit)
 
   // Stats
-  const totalPapers = papers.length
-  const publishedPapers = papers.filter((p) => p.status === "Published").length
-  const templatePapers = papers.filter((p) => p.isTemplate).length
-  const averageMarks = papers.length > 0 ? Math.round(papers.reduce((sum, p) => sum + p.total, 0) / papers.length) : 0
+  const allPapers = statsData?.papers ?? []
+  const totalPapers = allPapers.length
+  const publishedPapers = allPapers.filter((p) => p.status === "Published").length
+  const templatePapers = allPapers.filter((p) => p.isTemplate).length
+  const averageMarks = allPapers.length > 0 ? Math.round(allPapers.reduce((sum, p) => sum + p.total, 0) / allPapers.length) : 0
 
   return (
     <div className="w-full">

@@ -2,8 +2,31 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
+import { Button } from "@workspace/ui/components/button"
 import { CheckCircle2, FileText, List, BookOpen, ClipboardList } from "lucide-react"
 import type { WizardData, WizardSubject } from "../../types/create-wizard"
+
+export function formatDurationBn(minutes: number): string {
+  if (!minutes) return "০ মিনিট"
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+
+  const toBnNums = (num: number): string => {
+    const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+    return String(num)
+      .split("")
+      .map((digit) => bnDigits[parseInt(digit, 10)] || digit)
+      .join("")
+  }
+
+  if (hours > 0 && mins > 0) {
+    return `${toBnNums(hours)} ঘণ্টা ${toBnNums(mins)} মিনিট`
+  } else if (hours > 0) {
+    return `${toBnNums(hours)} ঘণ্টা`
+  } else {
+    return `${toBnNums(mins)} মিনিট`
+  }
+}
 
 interface StepReviewProps {
   data: WizardData
@@ -12,7 +35,7 @@ interface StepReviewProps {
 
 export function StepReview({ data, onGoToStep }: StepReviewProps) {
   const getSubjectTotal = (s: WizardSubject) =>
-    s.distributions.reduce((sum, d) => sum + d.marksPerQuestion * d.questionCount, 0)
+    s.distributions.reduce((sum, d) => sum + d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount), 0)
 
   const grandTotal = data.subjects.reduce((sum, s) => sum + getSubjectTotal(s), 0)
 
@@ -44,46 +67,19 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
           onEdit={() => onGoToStep(0)}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-            <ReviewField label="শিরোনাম" value={data.title} />
             <ReviewField label="পরীক্ষার নাম" value={data.examName} />
             <ReviewField label="শ্রেণী" value={data.className} />
+            <ReviewField label="পরীক্ষার সময়" value={formatDurationBn(data.timeInMinutes)} />
             <ReviewField label="টেমপ্লেট" value={data.isTemplate ? "হ্যাঁ" : "না"} />
-            {data.description && (
-              <div className="col-span-1 sm:col-span-2">
-                <ReviewField label="বিবরণ" value={data.description} />
-              </div>
-            )}
           </div>
         </ReviewSection>
 
         {/* Sections */}
-        <ReviewSection
-          icon={<List className="h-4 w-4" />}
-          title={`বিভাগ সমূহ (${data.sections.length})`}
-          onEdit={() => onGoToStep(1)}
-        >
-          {data.sections.length === 0 ? (
-            <p className="text-xs text-outline font-body italic">কোনো বিভাগ যোগ করা হয়নি</p>
-          ) : (
-            <div className="space-y-1.5">
-              {data.sections.map((s, i) => (
-                <div key={s.tempId} className="flex items-center gap-2 text-sm font-body">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0">
-                    {i + 1}
-                  </span>
-                  <span className="text-on-surface">{s.title}</span>
-                  {s.titleBn && <span className="text-outline">({s.titleBn})</span>}
-                </div>
-              ))}
-            </div>
-          )}
-        </ReviewSection>
-
         {/* Subjects & Distribution */}
         <ReviewSection
           icon={<BookOpen className="h-4 w-4" />}
           title={`বিষয় ও নম্বর বণ্টন (${data.subjects.length} বিষয়)`}
-          onEdit={() => onGoToStep(2)}
+          onEdit={() => onGoToStep(1)}
         >
           <div className="space-y-4">
             {data.subjects.map((subject) => {
@@ -115,7 +111,7 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.marksPerQuestion}</td>
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionCount}</td>
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionsToAttempt ?? "সব"}</td>
-                              <td className="py-1.5 px-2 text-center font-bold text-primary">{d.marksPerQuestion * d.questionCount}</td>
+                              <td className="py-1.5 px-2 text-center font-bold text-primary">{d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -128,22 +124,7 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
           </div>
         </ReviewSection>
 
-        {/* Instructions */}
-        <ReviewSection
-          icon={<ClipboardList className="h-4 w-4" />}
-          title={`নির্দেশাবলী (${data.instructions.length})`}
-          onEdit={() => onGoToStep(3)}
-        >
-          {data.instructions.length === 0 ? (
-            <p className="text-xs text-outline font-body italic">কোনো নির্দেশনা যোগ করা হয়নি</p>
-          ) : (
-            <ol className="list-decimal list-inside space-y-1 text-sm text-on-surface font-body">
-              {data.instructions.map((inst, i) => (
-                <li key={i}>{inst}</li>
-              ))}
-            </ol>
-          )}
-        </ReviewSection>
+
 
         {/* Grand Total */}
         <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-5 font-display">
@@ -175,13 +156,14 @@ function ReviewSection({
           <span className="text-primary">{icon}</span>
           <span className="text-xs font-bold uppercase tracking-wider text-on-surface font-display">{title}</span>
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={onEdit}
-          className="text-[11px] text-primary font-bold hover:underline cursor-pointer font-body"
+          className="h-7 rounded-lg px-3 py-1 font-bold text-xs cursor-pointer text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary transition-colors border-0"
         >
-          সম্পাদনা
-        </button>
+          এডিট
+        </Button>
       </div>
       <div>{children}</div>
     </div>

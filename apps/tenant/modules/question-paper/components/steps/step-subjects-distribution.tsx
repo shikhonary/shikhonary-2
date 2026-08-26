@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BookOpen, Plus, Trash2, ChevronDown, ChevronUp, Loader2, Calculator, Sparkles, Info } from "lucide-react"
 import { trpc } from "@/trpc/client"
 import { useQuery } from "@tanstack/react-query"
+import { toast } from "@workspace/ui/components/sonner"
 import type { StepProps, WizardSubject, WizardDistribution, AcademicSubjectRef, QuestionTypeRef } from "../../types/create-wizard"
 
 interface StepSubjectsDistributionProps extends StepProps {
@@ -28,7 +29,7 @@ export function StepSubjectsDistribution({
 }: StepSubjectsDistributionProps) {
   const [selectedSubjectId, setSelectedSubjectId] = useState("")
   const [expandedSubject, setExpandedSubject] = useState<string | null>(null)
-  const [isAutoFilling, setIsAutoFilling] = useState(false)
+  const [showAutoFillToast, setShowAutoFillToast] = useState(false)
 
   // Distribution form state per subject
   const [distForm, setDistForm] = useState<{
@@ -47,15 +48,19 @@ export function StepSubjectsDistribution({
     setDistForm({ questionTypeId: "", marksPerQuestion: "", questionCount: "", questionsToAttempt: "" })
   }
 
-  // Query for the selected subject's details (to get subjectQuestionTypes)
+  // Get currently expanded subject's subjectId
+  const expandedSubjectObj = data.subjects.find((s) => s.tempId === expandedSubject)
+  const expandedSubjectId = expandedSubjectObj?.subjectId || ""
+
+  // Query for the expanded subject's details (to get subjectQuestionTypes)
   const { data: subjectDetail, isLoading: isDetailLoading } = useQuery({
-    ...trpc.academicSubject.byId.queryOptions({ id: selectedSubjectId }),
-    enabled: !!selectedSubjectId,
+    ...trpc.academicSubject.byId.queryOptions({ id: expandedSubjectId }),
+    enabled: !!expandedSubjectId,
     retry: false,
     refetchOnWindowFocus: false,
   })
 
-  // Add subject with auto-populated distributions from SubjectQuestionType
+  // Add subject manually (starts with empty distributions)
   const handleAddSubject = () => {
     if (!selectedSubjectId) return
     if (data.subjects.some((s) => s.subjectId === selectedSubjectId)) return
@@ -63,47 +68,61 @@ export function StepSubjectsDistribution({
     const matched = subjects.find((s) => s.id === selectedSubjectId)
     if (!matched) return
 
-    // Build auto-populated distributions from subjectQuestionTypes
-    const autoDistributions: WizardDistribution[] = []
-
-    if (subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0) {
-      subjectDetail.subjectQuestionTypes.forEach((sqt: any, idx: number) => {
-        const qType = questionTypes.find((t) => t.id === sqt.questionTypeId)
-        if (!qType) return
-
-        autoDistributions.push({
-          tempId: crypto.randomUUID(),
-          questionTypeId: sqt.questionTypeId,
-          questionTypeName: qType.nameBn || qType.nameEn,
-          marksPerQuestion: sqt.mark || qType.mark || 1,
-          questionCount: sqt.totalQuestions || 0,
-          questionsToAttempt: sqt.requiredCount > 0 ? sqt.requiredCount : null,
-          orderIndex: idx,
-        })
-      })
-    }
-
     const newSubject: WizardSubject = {
       tempId: crypto.randomUUID(),
       subjectId: matched.id,
       subjectName: matched.nameBn || matched.nameEn,
-      distributions: autoDistributions,
+      distributions: [],
     }
 
     onChange({ subjects: [...data.subjects, newSubject] })
     setSelectedSubjectId("")
     setExpandedSubject(newSubject.tempId)
-
-    if (autoDistributions.length > 0) {
-      setIsAutoFilling(true)
-      setTimeout(() => setIsAutoFilling(false), 2000)
-    }
   }
 
   // Remove subject
   const handleRemoveSubject = (tempId: string) => {
     onChange({ subjects: data.subjects.filter((s) => s.tempId !== tempId) })
     if (expandedSubject === tempId) setExpandedSubject(null)
+  }
+
+  // Handle question type selection & autofill distribution inputs
+  const handleQuestionTypeChange = (qTypeId: string) => {
+    const matchedGlobal = questionTypes.find((t) => t.id === qTypeId)
+    if (!matchedGlobal) return
+
+    // Find if there is a custom preset in subjectDetail.subjectQuestionTypes
+    const preset = subjectDetail?.subjectQuestionTypes?.find(
+      (sqt: any) => sqt.questionTypeId === qTypeId
+    )
+
+    setDistForm({
+      questionTypeId: qTypeId,
+      marksPerQuestion: preset ? String(preset.mark) : String(matchedGlobal.mark || 1),
+      questionCount: preset ? String(preset.totalQuestions || 0) : "",
+      questionsToAttempt: preset && preset.requiredCount > 0 ? String(preset.requiredCount) : "",
+    })
+
+    if (preset) {
+      setShowAutoFillToast(true)
+      setTimeout(() => setShowAutoFillToast(false), 2000)
+    }
+  }
+
+  const handleQuestionCountBlur = () => {
+    const tot = parseInt(distForm.questionCount, 10) || 0
+    const req = parseInt(distForm.questionsToAttempt, 10) || 0
+    if (distForm.questionsToAttempt !== "" && tot < req) {
+      setDistForm((p) => ({ ...p, questionsToAttempt: p.questionCount }))
+    }
+  }
+
+  const handleQuestionsToAttemptBlur = () => {
+    const tot = parseInt(distForm.questionCount, 10) || 0
+    const req = parseInt(distForm.questionsToAttempt, 10) || 0
+    if (distForm.questionsToAttempt !== "" && tot < req) {
+      setDistForm((p) => ({ ...p, questionCount: p.questionsToAttempt }))
+    }
   }
 
   // Add distribution to a subject
@@ -113,19 +132,29 @@ export function StepSubjectsDistribution({
     const matched = questionTypes.find((t) => t.id === distForm.questionTypeId)
     if (!matched) return
 
+    let finalQuestionCount = parseInt(distForm.questionCount, 10)
+    const finalQuestionsToAttempt = distForm.questionsToAttempt ? parseInt(distForm.questionsToAttempt, 10) : null
+
+    if (finalQuestionsToAttempt !== null && finalQuestionCount < finalQuestionsToAttempt) {
+      finalQuestionCount = finalQuestionsToAttempt
+      toast.info("চেষ্টার সংখ্যা অনুযায়ী মোট প্রশ্ন সংখ্যা সমন্বয় করা হয়েছে।")
+    }
+
     const distribution: WizardDistribution = {
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
       questionTypeName: matched.nameBn || matched.nameEn,
       marksPerQuestion: parseFloat(distForm.marksPerQuestion),
-      questionCount: parseInt(distForm.questionCount, 10),
-      questionsToAttempt: distForm.questionsToAttempt ? parseInt(distForm.questionsToAttempt, 10) : null,
+      questionCount: finalQuestionCount,
+      questionsToAttempt: finalQuestionsToAttempt,
       orderIndex: 0,
     }
 
     const updatedSubjects = data.subjects.map((s) => {
       if (s.tempId !== subjectTempId) return s
-      const newDists = [...s.distributions, distribution].map((d, i) => ({ ...d, orderIndex: i }))
+      // Avoid duplicate distribution question types within the same subject
+      const filteredDists = s.distributions.filter(d => d.questionTypeId !== matched.id)
+      const newDists = [...filteredDists, distribution].map((d, i) => ({ ...d, orderIndex: i }))
       return { ...s, distributions: newDists }
     })
 
@@ -147,7 +176,7 @@ export function StepSubjectsDistribution({
 
   // Calculate totals
   const getSubjectTotal = (subject: WizardSubject) =>
-    subject.distributions.reduce((sum, d) => sum + d.marksPerQuestion * d.questionCount, 0)
+    subject.distributions.reduce((sum, d) => sum + d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount), 0)
 
   const grandTotal = data.subjects.reduce((sum, s) => sum + getSubjectTotal(s), 0)
 
@@ -185,25 +214,16 @@ export function StepSubjectsDistribution({
         )}
       </CardHeader>
       <CardContent className="p-4 sm:p-8 space-y-6">
-        {/* Auto-fill notice */}
         <div className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-on-surface font-body">
-          <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
           <p className="text-xs leading-relaxed">
-            বিষয় যোগ করলে পূর্বনির্ধারিত নম্বর বণ্টন স্বয়ংক্রিয়ভাবে পূরণ হবে। আপনি পরে সম্পাদনা করতে পারবেন।
+            এই ধাপে পরীক্ষার জন্য এক বা একাধিক বিষয় যোগ করতে পারবেন। বিষয় যোগ করার পর তার কার্ডটি উন্মুক্ত করে নির্দিষ্ট প্রশ্নের ধরণ সিলেক্ট করলে পূর্বনির্ধারিত নম্বর ও সংখ্যা ফর্মে বসে যাবে।
           </p>
         </div>
 
         {/* Subject error */}
         {errors.subjects && (
           <p className="text-xs text-error font-body">{errors.subjects}</p>
-        )}
-
-        {/* Auto-fill success flash */}
-        {isAutoFilling && (
-          <div className="flex items-center gap-2 rounded-lg border border-green-300 bg-green-50 p-3 text-green-800 font-body animate-in fade-in duration-300">
-            <Sparkles className="h-4 w-4 shrink-0" />
-            <p className="text-xs font-medium">নম্বর বণ্টন স্বয়ংক্রিয়ভাবে পূরণ করা হয়েছে!</p>
-          </div>
         )}
 
         {/* Add Subject */}
@@ -230,15 +250,11 @@ export function StepSubjectsDistribution({
           <Button
             type="button"
             onClick={handleAddSubject}
-            disabled={!selectedSubjectId || isDetailLoading}
+            disabled={!selectedSubjectId}
             className="flex items-center gap-2 rounded-lg bg-primary-container px-5 py-2.5 font-bold text-on-primary-container text-sm transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal font-display shrink-0"
           >
-            {isDetailLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-            <span>{isDetailLoading ? "লোড হচ্ছে..." : "বিষয় যোগ"}</span>
+            <Plus className="h-4 w-4" />
+            <span>বিষয় যোগ</span>
           </Button>
         </div>
 
@@ -268,7 +284,10 @@ export function StepSubjectsDistribution({
                   {/* Subject header */}
                   <button
                     type="button"
-                    onClick={() => setExpandedSubject(isExpanded ? null : subject.tempId)}
+                    onClick={() => {
+                      setExpandedSubject(isExpanded ? null : subject.tempId)
+                      resetDistForm()
+                    }}
                     className="w-full flex items-center gap-3 p-4 hover:bg-surface-container-low transition-colors cursor-pointer"
                   >
                     <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">
@@ -318,7 +337,7 @@ export function StepSubjectsDistribution({
                                     {dist.questionsToAttempt ?? "সব"}
                                   </td>
                                   <td className="py-2 px-2 text-center font-bold text-primary">
-                                    {dist.marksPerQuestion * dist.questionCount}
+                                    {dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}
                                   </td>
                                   <td className="py-2 px-2 text-center">
                                     <Button
@@ -339,11 +358,24 @@ export function StepSubjectsDistribution({
 
                       {/* Add distribution form */}
                       <div className="rounded-lg border border-dashed border-outline-variant/60 p-4 space-y-3 bg-surface-container-low/30">
-                        <p className="text-[11px] font-bold text-outline uppercase tracking-wider font-display">নম্বর বণ্টন যোগ করুন</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[11px] font-bold text-outline uppercase tracking-wider font-display">নম্বর বণ্টন যোগ করুন</p>
+                          {isDetailLoading && (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary shrink-0" />
+                          )}
+                        </div>
+
+                        {showAutoFillToast && (
+                          <div className="flex items-center gap-1.5 text-primary text-[11px] font-body animate-in fade-in duration-300">
+                            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                            <span>নম্বর ও প্রশ্ন সংখ্যা স্বয়ংক্রিয়ভাবে পূরণ হয়েছে!</span>
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="col-span-2 sm:col-span-1">
                             <label className="text-[10px] text-outline font-body mb-1 block">প্রশ্নের ধরণ *</label>
-                            <Select value={distForm.questionTypeId} onValueChange={(v) => setDistForm((p) => ({ ...p, questionTypeId: v }))}>
+                            <Select value={distForm.questionTypeId} onValueChange={handleQuestionTypeChange}>
                               <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-xs h-auto justify-between">
                                 <SelectValue placeholder="ধরণ" />
                               </SelectTrigger>
@@ -374,6 +406,7 @@ export function StepSubjectsDistribution({
                               type="number"
                               value={distForm.questionCount}
                               onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
+                              onBlur={handleQuestionCountBlur}
                               placeholder="10"
                               min={0}
                               className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body text-xs text-on-surface bg-white focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
@@ -385,21 +418,43 @@ export function StepSubjectsDistribution({
                               type="number"
                               value={distForm.questionsToAttempt}
                               onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
+                              onBlur={handleQuestionsToAttemptBlur}
                               placeholder="সব"
                               min={1}
                               className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body text-xs text-on-surface bg-white focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
                             />
                           </div>
                         </div>
-                        <Button
-                          type="button"
-                          onClick={() => handleAddDistribution(subject.tempId)}
-                          disabled={!distForm.questionTypeId || !distForm.marksPerQuestion || !distForm.questionCount}
-                          className="flex items-center gap-1.5 rounded-lg bg-primary-container/60 px-4 py-2 font-bold text-on-primary-container text-xs transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal font-display"
-                        >
-                          <Calculator className="h-3.5 w-3.5" />
-                          <span>যোগ করুন</span>
-                        </Button>
+
+                        {distForm.questionsToAttempt !== "" && (parseInt(distForm.questionCount, 10) || 0) < (parseInt(distForm.questionsToAttempt, 10) || 0) && (
+                          <p className="text-[11px] text-error font-body font-medium animate-in fade-in duration-200">
+                            ⚠️ চেষ্টার সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।
+                          </p>
+                        )}
+
+                        {(() => {
+                          const isFormInvalid =
+                            !distForm.questionTypeId ||
+                            !distForm.marksPerQuestion ||
+                            !distForm.questionCount ||
+                            (distForm.questionsToAttempt !== "" && (parseInt(distForm.questionCount, 10) || 0) < (parseInt(distForm.questionsToAttempt, 10) || 0))
+
+                          return (
+                            <Button
+                              type="button"
+                              onClick={() => handleAddDistribution(subject.tempId)}
+                              disabled={isFormInvalid}
+                              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal font-display ${
+                                isFormInvalid
+                                  ? "bg-primary-container/40 text-on-primary-container/60"
+                                  : "bg-primary-container text-on-primary-container hover:bg-primary hover:text-white"
+                              }`}
+                            >
+                              <Calculator className="h-3.5 w-3.5" />
+                              <span>যোগ করুন</span>
+                            </Button>
+                          )
+                        })()}
                       </div>
 
                       {/* Subject actions */}

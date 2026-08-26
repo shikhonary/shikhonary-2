@@ -165,3 +165,78 @@ export function useDeleteDistribution() {
     },
   })
 }
+
+// ---------------------------------------------------------------------------
+// Builder Specific Hooks
+// ---------------------------------------------------------------------------
+
+export function useQuestionPaperDistributionStatuses(paperId: string, enabled = true) {
+  return useQuery({
+    ...trpc.questionPaper.getDistributionStatuses.queryOptions({ questionPaperId: paperId }),
+    enabled: Boolean(paperId) && enabled,
+    refetchOnWindowFocus: false,
+  })
+}
+
+export function useAvailableQuestions(
+  input: {
+    subjectId: string
+    chapterId?: string
+    questionTypeId?: string
+    category?: "MCQ" | "CQ" | "SHORT"
+    difficulty?: string
+    search?: string
+    year?: number
+    excludePaperId?: string
+    limit?: number
+    cursor?: string
+  },
+  enabled = true
+) {
+  return useQuery({
+    ...trpc.questionPaper.getAvailableQuestions.queryOptions(input),
+    enabled: Boolean(input.subjectId) && enabled,
+    refetchOnWindowFocus: false,
+  })
+}
+
+export function useBulkAssignQuestions() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.bulkAssignQuestions.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useBulkRemoveQuestions() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.bulkRemoveQuestions.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useUpdateQuestionPaperSettings() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.updateSettings.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useGeneratePaperSets() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.generateSets.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+

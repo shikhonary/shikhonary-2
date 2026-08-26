@@ -17,8 +17,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { MoreVertical, Pen, Trash, Clock, Copy, Printer, CheckCircle, AlertTriangle } from "lucide-react"
+import { MoreVertical, Pen, Trash, Clock, Copy, Printer, CheckCircle, AlertTriangle, Sparkles } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+
+export function formatDurationBn(minutes: number): string {
+  if (!minutes) return "০ মিনিট"
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+
+  const toBnNums = (num: number): string => {
+    const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+    return String(num)
+      .split("")
+      .map((digit) => bnDigits[parseInt(digit, 10)] || digit)
+      .join("")
+  }
+
+  if (hours > 0 && mins > 0) {
+    return `${toBnNums(hours)} ঘণ্টা ${toBnNums(mins)} মিনিট`
+  } else if (hours > 0) {
+    return `${toBnNums(hours)} ঘণ্টা`
+  } else {
+    return `${toBnNums(mins)} মিনিট`
+  }
+}
 
 export interface QuestionPaperItem {
   id: string
@@ -132,6 +154,9 @@ export function QuestionPaperDataTable({
                       <Badge variant="outline" className="text-[10px] font-bold border-outline/20 bg-muted/5 px-2 py-0.5 rounded-full text-outline font-display h-auto">
                         পূর্ণমান: {item.total}
                       </Badge>
+                      <Badge variant="outline" className="text-[10px] font-bold border-outline/20 bg-muted/5 px-2 py-0.5 rounded-full text-outline font-display h-auto">
+                        সময়: {formatDurationBn(item.timeInMinutes)}
+                      </Badge>
                       {item.isTemplate && (
                         <Badge variant="outline" className="text-[10px] font-bold border-teal-500/20 bg-teal-500/5 px-2 py-0.5 rounded-full text-teal-600 font-display h-auto">
                           টেমপ্লেট
@@ -152,11 +177,22 @@ export function QuestionPaperDataTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px] font-display">
                       <DropdownMenuItem
-                        onClick={() => onEdit?.(item)}
+                        asChild
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10"
+                      >
+                        <Link href={`/question-papers/${item.id}/builder`}>
+                          <Sparkles className="h-3.5 w-3.5" />
+                          <span>বিল্ডার ওপেন করুন</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        asChild
                         className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
                       >
-                        <Pen className="h-3.5 w-3.5" />
-                        <span>সম্পাদনা করুন</span>
+                        <Link href={`/question-papers/${item.id}/edit`}>
+                          <Pen className="h-3.5 w-3.5" />
+                          <span>সম্পাদনা করুন</span>
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => onDuplicate(item.id, item.title)}
@@ -255,7 +291,7 @@ export function QuestionPaperDataTable({
                           পূর্ণমান: {item.total}
                         </span>
                         <span className="text-[10px] text-outline">
-                          সময়: {item.timeInMinutes} মিনিট
+                          সময়: {formatDurationBn(item.timeInMinutes)}
                         </span>
                       </div>
                     </TableCell>
@@ -275,24 +311,48 @@ export function QuestionPaperDataTable({
                     </TableCell>
 
                     <TableCell className="py-4 px-6 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-auto w-auto"
-                          >
-                            <MoreVertical />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px] font-display">
-                          <DropdownMenuItem
-                            onClick={() => onEdit?.(item)}
-                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                          >
-                            <Pen className="h-3.5 w-3.5" />
-                            <span>সম্পাদনা করুন</span>
-                          </DropdownMenuItem>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="rounded-lg h-8 gap-1.5 border-primary/30 text-primary hover:bg-primary/10 font-bold text-xs cursor-pointer"
+                        >
+                          <Link href={`/question-papers/${item.id}/builder`}>
+                            <Sparkles className="h-3.5 w-3.5" />
+                            <span>বিল্ডার</span>
+                          </Link>
+                        </Button>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-auto w-auto"
+                            >
+                              <MoreVertical />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px] font-display">
+                            <DropdownMenuItem
+                              asChild
+                              className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10"
+                            >
+                              <Link href={`/question-papers/${item.id}/builder`}>
+                                <Sparkles className="h-3.5 w-3.5" />
+                                <span>বিল্ডার ওপেন করুন</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              asChild
+                              className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
+                            >
+                              <Link href={`/question-papers/${item.id}/edit`}>
+                                <Pen className="h-3.5 w-3.5" />
+                                <span>সম্পাদনা করুন</span>
+                              </Link>
+                            </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => onDuplicate(item.id, item.title)}
                             className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
@@ -319,8 +379,9 @@ export function QuestionPaperDataTable({
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                  </TableCell>
+                </TableRow>
                 ))}
               </TableBody>
             </Table>
@@ -369,7 +430,7 @@ export function QuestionPaperDataTable({
                   variant={currentPage === pageNum ? "default" : "ghost"}
                   onClick={() => onPageChange(pageNum)}
                   className={`size-8 sm:size-10 rounded-lg text-xs sm:text-sm transition-colors shrink-0 ${currentPage === pageNum
-                    ? "bg-primary font-bold text-on-primary hover:bg-primary"
+                    ? "bg-primary font-bold text-white hover:bg-primary hover:text-white"
                     : "hover:bg-surface-container-high text-on-surface"
                     }`}
                 >

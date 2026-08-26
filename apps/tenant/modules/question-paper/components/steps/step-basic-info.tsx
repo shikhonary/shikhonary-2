@@ -3,10 +3,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Textarea } from "@workspace/ui/components/textarea"
 import { Checkbox } from "@workspace/ui/components/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { FileText, GraduationCap, BookOpen, Loader2 } from "lucide-react"
+import { GraduationCap, BookOpen, Loader2, Clock } from "lucide-react"
 import type { StepProps, AcademicClassRef } from "../../types/create-wizard"
 
 interface StepBasicInfoProps extends StepProps {
@@ -27,40 +26,20 @@ export function StepBasicInfo({ data, onChange, errors, classes, isClassesLoadin
     <Card className="overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
       <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
         <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-          <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+          <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
         <div>
           <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
             প্রাথমিক তথ্য
           </CardTitle>
           <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5 font-body">
-            প্রশ্নপত্রের মৌলিক তথ্য এবং শ্রেণী নির্বাচন করুন
+            পরীক্ষার নাম, শ্রেণী ও সময় নির্ধারণ করুন
           </p>
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-8">
         <div className="space-y-6 sm:space-y-8">
           <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
-            {/* Title */}
-            <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                প্রশ্নপত্রের শিরোনাম
-              </Label>
-              <div className="group relative">
-                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
-                <Input
-                  type="text"
-                  value={data.title}
-                  onChange={(e) => onChange({ title: e.target.value })}
-                  placeholder="উদা: ৯ম শ্রেণী গণিত অর্ধবার্ষিক পরীক্ষা"
-                  className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                />
-              </div>
-              {errors.title && (
-                <p className="text-xs text-error font-body mt-1">{errors.title}</p>
-              )}
-            </div>
-
             {/* Exam Name */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -112,8 +91,29 @@ export function StepBasicInfo({ data, onChange, errors, classes, isClassesLoadin
               )}
             </div>
 
+            {/* Time In Minutes */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                পরীক্ষার সময় (মিনিট)
+              </Label>
+              <div className="group relative">
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
+                <Input
+                  type="number"
+                  min="0"
+                  value={data.timeInMinutes || ""}
+                  onChange={(e) => onChange({ timeInMinutes: parseInt(e.target.value, 10) || 0 })}
+                  placeholder="উদা: ৯০"
+                  className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
+                />
+              </div>
+              {errors.timeInMinutes && (
+                <p className="text-xs text-error font-body mt-1">{errors.timeInMinutes}</p>
+              )}
+            </div>
+
             {/* Template Checkbox */}
-            <div className="flex items-start space-x-3 rounded-lg border border-outline-variant/40 p-4 hover:bg-surface-container-low transition-colors mt-2 md:mt-8 font-body">
+            <div className="flex items-start space-x-3 rounded-lg border border-outline-variant/40 p-4 hover:bg-surface-container-low transition-colors font-body">
               <Checkbox
                 id="isTemplate"
                 checked={data.isTemplate}
@@ -129,19 +129,6 @@ export function StepBasicInfo({ data, onChange, errors, classes, isClassesLoadin
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2 border-t border-outline-variant/40 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-              বিবরণ / সংক্ষিপ্ত নোট (ঐচ্ছিক)
-            </Label>
-            <Textarea
-              value={data.description}
-              onChange={(e) => onChange({ description: e.target.value })}
-              placeholder="বিশেষ নির্দেশনা, নোটিশ বা বিবরণ লিখুন..."
-              className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 px-4 font-body text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden min-h-[120px]"
-            />
           </div>
         </div>
       </CardContent>

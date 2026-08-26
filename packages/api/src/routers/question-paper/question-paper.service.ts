@@ -17,6 +17,12 @@ import type {
   DeleteQuestionPaperSubjectInput,
   UpsertQuestionPaperDistributionInput,
   DeleteQuestionPaperDistributionInput,
+  GetDistributionStatusesInput,
+  GetAvailableQuestionsInput,
+  BulkAssignQuestionsInput,
+  BulkRemoveQuestionsInput,
+  UpdateQuestionPaperSettingsInput,
+  GeneratePaperSetsInput,
 } from "./question-paper.schema"
 
 // ---------------------------------------------------------------------------
@@ -127,7 +133,7 @@ export async function listQuestionPapers(
 ) {
   const where: any = { deletedAt: null }
 
-  if (input.classId) {
+  if (input.classId && input.classId !== "All") {
     where.classId = input.classId
   }
 
@@ -140,26 +146,48 @@ export async function listQuestionPapers(
   }
 
   if (input.search && input.search.trim() !== "") {
-    where.title = { contains: input.search.trim(), mode: "insensitive" }
+    where.OR = [
+      { title: { contains: input.search.trim(), mode: "insensitive" } },
+      { examName: { contains: input.search.trim(), mode: "insensitive" } },
+    ]
   }
 
-  const papers = await tenantDb.questionPaper.findMany({
-    where,
-    take: input.limit,
-    skip: input.cursor ? 1 : 0,
-    cursor: input.cursor ? { id: input.cursor } : undefined,
-    orderBy: { createdAt: "desc" },
-  })
+  let orderBy: any = { createdAt: "desc" }
+  if (input.sort === "title_asc") {
+    orderBy = { title: "asc" }
+  } else if (input.sort === "title_desc") {
+    orderBy = { title: "desc" }
+  } else if (input.sort === "newest") {
+    orderBy = { createdAt: "desc" }
+  } else if (input.sort === "oldest") {
+    orderBy = { createdAt: "asc" }
+  }
+
+  const page = input.page ?? 1
+  const limit = input.limit ?? 10
+  const skip = input.cursor ? 1 : (page - 1) * limit
+
+  const [papers, totalItems] = await Promise.all([
+    tenantDb.questionPaper.findMany({
+      where,
+      take: limit,
+      skip,
+      cursor: input.cursor ? { id: input.cursor } : undefined,
+      orderBy,
+    }),
+    tenantDb.questionPaper.count({ where }),
+  ])
 
   const nextCursor =
-    papers.length === input.limit
+    papers.length === limit
       ? papers[papers.length - 1]?.id
       : undefined
 
-  return { papers, nextCursor }
+  return { papers, totalItems, nextCursor }
 }
 
 export async function getQuestionPaperById(
+  db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: GetQuestionPaperInput
 ) {
@@ -190,7 +218,107 @@ export async function getQuestionPaperById(
     throw notFound("QuestionPaper")
   }
 
-  return paper
+  // Batch resolve cross-DB references from db in parallel
+  const mcqIds = paper.questions.map((q) => q.mcqId).filter(Boolean) as string[]
+  const cqIds = paper.questions.map((q) => q.cqId).filter(Boolean) as string[]
+  const shortAnswerIds = paper.questions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
+
+  const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
+  const questionTypeIds = Array.from(
+    new Set(paper.subjects.flatMap((s) => s.distributions.map((d) => d.questionTypeId)).filter(Boolean))
+  )
+
+  const [
+    mcqs,
+    cqs,
+    shortAnswers,
+    academicClass,
+    academicSubjects,
+    questionTypes,
+  ] = await Promise.all([
+    mcqIds.length > 0
+      ? db.mcq.findMany({
+          where: { id: { in: mcqIds } },
+          include: {
+            attachments: true,
+            chapter: true,
+            questionType: true,
+          },
+        })
+      : [],
+    cqIds.length > 0
+      ? db.cq.findMany({
+          where: { id: { in: cqIds } },
+          include: {
+            attachments: true,
+            answer: true,
+            chapter: true,
+            questionType: true,
+          },
+        })
+      : [],
+    shortAnswerIds.length > 0
+      ? db.shortAnswer.findMany({
+          where: { id: { in: shortAnswerIds } },
+          include: {
+            attachments: true,
+            chapter: true,
+            questionType: true,
+          },
+        })
+      : [],
+    paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
+    subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
+    questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
+  ])
+
+  const mcqMap = new Map(mcqs.map((m) => [m.id, m]))
+  const cqMap = new Map(cqs.map((c) => [c.id, c]))
+  const shortMap = new Map(shortAnswers.map((s) => [s.id, s]))
+  const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
+  const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
+
+  // Enrich subjects & distributions with main DB data
+  const enrichedSubjects = paper.subjects.map((sub) => ({
+    ...sub,
+    subject: subjectMap.get(sub.subjectId) || null,
+    distributions: sub.distributions.map((dist) => ({
+      ...dist,
+      questionType: qTypeMap.get(dist.questionTypeId) || null,
+    })),
+  }))
+
+  // Enrich questions with resolved entity
+  const enrichedQuestions = paper.questions.map((q) => {
+    let resolvedMcq = q.mcqId ? mcqMap.get(q.mcqId) || null : null
+    let resolvedCq = q.cqId ? cqMap.get(q.cqId) || null : null
+    let resolvedShort = q.shortAnswerId ? shortMap.get(q.shortAnswerId) || null : null
+
+    // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
+    if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
+      resolvedMcq = q.contentSnapshot as any
+    }
+    if (!resolvedCq && q.cqId && q.contentSnapshot) {
+      resolvedCq = q.contentSnapshot as any
+    }
+    if (!resolvedShort && q.shortAnswerId && q.contentSnapshot) {
+      resolvedShort = q.contentSnapshot as any
+    }
+
+    return {
+      ...q,
+      mcq: resolvedMcq,
+      cq: resolvedCq,
+      shortAnswer: resolvedShort,
+    }
+  })
+
+  return {
+    ...paper,
+    academicClass,
+    subjects: enrichedSubjects,
+    questions: enrichedQuestions,
+  }
 }
 
 export async function createQuestionPaper(
@@ -208,6 +336,7 @@ export async function createQuestionPaper(
       settings: input.settings,
       instructions: input.instructions,
       isTemplate: input.isTemplate,
+      timeInMinutes: input.timeInMinutes,
       status: "Draft",
     },
   })
@@ -249,6 +378,7 @@ export async function updateQuestionPaper(
   if (data.isTemplate !== undefined) updateData.isTemplate = data.isTemplate
   if (data.isActive !== undefined) updateData.isActive = data.isActive
   if (data.status !== undefined) updateData.status = data.status
+  if (data.timeInMinutes !== undefined) updateData.timeInMinutes = data.timeInMinutes
 
   const updated = await tenantDb.questionPaper.update({
     where: { id },
@@ -618,7 +748,8 @@ export async function upsertQuestionPaperDistribution(
   })
   if (!subject) throw notFound("QuestionPaperSubject")
 
-  const totalMarks = input.marksPerQuestion * input.questionCount
+  const attemptCount = input.questionsToAttempt ?? input.questionCount
+  const totalMarks = input.marksPerQuestion * attemptCount
   let dist
   let isNew = true
 
@@ -845,3 +976,529 @@ export async function getQuestionPaperHistory(
     orderBy: { createdAt: "desc" },
   })
 }
+
+// ---------------------------------------------------------------------------
+// Builder Service Functions
+// ---------------------------------------------------------------------------
+
+export async function getQuestionPaperDistributionStatuses(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: GetDistributionStatusesInput
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+    include: {
+      subjects: {
+        include: {
+          distributions: {
+            orderBy: { orderIndex: "asc" },
+          },
+        },
+      },
+      questions: true,
+    },
+  })
+
+  if (!paper || paper.deletedAt) {
+    throw notFound("QuestionPaper")
+  }
+
+  const questionTypeIds = Array.from(
+    new Set(paper.subjects.flatMap((s) => s.distributions.map((d) => d.questionTypeId)).filter(Boolean))
+  )
+  const questionTypes = await db.questionType.findMany({
+    where: { id: { in: questionTypeIds } },
+  })
+  const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
+
+  // Count questions per distribution
+  const countsByDist = new Map<string, number>()
+  for (const q of paper.questions) {
+    const cur = countsByDist.get(q.distributionId) || 0
+    countsByDist.set(q.distributionId, cur + 1)
+  }
+
+  const statuses: Array<{
+    distributionId: string
+    paperSubjectId: string
+    subjectId: string
+    subjectName: string
+    questionTypeId: string
+    questionTypeName: string
+    targetCount: number
+    addedCount: number
+    marksPerQuestion: number
+    totalMarks: number
+    status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE"
+    questionType: any
+  }> = []
+
+  let foundActive = false
+
+  for (const sub of paper.subjects) {
+    for (const dist of sub.distributions) {
+      const addedCount = countsByDist.get(dist.id) || 0
+      const targetCount = dist.questionCount
+      const isComplete = addedCount >= targetCount && targetCount > 0
+
+      let status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE" = "INCOMPLETE"
+      if (isComplete) {
+        status = "COMPLETED"
+      } else if (!foundActive) {
+        status = "ACTIVE"
+        foundActive = true
+      } else {
+        status = "LOCKED"
+      }
+
+      statuses.push({
+        distributionId: dist.id,
+        paperSubjectId: sub.id,
+        subjectId: sub.subjectId,
+        subjectName: sub.subjectName,
+        questionTypeId: dist.questionTypeId,
+        questionTypeName: dist.questionTypeName,
+        targetCount,
+        addedCount,
+        marksPerQuestion: dist.marksPerQuestion,
+        totalMarks: dist.totalMarks,
+        status,
+        questionType: qTypeMap.get(dist.questionTypeId) || null,
+      })
+    }
+  }
+
+  return statuses
+}
+
+export async function getAvailableQuestions(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: GetAvailableQuestionsInput
+) {
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, year, excludePaperId, limit, cursor } = input
+
+  const excludedMcqIds = new Set<string>()
+  const excludedCqIds = new Set<string>()
+  const excludedShortIds = new Set<string>()
+
+  if (excludePaperId) {
+    const existing = await tenantDb.questionPaperQuestion.findMany({
+      where: { questionPaperId: excludePaperId },
+      select: { mcqId: true, cqId: true, shortAnswerId: true },
+    })
+    for (const q of existing) {
+      if (q.mcqId) excludedMcqIds.add(q.mcqId)
+      if (q.cqId) excludedCqIds.add(q.cqId)
+      if (q.shortAnswerId) excludedShortIds.add(q.shortAnswerId)
+    }
+  }
+
+  const whereCommon: any = {
+    subjectId,
+    isActive: true,
+  }
+  if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
+  if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") whereCommon.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
+  if (year) whereCommon.year = year
+
+  if (category === "CQ") {
+    const where: any = { ...whereCommon }
+    if (search && search.trim()) {
+      where.OR = [
+        { questionA: { contains: search.trim(), mode: "insensitive" } },
+        { questionB: { contains: search.trim(), mode: "insensitive" } },
+        { context: { contains: search.trim(), mode: "insensitive" } },
+      ]
+    }
+    const cqs = await db.cq.findMany({
+      where,
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: {
+        chapter: true,
+        questionType: true,
+        answer: true,
+      },
+      orderBy: { createdAt: "desc" },
+    })
+
+    const hasNext = cqs.length > limit
+    const items = hasNext ? cqs.slice(0, limit) : cqs
+    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+
+    return {
+      category: "CQ",
+      items: items.map((c) => ({
+        ...c,
+        isAssigned: excludedCqIds.has(c.id),
+      })),
+      nextCursor,
+    }
+  }
+
+  if (category === "SHORT") {
+    const where: any = { ...whereCommon }
+    if (search && search.trim()) {
+      where.question = { contains: search.trim(), mode: "insensitive" }
+    }
+    const shorts = await db.shortAnswer.findMany({
+      where,
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: {
+        chapter: true,
+        questionType: true,
+      },
+      orderBy: { createdAt: "desc" },
+    })
+
+    const hasNext = shorts.length > limit
+    const items = hasNext ? shorts.slice(0, limit) : shorts
+    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+
+    return {
+      category: "SHORT",
+      items: items.map((s) => ({
+        ...s,
+        isAssigned: excludedShortIds.has(s.id),
+      })),
+      nextCursor,
+    }
+  }
+
+  // Default: MCQ
+  const where: any = { ...whereCommon }
+  if (search && search.trim()) {
+    where.question = { contains: search.trim(), mode: "insensitive" }
+  }
+  const mcqs = await db.mcq.findMany({
+    where,
+    take: limit + 1,
+    cursor: cursor ? { id: cursor } : undefined,
+    include: {
+      chapter: true,
+      questionType: true,
+    },
+    orderBy: { createdAt: "desc" },
+  })
+
+  const hasNext = mcqs.length > limit
+  const items = hasNext ? mcqs.slice(0, limit) : mcqs
+  const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+
+  return {
+    category: "MCQ",
+    items: items.map((m) => ({
+      ...m,
+      isAssigned: excludedMcqIds.has(m.id),
+    })),
+    nextCursor,
+  }
+}
+
+export async function bulkAssignQuestions(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: BulkAssignQuestionsInput,
+  actorId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+
+  const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+    where: { id: input.distributionId },
+  })
+  if (!dist) throw notFound("QuestionPaperSubjectMarkDistribution")
+
+  const highest = await tenantDb.questionPaperQuestion.findFirst({
+    where: { questionPaperId: input.questionPaperId },
+    orderBy: { orderIndex: "desc" },
+    select: { orderIndex: true },
+  })
+  let nextOrder = (highest?.orderIndex ?? -1) + 1
+
+  const recordsToCreate: any[] = []
+
+  if (input.mcqIds && input.mcqIds.length > 0) {
+    for (const mcqId of input.mcqIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        mcqId,
+        distributionId: input.distributionId,
+        sectionId: input.sectionId ?? null,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.cqIds && input.cqIds.length > 0) {
+    for (const cqId of input.cqIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        cqId,
+        distributionId: input.distributionId,
+        sectionId: input.sectionId ?? null,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.shortAnswerIds && input.shortAnswerIds.length > 0) {
+    for (const shortAnswerId of input.shortAnswerIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        shortAnswerId,
+        distributionId: input.distributionId,
+        sectionId: input.sectionId ?? null,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (recordsToCreate.length === 0) {
+    return { success: true, count: 0 }
+  }
+
+  for (const record of recordsToCreate) {
+    if (paper.status === "Published") {
+      if (record.mcqId) {
+        record.contentSnapshot = (await db.mcq.findUnique({ where: { id: record.mcqId } })) as any
+      } else if (record.cqId) {
+        record.contentSnapshot = (await db.cq.findUnique({ where: { id: record.cqId } })) as any
+      } else if (record.shortAnswerId) {
+        record.contentSnapshot = (await db.shortAnswer.findUnique({ where: { id: record.shortAnswerId } })) as any
+      }
+    }
+    await tenantDb.questionPaperQuestion.upsert({
+      where: record.mcqId
+        ? { questionPaperId_mcqId: { questionPaperId: input.questionPaperId, mcqId: record.mcqId } }
+        : record.cqId
+          ? { questionPaperId_cqId: { questionPaperId: input.questionPaperId, cqId: record.cqId } }
+          : { questionPaperId_shortAnswerId: { questionPaperId: input.questionPaperId, shortAnswerId: record.shortAnswerId! } },
+      create: record,
+      update: { distributionId: input.distributionId, sectionId: input.sectionId ?? null },
+    })
+  }
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_ADDED",
+    actorId,
+    changes: { count: recordsToCreate.length, distributionId: input.distributionId },
+  })
+
+  return { success: true, count: recordsToCreate.length }
+}
+
+export async function bulkRemoveQuestions(
+  tenantDb: TenantPrismaClient,
+  input: BulkRemoveQuestionsInput,
+  actorId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+
+  await tenantDb.questionPaperQuestion.deleteMany({
+    where: {
+      questionPaperId: input.questionPaperId,
+      OR: [
+        { id: { in: input.questionIds } },
+        { mcqId: { in: input.questionIds } },
+        { cqId: { in: input.questionIds } },
+        { shortAnswerId: { in: input.questionIds } },
+      ],
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_REMOVED",
+    actorId,
+    changes: { count: input.questionIds.length },
+  })
+
+  return { success: true }
+}
+
+export async function updateQuestionPaperSettings(
+  tenantDb: TenantPrismaClient,
+  input: UpdateQuestionPaperSettingsInput,
+  actorId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.id },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+
+  const updated = await tenantDb.questionPaper.update({
+    where: { id: input.id },
+    data: {
+      settings: input.settings,
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.id,
+    action: "SETTINGS_UPDATED",
+    actorId,
+    changes: { settings: input.settings },
+  })
+
+  return updated
+}
+
+export async function generatePaperSets(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: GeneratePaperSetsInput,
+  actorId?: string
+) {
+  const source = await getQuestionPaperById(db, tenantDb, { id: input.sourcePaperId })
+  if (!source) throw notFound("QuestionPaper")
+
+  const generatedPapers: Array<{ id: string; title: string; setCode: string }> = []
+
+  for (const setCode of input.setCodes) {
+    const newSettings = {
+      ...((source.settings as any) || {}),
+      setCode,
+      showSetCode: true,
+    }
+
+    const createdPaper = await tenantDb.questionPaper.create({
+      data: {
+        title: `${source.title} (সেট ${setCode})`,
+        examName: source.examName,
+        description: source.description,
+        classId: source.classId,
+        className: source.className,
+        settings: newSettings,
+        instructions: source.instructions ?? [],
+        isTemplate: false,
+        status: "Draft",
+        total: source.total,
+        timeInMinutes: source.timeInMinutes,
+        createdBy: actorId,
+      },
+    })
+
+    const sectionMap = new Map<string, string>()
+    for (const sec of source.sections) {
+      const newSec = await tenantDb.questionPaperSection.create({
+        data: {
+          questionPaperId: createdPaper.id,
+          title: sec.title,
+          titleBn: sec.titleBn,
+          instructions: sec.instructions,
+          orderIndex: sec.orderIndex,
+        },
+      })
+      sectionMap.set(sec.id, newSec.id)
+    }
+
+    const distMap = new Map<string, string>()
+    for (const sub of source.subjects) {
+      const newSub = await tenantDb.questionPaperSubject.create({
+        data: {
+          questionPaperId: createdPaper.id,
+          subjectId: sub.subjectId,
+          subjectName: sub.subjectName,
+          subjectTotal: sub.subjectTotal,
+        },
+      })
+
+      for (const dist of sub.distributions) {
+        const newDist = await tenantDb.questionPaperSubjectMarkDistribution.create({
+          data: {
+            paperSubjectId: newSub.id,
+            questionTypeId: dist.questionTypeId,
+            questionTypeName: dist.questionTypeName,
+            marksPerQuestion: dist.marksPerQuestion,
+            questionCount: dist.questionCount,
+            totalMarks: dist.totalMarks,
+            questionsToAttempt: dist.questionsToAttempt,
+            orderIndex: dist.orderIndex,
+          },
+        })
+        distMap.set(dist.id, newDist.id)
+      }
+    }
+
+    const questionsByDist = new Map<string, any[]>()
+    for (const q of source.questions) {
+      const arr = questionsByDist.get(q.distributionId) || []
+      arr.push(q)
+      questionsByDist.set(q.distributionId, arr)
+    }
+
+    let globalOrder = 0
+    for (const [oldDistId, qList] of questionsByDist.entries()) {
+      const newDistId = distMap.get(oldDistId)
+      if (!newDistId) continue
+
+      let processedList = [...qList]
+      if (input.shuffleQuestions) {
+        for (let i = processedList.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[processedList[i], processedList[j]] = [processedList[j]!, processedList[i]!]
+        }
+      }
+
+      for (const q of processedList) {
+        const newSecId = q.sectionId ? sectionMap.get(q.sectionId) : null
+        let overrides = { ...(q.overrides || {}) }
+
+        if (input.shuffleOptions && q.mcq && q.mcq.options && q.mcq.options.length > 1) {
+          const originalOptions: string[] = q.mcq.options
+          const indexed = originalOptions.map((opt, i) => ({ opt, originalIndex: i }))
+          for (let i = indexed.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[indexed[i], indexed[j]] = [indexed[j]!, indexed[i]!]
+          }
+          overrides.shuffledOptions = indexed.map((item) => item.opt)
+        }
+
+        await tenantDb.questionPaperQuestion.create({
+          data: {
+            questionPaperId: createdPaper.id,
+            mcqId: q.mcqId,
+            cqId: q.cqId,
+            shortAnswerId: q.shortAnswerId,
+            distributionId: newDistId,
+            sectionId: newSecId,
+            orderIndex: globalOrder++,
+            assignedMarks: q.assignedMarks,
+            overrides,
+            contentSnapshot: q.contentSnapshot ?? null,
+          },
+        })
+      }
+    }
+
+    await logHistory(tenantDb, {
+      questionPaperId: createdPaper.id,
+      action: "CREATED",
+      actorId,
+      changes: { setCode, generatedFrom: source.id },
+    })
+
+    generatedPapers.push({
+      id: createdPaper.id,
+      title: createdPaper.title,
+      setCode,
+    })
+  }
+
+  return {
+    success: true,
+    generatedPapers,
+  }
+}
+

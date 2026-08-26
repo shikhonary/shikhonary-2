@@ -85,6 +85,12 @@ export type {
   DeleteQuestionPaperSubjectInput,
   UpsertQuestionPaperDistributionInput,
   DeleteQuestionPaperDistributionInput,
+  GetDistributionStatusesInput,
+  GetAvailableQuestionsInput,
+  BulkAssignQuestionsInput,
+  BulkRemoveQuestionsInput,
+  UpdateQuestionPaperSettingsInput,
+  GeneratePaperSetsInput,
 } from "./routers/question-paper/question-paper.schema"
 
 // ── Academic Setup Exports ───────────────────────────────────

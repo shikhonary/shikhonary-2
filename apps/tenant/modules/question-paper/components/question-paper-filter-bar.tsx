@@ -136,7 +136,7 @@ export function QuestionPaperFilterBar({
         {isMobile && (
           <label className="text-xs font-bold text-on-surface flex items-center gap-1.5 font-display">
             <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
-            সাজানোর ক্রম
+            সর্ট
           </label>
         )}
         <Select
@@ -144,10 +144,10 @@ export function QuestionPaperFilterBar({
           onValueChange={(val) => onSortChange(val ?? "All")}
         >
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="সাজানোর ক্রম" />
+            <SelectValue placeholder="সর্ট" />
           </SelectTrigger>
           <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body">
-            <SelectItem value="All">সাজানোর ক্রম</SelectItem>
+            <SelectItem value="All">সর্ট</SelectItem>
             <SelectItem value="newest">নতুন তৈরি</SelectItem>
             <SelectItem value="oldest">পুরাতন তৈরি</SelectItem>
             <SelectItem value="title_asc">শিরোনাম (A to Z)</SelectItem>
@@ -298,12 +298,12 @@ export function QuestionPaperFilterBar({
                 variant="secondary"
                 className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0 font-body"
               >
-                <span>সাজানোর ক্রম: {getSortLabel(selectedSort)}</span>
+                <span>সর্ট: {getSortLabel(selectedSort)}</span>
                 <button
                   type="button"
                   onClick={() => onSortChange("All")}
                   className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
-                  title="সাজানোর ক্রম বাদ দিন"
+                  title="সর্ট বাদ দিন"
                 >
                   <X className="h-3 w-3" />
                 </button>

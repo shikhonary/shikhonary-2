@@ -9,16 +9,13 @@ import { trpc } from "@/trpc/client"
 import { Loader2, Check, ArrowLeft, ArrowRight, SkipForward, FileText } from "lucide-react"
 import {
   useCreateQuestionPaper,
-  useUpsertSection,
   useUpsertSubject,
   useUpsertDistribution,
 } from "../services/use-question-paper"
 import { INITIAL_WIZARD_DATA, WIZARD_STEPS } from "../types/create-wizard"
 import type { WizardData } from "../types/create-wizard"
 import { StepBasicInfo } from "./steps/step-basic-info"
-import { StepSections } from "./steps/step-sections"
 import { StepSubjectsDistribution } from "./steps/step-subjects-distribution"
-import { StepInstructions } from "./steps/step-instructions"
 import { StepReview } from "./steps/step-review"
 
 export function CreateQuestionPaperStepper() {
@@ -30,7 +27,6 @@ export function CreateQuestionPaperStepper() {
 
   // Mutations
   const createMutation = useCreateQuestionPaper()
-  const upsertSectionMutation = useUpsertSection()
   const upsertSubjectMutation = useUpsertSubject()
   const upsertDistMutation = useUpsertDistribution()
 
@@ -74,12 +70,12 @@ export function CreateQuestionPaperStepper() {
     const e: Record<string, string> = {}
 
     if (step === 0) {
-      if (!wizardData.title.trim()) e.title = "প্রশ্নপত্রের শিরোনাম আবশ্যক"
       if (!wizardData.examName.trim()) e.examName = "পরীক্ষার নাম আবশ্যক"
       if (!wizardData.classId) e.classId = "শ্রেণী নির্বাচন আবশ্যক"
+      if (wizardData.timeInMinutes <= 0) e.timeInMinutes = "পরীক্ষার সময় অবশ্যই ০ থেকে বেশি হতে হবে"
     }
 
-    if (step === 2) {
+    if (step === 1) {
       if (wizardData.subjects.length === 0) {
         e.subjects = "অন্তত একটি বিষয় যোগ করুন"
       }
@@ -152,31 +148,22 @@ export function CreateQuestionPaperStepper() {
 
     try {
       // 1. Create the paper
+      const dynamicTitle = `${wizardData.className} - ${wizardData.examName} প্রশ্নপত্র`
       const paper = await createMutation.mutateAsync({
-        title: wizardData.title,
+        title: dynamicTitle,
         examName: wizardData.examName,
-        description: wizardData.description || "",
+        description: "",
         classId: wizardData.classId,
         className: wizardData.className,
         isTemplate: wizardData.isTemplate,
+        timeInMinutes: wizardData.timeInMinutes,
         settings: {},
-        instructions: wizardData.instructions,
+        instructions: [],
       })
 
       const paperId = paper.id
 
-      // 2. Create sections
-      for (const section of wizardData.sections) {
-        await upsertSectionMutation.mutateAsync({
-          questionPaperId: paperId,
-          title: section.title,
-          titleBn: section.titleBn || null,
-          instructions: section.instructions || null,
-          orderIndex: section.orderIndex,
-        })
-      }
-
-      // 3. Create subjects + distributions
+      // 2. Create subjects + distributions
       for (const subject of wizardData.subjects) {
         const createdSubject = await upsertSubjectMutation.mutateAsync({
           questionPaperId: paperId,
@@ -201,7 +188,7 @@ export function CreateQuestionPaperStepper() {
 
       toast.success("প্রশ্নপত্র সফলভাবে তৈরি হয়েছে!")
       setTimeout(() => {
-        router.push(`/question-papers/${paperId}/edit`)
+        router.push(`/question-papers/${paperId}/builder`)
       }, 800)
     } catch (err: any) {
       const msg = err.message || "প্রশ্নপত্র তৈরি করতে ব্যর্থ হয়েছে"
@@ -213,7 +200,7 @@ export function CreateQuestionPaperStepper() {
 
   // ── Step skippable flags ───────────────────────────────────────
 
-  const isSkippable = currentStep === 1 || currentStep === 3
+  const isSkippable = false
   const isLastStep = currentStep === WIZARD_STEPS.length - 1
 
   // ── Render ─────────────────────────────────────────────────────
@@ -277,9 +264,6 @@ export function CreateQuestionPaperStepper() {
           />
         )}
         {currentStep === 1 && (
-          <StepSections data={wizardData} onChange={handleChange} errors={errors} />
-        )}
-        {currentStep === 2 && (
           <StepSubjectsDistribution
             data={wizardData}
             onChange={handleChange}
@@ -289,10 +273,7 @@ export function CreateQuestionPaperStepper() {
             isLoading={isSubjectsLoading || isTypesLoading}
           />
         )}
-        {currentStep === 3 && (
-          <StepInstructions data={wizardData} onChange={handleChange} errors={errors} />
-        )}
-        {currentStep === 4 && (
+        {currentStep === 2 && (
           <StepReview data={wizardData} onGoToStep={goToStep} />
         )}
       </div>
@@ -314,18 +295,6 @@ export function CreateQuestionPaperStepper() {
           )}
         </div>
         <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-3">
-          {isSkippable && !isLastStep && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleSkip}
-              disabled={isSubmitting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 font-bold text-outline hover:text-primary transition-all cursor-pointer h-auto normal-case tracking-normal text-sm"
-            >
-              <SkipForward className="h-4 w-4" />
-              <span>এড়িয়ে যান</span>
-            </Button>
-          )}
           {isLastStep ? (
             <Button
               type="button"

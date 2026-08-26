@@ -10,6 +10,8 @@ export const listQuestionPapersSchema = paginationSchema.extend({
   status: z.enum(["Draft", "Published"]).optional(),
   isTemplate: z.boolean().optional(),
   search: z.string().optional(),
+  page: z.number().int().min(1).optional(),
+  sort: z.string().optional(),
 })
 
 export type ListQuestionPapersInput = z.infer<typeof listQuestionPapersSchema>
@@ -31,6 +33,7 @@ export const createQuestionPaperSchema = z.object({
   settings: z.record(z.any()).optional().default({}),
   instructions: z.array(z.any()).optional().default([]),
   isTemplate: z.boolean().optional().default(false),
+  timeInMinutes: z.number().int().nonnegative().optional().default(0),
 })
 
 export type CreateQuestionPaperInput = z.infer<typeof createQuestionPaperSchema>
@@ -47,6 +50,7 @@ export const updateQuestionPaperSchema = z.object({
   status: z.enum(["Draft", "Published"]).optional(),
   isTemplate: z.boolean().optional(),
   isActive: z.boolean().optional(),
+  timeInMinutes: z.number().int().nonnegative().optional(),
 })
 
 export type UpdateQuestionPaperInput = z.infer<typeof updateQuestionPaperSchema>
@@ -163,3 +167,63 @@ export const reorderQuestionPaperQuestionsSchema = z.object({
 })
 
 export type ReorderQuestionPaperQuestionsInput = z.infer<typeof reorderQuestionPaperQuestionsSchema>
+
+// ---------------------------------------------------------------------------
+// Builder Specific Queries & Mutations
+// ---------------------------------------------------------------------------
+
+export const getDistributionStatusesSchema = z.object({
+  questionPaperId: z.string().min(1),
+})
+
+export type GetDistributionStatusesInput = z.infer<typeof getDistributionStatusesSchema>
+
+export const getAvailableQuestionsSchema = z.object({
+  subjectId: z.string().min(1),
+  chapterId: z.string().optional(),
+  questionTypeId: z.string().optional(),
+  category: z.enum(["MCQ", "CQ", "SHORT"]).optional(),
+  difficulty: z.string().optional(),
+  search: z.string().optional(),
+  year: z.number().int().optional(),
+  excludePaperId: z.string().optional(),
+  limit: z.number().int().min(1).max(100).default(50),
+  cursor: z.string().optional(),
+})
+
+export type GetAvailableQuestionsInput = z.infer<typeof getAvailableQuestionsSchema>
+
+export const bulkAssignQuestionsSchema = z.object({
+  questionPaperId: z.string().min(1),
+  distributionId: z.string().min(1),
+  sectionId: z.string().optional().nullable(),
+  mcqIds: z.array(z.string()).optional(),
+  cqIds: z.array(z.string()).optional(),
+  shortAnswerIds: z.array(z.string()).optional(),
+})
+
+export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>
+
+export const bulkRemoveQuestionsSchema = z.object({
+  questionPaperId: z.string().min(1),
+  questionIds: z.array(z.string().min(1)),
+})
+
+export type BulkRemoveQuestionsInput = z.infer<typeof bulkRemoveQuestionsSchema>
+
+export const updateQuestionPaperSettingsSchema = z.object({
+  id: z.string().min(1),
+  settings: z.record(z.any()),
+})
+
+export type UpdateQuestionPaperSettingsInput = z.infer<typeof updateQuestionPaperSettingsSchema>
+
+export const generatePaperSetsSchema = z.object({
+  sourcePaperId: z.string().min(1),
+  setCodes: z.array(z.string()).min(1),
+  shuffleQuestions: z.boolean().default(true),
+  shuffleOptions: z.boolean().default(true),
+})
+
+export type GeneratePaperSetsInput = z.infer<typeof generatePaperSetsSchema>
+
