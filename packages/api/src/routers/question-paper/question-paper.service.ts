@@ -1100,12 +1100,14 @@ export async function getAvailableQuestions(
     isActive: true,
   }
   if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
-  if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") whereCommon.questionTypeId = questionTypeId
   if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
   if (year) whereCommon.year = year
 
   if (category === "CQ") {
     const where: any = { ...whereCommon }
+    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      where.questionTypeId = questionTypeId
+    }
     if (search && search.trim()) {
       where.OR = [
         { questionA: { contains: search.trim(), mode: "insensitive" } },

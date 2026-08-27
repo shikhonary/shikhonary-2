@@ -117,7 +117,9 @@ export function PrintQuestionPaperView({ id }: PrintQuestionPaperViewProps) {
         {/* Paper Header */}
         <div className="text-center space-y-1.5 border-b-2 border-black pb-4 mb-6">
           <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-black">
-            {settings.institutionName || tenant.nameBn || tenant.name}
+            {!settings.institutionName || settings.institutionName === "শিখনারী একাডেমি"
+              ? (tenant.nameBn || tenant.name)
+              : settings.institutionName}
           </h1>
           <h2 className="text-lg font-bold font-display text-black">
             {paper.examName || paper.title} {settings.showSetCode && settings.setCode ? `(সেট: ${settings.setCode})` : ""}

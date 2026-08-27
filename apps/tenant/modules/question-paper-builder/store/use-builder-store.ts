@@ -36,7 +36,7 @@ interface BuilderState {
   setBlockBreak: (id: string, type: "page" | "column" | "none") => void;
   
   // Hydration
-  hydratePaper: (id: string, settings: Partial<PaperSettings>, paperData?: any) => void;
+  hydratePaper: (id: string, settings: Partial<PaperSettings>, paperData?: any, tenantNameBn?: string | null) => void;
 }
 
 const defaultSettings: PaperSettings = {
@@ -201,13 +201,16 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     hasUnsavedChanges: true,
   })),
   
-  hydratePaper: (id, dbSettings, paperData) => set((state) => {
+  hydratePaper: (id, dbSettings, paperData, tenantNameBn) => set((state) => {
     // If items are present in the JSON (e.g. for generated sets), load them overriding relational data
     const overrideItems = (dbSettings as any)?.items;
     
     const dynamicDefaults = { ...defaultSettings };
+    if (tenantNameBn) {
+      dynamicDefaults.institutionName = tenantNameBn;
+    }
     if (paperData) {
-      if (paperData.title) dynamicDefaults.examName = paperData.title;
+      if (paperData.examName || paperData.title) dynamicDefaults.examName = paperData.examName || paperData.title;
       if (paperData.academicClass?.nameBn || paperData.academicClass?.nameEn) {
         dynamicDefaults.className = paperData.academicClass.nameBn || paperData.academicClass.nameEn;
       }
@@ -242,6 +245,41 @@ export const useBuilderStore = create<BuilderState>((set) => ({
           (finalSettings as any)[k] = (dbSettings as any)[k];
         }
       });
+    }
+
+    if (tenantNameBn && (!finalSettings.institutionName || finalSettings.institutionName === "শিখনারী একাডেমি")) {
+      finalSettings.institutionName = tenantNameBn;
+    }
+
+    if (paperData) {
+      if (paperData.examName || paperData.title) {
+        finalSettings.examName = paperData.examName || paperData.title;
+      }
+      if (paperData.academicClass?.nameBn || paperData.academicClass?.nameEn) {
+        finalSettings.className = paperData.academicClass.nameBn || paperData.academicClass.nameEn;
+      }
+      if (paperData.subjects?.length > 0) {
+        finalSettings.subjectName = paperData.subjects.map((s: any) => s.subject?.nameBn || s.subject?.nameEn).join(", ");
+      }
+      
+      const englishToBengali: Record<string, string> = {
+        '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
+        '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'
+      };
+      const toBn = (num: number | string) => num.toString().replace(/\d/g, match => englishToBengali[match] || match);
+
+      if (paperData.timeInMinutes) {
+        const hrs = Math.floor(paperData.timeInMinutes / 60);
+        const mins = paperData.timeInMinutes % 60;
+        let timeStr = "";
+        if (hrs > 0) timeStr += `${toBn(hrs)} ঘণ্টা `;
+        if (mins > 0) timeStr += `${toBn(mins)} মিনিট`;
+        finalSettings.time = timeStr.trim();
+      }
+      
+      if (paperData.total) {
+        finalSettings.totalMarks = toBn(paperData.total);
+      }
     }
 
     return {

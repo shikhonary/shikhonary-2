@@ -14,6 +14,7 @@ import {
   useUpdateQuestionPaperSettings,
 } from "@/modules/question-paper/services/use-question-paper";
 import { GenerateSetsModal } from "../components/modals/generate-sets-modal";
+import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
 
 interface Props {
   paperId: string;
@@ -62,6 +63,7 @@ function AutoSaveManager({ paperId }: { paperId: string }) {
 }
 
 export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
+  const { tenant } = useTenant();
   const { hydratePaper, saveStatus, markSaved, settings } = useBuilderStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
@@ -71,10 +73,15 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
 
   useEffect(() => {
     if (paperQuery && !isHydrated) {
-      hydratePaper(paperId, (paperQuery.settings || {}) as any, paperQuery);
+      hydratePaper(
+        paperId,
+        (paperQuery.settings || {}) as any,
+        paperQuery,
+        tenant.nameBn || tenant.name
+      );
       setIsHydrated(true);
     }
-  }, [paperQuery, isHydrated, hydratePaper, paperId]);
+  }, [paperQuery, isHydrated, hydratePaper, paperId, tenant]);
 
   const handleManualSave = async () => {
     useBuilderStore.setState({ saveStatus: "saving" });

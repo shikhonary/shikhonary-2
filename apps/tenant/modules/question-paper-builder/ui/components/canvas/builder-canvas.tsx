@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef, useMemo } from "react";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { MCQBlock } from "../blocks/mcq-block";
 import { CQBlock } from "../blocks/cq-block";
@@ -7,6 +7,7 @@ import { HeaderBlock } from "../blocks/header-block";
 import { OMRBlock } from "../blocks/omr-block";
 import { Button } from "@workspace/ui/components/button";
 import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
+import Link from "next/link";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
@@ -93,9 +94,9 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
               {dist.questionType?.nameEn} ({statusInfo?.addedCount || 0}/{statusInfo?.targetCount || dist.questionCount})
             </p>
             <Button asChild className="rounded-full shadow-sm">
-              <a href={`/question-papers/${paperId}/distributions/${dist.id}/pick`}>
+              <Link href={`/question-papers/${paperId}/distributions/${dist.id}/pick`}>
                 + Select Questions
-              </a>
+              </Link>
             </Button>
           </div>
         );
@@ -141,30 +142,33 @@ export const BuilderCanvas: React.FC = () => {
   const canvasWidth = settings.paperOrientation === "portrait" ? dims.w : dims.h;
   const canvasMinHeight = settings.paperOrientation === "portrait" ? dims.h : dims.w;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (zoom !== "auto" || !containerRef.current) return;
     
     // The parent element (main tag) dictates the available width
     const parent = containerRef.current.parentElement;
     if (!parent) return;
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width } = entry.contentRect;
-        // 1mm = 3.779527559px
-        const canvasPx = canvasWidth * 3.78; 
-        const padding = 64; // 32px padding on each side (p-8)
-        let calculatedZoom = (width - padding) / canvasPx;
-        
-        // Don't scale up past 100% on huge screens
-        if (calculatedZoom > 1) calculatedZoom = 1;
-        // Don't scale down past 30% to keep it readable
-        if (calculatedZoom < 0.3) calculatedZoom = 0.3;
-        
-        setAutoZoom(calculatedZoom);
-      }
-    });
+    const updateZoom = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.clientWidth;
+      // 1mm = 3.779527559px
+      const canvasPx = canvasWidth * 3.78; 
+      const padding = 64; // 32px padding on each side (p-8)
+      let calculatedZoom = (width - padding - 4) / canvasPx; // Subtract 4px safety margin for rounding errors
+      
+      // Don't scale up past 100% on huge screens
+      if (calculatedZoom > 1) calculatedZoom = 1;
+      // Don't scale down past 30% to keep it readable
+      if (calculatedZoom < 0.3) calculatedZoom = 0.3;
+      
+      setAutoZoom(calculatedZoom);
+    };
 
+    // Calculate synchronously on mount to avoid delay/layout flashes
+    updateZoom();
+
+    const observer = new ResizeObserver(updateZoom);
     observer.observe(parent);
     return () => observer.disconnect();
   }, [zoom, canvasWidth]);
@@ -410,82 +414,93 @@ export const BuilderCanvas: React.FC = () => {
       {/* WYSIWYG Editor Layout (Hidden in Print) */}
       <div className="flex flex-col items-center gap-8 print:hidden">
         {pages.map((page, pageIdx) => (
-          <div 
-            key={`page-${pageIdx}`}
-            className="bg-white shadow-xl relative shrink-0"
+          <div
+            key={`page-wrapper-${pageIdx}`}
+            className="shrink-0"
             style={{
-              width: `${canvasWidth}mm`,
-              minHeight: `${canvasMinHeight}mm`,
-              transform: `scale(${zoomFactor})`,
-              transformOrigin: "top center",
-              paddingTop: page.isOMRPage ? '0mm' : `${settings.margins.top}mm`,
-              paddingBottom: page.isOMRPage ? '0mm' : `${settings.margins.bottom}mm`,
-              paddingLeft: page.isOMRPage ? '0mm' : `${settings.margins.left}mm`,
-              paddingRight: page.isOMRPage ? '0mm' : `${settings.margins.right}mm`,
-              fontFamily: settings.fontFamily,
-              fontSize: `${settings.fontSize}px`,
+              width: `${canvasWidth * 3.78 * zoomFactor}px`,
+              height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
+              position: "relative",
+              overflow: "visible",
             }}
           >
-            {settings.showWatermark && (settings.watermark || settings.institutionName) && (
-              <div 
-                className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none"
-                style={{ zIndex: 0 }}
-              >
-                <div 
-                  className="font-bold whitespace-nowrap text-black/10"
-                  style={{ 
-                    fontSize: '100px', 
-                    transform: 'rotate(-45deg)',
-                  }}
-                >
-                  {settings.watermark || settings.institutionName}
-                </div>
-              </div>
-            )}
-            
-            <div className="relative z-10 w-full h-full flex flex-col">
-              {page.isOMRPage ? (
-                <OMRBlock />
-              ) : (
-              <>
-                {page.fullHeader && (
-                  <div className="mb-8">
-                    <BlockRenderer block={page.fullHeader} />
-                  </div>
-                )}
-                
-                <div 
-                  className="flex h-full"
-                  style={{ gap: "40px" }}
-                >
-                  {page.columns.map((col, colIdx) => (
-                    <div 
-                      key={`col-${colIdx}`} 
-                      className="flex-1 flex flex-col"
-                      style={{ 
-                        borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
-                        paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "20px" : "0",
-                        marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
-                      }}
-                    >
-                      {col.map(b => (
-                        <div key={b.id} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
-                          <BlockRenderer block={b} />
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-            </div>
-
-            {/* WYSIWYG Marketing Footer */}
             <div 
-              className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
-              style={{ bottom: '8px' }}
+              key={`page-${pageIdx}`}
+              className="bg-white shadow-xl relative shrink-0"
+              style={{
+                width: `${canvasWidth}mm`,
+                minHeight: `${canvasMinHeight}mm`,
+                transform: `scale(${zoomFactor})`,
+                transformOrigin: "top left",
+                paddingTop: page.isOMRPage ? '0mm' : `${settings.margins.top}mm`,
+                paddingBottom: page.isOMRPage ? '0mm' : `${settings.margins.bottom}mm`,
+                paddingLeft: page.isOMRPage ? '0mm' : `${settings.margins.left}mm`,
+                paddingRight: page.isOMRPage ? '0mm' : `${settings.margins.right}mm`,
+                fontFamily: settings.fontFamily,
+                fontSize: `${settings.fontSize}px`,
+              }}
             >
-              Generated via Shikhonary
+              {settings.showWatermark && (settings.watermark || settings.institutionName) && (
+                <div 
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none"
+                  style={{ zIndex: 0 }}
+                >
+                  <div 
+                    className="font-bold whitespace-nowrap text-black/10"
+                    style={{ 
+                      fontSize: '100px', 
+                      transform: 'rotate(-45deg)',
+                    }}
+                  >
+                    {settings.watermark || settings.institutionName}
+                  </div>
+                </div>
+              )}
+              
+              <div className="relative z-10 w-full h-full flex flex-col">
+                {page.isOMRPage ? (
+                  <OMRBlock />
+                ) : (
+                <>
+                  {page.fullHeader && (
+                    <div className="mb-8">
+                      <BlockRenderer block={page.fullHeader} />
+                    </div>
+                  )}
+                  
+                  <div 
+                    className="flex h-full"
+                    style={{ gap: "40px" }}
+                  >
+                    {page.columns.map((col, colIdx) => (
+                      <div 
+                        key={`col-${colIdx}`} 
+                        className="flex-1 flex flex-col"
+                        style={{ 
+                          borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
+                          paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "20px" : "0",
+                          marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
+                        }}
+                      >
+                        {col.map(b => (
+                          <div key={b.id} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
+                            <BlockRenderer block={b} />
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              </div>
+
+              {/* WYSIWYG Marketing Footer */}
+              <div 
+                className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
+                style={{ bottom: '8px' }}
+              >
+                Generated via Shikhonary
+              </div>
             </div>
           </div>
         ))}
