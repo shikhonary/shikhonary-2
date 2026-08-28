@@ -34,7 +34,7 @@ export interface QuestionTypeItem {
   id: string
   nameEn: string
   nameBn: string
-  label: string
+  label?: string | null
   mark: number
   position: number
   isActive: boolean
@@ -104,7 +104,7 @@ export function QuestionTypeTable({
                         <p className="text-[10px] text-on-surface-variant truncate">{qt.nameBn}</p>
                         <div className="mt-1 flex flex-wrap gap-1">
                           <Badge variant="outline" className="rounded-md border border-outline-variant/30 bg-surface px-1.5 py-0 text-[9px] font-bold text-outline">
-                            {qt.label}
+                            {qt.label || "-"}
                           </Badge>
                           <Badge
                             variant="outline"
@@ -215,7 +215,7 @@ export function QuestionTypeTable({
                       </TableCell>
                       <TableCell className="py-4 group-hover:py-5 px-6 transition-all duration-200 ease-in-out">
                         <Badge variant="outline" className="rounded-md border border-outline-variant/30 bg-surface-container-lowest px-2 py-0.5 text-xs font-bold text-outline">
-                          {qt.label}
+                          {qt.label || "-"}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-4 group-hover:py-5 px-6 text-on-surface transition-all duration-200 ease-in-out">

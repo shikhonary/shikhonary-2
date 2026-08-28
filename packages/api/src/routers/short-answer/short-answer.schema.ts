@@ -5,7 +5,6 @@ export const listShortAnswersSchema = z.object({
   limit: z.number().min(1).max(100).default(10),
   page: z.number().min(1).default(1),
   query: z.string().optional(),
-  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).optional(),
@@ -17,7 +16,6 @@ export const listShortAnswersSchema = z.object({
 })
 
 export const shortAnswerStatsSchema = z.object({
-  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
 })
@@ -40,7 +38,6 @@ export const toggleShortAnswerActiveSchema = z.object({
 })
 
 export const createShortAnswerSchema = z.object({
-  classId: z.string().min(1, "Academic class is required"),
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().min(1, "Chapter is required"),
   question: z.string().min(1, "Question text is required"),
@@ -70,7 +67,6 @@ export const updateShortAnswerSchema = createShortAnswerSchema.extend({
 export const importShortAnswersSchema = z.object({
   shortAnswers: z.array(
     z.object({
-      classId: z.string().optional(),
       subjectId: z.string().optional(),
       chapterId: z.string().optional(),
       question: z.string(),

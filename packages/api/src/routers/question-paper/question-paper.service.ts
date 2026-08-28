@@ -238,34 +238,34 @@ export async function getQuestionPaperById(
   ] = await Promise.all([
     mcqIds.length > 0
       ? db.mcq.findMany({
-          where: { id: { in: mcqIds } },
-          include: {
-            attachments: true,
-            chapter: true,
-            questionType: true,
-          },
-        })
+        where: { id: { in: mcqIds } },
+        include: {
+          attachments: true,
+          chapter: true,
+          questionType: true,
+        },
+      })
       : [],
     cqIds.length > 0
       ? db.cq.findMany({
-          where: { id: { in: cqIds } },
-          include: {
-            attachments: true,
-            answer: true,
-            chapter: true,
-            questionType: true,
-          },
-        })
+        where: { id: { in: cqIds } },
+        include: {
+          attachments: true,
+          answer: true,
+          chapter: true,
+          questionType: true,
+        },
+      })
       : [],
     shortAnswerIds.length > 0
       ? db.shortAnswer.findMany({
-          where: { id: { in: shortAnswerIds } },
-          include: {
-            attachments: true,
-            chapter: true,
-            questionType: true,
-          },
-        })
+        where: { id: { in: shortAnswerIds } },
+        include: {
+          attachments: true,
+          chapter: true,
+          questionType: true,
+        },
+      })
       : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
@@ -916,7 +916,7 @@ export async function removeQuestionPaperQuestion(
     where.mcqId = input.questionId
   } else if (input.questionType === "CQ") {
     where.cqId = input.questionId
-  } else if (input.questionType === "SHORT") {
+  } else if (input.questionType === "SA") {
     where.shortAnswerId = input.questionId
   }
 
@@ -1077,11 +1077,13 @@ export async function getAvailableQuestions(
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
-  const { subjectId, chapterId, questionTypeId, category, difficulty, search, year, excludePaperId, limit, cursor } = input
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, year, excludePaperId, limit, cursor } = input
 
   const excludedMcqIds = new Set<string>()
   const excludedCqIds = new Set<string>()
   const excludedShortIds = new Set<string>()
+
+  console.log(category)
 
   if (excludePaperId) {
     const existing = await tenantDb.questionPaperQuestion.findMany({
@@ -1102,6 +1104,15 @@ export async function getAvailableQuestions(
   if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
   if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
   if (year) whereCommon.year = year
+  if (board && board !== "all" && board !== "All") {
+    const parts = board.split("-")
+    const yearPart = parts[parts.length - 1]
+    const sourcePart = parts.slice(0, parts.length - 1).join("-")
+    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
+      whereCommon.source = sourcePart
+      whereCommon.year = Number(yearPart)
+    }
+  }
 
   if (category === "CQ") {
     const where: any = { ...whereCommon }
@@ -1123,6 +1134,7 @@ export async function getAvailableQuestions(
         chapter: true,
         questionType: true,
         answer: true,
+        attachments: true,
       },
       orderBy: { createdAt: "desc" },
     })
@@ -1141,8 +1153,11 @@ export async function getAvailableQuestions(
     }
   }
 
-  if (category === "SHORT") {
+  if (category === "SA") {
     const where: any = { ...whereCommon }
+    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      where.questionTypeId = questionTypeId
+    }
     if (search && search.trim()) {
       where.question = { contains: search.trim(), mode: "insensitive" }
     }
@@ -1153,6 +1168,7 @@ export async function getAvailableQuestions(
       include: {
         chapter: true,
         questionType: true,
+        attachments: true,
       },
       orderBy: { createdAt: "desc" },
     })
@@ -1162,7 +1178,7 @@ export async function getAvailableQuestions(
     const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
 
     return {
-      category: "SHORT",
+      category: "SA",
       items: items.map((s) => ({
         ...s,
         isAssigned: excludedShortIds.has(s.id),
@@ -1173,6 +1189,9 @@ export async function getAvailableQuestions(
 
   // Default: MCQ
   const where: any = { ...whereCommon }
+  if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+    where.questionTypeId = questionTypeId
+  }
   if (search && search.trim()) {
     where.question = { contains: search.trim(), mode: "insensitive" }
   }
@@ -1183,6 +1202,7 @@ export async function getAvailableQuestions(
     include: {
       chapter: true,
       questionType: true,
+      attachments: true,
     },
     orderBy: { createdAt: "desc" },
   })
@@ -1190,6 +1210,8 @@ export async function getAvailableQuestions(
   const hasNext = mcqs.length > limit
   const items = hasNext ? mcqs.slice(0, limit) : mcqs
   const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+
+  console.log(items)
 
   return {
     category: "MCQ",
@@ -1449,7 +1471,7 @@ export async function generatePaperSets(
       if (input.shuffleQuestions) {
         for (let i = processedList.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
-          ;[processedList[i], processedList[j]] = [processedList[j]!, processedList[i]!]
+            ;[processedList[i], processedList[j]] = [processedList[j]!, processedList[i]!]
         }
       }
 
@@ -1462,7 +1484,7 @@ export async function generatePaperSets(
           const indexed = originalOptions.map((opt, i) => ({ opt, originalIndex: i }))
           for (let i = indexed.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1))
-            ;[indexed[i], indexed[j]] = [indexed[j]!, indexed[i]!]
+              ;[indexed[i], indexed[j]] = [indexed[j]!, indexed[i]!]
           }
           overrides.shuffledOptions = indexed.map((item) => item.opt)
         }

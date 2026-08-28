@@ -68,7 +68,6 @@ export function ShortAnswerListView() {
     limit,
     page: currentPage,
     query: searchQuery || undefined,
-    classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     source: boardSource,
@@ -89,9 +88,8 @@ export function ShortAnswerListView() {
 
   // Query stats
   const { data: statsData } = useShortAnswerStats(
-    selectedAcademicClassId !== "All" || selectedSubjectId !== "All" || selectedChapterId !== "All"
+    selectedSubjectId !== "All" || selectedChapterId !== "All"
       ? {
-          classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
           subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
           chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
         }

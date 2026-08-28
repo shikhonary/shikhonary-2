@@ -475,7 +475,6 @@ export function ImportShortAnswerView() {
         }
 
         validated.push({
-          classId: item.classId || overrideClassId || undefined,
           subjectId,
           chapterId,
           question: String(item.question || "").trim(),

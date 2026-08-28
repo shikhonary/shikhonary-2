@@ -109,7 +109,6 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps) {
 
       await updateMutation.mutateAsync({
         id,
-        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         question: data.question.trim(),

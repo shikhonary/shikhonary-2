@@ -166,7 +166,6 @@ export function EditCqView() {
 
       await updateMutation.mutateAsync({
         id: cqId,
-        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         context: data.context?.trim() || null,

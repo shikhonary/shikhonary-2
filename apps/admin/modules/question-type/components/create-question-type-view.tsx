@@ -19,7 +19,7 @@ import { useCreateQuestionType } from "../services/use-question-type"
 const createQuestionTypeFormSchema = z.object({
   nameEn: z.string().min(1, "English name is required"),
   nameBn: z.string().min(1, "Bangla name is required"),
-  label: z.string().min(1, "Label is required"),
+  label: z.string().optional().or(z.literal("")),
   mark: z.coerce.number().min(0, "Mark must be at least 0"),
   position: z.coerce.number().int().min(0, "Position must be at least 0"),
   descriptionEn: z.string().optional().or(z.literal("")),
@@ -63,6 +63,7 @@ export function CreateQuestionTypeView() {
     try {
       await createMutation.mutateAsync({
         ...data,
+        label: data.label?.trim() || undefined,
         descriptionEn: data.descriptionEn?.trim() || undefined,
         descriptionBn: data.descriptionBn?.trim() || undefined,
       })
@@ -176,7 +177,7 @@ export function CreateQuestionTypeView() {
                 {/* Label */}
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    System Unique Label *
+                    System Unique Label
                   </Label>
                   <div className="group relative">
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />

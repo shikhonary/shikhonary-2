@@ -3,7 +3,6 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listMcqsSchema = paginationSchema.extend({
-  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   board: z.string().optional(),
@@ -16,7 +15,6 @@ export const listMcqsSchema = paginationSchema.extend({
 export type ListMcqsInput = z.infer<typeof listMcqsSchema>
 
 export const mcqStatsSchema = z.object({
-  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
 })
@@ -27,7 +25,6 @@ export const getMcqSchema = idSchema
 export type GetMcqInput = z.infer<typeof getMcqSchema>
 
 export const createMcqSchema = z.object({
-  classId: z.string().min(1, "Academic class is required"),
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().min(1, "Chapter is required"),
   question: z.string().min(1, "Question stem is required"),

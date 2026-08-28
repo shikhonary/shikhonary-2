@@ -22,7 +22,7 @@ const subjectQuestionTypesFormSchema = z.object({
       questionTypeId: z.string(),
       questionTypeNameEn: z.string(),
       questionTypeNameBn: z.string(),
-      questionTypeLabel: z.string(),
+      questionTypeLabel: z.string().optional().nullable(),
       enabled: z.preprocess(
         (val) => {
           if (Array.isArray(val)) {
@@ -326,7 +326,7 @@ function SubjectQuestionTypeConfigForm({ subject }: SubjectQuestionTypeConfigFor
                             </td>
                             <td className="p-4">
                               <span className="font-mono text-xs text-outline font-bold">
-                                {watch(`configs.${index}.questionTypeLabel`)}
+                                {watch(`configs.${index}.questionTypeLabel`) || "-"}
                               </span>
                             </td>
                             <td className="p-4">
@@ -431,7 +431,7 @@ function SubjectQuestionTypeConfigForm({ subject }: SubjectQuestionTypeConfigFor
                             </div>
                           </div>
                           <span className="inline-flex items-center rounded-md bg-surface-container-high px-2 py-0.5 text-[10px] font-medium text-on-surface-variant font-mono">
-                            {watch(`configs.${index}.questionTypeLabel`)}
+                            {watch(`configs.${index}.questionTypeLabel`) || "-"}
                           </span>
                         </div>
 

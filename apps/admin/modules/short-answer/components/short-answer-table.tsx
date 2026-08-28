@@ -28,11 +28,6 @@ export interface ShortAnswerItem {
   isActive: boolean
   createdAt: Date | string
   updatedAt: Date | string
-  academicClass?: {
-    id: string
-    nameEn: string
-    nameBn?: string
-  } | null
   subject?: {
     id: string
     nameEn: string
@@ -225,13 +220,6 @@ export function ShortAnswerTable({
                         <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
                           #{globalIndex}
                         </span>
-
-                        {/* Class Badge */}
-                        {item.academicClass && (
-                          <span className="px-2.5 py-0.5 bg-secondary/10 text-secondary rounded font-label-sm text-xs font-bold border border-secondary/20">
-                            {item.academicClass.nameBn || item.academicClass.nameEn}
-                          </span>
-                        )}
 
                         {/* Subject Badge */}
                         {item.subject && (

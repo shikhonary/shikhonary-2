@@ -44,11 +44,6 @@ export interface CqItem {
     nameBn: string
     position: number
   }
-  academicClass: {
-    id: string
-    nameEn: string
-    nameBn: string
-  }
   answer?: {
     id: string
     answerA?: string | null
@@ -245,11 +240,6 @@ export function CqTable({
                         {/* Global Index Badge */}
                         <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
                           #{globalIndex}
-                        </span>
-
-                        {/* Class Badge */}
-                        <span className="px-2.5 py-0.5 bg-secondary/10 text-secondary rounded font-label-sm text-xs font-bold border border-secondary/20">
-                          {item.academicClass.nameBn || item.academicClass.nameEn}
                         </span>
 
                         {/* Subject Badge */}

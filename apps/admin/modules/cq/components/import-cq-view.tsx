@@ -600,7 +600,6 @@ export function ImportCqView() {
         }
 
         validated.push({
-          classId: (item.classId || overrideClassId) || undefined,
           subjectId,
           chapterId,
           context: item.context?.trim() || null,

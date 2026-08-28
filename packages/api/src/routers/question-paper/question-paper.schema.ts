@@ -151,7 +151,7 @@ export type AddQuestionPaperQuestionInput = z.infer<typeof addQuestionPaperQuest
 export const removeQuestionPaperQuestionSchema = z.object({
   questionPaperId: z.string().min(1),
   questionId: z.string().min(1),
-  questionType: z.enum(["MCQ", "CQ", "SHORT"]),
+  questionType: z.enum(["MCQ", "CQ", "SA"]),
 })
 
 export type RemoveQuestionPaperQuestionInput = z.infer<typeof removeQuestionPaperQuestionSchema>
@@ -182,9 +182,10 @@ export const getAvailableQuestionsSchema = z.object({
   subjectId: z.string().min(1),
   chapterId: z.string().optional(),
   questionTypeId: z.string().optional(),
-  category: z.enum(["MCQ", "CQ", "SHORT"]).optional(),
+  category: z.enum(["MCQ", "CQ", "SA"]).optional(),
   difficulty: z.string().optional(),
   search: z.string().optional(),
+  board: z.string().optional(),
   year: z.number().int().optional(),
   excludePaperId: z.string().optional(),
   limit: z.number().int().min(1).max(100).default(50),

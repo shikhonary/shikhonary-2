@@ -48,7 +48,6 @@ export function McqListView() {
     limit,
     page: currentPage,
     query: searchQuery || undefined,
-    classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
@@ -68,9 +67,8 @@ export function McqListView() {
 
   // Query MCQ stats
   const { data: statsData } = useMcqStats(
-    selectedAcademicClassId !== "All" || selectedSubjectId !== "All" || selectedChapterId !== "All"
+    selectedSubjectId !== "All" || selectedChapterId !== "All"
       ? {
-          classId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
           subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
           chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
         }

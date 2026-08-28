@@ -15,7 +15,6 @@ import type {
 export async function listCqs(db: PrismaClient, input: ListCqsInput) {
   const where: any = {}
   
-  if (input.classId) where.classId = input.classId
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
   if (input.difficulty) where.difficulty = input.difficulty
@@ -68,13 +67,6 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
       skip,
       orderBy,
       include: {
-        academicClass: {
-          select: {
-            id: true,
-            nameBn: true,
-            nameEn: true,
-          },
-        },
         subject: {
           select: {
             id: true,
@@ -121,7 +113,6 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
   const cq = await db.cq.findUnique({
     where: { id: input.id },
     include: {
-      academicClass: true,
       subject: true,
       chapter: true,
       questionType: true,
@@ -197,7 +188,6 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
 
   return db.cq.create({
     data: {
-      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       questionA: data.questionA,
@@ -290,7 +280,6 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
   return db.cq.update({
     where: { id },
     data: {
-      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       questionA: data.questionA,
@@ -435,7 +424,6 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
 
         const createdCq = await tx.cq.create({
           data: {
-            classId: data.classId,
             subjectId: data.subjectId,
             chapterId: data.chapterId,
             questionA: data.questionA,
@@ -487,7 +475,6 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
 
 export async function getCqStats(db: PrismaClient, input: CqStatsInput = {}) {
   const where: any = {}
-  if (input.classId) where.classId = input.classId
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
 

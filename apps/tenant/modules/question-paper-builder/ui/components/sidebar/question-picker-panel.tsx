@@ -31,10 +31,10 @@ export const QuestionPickerPanel: React.FC = () => {
   const qTypeNameEn = (activeDist?.questionType?.nameEn || "").toLowerCase();
   const qTypeNameBn = activeDist?.questionType?.nameBn || "";
 
-  let category: "MCQ" | "CQ" | "SHORT" = "MCQ";
+  let category: "MCQ" | "CQ" | "SA" = "MCQ";
   if (qTypeNameEn.includes("short") || qTypeNameBn.includes("সংক্ষিপ্ত")) {
-    category = "SHORT";
-  } else if (qTypeNameEn.includes("creative") || qTypeNameEn.includes("cq") || qTypeNameBn.includes("সৃজনশীল")) {
+    category = "SA";
+  } else if ((qTypeNameEn.includes("creative") || qTypeNameEn.includes("cq") || qTypeNameBn.includes("সৃজনশীল")) && !qTypeNameEn.includes("mcq")) {
     category = "CQ";
   }
 
@@ -55,7 +55,7 @@ export const QuestionPickerPanel: React.FC = () => {
   const handleQuickAssign = async (questionId: string) => {
     if (!paperId || !activeDistId) return;
     try {
-      if (category === "SHORT") {
+      if (category === "SA") {
         await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, shortAnswerIds: [questionId] });
       } else if (category === "CQ") {
         await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, cqIds: [questionId] });
@@ -144,6 +144,9 @@ export const QuestionPickerPanel: React.FC = () => {
           <div className="space-y-2.5">
             {questions.map((q: any) => {
               const isAssigned = q.isAssigned;
+              const combinedContext = q.type === "COMBINED" && Array.isArray(q.attachments)
+                ? q.attachments.find((att: any) => att.caption)?.caption
+                : null;
 
               return (
                 <div
@@ -155,11 +158,18 @@ export const QuestionPickerPanel: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    {q.chapter && (
-                      <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
-                        {q.chapter?.nameBn || q.chapter?.nameEn}
-                      </Badge>
-                    )}
+                    <div className="flex flex-wrap gap-1">
+                      {q.chapter && (
+                        <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
+                          {q.chapter?.nameBn || q.chapter?.nameEn}
+                        </Badge>
+                      )}
+                      {q.type && (
+                        <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-primary/5 text-primary border-primary/20">
+                          {q.type === "SINGLE" ? "সাধারণ" : q.type === "MULTIPLE" ? "বহুপদি" : q.type === "COMBINED" ? "অভিন্ন" : q.type}
+                        </Badge>
+                      )}
+                    </div>
                     {isAssigned ? (
                       <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" /> যোগকৃত
@@ -178,13 +188,52 @@ export const QuestionPickerPanel: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="font-body text-on-surface line-clamp-3 leading-relaxed">
+                  {/* Context for Combined MCQ */}
+                  {category !== "CQ" && combinedContext && (
+                    <div className="text-[11px] text-on-surface-variant bg-muted/40 p-2 rounded-lg whitespace-pre-wrap border border-outline-variant/60 mb-2 leading-relaxed font-body">
+                      <RenderMath text={combinedContext} />
+                    </div>
+                  )}
+
+                  <div className="font-body text-on-surface line-clamp-3 leading-relaxed mb-2">
                     {category === "CQ" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
                     ) : (
                       <RenderMath text={q.question || ""} />
                     )}
                   </div>
+
+                  {/* Attachments */}
+                  {Array.isArray(q.attachments) && q.attachments.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {q.attachments.map((att: any, attIdx: number) => {
+                        const isImage = att.type === "image" || /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(att.url);
+                        if (isImage && att.url !== "text-context") {
+                          return (
+                            <div key={attIdx} className="space-y-1">
+                              <img
+                                src={att.url}
+                                alt={att.caption || "Attachment"}
+                                className="max-h-24 rounded-lg border border-outline-variant/60 object-contain bg-muted/20"
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
+                  )}
+
+                  {/* References */}
+                  {Array.isArray(q.reference) && q.reference.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2 border-t border-outline-variant/30 pt-2">
+                      {q.reference.map((ref: string, rIdx: number) => (
+                        <span key={rIdx} className="px-1.5 py-0.5 bg-muted text-[10px] font-medium rounded text-muted-foreground">
+                          🏷️ {ref}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

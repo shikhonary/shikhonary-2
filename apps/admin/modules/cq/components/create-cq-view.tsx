@@ -129,7 +129,6 @@ export function CreateCqView() {
       }
 
       await createMutation.mutateAsync({
-        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         context: data.context?.trim() || null,

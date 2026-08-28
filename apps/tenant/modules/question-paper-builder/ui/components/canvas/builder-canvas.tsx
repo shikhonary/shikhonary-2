@@ -91,11 +91,11 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
         return (
           <div className="border-2 border-dashed border-primary/50 bg-primary/5 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-center transition-colors hover:bg-primary/10">
             <p className="text-sm font-medium text-primary">
-              {dist.questionType?.nameEn} ({statusInfo?.addedCount || 0}/{statusInfo?.targetCount || dist.questionCount})
+              {dist.questionType?.nameBn || dist.questionType?.nameEn} ({statusInfo?.addedCount || 0}/{statusInfo?.targetCount || dist.questionCount}টি)
             </p>
             <Button asChild className="rounded-full shadow-sm">
               <Link href={`/question-papers/${paperId}/distributions/${dist.id}/pick`}>
-                + Select Questions
+                + প্রশ্ন নির্বাচন করুন
               </Link>
             </Button>
           </div>
@@ -106,7 +106,7 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
           <div className="border border-dashed border-muted bg-muted/20 rounded-2xl p-4 flex items-center justify-center text-center opacity-60">
             <p className="text-xs text-muted-foreground flex items-center gap-2">
               <span className="w-4 h-4 rounded-full border border-muted-foreground flex items-center justify-center">🔒</span>
-              Complete previous sections to unlock {dist.questionType?.nameEn}
+              পূর্ববর্তী অংশসমূহ সম্পন্ন করে {dist.questionType?.nameBn || dist.questionType?.nameEn} আনলক করুন
             </p>
           </div>
         );
@@ -116,7 +116,7 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
     case "empty":
       return (
         <div className="text-center py-20 text-muted-foreground print:hidden border-2 border-dashed rounded-lg">
-          No subjects configured. Set up the mark distribution in the settings sidebar.
+          কোনো বিষয় বা বণ্টন সাজানো হয়নি। অনুগ্রহ করে পাশের সেটিংস প্যানেল থেকে নম্বর বণ্টন প্রস্তুত করুন।
         </div>
       );
     default:

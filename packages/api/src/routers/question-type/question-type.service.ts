@@ -89,15 +89,26 @@ export async function createQuestionType(
   db: PrismaClient,
   input: CreateQuestionTypeInput,
 ) {
-  const existing = await db.questionType.findUnique({
-    where: { label: input.label },
-  })
-  if (existing) {
-    throw conflict(`Question type with label "${input.label}" already exists.`)
+  if (input.label) {
+    const existing = await db.questionType.findFirst({
+      where: { label: input.label },
+    })
+    if (existing) {
+      throw conflict(`Question type with label "${input.label}" already exists.`)
+    }
   }
 
   return db.questionType.create({
-    data: input,
+    data: {
+      nameEn: input.nameEn,
+      nameBn: input.nameBn,
+      label: input.label ?? null,
+      mark: input.mark,
+      position: input.position,
+      descriptionEn: input.descriptionEn ?? null,
+      descriptionBn: input.descriptionBn ?? null,
+      isActive: input.isActive,
+    },
   })
 }
 
@@ -112,7 +123,7 @@ export async function updateQuestionType(
   if (!existing) throw notFound("QuestionType")
 
   if (data.label && data.label !== existing.label) {
-    const conflictLabel = await db.questionType.findUnique({
+    const conflictLabel = await db.questionType.findFirst({
       where: { label: data.label },
     })
     if (conflictLabel) {
@@ -122,7 +133,16 @@ export async function updateQuestionType(
 
   return db.questionType.update({
     where: { id },
-    data,
+    data: {
+      nameEn: data.nameEn,
+      nameBn: data.nameBn,
+      label: data.label === undefined ? undefined : data.label,
+      mark: data.mark,
+      position: data.position,
+      descriptionEn: data.descriptionEn === undefined ? undefined : data.descriptionEn,
+      descriptionBn: data.descriptionBn === undefined ? undefined : data.descriptionBn,
+      isActive: data.isActive,
+    },
   })
 }
 

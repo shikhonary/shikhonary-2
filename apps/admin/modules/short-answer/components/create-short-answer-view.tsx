@@ -101,7 +101,6 @@ export function CreateShortAnswerView() {
       const parsedYear = data.year && !isNaN(Number(data.year)) ? Number(data.year) : null
 
       await createMutation.mutateAsync({
-        classId: data.classId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         question: data.question.trim(),

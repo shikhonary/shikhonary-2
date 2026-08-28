@@ -984,7 +984,6 @@ export function ImportMcqView() {
           year: item.year !== undefined && item.year !== null && !isNaN(Number(item.year)) ? Number(item.year) : undefined,
           source: item.source ? String(item.source) : undefined,
           questionTypeId: item.questionTypeId ? String(item.questionTypeId) : undefined,
-          classId: (item.classId ? String(item.classId) : overrideClassId) || undefined,
           subjectId,
           chapterId,
           isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,

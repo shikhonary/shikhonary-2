@@ -18,7 +18,7 @@ export type GetQuestionTypeInput = z.infer<typeof getQuestionTypeSchema>
 export const createQuestionTypeSchema = z.object({
   nameEn: z.string().min(1, "English name is required"),
   nameBn: z.string().min(1, "Bangla name is required"),
-  label: z.string().min(1, "Label is required"),
+  label: z.string().optional().nullable(),
   mark: z.number().min(0, "Mark must be at least 0"),
   position: z.number().int().min(0).default(0),
   descriptionEn: z.string().optional().nullable(),
@@ -32,7 +32,7 @@ export const updateQuestionTypeSchema = z.object({
   id: z.string().min(1),
   nameEn: z.string().min(1).optional(),
   nameBn: z.string().min(1).optional(),
-  label: z.string().min(1).optional(),
+  label: z.string().optional().nullable(),
   mark: z.number().min(0).optional(),
   position: z.number().int().min(0).optional(),
   descriptionEn: z.string().optional().nullable(),

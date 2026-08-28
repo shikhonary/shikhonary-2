@@ -183,9 +183,10 @@ export function useAvailableQuestions(
     subjectId: string
     chapterId?: string
     questionTypeId?: string
-    category?: "MCQ" | "CQ" | "SHORT"
+    category?: "MCQ" | "CQ" | "SA"
     difficulty?: string
     search?: string
+    board?: string
     year?: number
     excludePaperId?: string
     limit?: number

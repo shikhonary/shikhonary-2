@@ -13,12 +13,11 @@ import {
 } from "./short-answer.schema"
 
 export async function listShortAnswers(db: PrismaClient, input: ListShortAnswersInput) {
-  const { page, limit, query, classId, subjectId, chapterId, difficulty, source, year, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, year, sort } = input
   const skip = (page - 1) * limit
 
   const where: any = {}
 
-  if (classId) where.classId = classId
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
@@ -49,13 +48,6 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
       take: limit,
       orderBy,
       include: {
-        academicClass: {
-          select: {
-            id: true,
-            nameEn: true,
-            nameBn: true,
-          },
-        },
         subject: {
           select: {
             id: true,
@@ -98,7 +90,6 @@ export async function getShortAnswerById(db: PrismaClient, input: GetShortAnswer
   const sa = await db.shortAnswer.findUnique({
     where: { id: input.id },
     include: {
-      academicClass: true,
       subject: true,
       chapter: true,
       questionType: true,
@@ -128,7 +119,7 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
           { label: { contains: "Short Answer", mode: "insensitive" } },
           { nameEn: { contains: "Short Answer", mode: "insensitive" } },
           { label: { contains: "ShortAnswer", mode: "insensitive" } },
-          { nameEn: { contains: "ShortAnswer", mode: "insensitive" } },
+          { nameEn: { contains: "SA", mode: "insensitive" } },
         ],
         isActive: true,
         subjects: {
@@ -148,7 +139,7 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
             { label: { contains: "Short Answer", mode: "insensitive" } },
             { nameEn: { contains: "Short Answer", mode: "insensitive" } },
             { label: { contains: "ShortAnswer", mode: "insensitive" } },
-            { nameEn: { contains: "ShortAnswer", mode: "insensitive" } },
+            { nameEn: { contains: "SA", mode: "insensitive" } },
           ],
           isActive: true,
         },
@@ -162,7 +153,6 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
 
   return db.shortAnswer.create({
     data: {
-      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       question: data.question,
@@ -175,13 +165,13 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
       isActive: data.isActive,
       attachments: allAttachments.length > 0
         ? {
-            create: allAttachments.map((att) => ({
-              url: att.url,
-              type: att.type ?? "image",
-              caption: att.caption ?? null,
-              position: att.position ?? 0,
-            })),
-          }
+          create: allAttachments.map((att) => ({
+            url: att.url,
+            type: att.type ?? "image",
+            caption: att.caption ?? null,
+            position: att.position ?? 0,
+          })),
+        }
         : undefined,
     } as any,
     include: {
@@ -206,7 +196,7 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
           { label: { contains: "Short Answer", mode: "insensitive" } },
           { nameEn: { contains: "Short Answer", mode: "insensitive" } },
           { label: { contains: "ShortAnswer", mode: "insensitive" } },
-          { nameEn: { contains: "ShortAnswer", mode: "insensitive" } },
+          { nameEn: { contains: "SA", mode: "insensitive" } },
         ],
         isActive: true,
         subjects: {
@@ -225,7 +215,6 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
   return db.shortAnswer.update({
     where: { id },
     data: {
-      classId: data.classId,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       question: data.question,
@@ -238,14 +227,14 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
       isActive: data.isActive,
       attachments: allAttachments.length > 0
         ? {
-            deleteMany: {},
-            create: allAttachments.map((att) => ({
-              url: att.url,
-              type: att.type ?? "image",
-              caption: att.caption ?? null,
-              position: att.position ?? 0,
-            })),
-          }
+          deleteMany: {},
+          create: allAttachments.map((att) => ({
+            url: att.url,
+            type: att.type ?? "image",
+            caption: att.caption ?? null,
+            position: att.position ?? 0,
+          })),
+        }
         : { deleteMany: {} },
     } as any,
     include: {
@@ -282,7 +271,6 @@ export async function toggleShortAnswerActive(db: PrismaClient, input: ToggleSho
 
 export async function getShortAnswerStats(db: PrismaClient, input: ShortAnswerStatsInput) {
   const where: any = {}
-  if (input.classId) where.classId = input.classId
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
 
@@ -340,7 +328,7 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
         { label: { contains: "Short Answer", mode: "insensitive" } },
         { nameEn: { contains: "Short Answer", mode: "insensitive" } },
         { label: { contains: "ShortAnswer", mode: "insensitive" } },
-        { nameEn: { contains: "ShortAnswer", mode: "insensitive" } },
+        { nameEn: { contains: "SA", mode: "insensitive" } },
       ],
       isActive: true,
     },
@@ -368,7 +356,7 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
                   { label: { contains: "Short Answer", mode: "insensitive" } },
                   { nameEn: { contains: "Short Answer", mode: "insensitive" } },
                   { label: { contains: "ShortAnswer", mode: "insensitive" } },
-                  { nameEn: { contains: "ShortAnswer", mode: "insensitive" } },
+                  { nameEn: { contains: "SA", mode: "insensitive" } },
                 ],
                 isActive: true,
                 subjects: {
@@ -390,7 +378,6 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
 
         const createdSa = await tx.shortAnswer.create({
           data: {
-            classId: data.classId,
             subjectId: data.subjectId,
             chapterId: data.chapterId,
             question: data.question,
@@ -403,13 +390,13 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0
               ? {
-                  create: allAttachments.map((att) => ({
-                    url: att.url,
-                    type: att.type ?? "image",
-                    caption: att.caption ?? null,
-                    position: att.position ?? 0,
-                  })),
-                }
+                create: allAttachments.map((att) => ({
+                  url: att.url,
+                  type: att.type ?? "image",
+                  caption: att.caption ?? null,
+                  position: att.position ?? 0,
+                })),
+              }
               : undefined,
           } as any,
         })
