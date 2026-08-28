@@ -6,7 +6,7 @@ import { BuilderSidebar } from "../components/sidebar/builder-sidebar";
 import { BuilderCanvas } from "../components/canvas/builder-canvas";
 import { FloatingFormatToolbar } from "../components/toolbar/floating-format-toolbar";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Loader2, Save, Copy, Printer } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Copy, Printer, Download } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
 import {
@@ -15,6 +15,8 @@ import {
 } from "@/modules/question-paper/services/use-question-paper";
 import { GenerateSetsModal } from "../components/modals/generate-sets-modal";
 import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
+import { useDownloadPaper } from "../../hooks/use-download-paper";
+import { ExportOverlay } from "../components/canvas/export-overlay";
 
 interface Props {
   paperId: string;
@@ -70,6 +72,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
 
   const { data: paperQuery, isLoading, error } = useQuestionPaperById(paperId);
   const { mutateAsync: updateSettingsMutation, isPending: isManualSaving } = useUpdateQuestionPaperSettings();
+  const { downloadAsPdf, isDownloading } = useDownloadPaper({ paperTitle: paperQuery?.title });
 
   useEffect(() => {
     if (paperQuery && !isHydrated) {
@@ -150,6 +153,14 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
             <Copy className="w-3.5 h-3.5" />
             <span>সেট তৈরি</span>
           </Button>
+          <Button variant="outline" size="sm" onClick={downloadAsPdf} disabled={isDownloading} className="cursor-pointer gap-1.5">
+            {isDownloading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            <span>ডাউনলোড PDF</span>
+          </Button>
           <Button variant="outline" size="sm" asChild className="cursor-pointer gap-1.5">
             <Link href={`/question-papers/${paperId}/print`} target="_blank">
               <Printer className="w-3.5 h-3.5" />
@@ -182,6 +193,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         originalPaperTitle={paperQuery.title}
         originalPaper={paperQuery}
       />
+      <ExportOverlay />
     </div>
   );
 };

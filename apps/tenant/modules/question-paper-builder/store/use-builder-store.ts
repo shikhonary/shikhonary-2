@@ -11,6 +11,7 @@ interface BuilderState {
   selectedItemId: string | null;
   calculatedBlocks: PaperBlock[];
   isExporting: boolean;
+  exportProgress: { current: number; total: number } | null;
   saveStatus: "idle" | "saving" | "saved" | "error";
   hasUnsavedChanges: boolean;
 
@@ -26,6 +27,7 @@ interface BuilderState {
   setZoom: (zoom: number | "auto") => void;
   setSelectedItemId: (id: string | null) => void;
   setIsExporting: (isExporting: boolean) => void;
+  setExportProgress: (progress: { current: number; total: number } | null) => void;
   setSaveStatus: (status: "idle" | "saving" | "saved" | "error") => void;
   markSaved: () => void;
   setMcqOptionLayout: (id: string, columns: number) => void;
@@ -94,6 +96,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   selectedItemId: null,
   calculatedBlocks: [],
   isExporting: false,
+  exportProgress: null,
   saveStatus: "idle",
   hasUnsavedChanges: false,
 
@@ -136,6 +139,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   setZoom: (zoom) => set({ zoom }),
   setSelectedItemId: (id) => set({ selectedItemId: id }),
   setIsExporting: (isExporting) => set({ isExporting }),
+  setExportProgress: (exportProgress) => set({ exportProgress }),
   setSaveStatus: (saveStatus) => set({ saveStatus }),
   markSaved: () => set({ hasUnsavedChanges: false, saveStatus: "saved" }),
   

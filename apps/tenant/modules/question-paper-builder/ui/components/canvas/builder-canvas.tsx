@@ -28,6 +28,7 @@ const toBengaliDigits = (num: number | string): string => {
 import { PaperBlock } from "../../../types";
 
 const BlockRenderer = ({ block }: { block: PaperBlock }) => {
+  const isExporting = useBuilderStore((state) => state.isExporting);
   switch (block.type) {
     case "header-full":
     case "header-column":
@@ -86,6 +87,7 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
     case "question-short":
       return <ShortAnswerBlock item={block.data.item} />;
     case "dist-action": {
+      if (isExporting) return null;
       const { dist, status, statusInfo, paperId } = block.data;
       if (status === "ACTIVE") {
         return (
@@ -114,6 +116,7 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return null;
     }
     case "empty":
+      if (isExporting) return null;
       return (
         <div className="text-center py-20 text-muted-foreground print:hidden border-2 border-dashed rounded-lg">
           কোনো বিষয় বা বণ্টন সাজানো হয়নি। অনুগ্রহ করে পাশের সেটিংস প্যানেল থেকে নম্বর বণ্টন প্রস্তুত করুন।
@@ -417,6 +420,7 @@ export const BuilderCanvas: React.FC = () => {
           <div
             key={`page-wrapper-${pageIdx}`}
             className="shrink-0"
+            data-page-index={pageIdx}
             style={{
               width: `${canvasWidth * 3.78 * zoomFactor}px`,
               height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
@@ -427,6 +431,7 @@ export const BuilderCanvas: React.FC = () => {
             <div 
               key={`page-${pageIdx}`}
               className="bg-white shadow-xl relative shrink-0"
+              data-page-content="true"
               style={{
                 width: `${canvasWidth}mm`,
                 minHeight: `${canvasMinHeight}mm`,
