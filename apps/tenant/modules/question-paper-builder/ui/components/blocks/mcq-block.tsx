@@ -145,8 +145,8 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
       case "parentheses": return <span className="shrink-0">({label})</span>;
       case "circle":
         return (
-          <div className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50"
-               style={{ width: "1.6em", height: "1.6em", fontSize: "calc(100% - 2px)", marginTop: "2px" }}>
+          <div className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
+               style={{ width: "1.6em", height: "1.6em", fontSize: "calc(100% - 2px)", marginTop: "2px", lineHeight: "1" }}>
             {label}
           </div>
         );

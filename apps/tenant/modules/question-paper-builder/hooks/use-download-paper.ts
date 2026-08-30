@@ -62,7 +62,36 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
     setIsExporting(true);
     setExportProgress(null);
 
+    let originalDescriptor: PropertyDescriptor | undefined;
+
     try {
+      // 0. Intercept CSSStyleSheet.prototype.cssRules to prevent SecurityError from cross-origin stylesheets
+      if (typeof CSSStyleSheet !== "undefined") {
+        originalDescriptor = Object.getOwnPropertyDescriptor(
+          CSSStyleSheet.prototype,
+          "cssRules"
+        );
+        const originalGet = originalDescriptor?.get;
+
+        if (originalGet) {
+          try {
+            Object.defineProperty(CSSStyleSheet.prototype, "cssRules", {
+              get() {
+                try {
+                  return originalGet.call(this);
+                } catch (e) {
+                  // Return an empty array so html-to-image doesn't fail on CORS-restricted stylesheets
+                  return [];
+                }
+              },
+              configurable: true,
+            });
+          } catch (err) {
+            console.warn("Failed to patch CSSStyleSheet.prototype.cssRules:", err);
+          }
+        }
+      }
+
       // 1. Wait for fonts
       await waitForFonts();
 
@@ -72,31 +101,44 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       // 3. Wait for reflow
       await new Promise((resolve) => setTimeout(resolve, 400));
 
-      // 4. Find all page content nodes
-      const pageNodes = document.querySelectorAll<HTMLElement>(
-        "[data-page-content]"
+      // 4. Find all page content nodes and sort them by sequential index
+      const pageNodes = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-page-content]")
       );
+
+      pageNodes.sort((a, b) => {
+        const idxA = parseInt(a.getAttribute("data-page-seq-index") || "0", 10);
+        const idxB = parseInt(b.getAttribute("data-page-seq-index") || "0", 10);
+        return idxA - idxB;
+      });
 
       if (pageNodes.length === 0) {
         throw new Error("কোনো পৃষ্ঠা পাওয়া যায়নি");
       }
 
-      // 5. Determine PDF dimensions
+      // 5. Determine PDF dimensions and sheet settings
+      const isBookFold = settings.bookFoldLayout;
       const dims = PAPER_DIMENSIONS[settings.paperSize] ?? PAPER_DIMENSIONS.A4!;
       const isLandscape = settings.paperOrientation === "landscape";
-      const pdfWidth = isLandscape ? dims!.h : dims!.w;
-      const pdfHeight = isLandscape ? dims!.w : dims!.h;
+
+      const logicalWidth = isLandscape ? dims!.h : dims!.w;
+      const logicalHeight = isLandscape ? dims!.w : dims!.h;
+
+      // For book fold, the sheet width is double the logical page width, and orientation is landscape
+      const pdfWidth = isBookFold ? logicalWidth * 2 : logicalWidth;
+      const pdfHeight = logicalHeight;
 
       // 6. Create jsPDF instance
       const pdf = new jsPDF({
-        orientation: isLandscape ? "landscape" : "portrait",
+        orientation: isBookFold ? "landscape" : (isLandscape ? "landscape" : "portrait"),
         unit: "mm",
         format: [pdfWidth, pdfHeight],
       });
 
       setExportProgress({ current: 0, total: pageNodes.length });
 
-      // 7. Capture each page
+      // 7. Capture each page as a PNG data URL
+      const pageImages: string[] = [];
       for (let i = 0; i < pageNodes.length; i++) {
         const pageNode = pageNodes[i];
         if (!pageNode) continue;
@@ -121,17 +163,68 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
             backgroundColor: "#ffffff",
           });
         }
-
-        // Add page to PDF (first page is auto-created)
-        if (i > 0) {
-          pdf.addPage([pdfWidth, pdfHeight], isLandscape ? "l" : "p");
-        }
-
-        // Add the captured image to fill the entire page
-        pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pageImages.push(dataUrl);
       }
 
-      // 8. Save the PDF
+      // 8. Compile captured pages into the PDF document
+      if (isBookFold) {
+        // Pad to multiple of 4 pages (should already be padded in canvas rendering, but safeguard)
+        while (pageImages.length % 4 !== 0) {
+          pageImages.push(""); // empty string represents a blank page
+        }
+
+        const S = pageImages.length / 4;
+        let addedFirst = false;
+
+        for (let i = 0; i < S; i++) {
+          // Front Side: Left = Last page, Right = First page
+          const frontLeftIdx = pageImages.length - 1 - 2 * i;
+          const frontRightIdx = 2 * i;
+          const frontLeftImg = pageImages[frontLeftIdx];
+          const frontRightImg = pageImages[frontRightIdx];
+
+          if (addedFirst) {
+            pdf.addPage([pdfWidth, pdfHeight], "landscape");
+          } else {
+            addedFirst = true;
+          }
+          
+          if (frontLeftImg) {
+            pdf.addImage(frontLeftImg, "PNG", 0, 0, logicalWidth, logicalHeight);
+          }
+          if (frontRightImg) {
+            pdf.addImage(frontRightImg, "PNG", logicalWidth, 0, logicalWidth, logicalHeight);
+          }
+
+          // Back Side: Left = Second page, Right = Second to last page
+          const backLeftIdx = 2 * i + 1;
+          const backRightIdx = pageImages.length - 2 - 2 * i;
+          const backLeftImg = pageImages[backLeftIdx];
+          const backRightImg = pageImages[backRightIdx];
+
+          pdf.addPage([pdfWidth, pdfHeight], "landscape");
+          
+          if (backLeftImg) {
+            pdf.addImage(backLeftImg, "PNG", 0, 0, logicalWidth, logicalHeight);
+          }
+          if (backRightImg) {
+            pdf.addImage(backRightImg, "PNG", logicalWidth, 0, logicalWidth, logicalHeight);
+          }
+        }
+      } else {
+        // Standard Sequential Layout
+        for (let i = 0; i < pageImages.length; i++) {
+          const img = pageImages[i];
+          if (!img) continue;
+
+          if (i > 0) {
+            pdf.addPage([pdfWidth, pdfHeight], isLandscape ? "l" : "p");
+          }
+          pdf.addImage(img, "PNG", 0, 0, pdfWidth, pdfHeight);
+        }
+      }
+
+      // 9. Save the PDF
       const filename = paperTitle
         ? `${paperTitle.replace(/[<>:"/\\|?*]/g, "_")}.pdf`
         : "question-paper.pdf";
@@ -142,6 +235,15 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       console.error("PDF download failed:", error);
       toast.error(error?.message || "পিডিএফ তৈরি করতে ব্যর্থ হয়েছে");
     } finally {
+      // Restore original CSSStyleSheet.prototype.cssRules
+      if (typeof CSSStyleSheet !== "undefined" && originalDescriptor) {
+        try {
+          Object.defineProperty(CSSStyleSheet.prototype, "cssRules", originalDescriptor);
+        } catch (err) {
+          console.warn("Failed to restore CSSStyleSheet.prototype.cssRules:", err);
+        }
+      }
+
       // 9. Restore original zoom and clean up
       const { setZoom: restoreZoom, setIsExporting: restoreExporting, setExportProgress: restoreProgress } = useBuilderStore.getState();
       restoreZoom(originalZoom);

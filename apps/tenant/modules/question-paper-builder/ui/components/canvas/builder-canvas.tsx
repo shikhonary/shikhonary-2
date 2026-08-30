@@ -384,6 +384,97 @@ export const BuilderCanvas: React.FC = () => {
     return result;
   }, [blocks, measuredHeights, pageContentHeight, settings.columns, settings.showOMRSheet]);
 
+
+
+  const renderPage = (page: typeof pages[0] & { isBlank?: boolean }, seqIndex: number) => {
+    return (
+      <div 
+        key={`page-renderer-${seqIndex}`}
+        className="bg-white shadow-xl relative shrink-0"
+        data-page-content="true"
+        data-page-seq-index={seqIndex}
+        style={{
+          width: `${canvasWidth}mm`,
+          minHeight: `${canvasMinHeight}mm`,
+          transform: `scale(${zoomFactor})`,
+          transformOrigin: "top left",
+          paddingTop: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.top}mm`,
+          paddingBottom: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.bottom}mm`,
+          paddingLeft: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.left}mm`,
+          paddingRight: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.right}mm`,
+          fontFamily: settings.fontFamily,
+          fontSize: `${settings.fontSize}px`,
+        }}
+      >
+        {settings.showWatermark && !page.isBlank && (settings.watermark || settings.institutionName) && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none"
+            style={{ zIndex: 0 }}
+          >
+            <div 
+              className="font-bold whitespace-nowrap text-black/10"
+              style={{ 
+                fontSize: '100px', 
+                transform: 'rotate(-45deg)',
+              }}
+            >
+              {settings.watermark || settings.institutionName}
+            </div>
+          </div>
+        )}
+        
+        <div className="relative z-10 w-full h-full flex flex-col">
+          {page.isBlank ? (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground/60 text-sm italic select-none">
+              খালি পৃষ্ঠা (Blank Page)
+            </div>
+          ) : page.isOMRPage ? (
+            <OMRBlock />
+          ) : (
+            <>
+              {page.fullHeader && (
+                <div className="mb-8">
+                  <BlockRenderer block={page.fullHeader} />
+                </div>
+              )}
+              
+              <div 
+                className="flex h-full"
+                style={{ gap: "40px" }}
+              >
+                {page.columns.map((col, colIdx) => (
+                  <div 
+                    key={`col-${colIdx}`} 
+                    className="flex-1 flex flex-col"
+                    style={{ 
+                      borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
+                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "20px" : "0",
+                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
+                    }}
+                  >
+                    {col.map(b => (
+                      <div key={b.id} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
+                        <BlockRenderer block={b} />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* WYSIWYG Marketing Footer */}
+        <div 
+          className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
+          style={{ bottom: '8px' }}
+        >
+          Generated via Shikhonary
+        </div>
+      </div>
+    );
+  };
+
   if (!paperQuery) return null;
 
   return (
@@ -419,93 +510,23 @@ export const BuilderCanvas: React.FC = () => {
         {pages.map((page, pageIdx) => (
           <div
             key={`page-wrapper-${pageIdx}`}
-            className="shrink-0"
+            className="shrink-0 flex flex-col items-center gap-2"
             data-page-index={pageIdx}
-            style={{
-              width: `${canvasWidth * 3.78 * zoomFactor}px`,
-              height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
-              position: "relative",
-              overflow: "visible",
-            }}
           >
-            <div 
-              key={`page-${pageIdx}`}
-              className="bg-white shadow-xl relative shrink-0"
-              data-page-content="true"
+            {settings.bookFoldLayout && (
+              <div className="text-xs font-semibold text-muted-foreground bg-muted/60 px-3 py-1 rounded-md border select-none">
+                বুকলেট পৃষ্ঠা - {pageIdx + 1} (Booklet Page {pageIdx + 1})
+              </div>
+            )}
+            <div
               style={{
-                width: `${canvasWidth}mm`,
-                minHeight: `${canvasMinHeight}mm`,
-                transform: `scale(${zoomFactor})`,
-                transformOrigin: "top left",
-                paddingTop: page.isOMRPage ? '0mm' : `${settings.margins.top}mm`,
-                paddingBottom: page.isOMRPage ? '0mm' : `${settings.margins.bottom}mm`,
-                paddingLeft: page.isOMRPage ? '0mm' : `${settings.margins.left}mm`,
-                paddingRight: page.isOMRPage ? '0mm' : `${settings.margins.right}mm`,
-                fontFamily: settings.fontFamily,
-                fontSize: `${settings.fontSize}px`,
+                width: `${canvasWidth * 3.78 * zoomFactor}px`,
+                height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
+                position: "relative",
+                overflow: "visible",
               }}
             >
-              {settings.showWatermark && (settings.watermark || settings.institutionName) && (
-                <div 
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none"
-                  style={{ zIndex: 0 }}
-                >
-                  <div 
-                    className="font-bold whitespace-nowrap text-black/10"
-                    style={{ 
-                      fontSize: '100px', 
-                      transform: 'rotate(-45deg)',
-                    }}
-                  >
-                    {settings.watermark || settings.institutionName}
-                  </div>
-                </div>
-              )}
-              
-              <div className="relative z-10 w-full h-full flex flex-col">
-                {page.isOMRPage ? (
-                  <OMRBlock />
-                ) : (
-                <>
-                  {page.fullHeader && (
-                    <div className="mb-8">
-                      <BlockRenderer block={page.fullHeader} />
-                    </div>
-                  )}
-                  
-                  <div 
-                    className="flex h-full"
-                    style={{ gap: "40px" }}
-                  >
-                    {page.columns.map((col, colIdx) => (
-                      <div 
-                        key={`col-${colIdx}`} 
-                        className="flex-1 flex flex-col"
-                        style={{ 
-                          borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
-                          paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "20px" : "0",
-                          marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
-                        }}
-                      >
-                        {col.map(b => (
-                          <div key={b.id} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
-                            <BlockRenderer block={b} />
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-              </div>
-
-              {/* WYSIWYG Marketing Footer */}
-              <div 
-                className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
-                style={{ bottom: '8px' }}
-              >
-                Generated via Shikhonary
-              </div>
+              {renderPage(page, pageIdx)}
             </div>
           </div>
         ))}

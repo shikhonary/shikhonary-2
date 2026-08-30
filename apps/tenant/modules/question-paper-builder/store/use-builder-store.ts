@@ -48,6 +48,7 @@ const defaultSettings: PaperSettings = {
   columns: 1,
   showColumnDivider: false,
   bookletMode: false,
+  bookFoldLayout: false,
   headerTemplate: "modern",
   optionStyle: "circle",
   fontFamily: "SolaimanLipi",

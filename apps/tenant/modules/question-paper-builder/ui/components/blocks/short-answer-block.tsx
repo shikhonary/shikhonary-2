@@ -128,6 +128,40 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
   const label = subLabels[item.orderIndex] || "";
 
+  const renderSubQuestionLabel = (labelStr: string) => {
+    const labelStyle = {
+      fontSize: questionStyle.fontSize,
+      fontFamily: questionStyle.fontFamily,
+    };
+
+    switch (settings.optionStyle) {
+      case "dot":
+        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{labelStr}.</span>;
+      case "parentheses":
+        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({labelStr})</span>;
+      case "round":
+        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{labelStr})</span>;
+      case "circle":
+        return (
+          <div 
+            className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
+            style={{ 
+              width: "1.6em", 
+              height: "1.6em", 
+              fontSize: `${(questionStyle.fontSize || settings.fontSize) - 2}px`, 
+              marginTop: "2px",
+              fontFamily: settings.fontFamily,
+              lineHeight: "1"
+            }}
+          >
+            {labelStr}
+          </div>
+        );
+      default:
+        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({labelStr})</span>;
+    }
+  };
+
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-1">
       {/* Hover Controls */}
@@ -164,15 +198,7 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
       )}
       <div className="flex justify-between items-start gap-2 pl-4">
         <div className="flex gap-2 flex-1 relative">
-          <div
-            className="font-bold shrink-0 flex items-center"
-            style={{
-              fontSize: questionStyle.fontSize,
-              marginTop: "2px",
-            }}
-          >
-            {label}.
-          </div>
+          {renderSubQuestionLabel(label)}
           <div className="flex-1 w-full min-w-0">
             <ShortAnswerEditableText 
               text={data.question}

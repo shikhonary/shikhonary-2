@@ -141,6 +141,18 @@ export const PageSetupCard: React.FC = () => {
           />
         </div>
       )}
+
+      <div className="flex items-center justify-between pt-2 border-t">
+        <div>
+          <Label htmlFor="book-fold" className="text-sm font-medium block">বুক ফোল্ড লেআউট</Label>
+          <span className="text-[10px] text-muted-foreground">folding-friendly বুকলেট প্রিন্ট পেইজ বিন্যাস</span>
+        </div>
+        <Switch 
+          id="book-fold"
+          checked={settings.bookFoldLayout}
+          onCheckedChange={(c) => updateSettings({ bookFoldLayout: c })}
+        />
+      </div>
     </div>
   );
 };

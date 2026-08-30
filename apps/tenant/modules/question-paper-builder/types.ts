@@ -99,6 +99,7 @@ export interface PaperSettings {
   columns: 1 | 2 | 3;
   showColumnDivider: boolean;
   bookletMode: boolean;
+  bookFoldLayout: boolean;
 
   headerTemplate: "classic" | "modern" | "minimal" | "left-aligned";
 
