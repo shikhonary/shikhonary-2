@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/componen
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
+import { Textarea } from "@workspace/ui/components/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import { Loader2, Save, HelpCircle, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react"
 
@@ -33,12 +34,14 @@ const subjectQuestionStructureSchema = z.object({
       nameEn: z.string().min(1, "English section name is required"),
       nameBn: z.string().min(1, "Bangla section name is required"),
       position: z.number().int().default(0),
+      instructions: z.string().optional().nullable(),
       subSections: z.array(
         z.object({
           id: z.string().optional(),
           nameEn: z.string().min(1, "English sub-section name is required"),
           nameBn: z.string().min(1, "Bangla sub-section name is required"),
           position: z.number().int().default(0),
+          instructions: z.string().optional().nullable(),
           questionTypes: z.array(questionTypeConfigSchema).default([]),
         })
       ).default([]),
@@ -60,6 +63,7 @@ interface SubSectionConfig {
   nameEn: string
   nameBn: string
   position: number
+  instructions?: string | null
   questionTypes: QuestionTypeConfig[]
 }
 
@@ -68,6 +72,7 @@ interface SectionConfig {
   nameEn: string
   nameBn: string
   position: number
+  instructions?: string | null
   subSections: SubSectionConfig[]
   questionTypes: QuestionTypeConfig[]
 }
@@ -336,7 +341,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
             </div>
             <Button
               type="button"
-              onClick={() => appendSection({ nameEn: "", nameBn: "", position: sections.length, subSections: [], questionTypes: [] })}
+              onClick={() => appendSection({ nameEn: "", nameBn: "", position: sections.length, subSections: [], questionTypes: [], instructions: "" })}
               className="flex items-center gap-1.5 text-xs h-9 bg-primary text-white font-semibold rounded-lg hover:bg-primary/95 transition-all"
             >
               <Plus className="h-4 w-4" />

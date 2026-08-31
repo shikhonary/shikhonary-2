@@ -16,12 +16,14 @@ export const saveSubjectStructureSchema = z.object({
       nameEn: z.string().min(1),
       nameBn: z.string().min(1),
       position: z.number().int().default(0),
+      instructions: z.string().optional().nullable(),
       subSections: z.array(
         z.object({
           id: z.string().optional(),
           nameEn: z.string().min(1),
           nameBn: z.string().min(1),
           position: z.number().int().default(0),
+          instructions: z.string().optional().nullable(),
           questionTypes: z.array(questionTypeConfigSchema),
         })
       ).default([]),

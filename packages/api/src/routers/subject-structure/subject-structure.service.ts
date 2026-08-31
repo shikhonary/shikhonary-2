@@ -31,6 +31,7 @@ export async function saveSubjectStructure(
           nameEn: sec.nameEn,
           nameBn: sec.nameBn,
           position: sec.position,
+          instructions: sec.instructions ?? null,
         },
       })
 
@@ -57,6 +58,7 @@ export async function saveSubjectStructure(
             nameEn: sub.nameEn,
             nameBn: sub.nameBn,
             position: sub.position,
+            instructions: sub.instructions ?? null,
           },
         })
 

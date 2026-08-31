@@ -643,11 +643,12 @@ model SubjectQuestionType {
 }
 
 model SubjectQuestionSection {
-  id        String @id @default(cuid())
-  nameBn    String
-  nameEn    String
-  position  Int    @default(0)
-  subjectId String
+  id           String  @id @default(cuid())
+  nameBn       String
+  nameEn       String
+  position     Int     @default(0)
+  subjectId    String
+  instructions String?
 
   subject              AcademicSubject             @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   subjectQuestionTypes SubjectQuestionType[]
@@ -661,11 +662,12 @@ model SubjectQuestionSection {
 }
 
 model SubjectQuestionSubSection {
-  id        String @id @default(cuid())
-  nameBn    String
-  nameEn    String
-  position  Int    @default(0)
-  sectionId String
+  id           String  @id @default(cuid())
+  nameBn       String
+  nameEn       String
+  position     Int     @default(0)
+  sectionId    String
+  instructions String?
 
   section              SubjectQuestionSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   subjectQuestionTypes SubjectQuestionType[]

@@ -100,6 +100,8 @@ model QuestionPaperSubSection {
     title        String  // "Arithmetic", "পাটিগণিত"
     titleBn      String? // Bengali title (optional)
 
+    instructions String? // Per-sub-section instructions, e.g. "Answer any 3"
+
     orderIndex Int @default(0)
 
     questions     QuestionPaperQuestion[]

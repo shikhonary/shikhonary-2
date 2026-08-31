@@ -11,6 +11,8 @@ import {
   reorderQuestionPaperQuestionsSchema,
   upsertQuestionPaperSectionSchema,
   deleteQuestionPaperSectionSchema,
+  upsertQuestionPaperSubSectionSchema,
+  deleteQuestionPaperSubSectionSchema,
   upsertQuestionPaperSubjectSchema,
   deleteQuestionPaperSubjectSchema,
   upsertQuestionPaperDistributionSchema,
@@ -34,6 +36,8 @@ import {
   reorderQuestionPaperQuestions,
   upsertQuestionPaperSection,
   deleteQuestionPaperSection,
+  upsertQuestionPaperSubSection,
+  deleteQuestionPaperSubSection,
   upsertQuestionPaperSubject,
   deleteQuestionPaperSubject,
   upsertQuestionPaperDistribution,
@@ -150,6 +154,18 @@ export const questionPaperRouter = createTRPCRouter({
     .input(deleteQuestionPaperSectionSchema)
     .mutation(({ ctx, input }) =>
       deleteQuestionPaperSection(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  upsertSubSection: tenantMemberProcedure
+    .input(upsertQuestionPaperSubSectionSchema)
+    .mutation(({ ctx, input }) =>
+      upsertQuestionPaperSubSection(ctx.tenantDb, input)
+    ),
+
+  deleteSubSection: tenantMemberProcedure
+    .input(deleteQuestionPaperSubSectionSchema)
+    .mutation(({ ctx, input }) =>
+      deleteQuestionPaperSubSection(ctx.tenantDb, input)
     ),
 
   upsertSubject: tenantMemberProcedure

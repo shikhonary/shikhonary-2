@@ -86,6 +86,28 @@ export const deleteQuestionPaperSectionSchema = z.object({
 export type DeleteQuestionPaperSectionInput = z.infer<typeof deleteQuestionPaperSectionSchema>
 
 // ---------------------------------------------------------------------------
+// Mutations - Sub-Sections
+// ---------------------------------------------------------------------------
+
+export const upsertQuestionPaperSubSectionSchema = z.object({
+  id: z.string().optional(),
+  sectionId: z.string().min(1),
+  title: z.string().min(1, "Sub-section title is required"),
+  titleBn: z.string().optional().nullable(),
+  instructions: z.string().optional().nullable(),
+  orderIndex: z.number().int().optional().default(0),
+})
+
+export type UpsertQuestionPaperSubSectionInput = z.infer<typeof upsertQuestionPaperSubSectionSchema>
+
+export const deleteQuestionPaperSubSectionSchema = z.object({
+  sectionId: z.string().min(1),
+  id: z.string().min(1),
+})
+
+export type DeleteQuestionPaperSubSectionInput = z.infer<typeof deleteQuestionPaperSubSectionSchema>
+
+// ---------------------------------------------------------------------------
 // Mutations - Subjects
 // ---------------------------------------------------------------------------
 

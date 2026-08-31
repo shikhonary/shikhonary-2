@@ -13,6 +13,8 @@ import type {
   ReorderQuestionPaperQuestionsInput,
   UpsertQuestionPaperSectionInput,
   DeleteQuestionPaperSectionInput,
+  UpsertQuestionPaperSubSectionInput,
+  DeleteQuestionPaperSubSectionInput,
   UpsertQuestionPaperSubjectInput,
   DeleteQuestionPaperSubjectInput,
   UpsertQuestionPaperDistributionInput,
@@ -675,6 +677,58 @@ export async function deleteQuestionPaperSection(
 }
 
 // ---------------------------------------------------------------------------
+// Sub-Section Mutations
+// ---------------------------------------------------------------------------
+
+export async function upsertQuestionPaperSubSection(
+  tenantDb: TenantPrismaClient,
+  input: UpsertQuestionPaperSubSectionInput,
+) {
+  if (input.id) {
+    const existing = await tenantDb.questionPaperSubSection.findUnique({
+      where: { id: input.id },
+    })
+    if (!existing) throw notFound("QuestionPaperSubSection")
+
+    return tenantDb.questionPaperSubSection.update({
+      where: { id: input.id },
+      data: {
+        title: input.title,
+        titleBn: input.titleBn,
+        instructions: input.instructions,
+        orderIndex: input.orderIndex,
+      },
+    })
+  }
+
+  return tenantDb.questionPaperSubSection.create({
+    data: {
+      sectionId: input.sectionId,
+      title: input.title,
+      titleBn: input.titleBn,
+      instructions: input.instructions,
+      orderIndex: input.orderIndex,
+    },
+  })
+}
+
+export async function deleteQuestionPaperSubSection(
+  tenantDb: TenantPrismaClient,
+  input: DeleteQuestionPaperSubSectionInput,
+) {
+  const existing = await tenantDb.questionPaperSubSection.findUnique({
+    where: { id: input.id },
+  })
+  if (!existing) throw notFound("QuestionPaperSubSection")
+
+  await tenantDb.questionPaperSubSection.delete({
+    where: { id: input.id },
+  })
+
+  return { success: true }
+}
+
+// ---------------------------------------------------------------------------
 // Subject Mutations
 // ---------------------------------------------------------------------------
 
@@ -760,6 +814,7 @@ export async function upsertQuestionPaperSubject(
               title: mSub.nameEn,
               titleBn: mSub.nameBn,
               orderIndex: mSub.position,
+              instructions: mSub.instructions ?? null,
             },
           })
         }
