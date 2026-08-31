@@ -65,6 +65,8 @@ const navGroups = [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
+      { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
+      { href: "/amplifications", label: "Amplification", icon: HelpCircle },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },
@@ -109,7 +111,7 @@ export function TopNav() {
 
   return (
     <header className="w-full h-14 sticky top-0 bg-surface border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
-      
+
       {/* Left Side: Sheet Drawer trigger on mobile, empty spacer on desktop */}
       <div className="flex items-center">
         <Sheet>
@@ -121,7 +123,7 @@ export function TopNav() {
               <Menu className="h-5 w-5" />
             </button>
           </SheetTrigger>
-          
+
           <SheetContent side="left" className="w-[280px] p-0 flex flex-col h-full bg-surface">
             {/* Header / Brand */}
             <SheetHeader className="p-4 border-b border-outline-variant flex flex-row items-center gap-3">
@@ -152,11 +154,10 @@ export function TopNav() {
                       <SheetClose asChild key={item.href}>
                         <Link
                           href={item.href}
-                          className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ease-in-out border-l-4 ${
-                            isActive
+                          className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ease-in-out border-l-4 ${isActive
                               ? "bg-surface-container-high text-primary rounded-r-lg font-bold border-primary"
                               : "text-on-surface-variant hover:bg-surface-variant border-transparent"
-                          }`}
+                            }`}
                         >
                           <Icon className="h-5 w-5 shrink-0" />
                           <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
@@ -231,7 +232,7 @@ export function TopNav() {
               )}
             </div>
           </DropdownMenuTrigger>
-          
+
           <DropdownMenuContent className="w-56 mt-1 rounded-xl bg-card border border-border" align="end">
             <DropdownMenuLabel className="pb-1.5 pt-2">
               <div className="flex flex-col text-left">
@@ -251,18 +252,18 @@ export function TopNav() {
                 )}
               </div>
             </DropdownMenuLabel>
-            
+
             <DropdownMenuSeparator />
-            
+
             <DropdownMenuItem asChild>
               <Link href="/settings" className="flex items-center gap-2 w-full cursor-pointer">
                 <Settings className="h-3.5 w-3.5" />
                 <span>Account Settings</span>
               </Link>
             </DropdownMenuItem>
-            
+
             <DropdownMenuSeparator />
-            
+
             <DropdownMenuItem
               onClick={handleSignOut}
               className="flex items-center gap-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"

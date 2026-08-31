@@ -109,7 +109,7 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
     removeQuestion({
       questionPaperId: paperId,
       questionId: data.id || item.id,
-      questionType: "SHORT",
+      questionType: "SA",
     });
   };
 

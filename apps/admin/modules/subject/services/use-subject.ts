@@ -106,3 +106,17 @@ export function useSaveSubjectQuestionTypes() {
   })
 }
 
+/**
+ * Hook to save the unified subject structure (sections, sub-sections, and question types).
+ */
+export function useSaveSubjectStructure() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.subjectStructure.save.mutationOptions(),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
+    },
+  })
+}
+

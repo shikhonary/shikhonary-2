@@ -180,6 +180,34 @@ export function PrintQuestionPaperView({ id }: PrintQuestionPaperViewProps) {
                         const mcq = pq.mcq || (pq.contentSnapshot?.options ? pq.contentSnapshot : null);
                         const cq = pq.cq || (pq.contentSnapshot?.questionA ? pq.contentSnapshot : null);
                         const short = pq.shortAnswer || (pq.contentSnapshot?.question ? pq.contentSnapshot : null);
+                        const paragraph = pq.paragraph || (pq.contentSnapshot?.name ? pq.contentSnapshot : null);
+                        const amplification = pq.amplification || (pq.contentSnapshot?.title ? pq.contentSnapshot : null);
+
+                        if (paragraph) {
+                          return (
+                            <div key={pq.id} className="text-sm leading-relaxed text-black space-y-1 break-inside-avoid">
+                              <div className="flex gap-2 items-start">
+                                <span className="font-bold shrink-0">{toBengaliDigits(idx + 1)}।</span>
+                                <div className="flex-1 font-medium">
+                                  <RenderMath text={paragraph.name} />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (amplification) {
+                          return (
+                            <div key={pq.id} className="text-sm leading-relaxed text-black space-y-1 break-inside-avoid">
+                              <div className="flex gap-2 items-start">
+                                <span className="font-bold shrink-0">{toBengaliDigits(idx + 1)}।</span>
+                                <div className="flex-1 font-medium">
+                                  <RenderMath text={amplification.title} />
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
 
                         if (cq) {
                           const subQuestions = [

@@ -90,7 +90,11 @@ export async function getShortAnswerById(db: PrismaClient, input: GetShortAnswer
   const sa = await db.shortAnswer.findUnique({
     where: { id: input.id },
     include: {
-      subject: true,
+      subject: {
+        include: {
+          classSubjects: true,
+        },
+      },
       chapter: true,
       questionType: true,
       attachments: true,

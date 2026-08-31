@@ -104,10 +104,36 @@ export async function getAcademicSubjectById(
         select: {
           id: true,
           questionTypeId: true,
+          sectionId: true,
+          subSectionId: true,
           mark: true,
           totalQuestions: true,
           requiredCount: true,
           markDistribution: true,
+        },
+      },
+      sections: {
+        orderBy: {
+          position: "asc",
+        },
+        include: {
+          subSections: {
+            orderBy: {
+              position: "asc",
+            },
+            include: {
+              subjectQuestionTypes: {
+                include: {
+                  questionType: true,
+                },
+              },
+            },
+          },
+          subjectQuestionTypes: {
+            include: {
+              questionType: true,
+            },
+          },
         },
       },
     },

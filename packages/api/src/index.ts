@@ -166,7 +166,24 @@ export type {
   ToggleShortAnswerActiveInput,
   ImportShortAnswersInput,
 } from "./routers/short-answer/short-answer.schema"
+export type {
+  ListParagraphsInput,
+  ParagraphStatsInput,
+  CreateParagraphInput,
+  UpdateParagraphInput,
+  DeleteParagraphInput,
+  BulkDeleteParagraphsInput,
+  ImportParagraphsInput,
+} from "./routers/paragraph/paragraph.schema"
 
-
+export type {
+  ListAmplificationsInput,
+  AmplificationStatsInput,
+  CreateAmplificationInput,
+  UpdateAmplificationInput,
+  DeleteAmplificationInput,
+  BulkDeleteAmplificationsInput,
+  ImportAmplificationsInput,
+} from "./routers/amplification/amplification.schema"
 
 

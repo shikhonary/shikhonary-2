@@ -11,45 +11,70 @@ import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/componen
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Loader2, Save, HelpCircle, Award, Hash, ArrowLeft } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+import { Loader2, Save, HelpCircle, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react"
 
-import { useSubjectById, useSaveSubjectQuestionTypes } from "../services/use-subject"
+import { useSubjectById, useSaveSubjectStructure } from "../services/use-subject"
 import { useQuestionTypesList } from "../../question-type/services/use-question-type"
 
-const subjectQuestionTypesFormSchema = z.object({
-  configs: z.array(
-    z.object({
-      questionTypeId: z.string(),
-      questionTypeNameEn: z.string(),
-      questionTypeNameBn: z.string(),
-      questionTypeLabel: z.string().optional().nullable(),
-      enabled: z.preprocess(
-        (val) => {
-          if (Array.isArray(val)) {
-            return val.includes(true) || val.includes("true");
-          }
-          return val === true || val === "true";
-        },
-        z.boolean()
-      ),
-      mark: z.preprocess(
-        (val) => (val === "" || val === null || val === undefined ? 0 : val),
-        z.coerce.number().min(0, "Mark must be at least 0")
-      ),
-      requiredCount: z.preprocess(
-        (val) => (val === "" || val === null || val === undefined ? 0 : val),
-        z.coerce.number().int().min(0, "Required count must be at least 0")
-      ),
-      totalQuestions: z.preprocess(
-        (val) => (val === "" || val === null || val === undefined ? 0 : val),
-        z.coerce.number().int().min(0, "Total questions must be at least 0")
-      ),
-      markDistributionStr: z.string().optional(),
-    })
-  ),
+// Schema matching the unified save structure endpoint
+const questionTypeConfigSchema = z.object({
+  questionTypeId: z.string().min(1, "Question Type is required"),
+  mark: z.coerce.number().min(0, "Mark must be at least 0"),
+  requiredCount: z.coerce.number().int().min(0, "Required count must be at least 0"),
+  totalQuestions: z.coerce.number().int().min(0, "Total questions must be at least 0"),
+  markDistributionStr: z.string().optional(),
 })
 
-type SubjectQuestionTypesFormData = z.infer<typeof subjectQuestionTypesFormSchema>
+const subjectQuestionStructureSchema = z.object({
+  sections: z.array(
+    z.object({
+      id: z.string().optional(),
+      nameEn: z.string().min(1, "English section name is required"),
+      nameBn: z.string().min(1, "Bangla section name is required"),
+      position: z.number().int().default(0),
+      subSections: z.array(
+        z.object({
+          id: z.string().optional(),
+          nameEn: z.string().min(1, "English sub-section name is required"),
+          nameBn: z.string().min(1, "Bangla sub-section name is required"),
+          position: z.number().int().default(0),
+          questionTypes: z.array(questionTypeConfigSchema).default([]),
+        })
+      ).default([]),
+      questionTypes: z.array(questionTypeConfigSchema).default([]),
+    })
+  ).default([]),
+})
+
+interface QuestionTypeConfig {
+  questionTypeId: string
+  mark: number
+  requiredCount: number
+  totalQuestions: number
+  markDistributionStr?: string
+}
+
+interface SubSectionConfig {
+  id?: string
+  nameEn: string
+  nameBn: string
+  position: number
+  questionTypes: QuestionTypeConfig[]
+}
+
+interface SectionConfig {
+  id?: string
+  nameEn: string
+  nameBn: string
+  position: number
+  subSections: SubSectionConfig[]
+  questionTypes: QuestionTypeConfig[]
+}
+
+interface SubjectQuestionStructureData {
+  sections: SectionConfig[]
+}
 
 interface SubjectQuestionTypeConfigViewProps {
   subjectId: string
@@ -78,141 +103,192 @@ export function SubjectQuestionTypeConfigView({ subjectId }: SubjectQuestionType
     )
   }
 
-  return <SubjectQuestionTypeConfigForm subject={subject} />
+  return <SubjectQuestionStructureForm subject={subject} />
 }
 
-interface SubjectQuestionTypeConfigFormProps {
+interface SubjectQuestionStructureFormProps {
   subject: any
 }
 
-function SubjectQuestionTypeConfigForm({ subject }: SubjectQuestionTypeConfigFormProps) {
+function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormProps) {
   const router = useRouter()
-  const saveMutation = useSaveSubjectQuestionTypes()
+  const saveMutation = useSaveSubjectStructure()
   const { data: qTypesData, isLoading: isQTypesLoading } = useQuestionTypesList({ limit: 100 })
   const questionTypesList = qTypesData?.questionTypes ?? []
 
   const {
     control,
     handleSubmit,
-    register,
-    watch,
     reset,
+    watch,
     formState: { isSubmitting, errors },
-  } = useForm<SubjectQuestionTypesFormData>({
-    resolver: zodResolver(subjectQuestionTypesFormSchema),
+  } = useForm<any>({
+    resolver: zodResolver(subjectQuestionStructureSchema),
     defaultValues: {
-      configs: [],
+      sections: [],
     },
   })
 
-  const { fields } = useFieldArray({
+  const { fields: sections, append: appendSection, remove: removeSection, move: moveSection } = useFieldArray({
     control,
-    name: "configs",
+    name: "sections",
   })
 
-  // Synchronize system question types list with subject's active mappings
+  // Synchronize system DB structure with form default values
   useEffect(() => {
-    if (questionTypesList.length > 0) {
-      const initialConfigs = questionTypesList.map((qt) => {
-        const mapped = subject.subjectQuestionTypes?.find(
-          (m: any) => m.questionTypeId === qt.id
-        )
-
-        let markDistributionStr = ""
-        if (mapped?.markDistribution) {
-          try {
-            const dist = typeof mapped.markDistribution === 'string'
-              ? JSON.parse(mapped.markDistribution)
-              : mapped.markDistribution
-            if (dist && typeof dist === 'object') {
-              const sortedValues = Object.keys(dist)
-                .sort()
-                .map((k) => dist[k])
-              markDistributionStr = sortedValues.join(", ")
-            }
-          } catch (e) {
-            console.error("Failed to parse markDistribution", e)
-          }
-        }
+    if (subject) {
+      const initialSections = subject.sections?.map((sec: any) => {
+        // Find direct question types that belong to this section but don't have a sub-section
+        const directQuestionTypes = subject.subjectQuestionTypes?.filter(
+          (sqt: any) => sqt.sectionId === sec.id && !sqt.subSectionId
+        ) || []
 
         return {
-          questionTypeId: qt.id,
-          questionTypeNameEn: qt.nameEn,
-          questionTypeNameBn: qt.nameBn,
-          questionTypeLabel: qt.label,
-          enabled: !!mapped,
-          mark: mapped ? mapped.mark : qt.mark,
-          requiredCount: mapped ? mapped.requiredCount : 0,
-          totalQuestions: mapped ? mapped.totalQuestions : 0,
-          markDistributionStr: markDistributionStr,
+          id: sec.id,
+          nameEn: sec.nameEn,
+          nameBn: sec.nameBn,
+          position: sec.position,
+          subSections: sec.subSections?.map((sub: any) => {
+            const subQuestionTypes = subject.subjectQuestionTypes?.filter(
+              (sqt: any) => sqt.subSectionId === sub.id
+            ) || []
+
+            return {
+              id: sub.id,
+              nameEn: sub.nameEn,
+              nameBn: sub.nameBn,
+              position: sub.position,
+              questionTypes: subQuestionTypes.map((sqt: any) => {
+                let markDistributionStr = ""
+                if (sqt.markDistribution) {
+                  try {
+                    const dist = typeof sqt.markDistribution === 'string'
+                      ? JSON.parse(sqt.markDistribution)
+                      : sqt.markDistribution
+                    if (dist && typeof dist === 'object') {
+                      const sortedValues = Object.keys(dist)
+                        .sort()
+                        .map((k) => dist[k])
+                      markDistributionStr = sortedValues.join(", ")
+                    }
+                  } catch (e) {
+                    console.error("Failed to parse markDistribution", e)
+                  }
+                }
+                return {
+                  questionTypeId: sqt.questionTypeId,
+                  mark: sqt.mark,
+                  requiredCount: sqt.requiredCount,
+                  totalQuestions: sqt.totalQuestions,
+                  markDistributionStr,
+                }
+              }),
+            }
+          }) || [],
+          questionTypes: directQuestionTypes.map((sqt: any) => {
+            let markDistributionStr = ""
+            if (sqt.markDistribution) {
+              try {
+                const dist = typeof sqt.markDistribution === 'string'
+                  ? JSON.parse(sqt.markDistribution)
+                  : sqt.markDistribution
+                if (dist && typeof dist === 'object') {
+                  const sortedValues = Object.keys(dist)
+                    .sort()
+                    .map((k) => dist[k])
+                  markDistributionStr = sortedValues.join(", ")
+                }
+              } catch (e) {
+                console.error("Failed to parse markDistribution", e)
+              }
+            }
+            return {
+              questionTypeId: sqt.questionTypeId,
+              mark: sqt.mark,
+              requiredCount: sqt.requiredCount,
+              totalQuestions: sqt.totalQuestions,
+              markDistributionStr,
+            }
+          }),
         }
-      })
+      }) || []
 
-      reset({ configs: initialConfigs })
+      reset({ sections: initialSections })
     }
-  }, [questionTypesList, subject, reset])
+  }, [subject, reset])
 
-  // Log and notify about validation errors
+  // Log validation errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      console.error("Validation Errors Details:", JSON.stringify(errors, null, 2))
-      toast.error("Please ensure all enabled question types have valid, positive marks and counts.")
+      console.error("Validation Errors Details:", errors)
+      toast.error("Please fill in all section & sub-section names and ensure all question types are configured correctly.")
     }
   }, [errors])
 
-  const onSubmit = async (data: SubjectQuestionTypesFormData) => {
-    console.log("Form raw data on submit:", data)
+  const onSubmit = async (data: any) => {
     try {
-      const activeConfigs = []
+      // Map form mark distribution strings into Record<string, number> structures
+      const processedSections = data.sections.map((sec: SectionConfig, secIdx: number) => {
+        const processQtConfigs = (qts: QuestionTypeConfig[], path: string) => {
+          return qts.map((c: QuestionTypeConfig) => {
+            let markDistribution: Record<string, number> | null = null
+            if (c.markDistributionStr && c.markDistributionStr.trim()) {
+              const parts = c.markDistributionStr
+                .split(",")
+                .map((p: string) => parseFloat(p.trim()))
+                .filter((p: number) => !isNaN(p))
 
-      for (const c of data.configs) {
-        if (!c.enabled) continue
+              if (parts.length > 0) {
+                const sum = parts.reduce((a: number, b: number) => a + b, 0)
+                if (Math.abs(sum - c.mark) > 0.01) {
+                  const typeName = questionTypesList.find((t) => t.id === c.questionTypeId)?.nameEn || "Question Type"
+                  throw new Error(
+                    `In ${path}, for "${typeName}", the sum of mark distribution parts (${sum}) must equal the total mark (${c.mark}).`
+                  )
+                }
 
-        let markDistribution: Record<string, number> | null = null
-        if (c.markDistributionStr && c.markDistributionStr.trim()) {
-          const parts = c.markDistributionStr
-            .split(",")
-            .map((p) => parseFloat(p.trim()))
-            .filter((p) => !isNaN(p))
-
-          if (parts.length > 0) {
-            const sum = parts.reduce((a, b) => a + b, 0)
-            if (Math.abs(sum - c.mark) > 0.01) {
-              throw new Error(
-                `For "${c.questionTypeNameEn}", the sum of mark distribution parts (${sum}) must equal the total mark (${c.mark}).`
-              )
+                markDistribution = {}
+                const keys = ["a", "b", "c", "d", "e", "f", "g"]
+                parts.forEach((val: number, idx: number) => {
+                  const key = keys[idx]
+                  if (key) {
+                    markDistribution![key] = val
+                  }
+                })
+              }
             }
 
-            markDistribution = {}
-            const keys = ["a", "b", "c", "d", "e", "f", "g"]
-            parts.forEach((val, idx) => {
-              if (idx < keys.length) {
-                markDistribution![keys[idx]] = val
-              }
-            })
-          }
+            return {
+              questionTypeId: c.questionTypeId,
+              mark: c.mark,
+              requiredCount: c.requiredCount,
+              totalQuestions: c.totalQuestions,
+              markDistribution,
+            }
+          })
         }
 
-        activeConfigs.push({
-          questionTypeId: c.questionTypeId,
-          mark: c.mark,
-          requiredCount: c.requiredCount,
-          totalQuestions: c.totalQuestions,
-          markDistribution,
-        })
-      }
-
-      console.log("Mapped activeConfigs payload:", activeConfigs)
+        return {
+          nameEn: sec.nameEn,
+          nameBn: sec.nameBn,
+          position: secIdx,
+          questionTypes: processQtConfigs(sec.questionTypes || [], `Section "${sec.nameEn}"`),
+          subSections: (sec.subSections || []).map((sub: SubSectionConfig, subIdx: number) => ({
+            nameEn: sub.nameEn,
+            nameBn: sub.nameBn,
+            position: subIdx,
+            questionTypes: processQtConfigs(sub.questionTypes || [], `Section "${sec.nameEn}" > Sub-section "${sub.nameEn}"`),
+          })),
+        }
+      })
 
       await saveMutation.mutateAsync({
         subjectId: subject.id,
-        questionTypes: activeConfigs,
+        sections: processedSections,
       })
 
-      toast.success("Question types configuration updated successfully.")
-      setTimeout(() => {
-        router.push("/subjects")
-      }, 1000)
+      toast.success("Subject exam structure updated successfully.")
+      router.push("/subjects")
     } catch (err: any) {
       toast.error(err.message || "Failed to update configuration.")
     }
@@ -228,9 +304,9 @@ function SubjectQuestionTypeConfigForm({ subject }: SubjectQuestionTypeConfigFor
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header Section */}
-      <div className="mb-6 sm:mb-8 flex flex-col gap-4">
+    <div className="w-full max-w-5xl mx-auto pb-12">
+      {/* Navigation Headers */}
+      <div className="mb-6 flex flex-col gap-3">
         <Link
           href="/subjects"
           className="inline-flex items-center gap-1.5 text-sm text-outline hover:text-primary transition-colors font-medium w-fit cursor-pointer"
@@ -239,308 +315,467 @@ function SubjectQuestionTypeConfigForm({ subject }: SubjectQuestionTypeConfigFor
           Back to Subjects
         </Link>
         <div>
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/subjects"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              Subjects
-            </Link>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="font-label-sm text-xs font-bold text-outline">{subject.nameEn}</span>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="font-label-sm text-xs font-bold text-primary">Question Types</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Configure Question Types
+          <h2 className="mb-1 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
+            Configure Subject Exam Structure
           </h2>
           <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Configure default marks, required question counts, and enabled formats for <span className="font-bold text-primary">{subject.nameEn} ({subject.nameBn})</span>.
+            Organize sections, nested sub-sections, and specify default marking configurations for{" "}
+            <span className="font-bold text-primary">{subject.nameEn} ({subject.nameBn})</span>.
           </p>
         </div>
       </div>
 
-      <Card className="overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
-        <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
-          <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-            <HelpCircle className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
-          <div>
-            <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
-              Question Type Specifications
-            </CardTitle>
-            <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5">
-              Enable question formats and specify default marking structures.
-            </p>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-4 sm:p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {fields.length === 0 ? (
-              <p className="text-center text-sm font-medium text-on-surface-variant py-6">
-                No active question types found in the system.
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="rounded-xl border border-outline-variant bg-white p-0 shadow-xs">
+          <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-6 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-bold text-on-surface">Sections Layout Builder</CardTitle>
+              <p className="text-xs text-on-surface-variant mt-1">
+                Define the structural order and assign nested question types.
               </p>
-            ) : (
-              <div className="space-y-4">
-                {/* Desktop View Table */}
-                <div className="hidden sm:block overflow-x-auto rounded-xl border border-outline-variant">
-                  <table className="w-full text-left border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-surface-container-low border-b border-outline-variant">
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[80px]">Enable</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant">Question Type</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[120px]">Label</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[120px]">Default Mark</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[160px]">Mark Distribution</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[135px]">Required Count</th>
-                        <th className="p-4 font-bold text-xs uppercase text-on-surface-variant w-[130px]">Total Count</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {fields.map((field, index) => {
-                        const isEnabled = watch(`configs.${index}.enabled`)
-                        return (
-                          <tr key={field.id} className="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
-                            <td className="p-4">
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.enabled`}
-                                render={({ field }) => (
-                                  <input
-                                    type="checkbox"
-                                    checked={!!field.value}
-                                    onChange={(e) => field.onChange(e.target.checked)}
-                                    className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td className="p-4">
-                              <div className="font-semibold text-on-surface">
-                                {watch(`configs.${index}.questionTypeNameEn`)}
-                              </div>
-                              <div className="text-xs text-on-surface-variant">
-                                {watch(`configs.${index}.questionTypeNameBn`)}
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <span className="font-mono text-xs text-outline font-bold">
-                                {watch(`configs.${index}.questionTypeLabel`) || "-"}
-                              </span>
-                            </td>
-                            <td className="p-4">
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.mark`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    step="any"
-                                    disabled={!isEnabled}
-                                    placeholder="0"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                    className="h-9 w-24 rounded-lg border border-outline-variant text-center bg-white px-2 py-1 text-sm outline-hidden focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td className="p-4">
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.markDistributionStr`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="text"
-                                    disabled={!isEnabled}
-                                    placeholder="e.g. 2, 4, 4"
-                                    value={field.value ?? ""}
-                                    onChange={field.onChange}
-                                    className="h-9 w-full min-w-[120px] rounded-lg border border-outline-variant text-center bg-white px-2 py-1 text-sm outline-hidden focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td className="p-4">
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.requiredCount`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    disabled={!isEnabled}
-                                    placeholder="0"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-                                    className="h-9 w-24 rounded-lg border border-outline-variant text-center bg-white px-2 py-1 text-sm outline-hidden focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-                                  />
-                                )}
-                              />
-                            </td>
-                            <td className="p-4">
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.totalQuestions`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    disabled={!isEnabled}
-                                    placeholder="0"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-                                    className="h-9 w-24 rounded-lg border border-outline-variant text-center bg-white px-2 py-1 text-sm outline-hidden focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-                                  />
-                                )}
-                              />
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+            </div>
+            <Button
+              type="button"
+              onClick={() => appendSection({ nameEn: "", nameBn: "", position: sections.length, subSections: [], questionTypes: [] })}
+              className="flex items-center gap-1.5 text-xs h-9 bg-primary text-white font-semibold rounded-lg hover:bg-primary/95 transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              Add Section
+            </Button>
+          </CardHeader>
 
-                {/* Mobile View Card Layout */}
-                <div className="sm:hidden space-y-3">
-                  {fields.map((field, index) => {
-                    const isEnabled = watch(`configs.${index}.enabled`)
-                    return (
-                      <div key={field.id} className="rounded-xl border border-outline-variant/60 bg-surface-container-low p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Controller
-                              control={control}
-                              name={`configs.${index}.enabled`}
-                              render={({ field }) => (
-                                <input
-                                  type="checkbox"
-                                  checked={!!field.value}
-                                  onChange={(e) => field.onChange(e.target.checked)}
-                                  className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
-                                />
-                              )}
-                            />
-                            <div>
-                              <span className="font-semibold text-on-surface text-sm block">
-                                {watch(`configs.${index}.questionTypeNameEn`)}
-                              </span>
-                              <span className="text-xs text-on-surface-variant block">
-                                {watch(`configs.${index}.questionTypeNameBn`)}
-                              </span>
-                            </div>
-                          </div>
-                          <span className="inline-flex items-center rounded-md bg-surface-container-high px-2 py-0.5 text-[10px] font-medium text-on-surface-variant font-mono">
-                            {watch(`configs.${index}.questionTypeLabel`) || "-"}
-                          </span>
-                        </div>
-
-                        {isEnabled && (
-                          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-outline-variant/20">
-                            <div className="space-y-1">
-                              <Label className="text-[10px] uppercase font-bold text-on-surface-variant">Total Mark</Label>
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.mark`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    step="any"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseFloat(e.target.value))}
-                                    className="h-8 w-full rounded-lg border border-outline-variant text-center bg-white text-xs"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-[10px] uppercase font-bold text-on-surface-variant">Required Count</Label>
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.requiredCount`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-                                    className="h-8 w-full rounded-lg border border-outline-variant text-center bg-white text-xs"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-[10px] uppercase font-bold text-on-surface-variant">Total Count</Label>
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.totalQuestions`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="number"
-                                    value={field.value ?? ""}
-                                    onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-                                    className="h-8 w-full rounded-lg border border-outline-variant text-center bg-white text-xs"
-                                  />
-                                )}
-                              />
-                            </div>
-                            <div className="space-y-1 col-span-2">
-                              <Label className="text-[10px] uppercase font-bold text-on-surface-variant">Mark Distribution (e.g. 2, 4, 4)</Label>
-                              <Controller
-                                control={control}
-                                name={`configs.${index}.markDistributionStr`}
-                                render={({ field }) => (
-                                  <Input
-                                    type="text"
-                                    placeholder="e.g. 2, 4, 4"
-                                    value={field.value ?? ""}
-                                    onChange={field.onChange}
-                                    className="h-8 w-full rounded-lg border border-outline-variant text-center bg-white text-xs px-2"
-                                  />
-                                )}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Actions Footer */}
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-outline-variant/40">
-              <Link href="/subjects">
+          <CardContent className="p-6 space-y-6 bg-surface-container-lowest/20">
+            {sections.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed border-outline-variant rounded-xl bg-white space-y-3">
+                <p className="text-sm font-medium text-on-surface-variant">No exam sections configured yet.</p>
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={isSubmitting}
-                  className="rounded-lg border border-outline px-6 py-2.5 font-bold text-primary hover:bg-surface-container-low transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
+                  onClick={() => appendSection({ nameEn: "", nameBn: "", position: 0, subSections: [], questionTypes: [] })}
+                  className="mx-auto flex items-center gap-1.5 text-xs text-primary border-primary hover:bg-primary/5"
                 >
-                  Cancel
+                  <Plus className="h-4 w-4" />
+                  Add First Section
                 </Button>
-              </Link>
-              <Button
-                type="submit"
-                disabled={isSubmitting || fields.length === 0}
-                className="rounded-lg bg-primary-container px-8 py-2.5 font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Saving Mappings...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5">
-                    <Save className="h-4 w-4" />
-                    <span>Save Mappings</span>
-                  </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {sections.map((sectionField, secIndex) => (
+                  <SectionCard
+                    key={sectionField.id}
+                    control={control}
+                    secIndex={secIndex}
+                    totalSections={sections.length}
+                    moveSection={moveSection}
+                    removeSection={removeSection}
+                    questionTypesList={questionTypesList}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-4">
+          <Link href="/subjects">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              className="rounded-lg border border-outline px-6 py-2 h-10 font-bold text-primary hover:bg-surface-container-low transition-all text-sm"
+            >
+              Cancel
+            </Button>
+          </Link>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="rounded-lg bg-primary px-8 py-2 h-10 font-bold text-white shadow-md hover:bg-primary/90 transition-all text-sm"
+          >
+            {isSubmitting ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Saving Structure...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <Save className="h-4 w-4" />
+                <span>Save Structure</span>
+              </div>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   SECTION CARD COMPONENT
+   ────────────────────────────────────────────────────────────────────────── */
+interface SectionCardProps {
+  control: any
+  secIndex: number
+  totalSections: number
+  moveSection: (from: number, to: number) => void
+  removeSection: (index: number) => void
+  questionTypesList: any[]
+}
+
+function SectionCard({ control, secIndex, totalSections, moveSection, removeSection, questionTypesList }: SectionCardProps) {
+  const { fields: subSections, append: appendSubSection, remove: removeSubSection } = useFieldArray({
+    control,
+    name: `sections.${secIndex}.subSections`,
+  })
+
+  const { fields: directQuestionTypes, append: appendDirectQt, remove: removeDirectQt } = useFieldArray({
+    control,
+    name: `sections.${secIndex}.questionTypes`,
+  })
+
+  return (
+    <Card className="border border-outline-variant bg-white shadow-xs overflow-hidden">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-surface-container-low p-4 border-b border-outline-variant/60">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {/* Ordering buttons */}
+          <div className="flex flex-col">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={secIndex === 0}
+              onClick={() => moveSection(secIndex, secIndex - 1)}
+              className="h-6 w-6 text-on-surface-variant hover:text-primary disabled:opacity-30"
+            >
+              <ArrowUp className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={secIndex === totalSections - 1}
+              onClick={() => moveSection(secIndex, secIndex + 1)}
+              className="h-6 w-6 text-on-surface-variant hover:text-primary disabled:opacity-30"
+            >
+              <ArrowDown className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 flex-1 sm:w-80">
+            <div>
+              <Label className="text-[10px] text-outline font-semibold uppercase">Section Name (EN)</Label>
+              <Controller
+                control={control}
+                name={`sections.${secIndex}.nameEn`}
+                render={({ field }) => (
+                  <Input {...field} placeholder="e.g. Section A" className="h-9 text-sm" />
                 )}
-              </Button>
+              />
             </div>
-          </form>
-        </CardContent>
-      </Card>
+            <div>
+              <Label className="text-[10px] text-outline font-semibold uppercase">Section Name (BN)</Label>
+              <Controller
+                control={control}
+                name={`sections.${secIndex}.nameBn`}
+                render={({ field }) => (
+                  <Input {...field} placeholder="e.g. ক বিভাগ" className="h-9 text-sm" />
+                )}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => appendSubSection({ nameEn: "", nameBn: "", position: subSections.length, questionTypes: [] })}
+            className="flex items-center gap-1 text-xs h-8 border-outline text-primary hover:bg-primary/5"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add Sub-section
+          </Button>
+          {subSections.length === 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => appendDirectQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+              className="flex items-center gap-1 text-xs h-8 border-outline text-primary hover:bg-primary/5"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add Question Type
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => removeSection(secIndex)}
+            className="h-8 w-8 text-error hover:bg-error/5 hover:text-error/95"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Render nested Sub-sections if any exist */}
+        {subSections.length > 0 && (
+          <div className="space-y-4 pl-4 border-l-2 border-primary/20">
+            <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Sub-sections</h4>
+            {subSections.map((subField, subIndex) => (
+              <SubSectionCard
+                key={subField.id}
+                control={control}
+                secIndex={secIndex}
+                subIndex={subIndex}
+                removeSubSection={removeSubSection}
+                questionTypesList={questionTypesList}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Render Direct Question Types (only when no subsections exist) */}
+        {subSections.length === 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-1.5">
+              <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Question Types</h4>
+              {directQuestionTypes.length > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => appendDirectQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+                  className="text-xs text-primary font-bold hover:bg-primary/5 h-7 px-2"
+                >
+                  + Add Type
+                </Button>
+              )}
+            </div>
+
+            {directQuestionTypes.length === 0 ? (
+              <p className="text-xs text-center text-outline py-4">No question types added. Add a type or a sub-section above.</p>
+            ) : (
+              <div className="space-y-2">
+                {directQuestionTypes.map((qtField, qtIndex) => (
+                  <QuestionTypeRow
+                    key={qtField.id}
+                    control={control}
+                    namePrefix={`sections.${secIndex}.questionTypes.${qtIndex}`}
+                    removeRow={() => removeDirectQt(qtIndex)}
+                    questionTypesList={questionTypesList}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   SUB-SECTION CARD COMPONENT
+   ────────────────────────────────────────────────────────────────────────── */
+interface SubSectionCardProps {
+  control: any
+  secIndex: number
+  subIndex: number
+  removeSubSection: (index: number) => void
+  questionTypesList: any[]
+}
+
+function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questionTypesList }: SubSectionCardProps) {
+  const { fields: subQtFields, append: appendSubQt, remove: removeSubQt } = useFieldArray({
+    control,
+    name: `sections.${secIndex}.subSections.${subIndex}.questionTypes`,
+  })
+
+  return (
+    <div className="rounded-lg border border-outline-variant bg-surface-container-lowest/40 p-4 space-y-3">
+      {/* Header Info */}
+      <div className="flex items-center justify-between gap-3 border-b border-outline-variant/40 pb-2">
+        <div className="grid grid-cols-2 gap-2 flex-1 max-w-sm">
+          <div>
+            <Label className="text-[9px] text-outline font-semibold uppercase">Sub-section Name (EN)</Label>
+            <Controller
+              control={control}
+              name={`sections.${secIndex}.subSections.${subIndex}.nameEn`}
+              render={({ field }) => (
+                <Input {...field} placeholder="e.g. Arithmetic" className="h-8 text-xs bg-white" />
+              )}
+            />
+          </div>
+          <div>
+            <Label className="text-[9px] text-outline font-semibold uppercase">Sub-section Name (BN)</Label>
+            <Controller
+              control={control}
+              name={`sections.${secIndex}.subSections.${subIndex}.nameBn`}
+              render={({ field }) => (
+                <Input {...field} placeholder="e.g. পাটিগণিত" className="h-8 text-xs bg-white" />
+              )}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => appendSubQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+            className="flex items-center gap-1 text-[11px] h-7 border-outline text-primary hover:bg-primary/5 bg-white"
+          >
+            <Plus className="h-3 w-3" />
+            Add Type
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => removeSubSection(subIndex)}
+            className="h-7 w-7 text-error hover:bg-error/5"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Nested Question Types inside Subsection */}
+      {subQtFields.length === 0 ? (
+        <p className="text-[11px] text-center text-outline py-2">No question formats mapped under this sub-section.</p>
+      ) : (
+        <div className="space-y-2">
+          {subQtFields.map((qtField, qtIndex) => (
+            <QuestionTypeRow
+              key={qtField.id}
+              control={control}
+              namePrefix={`sections.${secIndex}.subSections.${subIndex}.questionTypes.${qtIndex}`}
+              removeRow={() => removeSubQt(qtIndex)}
+              questionTypesList={questionTypesList}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   QUESTION TYPE SPECIFICATION ROW
+   ────────────────────────────────────────────────────────────────────────── */
+interface QuestionTypeRowProps {
+  control: any
+  namePrefix: string
+  removeRow: () => void
+  questionTypesList: any[]
+}
+
+function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: QuestionTypeRowProps) {
+  return (
+    <div className="flex flex-wrap sm:flex-nowrap items-end gap-3 bg-white p-3 rounded-lg border border-outline-variant/60 shadow-xs relative">
+      <div className="w-full sm:flex-1 min-w-[150px]">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Question Format</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.questionTypeId`}
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger className="h-9 text-xs">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {questionTypesList.map((qt) => (
+                  <SelectItem key={qt.id} value={qt.id} className="text-xs">
+                    {qt.nameEn} ({qt.nameBn})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </div>
+
+      <div className="w-[100px] shrink-0">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Total Mark</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.mark`}
+          render={({ field }) => (
+            <Input
+              type="number"
+              step="any"
+              placeholder="0"
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value === "" ? "" : parseFloat(e.target.value))}
+              className="h-9 text-center text-xs"
+            />
+          )}
+        />
+      </div>
+
+      <div className="flex-1 min-w-[120px]">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Mark Distribution</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.markDistributionStr`}
+          render={({ field }) => (
+            <Input
+              type="text"
+              placeholder="e.g. 2, 4, 4"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              className="h-9 text-center text-xs"
+            />
+          )}
+        />
+      </div>
+
+      <div className="w-[100px] shrink-0">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Required Count</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.requiredCount`}
+          render={({ field }) => (
+            <Input
+              type="number"
+              placeholder="0"
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
+              className="h-9 text-center text-xs"
+            />
+          )}
+        />
+      </div>
+
+      <div className="w-[100px] shrink-0">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Total Count</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.totalQuestions`}
+          render={({ field }) => (
+            <Input
+              type="number"
+              placeholder="0"
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
+              className="h-9 text-center text-xs"
+            />
+          )}
+        />
+      </div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={removeRow}
+        className="h-9 w-9 text-error hover:bg-error/5"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
     </div>
   )
 }

@@ -81,13 +81,35 @@ model QuestionPaperSection {
 
     orderIndex Int @default(0)
 
-    questions QuestionPaperQuestion[]
+    questions     QuestionPaperQuestion[]
+    subSections   QuestionPaperSubSection[]
+    distributions QuestionPaperSubjectMarkDistribution[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@index([questionPaperId])
     @@map("question_paper_section")
+}
+
+model QuestionPaperSubSection {
+    id              String        @id @default(uuid())
+    sectionId       String
+    section         QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+    title        String  // "Arithmetic", "পাটিগণিত"
+    titleBn      String? // Bengali title (optional)
+
+    orderIndex Int @default(0)
+
+    questions     QuestionPaperQuestion[]
+    distributions QuestionPaperSubjectMarkDistribution[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([sectionId])
+    @@map("question_paper_sub_section")
 }
 
 // ── One row per (paper × subject) ──────────────────────────────
@@ -123,11 +145,17 @@ model QuestionPaperSubjectMarkDistribution {
     id String @id @default(uuid())
 
     // Logical reference to main.QuestionType (no @relation — cross-DB)
-    questionTypeId   String
-    questionTypeName String
+    questionTypeId    String
+    questionTypeName  String
+    questionTypeLabel String?
 
     paperSubjectId String
     paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
+
+    sectionId      String?
+    section        QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+    subSectionId   String?
+    subSection     QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
     // ── Marks ───────────────────────────────────────────────────
     marksPerQuestion Float @default(0) // marks awarded per single question
@@ -150,6 +178,8 @@ model QuestionPaperSubjectMarkDistribution {
 
     @@index([paperSubjectId])
     @@index([questionTypeId])
+    @@index([sectionId])
+    @@index([subSectionId])
     @@map("question_paper_subject_mark_distribution")
 }
 
@@ -168,14 +198,18 @@ model QuestionPaperQuestion {
     mcqId         String?
     cqId          String?
     shortAnswerId String?
+    paragraphId   String?
+    amplificationId String?
 
     // Associate with subject and distribution breakdown
     distributionId String
     distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
 
     // Optional section grouping (presentation layer)
-    sectionId String?
-    section   QuestionPaperSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+    sectionId    String?
+    section      QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+    subSectionId String?
+    subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
     orderIndex    Int    @default(0)
     assignedMarks Float? // Override mark for this specific question
@@ -194,12 +228,17 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, mcqId])
     @@unique([questionPaperId, cqId])
     @@unique([questionPaperId, shortAnswerId])
+    @@unique([questionPaperId, paragraphId])
+    @@unique([questionPaperId, amplificationId])
     @@index([questionPaperId])
     @@index([mcqId])
     @@index([cqId])
     @@index([shortAnswerId])
+    @@index([paragraphId])
+    @@index([amplificationId])
     @@index([distributionId])
     @@index([sectionId])
+    @@index([subSectionId])
     @@map("question_paper_question")
 }
 

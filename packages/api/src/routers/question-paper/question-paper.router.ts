@@ -155,7 +155,7 @@ export const questionPaperRouter = createTRPCRouter({
   upsertSubject: tenantMemberProcedure
     .input(upsertQuestionPaperSubjectSchema)
     .mutation(({ ctx, input }) =>
-      upsertQuestionPaperSubject(ctx.tenantDb, input, ctx.session.user.id)
+      upsertQuestionPaperSubject(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   deleteSubject: tenantMemberProcedure
@@ -167,7 +167,7 @@ export const questionPaperRouter = createTRPCRouter({
   upsertDistribution: tenantMemberProcedure
     .input(upsertQuestionPaperDistributionSchema)
     .mutation(({ ctx, input }) =>
-      upsertQuestionPaperDistribution(ctx.tenantDb, input, ctx.session.user.id)
+      upsertQuestionPaperDistribution(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   deleteDistribution: tenantMemberProcedure

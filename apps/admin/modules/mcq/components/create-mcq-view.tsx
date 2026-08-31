@@ -54,7 +54,7 @@ export function CreateMcqView() {
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
-  const questionTypes = questionTypesData?.items ?? []
+  const questionTypes = questionTypesData?.questionTypes ?? []
 
   const {
     register,

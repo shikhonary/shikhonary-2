@@ -28,6 +28,9 @@ import { questionTypeRouter } from "./routers/question-type/question-type.router
 import { mcqRouter } from "./routers/mcq/mcq.router"
 import { cqRouter } from "./routers/cq/cq.router"
 import { shortAnswerRouter } from "./routers/short-answer/short-answer.router"
+import { subjectStructureRouter } from "./routers/subject-structure/subject-structure.router"
+import { paragraphRouter } from "./routers/paragraph/paragraph.router"
+import { amplificationRouter } from "./routers/amplification/amplification.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -50,6 +53,9 @@ export const appRouter = createTRPCRouter({
   mcq: mcqRouter,
   cq: cqRouter,
   shortAnswer: shortAnswerRouter,
+  subjectStructure: subjectStructureRouter,
+  paragraph: paragraphRouter,
+  amplification: amplificationRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

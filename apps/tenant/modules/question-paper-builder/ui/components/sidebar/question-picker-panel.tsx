@@ -31,11 +31,15 @@ export const QuestionPickerPanel: React.FC = () => {
   const qTypeNameEn = (activeDist?.questionType?.nameEn || "").toLowerCase();
   const qTypeNameBn = activeDist?.questionType?.nameBn || "";
 
-  let category: "MCQ" | "CQ" | "SA" = "MCQ";
+  let category: "MCQ" | "CQ" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
   if (qTypeNameEn.includes("short") || qTypeNameBn.includes("সংক্ষিপ্ত")) {
     category = "SA";
   } else if ((qTypeNameEn.includes("creative") || qTypeNameEn.includes("cq") || qTypeNameBn.includes("সৃজনশীল")) && !qTypeNameEn.includes("mcq")) {
     category = "CQ";
+  } else if (qTypeNameEn.includes("paragraph") || qTypeNameBn.includes("অনুচ্ছেদ")) {
+    category = "PARAGRAPH";
+  } else if (qTypeNameEn.includes("amplification") || qTypeNameBn.includes("ভাবসম্প্রসারণ")) {
+    category = "AMPLIFICATION";
   }
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
@@ -59,6 +63,10 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, shortAnswerIds: [questionId] });
       } else if (category === "CQ") {
         await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, cqIds: [questionId] });
+      } else if (category === "PARAGRAPH") {
+        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, paragraphIds: [questionId] });
+      } else if (category === "AMPLIFICATION") {
+        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, amplificationIds: [questionId] });
       } else {
         await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, mcqIds: [questionId] });
       }
@@ -198,6 +206,10 @@ export const QuestionPickerPanel: React.FC = () => {
                   <div className="font-body text-on-surface line-clamp-3 leading-relaxed mb-2">
                     {category === "CQ" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
+                    ) : category === "PARAGRAPH" ? (
+                      <RenderMath text={q.name || ""} />
+                    ) : category === "AMPLIFICATION" ? (
+                      <RenderMath text={q.title || ""} />
                     ) : (
                       <RenderMath text={q.question || ""} />
                     )}

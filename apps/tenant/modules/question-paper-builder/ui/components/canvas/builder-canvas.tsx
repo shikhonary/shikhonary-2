@@ -3,6 +3,8 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { MCQBlock } from "../blocks/mcq-block";
 import { CQBlock } from "../blocks/cq-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
+import { ParagraphBlock } from "../blocks/paragraph-block";
+import { AmplificationBlock } from "../blocks/amplification-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { OMRBlock } from "../blocks/omr-block";
 import { Button } from "@workspace/ui/components/button";
@@ -33,8 +35,39 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
     case "header-full":
     case "header-column":
       return <HeaderBlock />;
-    case "subject-title":
-      return <h3 className="font-bold text-center text-lg">{block.data.nameBn}</h3>;
+    case "subject-title": {
+      const { nameBn, nameEn, subjectTotal } = block.data || {};
+      const title = nameBn || nameEn || "";
+      const totalMarksText = typeof subjectTotal === "number" || subjectTotal ? ` - ${toBengaliDigits(subjectTotal)}` : "";
+      return (
+        <h3 className="font-bold text-center text-base">
+          {title}{totalMarksText}
+        </h3>
+      );
+    }
+    case "section-title": {
+      const { title, titleBn, instructions } = block.data;
+      return (
+        <div className="w-full mt-6 mb-3 border-b border-on-surface/10 pb-1 flex flex-col items-center">
+          <h3 className="font-bold text-base text-center">
+            {titleBn || title}
+          </h3>
+          {instructions && (
+            <p className="text-xs text-muted-foreground italic text-center mt-0.5">{instructions}</p>
+          )}
+        </div>
+      );
+    }
+    case "sub-section-title": {
+      const { title, titleBn } = block.data;
+      return (
+        <div className="w-full mt-4 mb-2 pl-2">
+          <h4 className="font-semibold text-sm border-l-2 border-primary/50 pl-2 text-left">
+            {titleBn || title}
+          </h4>
+        </div>
+      );
+    }
     case "dist-title": {
       const { dist, attemptCount, totalProvided, isCq, isMcq } = block.data;
       const instructionText = isCq && attemptCount < totalProvided && attemptCount > 0 
@@ -86,6 +119,10 @@ const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <CQBlock item={block.data.item} />;
     case "question-short":
       return <ShortAnswerBlock item={block.data.item} />;
+    case "question-paragraph":
+      return <ParagraphBlock item={block.data.item} />;
+    case "question-amplification":
+      return <AmplificationBlock item={block.data.item} />;
     case "dist-action": {
       if (isExporting) return null;
       const { dist, status, statusInfo, paperId } = block.data;
@@ -201,10 +238,21 @@ export const BuilderCanvas: React.FC = () => {
 
     paperQuery.subjects?.forEach((subject: any) => {
       if (paperQuery.subjects.length > 1) {
-        newBlocks.push({ id: `subj-${subject.id}`, type: "subject-title", data: subject.subject, gap: 0 });
+        newBlocks.push({
+          id: `subj-${subject.id}`,
+          type: "subject-title",
+          data: {
+            nameBn: subject.subject?.nameBn || subject.subjectName,
+            nameEn: subject.subject?.nameEn,
+            subjectTotal: subject.subjectTotal,
+          },
+          gap: 0,
+        });
       }
 
-      subject.distributions?.forEach((dist: any) => {
+      const hasSections = paperQuery.sections && paperQuery.sections.length > 0;
+
+      const renderDistribution = (dist: any) => {
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
         const status = statusInfo?.status || "LOCKED";
         const questions = paperQuery.questions?.filter((q: any) => q.distributionId === dist.id) || [];
@@ -289,6 +337,38 @@ export const BuilderCanvas: React.FC = () => {
               gap: idx === questions.length - 1 ? 4 : 0
             });
           }
+          if (q.paragraph) {
+            if (idx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-paragraph",
+              data: { 
+                item: { 
+                  id: q.id, 
+                  type: "PARAGRAPH", 
+                  data: q.paragraph, 
+                  orderIndex: idx, 
+                  masterNumber: globalWrittenNumber, 
+                  isFirstParagraph: idx === 0, 
+                  totalQuestions: questions.length, 
+                  marksPerQuestion: dist.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ"
+                } 
+              },
+              gap: idx === questions.length - 1 ? 4 : 0
+            });
+          }
+          if (q.amplification) {
+            globalWrittenNumber++;
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-amplification",
+              data: { item: { id: q.id, type: "AMPLIFICATION", data: q.amplification, orderIndex: idx, masterNumber: globalWrittenNumber } },
+              gap: 4
+            });
+          }
         });
 
         newBlocks.push({
@@ -297,7 +377,50 @@ export const BuilderCanvas: React.FC = () => {
           data: { dist, status, statusInfo, paperId },
           gap: 0
         });
-      });
+      };
+
+      if (hasSections) {
+        const subjectSections = paperQuery.sections.filter((sec: any) => {
+          return subject.distributions?.some((d: any) => d.sectionId === sec.id);
+        });
+
+        subjectSections.forEach((sec: any) => {
+          newBlocks.push({
+            id: `subj-${subject.id}-sec-${sec.id}`,
+            type: "section-title",
+            data: { title: sec.title, titleBn: sec.titleBn, instructions: sec.instructions },
+            gap: 0
+          });
+
+          const subjectSubSections = sec.subSections?.filter((sub: any) => {
+            return subject.distributions?.some((d: any) => d.subSectionId === sub.id);
+          }) || [];
+
+          if (subjectSubSections.length > 0) {
+            subjectSubSections.forEach((sub: any) => {
+              newBlocks.push({
+                id: `subj-${subject.id}-sub-${sub.id}`,
+                type: "sub-section-title",
+                data: { title: sub.title, titleBn: sub.titleBn },
+                gap: 0
+              });
+
+              const subDists = subject.distributions?.filter((d: any) => d.subSectionId === sub.id) || [];
+              subDists.forEach(renderDistribution);
+            });
+          } else {
+            const secDists = subject.distributions?.filter((d: any) => d.sectionId === sec.id && !d.subSectionId) || [];
+            secDists.forEach(renderDistribution);
+          }
+        });
+
+        const unassignedDists = subject.distributions?.filter((d: any) => !d.sectionId) || [];
+        if (unassignedDists.length > 0) {
+          unassignedDists.forEach(renderDistribution);
+        }
+      } else {
+        subject.distributions?.forEach(renderDistribution);
+      }
     });
 
     return newBlocks;
@@ -325,7 +448,7 @@ export const BuilderCanvas: React.FC = () => {
       const el = document.getElementById(`measure-block-${b.id}`);
       if (el) {
         // add a small buffer for safety to prevent actual overflow
-        newHeights[b.id] = el.getBoundingClientRect().height;
+        newHeights[b.id] = el.getBoundingClientRect().height + 4;
       }
     });
     setMeasuredHeights(newHeights);
@@ -353,11 +476,23 @@ export const BuilderCanvas: React.FC = () => {
 
     const contentBlocks = blocks.filter(b => b.type !== "header-full");
 
-    contentBlocks.forEach(b => {
+    contentBlocks.forEach((b, idx) => {
       const h = measuredHeights[b.id] || 0;
       
+      // If it's a heading, look ahead to see if the first question fits on this page
+      let needsEarlyWrap = false;
+      if (b.type === "dist-title" || b.type === "subject-title") {
+        const nextBlock = contentBlocks[idx + 1];
+        if (nextBlock && nextBlock.type.startsWith("question-")) {
+          const hNext = measuredHeights[nextBlock.id] || 0;
+          if (currentColumnHeight + h + hNext > availableHeight && currentColumnHeight > 0) {
+            needsEarlyWrap = true;
+          }
+        }
+      }
+      
       // Check if adding this block exceeds column height
-      if (currentColumnHeight + h > availableHeight && currentColumnHeight > 0) {
+      if ((currentColumnHeight + h > availableHeight || needsEarlyWrap) && currentColumnHeight > 0) {
         currentColumnIdx++;
         currentColumnHeight = 0;
         
@@ -390,7 +525,7 @@ export const BuilderCanvas: React.FC = () => {
     return (
       <div 
         key={`page-renderer-${seqIndex}`}
-        className="bg-white shadow-xl relative shrink-0"
+        className="bg-white shadow-xl relative shrink-0 border border-slate-200/80"
         data-page-content="true"
         data-page-seq-index={seqIndex}
         style={{
@@ -478,7 +613,7 @@ export const BuilderCanvas: React.FC = () => {
   if (!paperQuery) return null;
 
   return (
-    <div ref={containerRef} id="print-container" className="w-full h-full overflow-auto p-8 flex flex-col items-center gap-8 print:p-0 print:gap-0 print:block print:overflow-visible bg-muted/30 print:bg-white">
+    <div ref={containerRef} id="print-container" className="w-full h-full overflow-auto p-8 pb-24 flex flex-col items-center gap-12 print:p-0 print:gap-0 print:block print:overflow-visible bg-slate-100 print:bg-white">
       
       {/* Invisible Measurement Container */}
       <div 
@@ -506,16 +641,20 @@ export const BuilderCanvas: React.FC = () => {
       </div>
 
       {/* WYSIWYG Editor Layout (Hidden in Print) */}
-      <div className="flex flex-col items-center gap-8 print:hidden">
+      <div className="flex flex-col items-center gap-12 print:hidden">
         {pages.map((page, pageIdx) => (
           <div
             key={`page-wrapper-${pageIdx}`}
-            className="shrink-0 flex flex-col items-center gap-2"
+            className="shrink-0 flex flex-col items-center gap-3"
             data-page-index={pageIdx}
           >
-            {settings.bookFoldLayout && (
-              <div className="text-xs font-semibold text-muted-foreground bg-muted/60 px-3 py-1 rounded-md border select-none">
+            {settings.bookFoldLayout ? (
+              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
                 বুকলেট পৃষ্ঠা - {pageIdx + 1} (Booklet Page {pageIdx + 1})
+              </div>
+            ) : (
+              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
+                পৃষ্ঠা - {pageIdx + 1} (Page {pageIdx + 1})
               </div>
             )}
             <div

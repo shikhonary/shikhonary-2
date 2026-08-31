@@ -529,9 +529,12 @@ model AcademicSubject {
   classSubjects        AcademicClassSubject[]
   chapters             AcademicChapter[]
   subjectQuestionTypes SubjectQuestionType[]
+  sections             SubjectQuestionSection[]
   mcqs                 Mcq[]
   cqs                  Cq[]
   shortAnswers         ShortAnswer[]
+  paragraphs           Paragraph[]
+  amplifications       Amplification[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -570,9 +573,11 @@ model AcademicChapter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mcqs         Mcq[]
-  cqs          Cq[]
-  shortAnswers ShortAnswer[]
+  mcqs           Mcq[]
+  cqs            Cq[]
+  shortAnswers   ShortAnswer[]
+  paragraphs     Paragraph[]
+  amplifications Amplification[]
 
   @@index([isActive])
   @@index([subjectId])
@@ -601,8 +606,10 @@ model QuestionType {
   cqs          Cq[]
   shortAnswers ShortAnswer[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  paragraphs     Paragraph[]
+  amplifications Amplification[]
 
   @@index([label])
   @@index([isActive])
@@ -610,24 +617,64 @@ model QuestionType {
 }
 
 model SubjectQuestionType {
-  id             String @id @default(cuid())
+  id             String  @id @default(cuid())
   subjectId      String
   questionTypeId String
+  sectionId      String?
+  subSectionId   String?
 
   mark             Float
   markDistribution Json?
   totalQuestions   Int   @default(0)
   requiredCount    Int   @default(0)
 
-  subject      AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  questionType QuestionType    @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
+  subject      AcademicSubject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questionType QuestionType               @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
+  section      SubjectQuestionSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  subSection   SubjectQuestionSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 
-  @@unique([subjectId, questionTypeId])
   @@index([subjectId])
   @@index([questionTypeId])
+  @@index([sectionId])
+  @@index([subSectionId])
   @@map("subject_question_type")
+}
+
+model SubjectQuestionSection {
+  id        String @id @default(cuid())
+  nameBn    String
+  nameEn    String
+  position  Int    @default(0)
+  subjectId String
+
+  subject              AcademicSubject             @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectQuestionTypes SubjectQuestionType[]
+  subSections          SubjectQuestionSubSection[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@map("subject_question_section")
+}
+
+model SubjectQuestionSubSection {
+  id        String @id @default(cuid())
+  nameBn    String
+  nameEn    String
+  position  Int    @default(0)
+  sectionId String
+
+  section              SubjectQuestionSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  subjectQuestionTypes SubjectQuestionType[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sectionId])
+  @@map("subject_question_sub_section")
 }
 
 model Mcq {
@@ -795,6 +842,58 @@ model ShortAnswer {
   @@index([subjectId])
   @@index([difficulty])
   @@map("short_answer")
+}
+
+model Paragraph {
+  id        String   @id @default(cuid())
+  name      String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  chapterId String?
+  subject   AcademicSubject  @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("paragraph")
+}
+
+model Amplification {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  chapterId String?
+  subject   AcademicSubject  @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("amplification")
 }
 
 model QuestionReport {

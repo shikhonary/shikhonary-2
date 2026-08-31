@@ -1084,6 +1084,8 @@ export function ImportMcqView() {
       isMath: false,
       reference: [],
       isActive: true,
+      difficulty: "MEDIUM",
+      attachments: [],
       subjectId: selectedSubjectId || "",
       chapterId: selectedChapterId || "",
     }

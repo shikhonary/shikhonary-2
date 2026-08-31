@@ -78,7 +78,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps) {
   useEffect(() => {
     if (saData) {
       reset({
-        classId: saData.classId,
+        classId: saData.subject.classSubjects[0]?.classId || "",
         subjectId: saData.subjectId,
         chapterId: saData.chapterId,
         question: saData.question,

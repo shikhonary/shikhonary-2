@@ -106,7 +106,7 @@ export function EditCqView() {
   useEffect(() => {
     if (cqData) {
       reset({
-        classId: cqData.classId,
+        classId: cqData.subject.classSubjects[0]?.classId || "",
         subjectId: cqData.subjectId,
         chapterId: cqData.chapterId,
         context: cqData.context || "",

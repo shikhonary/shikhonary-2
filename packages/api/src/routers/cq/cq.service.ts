@@ -113,7 +113,11 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
   const cq = await db.cq.findUnique({
     where: { id: input.id },
     include: {
-      subject: true,
+      subject: {
+        include: {
+          classSubjects: true,
+        },
+      },
       chapter: true,
       questionType: true,
       answer: true,

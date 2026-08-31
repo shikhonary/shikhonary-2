@@ -61,6 +61,8 @@ const navGroups: NavGroup[] = [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
+      { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
+      { href: "/amplifications", label: "Amplification", icon: HelpCircle },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },

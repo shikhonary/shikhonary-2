@@ -88,11 +88,15 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const qTypeNameEn = (distStatus.questionType?.nameEn || "").toLowerCase();
   const qTypeNameBn = distStatus.questionType?.nameBn || "";
 
-  let category: "MCQ" | "CQ" | "SA" = "MCQ";
+  let category: "MCQ" | "CQ" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
   if (qTypeNameEn.includes("short") || qTypeNameBn.includes("সংক্ষিপ্ত")) {
     category = "SA";
   } else if ((qTypeNameEn.includes("creative") || qTypeNameEn.includes("cq") || qTypeNameBn.includes("সৃজনশীল")) && !qTypeNameEn.includes("mcq")) {
     category = "CQ";
+  } else if (qTypeNameEn.includes("paragraph") || qTypeNameBn.includes("অনুচ্ছেদ")) {
+    category = "PARAGRAPH";
+  } else if (qTypeNameEn.includes("amplification") || qTypeNameBn.includes("ভাবসম্প্রসারণ")) {
+    category = "AMPLIFICATION";
   }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All");
@@ -167,6 +171,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ questionPaperId: paperId, distributionId, shortAnswerIds: selectedIds });
       } else if (category === "CQ") {
         await bulkAssign({ questionPaperId: paperId, distributionId, cqIds: selectedIds });
+      } else if (category === "PARAGRAPH") {
+        await bulkAssign({ questionPaperId: paperId, distributionId, paragraphIds: selectedIds });
+      } else if (category === "AMPLIFICATION") {
+        await bulkAssign({ questionPaperId: paperId, distributionId, amplificationIds: selectedIds });
       } else {
         await bulkAssign({ questionPaperId: paperId, distributionId, mcqIds: selectedIds });
       }
@@ -432,7 +440,7 @@ function QuestionGrid({
 }: { 
   subjectId: string, 
   questionTypeId: string, 
-  category: "MCQ" | "CQ" | "SA", 
+  category: "MCQ" | "CQ" | "SA" | "PARAGRAPH" | "AMPLIFICATION", 
   search: string, 
   chapterId: string,
   board: string,
@@ -539,6 +547,18 @@ function QuestionGrid({
                     <RenderMath text={q.answer} />
                   </div>
                 )}
+              </div>
+            ) : category === "PARAGRAPH" ? (
+              <div className="flex flex-col gap-3 font-body">
+                <div className="text-sm font-semibold text-on-surface">
+                  <RenderMath text={q.name || ""} />
+                </div>
+              </div>
+            ) : category === "AMPLIFICATION" ? (
+              <div className="flex flex-col gap-3 font-body">
+                <div className="text-sm font-semibold text-on-surface">
+                  <RenderMath text={q.title || ""} />
+                </div>
               </div>
             ) : category === "CQ" ? (
               <div className="flex flex-col gap-3 font-body">
