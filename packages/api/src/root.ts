@@ -27,6 +27,7 @@ import { academicYearRouter } from "./routers/academic-year/academic-year.router
 import { questionTypeRouter } from "./routers/question-type/question-type.router"
 import { mcqRouter } from "./routers/mcq/mcq.router"
 import { cqRouter } from "./routers/cq/cq.router"
+import { csRouter } from "./routers/cs/cs.router"
 import { shortAnswerRouter } from "./routers/short-answer/short-answer.router"
 import { subjectStructureRouter } from "./routers/subject-structure/subject-structure.router"
 import { paragraphRouter } from "./routers/paragraph/paragraph.router"
@@ -52,6 +53,7 @@ export const appRouter = createTRPCRouter({
   questionType: questionTypeRouter,
   mcq: mcqRouter,
   cq: cqRouter,
+  cs: csRouter,
   shortAnswer: shortAnswerRouter,
   subjectStructure: subjectStructureRouter,
   paragraph: paragraphRouter,

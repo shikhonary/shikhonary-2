@@ -25,20 +25,38 @@ export const QuestionPickerPanel: React.FC = () => {
   const [selectedDistId, setSelectedDistId] = useState<string>("");
   const [search, setSearch] = useState("");
 
-  const activeDist = statuses?.find((s: any) => s.distributionId === (selectedDistId || statuses[0]?.distributionId)) || statuses?.[0];
+  const activeSectionId = useBuilderStore((state) => state.activeSectionId);
+  const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
+
+  const activeDist = statuses?.find((s: any) => {
+    if (selectedDistId) return s.distributionId === selectedDistId;
+    if (activeSubSectionId) return s.subSectionId === activeSubSectionId;
+    if (activeSectionId) return s.sectionId === activeSectionId;
+    return false;
+  }) || statuses?.find((s: any) => s.distributionId === selectedDistId) || statuses?.[0];
   const activeDistId = activeDist?.distributionId || "";
 
-  const qTypeNameEn = (activeDist?.questionType?.nameEn || "").toLowerCase();
-  const qTypeNameBn = activeDist?.questionType?.nameBn || "";
+  const qTypeNameEn = (activeDist?.questionType?.nameEn || activeDist?.questionTypeName || "").toLowerCase();
+  const qTypeNameBn = (activeDist?.questionType?.nameBn || "").toLowerCase();
+  const qTypeCode = (activeDist?.questionType?.code || "").toLowerCase();
+  const qTypeLabel = (activeDist?.questionTypeLabel || "").toLowerCase();
+  const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
-  let category: "MCQ" | "CQ" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
-  if (qTypeNameEn.includes("short") || qTypeNameBn.includes("সংক্ষিপ্ত")) {
-    category = "SA";
-  } else if ((qTypeNameEn.includes("creative") || qTypeNameEn.includes("cq") || qTypeNameBn.includes("সৃজনশীল")) && !qTypeNameEn.includes("mcq")) {
+  const rawTypeName = (activeDist?.questionTypeName || activeDist?.questionType?.nameEn || "").trim().toUpperCase();
+  const validCategories = ["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"];
+
+  let category: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
+  if (validCategories.includes(rawTypeName)) {
+    category = rawTypeName as any;
+  } else if (/\bcs\b/i.test(combinedStr) || combinedStr.includes("creative scenario") || combinedStr.includes("creative short") || combinedStr.includes("scenario")) {
+    category = "CS";
+  } else if ((combinedStr.includes("creative") || combinedStr.includes("cq") || combinedStr.includes("সৃজনশীল")) && !combinedStr.includes("mcq")) {
     category = "CQ";
-  } else if (qTypeNameEn.includes("paragraph") || qTypeNameBn.includes("অনুচ্ছেদ")) {
+  } else if (combinedStr.includes("short") || combinedStr.includes("sa") || combinedStr.includes("সংক্ষিপ্ত")) {
+    category = "SA";
+  } else if (combinedStr.includes("paragraph") || combinedStr.includes("অনুচ্ছেদ")) {
     category = "PARAGRAPH";
-  } else if (qTypeNameEn.includes("amplification") || qTypeNameBn.includes("ভাবসম্প্রসারণ")) {
+  } else if (combinedStr.includes("amplification") || combinedStr.includes("ভাবসম্প্রসারণ")) {
     category = "AMPLIFICATION";
   }
 
@@ -54,22 +72,61 @@ export const QuestionPickerPanel: React.FC = () => {
     Boolean(activeDist?.subjectId)
   );
 
+  const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
+  const dismissedSubSectionIds = useBuilderStore((state) => state.dismissedSubSectionIds);
+
+  const allSubSections = React.useMemo(() => {
+    if (!paperQuery?.sections) return [];
+    const list: { id: string; title: string; titleBn: string | null; sectionId: string }[] = [];
+    paperQuery.sections.forEach((sec: any) => {
+      if (sec.subSections && sec.subSections.length > 0) {
+        sec.subSections.forEach((sub: any) => {
+          if (!dismissedSubSectionIds.includes(sub.id)) {
+            list.push({
+              id: sub.id,
+              title: sub.title,
+              titleBn: sub.titleBn,
+              sectionId: sec.id,
+            });
+          }
+        });
+      }
+    });
+    return list;
+  }, [paperQuery?.sections, dismissedSubSectionIds]);
+
+  const currentSubIndex = allSubSections.findIndex((sub) => sub.id === activeSubSectionId);
+  const currentSub = currentSubIndex !== -1 ? allSubSections[currentSubIndex] : null;
+  const nextSub = currentSubIndex !== -1 && currentSubIndex < allSubSections.length - 1 
+    ? allSubSections[currentSubIndex + 1] 
+    : (currentSubIndex === -1 && allSubSections.length > 0 ? allSubSections[0] : null);
+
   const { mutateAsync: assignQuestion, isPending: isAssigning } = useBulkAssignQuestions();
 
   const handleQuickAssign = async (questionId: string) => {
     if (!paperId || !activeDistId) return;
     try {
+      const payloadBase = {
+        questionPaperId: paperId,
+        distributionId: activeDistId,
+        sectionId: activeSectionId || (activeDist as any)?.sectionId || undefined,
+        subSectionId: activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
+      };
+
       if (category === "SA") {
-        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, shortAnswerIds: [questionId] });
+        await assignQuestion({ ...payloadBase, shortAnswerIds: [questionId] });
       } else if (category === "CQ") {
-        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, cqIds: [questionId] });
+        await assignQuestion({ ...payloadBase, cqIds: [questionId] });
+      } else if (category === "CS") {
+        await assignQuestion({ ...payloadBase, csIds: [questionId] });
       } else if (category === "PARAGRAPH") {
-        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, paragraphIds: [questionId] });
+        await assignQuestion({ ...payloadBase, paragraphIds: [questionId] });
       } else if (category === "AMPLIFICATION") {
-        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, amplificationIds: [questionId] });
+        await assignQuestion({ ...payloadBase, amplificationIds: [questionId] });
       } else {
-        await assignQuestion({ questionPaperId: paperId, distributionId: activeDistId, mcqIds: [questionId] });
+        await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
+
       toast.success("প্রশ্নটি প্রশ্নপত্রে যোগ করা হয়েছে!");
     } catch (err: any) {
       toast.error(err?.message || "প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
@@ -123,6 +180,31 @@ export const QuestionPickerPanel: React.FC = () => {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {/* Active Sub-section Banner & Next Button */}
+        {allSubSections.length > 0 && (
+          <div className="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-lg p-2 text-xs">
+            <div className="flex items-center gap-1.5 truncate">
+              <span className="font-bold text-primary shrink-0">উপ-বিভাগ:</span>
+              <span className="truncate font-medium text-foreground">
+                {currentSub ? (currentSub.titleBn || currentSub.title) : "সকল / নির্বাচিত নয়"}
+              </span>
+            </div>
+            {nextSub && (
+              <Button
+                type="button"
+                size="sm"
+                variant="default"
+                onClick={() => setActiveTarget({ sectionId: nextSub.sectionId, subSectionId: nextSub.id })}
+                className="h-6 text-[10px] px-2 bg-primary text-white hover:bg-primary/95 font-bold shrink-0 flex items-center gap-1 cursor-pointer"
+                title={`পরবর্তী উপ-বিভাগ: ${nextSub.titleBn || nextSub.title}`}
+              >
+                <span>পরবর্তী</span>
+                <ArrowRight className="w-3 h-3" />
+              </Button>
+            )}
           </div>
         )}
 
@@ -204,7 +286,7 @@ export const QuestionPickerPanel: React.FC = () => {
                   )}
 
                   <div className="font-body text-on-surface line-clamp-3 leading-relaxed mb-2">
-                    {category === "CQ" ? (
+                    {category === "CQ" || category === "CS" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
                     ) : category === "PARAGRAPH" ? (
                       <RenderMath text={q.name || ""} />

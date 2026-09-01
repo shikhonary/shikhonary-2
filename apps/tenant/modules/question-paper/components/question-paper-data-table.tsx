@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { MoreVertical, Pen, Trash, Clock, Copy, Printer, CheckCircle, AlertTriangle, Sparkles } from "lucide-react"
+import { MoreVertical, Pen, Trash, Clock, Copy, CheckCircle, AlertTriangle, Sparkles } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 
 export function formatDurationBn(minutes: number): string {
@@ -202,15 +202,6 @@ export function QuestionPaperDataTable({
                         <span>ডুপ্লিকেট করুন</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        asChild
-                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                      >
-                        <Link href={`/question-papers/${item.id}/print`} target="_blank">
-                          <Printer className="h-3.5 w-3.5" />
-                          <span>প্রিন্ট করুন</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
                         variant="destructive"
                         onClick={() => onDelete(item.id, item.title)}
                         className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
@@ -359,15 +350,6 @@ export function QuestionPaperDataTable({
                           >
                             <Copy className="h-3.5 w-3.5" />
                             <span>ডুপ্লিকেট করুন</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            asChild
-                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                          >
-                            <Link href={`/question-papers/${item.id}/print`} target="_blank">
-                              <Printer className="h-3.5 w-3.5 mr-1" />
-                              <span>প্রিন্ট করুন</span>
-                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             variant="destructive"

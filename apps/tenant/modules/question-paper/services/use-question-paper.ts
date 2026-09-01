@@ -183,7 +183,7 @@ export function useAvailableQuestions(
     subjectId: string
     chapterId?: string
     questionTypeId?: string
-    category?: "MCQ" | "CQ" | "SA" | "PARAGRAPH" | "AMPLIFICATION"
+    category?: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION"
     difficulty?: string
     search?: string
     board?: string

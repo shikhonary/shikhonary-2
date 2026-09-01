@@ -15,12 +15,24 @@ interface BuilderState {
   saveStatus: "idle" | "saving" | "saved" | "error";
   hasUnsavedChanges: boolean;
 
+  // Active section & subsection target for Question Picker
+  activeSectionId: string | null;
+  activeSubSectionId: string | null;
+  dismissedSectionIds: string[];
+  dismissedSubSectionIds: string[];
+
   // Actions
   setPaperId: (id: string) => void;
   setItems: (items: PaperItem[]) => void;
   updateItem: (id: string, updates: Partial<PaperItem>) => void;
   deleteItem: (id: string) => void;
   reorderItems: (oldIndex: number, newIndex: number) => void;
+  
+  setActiveTarget: (target: { sectionId?: string | null; subSectionId?: string | null }) => void;
+  dismissSection: (sectionId: string) => void;
+  dismissSubSection: (subSectionId: string) => void;
+  restoreSection: (sectionId: string) => void;
+  restoreSubSection: (subSectionId: string) => void;
   
   updateSettings: (updates: Partial<PaperSettings>) => void;
   
@@ -100,6 +112,35 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   exportProgress: null,
   saveStatus: "idle",
   hasUnsavedChanges: false,
+
+  activeSectionId: null,
+  activeSubSectionId: null,
+  dismissedSectionIds: [],
+  dismissedSubSectionIds: [],
+
+  setActiveTarget: (target) => set((state) => ({
+    activeSectionId: target.sectionId !== undefined ? target.sectionId : state.activeSectionId,
+    activeSubSectionId: target.subSectionId !== undefined ? target.subSectionId : state.activeSubSectionId,
+  })),
+
+  dismissSection: (sectionId) => set((state) => ({
+    dismissedSectionIds: Array.from(new Set([...state.dismissedSectionIds, sectionId])),
+    activeSectionId: state.activeSectionId === sectionId ? null : state.activeSectionId,
+    activeSubSectionId: state.activeSectionId === sectionId ? null : state.activeSubSectionId,
+  })),
+
+  dismissSubSection: (subSectionId) => set((state) => ({
+    dismissedSubSectionIds: Array.from(new Set([...state.dismissedSubSectionIds, subSectionId])),
+    activeSubSectionId: state.activeSubSectionId === subSectionId ? null : state.activeSubSectionId,
+  })),
+
+  restoreSection: (sectionId) => set((state) => ({
+    dismissedSectionIds: state.dismissedSectionIds.filter((id) => id !== sectionId),
+  })),
+
+  restoreSubSection: (subSectionId) => set((state) => ({
+    dismissedSubSectionIds: state.dismissedSubSectionIds.filter((id) => id !== subSectionId),
+  })),
 
   setPaperId: (id) => set({ paperId: id }),
   

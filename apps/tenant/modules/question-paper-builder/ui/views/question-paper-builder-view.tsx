@@ -6,7 +6,7 @@ import { BuilderSidebar } from "../components/sidebar/builder-sidebar";
 import { BuilderCanvas } from "../components/canvas/builder-canvas";
 import { FloatingFormatToolbar } from "../components/toolbar/floating-format-toolbar";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Loader2, Save, Copy, Printer, Download } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Copy, Download } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
 import {
@@ -160,12 +160,6 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
               <Download className="w-3.5 h-3.5" />
             )}
             <span>ডাউনলোড PDF</span>
-          </Button>
-          <Button variant="outline" size="sm" asChild className="cursor-pointer gap-1.5">
-            <Link href={`/question-papers/${paperId}/print`} target="_blank">
-              <Printer className="w-3.5 h-3.5" />
-              <span>প্রিন্ট / PDF</span>
-            </Link>
           </Button>
           <Button size="sm" onClick={handleManualSave} disabled={saveStatus === "saving" || isManualSaving} className="cursor-pointer gap-1.5 bg-primary text-white">
             {saveStatus === "saving" || isManualSaving ? (

@@ -78,6 +78,8 @@ export function DashboardHeader() {
         <Sheet>
           <SheetTrigger asChild>
             <button
+              id="mobile-navigation-trigger"
+              type="button"
               className="md:hidden w-9 h-9 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors cursor-pointer active:opacity-80"
               title="Open Navigation"
             >
@@ -202,7 +204,9 @@ export function DashboardHeader() {
         {/* User dropdown menu trigger */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div
+            <button
+              id="user-profile-dropdown-trigger"
+              type="button"
               className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer active:opacity-80 hover:ring-2 hover:ring-primary/20 transition-all shrink-0 flex items-center justify-center"
               title={user?.name || "Shikhonary Profile"}
             >
@@ -217,7 +221,7 @@ export function DashboardHeader() {
                   {getFirstLetter()}
                 </div>
               )}
-            </div>
+            </button>
           </DropdownMenuTrigger>
           
           <DropdownMenuContent className="w-56 mt-1 rounded-xl bg-card border border-border" align="end">

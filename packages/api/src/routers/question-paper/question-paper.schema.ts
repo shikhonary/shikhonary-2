@@ -95,6 +95,7 @@ export const upsertQuestionPaperSubSectionSchema = z.object({
   title: z.string().min(1, "Sub-section title is required"),
   titleBn: z.string().optional().nullable(),
   instructions: z.string().optional().nullable(),
+  questionsToAttempt: z.number().int().positive().optional().nullable(),
   orderIndex: z.number().int().optional().default(0),
 })
 
@@ -116,6 +117,7 @@ export const upsertQuestionPaperSubjectSchema = z.object({
   questionPaperId: z.string().min(1),
   subjectId: z.string().min(1),
   subjectName: z.string().min(1),
+  orderIndex: z.number().int().optional(),
   subjectTotal: z.number().optional().default(0),
 })
 
@@ -139,9 +141,12 @@ export const upsertQuestionPaperDistributionSchema = z.object({
   questionTypeName: z.string().min(1),
   questionTypeLabel: z.string().optional().nullable(),
   marksPerQuestion: z.number().positive(),
+  markDistribution: z.any().optional().nullable(),
   questionCount: z.number().int().nonnegative(),
   questionsToAttempt: z.number().int().positive().optional().nullable(),
   orderIndex: z.number().int().optional().default(0),
+  sectionId: z.string().optional().nullable(),
+  subSectionId: z.string().optional().nullable(),
 })
 
 export type UpsertQuestionPaperDistributionInput = z.infer<typeof upsertQuestionPaperDistributionSchema>
@@ -161,9 +166,11 @@ export const addQuestionPaperQuestionSchema = z.object({
   questionPaperId: z.string().min(1),
   mcqId: z.string().optional().nullable(),
   cqId: z.string().optional().nullable(),
+  csId: z.string().optional().nullable(),
   shortAnswerId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
+  subSectionId: z.string().optional().nullable(),
   orderIndex: z.number().int().optional().default(0),
   assignedMarks: z.number().optional().nullable(),
   overrides: z.record(z.any()).optional().default({}),
@@ -174,7 +181,7 @@ export type AddQuestionPaperQuestionInput = z.infer<typeof addQuestionPaperQuest
 export const removeQuestionPaperQuestionSchema = z.object({
   questionPaperId: z.string().min(1),
   questionId: z.string().min(1),
-  questionType: z.enum(["MCQ", "CQ", "SA", "PARAGRAPH", "AMPLIFICATION"]),
+  questionType: z.enum(["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"]),
 })
 
 export type RemoveQuestionPaperQuestionInput = z.infer<typeof removeQuestionPaperQuestionSchema>
@@ -205,7 +212,7 @@ export const getAvailableQuestionsSchema = z.object({
   subjectId: z.string().min(1),
   chapterId: z.string().optional(),
   questionTypeId: z.string().optional(),
-  category: z.enum(["MCQ", "CQ", "SA", "PARAGRAPH", "AMPLIFICATION"]).optional(),
+  category: z.enum(["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"]).optional(),
   difficulty: z.string().optional(),
   search: z.string().optional(),
   board: z.string().optional(),
@@ -221,8 +228,10 @@ export const bulkAssignQuestionsSchema = z.object({
   questionPaperId: z.string().min(1),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
+  subSectionId: z.string().optional().nullable(),
   mcqIds: z.array(z.string()).optional(),
   cqIds: z.array(z.string()).optional(),
+  csIds: z.array(z.string()).optional(),
   shortAnswerIds: z.array(z.string()).optional(),
   paragraphIds: z.array(z.string()).optional(),
   amplificationIds: z.array(z.string()).optional(),

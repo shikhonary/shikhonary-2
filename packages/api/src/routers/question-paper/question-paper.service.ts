@@ -200,6 +200,7 @@ export async function getQuestionPaperById(
         orderBy: { orderIndex: "asc" },
       },
       subjects: {
+        orderBy: { orderIndex: "asc" },
         include: {
           distributions: {
             orderBy: { orderIndex: "asc" },
@@ -228,6 +229,7 @@ export async function getQuestionPaperById(
   // Batch resolve cross-DB references from db in parallel
   const mcqIds = paper.questions.map((q) => q.mcqId).filter(Boolean) as string[]
   const cqIds = paper.questions.map((q) => q.cqId).filter(Boolean) as string[]
+  const csIds = paper.questions.map((q: any) => q.csId).filter(Boolean) as string[]
   const shortAnswerIds = paper.questions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
   const paragraphIds = paper.questions.map((q) => q.paragraphId).filter(Boolean) as string[]
   const amplificationIds = paper.questions.map((q) => q.amplificationId).filter(Boolean) as string[]
@@ -240,6 +242,7 @@ export async function getQuestionPaperById(
   const [
     mcqs,
     cqs,
+    cses,
     shortAnswers,
     paragraphs,
     amplifications,
@@ -263,6 +266,15 @@ export async function getQuestionPaperById(
         include: {
           attachments: true,
           answer: true,
+          chapter: true,
+          questionType: true,
+        },
+      })
+      : [],
+    csIds.length > 0
+      ? (db as any).cS.findMany({
+        where: { id: { in: csIds } },
+        include: {
           chapter: true,
           questionType: true,
         },
@@ -303,6 +315,7 @@ export async function getQuestionPaperById(
 
   const mcqMap = new Map(mcqs.map((m) => [m.id, m]))
   const cqMap = new Map(cqs.map((c) => [c.id, c]))
+  const csMap = new Map(cses.map((c: any) => [c.id, c]))
   const shortMap = new Map(shortAnswers.map((s) => [s.id, s]))
   const paragraphMap = new Map(paragraphs.map((p) => [p.id, p]))
   const amplificationMap = new Map(amplifications.map((a) => [a.id, a]))
@@ -320,9 +333,10 @@ export async function getQuestionPaperById(
   }))
 
   // Enrich questions with resolved entity
-  const enrichedQuestions = paper.questions.map((q) => {
+  const enrichedQuestions = paper.questions.map((q: any) => {
     let resolvedMcq = q.mcqId ? mcqMap.get(q.mcqId) || null : null
     let resolvedCq = q.cqId ? cqMap.get(q.cqId) || null : null
+    let resolvedCs = q.csId ? csMap.get(q.csId) || null : null
     let resolvedShort = q.shortAnswerId ? shortMap.get(q.shortAnswerId) || null : null
     let resolvedParagraph = q.paragraphId ? paragraphMap.get(q.paragraphId) || null : null
     let resolvedAmplification = q.amplificationId ? amplificationMap.get(q.amplificationId) || null : null
@@ -333,6 +347,9 @@ export async function getQuestionPaperById(
     }
     if (!resolvedCq && q.cqId && q.contentSnapshot) {
       resolvedCq = q.contentSnapshot as any
+    }
+    if (!resolvedCs && q.csId && q.contentSnapshot) {
+      resolvedCs = q.contentSnapshot as any
     }
     if (!resolvedShort && q.shortAnswerId && q.contentSnapshot) {
       resolvedShort = q.contentSnapshot as any
@@ -348,6 +365,7 @@ export async function getQuestionPaperById(
       ...q,
       mcq: resolvedMcq,
       cq: resolvedCq,
+      cs: resolvedCs,
       shortAnswer: resolvedShort,
       paragraph: resolvedParagraph,
       amplification: resolvedAmplification,
@@ -457,23 +475,12 @@ export async function deleteQuestionPaper(
     where: { id: input.id },
   })
 
-  if (!existing || existing.deletedAt) {
+  if (!existing) {
     throw notFound("QuestionPaper")
   }
 
-  const deleted = await tenantDb.questionPaper.update({
+  await tenantDb.questionPaper.delete({
     where: { id: input.id },
-    data: {
-      deletedAt: new Date(),
-      isActive: false,
-    },
-  })
-
-  await logHistory(tenantDb, {
-    questionPaperId: input.id,
-    action: "DELETED",
-    actorId,
-    changes: { before: existing, after: deleted },
   })
 
   return { success: true }
@@ -554,6 +561,7 @@ export async function duplicateQuestionPaper(
           questionTypeId: dist.questionTypeId,
           questionTypeName: dist.questionTypeName,
           marksPerQuestion: dist.marksPerQuestion,
+          markDistribution: (dist.markDistribution as any) ?? undefined,
           questionCount: dist.questionCount,
           totalMarks: dist.totalMarks,
           questionsToAttempt: dist.questionsToAttempt,
@@ -696,6 +704,7 @@ export async function upsertQuestionPaperSubSection(
         title: input.title,
         titleBn: input.titleBn,
         instructions: input.instructions,
+        questionsToAttempt: input.questionsToAttempt,
         orderIndex: input.orderIndex,
       },
     })
@@ -707,6 +716,7 @@ export async function upsertQuestionPaperSubSection(
       title: input.title,
       titleBn: input.titleBn,
       instructions: input.instructions,
+      questionsToAttempt: input.questionsToAttempt,
       orderIndex: input.orderIndex,
     },
   })
@@ -758,6 +768,7 @@ export async function upsertQuestionPaperSubject(
       data: {
         subjectId: input.subjectId,
         subjectName: input.subjectName,
+        orderIndex: input.orderIndex ?? 0,
         subjectTotal: input.subjectTotal,
       },
     })
@@ -767,6 +778,7 @@ export async function upsertQuestionPaperSubject(
         questionPaperId: input.questionPaperId,
         subjectId: input.subjectId,
         subjectName: input.subjectName,
+        orderIndex: input.orderIndex ?? 0,
         subjectTotal: input.subjectTotal,
       },
     })
@@ -795,7 +807,13 @@ export async function upsertQuestionPaperSubject(
             title: mSec.nameEn,
             titleBn: mSec.nameBn,
             orderIndex: mSec.position,
+            instructions: mSec.instructions ?? null,
           },
+        })
+      } else if (!pSection.instructions && mSec.instructions) {
+        pSection = await tenantDb.questionPaperSection.update({
+          where: { id: pSection.id },
+          data: { instructions: mSec.instructions },
         })
       }
 
@@ -816,6 +834,11 @@ export async function upsertQuestionPaperSubject(
               orderIndex: mSub.position,
               instructions: mSub.instructions ?? null,
             },
+          })
+        } else if (!pSub.instructions && mSub.instructions) {
+          await tenantDb.questionPaperSubSection.update({
+            where: { id: pSub.id },
+            data: { instructions: mSub.instructions },
           })
         }
       }
@@ -943,6 +966,19 @@ export async function upsertQuestionPaperDistribution(
     }
   }
 
+  let questionTypeName = input.questionTypeName
+  let questionTypeLabel = input.questionTypeLabel
+
+  if (input.questionTypeId) {
+    const qType = await db.questionType.findUnique({ where: { id: input.questionTypeId } })
+    if (qType) {
+      questionTypeName = qType.nameEn || qType.nameBn || questionTypeName
+      questionTypeLabel = input.questionTypeLabel || qType.label || qType.nameBn || qType.nameEn
+    }
+  }
+
+  const markDistribution = (input.markDistribution ?? sqType?.markDistribution ?? undefined) as any
+
   const attemptCount = input.questionsToAttempt ?? input.questionCount
   const totalMarks = input.marksPerQuestion * attemptCount
   let dist
@@ -959,15 +995,16 @@ export async function upsertQuestionPaperDistribution(
       where: { id: input.id },
       data: {
         questionTypeId: input.questionTypeId,
-        questionTypeName: input.questionTypeName,
-        questionTypeLabel: input.questionTypeLabel,
+        questionTypeName,
+        questionTypeLabel,
         marksPerQuestion: input.marksPerQuestion,
+        markDistribution,
         questionCount: input.questionCount,
         totalMarks,
         questionsToAttempt: input.questionsToAttempt,
-        orderIndex: input.orderIndex,
-        sectionId: sectionId ?? undefined,
-        subSectionId: subSectionId ?? undefined,
+        orderIndex: input.orderIndex ?? existing.orderIndex,
+        sectionId: input.sectionId ?? sectionId ?? undefined,
+        subSectionId: input.subSectionId ?? subSectionId ?? undefined,
       },
     })
   } else {
@@ -975,17 +1012,26 @@ export async function upsertQuestionPaperDistribution(
       data: {
         paperSubjectId: input.paperSubjectId,
         questionTypeId: input.questionTypeId,
-        questionTypeName: input.questionTypeName,
-        questionTypeLabel: input.questionTypeLabel,
+        questionTypeName,
+        questionTypeLabel,
         marksPerQuestion: input.marksPerQuestion,
+        markDistribution,
         questionCount: input.questionCount,
         totalMarks,
         questionsToAttempt: input.questionsToAttempt,
         orderIndex: input.orderIndex,
-        sectionId,
-        subSectionId,
+        sectionId: input.sectionId ?? sectionId,
+        subSectionId: input.subSectionId ?? subSectionId,
       },
     })
+  }
+
+  const targetSubId = input.subSectionId ?? subSectionId
+  if (targetSubId && input.questionsToAttempt !== undefined) {
+    await tenantDb.questionPaperSubSection.update({
+      where: { id: targetSubId },
+      data: { questionsToAttempt: input.questionsToAttempt },
+    }).catch(() => { })
   }
 
   // Sync totals
@@ -1081,6 +1127,13 @@ export async function addQuestionPaperQuestion(
     }
   }
 
+  const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+    where: { id: input.distributionId },
+  })
+
+  const finalSectionId = input.sectionId ?? dist?.sectionId ?? null
+  const finalSubSectionId = input.subSectionId ?? dist?.subSectionId ?? null
+
   // Create the junction row
   const paperQuestion = await tenantDb.questionPaperQuestion.create({
     data: {
@@ -1089,7 +1142,8 @@ export async function addQuestionPaperQuestion(
       cqId: input.cqId,
       shortAnswerId: input.shortAnswerId,
       distributionId: input.distributionId,
-      sectionId: input.sectionId,
+      sectionId: finalSectionId,
+      subSectionId: finalSubSectionId,
       orderIndex: input.orderIndex,
       assignedMarks: input.assignedMarks,
       overrides: input.overrides ?? {},
@@ -1117,6 +1171,8 @@ export async function removeQuestionPaperQuestion(
     where.mcqId = input.questionId
   } else if (input.questionType === "CQ") {
     where.cqId = input.questionId
+  } else if (input.questionType === "CS") {
+    where.csId = input.questionId
   } else if (input.questionType === "SA") {
     where.shortAnswerId = input.questionId
   } else if (input.questionType === "PARAGRAPH") {
@@ -1195,6 +1251,7 @@ export async function getQuestionPaperDistributionStatuses(
     where: { id: input.questionPaperId },
     include: {
       subjects: {
+        orderBy: { id: "asc" },
         include: {
           distributions: {
             orderBy: { orderIndex: "asc" },
@@ -1235,12 +1292,13 @@ export async function getQuestionPaperDistributionStatuses(
     targetCount: number
     addedCount: number
     marksPerQuestion: number
+    markDistribution: any
     totalMarks: number
     status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE"
+    sectionId: string | null
+    subSectionId: string | null
     questionType: any
   }> = []
-
-  let foundActive = false
 
   for (const sub of paper.subjects) {
     for (const dist of sub.distributions) {
@@ -1248,16 +1306,7 @@ export async function getQuestionPaperDistributionStatuses(
       const targetCount = dist.questionCount
 
       const isComplete = addedCount >= targetCount && targetCount > 0
-
-      let status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE" = "INCOMPLETE"
-      if (isComplete) {
-        status = "COMPLETED"
-      } else if (!foundActive) {
-        status = "ACTIVE"
-        foundActive = true
-      } else {
-        status = "LOCKED"
-      }
+      const status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE" = isComplete ? "COMPLETED" : "ACTIVE"
 
       statuses.push({
         distributionId: dist.id,
@@ -1270,8 +1319,11 @@ export async function getQuestionPaperDistributionStatuses(
         targetCount,
         addedCount,
         marksPerQuestion: dist.marksPerQuestion,
+        markDistribution: dist.markDistribution || null,
         totalMarks: dist.totalMarks,
         status,
+        sectionId: dist.sectionId || null,
+        subSectionId: dist.subSectionId || null,
         questionType: qTypeMap.get(dist.questionTypeId) || null,
       })
     }
@@ -1289,6 +1341,7 @@ export async function getAvailableQuestions(
 
   const excludedMcqIds = new Set<string>()
   const excludedCqIds = new Set<string>()
+  const excludedCsIds = new Set<string>()
   const excludedShortIds = new Set<string>()
   const excludedParagraphIds = new Set<string>()
   const excludedAmplificationIds = new Set<string>()
@@ -1298,11 +1351,11 @@ export async function getAvailableQuestions(
   if (excludePaperId) {
     const existing = await tenantDb.questionPaperQuestion.findMany({
       where: { questionPaperId: excludePaperId },
-      select: { mcqId: true, cqId: true, shortAnswerId: true, paragraphId: true, amplificationId: true },
     })
     for (const q of existing) {
       if (q.mcqId) excludedMcqIds.add(q.mcqId)
       if (q.cqId) excludedCqIds.add(q.cqId)
+      if (q.csId) excludedCsIds.add(q.csId)
       if (q.shortAnswerId) excludedShortIds.add(q.shortAnswerId)
       if (q.paragraphId) excludedParagraphIds.add(q.paragraphId)
       if (q.amplificationId) excludedAmplificationIds.add(q.amplificationId)
@@ -1326,7 +1379,26 @@ export async function getAvailableQuestions(
     }
   }
 
-  if (category === "CQ") {
+  let effectiveCategory = category
+  if ((!effectiveCategory || effectiveCategory === "MCQ") && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+    const qt = await db.questionType.findUnique({ where: { id: questionTypeId }, select: { nameEn: true, nameBn: true, label: true } })
+    if (qt) {
+      const qStr = `${qt.nameEn || ""} ${qt.nameBn || ""} ${qt.label || ""}`.toLowerCase()
+      if (/\bcs\b/i.test(qStr) || qStr.includes("creative scenario") || qStr.includes("creative short") || qStr.includes("scenario")) {
+        effectiveCategory = "CS"
+      } else if ((qStr.includes("cq") || qStr.includes("creative") || qStr.includes("সৃজনশীল")) && !qStr.includes("mcq")) {
+        effectiveCategory = "CQ"
+      } else if (qStr.includes("short") || qStr.includes("sa") || qStr.includes("সংক্ষিপ্ত")) {
+        effectiveCategory = "SA"
+      } else if (qStr.includes("paragraph") || qStr.includes("অনুচ্ছেদ")) {
+        effectiveCategory = "PARAGRAPH"
+      } else if (qStr.includes("amplification") || qStr.includes("ভাবসম্প্রসারণ")) {
+        effectiveCategory = "AMPLIFICATION"
+      }
+    }
+  }
+
+  if (effectiveCategory === "CQ") {
     const where: any = { ...whereCommon }
     if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
       where.questionTypeId = questionTypeId
@@ -1365,7 +1437,57 @@ export async function getAvailableQuestions(
     }
   }
 
-  if (category === "PARAGRAPH") {
+  if (effectiveCategory === "CS") {
+    const where: any = { ...whereCommon }
+    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      where.questionTypeId = questionTypeId
+    }
+    if (search && search.trim()) {
+      where.OR = [
+        { questionA: { contains: search.trim(), mode: "insensitive" } },
+        { questionB: { contains: search.trim(), mode: "insensitive" } },
+      ]
+    }
+    let cses = await (db as any).cS.findMany({
+      where,
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: {
+        chapter: true,
+        questionType: true,
+      },
+      orderBy: { createdAt: "desc" },
+    })
+
+    if (cses.length === 0 && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      delete where.questionTypeId
+      cses = await (db as any).cS.findMany({
+        where,
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
+        include: {
+          chapter: true,
+          questionType: true,
+        },
+        orderBy: { createdAt: "desc" },
+      })
+    }
+
+    const hasNext = cses.length > limit
+    const items = hasNext ? cses.slice(0, limit) : cses
+    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+
+    return {
+      category: "CS",
+      items: items.map((c: any) => ({
+        ...c,
+        isAssigned: excludedCsIds.has(c.id),
+      })),
+      nextCursor,
+    }
+  }
+
+  if (effectiveCategory === "PARAGRAPH") {
     const where: any = { ...whereCommon }
     delete where.isActive
     if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
@@ -1399,7 +1521,7 @@ export async function getAvailableQuestions(
     }
   }
 
-  if (category === "AMPLIFICATION") {
+  if (effectiveCategory === "AMPLIFICATION") {
     const where: any = { ...whereCommon }
     delete where.isActive
     if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
@@ -1433,7 +1555,7 @@ export async function getAvailableQuestions(
     }
   }
 
-  if (category === "SA") {
+  if (effectiveCategory === "SA") {
     const where: any = { ...whereCommon }
     if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
       where.questionTypeId = questionTypeId
@@ -1519,6 +1641,9 @@ export async function bulkAssignQuestions(
   })
   if (!dist) throw notFound("QuestionPaperSubjectMarkDistribution")
 
+  const finalSectionId = input.sectionId ?? dist.sectionId ?? null
+  const finalSubSectionId = input.subSectionId ?? dist.subSectionId ?? null
+
   const highest = await tenantDb.questionPaperQuestion.findFirst({
     where: { questionPaperId: input.questionPaperId },
     orderBy: { orderIndex: "desc" },
@@ -1534,7 +1659,8 @@ export async function bulkAssignQuestions(
         questionPaperId: input.questionPaperId,
         mcqId,
         distributionId: input.distributionId,
-        sectionId: input.sectionId ?? null,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
         orderIndex: nextOrder++,
       })
     }
@@ -1546,7 +1672,21 @@ export async function bulkAssignQuestions(
         questionPaperId: input.questionPaperId,
         cqId,
         distributionId: input.distributionId,
-        sectionId: input.sectionId ?? null,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.csIds && input.csIds.length > 0) {
+    for (const csId of input.csIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        csId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
         orderIndex: nextOrder++,
       })
     }
@@ -1558,7 +1698,8 @@ export async function bulkAssignQuestions(
         questionPaperId: input.questionPaperId,
         shortAnswerId,
         distributionId: input.distributionId,
-        sectionId: input.sectionId ?? null,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
         orderIndex: nextOrder++,
       })
     }
@@ -1570,7 +1711,8 @@ export async function bulkAssignQuestions(
         questionPaperId: input.questionPaperId,
         paragraphId,
         distributionId: input.distributionId,
-        sectionId: input.sectionId ?? null,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
         orderIndex: nextOrder++,
       })
     }
@@ -1582,7 +1724,8 @@ export async function bulkAssignQuestions(
         questionPaperId: input.questionPaperId,
         amplificationId,
         distributionId: input.distributionId,
-        sectionId: input.sectionId ?? null,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
         orderIndex: nextOrder++,
       })
     }
@@ -1598,6 +1741,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.mcq.findUnique({ where: { id: record.mcqId } })) as any
       } else if (record.cqId) {
         record.contentSnapshot = (await db.cq.findUnique({ where: { id: record.cqId } })) as any
+      } else if (record.csId) {
+        record.contentSnapshot = (await (db as any).cS.findUnique({ where: { id: record.csId } })) as any
       } else if (record.shortAnswerId) {
         record.contentSnapshot = (await db.shortAnswer.findUnique({ where: { id: record.shortAnswerId } })) as any
       } else if (record.paragraphId) {
@@ -1606,18 +1751,26 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.amplification.findUnique({ where: { id: record.amplificationId } })) as any
       }
     }
+
+    let whereCondition: any = {};
+    if (record.mcqId) {
+      whereCondition = { questionPaperId_mcqId: { questionPaperId: input.questionPaperId, mcqId: record.mcqId } };
+    } else if (record.cqId) {
+      whereCondition = { questionPaperId_cqId: { questionPaperId: input.questionPaperId, cqId: record.cqId } };
+    } else if (record.csId) {
+      whereCondition = { questionPaperId_csId: { questionPaperId: input.questionPaperId, csId: record.csId } };
+    } else if (record.shortAnswerId) {
+      whereCondition = { questionPaperId_shortAnswerId: { questionPaperId: input.questionPaperId, shortAnswerId: record.shortAnswerId } };
+    } else if (record.paragraphId) {
+      whereCondition = { questionPaperId_paragraphId: { questionPaperId: input.questionPaperId, paragraphId: record.paragraphId } };
+    } else if (record.amplificationId) {
+      whereCondition = { questionPaperId_amplificationId: { questionPaperId: input.questionPaperId, amplificationId: record.amplificationId } };
+    }
+
     await tenantDb.questionPaperQuestion.upsert({
-      where: record.mcqId
-        ? { questionPaperId_mcqId: { questionPaperId: input.questionPaperId, mcqId: record.mcqId } }
-        : record.cqId
-          ? { questionPaperId_cqId: { questionPaperId: input.questionPaperId, cqId: record.cqId } }
-          : record.shortAnswerId
-            ? { questionPaperId_shortAnswerId: { questionPaperId: input.questionPaperId, shortAnswerId: record.shortAnswerId } }
-            : record.paragraphId
-              ? { questionPaperId_paragraphId: { questionPaperId: input.questionPaperId, paragraphId: record.paragraphId } }
-              : { questionPaperId_amplificationId: { questionPaperId: input.questionPaperId, amplificationId: record.amplificationId! } },
+      where: whereCondition,
       create: record,
-      update: { distributionId: input.distributionId, sectionId: input.sectionId ?? null },
+      update: { distributionId: input.distributionId, sectionId: input.sectionId ?? null, subSectionId: input.subSectionId ?? null },
     })
   }
 
@@ -1757,6 +1910,7 @@ export async function generatePaperSets(
             questionTypeId: dist.questionTypeId,
             questionTypeName: dist.questionTypeName,
             marksPerQuestion: dist.marksPerQuestion,
+            markDistribution: (dist.markDistribution as any) ?? undefined,
             questionCount: dist.questionCount,
             totalMarks: dist.totalMarks,
             questionsToAttempt: dist.questionsToAttempt,

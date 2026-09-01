@@ -157,6 +157,17 @@ export type {
 } from "./routers/cq/cq.schema"
 
 export type {
+  ListCsInput,
+  CsStatsInput,
+  CreateCsInput,
+  UpdateCsInput,
+  DeleteCsInput,
+  BulkDeleteCsInput,
+  ToggleCsActiveInput,
+  ImportCsInput,
+} from "./routers/cs/cs.schema"
+
+export type {
   ListShortAnswersInput,
   ShortAnswerStatsInput,
   CreateShortAnswerInput,

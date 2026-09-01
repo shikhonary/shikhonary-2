@@ -111,7 +111,6 @@ const ClassicLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
         {settings.showExamName && <EditableField value={settings.examName} field="examName" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-lg" : "text-2xl")} />}
         {settings.showClassName && <EditableField value={settings.className} field="className" className={cn("block font-medium leading-none mx-auto text-center", isNarrow ? "text-sm" : "text-lg")} />}
         {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className={cn("block font-medium leading-none mx-auto text-center", isNarrow ? "text-sm" : "text-lg")} />}
-        {settings.showChapterName && <EditableField value={settings.chapterName} field="chapterName" className={cn("block leading-none mx-auto text-center", isNarrow ? "text-xs" : "text-base")} />}
       </div>
     </div>
     <HeaderTimeMarks settings={settings} />
@@ -129,7 +128,6 @@ const ModernLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolean
         {settings.showExamName && <EditableField value={settings.examName} field="examName" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-xl" : "text-2xl")} />}
         {settings.showClassName && <EditableField value={settings.className} field="className" className={cn("block font-medium leading-none mx-auto text-center", isNarrow ? "text-base" : "text-lg")} />}
         {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className={cn("block font-medium leading-none mx-auto text-center", isNarrow ? "text-base" : "text-lg")} />}
-        {settings.showChapterName && <EditableField value={settings.chapterName} field="chapterName" className={cn("block leading-none mx-auto text-center", isNarrow ? "text-sm" : "text-base")} />}
       </div>
     </div>
     <HeaderTimeMarks settings={settings} className="border-t border-black" />
@@ -150,7 +148,6 @@ const LeftAlignedLayout = ({ settings, isNarrow }: { settings: any, isNarrow: bo
             {settings.showSubjectName && <span className="text-muted-foreground">•</span>}
             {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className="text-left" />}
           </div>
-          {settings.showChapterName && <EditableField value={settings.chapterName} field="chapterName" className={cn("block text-left text-muted-foreground leading-none", isNarrow ? "text-xs" : "text-base")} />}
         </div>
       </div>
       <HeaderSetCode settings={settings} />
@@ -174,8 +171,6 @@ const MinimalLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
           {settings.showClassName && <EditableField value={settings.className} field="className" className="text-left" />}
           {settings.showSubjectName && <span>—</span>}
           {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className="text-left" />}
-          {settings.showChapterName && <span>—</span>}
-          {settings.showChapterName && <EditableField value={settings.chapterName} field="chapterName" className="text-left" />}
         </div>
       </div>
 

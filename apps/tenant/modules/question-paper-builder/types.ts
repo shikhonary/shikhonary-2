@@ -5,7 +5,7 @@ export interface ElementStyle {
   fontWeight?: string | number;
 }
 
-export type PaperItemType = "MCQ" | "CQ" | "HEADER";
+export type PaperItemType = "MCQ" | "CQ" | "CS" | "HEADER";
 
 export interface BasePaperItem {
   id: string;
@@ -83,7 +83,15 @@ export interface CQItem extends BasePaperItem {
   subQuestions: CQSubQuestion[];
 }
 
-export type PaperItem = PaperHeaderItem | MCQItem | CQItem;
+export interface CSItem extends BasePaperItem {
+  type: "CS";
+  number: number;
+  questionA: string;
+  questionB: string;
+  subQuestions: CQSubQuestion[];
+}
+
+export type PaperItem = PaperHeaderItem | MCQItem | CQItem | CSItem;
 
 export interface MarginSettings {
   top: number;

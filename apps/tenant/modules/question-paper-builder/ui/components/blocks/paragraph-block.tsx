@@ -192,7 +192,7 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
-            {toBengaliDigits(item.marksPerQuestion || 5)} <span className="font-sans px-1">×</span> {toBengaliDigits(item.totalQuestions || 1)} = {toBengaliDigits((item.marksPerQuestion || 5) * (item.totalQuestions || 1))}
+            {toBengaliDigits(item.marksPerQuestion || 5)} <span className="font-sans px-1">×</span> {toBengaliDigits(item.attemptCount || item.totalQuestions || 1)} = {toBengaliDigits((item.marksPerQuestion || 5) * (item.attemptCount || item.totalQuestions || 1))}
           </div>
         </div>
       )}

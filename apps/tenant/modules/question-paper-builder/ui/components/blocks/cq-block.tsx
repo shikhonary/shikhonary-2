@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
-import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
+import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -103,6 +103,17 @@ export const CQBlock = ({ item }: { item: any }) => {
   const data = item.data || {};
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
+  const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
+  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId));
+  const rawMarkDist = item.markDistribution || item.distribution?.markDistribution || distStatus?.markDistribution;
+  let markDist = rawMarkDist;
+  if (typeof rawMarkDist === "string") {
+    try {
+      markDist = JSON.parse(rawMarkDist);
+    } catch (e) {
+      markDist = rawMarkDist;
+    }
+  }
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -136,11 +147,31 @@ export const CQBlock = ({ item }: { item: any }) => {
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
 
+  const getSubQuestionMark = (id: string, index: number, defaultMark: number) => {
+    if (!markDist) return defaultMark;
+
+    if (Array.isArray(markDist)) {
+      if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
+        return Number(markDist[index]);
+      }
+    } else if (typeof markDist === "object") {
+      const labelBn = index === 0 ? "ক" : index === 1 ? "খ" : index === 2 ? "গ" : "ঘ";
+      const keysToTry = [id, id.toLowerCase(), String(index + 1), labelBn, `mark${id}`];
+      for (const k of keysToTry) {
+        if (markDist[k] !== undefined && !isNaN(Number(markDist[k]))) {
+          return Number(markDist[k]);
+        }
+      }
+    }
+
+    return defaultMark;
+  };
+
   const subQuestions = [
-    { id: "A", label: "ক", text: data.questionA, marks: 1 },
-    { id: "B", label: "খ", text: data.questionB, marks: 2 },
-    { id: "C", label: "গ", text: data.questionC, marks: 3 },
-    { id: "D", label: "ঘ", text: data.questionD, marks: 4 },
+    { id: "A", label: "ক", text: data.questionA, marks: getSubQuestionMark("A", 0, 1) },
+    { id: "B", label: "খ", text: data.questionB, marks: getSubQuestionMark("B", 1, 2) },
+    { id: "C", label: "গ", text: data.questionC, marks: getSubQuestionMark("C", 2, 3) },
+    { id: "D", label: "ঘ", text: data.questionD, marks: getSubQuestionMark("D", 3, 4) },
   ].filter((sq) => sq.text);
 
   const renderSubQuestionLabel = (label: string) => {

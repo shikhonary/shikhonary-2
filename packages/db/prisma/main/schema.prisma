@@ -535,6 +535,7 @@ model AcademicSubject {
   shortAnswers         ShortAnswer[]
   paragraphs           Paragraph[]
   amplifications       Amplification[]
+  cs                   CS[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -578,6 +579,7 @@ model AcademicChapter {
   shortAnswers   ShortAnswer[]
   paragraphs     Paragraph[]
   amplifications Amplification[]
+  cs             CS[]
 
   @@index([isActive])
   @@index([subjectId])
@@ -610,6 +612,7 @@ model QuestionType {
   updatedAt      DateTime        @updatedAt
   paragraphs     Paragraph[]
   amplifications Amplification[]
+  cs             CS[]
 
   @@index([label])
   @@index([isActive])
@@ -896,6 +899,37 @@ model Amplification {
   @@index([subjectId])
   @@index([difficulty])
   @@map("amplification")
+}
+
+model CS {
+  id        String   @id @default(cuid())
+  questionA String
+  questionB String
+  reference String[] @default([])
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  chapterId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  chapter   AcademicChapter @relation(fields: [chapterId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (optional) ──
+  questionTypeId String?
+  questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("cs")
 }
 
 model QuestionReport {

@@ -79,6 +79,8 @@ model QuestionPaperSection {
     titleBn      String? // Bengali title (optional)
     instructions String? // Per-section instructions, e.g. "Answer any 5"
 
+    questionsToAttempt Int? // Required question attempt limit for this section
+
     orderIndex Int @default(0)
 
     questions     QuestionPaperQuestion[]
@@ -102,6 +104,8 @@ model QuestionPaperSubSection {
 
     instructions String? // Per-sub-section instructions, e.g. "Answer any 3"
 
+    questionsToAttempt Int? // Required question attempt limit for this sub-section
+
     orderIndex Int @default(0)
 
     questions     QuestionPaperQuestion[]
@@ -122,6 +126,8 @@ model QuestionPaperSubject {
     // Logical reference to main.AcademicSubject (no @relation — cross-DB)
     subjectId   String
     subjectName String
+
+    orderIndex  Int @default(0)
 
     // Denormalised subject-level total (sum of all distributions below)
     subjectTotal Float @default(0)
@@ -161,6 +167,7 @@ model QuestionPaperSubjectMarkDistribution {
 
     // ── Marks ───────────────────────────────────────────────────
     marksPerQuestion Float @default(0) // marks awarded per single question
+    markDistribution Json? // Inherited from main.SubjectQuestionType.markDistribution
     questionCount    Int   @default(0) // total questions of this type
 
     // Derived: totalMarks = marksPerQuestion × questionCount
@@ -199,6 +206,7 @@ model QuestionPaperQuestion {
     // Logical references to main-DB question bank (no @relation — cross-DB)
     mcqId         String?
     cqId          String?
+    csId          String?
     shortAnswerId String?
     paragraphId   String?
     amplificationId String?
@@ -229,12 +237,14 @@ model QuestionPaperQuestion {
 
     @@unique([questionPaperId, mcqId])
     @@unique([questionPaperId, cqId])
+    @@unique([questionPaperId, csId])
     @@unique([questionPaperId, shortAnswerId])
     @@unique([questionPaperId, paragraphId])
     @@unique([questionPaperId, amplificationId])
     @@index([questionPaperId])
     @@index([mcqId])
     @@index([cqId])
+    @@index([csId])
     @@index([shortAnswerId])
     @@index([paragraphId])
     @@index([amplificationId])

@@ -60,6 +60,14 @@ export function StepSubjectsDistribution({
     refetchOnWindowFocus: false,
   })
 
+  const allowedQuestionTypeIds = subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0
+    ? new Set(subjectDetail.subjectQuestionTypes.map((sqt: any) => sqt.questionTypeId))
+    : null;
+
+  const filteredQuestionTypes = allowedQuestionTypeIds
+    ? questionTypes.filter((t) => allowedQuestionTypeIds.has(t.id))
+    : questionTypes;
+
   // Add subject manually (starts with empty distributions)
   const handleAddSubject = () => {
     if (!selectedSubjectId) return
@@ -380,7 +388,7 @@ export function StepSubjectsDistribution({
                                 <SelectValue placeholder="ধরণ" />
                               </SelectTrigger>
                               <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body">
-                                {questionTypes.map((t) => (
+                                {filteredQuestionTypes.map((t) => (
                                   <SelectItem key={t.id} value={t.id}>
                                     {t.nameBn || t.nameEn}
                                   </SelectItem>

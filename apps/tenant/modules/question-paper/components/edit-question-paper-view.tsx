@@ -28,7 +28,6 @@ import { useQuery } from "@tanstack/react-query"
 import {
   Plus,
   Trash,
-  Printer,
   ArrowLeft,
   Loader2,
   FileText,
@@ -256,18 +255,18 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
       }
 
       // 2. Add or update subjects and their distributions
-      for (const localSub of wizardData.subjects) {
+      for (let i = 0; i < wizardData.subjects.length; i++) {
+        const localSub = wizardData.subjects[i]!
         let dbSub = dbSubjects.find((s: any) => s.subjectId === localSub.subjectId)
-        let paperSubjectId = dbSub?.id
 
-        if (!dbSub) {
-          const created = await upsertSubjectMutation.mutateAsync({
-            questionPaperId: paper.id,
-            subjectId: localSub.subjectId,
-            subjectName: localSub.subjectName,
-          })
-          paperSubjectId = created.id
-        }
+        const created = await upsertSubjectMutation.mutateAsync({
+          id: dbSub?.id,
+          questionPaperId: paper.id,
+          subjectId: localSub.subjectId,
+          subjectName: localSub.subjectName,
+          orderIndex: i,
+        })
+        const paperSubjectId = created.id
 
         if (!paperSubjectId) continue
 

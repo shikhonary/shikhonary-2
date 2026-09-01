@@ -164,11 +164,13 @@ export function CreateQuestionPaperStepper() {
       const paperId = paper.id
 
       // 2. Create subjects + distributions
-      for (const subject of wizardData.subjects) {
+      for (let i = 0; i < wizardData.subjects.length; i++) {
+        const subject = wizardData.subjects[i]!
         const createdSubject = await upsertSubjectMutation.mutateAsync({
           questionPaperId: paperId,
           subjectId: subject.subjectId,
           subjectName: subject.subjectName,
+          orderIndex: i,
         })
 
         const paperSubjectId = createdSubject.id

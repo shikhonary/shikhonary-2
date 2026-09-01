@@ -153,6 +153,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
           nameEn: sec.nameEn,
           nameBn: sec.nameBn,
           position: sec.position,
+          instructions: sec.instructions ?? "",
           subSections: sec.subSections?.map((sub: any) => {
             const subQuestionTypes = subject.subjectQuestionTypes?.filter(
               (sqt: any) => sqt.subSectionId === sub.id
@@ -163,6 +164,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               nameEn: sub.nameEn,
               nameBn: sub.nameBn,
               position: sub.position,
+              instructions: sub.instructions ?? "",
               questionTypes: subQuestionTypes.map((sqt: any) => {
                 let markDistributionStr = ""
                 if (sqt.markDistribution) {
@@ -277,11 +279,13 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
           nameEn: sec.nameEn,
           nameBn: sec.nameBn,
           position: secIdx,
+          instructions: sec.instructions || null,
           questionTypes: processQtConfigs(sec.questionTypes || [], `Section "${sec.nameEn}"`),
           subSections: (sec.subSections || []).map((sub: SubSectionConfig, subIdx: number) => ({
             nameEn: sub.nameEn,
             nameBn: sub.nameBn,
             position: subIdx,
+            instructions: sub.instructions || null,
             questionTypes: processQtConfigs(sub.questionTypes || [], `Section "${sec.nameEn}" > Sub-section "${sub.nameEn}"`),
           })),
         }
@@ -496,7 +500,7 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
           <Button
             type="button"
             variant="outline"
-            onClick={() => appendSubSection({ nameEn: "", nameBn: "", position: subSections.length, questionTypes: [] })}
+            onClick={() => appendSubSection({ nameEn: "", nameBn: "", position: subSections.length, instructions: "", questionTypes: [] })}
             className="flex items-center gap-1 text-xs h-8 border-outline text-primary hover:bg-primary/5"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -526,6 +530,22 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Section Instructions */}
+        <div>
+          <Label className="text-[10px] text-outline font-semibold uppercase">Instructions (Optional)</Label>
+          <Controller
+            control={control}
+            name={`sections.${secIndex}.instructions`}
+            render={({ field }) => (
+              <Textarea
+                {...field}
+                value={field.value ?? ""}
+                placeholder="e.g. Answer any 5 questions from this section"
+                className="h-16 text-xs bg-white min-h-[60px]"
+              />
+            )}
+          />
+        </div>
         {/* Render nested Sub-sections if any exist */}
         {subSections.length > 0 && (
           <div className="space-y-4 pl-4 border-l-2 border-primary/20">
@@ -646,6 +666,23 @@ function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questio
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
+      </div>
+
+      {/* Sub-section Instructions */}
+      <div>
+        <Label className="text-[9px] text-outline font-semibold uppercase">Instructions (Optional)</Label>
+        <Controller
+          control={control}
+          name={`sections.${secIndex}.subSections.${subIndex}.instructions`}
+          render={({ field }) => (
+            <Textarea
+              {...field}
+              value={field.value ?? ""}
+              placeholder="e.g. Answer any 3 questions from this sub-section"
+              className="h-14 text-xs bg-white min-h-[50px]"
+            />
+          )}
+        />
       </div>
 
       {/* Nested Question Types inside Subsection */}

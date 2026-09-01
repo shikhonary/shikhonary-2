@@ -13,7 +13,6 @@ export const HeaderTogglesCard: React.FC = () => {
   const toggles = [
     { key: "showClassName", label: "শ্রেণির নাম" },
     { key: "showSubjectName", label: "বিষয়ের নাম" },
-    { key: "showChapterName", label: "অধ্যায়ের নাম" },
     { key: "showSetCode", label: "সেট কোড" },
     { key: "showExamName", label: "পরীক্ষার নাম" },
     { key: "showTime", label: "সময়" },

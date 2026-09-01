@@ -64,6 +64,7 @@ const navGroups = [
     items: [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
+      { href: "/cs", label: "CS", icon: HelpCircle },
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
       { href: "/amplifications", label: "Amplification", icon: HelpCircle },
@@ -215,7 +216,9 @@ export function TopNav() {
         {/* User dropdown menu trigger */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div
+            <button
+              id="admin-profile-dropdown-trigger"
+              type="button"
               className="w-9 h-9 rounded-full overflow-hidden border border-outline-variant ml-2 cursor-pointer active:opacity-80 hover:ring-2 hover:ring-primary/20 transition-all shrink-0 flex items-center justify-center"
               title={user?.name || "Shikhonary Admin Profile"}
             >
@@ -230,7 +233,7 @@ export function TopNav() {
                   {getFirstLetter()}
                 </div>
               )}
-            </div>
+            </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-56 mt-1 rounded-xl bg-card border border-border" align="end">
