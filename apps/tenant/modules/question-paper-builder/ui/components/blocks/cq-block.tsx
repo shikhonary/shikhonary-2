@@ -148,6 +148,11 @@ export const CQBlock = ({ item }: { item: any }) => {
   const contextStyle = getContextStyle();
 
   const getSubQuestionMark = (id: string, index: number, defaultMark: number) => {
+    if (id === "A" && (data.markA ?? data.marksA) !== undefined) return data.markA ?? data.marksA;
+    if (id === "B" && (data.markB ?? data.marksB) !== undefined) return data.markB ?? data.marksB;
+    if (id === "C" && (data.markC ?? data.marksC) !== undefined) return data.markC ?? data.marksC;
+    if (id === "D" && (data.markD ?? data.marksD) !== undefined) return data.markD ?? data.marksD;
+
     if (!markDist) return defaultMark;
 
     if (Array.isArray(markDist)) {

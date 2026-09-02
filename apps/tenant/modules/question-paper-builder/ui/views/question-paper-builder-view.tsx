@@ -176,7 +176,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
       <div className="flex flex-1 overflow-hidden print:overflow-visible relative">
         <BuilderSidebar />
         <main className="flex-1 relative overflow-auto print:overflow-visible bg-muted/30 print:bg-transparent">
-          <BuilderCanvas />
+          <BuilderCanvas paperId={paperId} paper={paperQuery} />
           <FloatingFormatToolbar />
         </main>
       </div>

@@ -91,12 +91,12 @@ export type DeleteQuestionPaperSectionInput = z.infer<typeof deleteQuestionPaper
 
 export const upsertQuestionPaperSubSectionSchema = z.object({
   id: z.string().optional(),
-  sectionId: z.string().min(1),
-  title: z.string().min(1, "Sub-section title is required"),
+  sectionId: z.string().optional(),
+  title: z.string().optional(),
   titleBn: z.string().optional().nullable(),
   instructions: z.string().optional().nullable(),
-  questionsToAttempt: z.number().int().positive().optional().nullable(),
-  orderIndex: z.number().int().optional().default(0),
+  questionsToAttempt: z.number().int().nonnegative().optional().nullable(),
+  orderIndex: z.number().int().optional(),
 })
 
 export type UpsertQuestionPaperSubSectionInput = z.infer<typeof upsertQuestionPaperSubSectionSchema>
@@ -119,6 +119,7 @@ export const upsertQuestionPaperSubjectSchema = z.object({
   subjectName: z.string().min(1),
   orderIndex: z.number().int().optional(),
   subjectTotal: z.number().optional().default(0),
+  questionTypeIds: z.array(z.string()).optional(),
 })
 
 export type UpsertQuestionPaperSubjectInput = z.infer<typeof upsertQuestionPaperSubjectSchema>

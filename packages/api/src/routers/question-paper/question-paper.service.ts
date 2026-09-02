@@ -692,34 +692,37 @@ export async function upsertQuestionPaperSubSection(
   tenantDb: TenantPrismaClient,
   input: UpsertQuestionPaperSubSectionInput,
 ) {
+  let sub
   if (input.id) {
     const existing = await tenantDb.questionPaperSubSection.findUnique({
       where: { id: input.id },
     })
     if (!existing) throw notFound("QuestionPaperSubSection")
 
-    return tenantDb.questionPaperSubSection.update({
+    sub = await tenantDb.questionPaperSubSection.update({
       where: { id: input.id },
       data: {
-        title: input.title,
+        title: input.title !== undefined ? input.title : existing.title,
+        titleBn: input.titleBn !== undefined ? input.titleBn : existing.titleBn,
+        instructions: input.instructions !== undefined ? input.instructions : existing.instructions,
+        questionsToAttempt: input.questionsToAttempt !== undefined ? input.questionsToAttempt : existing.questionsToAttempt,
+        orderIndex: input.orderIndex !== undefined ? input.orderIndex : existing.orderIndex,
+      },
+    })
+  } else {
+    sub = await tenantDb.questionPaperSubSection.create({
+      data: {
+        sectionId: input.sectionId!,
+        title: input.title || "Sub-section",
         titleBn: input.titleBn,
         instructions: input.instructions,
-        questionsToAttempt: input.questionsToAttempt,
-        orderIndex: input.orderIndex,
+        questionsToAttempt: input.questionsToAttempt ?? 0,
+        orderIndex: input.orderIndex ?? 0,
       },
     })
   }
 
-  return tenantDb.questionPaperSubSection.create({
-    data: {
-      sectionId: input.sectionId,
-      title: input.title,
-      titleBn: input.titleBn,
-      instructions: input.instructions,
-      questionsToAttempt: input.questionsToAttempt,
-      orderIndex: input.orderIndex,
-    },
-  })
+  return sub
 }
 
 export async function deleteQuestionPaperSubSection(
@@ -784,15 +787,52 @@ export async function upsertQuestionPaperSubject(
     })
 
     // Auto-create sections and sub-sections based on subject question structure in main DB
+    const definedTypeIds = input.questionTypeIds && input.questionTypeIds.length > 0
+      ? new Set(input.questionTypeIds)
+      : null
+
     const mainSections = await db.subjectQuestionSection.findMany({
       where: { subjectId: input.subjectId },
       include: {
-        subSections: true,
+        subSections: {
+          include: {
+            subjectQuestionTypes: true,
+          },
+          orderBy: { position: "asc" },
+        },
+        subjectQuestionTypes: true,
       },
       orderBy: { position: "asc" },
     })
 
     for (const mSec of mainSections) {
+      let shouldCreateSection = true
+      let validSubSectionsToCreate = mSec.subSections
+
+      if (definedTypeIds) {
+        const secTypeIds = mSec.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+        const hasDirectMatch = secTypeIds.some((id) => definedTypeIds.has(id))
+
+        validSubSectionsToCreate = mSec.subSections.filter((mSub) => {
+          const subTypeIds = mSub.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+          if (subTypeIds.length > 0) {
+            return subTypeIds.some((id) => definedTypeIds.has(id))
+          }
+          return hasDirectMatch
+        })
+
+        const hasSubMatch = validSubSectionsToCreate.length > 0
+        const totalLinkedTypes = secTypeIds.length + mSec.subSections.reduce((sum, s) => sum + s.subjectQuestionTypes.length, 0)
+
+        if (totalLinkedTypes > 0 && !hasDirectMatch && !hasSubMatch) {
+          shouldCreateSection = false
+        }
+      }
+
+      if (!shouldCreateSection) {
+        continue
+      }
+
       let pSection = await tenantDb.questionPaperSection.findFirst({
         where: {
           questionPaperId: input.questionPaperId,
@@ -808,37 +848,54 @@ export async function upsertQuestionPaperSubject(
             titleBn: mSec.nameBn,
             orderIndex: mSec.position,
             instructions: mSec.instructions ?? null,
+            questionsToAttempt: null,
           },
         })
       } else if (!pSection.instructions && mSec.instructions) {
         pSection = await tenantDb.questionPaperSection.update({
           where: { id: pSection.id },
-          data: { instructions: mSec.instructions },
+          data: { 
+            instructions: mSec.instructions ?? pSection.instructions,
+          },
         })
       }
 
-      for (const mSub of mSec.subSections) {
-        const pSub = await tenantDb.questionPaperSubSection.findFirst({
+      const typeCounts = new Map<string, number>()
+      if (input.questionTypeIds) {
+        for (const tid of input.questionTypeIds) {
+          typeCounts.set(tid, (typeCounts.get(tid) || 0) + 1)
+        }
+      }
+
+      for (const mSub of validSubSectionsToCreate) {
+        const subTypeIds = mSub.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+        let requiredInstances = 1
+        if (input.questionTypeIds && subTypeIds.length > 0) {
+          const matchingCounts = subTypeIds.map((tid) => typeCounts.get(tid) || 0)
+          const maxCount = Math.max(...matchingCounts)
+          if (maxCount > 0) requiredInstances = maxCount
+        }
+
+        const existingSubs = await tenantDb.questionPaperSubSection.findMany({
           where: {
             sectionId: pSection.id,
             title: mSub.nameEn,
             titleBn: mSub.nameBn,
           },
+          orderBy: { orderIndex: "asc" },
         })
-        if (!pSub) {
+
+        const needed = Math.max(1, requiredInstances) - existingSubs.length
+        for (let i = 0; i < needed; i++) {
           await tenantDb.questionPaperSubSection.create({
             data: {
               sectionId: pSection.id,
               title: mSub.nameEn,
               titleBn: mSub.nameBn,
-              orderIndex: mSub.position,
+              orderIndex: mSub.position + existingSubs.length + i,
               instructions: mSub.instructions ?? null,
+              questionsToAttempt: 0,
             },
-          })
-        } else if (!pSub.instructions && mSub.instructions) {
-          await tenantDb.questionPaperSubSection.update({
-            where: { id: pSub.id },
-            data: { instructions: mSub.instructions },
           })
         }
       }
@@ -951,13 +1008,23 @@ export async function upsertQuestionPaperDistribution(
         where: { id: sqType.subSectionId },
       })
       if (mSub) {
-        const pSub = await tenantDb.questionPaperSubSection.findFirst({
+        const existingDists = await tenantDb.questionPaperSubjectMarkDistribution.findMany({
+          where: { paperSubjectId: subject.id },
+          select: { subSectionId: true },
+        })
+        const usedSubIds = new Set(existingDists.map((d) => d.subSectionId).filter(Boolean))
+
+        const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
           where: {
             section: { questionPaperId: subject.questionPaperId },
             title: mSub.nameEn,
             titleBn: mSub.nameBn,
           },
+          orderBy: { orderIndex: "asc" },
         })
+
+        const pSub = candidateSubs.find((s) => !usedSubIds.has(s.id)) || candidateSubs[0]
+
         if (pSub) {
           subSectionId = pSub.id
           sectionId = pSub.sectionId
@@ -1001,7 +1068,7 @@ export async function upsertQuestionPaperDistribution(
         markDistribution,
         questionCount: input.questionCount,
         totalMarks,
-        questionsToAttempt: input.questionsToAttempt,
+        questionsToAttempt: input.questionsToAttempt !== undefined ? input.questionsToAttempt : (existing.questionsToAttempt ?? input.questionCount),
         orderIndex: input.orderIndex ?? existing.orderIndex,
         sectionId: input.sectionId ?? sectionId ?? undefined,
         subSectionId: input.subSectionId ?? subSectionId ?? undefined,
@@ -1018,7 +1085,7 @@ export async function upsertQuestionPaperDistribution(
         markDistribution,
         questionCount: input.questionCount,
         totalMarks,
-        questionsToAttempt: input.questionsToAttempt,
+        questionsToAttempt: input.questionsToAttempt ?? input.questionCount,
         orderIndex: input.orderIndex,
         sectionId: input.sectionId ?? sectionId,
         subSectionId: input.subSectionId ?? subSectionId,
@@ -1027,10 +1094,53 @@ export async function upsertQuestionPaperDistribution(
   }
 
   const targetSubId = input.subSectionId ?? subSectionId
-  if (targetSubId && input.questionsToAttempt !== undefined) {
-    await tenantDb.questionPaperSubSection.update({
-      where: { id: targetSubId },
-      data: { questionsToAttempt: input.questionsToAttempt },
+  const targetSecId = input.sectionId ?? sectionId
+
+  if (targetSubId) {
+    if (input.id && input.subSectionId && input.questionsToAttempt !== undefined && input.questionsToAttempt !== null) {
+      await tenantDb.questionPaperSubSection.update({
+        where: { id: targetSubId },
+        data: { questionsToAttempt: input.questionsToAttempt },
+      }).catch(() => { })
+    } else {
+      const sharedSqTypes = await db.subjectQuestionType.findMany({
+        where: {
+          subjectId: subject.subjectId,
+          questionTypeId: input.questionTypeId,
+        },
+      })
+
+      const isSharedType = sharedSqTypes.length > 1
+
+      if (isSharedType) {
+        await tenantDb.questionPaperSubSection.update({
+          where: { id: targetSubId },
+          data: { questionsToAttempt: 0 },
+        }).catch(() => { })
+      } else {
+        const attemptVal = input.questionsToAttempt ?? dist.questionsToAttempt ?? dist.questionCount ?? 1
+        await tenantDb.questionPaperSubSection.update({
+          where: { id: targetSubId },
+          data: { questionsToAttempt: attemptVal },
+        }).catch(() => { })
+      }
+    }
+  }
+
+  if (targetSecId) {
+    const secSubs = await tenantDb.questionPaperSubSection.findMany({
+      where: { sectionId: targetSecId },
+      select: { questionsToAttempt: true },
+    })
+
+    const secAttemptSum = secSubs.reduce((sum, s) => sum + (s.questionsToAttempt || 0), 0)
+    const finalSecAttempt = secAttemptSum > 0 ? secAttemptSum : (input.questionsToAttempt ?? input.questionCount)
+
+    await tenantDb.questionPaperSection.update({
+      where: { id: targetSecId },
+      data: { 
+        questionsToAttempt: finalSecAttempt ?? undefined,
+      },
     }).catch(() => { })
   }
 

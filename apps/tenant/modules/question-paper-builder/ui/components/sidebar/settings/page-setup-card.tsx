@@ -122,25 +122,7 @@ export const PageSetupCard: React.FC = () => {
         />
       </div>
 
-      {settings.columns > 1 && (
-        <div className="flex items-center justify-between pt-2 border-t">
-          <div>
-            <Label htmlFor="booklet-mode" className="text-sm font-medium block">বুকলেট মোড</Label>
-            <span className="text-[10px] text-muted-foreground">প্রতিটি কলামের শুরুতে হেডার দেখাবে</span>
-          </div>
-          <Switch 
-            id="booklet-mode"
-            checked={settings.bookletMode}
-            onCheckedChange={(c) => {
-              if (c) {
-                updateSettings({ bookletMode: true, headerTemplate: "modern" });
-              } else {
-                updateSettings({ bookletMode: false });
-              }
-            }}
-          />
-        </div>
-      )}
+
 
       <div className="flex items-center justify-between pt-2 border-t">
         <div>

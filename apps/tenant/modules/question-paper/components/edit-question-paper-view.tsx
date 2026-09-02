@@ -259,12 +259,14 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
         const localSub = wizardData.subjects[i]!
         let dbSub = dbSubjects.find((s: any) => s.subjectId === localSub.subjectId)
 
+        const questionTypeIds = localSub.distributions.map((d: any) => d.questionTypeId)
         const created = await upsertSubjectMutation.mutateAsync({
           id: dbSub?.id,
           questionPaperId: paper.id,
           subjectId: localSub.subjectId,
           subjectName: localSub.subjectName,
           orderIndex: i,
+          questionTypeIds,
         })
         const paperSubjectId = created.id
 

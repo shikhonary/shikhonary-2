@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
-import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
+import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -103,6 +103,38 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
   const data = item.data || {};
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
+  const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
+  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId));
+  const rawMarkDist = item.markDistribution || item.distribution?.markDistribution || distStatus?.markDistribution;
+  let markDist = rawMarkDist;
+  if (typeof rawMarkDist === "string") {
+    try {
+      markDist = JSON.parse(rawMarkDist);
+    } catch (e) {
+      markDist = rawMarkDist;
+    }
+  }
+
+  const getQuestionMark = (index: number, defaultMark?: number) => {
+    if ((data.mark ?? data.marks) !== undefined) return data.mark ?? data.marks;
+    if (!markDist) return defaultMark;
+
+    if (Array.isArray(markDist)) {
+      if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
+        return Number(markDist[index]);
+      }
+    } else if (typeof markDist === "object") {
+      const keysToTry = [String(index + 1), String(index), `q${index + 1}`, `mark${index + 1}`];
+      for (const k of keysToTry) {
+        if (markDist[k] !== undefined && !isNaN(Number(markDist[k]))) {
+          return Number(markDist[k]);
+        }
+      }
+    }
+    return defaultMark;
+  };
+
+  const mark = getQuestionMark(item.orderIndex, item.marksPerQuestion || distStatus?.marksPerQuestion);
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -159,6 +191,11 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
               className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
             />
           </div>
+          {mark !== undefined && (
+            <span className="font-bold text-sm text-[12px] ml-2 shrink-0">
+              {toBengaliDigits(mark)}
+            </span>
+          )}
         </div>
       </div>
     </div>

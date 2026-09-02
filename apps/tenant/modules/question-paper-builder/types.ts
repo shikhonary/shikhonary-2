@@ -155,6 +155,10 @@ export interface PaperSettings {
   itemStyles?: Record<string, ElementStyle>;
   itemTexts?: Record<string, string>;
 
+  // Dismissed Sections & SubSections
+  dismissedSectionIds?: string[];
+  dismissedSubSectionIds?: string[];
+
   // OMR Settings
   showOMRSheet: boolean;
   omrSettings: {

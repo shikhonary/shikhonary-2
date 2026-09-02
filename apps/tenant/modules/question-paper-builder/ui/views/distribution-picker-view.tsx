@@ -10,6 +10,7 @@ import {
   useAvailableQuestions,
   useBulkAssignQuestions
 } from "@/modules/question-paper/services/use-question-paper";
+import { useBuilderStore } from "../../store/use-builder-store";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
@@ -229,6 +230,24 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }
       toast.success(`${selectedIds.length}টি প্রশ্ন যুক্ত করা হয়েছে!`);
+
+      const newTotal = subSectionQuestionsCount + selectedIds.length;
+      const effectiveSecId = urlSectionId || (distStatus as any)?.sectionId;
+      const effectiveSubId = urlSubSectionId || (distStatus as any)?.subSectionId;
+
+      if (effectiveSecId && effectiveSubId && paperQuery?.sections) {
+        const sec = paperQuery.sections.find((s: any) => s.id === effectiveSecId);
+        if (sec?.subSections && sec.subSections.length > 0) {
+          const currentIndex = sec.subSections.findIndex((s: any) => s.id === effectiveSubId);
+          if (newTotal >= effectiveTargetCount && currentIndex !== -1 && currentIndex < sec.subSections.length - 1) {
+            const nextSub = sec.subSections[currentIndex + 1];
+            if (nextSub) {
+              useBuilderStore.getState().setActiveTarget({ sectionId: effectiveSecId, subSectionId: nextSub.id });
+            }
+          }
+        }
+      }
+
       if (goToNext && nextDistStatus) {
         setSelectedIds([]);
         router.push(`/question-papers/${paperId}/distributions/${nextDistStatus.distributionId}/pick`);

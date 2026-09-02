@@ -126,6 +126,26 @@ export function useDeleteSection() {
   })
 }
 
+export function useUpsertSubSection() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.upsertSubSection.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useDeleteSubSection() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.deleteSubSection.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
 export function useUpsertSubject() {
   const queryClient = useQueryClient()
   return useMutation({

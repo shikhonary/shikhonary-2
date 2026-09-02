@@ -98,23 +98,51 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       // 2. Temporarily set zoom to 1 for true-size capture
       setZoom(1);
 
-      // 3. Wait for reflow
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      // 3. Wait for reflow and ensure page nodes are mounted
+      let pageNodes: HTMLElement[] = [];
 
-      // 4. Find all page content nodes and sort them by sequential index
-      const pageNodes = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-page-content]")
-      );
+      for (let attempt = 0; attempt < 15; attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+
+        // Strategy 1: Find by [data-page-content] attribute
+        let found = Array.from(document.querySelectorAll<HTMLElement>("[data-page-content]"));
+        
+        // Strategy 2: Find by [data-page-index] wrappers
+        if (found.length === 0) {
+          const wrappers = Array.from(document.querySelectorAll<HTMLElement>("[data-page-index]"));
+          found = wrappers
+            .map((w) => w.querySelector<HTMLElement>("[data-page-content]") || (w.querySelector(".shadow-xl") as HTMLElement) || (w.firstElementChild as HTMLElement) || w)
+            .filter(Boolean);
+        }
+
+        // Strategy 3: Find by .shadow-xl class inside print-container
+        if (found.length === 0) {
+          const printContainer = document.getElementById("print-container");
+          if (printContainer) {
+            found = Array.from(printContainer.querySelectorAll<HTMLElement>(".shadow-xl"));
+          }
+        }
+
+        if (found.length > 0) {
+          pageNodes = found;
+          break;
+        }
+      }
+
+      // Ultimate Fallback: If no page elements were matched, capture the print-container element directly
+      if (pageNodes.length === 0) {
+        const printContainer = document.getElementById("print-container");
+        if (printContainer) {
+          const canvasWrap = printContainer.querySelector<HTMLElement>(".print\\:hidden") || printContainer;
+          pageNodes = [canvasWrap];
+        }
+      }
 
       pageNodes.sort((a, b) => {
-        const idxA = parseInt(a.getAttribute("data-page-seq-index") || "0", 10);
-        const idxB = parseInt(b.getAttribute("data-page-seq-index") || "0", 10);
+        const idxA = parseInt(a.getAttribute("data-page-seq-index") || a.getAttribute("data-page-index") || a.parentElement?.getAttribute("data-page-index") || "0", 10);
+        const idxB = parseInt(b.getAttribute("data-page-seq-index") || b.getAttribute("data-page-index") || b.parentElement?.getAttribute("data-page-index") || "0", 10);
         return idxA - idxB;
       });
-
-      if (pageNodes.length === 0) {
-        throw new Error("কোনো পৃষ্ঠা পাওয়া যায়নি");
-      }
 
       // 5. Determine PDF dimensions and sheet settings
       const isBookFold = settings.bookFoldLayout;

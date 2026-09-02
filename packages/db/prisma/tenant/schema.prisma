@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../../generated/tenant"
+    provider = "prisma-client"
+    output   = "../../generated/tenant"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -75,7 +75,7 @@ model QuestionPaperSection {
     questionPaperId String
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
-    title        String  // "Section A", "বিভাগ ক"
+    title        String // "Section A", "বিভাগ ক"
     titleBn      String? // Bengali title (optional)
     instructions String? // Per-section instructions, e.g. "Answer any 5"
 
@@ -95,12 +95,12 @@ model QuestionPaperSection {
 }
 
 model QuestionPaperSubSection {
-    id              String        @id @default(uuid())
-    sectionId       String
-    section         QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+    id        String               @id @default(uuid())
+    sectionId String
+    section   QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
-    title        String  // "Arithmetic", "পাটিগণিত"
-    titleBn      String? // Bengali title (optional)
+    title   String // "Arithmetic", "পাটিগণিত"
+    titleBn String? // Bengali title (optional)
 
     instructions String? // Per-sub-section instructions, e.g. "Answer any 3"
 
@@ -127,7 +127,7 @@ model QuestionPaperSubject {
     subjectId   String
     subjectName String
 
-    orderIndex  Int @default(0)
+    orderIndex Int @default(0)
 
     // Denormalised subject-level total (sum of all distributions below)
     subjectTotal Float @default(0)
@@ -160,10 +160,10 @@ model QuestionPaperSubjectMarkDistribution {
     paperSubjectId String
     paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
 
-    sectionId      String?
-    section        QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
-    subSectionId   String?
-    subSection     QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
+    sectionId    String?
+    section      QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+    subSectionId String?
+    subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
     // ── Marks ───────────────────────────────────────────────────
     marksPerQuestion Float @default(0) // marks awarded per single question
@@ -204,11 +204,11 @@ model QuestionPaperQuestion {
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
     // Logical references to main-DB question bank (no @relation — cross-DB)
-    mcqId         String?
-    cqId          String?
-    csId          String?
-    shortAnswerId String?
-    paragraphId   String?
+    mcqId           String?
+    cqId            String?
+    csId            String?
+    shortAnswerId   String?
+    paragraphId     String?
     amplificationId String?
 
     // Associate with subject and distribution breakdown
@@ -266,10 +266,10 @@ model QuestionPaperHistory {
 
     // What happened
     action String // "CREATED" | "SETTINGS_UPDATED" | "QUESTION_ADDED"
-                  // | "QUESTION_REMOVED" | "QUESTION_REORDERED"
-                  // | "DISTRIBUTION_CHANGED" | "SECTION_ADDED"
-                  // | "SECTION_REMOVED" | "PUBLISHED" | "UNPUBLISHED"
-                  // | "MARKS_OVERRIDDEN" | "TEMPLATE_CREATED"
+    // | "QUESTION_REMOVED" | "QUESTION_REORDERED"
+    // | "DISTRIBUTION_CHANGED" | "SECTION_ADDED"
+    // | "SECTION_REMOVED" | "PUBLISHED" | "UNPUBLISHED"
+    // | "MARKS_OVERRIDDEN" | "TEMPLATE_CREATED"
 
     // Who did it
     actorId   String? // Logical ref to main.User (null for system actions)

@@ -1,18 +1,8 @@
 import React, { useEffect, useLayoutEffect, useState, useRef, useMemo } from "react";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { MCQBlock } from "../blocks/mcq-block";
-import { CQBlock } from "../blocks/cq-block";
-import { CSBlock } from "../blocks/cs-block";
-import { ShortAnswerBlock } from "../blocks/short-answer-block";
-import { ParagraphBlock } from "../blocks/paragraph-block";
-import { AmplificationBlock } from "../blocks/amplification-block";
-import { HeaderBlock } from "../blocks/header-block";
+import { BlockRenderer } from "./block-renderer";
 import { OMRBlock } from "../blocks/omr-block";
-import { Button } from "@workspace/ui/components/button";
-import { useQuestionPaperById, useQuestionPaperDistributionStatuses, useUpsertDistribution } from "@/modules/question-paper/services/use-question-paper";
-import { toast } from "@workspace/ui/components/sonner";
-import Link from "next/link";
-import { X, Target, ArrowRight, ArrowLeft } from "lucide-react";
+import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
@@ -32,380 +22,23 @@ const toBengaliDigits = (num: number | string): string => {
 
 import { PaperBlock } from "../../../types";
 
-const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => {
-  const isExporting = useBuilderStore((state) => state.isExporting);
-  const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
-  const { mutateAsync: upsertDistribution } = useUpsertDistribution();
+interface BuilderCanvasProps {
+  paperId?: string;
+  paper?: any;
+}
 
-  if (isExporting) return null;
-
-  const { dist, status, statusInfo, paperId, prevSubSectionId, prevSubSectionTitle, nextSubSectionId, nextSubSectionTitle, sectionId, subSectionId } = blockData || {};
-
-  const { data: paperQuery } = useQuestionPaperById(paperId);
-
-  const sectionTotalProvided = Math.max(5, blockData?.secTotalProvided || dist.questionCount || 0);
-  const otherSubOccupied = blockData?.otherSubOccupied ?? blockData?.otherSubAttemptSum ?? 0;
-  const subRequired = blockData?.subQuestionsToAttempt ?? dist.questionsToAttempt ?? 1;
-
-  const subPickLimit = blockData?.subPickLimit ?? Math.max(subRequired, sectionTotalProvided - otherSubOccupied);
-  const targetLimit = subSectionId ? subPickLimit : (statusInfo?.targetCount || dist.questionCount || 0);
-
-  const nameEn = (dist.questionTypeName || dist.questionType?.nameEn || "").toLowerCase();
-  const nameBn = (dist.questionType?.nameBn || "").toLowerCase();
-  const label = (dist.questionTypeLabel || dist.questionType?.label || "").toLowerCase();
-  const code = (dist.questionType?.code || "").toLowerCase();
-
-  let subTitleStr = "";
-  if (subSectionId && paperQuery?.sections) {
-    for (const sec of paperQuery.sections) {
-      if (sec.subSections) {
-        const matchingSub = sec.subSections.find((s: any) => s.id === subSectionId);
-        if (matchingSub) {
-          subTitleStr = `${matchingSub.title || ""} ${matchingSub.titleBn || ""} ${matchingSub.instructions || ""}`.toLowerCase();
-          break;
-        }
-      }
-    }
-  }
-
-  let secTitleStr = "";
-  if (sectionId && paperQuery?.sections) {
-    const matchingSec = paperQuery.sections.find((s: any) => s.id === sectionId);
-    if (matchingSec) {
-      secTitleStr = `${matchingSec.title || ""} ${matchingSec.titleBn || ""} ${matchingSec.instructions || ""}`.toLowerCase();
-    }
-  }
-
-  const combinedStr = `${nameEn} ${nameBn} ${label} ${code} ${subTitleStr} ${secTitleStr}`.toLowerCase();
-
-  const rawTypeName = (dist?.questionTypeName || dist?.questionType?.nameEn || "").trim().toUpperCase();
-  const validCategories = ["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"];
-
-  let resolvedCategory = "MCQ";
-  if (validCategories.includes(rawTypeName)) {
-    resolvedCategory = rawTypeName as any;
-  } else if (/\bcs\b/i.test(combinedStr) || combinedStr.includes("creative scenario") || combinedStr.includes("creative short") || combinedStr.includes("scenario") || combinedStr.includes("উদ্দীপক")) {
-    resolvedCategory = "CS";
-  } else if ((combinedStr.includes("creative") || combinedStr.includes("cq") || combinedStr.includes("সৃজনশীল")) && !combinedStr.includes("mcq")) {
-    resolvedCategory = "CQ";
-  } else if (combinedStr.includes("short") || combinedStr.includes("sa") || combinedStr.includes("সংক্ষিপ্ত")) {
-    resolvedCategory = "SA";
-  } else if (combinedStr.includes("paragraph") || combinedStr.includes("অনুচ্ছেদ")) {
-    resolvedCategory = "PARAGRAPH";
-  } else if (combinedStr.includes("amplification") || combinedStr.includes("ভাবসম্প্রসারণ")) {
-    resolvedCategory = "AMPLIFICATION";
-  }
-
-  const queryParams = new URLSearchParams();
-  if (sectionId) queryParams.set("sectionId", sectionId);
-  if (subSectionId) queryParams.set("subSectionId", subSectionId);
-  if (dist.questionTypeId) queryParams.set("questionTypeId", dist.questionTypeId);
-  queryParams.set("category", resolvedCategory);
-  if (targetLimit > 0) {
-    queryParams.set("limit", String(targetLimit));
-  }
-  const pickUrl = `/question-papers/${paperId}/distributions/${dist.id}/pick` + 
-    (queryParams.toString() ? `?${queryParams.toString()}` : "");
-
-  const maxOptionCount = Math.max(1, dist.questionCount || statusInfo?.targetCount || 5);
-  const currentAttempt = subSectionId 
-    ? (blockData?.subQuestionsToAttempt ?? dist.questionsToAttempt ?? 1)
-    : (dist.questionsToAttempt ?? dist.questionCount ?? 1);
-
-  if (status !== "COMPLETED") {
-    return (
-      <div className="border-2 border-dashed border-primary/40 bg-primary/5 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center gap-2.5 text-center transition-colors hover:bg-primary/10 my-2 print:hidden">
-        <p className="text-xs sm:text-sm font-semibold text-primary">
-          {dist.questionType?.nameBn || dist.questionType?.nameEn} ({statusInfo?.addedCount || 0}/{statusInfo?.targetCount || dist.questionCount}টি)
-        </p>
-
-        {subSectionId && (
-          <div className="flex items-center gap-1.5 text-xs text-primary font-semibold bg-background/90 px-3 py-1 rounded-full border border-primary/30 shadow-xs">
-            <span>উত্তর দিতে হবে:</span>
-            <select
-              value={currentAttempt}
-              onChange={async (e) => {
-                const val = parseInt(e.target.value, 10);
-                const sectionTotalRequired = blockData?.secTotalRequired || statusInfo?.targetCount || 3;
-                const otherSubAttemptSum = blockData?.otherSubAttemptSum || 0;
-                const maxAllowedTarget = Math.max(1, sectionTotalRequired - otherSubAttemptSum);
-
-                if (val > maxAllowedTarget) {
-                  toast.error(`ভুল মান: সেকশনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sectionTotalRequired)}টি) অতিক্রম করা যাবে না। এই উপ-বিভাগে সর্বোচ্চ ${toBengaliDigits(maxAllowedTarget)}টি উত্তর নির্ধারণ করতে পারবেন।`);
-                  return;
-                }
-
-                try {
-                  await upsertDistribution({
-                    id: dist.id,
-                    paperSubjectId: dist.paperSubjectId,
-                    questionTypeId: dist.questionTypeId,
-                    questionTypeName: resolvedCategory || dist.questionTypeName || dist.questionType?.nameBn || dist.questionType?.nameEn || "Question",
-                    questionTypeLabel: dist.questionTypeLabel || undefined,
-                    marksPerQuestion: dist.marksPerQuestion ?? 1,
-                    questionCount: dist.questionCount ?? 1,
-                    questionsToAttempt: val,
-                    orderIndex: dist.orderIndex ?? 0,
-                    sectionId: sectionId || dist.sectionId || undefined,
-                    subSectionId: subSectionId || dist.subSectionId || undefined,
-                  });
-                  toast.success(`উত্তর দিতে হবে: ${toBengaliDigits(val)}টি নির্ধারিত হয়েছে`);
-                } catch (err: any) {
-                  toast.error(err?.message || "হালনাগাদ করতে ব্যর্থ হয়েছে");
-                }
-              }}
-              className="bg-transparent font-bold cursor-pointer focus:outline-none text-primary"
-            >
-              {Array.from({ length: maxOptionCount }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{toBengaliDigits(n)}টি</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        <div className="flex items-center gap-2">
-          {prevSubSectionId && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setActiveTarget({ sectionId: sectionId || null, subSectionId: prevSubSectionId })}
-              className="rounded-full border-primary/40 text-primary hover:bg-primary/10 font-bold text-xs h-8 cursor-pointer flex items-center gap-1"
-              title={`পূর্ববর্তী উপ-বিভাগে যান: ${prevSubSectionTitle}`}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>পূর্ববর্তী</span>
-            </Button>
-          )}
-          <Button asChild size="sm" className="rounded-full shadow-xs cursor-pointer font-bold">
-            <Link href={pickUrl}>
-              + প্রশ্ন নির্বাচন করুন
-            </Link>
-          </Button>
-          {nextSubSectionId && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId })}
-              className="rounded-full border-primary/40 text-primary hover:bg-primary/10 font-bold text-xs h-8 cursor-pointer flex items-center gap-1"
-              title={`পরবর্তী উপ-বিভাগে যান: ${nextSubSectionTitle}`}
-            >
-              <span>পরবর্তী</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
-const BlockRenderer = ({ block }: { block: PaperBlock }) => {
-  const isExporting = useBuilderStore((state) => state.isExporting);
-  switch (block.type) {
-    case "header-full":
-    case "header-column":
-      return <HeaderBlock />;
-    case "subject-title": {
-      const { nameBn, nameEn, subjectTotal } = block.data || {};
-      const title = nameBn || nameEn || "";
-      const totalMarksText = typeof subjectTotal === "number" || subjectTotal ? ` - ${toBengaliDigits(subjectTotal)}` : "";
-      return (
-        <h3 className="font-bold text-center text-base">
-          {title}{totalMarksText}
-        </h3>
-      );
-    }
-    case "section-title": {
-      const { id, sectionId, title, titleBn, instructions, hasQuestions, isSectionFilled } = block.data || {};
-      const secId = id || sectionId;
-      const activeSectionId = useBuilderStore((state) => state.activeSectionId);
-      const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
-      const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
-      const dismissSection = useBuilderStore((state) => state.dismissSection);
-
-      const isActive = !isSectionFilled && activeSectionId === secId && !activeSubSectionId;
-      const formattedInst = instructions
-        ? instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
-          ? instructions.trim()
-          : `[${instructions.trim()}]`
-        : null;
-
-      return (
-        <div 
-          onClick={() => secId && setActiveTarget({ sectionId: secId, subSectionId: null })}
-          className={`group relative w-full mt-6 mb-3 border-b border-on-surface/10 pb-1 flex flex-col items-center cursor-pointer transition-all ${
-            isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded px-2" : "hover:bg-muted/20"
-          }`}
-        >
-          <div className="flex items-center justify-between w-full">
-            <div className="w-6"></div>
-            <h3 className="font-bold text-base text-center flex-1">
-              {titleBn || title}
-              {isActive && (
-                <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
-                  <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
-                </span>
-              )}
-            </h3>
-            {!hasQuestions && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (secId) dismissSection(secId);
-                }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-                title="বিভাগ বন্ধ করুন"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-          {formattedInst && (
-            <p className="text-[9px] text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
-          )}
-        </div>
-      );
-    }
-    case "sub-section-title": {
-      const { id, subSectionId, sectionId, title, titleBn, instructions, nextSubSectionId, nextSubSectionTitle, hasQuestions, hideTitle, isSectionFilled } = block.data || {};
-      const subId = id || subSectionId;
-      const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
-      const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
-      const dismissSubSection = useBuilderStore((state) => state.dismissSubSection);
-
-      const isActive = !isSectionFilled && activeSubSectionId === subId;
-      const formattedInst = instructions
-        ? instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
-          ? instructions.trim()
-          : `[${instructions.trim()}]`
-        : null;
-
-      return (
-        <div 
-          onClick={() => subId && setActiveTarget({ sectionId: sectionId || null, subSectionId: subId })}
-          className={`group relative w-full mt-4 mb-2 flex flex-col items-center cursor-pointer transition-all ${
-            isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded p-1" : "hover:bg-muted/20"
-          }`}
-        >
-          <div className="flex items-center justify-between w-full">
-            <div className="w-6"></div>
-            <h4 className="font-semibold text-sm text-center flex-1">
-              {titleBn || title}
-              {isActive && (
-                <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
-                  <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
-                </span>
-              )}
-            </h4>
-            {!hasQuestions && (
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (subId) dismissSubSection(subId);
-                  }}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-                  title="উপ-বিভাগ বন্ধ করুন"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
-          </div>
-          {formattedInst && (
-            <p className="text-[9px] text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
-          )}
-        </div>
-      );
-    }
-    case "dist-title": {
-      const { dist, attemptCount, totalProvided, isCq, isMcq } = block.data;
-      if (isCq || (dist?.questionTypeLabel && dist.questionTypeLabel.trim() !== "")) return null;
-
-      const instructionText = isCq && attemptCount < totalProvided && attemptCount > 0 
-        ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-        : isCq && block.data.questionsLen > attemptCount && attemptCount > 0 
-        ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-        : null;
-
-      const titleText = isMcq ? "বহুনির্বাচনি অভীক্ষা" : (dist.questionType?.nameBn || dist.questionType?.nameEn);
-
-      return (
-        <div className="flex flex-col items-stretch w-full">
-          {isMcq ? (
-            <div className="flex justify-between items-center w-full">
-              <div className="flex-1"></div>
-              <div className="font-semibold text-center flex-[2]">{titleText}</div>
-              <div className="flex-1 text-right font-bold whitespace-nowrap text-[12px] shrink-0">
-                {toBengaliDigits(dist.marksPerQuestion || 1)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist.marksPerQuestion || 1) * (attemptCount || 1))}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="font-semibold text-center">
-                {titleText}
-              </div>
-              {(instructionText || isCq) && (
-                <div className="flex justify-between items-center text-[12px]">
-                  <div className="flex-1"></div>
-                  <div className="text-center font-normal flex-[2]">
-                    {instructionText}
-                  </div>
-                  <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
-                    {isCq && (
-                      <>
-                        {toBengaliDigits(dist.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist.marksPerQuestion || 10) * (attemptCount || 1))}
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      );
-    }
-    case "question-mcq":
-      return <MCQBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
-    case "question-cq":
-      return <CQBlock item={block.data.item} />;
-    case "question-cs":
-      return <CSBlock item={block.data.item} />;
-    case "question-short":
-      return <ShortAnswerBlock item={block.data.item} />;
-    case "question-paragraph":
-      return <ParagraphBlock item={block.data.item} />;
-    case "question-amplification":
-      return <AmplificationBlock item={block.data.item} />;
-    case "dist-action":
-      return <DistActionBlock blockData={block.data} />;
-    case "empty":
-      if (isExporting) return null;
-      return (
-        <div className="text-center py-20 text-muted-foreground print:hidden border-2 border-dashed rounded-lg">
-          কোনো বিষয় বা বণ্টন সাজানো হয়নি। অনুগ্রহ করে পাশের সেটিংস প্যানেল থেকে নম্বর বণ্টন প্রস্তুত করুন।
-        </div>
-      );
-    default:
-      return null;
-  }
-};
-
-export const BuilderCanvas: React.FC = () => {
-  const paperId = useBuilderStore((state) => state.paperId);
+export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaperId, paper: propPaper }) => {
+  const storePaperId = useBuilderStore((state) => state.paperId);
+  const paperId = propPaperId || storePaperId;
   const zoom = useBuilderStore((state) => state.zoom);
   const settings = useBuilderStore((state) => state.settings);
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
-  const dismissedSectionIds = useBuilderStore((state) => state.dismissedSectionIds);
-  const dismissedSubSectionIds = useBuilderStore((state) => state.dismissedSubSectionIds);
+  const dismissedSectionIds = useBuilderStore((state) => state.dismissedSectionIds || state.settings?.dismissedSectionIds || []);
+  const dismissedSubSectionIds = useBuilderStore((state) => state.dismissedSubSectionIds || state.settings?.dismissedSubSectionIds || []);
 
-  const { data: paperQuery } = useQuestionPaperById(paperId || "");
+  const { data: fetchedPaper } = useQuestionPaperById(paperId || "");
+  const paperQuery = propPaper || fetchedPaper;
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
 
   const [measuredHeights, setMeasuredHeights] = useState<Record<string, number>>({});
@@ -461,8 +94,10 @@ export const BuilderCanvas: React.FC = () => {
     if (!paperQuery) return [];
     const newBlocks: PaperBlock[] = [];
     let globalWrittenNumber = 0;
+    let globalSectionIndex = 0;
 
-    if (!settings.bookletMode || settings.columns === 1) {
+    const isColumnHeader = settings.paperOrientation === "landscape" && settings.columns === 2;
+    if (!isColumnHeader) {
       newBlocks.push({ id: "header-full", type: "header-full", data: null, gap: 0 });
     } else {
       newBlocks.push({ id: "header-column", type: "header-column", data: null, gap: 0 });
@@ -486,19 +121,31 @@ export const BuilderCanvas: React.FC = () => {
         });
       }
 
+      const subjectDistIds = new Set(subject.distributions?.map((d: any) => d.id) || []);
+      const subjectSectionIds = new Set((paperQuery.sections || []).map((s: any) => s.id));
+      const subjectSubSectionIds = new Set(
+        (paperQuery.sections || []).flatMap((s: any) => (s.subSections || []).map((sub: any) => sub.id))
+      );
+
+      const subjectQuestions = (paperQuery.questions || []).filter((q: any) => {
+        if (q.distributionId && subjectDistIds.has(q.distributionId)) return true;
+        if (q.subSectionId && subjectSubSectionIds.has(q.subSectionId)) return true;
+        if (q.sectionId && subjectSectionIds.has(q.sectionId)) return true;
+        return false;
+      });
+
       const hasSections = paperQuery.sections && paperQuery.sections.length > 0;
 
       const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number }) => {
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
-        const questions = (paperQuery.questions || []).filter((q: any) => {
-          if (q.distributionId !== dist.id) return false;
+        const questions = subjectQuestions.filter((q: any) => {
           if (extraOptions?.subSectionId) {
-            return q.subSectionId === extraOptions.subSectionId;
+            return q.subSectionId === extraOptions.subSectionId || (q.distributionId === dist.id && (!q.subSectionId || q.subSectionId === extraOptions.subSectionId));
           }
           if (extraOptions?.sectionId) {
-            return q.sectionId === extraOptions.sectionId && !q.subSectionId;
+            return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (q.distributionId === dist.id && !q.subSectionId);
           }
-          return true;
+          return q.distributionId === dist.id;
         });
 
         const totalProvided = Number(dist.questionCount || 0);
@@ -511,7 +158,7 @@ export const BuilderCanvas: React.FC = () => {
 
         const subPrefix = extraOptions?.subSectionId ? `-sub-${extraOptions.subSectionId}` : (extraOptions?.sectionId ? `-sec-${extraOptions.sectionId}` : "");
 
-        if (!isCq && !shouldHideDistTitle) {
+        if (!shouldHideDistTitle && questions.length > 0) {
           newBlocks.push({
             id: `dist-${dist.id}${subPrefix}`,
             type: "dist-title",
@@ -613,7 +260,22 @@ export const BuilderCanvas: React.FC = () => {
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-short",
-              data: { item: { id: q.id, type: "SHORT", data: q.shortAnswer, orderIndex: idx, masterNumber: globalWrittenNumber, isFirstShortAnswer: idx === 0, totalQuestions: questions.length, attemptCount, marksPerQuestion: dist.marksPerQuestion } },
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SHORT",
+                  data: q.shortAnswer,
+                  orderIndex: idx,
+                  masterNumber: globalWrittenNumber,
+                  isFirstShortAnswer: idx === 0,
+                  totalQuestions: questions.length,
+                  attemptCount,
+                  marksPerQuestion: dist.marksPerQuestion,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution,
+                },
+              },
               gap: idx === questions.length - 1 ? 4 : 0
             });
           }
@@ -635,7 +297,10 @@ export const BuilderCanvas: React.FC = () => {
                   totalQuestions: questions.length, 
                   attemptCount,
                   marksPerQuestion: dist.marksPerQuestion,
-                  questionTypeLabel: dist.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ"
+                  questionTypeLabel: dist.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution,
                 } 
               },
               gap: idx === questions.length - 1 ? 4 : 0
@@ -646,7 +311,18 @@ export const BuilderCanvas: React.FC = () => {
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-amplification",
-              data: { item: { id: q.id, type: "AMPLIFICATION", data: q.amplification, orderIndex: idx, masterNumber: globalWrittenNumber } },
+              data: {
+                item: {
+                  id: q.id,
+                  type: "AMPLIFICATION",
+                  data: q.amplification,
+                  orderIndex: idx,
+                  masterNumber: globalWrittenNumber,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution,
+                },
+              },
               gap: 4
             });
           }
@@ -686,33 +362,39 @@ export const BuilderCanvas: React.FC = () => {
 
       if (hasSections) {
         const subjectSections = (paperQuery.sections || []).filter((sec: any) => {
-          if (dismissedSectionIds.includes(sec.id)) return false;
+          if ((dismissedSectionIds || []).includes(sec.id)) return false;
 
-          if (paperQuery.subjects && paperQuery.subjects.length > 1) {
-            const belongsToSubject = subject.distributions?.some(
-              (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => d.subSectionId === sub.id)
-            );
-            return belongsToSubject;
+          const belongsToSubject = subject.distributions?.some(
+            (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => d.subSectionId === sub.id)
+          );
+          const hasQuestionsInSec = subjectQuestions.some(
+            (q: any) => q.sectionId === sec.id || sec.subSections?.some((sub: any) => sub.id === q.subSectionId)
+          );
+
+          if (!belongsToSubject && !hasQuestionsInSec) {
+            return false;
           }
+
           return true;
         });
 
         subjectSections.forEach((sec: any) => {
-          const secQuestionsCount = paperQuery.questions?.filter((q: any) => {
+          const secQuestionsCount = subjectQuestions.filter((q: any) => {
             if (q.sectionId === sec.id) return true;
             return sec.subSections?.some((sub: any) => sub.id === q.subSectionId);
-          }).length || 0;
+          }).length;
 
           const secDists = subject.distributions?.filter(
-            (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => sub.id === d.subSectionId)
+            (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => d.subSectionId === sub.id)
           ) || [];
 
-          const secTotalProvided = Math.max(5, secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0));
+          const distsProvidedSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
+          const secTotalProvided = distsProvidedSum;
           const totalSectionTarget = secDists.reduce((sum: number, d: any) => {
             const st = statuses?.find((s: any) => s.distributionId === d.id);
             return sum + (st?.targetCount || d.questionCount || 0);
           }, 0);
-          const secTotalRequired = totalSectionTarget > 0 ? totalSectionTarget : 7;
+          const secTotalRequired = sec.questionsToAttempt ?? (totalSectionTarget > 0 ? totalSectionTarget : secTotalProvided);
 
           const totalSectionAdded = secDists.reduce((sum: number, d: any) => {
             const st = statuses?.find((s: any) => s.distributionId === d.id);
@@ -722,56 +404,33 @@ export const BuilderCanvas: React.FC = () => {
           const isSectionFilled = totalSectionTarget > 0 && totalSectionAdded >= totalSectionTarget;
 
           const validSubSections = (sec.subSections || []).filter((sub: any) => {
-            if (dismissedSubSectionIds.includes(sub.id)) return false;
-
-            const subQuestionsCount = paperQuery.questions?.filter((q: any) => q.subSectionId === sub.id).length || 0;
-            if (isSectionFilled && subQuestionsCount === 0) {
-              return false;
-            }
-
+            if ((dismissedSubSectionIds || []).includes(sub.id)) return false;
             return true;
           });
 
-          let finalSecInstruction = sec.instructions;
-          if (validSubSections.length > 0) {
-            const subRequiredSum = validSubSections.reduce((sum: number, sub: any) => {
-              const subDists = subject.distributions?.filter((d: any) => d.subSectionId === sub.id) || [];
-              const distAttempt = subDists.length > 0 ? subDists[0]?.questionsToAttempt : null;
-              const req = sub.questionsToAttempt ?? distAttempt ?? 1;
-              return sum + req;
+          let finalSecInstruction = (sec.instructions && sec.instructions.trim() !== "") ? sec.instructions : null;
+
+          if (finalSecInstruction) {
+            const secReqSum = secDists.reduce((sum: number, d: any) => {
+              const st = statuses?.find((s: any) => s.distributionId === d.id);
+              return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
             }, 0);
+            const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
 
-            const effectiveSecRequired = subRequiredSum > 0 ? subRequiredSum : secTotalRequired;
+            const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
+            const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
 
-            const clauseParts = validSubSections.map((sub: any) => {
-              const subDists = subject.distributions?.filter((d: any) => d.subSectionId === sub.id) || [];
-              const distAttempt = subDists.length > 0 ? subDists[0]?.questionsToAttempt : null;
-              const req = sub.questionsToAttempt ?? distAttempt ?? 1;
-              const prov = subDists.length > 0 ? (subDists[0]?.questionCount || 0) : 0;
-              const name = sub.titleBn || sub.title || "উপ-বিভাগ";
-
-              if (prov > 0 && prov !== req) {
-                return `${name} ${toBengaliDigits(prov)}টি প্রশ্ন থেকে ${toBengaliDigits(req)}টি`;
-              }
-              return `${name} থেকে ন্যূনতম ${toBengaliDigits(req)}টি`;
-            });
-
-            let clauseText = "";
-            if (clauseParts.length === 1) {
-              clauseText = (clauseParts[0] || "") + " প্রশ্নের উত্তর দিতে হবে।";
-            } else if (clauseParts.length === 2) {
-              clauseText = `${clauseParts[0]} এবং ${clauseParts[1]} করে মোট ${toBengaliDigits(effectiveSecRequired)}টি প্রশ্নের উত্তর দিতে হবে।`;
-            } else {
-              const copyParts = [...clauseParts];
-              const lastClause = copyParts.pop();
-              clauseText = `${copyParts.join(", ")} এবং ${lastClause} করে মোট ${toBengaliDigits(effectiveSecRequired)}টি প্রশ্নের উত্তর দিতে হবে।`;
+            let updatedInst = finalSecInstruction;
+            if (provCount > 0 && reqCount > 0 && (updatedInst.includes("প্রশ্ন থেকে") || updatedInst.includes("প্রশ্নের উত্তর"))) {
+              updatedInst = updatedInst.replace(/([০-৯\d]+)টি প্রশ্ন থেকে\s*(যে কোনো|যেকোনো)?\s*([০-৯\d]+)টি/, `${toBengaliDigits(provCount)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(reqCount)}টি`);
+            } else if (reqCount > 0 && (updatedInst.includes("যে কোনো") || updatedInst.includes("যেকোনো"))) {
+              updatedInst = updatedInst.replace(/(যে কোনো|যেকোনো)\s*([০-৯\d]+)টি/, `যে কোনো ${toBengaliDigits(reqCount)}টি`);
             }
-
-            const boardNotice = "দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। প্রদত্ত উদ্দীপকগুলো মনোযোগ দিয়ে পড়ো এবং সংশ্লিষ্ট প্রশ্নগুলোর যথাযথ উত্তর দাও।";
-            const grammarNotice = "একই প্রশ্নের উত্তরে সাধু ও চলিত ভাষারীতির মিশ্রণ দূষণীয়।";
-
-            finalSecInstruction = `${boardNotice} ${clauseText} ${grammarNotice}`;
+            finalSecInstruction = updatedInst;
           }
+
+          const isFirstSection = globalSectionIndex === 0;
+          globalSectionIndex++;
 
           newBlocks.push({
             id: `subj-${subject.id}-sec-${sec.id}`,
@@ -784,77 +443,121 @@ export const BuilderCanvas: React.FC = () => {
               instructions: finalSecInstruction,
               hasQuestions: secQuestionsCount > 0,
               isSectionFilled,
+              isFirstSection,
             },
             gap: 0
           });
 
           if (validSubSections.length > 0) {
-            const activeSub = validSubSections.find((s: any) => s.id === activeSubSectionId) || validSubSections[0];
+            const activeSub = (activeSubSectionId && validSubSections.find((s: any) => s.id === activeSubSectionId))
+              || validSubSections[0];
+
+            // Group sub-sections by unique title/structure so repeated sub-sections share their corresponding distribution
+            const uniqueSubTitles: string[] = [];
+            validSubSections.forEach((s: any) => {
+              const key = (s.title || s.titleBn || s.id).trim().toLowerCase();
+              if (!uniqueSubTitles.includes(key)) {
+                uniqueSubTitles.push(key);
+              }
+            });
+
+            const topicKeywords = [
+              "সহপাঠ", "গদ্য", "কবিতা", "ব্যাকরণ", "নির্মিতি", 
+              "পাটিগণিত", "বীজগণিত", "জ্যামিতি", "ত্রিকোণমিতি", "পরিসংখ্যান", 
+              "পদার্থ", "রসায়ন", "জীববিজ্ঞান", "পৌরনীতি", "অর্থনীতি", "ইতিহাস", "ভূগোল"
+            ];
+
+            // Resolve which distribution matches each sub-section
+            const subToDistMap = new Map<string, any>();
+            validSubSections.forEach((s: any) => {
+              const sSubStr = `${s.title || ""} ${s.titleBn || ""} ${s.instructions || ""}`.toLowerCase();
+              const scored = secDists.map((d: any) => {
+                let score = 10;
+                const distStr = `${d.questionTypeLabel || ""} ${d.questionTypeName || ""} ${d.questionType?.nameBn || ""} ${d.questionType?.nameEn || ""}`.toLowerCase();
+                for (const kw of topicKeywords) {
+                  const distHasKw = distStr.includes(kw);
+                  const subHasKw = sSubStr.includes(kw);
+                  if (distHasKw && subHasKw) score += 150;
+                  else if (distHasKw && !subHasKw) score -= 300;
+                }
+                if (d.subSectionId === s.id) score += 1000;
+                const hasAddedQ = subjectQuestions.some((q: any) => q.subSectionId === s.id && q.distributionId === d.id);
+                if (hasAddedQ) score += 500;
+                return { dist: d, score };
+              });
+              scored.sort((a, b) => b.score - a.score);
+              const matchedDist = scored.length > 0 && scored[0].score > 0 ? scored[0].dist : (secDists[0] || null);
+              subToDistMap.set(s.id, matchedDist);
+            });
 
             validSubSections.forEach((sub: any, subIndex: number) => {
               const prevSub = subIndex > 0 ? validSubSections[subIndex - 1] : null;
               const nextSub = subIndex < validSubSections.length - 1 ? validSubSections[subIndex + 1] : null;
               const isSubActive = sub.id === activeSub.id;
-              const subQuestionsCount = paperQuery.questions?.filter((q: any) => q.subSectionId === sub.id).length || 0;
+              const subQuestionsCount = subjectQuestions.filter((q: any) => q.subSectionId === sub.id).length;
 
-              const subDists = subject.distributions?.filter((d: any) => d.subSectionId === sub.id) || [];
-              let targetDists = subDists;
-              if (targetDists.length === 0) {
-                const secDists = subject.distributions?.filter((d: any) => d.sectionId === sec.id) || subject.distributions || [];
-                if (secDists[subIndex]) {
-                  targetDists = [secDists[subIndex]];
-                } else {
-                  const subTitleStr = `${sub.title || ""} ${sub.titleBn || ""} ${sub.instructions || ""}`.toLowerCase();
-                  const isSubCs = /\bcs\b/i.test(subTitleStr) || subTitleStr.includes("scenario") || subTitleStr.includes("সৃজনশীল");
-                  const isSubMcq = subTitleStr.includes("mcq") || subTitleStr.includes("বহুনির্বাচনি");
+              const targetDist = subToDistMap.get(sub.id) || secDists[0];
+              const targetDists = targetDist ? [targetDist] : [];
 
-                  if (isSubCs && !isSubMcq) {
-                    const csDist = secDists.filter((d: any) => {
-                      const nameEn = (d.questionTypeName || d.questionType?.nameEn || "").toLowerCase();
-                      const nameBn = (d.questionType?.nameBn || "").toLowerCase();
-                      const label = (d.questionTypeLabel || d.questionType?.label || "").toLowerCase();
-                      const code = (d.questionType?.code || "").toLowerCase();
-                      const dStr = `${nameEn} ${nameBn} ${label} ${code}`;
-                      return /\bcs\b/i.test(dStr) || dStr.includes("scenario") || (dStr.includes("সৃজনশীল") && !dStr.includes("mcq")) || dStr.includes("creative");
-                    });
-                    targetDists = csDist.length > 0 ? csDist : (secDists[0] ? [secDists[0]] : secDists);
-                  } else {
-                    targetDists = secDists[0] ? [secDists[0]] : secDists;
-                  }
-                }
-              }
+              const siblingSubSectionIds = validSubSections
+                .filter((s: any) => {
+                  const sDist = subToDistMap.get(s.id);
+                  return sDist && targetDist && (sDist.id === targetDist.id || sDist.questionTypeId === targetDist.questionTypeId);
+                })
+                .map((s: any) => s.id);
+
+              const isSharedQuestionType = siblingSubSectionIds.length > 1;
 
               const hasQuestionTypeLabel = targetDists.some(
                 (d: any) => Boolean(d.questionTypeLabel && d.questionTypeLabel.trim() !== "")
               );
 
-              const otherSubAttemptSum = (sec.subSections || [])
-                .filter((s: any) => s.id !== sub.id)
+              const currDistTypeId = targetDist?.questionTypeId;
+
+              const otherSubAttemptSum = validSubSections
+                .filter((s: any) => s.id !== sub.id && siblingSubSectionIds.includes(s.id))
                 .reduce((sum: number, s: any) => {
-                  const sDists = subject.distributions?.filter((d: any) => d.subSectionId === s.id) || [];
-                  const distAttempt = sDists.length > 0 ? sDists[0]?.questionsToAttempt : null;
-                  const explicitAttempt = s.questionsToAttempt ?? distAttempt ?? 0;
+                  const explicitAttempt = (s.questionsToAttempt && s.questionsToAttempt > 0) ? s.questionsToAttempt : 0;
                   return sum + explicitAttempt;
                 }, 0);
 
-              const otherSubAddedCount = (sec.subSections || [])
-                .filter((s: any) => s.id !== sub.id)
+              const otherSubOccupied = validSubSections
+                .filter((s: any) => s.id !== sub.id && siblingSubSectionIds.includes(s.id))
                 .reduce((sum: number, s: any) => {
-                  const qCount = paperQuery.questions?.filter((q: any) => q.subSectionId === s.id).length || 0;
-                  return sum + qCount;
+                  const qCount = subjectQuestions.filter((q: any) => q.subSectionId === s.id).length;
+                  const sReq = (s.questionsToAttempt && s.questionsToAttempt > 0) ? s.questionsToAttempt : 0;
+                  return sum + Math.max(qCount, sReq);
                 }, 0);
 
-              const otherSubOccupied = Math.max(otherSubAttemptSum, otherSubAddedCount);
-
-              const secRequiredTarget = totalSectionTarget > 0 ? totalSectionTarget : 3;
+              const secRequiredTarget = totalSectionTarget > 0 ? totalSectionTarget : secTotalRequired;
 
               const maxAllowedTarget = secRequiredTarget > 0 
                 ? Math.max(1, secRequiredTarget - otherSubAttemptSum)
                 : undefined;
 
-              const subPickLimit = secTotalProvided > 0 
+              const subDist = targetDist;
+              const subDistCount = subDist?.questionCount || 0;
+
+              const secRemainingQuota = secTotalProvided > 0 
                 ? Math.max(1, secTotalProvided - otherSubOccupied)
-                : (targetDists[0]?.questionCount || 5);
+                : (subDistCount || 1);
+
+              const subPickLimit = subDistCount > 0 
+                ? Math.min(subDistCount, secRemainingQuota)
+                : secRemainingQuota;
+
+              const subDistAttempt = targetDist?.questionsToAttempt;
+              const subReq = (sub.questionsToAttempt && sub.questionsToAttempt > 0) ? sub.questionsToAttempt : 0;
+              const subProv = targetDist?.questionCount || 0;
+
+              let finalSubInstruction = (sub.instructions && sub.instructions.trim() !== "") ? sub.instructions : null;
+              if (finalSubInstruction) {
+                if (subProv > 0 && subProv !== subReq && (finalSubInstruction.includes("প্রশ্ন থেকে") || finalSubInstruction.includes("প্রশ্নের উত্তর"))) {
+                  finalSubInstruction = finalSubInstruction.replace(/([০-৯\d]+)টি প্রশ্ন থেকে\s*(যে কোনো|যেকোনো)?\s*([০-৯\d]+)টি/, `${toBengaliDigits(subProv)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(subReq)}টি`);
+                } else if (subReq > 0 && (finalSubInstruction.includes("যে কোনো") || finalSubInstruction.includes("যেকোনো"))) {
+                  finalSubInstruction = finalSubInstruction.replace(/(যে কোনো|যেকোনো)\s*([০-৯\d]+)টি/, `যে কোনো ${toBengaliDigits(subReq)}টি`);
+                }
+              }
 
               newBlocks.push({
                 id: `subj-${subject.id}-sub-${sub.id}`,
@@ -865,12 +568,13 @@ export const BuilderCanvas: React.FC = () => {
                   sectionId: sec.id, 
                   title: sub.title, 
                   titleBn: sub.titleBn, 
-                  instructions: sub.instructions,
+                  instructions: finalSubInstruction,
                   nextSubSectionId: nextSub?.id,
                   nextSubSectionTitle: nextSub?.titleBn || nextSub?.title,
                   hasQuestions: subQuestionsCount > 0,
                   hideTitle: hasQuestionTypeLabel,
                   isSectionFilled,
+                  isFirstSubSection: subIndex === 0,
                 },
                 gap: 0
               });
@@ -890,6 +594,8 @@ export const BuilderCanvas: React.FC = () => {
                 otherSubAttemptSum,
                 subQuestionsToAttempt: sub.questionsToAttempt,
                 otherSubOccupied,
+                isSharedQuestionType,
+                siblingSubSectionIds,
               }));
             });
           } else {
@@ -912,7 +618,7 @@ export const BuilderCanvas: React.FC = () => {
     });
 
     return newBlocks;
-  }, [paperQuery, statuses, settings.bookletMode, settings.columns, paperId, settings.blocks, dismissedSectionIds, dismissedSubSectionIds, activeSectionId, activeSubSectionId]);
+  }, [paperQuery, statuses, settings.paperOrientation, settings.columns, paperId, settings.blocks, dismissedSectionIds, dismissedSubSectionIds, activeSectionId, activeSubSectionId]);
 
   // Expose the calculated blocks to the store for GenerateSetsModal
   useEffect(() => {
@@ -943,29 +649,34 @@ export const BuilderCanvas: React.FC = () => {
   }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles]);
 
   const pages = useMemo(() => {
-    if (pageContentHeight === 0 || Object.keys(measuredHeights).length === 0) return [];
+    if (!blocks || blocks.length === 0) return [];
 
+    const effectivePageHeight = pageContentHeight > 0 
+      ? pageContentHeight 
+      : (canvasMinHeight * 3.7795 - (settings.margins.top + settings.margins.bottom) * 3.7795);
+
+    const colCount = Math.max(1, Number(settings.columns) || 1);
     const result: { fullHeader?: PaperBlock, columns: PaperBlock[][], isOMRPage?: boolean }[] = [];
     
     let currentPage: { fullHeader?: PaperBlock, columns: PaperBlock[][], isOMRPage?: boolean } = { 
-      columns: Array.from({ length: settings.columns }, () => []) 
+      columns: Array.from({ length: colCount }, () => []) 
     };
     let currentColumnIdx = 0;
     let currentColumnHeight = 0;
 
     // If full header exists, put it on first page
     const fullHeaderBlock = blocks.find(b => b.type === "header-full");
-    let availableHeight = pageContentHeight - 10; // 10px tolerance
+    let availableHeight = effectivePageHeight - 10; // 10px tolerance
 
     if (fullHeaderBlock) {
       currentPage.fullHeader = fullHeaderBlock;
-      availableHeight -= (measuredHeights[fullHeaderBlock.id] || 0) + 32; // 32px for mt-8
+      availableHeight -= (measuredHeights[fullHeaderBlock.id] || 80) + 12; // 12px for mb-3
     }
 
     const contentBlocks = blocks.filter(b => b.type !== "header-full");
 
     contentBlocks.forEach((b, idx) => {
-      const h = measuredHeights[b.id] || 0;
+      const h = measuredHeights[b.id] || (b.type.startsWith("question-") ? 80 : 40);
       
       // If it's a heading, look ahead to see if the first question fits on this page
       let needsEarlyWrap = false;
@@ -984,11 +695,11 @@ export const BuilderCanvas: React.FC = () => {
         currentColumnIdx++;
         currentColumnHeight = 0;
         
-        if (currentColumnIdx >= settings.columns) {
+        if (currentColumnIdx >= colCount) {
           result.push(currentPage);
-          currentPage = { columns: Array.from({ length: settings.columns }, () => []) };
+          currentPage = { columns: Array.from({ length: colCount }, () => []) };
           currentColumnIdx = 0;
-          availableHeight = pageContentHeight - 10;
+          availableHeight = effectivePageHeight - 10;
         }
       }
       
@@ -999,6 +710,14 @@ export const BuilderCanvas: React.FC = () => {
     if (currentPage.columns.some(col => col.length > 0) || currentPage.fullHeader) {
       result.push(currentPage);
     }
+
+    // Safeguard: result must NEVER be empty if any blocks exist
+    if (result.length === 0) {
+      result.push({
+        fullHeader: fullHeaderBlock,
+        columns: [contentBlocks],
+      });
+    }
     
     if (settings.showOMRSheet) {
       result.push({ isOMRPage: true, columns: [] });
@@ -1006,8 +725,6 @@ export const BuilderCanvas: React.FC = () => {
 
     return result;
   }, [blocks, measuredHeights, pageContentHeight, settings.columns, settings.showOMRSheet]);
-
-
 
   const renderPage = (page: typeof pages[0] & { isBlank?: boolean }, seqIndex: number) => {
     return (
@@ -1056,7 +773,7 @@ export const BuilderCanvas: React.FC = () => {
           ) : (
             <>
               {page.fullHeader && (
-                <div className="mb-8">
+                <div className="mb-3">
                   <BlockRenderer block={page.fullHeader} />
                 </div>
               )}
@@ -1205,7 +922,7 @@ export const BuilderCanvas: React.FC = () => {
               }}>
                 <div className="relative z-10 w-full">
                   {blocks.filter(b => b.type === "header-full").map(b => (
-                    <div key={`print-header-${b.id}`} className="mb-8 w-full">
+                    <div key={`print-header-${b.id}`} className="mb-3 w-full">
                       <BlockRenderer block={b} />
                     </div>
                   ))}

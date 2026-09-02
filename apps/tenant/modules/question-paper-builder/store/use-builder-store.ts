@@ -98,6 +98,8 @@ const defaultSettings: PaperSettings = {
   time: "২ ঘন্টা ৩০ মিনিট",
   totalMarks: "৫০",
   instructions: "সবগুলো প্রশ্নের উত্তর দাও। প্রতিটি প্রশ্নের মান সমান।",
+  dismissedSectionIds: [],
+  dismissedSubSectionIds: [],
 };
 
 export const useBuilderStore = create<BuilderState>((set) => ({
@@ -123,24 +125,56 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     activeSubSectionId: target.subSectionId !== undefined ? target.subSectionId : state.activeSubSectionId,
   })),
 
-  dismissSection: (sectionId) => set((state) => ({
-    dismissedSectionIds: Array.from(new Set([...state.dismissedSectionIds, sectionId])),
-    activeSectionId: state.activeSectionId === sectionId ? null : state.activeSectionId,
-    activeSubSectionId: state.activeSectionId === sectionId ? null : state.activeSubSectionId,
-  })),
+  dismissSection: (sectionId) => set((state) => {
+    const nextDismissed = Array.from(new Set([...(state.settings.dismissedSectionIds || state.dismissedSectionIds || []), sectionId]));
+    return {
+      dismissedSectionIds: nextDismissed,
+      settings: {
+        ...state.settings,
+        dismissedSectionIds: nextDismissed,
+      },
+      hasUnsavedChanges: true,
+      activeSectionId: state.activeSectionId === sectionId ? null : state.activeSectionId,
+      activeSubSectionId: state.activeSectionId === sectionId ? null : state.activeSubSectionId,
+    };
+  }),
 
-  dismissSubSection: (subSectionId) => set((state) => ({
-    dismissedSubSectionIds: Array.from(new Set([...state.dismissedSubSectionIds, subSectionId])),
-    activeSubSectionId: state.activeSubSectionId === subSectionId ? null : state.activeSubSectionId,
-  })),
+  dismissSubSection: (subSectionId) => set((state) => {
+    const nextDismissed = Array.from(new Set([...(state.settings.dismissedSubSectionIds || state.dismissedSubSectionIds || []), subSectionId]));
+    return {
+      dismissedSubSectionIds: nextDismissed,
+      settings: {
+        ...state.settings,
+        dismissedSubSectionIds: nextDismissed,
+      },
+      hasUnsavedChanges: true,
+      activeSubSectionId: state.activeSubSectionId === subSectionId ? null : state.activeSubSectionId,
+    };
+  }),
 
-  restoreSection: (sectionId) => set((state) => ({
-    dismissedSectionIds: state.dismissedSectionIds.filter((id) => id !== sectionId),
-  })),
+  restoreSection: (sectionId) => set((state) => {
+    const nextDismissed = (state.settings.dismissedSectionIds || state.dismissedSectionIds || []).filter((id) => id !== sectionId);
+    return {
+      dismissedSectionIds: nextDismissed,
+      settings: {
+        ...state.settings,
+        dismissedSectionIds: nextDismissed,
+      },
+      hasUnsavedChanges: true,
+    };
+  }),
 
-  restoreSubSection: (subSectionId) => set((state) => ({
-    dismissedSubSectionIds: state.dismissedSubSectionIds.filter((id) => id !== subSectionId),
-  })),
+  restoreSubSection: (subSectionId) => set((state) => {
+    const nextDismissed = (state.settings.dismissedSubSectionIds || state.dismissedSubSectionIds || []).filter((id) => id !== subSectionId);
+    return {
+      dismissedSubSectionIds: nextDismissed,
+      settings: {
+        ...state.settings,
+        dismissedSubSectionIds: nextDismissed,
+      },
+      hasUnsavedChanges: true,
+    };
+  }),
 
   setPaperId: (id) => set({ paperId: id }),
   
@@ -328,9 +362,14 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       }
     }
 
+    const dismissedSectionIds = finalSettings.dismissedSectionIds || [];
+    const dismissedSubSectionIds = finalSettings.dismissedSubSectionIds || [];
+
     return {
       paperId: id,
       settings: finalSettings,
+      dismissedSectionIds,
+      dismissedSubSectionIds,
       items: overrideItems ? overrideItems : state.items,
       hasUnsavedChanges: false,
       saveStatus: "idle",

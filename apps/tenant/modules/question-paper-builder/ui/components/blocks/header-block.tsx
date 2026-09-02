@@ -191,7 +191,7 @@ const MinimalLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
 
 export const HeaderBlock: React.FC = () => {
   const settings = useBuilderStore((state) => state.settings);
-  const isNarrow = settings.bookletMode && settings.columns > 1;
+  const isNarrow = settings.paperOrientation === "landscape" && settings.columns === 2;
 
   switch (settings.headerTemplate) {
     case "modern": return <ModernLayout settings={settings} isNarrow={isNarrow} />;
