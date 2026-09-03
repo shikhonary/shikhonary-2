@@ -59,7 +59,7 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
           </div>
         )}
         <div className="text-sm font-semibold text-on-surface">
-          <RenderMath text={q.question} />
+          <RenderMath text={q.question || q.title || q.name || ""} />
         </div>
         {Array.isArray(q.attachments) && q.attachments.length > 0 && (
           <div className="flex flex-wrap gap-3 mt-1">

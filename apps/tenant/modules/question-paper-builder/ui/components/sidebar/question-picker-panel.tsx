@@ -15,6 +15,7 @@ import {
 } from "@/modules/question-paper/services/use-question-paper";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { toast } from "@workspace/ui/components/sonner";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import Link from "next/link";
 
 export const QuestionPickerPanel: React.FC = () => {
@@ -42,22 +43,22 @@ export const QuestionPickerPanel: React.FC = () => {
   const qTypeLabel = (activeDist?.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
-  const rawTypeName = (activeDist?.questionTypeName || activeDist?.questionType?.nameEn || "").trim().toUpperCase();
-  const validCategories = ["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"];
+  const rawName = activeDist?.questionTypeName || activeDist?.questionType?.nameEn || activeDist?.questionType?.nameBn || activeDist?.questionTypeLabel || "";
+  const normalized = normalizeQuestionTypeName(rawName) || normalizeQuestionTypeName(activeDist?.questionType?.nameEn) || normalizeQuestionTypeName(activeDist?.questionType?.nameBn);
 
-  let category: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
-  if (validCategories.includes(rawTypeName)) {
-    category = rawTypeName as any;
-  } else if (/\bcs\b/i.test(combinedStr) || combinedStr.includes("creative scenario") || combinedStr.includes("creative short") || combinedStr.includes("scenario")) {
-    category = "CS";
-  } else if ((combinedStr.includes("creative") || combinedStr.includes("cq") || combinedStr.includes("সৃজনশীল")) && !combinedStr.includes("mcq")) {
-    category = "CQ";
-  } else if (combinedStr.includes("short") || combinedStr.includes("sa") || combinedStr.includes("সংক্ষিপ্ত")) {
-    category = "SA";
-  } else if (combinedStr.includes("paragraph") || combinedStr.includes("অনুচ্ছেদ")) {
-    category = "PARAGRAPH";
-  } else if (combinedStr.includes("amplification") || combinedStr.includes("ভাবসম্প্রসারণ")) {
-    category = "AMPLIFICATION";
+  let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
+  if (normalized === QUESTION_TYPES.CS) {
+    category = QUESTION_TYPE_CODES.CS;
+  } else if (normalized === QUESTION_TYPES.CQ) {
+    category = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.SA) {
+    category = QUESTION_TYPE_CODES.SA;
+  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
+    category = QUESTION_TYPE_CODES.PARAGRAPH;
+  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
+    category = QUESTION_TYPE_CODES.AMPLIFICATION;
+  } else if (normalized === QUESTION_TYPES.MCQ) {
+    category = QUESTION_TYPE_CODES.MCQ;
   }
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(

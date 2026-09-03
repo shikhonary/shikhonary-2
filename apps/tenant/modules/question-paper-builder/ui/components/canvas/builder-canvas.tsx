@@ -93,6 +93,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     // 2. Otherwise, dynamically generate blocks from relations
     if (!paperQuery) return [];
     const newBlocks: PaperBlock[] = [];
+    const renderedQuestionIds = new Set<string>();
     let globalWrittenNumber = 0;
     let globalSectionIndex = 0;
 
@@ -136,9 +137,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
       const hasSections = paperQuery.sections && paperQuery.sections.length > 0;
 
-      const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number }) => {
+      const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
         const questions = subjectQuestions.filter((q: any) => {
+          if (renderedQuestionIds.has(q.id)) return false;
           if (extraOptions?.subSectionId) {
             return q.subSectionId === extraOptions.subSectionId || (q.distributionId === dist.id && (!q.subSectionId || q.subSectionId === extraOptions.subSectionId));
           }
@@ -168,6 +170,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         }
 
         questions.forEach((q: any, idx: number) => {
+          if (renderedQuestionIds.has(q.id)) return;
+          renderedQuestionIds.add(q.id);
           if (q.mcq) {
             let hideContext = false;
             let contextInstruction = "";
@@ -228,6 +232,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
                 },
               },
               gap: 4
@@ -248,6 +255,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
                 },
               },
               gap: 4
@@ -274,6 +284,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
                 },
               },
               gap: idx === questions.length - 1 ? 4 : 0
@@ -301,6 +314,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
                 } 
               },
               gap: idx === questions.length - 1 ? 4 : 0
@@ -321,6 +337,61 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                },
+              },
+              gap: 4
+            });
+          }
+          if (q.letter) {
+            globalWrittenNumber++;
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-letter",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "LETTER",
+                  data: q.letter,
+                  orderIndex: idx,
+                  masterNumber: globalWrittenNumber,
+                  totalQuestions: questions.length,
+                  attemptCount,
+                  marksPerQuestion: dist.marksPerQuestion,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                },
+              },
+              gap: 4
+            });
+          }
+          if (q.application) {
+            globalWrittenNumber++;
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-application",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "APPLICATION",
+                  data: q.application,
+                  orderIndex: idx,
+                  masterNumber: globalWrittenNumber,
+                  totalQuestions: questions.length,
+                  attemptCount,
+                  marksPerQuestion: dist.marksPerQuestion,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
                 },
               },
               gap: 4
@@ -354,6 +425,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               otherSubAttemptSum: extraOptions?.otherSubAttemptSum,
               subQuestionsToAttempt: extraOptions?.subQuestionsToAttempt,
               otherSubOccupied: extraOptions?.otherSubOccupied,
+              isSharedQuestionType: extraOptions?.isSharedQuestionType,
+              siblingSubSectionIds: extraOptions?.siblingSubSectionIds,
             },
             gap: 0
           });
@@ -365,7 +438,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           if ((dismissedSectionIds || []).includes(sec.id)) return false;
 
           const belongsToSubject = subject.distributions?.some(
-            (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => d.subSectionId === sub.id)
+            (d: any) => d.sectionId === sec.id || d.subSections?.some((s: any) => sec.subSections?.some((sub: any) => sub.id === s.subSectionId))
           );
           const hasQuestionsInSec = subjectQuestions.some(
             (q: any) => q.sectionId === sec.id || sec.subSections?.some((sub: any) => sub.id === q.subSectionId)
@@ -385,7 +458,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           }).length;
 
           const secDists = subject.distributions?.filter(
-            (d: any) => d.sectionId === sec.id || sec.subSections?.some((sub: any) => d.subSectionId === sub.id)
+            (d: any) => d.sectionId === sec.id || d.subSections?.some((s: any) => sec.subSections?.some((sub: any) => sub.id === s.subSectionId))
           ) || [];
 
           const distsProvidedSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
@@ -410,7 +483,59 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
           let finalSecInstruction = (sec.instructions && sec.instructions.trim() !== "") ? sec.instructions : null;
 
-          if (finalSecInstruction) {
+          if (validSubSections.length > 0) {
+            const secReqSum = secDists.reduce((sum: number, d: any) => {
+              const st = statuses?.find((s: any) => s.distributionId === d.id);
+              return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
+            }, 0);
+            const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
+
+            const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
+            const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
+
+            // Compute active sub-section breakdowns
+            const activeSubBreakdowns = validSubSections
+              .filter((s: any) => (s.questionsToAttempt && s.questionsToAttempt > 0))
+              .map((s: any) => {
+                const name = s.titleBn || s.title || "";
+                const count = toBengaliDigits(s.questionsToAttempt);
+                return `${name} থেকে ${count}টি`;
+              });
+
+            let subSectionClauseBreakdown = "";
+            let subSectionBracketBreakdown = "";
+
+            if (activeSubBreakdowns.length > 0) {
+              if (activeSubBreakdowns.length === 1) {
+                subSectionClauseBreakdown = `${activeSubBreakdowns[0]} সহ`;
+                subSectionBracketBreakdown = `${activeSubBreakdowns[0]} প্রশ্ন আবশ্যক`;
+              } else {
+                const allExceptLast = activeSubBreakdowns.slice(0, -1).join(", ");
+                const last = activeSubBreakdowns[activeSubBreakdowns.length - 1];
+                subSectionClauseBreakdown = `${allExceptLast} এবং ${last} সহ`;
+                subSectionBracketBreakdown = `${allExceptLast} এবং ${last} প্রশ্ন আবশ্যক`;
+              }
+            }
+
+            const prefix = "[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।";
+
+            // Scenario 1: All questions are required (no optional choice)
+            if (provCount > 0 && reqCount >= provCount) {
+              finalSecInstruction = `${prefix} সবগুলো প্রশ্নের উত্তর দিতে হবে।]`;
+            } 
+            // Scenario 2: Optional choice with sub-section specific quotas
+            else if (provCount > reqCount && activeSubBreakdowns.length > 0) {
+              finalSecInstruction = `${prefix} মোট ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে। ${subSectionBracketBreakdown}]`;
+            } 
+            // Scenario 3: Optional choice without specific sub-section quotas
+            else if (provCount > reqCount && reqCount > 0) {
+              finalSecInstruction = `${prefix} যেকোনো ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে।]`;
+            } 
+            // Fallback
+            else if (reqCount > 0) {
+              finalSecInstruction = `${prefix} যেকোনো ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে।]`;
+            }
+          } else if (finalSecInstruction) {
             const secReqSum = secDists.reduce((sum: number, d: any) => {
               const st = statuses?.find((s: any) => s.distributionId === d.id);
               return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
@@ -480,12 +605,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   if (distHasKw && subHasKw) score += 150;
                   else if (distHasKw && !subHasKw) score -= 300;
                 }
-                if (d.subSectionId === s.id) score += 1000;
+                if (d.subSections?.some((subRel: any) => subRel.subSectionId === s.id)) score += 1000;
                 const hasAddedQ = subjectQuestions.some((q: any) => q.subSectionId === s.id && q.distributionId === d.id);
                 if (hasAddedQ) score += 500;
                 return { dist: d, score };
               });
-              scored.sort((a, b) => b.score - a.score);
+              scored.sort((a: any, b: any) => b.score - a.score);
               const matchedDist = scored.length > 0 && scored[0].score > 0 ? scored[0].dist : (secDists[0] || null);
               subToDistMap.set(s.id, matchedDist);
             });
@@ -792,8 +917,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                       marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
                     }}
                   >
-                    {col.map(b => (
-                      <div key={b.id} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
+                    {col.map((b, bIdx) => (
+                      <div key={`${b.id}-${bIdx}`} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
                         <BlockRenderer block={b} />
                       </div>
                     ))}

@@ -3,6 +3,7 @@ import {
   listQuestionPapersSchema,
   getQuestionPaperSchema,
   createQuestionPaperSchema,
+  createQuestionPaperFullSchema,
   updateQuestionPaperSchema,
   deleteQuestionPaperSchema,
   duplicateQuestionPaperSchema,
@@ -23,11 +24,16 @@ import {
   bulkRemoveQuestionsSchema,
   updateQuestionPaperSettingsSchema,
   generatePaperSetsSchema,
+  addAlternativeQuestionSchema,
+  removeAlternativeQuestionSchema,
+  swapAlternativeQuestionSchema,
+  updateAlternativeQuestionSchema,
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
   getQuestionPaperById,
   createQuestionPaper,
+  createQuestionPaperFull,
   updateQuestionPaper,
   deleteQuestionPaper,
   duplicateQuestionPaper,
@@ -49,6 +55,10 @@ import {
   bulkRemoveQuestions,
   updateQuestionPaperSettings,
   generatePaperSets,
+  addAlternativeQuestion,
+  removeAlternativeQuestion,
+  swapAlternativeQuestion,
+  updateAlternativeQuestion,
 } from "./question-paper.service"
 
 export const questionPaperRouter = createTRPCRouter({
@@ -82,6 +92,12 @@ export const questionPaperRouter = createTRPCRouter({
     .input(createQuestionPaperSchema)
     .mutation(({ ctx, input }) =>
       createQuestionPaper(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  createFull: tenantMemberProcedure
+    .input(createQuestionPaperFullSchema)
+    .mutation(({ ctx, input }) =>
+      createQuestionPaperFull(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   update: tenantMemberProcedure
@@ -142,6 +158,30 @@ export const questionPaperRouter = createTRPCRouter({
     .input(reorderQuestionPaperQuestionsSchema)
     .mutation(({ ctx, input }) =>
       reorderQuestionPaperQuestions(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  addAlternative: tenantMemberProcedure
+    .input(addAlternativeQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      addAlternativeQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  removeAlternative: tenantMemberProcedure
+    .input(removeAlternativeQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      removeAlternativeQuestion(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  swapAlternative: tenantMemberProcedure
+    .input(swapAlternativeQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      swapAlternativeQuestion(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  updateAlternative: tenantMemberProcedure
+    .input(updateAlternativeQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      updateAlternativeQuestion(ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   upsertSection: tenantMemberProcedure

@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
+import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
+import { AddAlternativeModal } from "../modals/add-alternative-modal";
 
-const toBengaliDigits = (num: number | string): string => {
+const toBengaliDigits = (num?: number | string | null): string => {
+  if (num === null || num === undefined || num === "") return "";
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
   return num
     .toString()
@@ -157,10 +160,21 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
+  const [showAddAlternative, setShowAddAlternative] = useState(false);
+
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-2 break-inside-avoid py-1">
       {/* Hover Controls */}
       <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+        <button
+          type="button"
+          onClick={() => setShowAddAlternative(true)}
+          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
+          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
+        >
+          <Split className="w-3 h-3" />
+          অথবা
+        </button>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
@@ -173,31 +187,58 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
       </div>
 
       <div className="flex justify-between items-start gap-2">
-        <div className="flex gap-2 flex-1 relative">
-          <span
-            className="font-bold shrink-0"
-            style={{
-              fontSize: questionStyle.fontSize,
-              fontFamily: questionStyle.fontFamily,
-            }}
-          >
-            {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
-          </span>
-          <div className="flex-1 w-full min-w-0">
-            <AmplificationEditableText 
-              text={data.title}
-              itemKey={`${item.id}-question`}
-              defaultStyle={questionStyle}
-              className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
-            />
-          </div>
-          {mark !== undefined && (
-            <span className="font-bold text-sm text-[12px] ml-2 shrink-0">
-              {toBengaliDigits(mark)}
+        <div className="flex gap-2 flex-1 relative flex-col">
+          <div className="flex gap-2 items-start w-full">
+            <span
+              className="font-bold shrink-0"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            >
+              {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
             </span>
+            <div className="flex-1 w-full min-w-0">
+              <AmplificationEditableText 
+                text={data.title}
+                itemKey={`${item.id}-question`}
+                defaultStyle={questionStyle}
+                className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+              />
+            </div>
+            {mark !== undefined && (
+              <span className="font-bold text-sm text-[12px] ml-2 shrink-0">
+                {toBengaliDigits(mark)}
+              </span>
+            )}
+          </div>
+
+          {/* Attached Alternatives */}
+          {item.alternatives && item.alternatives.length > 0 && (
+            <AlternativeQuestionRenderer
+              paperId={paperId || ""}
+              parentQuestionId={item.id}
+              alternatives={item.alternatives}
+              settings={settings}
+              masterNumber={item.masterNumber || (item.orderIndex + 1)}
+              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+            />
           )}
         </div>
       </div>
+
+      <AddAlternativeModal
+        open={showAddAlternative}
+        onOpenChange={setShowAddAlternative}
+        paperId={paperId || ""}
+        primaryQuestionId={item.id}
+        primaryQuestionContentId={data.id}
+        primaryQuestionType="AMPLIFICATION"
+        subjectId={item.subjectId || distStatus?.subjectId || ""}
+        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+        masterNumber={item.masterNumber || (item.orderIndex + 1)}
+        distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
+      />
     </div>
   );
 };

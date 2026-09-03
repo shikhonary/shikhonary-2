@@ -109,7 +109,7 @@ model QuestionPaperSubSection {
     orderIndex Int @default(0)
 
     questions     QuestionPaperQuestion[]
-    distributions QuestionPaperSubjectMarkDistribution[]
+    distributions QuestionPaperSubSectionDistribution[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -160,10 +160,10 @@ model QuestionPaperSubjectMarkDistribution {
     paperSubjectId String
     paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
 
-    sectionId    String?
-    section      QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
-    subSectionId String?
-    subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
+    sectionId String?
+    section   QuestionPaperSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+
+    subSections QuestionPaperSubSectionDistribution[]
 
     // ── Marks ───────────────────────────────────────────────────
     marksPerQuestion Float @default(0) // marks awarded per single question
@@ -188,8 +188,22 @@ model QuestionPaperSubjectMarkDistribution {
     @@index([paperSubjectId])
     @@index([questionTypeId])
     @@index([sectionId])
-    @@index([subSectionId])
     @@map("question_paper_subject_mark_distribution")
+}
+
+model QuestionPaperSubSectionDistribution {
+    id             String                                @id @default(uuid())
+    subSectionId   String
+    subSection     QuestionPaperSubSection               @relation(fields: [subSectionId], references: [id], onDelete: Cascade)
+    distributionId String
+    distribution   QuestionPaperSubjectMarkDistribution  @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([subSectionId, distributionId])
+    @@index([subSectionId])
+    @@index([distributionId])
+    @@map("question_paper_sub_section_distribution")
 }
 
 // ── Junction: which questions belong to a paper, in what order ─
@@ -210,6 +224,23 @@ model QuestionPaperQuestion {
     shortAnswerId   String?
     paragraphId     String?
     amplificationId String?
+    letterId        String?
+    applicationId   String?
+    summaryId       String?
+    essenceId       String?
+    essayId         String?
+
+    // ── Alternative / OR Question Relationship ─────────────────
+    // If null, this is the primary question slot.
+    // If set, this question is an "OR" alternative to the parent question.
+    parentQuestionId String?
+    parentQuestion   QuestionPaperQuestion?  @relation("QuestionAlternatives", fields: [parentQuestionId], references: [id], onDelete: Cascade)
+    alternatives     QuestionPaperQuestion[] @relation("QuestionAlternatives")
+
+    // Display label rendered between questions: "অথবা" | "বা" | "OR"
+    orLabel          String?                 @default("অথবা")
+    // Order of alternative (0 for primary, 1 for 1st alt, 2 for 2nd alt, etc.)
+    orOrder          Int                     @default(0)
 
     // Associate with subject and distribution breakdown
     distributionId String
@@ -241,6 +272,12 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, shortAnswerId])
     @@unique([questionPaperId, paragraphId])
     @@unique([questionPaperId, amplificationId])
+    @@unique([questionPaperId, letterId])
+    @@unique([questionPaperId, applicationId])
+    @@unique([questionPaperId, summaryId])
+    @@unique([questionPaperId, essenceId])
+    @@unique([questionPaperId, essayId])
+    @@index([parentQuestionId])
     @@index([questionPaperId])
     @@index([mcqId])
     @@index([cqId])
@@ -248,6 +285,11 @@ model QuestionPaperQuestion {
     @@index([shortAnswerId])
     @@index([paragraphId])
     @@index([amplificationId])
+    @@index([letterId])
+    @@index([applicationId])
+    @@index([summaryId])
+    @@index([essenceId])
+    @@index([essayId])
     @@index([distributionId])
     @@index([sectionId])
     @@index([subSectionId])

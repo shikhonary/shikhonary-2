@@ -3,6 +3,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { Button } from "@workspace/ui/components/button";
 import { useQuestionPaperById, useUpsertSubSection } from "@/modules/question-paper/services/use-question-paper";
 import { toast } from "@workspace/ui/components/sonner";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -82,22 +83,50 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const combinedStr = `${nameEn} ${nameBn} ${label} ${code} ${subTitleStr} ${secTitleStr}`.toLowerCase();
 
-  const rawTypeName = (dist?.questionTypeName || dist?.questionType?.nameEn || "").trim().toUpperCase();
-  const validCategories = ["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"];
+  const distTypeName = dist?.questionTypeName || dist?.questionType?.nameEn || dist?.questionType?.nameBn || dist?.questionTypeLabel || "";
+  const normalized = normalizeQuestionTypeName(distTypeName) || normalizeQuestionTypeName(dist?.questionType?.nameEn) || normalizeQuestionTypeName(dist?.questionType?.nameBn);
 
-  let resolvedCategory = "MCQ";
-  if (validCategories.includes(rawTypeName)) {
-    resolvedCategory = rawTypeName as any;
-  } else if (/\bcs\b/i.test(combinedStr) || combinedStr.includes("creative scenario") || combinedStr.includes("creative short") || combinedStr.includes("scenario") || combinedStr.includes("উদ্দীপক")) {
-    resolvedCategory = "CS";
-  } else if ((combinedStr.includes("creative") || combinedStr.includes("cq") || combinedStr.includes("সৃজনশীল")) && !combinedStr.includes("mcq")) {
-    resolvedCategory = "CQ";
-  } else if (combinedStr.includes("short") || combinedStr.includes("sa") || combinedStr.includes("সংক্ষিপ্ত")) {
-    resolvedCategory = "SA";
-  } else if (combinedStr.includes("paragraph") || combinedStr.includes("অনুচ্ছেদ")) {
-    resolvedCategory = "PARAGRAPH";
-  } else if (combinedStr.includes("amplification") || combinedStr.includes("ভাবসম্প্রসারণ")) {
-    resolvedCategory = "AMPLIFICATION";
+  let resolvedCategory: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
+  if (normalized === QUESTION_TYPES.CS) {
+    resolvedCategory = QUESTION_TYPE_CODES.CS;
+  } else if (normalized === QUESTION_TYPES.CQ) {
+    resolvedCategory = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.SA) {
+    resolvedCategory = QUESTION_TYPE_CODES.SA;
+  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
+    resolvedCategory = QUESTION_TYPE_CODES.PARAGRAPH;
+  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
+    resolvedCategory = QUESTION_TYPE_CODES.AMPLIFICATION;
+  } else if (normalized === QUESTION_TYPES.LETTER) {
+    resolvedCategory = QUESTION_TYPE_CODES.LETTER;
+  } else if (normalized === QUESTION_TYPES.APPLICATION) {
+    resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
+  } else if (normalized === QUESTION_TYPES.SUMMARY) {
+    resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
+  } else if (normalized === QUESTION_TYPES.ESSENCE) {
+    resolvedCategory = QUESTION_TYPE_CODES.ESSENCE;
+  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
+    resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
+  } else if (normalized === QUESTION_TYPES.ESSAY) {
+    resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.MCQ) {
+    resolvedCategory = QUESTION_TYPE_CODES.MCQ;
+  } else {
+    // Robust fallback based on distribution questionTypeName
+    const lowerName = distTypeName.toLowerCase();
+    if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
+      resolvedCategory = QUESTION_TYPE_CODES.LETTER;
+    } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
+      resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
+    } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
+      resolvedCategory = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("short") || lowerName.includes("সংক্ষিপ্ত") || lowerName.includes("sa")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SA;
+    } else if (lowerName.includes("paragraph") || lowerName.includes("অনুচ্ছেদ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.PARAGRAPH;
+    } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
+      resolvedCategory = QUESTION_TYPE_CODES.AMPLIFICATION;
+    }
   }
 
   const queryParams = new URLSearchParams();

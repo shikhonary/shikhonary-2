@@ -3,17 +3,20 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 import { useAvailableQuestions } from "@/modules/question-paper/services/use-question-paper";
+import type { QuestionTypeCode } from "@workspace/utils";
 import { McqPickerCard } from "./mcq-picker-card";
 import { CqPickerCard } from "./cq-picker-card";
 import { CsPickerCard } from "./cs-picker-card";
 import { SaPickerCard } from "./sa-picker-card";
 import { ParagraphPickerCard } from "./paragraph-picker-card";
 import { AmplificationPickerCard } from "./amplification-picker-card";
+import { LetterPickerCard } from "./letter-picker-card";
+import { ApplicationPickerCard } from "./application-picker-card";
 
 export interface QuestionGridProps {
   subjectId: string;
   questionTypeId: string;
-  category: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION";
+  category: QuestionTypeCode;
   search: string;
   chapterId: string;
   board: string;
@@ -62,10 +65,20 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     );
   }
 
+  const effectiveCategory = (result?.category || category) as QuestionTypeCode;
+
   const renderCard = (q: any) => {
     const isSelected = selectedIds.includes(q.id);
 
-    switch (category) {
+    // If it has title without MCQ/CQ specific fields, check if it's application or letter
+    if (q.title && !q.options && !q.question && !q.context && !q.questionA) {
+      if (q.title.includes("দরখাস্ত") || q.title.includes("আবেদন")) {
+        return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      }
+      return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    switch (effectiveCategory) {
       case "CQ":
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CS":
@@ -76,6 +89,10 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <ParagraphPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "AMPLIFICATION":
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "APPLICATION":
+        return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "LETTER":
+        return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "MCQ":
       default:
         return <McqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;

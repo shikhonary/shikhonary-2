@@ -9,11 +9,11 @@ import {
   WandSparkles,
 } from "lucide-react";
 
-import { Button } from "./button";
-import { Badge } from "./badge";
-import { Separator } from "./separator";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import { Input } from "./input";
+import { Button } from "./button.js";
+import { Badge } from "./badge.js";
+import { Separator } from "./separator.js";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover.js";
+import { Input } from "./input.js";
 import { cn } from "@workspace/ui/lib/utils";
 
 const multiSelectVariants = cva(

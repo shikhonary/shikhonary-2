@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
+import type { QuestionTypeCode } from "@workspace/utils"
 import type {
   ListQuestionPapersInput,
   GetQuestionPaperInput,
@@ -41,7 +42,17 @@ export function useCreateQuestionPaper() {
   return useMutation({
     ...trpc.questionPaper.create.mutationOptions(),
     onSuccess: () => {
-      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+      queryClient.invalidateQueries(trpc.questionPaper.list.queryFilter())
+    },
+  })
+}
+
+export function useCreateQuestionPaperFull() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.createFull.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.list.queryFilter())
     },
   })
 }
@@ -203,7 +214,7 @@ export function useAvailableQuestions(
     subjectId: string
     chapterId?: string
     questionTypeId?: string
-    category?: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION"
+    category?: QuestionTypeCode
     difficulty?: string
     search?: string
     board?: string
@@ -255,6 +266,46 @@ export function useGeneratePaperSets() {
   const queryClient = useQueryClient()
   return useMutation({
     ...trpc.questionPaper.generateSets.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useAddAlternativeQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.addAlternative.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useRemoveAlternativeQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.removeAlternative.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useSwapAlternativeQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.swapAlternative.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useUpdateAlternativeQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.updateAlternative.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
     },

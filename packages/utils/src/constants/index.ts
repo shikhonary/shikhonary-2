@@ -247,5 +247,8 @@ export const QUESTION_DIFFICULTY_OPTIONS = [
   { value: QUESTION_DIFFICULTY.HARD, label: "Hard" },
 ] as const
 
+// ---------------------------------------------------------------------------
+// Question Types & Bilingual Mappings
+// ---------------------------------------------------------------------------
 
-
+export * from "./question-type"

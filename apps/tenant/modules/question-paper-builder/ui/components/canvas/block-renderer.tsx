@@ -7,9 +7,13 @@ import { CSBlock } from "../blocks/cs-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
 import { ParagraphBlock } from "../blocks/paragraph-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
+import { LetterBlock } from "../blocks/letter-block";
+import { ApplicationBlock } from "../blocks/application-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
+import { useDeleteSubSection, useDeleteSection } from "@/modules/question-paper/services/use-question-paper";
+import { toast } from "sonner";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -78,7 +82,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const subId = id || subSectionId;
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
-  const dismissSubSection = useBuilderStore((state) => state.dismissSubSection);
+  const { mutateAsync: deleteSubSection } = useDeleteSubSection();
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
   const formattedInst = instructions
@@ -108,12 +112,24 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
           <div className="flex items-center gap-1">
             <button
               type="button"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-                if (subId) dismissSubSection(subId);
+                if (subId && sectionId) {
+                  try {
+                    await deleteSubSection({ sectionId, id: subId });
+                    toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                    if (nextSubSectionId) {
+                      setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
+                    } else {
+                      setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
+                    }
+                  } catch (err: any) {
+                    toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+                  }
+                }
               }}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-              title="উপ-বিভাগ বন্ধ করুন"
+              title="উপ-বিভাগ মুছুন"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -217,6 +233,10 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ParagraphBlock item={block.data.item} />;
     case "question-amplification":
       return <AmplificationBlock item={block.data.item} />;
+    case "question-letter":
+      return <LetterBlock item={block.data.item} />;
+    case "question-application":
+      return <ApplicationBlock item={block.data.item} />;
     case "dist-action":
       return <DistActionBlock blockData={block.data} />;
     case "empty":

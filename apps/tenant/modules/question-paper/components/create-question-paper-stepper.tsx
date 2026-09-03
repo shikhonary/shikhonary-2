@@ -8,9 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { Loader2, Check, ArrowLeft, ArrowRight, SkipForward, FileText } from "lucide-react"
 import {
-  useCreateQuestionPaper,
-  useUpsertSubject,
-  useUpsertDistribution,
+  useCreateQuestionPaperFull,
 } from "../services/use-question-paper"
 import { INITIAL_WIZARD_DATA, WIZARD_STEPS } from "../types/create-wizard"
 import type { WizardData } from "../types/create-wizard"
@@ -26,9 +24,7 @@ export function CreateQuestionPaperStepper() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Mutations
-  const createMutation = useCreateQuestionPaper()
-  const upsertSubjectMutation = useUpsertSubject()
-  const upsertDistMutation = useUpsertDistribution()
+  const createFullMutation = useCreateQuestionPaperFull()
 
   // Reference data queries
   const { data: classesData, isLoading: isClassesLoading } = useQuery({
@@ -147,9 +143,10 @@ export function CreateQuestionPaperStepper() {
     setIsSubmitting(true)
 
     try {
-      // 1. Create the paper
       const dynamicTitle = `${wizardData.className} - ${wizardData.examName} প্রশ্নপত্র`
-      const paper = await createMutation.mutateAsync({
+
+      // Single batch request — paper + subjects + distributions all at once
+      const paper = await createFullMutation.mutateAsync({
         title: dynamicTitle,
         examName: wizardData.examName,
         description: "",
@@ -159,40 +156,25 @@ export function CreateQuestionPaperStepper() {
         timeInMinutes: wizardData.timeInMinutes,
         settings: {},
         instructions: [],
-      })
-
-      const paperId = paper.id
-
-      // 2. Create subjects + distributions
-      for (let i = 0; i < wizardData.subjects.length; i++) {
-        const subject = wizardData.subjects[i]!
-        const questionTypeIds = subject.distributions.map((d) => d.questionTypeId)
-        const createdSubject = await upsertSubjectMutation.mutateAsync({
-          questionPaperId: paperId,
+        subjects: wizardData.subjects.map((subject, i) => ({
           subjectId: subject.subjectId,
           subjectName: subject.subjectName,
           orderIndex: i,
-          questionTypeIds,
-        })
-
-        const paperSubjectId = createdSubject.id
-
-        for (const dist of subject.distributions) {
-          await upsertDistMutation.mutateAsync({
-            paperSubjectId,
+          questionTypeIds: subject.distributions.map((d) => d.questionTypeId),
+          distributions: subject.distributions.map((dist) => ({
             questionTypeId: dist.questionTypeId,
             questionTypeName: dist.questionTypeName,
             marksPerQuestion: dist.marksPerQuestion,
             questionCount: dist.questionCount,
             questionsToAttempt: dist.questionsToAttempt ?? null,
             orderIndex: dist.orderIndex,
-          })
-        }
-      }
+          })),
+        })),
+      })
 
       toast.success("প্রশ্নপত্র সফলভাবে তৈরি হয়েছে!")
       setTimeout(() => {
-        router.push(`/question-papers/${paperId}/builder`)
+        router.push(`/question-papers/${paper.id}/builder`)
       }, 800)
     } catch (err: any) {
       const msg = err.message || "প্রশ্নপত্র তৈরি করতে ব্যর্থ হয়েছে"

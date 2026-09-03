@@ -12,7 +12,8 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { HelpCircle, Loader2, Save, Award, Hash, Tag } from "lucide-react"
+import { HelpCircle, Loader2, Save, Award, Hash, Tag, Sparkles } from "lucide-react"
+import { QUESTION_TYPES, QUESTION_TYPE_OPTIONS, QUESTION_TYPE_MAP, type QuestionTypeName } from "@workspace/utils"
 
 import { useUpdateQuestionType, useQuestionTypeById } from "../services/use-question-type"
 
@@ -187,6 +188,38 @@ function EditQuestionTypeForm({ questionType, questionTypeId }: EditQuestionType
         <CardContent className="p-4 sm:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
             <div className="space-y-6">
+              {/* Standard Question Type Presets */}
+              <div className="space-y-2 rounded-xl bg-surface-container-lowest/60 border border-outline-variant/30 p-3 sm:p-4">
+                <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>Standard Question Type Presets (Click to autofill)</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {QUESTION_TYPE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        setValue("nameEn", opt.nameEn, { shouldValidate: true })
+                        setValue("nameBn", opt.nameBn, { shouldValidate: true })
+                        const meta = QUESTION_TYPE_MAP[opt.value as QuestionTypeName]
+                        if (meta?.defaultMark !== undefined) {
+                          setValue("mark", meta.defaultMark, { shouldValidate: true })
+                        }
+                        if (meta?.defaultPosition !== undefined) {
+                          setValue("position", meta.defaultPosition, { shouldValidate: true })
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-outline-variant/50 bg-white px-2.5 py-1 text-xs font-medium text-on-surface hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors cursor-pointer"
+                    >
+                      <span className="font-semibold">{opt.nameEn}</span>
+                      <span className="text-on-surface-variant text-[11px]">({opt.nameBn})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* English & Bangla Names */}
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Name EN */}

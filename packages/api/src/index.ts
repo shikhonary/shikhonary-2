@@ -73,6 +73,7 @@ export type {
   ListQuestionPapersInput,
   GetQuestionPaperInput,
   CreateQuestionPaperInput,
+  CreateQuestionPaperFullInput,
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
@@ -196,5 +197,45 @@ export type {
   BulkDeleteAmplificationsInput,
   ImportAmplificationsInput,
 } from "./routers/amplification/amplification.schema"
+
+export type {
+  ListLettersInput,
+  LetterStatsInput,
+  CreateLetterInput,
+  UpdateLetterInput,
+  DeleteLetterInput,
+  BulkDeleteLettersInput,
+  ImportLettersInput,
+} from "./routers/letter/letter.schema"
+
+export type {
+  ListApplicationsInput,
+  ApplicationStatsInput,
+  CreateApplicationInput,
+  UpdateApplicationInput,
+  DeleteApplicationInput,
+  BulkDeleteApplicationsInput,
+  ImportApplicationsInput,
+} from "./routers/application/application.schema"
+
+export type {
+  ListSummariesInput,
+  SummaryStatsInput,
+  CreateSummaryInput,
+  UpdateSummaryInput,
+  DeleteSummaryInput,
+  BulkDeleteSummariesInput,
+  ImportSummariesInput,
+} from "./routers/summary/summary.schema"
+
+export type {
+  ListEssencesInput,
+  EssenceStatsInput,
+  CreateEssenceInput,
+  UpdateEssenceInput,
+  DeleteEssenceInput,
+  BulkDeleteEssencesInput,
+  ImportEssencesInput,
+} from "./routers/essence/essence.schema"
 
 

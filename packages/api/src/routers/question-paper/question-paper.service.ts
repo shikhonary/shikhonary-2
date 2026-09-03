@@ -1,10 +1,12 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName } from "@workspace/utils"
 import { notFound } from "../../utils/errors"
 import type {
   ListQuestionPapersInput,
   GetQuestionPaperInput,
   CreateQuestionPaperInput,
+  CreateQuestionPaperFullInput,
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
@@ -25,6 +27,10 @@ import type {
   BulkRemoveQuestionsInput,
   UpdateQuestionPaperSettingsInput,
   GeneratePaperSetsInput,
+  AddAlternativeQuestionInput,
+  RemoveAlternativeQuestionInput,
+  SwapAlternativeQuestionInput,
+  UpdateAlternativeQuestionInput,
 } from "./question-paper.schema"
 
 // ---------------------------------------------------------------------------
@@ -197,13 +203,30 @@ export async function getQuestionPaperById(
     where: { id: input.id },
     include: {
       questions: {
+        where: { parentQuestionId: null },
         orderBy: { orderIndex: "asc" },
+        include: {
+          distribution: true,
+          alternatives: {
+            orderBy: { orOrder: "asc" },
+            include: {
+              distribution: true,
+            },
+          },
+        },
       },
       subjects: {
         orderBy: { orderIndex: "asc" },
         include: {
           distributions: {
             orderBy: { orderIndex: "asc" },
+            include: {
+              subSections: {
+                include: {
+                  subSection: true,
+                },
+              },
+            },
           },
         },
       },
@@ -212,6 +235,13 @@ export async function getQuestionPaperById(
         include: {
           subSections: {
             orderBy: { orderIndex: "asc" },
+            include: {
+              distributions: {
+                include: {
+                  distribution: true,
+                },
+              },
+            },
           },
         },
       },
@@ -226,13 +256,20 @@ export async function getQuestionPaperById(
     throw notFound("QuestionPaper")
   }
 
-  // Batch resolve cross-DB references from db in parallel
-  const mcqIds = paper.questions.map((q) => q.mcqId).filter(Boolean) as string[]
-  const cqIds = paper.questions.map((q) => q.cqId).filter(Boolean) as string[]
-  const csIds = paper.questions.map((q: any) => q.csId).filter(Boolean) as string[]
-  const shortAnswerIds = paper.questions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
-  const paragraphIds = paper.questions.map((q) => q.paragraphId).filter(Boolean) as string[]
-  const amplificationIds = paper.questions.map((q) => q.amplificationId).filter(Boolean) as string[]
+  // Batch resolve cross-DB references from db in parallel for both primary questions and alternatives
+  const allPaperQuestions = [
+    ...paper.questions,
+    ...paper.questions.flatMap((q: any) => q.alternatives || []),
+  ]
+
+  const mcqIds = allPaperQuestions.map((q) => q.mcqId).filter(Boolean) as string[]
+  const cqIds = allPaperQuestions.map((q) => q.cqId).filter(Boolean) as string[]
+  const csIds = allPaperQuestions.map((q: any) => q.csId).filter(Boolean) as string[]
+  const shortAnswerIds = allPaperQuestions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
+  const paragraphIds = allPaperQuestions.map((q) => q.paragraphId).filter(Boolean) as string[]
+  const amplificationIds = allPaperQuestions.map((q) => q.amplificationId).filter(Boolean) as string[]
+  const letterIds = allPaperQuestions.map((q: any) => q.letterId).filter(Boolean) as string[]
+  const applicationIds = allPaperQuestions.map((q: any) => q.applicationId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -246,6 +283,8 @@ export async function getQuestionPaperById(
     shortAnswers,
     paragraphs,
     amplifications,
+    letters,
+    applications,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -308,6 +347,22 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    letterIds.length > 0
+      ? (db as any).letter.findMany({
+        where: { id: { in: letterIds } },
+        include: {
+          questionType: true,
+        },
+      })
+      : [],
+    applicationIds.length > 0
+      ? (db as any).application.findMany({
+        where: { id: { in: applicationIds } },
+        include: {
+          questionType: true,
+        },
+      })
+      : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
     questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
@@ -319,6 +374,8 @@ export async function getQuestionPaperById(
   const shortMap = new Map(shortAnswers.map((s) => [s.id, s]))
   const paragraphMap = new Map(paragraphs.map((p) => [p.id, p]))
   const amplificationMap = new Map(amplifications.map((a) => [a.id, a]))
+  const letterMap = new Map(letters.map((l: any) => [l.id, l]))
+  const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -332,14 +389,19 @@ export async function getQuestionPaperById(
     })),
   }))
 
-  // Enrich questions with resolved entity
-  const enrichedQuestions = paper.questions.map((q: any) => {
+  const distMap = new Map(
+    enrichedSubjects.flatMap((s) => s.distributions.map((d: any) => [d.id, d]))
+  )
+
+  const enrichSingleQuestion = (q: any): any => {
     let resolvedMcq = q.mcqId ? mcqMap.get(q.mcqId) || null : null
     let resolvedCq = q.cqId ? cqMap.get(q.cqId) || null : null
     let resolvedCs = q.csId ? csMap.get(q.csId) || null : null
     let resolvedShort = q.shortAnswerId ? shortMap.get(q.shortAnswerId) || null : null
     let resolvedParagraph = q.paragraphId ? paragraphMap.get(q.paragraphId) || null : null
     let resolvedAmplification = q.amplificationId ? amplificationMap.get(q.amplificationId) || null : null
+    let resolvedLetter = q.letterId ? letterMap.get(q.letterId) || null : null
+    let resolvedApplication = q.applicationId ? applicationMap.get(q.applicationId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -360,17 +422,58 @@ export async function getQuestionPaperById(
     if (!resolvedAmplification && q.amplificationId && q.contentSnapshot) {
       resolvedAmplification = q.contentSnapshot as any
     }
+    if (!resolvedLetter && q.letterId && q.contentSnapshot) {
+      resolvedLetter = q.contentSnapshot as any
+    }
+    if (!resolvedApplication && q.applicationId && q.contentSnapshot) {
+      resolvedApplication = q.contentSnapshot as any
+    }
+
+    let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
+
+    const actualQuestionTypeId =
+      (resolvedParagraph as any)?.questionTypeId ||
+      (resolvedLetter as any)?.questionTypeId ||
+      (resolvedApplication as any)?.questionTypeId ||
+      (resolvedAmplification as any)?.questionTypeId ||
+      (resolvedCq as any)?.questionTypeId ||
+      (resolvedShort as any)?.questionTypeId
+
+    if (actualQuestionTypeId && resolvedDist && resolvedDist.questionTypeId !== actualQuestionTypeId) {
+      for (const dist of distMap.values()) {
+        const matchesExact = dist.questionTypeId === actualQuestionTypeId
+        const matchesCategory =
+          (resolvedParagraph && (dist.questionTypeName?.includes("অনুচ্ছেদ") || dist.questionTypeName?.toLowerCase().includes("paragraph"))) ||
+          (resolvedLetter && (dist.questionTypeName?.includes("চিঠি") || dist.questionTypeName?.includes("পত্র") || dist.questionTypeName?.toLowerCase().includes("letter"))) ||
+          (resolvedApplication && (dist.questionTypeName?.includes("আবেদন") || dist.questionTypeName?.includes("দরখাস্ত") || dist.questionTypeName?.toLowerCase().includes("application"))) ||
+          (resolvedAmplification && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
+          (resolvedShort && (dist.questionTypeName?.includes("সংক্ষিপ্ত") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
+          (resolvedCq && (dist.questionTypeName?.includes("সৃজনশীল") || dist.questionTypeName?.toLowerCase().includes("cq")))
+
+        if (matchesExact || matchesCategory) {
+          resolvedDist = dist
+          break
+        }
+      }
+    }
 
     return {
       ...q,
+      distribution: resolvedDist,
       mcq: resolvedMcq,
       cq: resolvedCq,
       cs: resolvedCs,
       shortAnswer: resolvedShort,
       paragraph: resolvedParagraph,
       amplification: resolvedAmplification,
+      letter: resolvedLetter,
+      application: resolvedApplication,
+      alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
-  })
+  }
+
+  // Enrich questions with resolved entity
+  const enrichedQuestions = paper.questions.map(enrichSingleQuestion)
 
   return {
     ...paper,
@@ -405,6 +508,317 @@ export async function createQuestionPaper(
     action: "CREATED",
     actorId,
     changes: { after: paper },
+  })
+
+  return paper
+}
+
+export async function createQuestionPaperFull(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: CreateQuestionPaperFullInput,
+  actorId?: string
+) {
+  // 1. Create the paper
+  const paper = await tenantDb.questionPaper.create({
+    data: {
+      title: input.title,
+      examName: input.examName,
+      description: input.description,
+      classId: input.classId,
+      className: input.className,
+      settings: input.settings,
+      instructions: input.instructions,
+      isTemplate: input.isTemplate,
+      timeInMinutes: input.timeInMinutes,
+      status: "Draft",
+      createdBy: actorId,
+    },
+  })
+
+  if (input.subjects.length === 0) {
+    await logHistory(tenantDb, {
+      questionPaperId: paper.id,
+      action: "CREATED",
+      actorId,
+      changes: { after: paper },
+    })
+    return paper
+  }
+
+  // 2. Batch-fetch all subject question structures from main DB upfront
+  const allSubjectIds = input.subjects.map((s) => s.subjectId)
+  const allQuestionTypeIds = Array.from(
+    new Set(input.subjects.flatMap((s) => s.distributions.map((d) => d.questionTypeId)))
+  )
+
+  const [mainSectionsAll, questionTypesAll] = await Promise.all([
+    db.subjectQuestionSection.findMany({
+      where: { subjectId: { in: allSubjectIds } },
+      include: {
+        subSections: {
+          include: { subjectQuestionTypes: true },
+          orderBy: { position: "asc" },
+        },
+        subjectQuestionTypes: true,
+      },
+      orderBy: { position: "asc" },
+    }),
+    allQuestionTypeIds.length > 0
+      ? db.questionType.findMany({ where: { id: { in: allQuestionTypeIds } } })
+      : [],
+  ])
+
+  const qTypeMap = new Map(questionTypesAll.map((t) => [t.id, t]))
+  const mainSectionsBySubject = new Map<string, typeof mainSectionsAll>()
+  for (const sec of mainSectionsAll) {
+    const arr = mainSectionsBySubject.get(sec.subjectId) || []
+    arr.push(sec)
+    mainSectionsBySubject.set(sec.subjectId, arr)
+  }
+
+  let paperTotal = 0
+
+  // 3. Process each subject + distributions + auto-create sections
+  for (let i = 0; i < input.subjects.length; i++) {
+    const subjectInput = input.subjects[i]!
+
+    const createdSubject = await tenantDb.questionPaperSubject.create({
+      data: {
+        questionPaperId: paper.id,
+        subjectId: subjectInput.subjectId,
+        subjectName: subjectInput.subjectName,
+        orderIndex: subjectInput.orderIndex ?? i,
+        subjectTotal: 0,
+      },
+    })
+
+    // Auto-create sections from main DB structure
+    const mainSections = mainSectionsBySubject.get(subjectInput.subjectId) || []
+    const definedTypeIds = subjectInput.questionTypeIds && subjectInput.questionTypeIds.length > 0
+      ? new Set(subjectInput.questionTypeIds)
+      : null
+
+    for (const mSec of mainSections) {
+      let shouldCreateSection = true
+      let validSubSectionsToCreate = mSec.subSections
+
+      if (definedTypeIds) {
+        const secTypeIds = mSec.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+        const hasDirectMatch = secTypeIds.some((id) => definedTypeIds.has(id))
+
+        validSubSectionsToCreate = mSec.subSections.filter((mSub) => {
+          const subTypeIds = mSub.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+          if (subTypeIds.length > 0) {
+            return subTypeIds.some((id) => definedTypeIds.has(id))
+          }
+          return hasDirectMatch
+        })
+
+        const hasSubMatch = validSubSectionsToCreate.length > 0
+        const totalLinkedTypes = secTypeIds.length + mSec.subSections.reduce((sum, s) => sum + s.subjectQuestionTypes.length, 0)
+
+        if (totalLinkedTypes > 0 && !hasDirectMatch && !hasSubMatch) {
+          shouldCreateSection = false
+        }
+      }
+
+      if (!shouldCreateSection) continue
+
+      const pSection = await tenantDb.questionPaperSection.create({
+        data: {
+          questionPaperId: paper.id,
+          title: mSec.nameEn,
+          titleBn: mSec.nameBn,
+          orderIndex: mSec.position,
+          instructions: mSec.instructions ?? null,
+          questionsToAttempt: null,
+        },
+      })
+
+      // Batch-create sub-sections
+      if (validSubSectionsToCreate.length > 0) {
+        const typeCounts = new Map<string, number>()
+        if (subjectInput.questionTypeIds) {
+          for (const tid of subjectInput.questionTypeIds) {
+            typeCounts.set(tid, (typeCounts.get(tid) || 0) + 1)
+          }
+        }
+
+        const subSectionsToCreate: Array<{
+          sectionId: string
+          title: string
+          titleBn: string | null
+          orderIndex: number
+          instructions: string | null
+          questionsToAttempt: number
+        }> = []
+
+        for (const mSub of validSubSectionsToCreate) {
+          const subTypeIds = mSub.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
+          let requiredInstances = 1
+          if (subjectInput.questionTypeIds && subTypeIds.length > 0) {
+            const matchingCounts = subTypeIds.map((tid) => typeCounts.get(tid) || 0)
+            const maxCount = Math.max(...matchingCounts)
+            if (maxCount > 0) requiredInstances = maxCount
+          }
+
+          for (let idx = 0; idx < requiredInstances; idx++) {
+            subSectionsToCreate.push({
+              sectionId: pSection.id,
+              title: mSub.nameEn,
+              titleBn: mSub.nameBn,
+              orderIndex: mSub.position + idx,
+              instructions: mSub.instructions ?? null,
+              questionsToAttempt: 0,
+            })
+          }
+        }
+
+        if (subSectionsToCreate.length > 0) {
+          await tenantDb.questionPaperSubSection.createMany({
+            data: subSectionsToCreate,
+          })
+        }
+      }
+    }
+
+    // Create distributions for this subject
+    let subjectTotal = 0
+
+    for (const distInput of subjectInput.distributions) {
+      const qType = qTypeMap.get(distInput.questionTypeId)
+      const questionTypeName = qType?.nameEn || qType?.nameBn || distInput.questionTypeName
+      const questionTypeLabel = distInput.questionTypeLabel || qType?.label || qType?.nameBn || qType?.nameEn || null
+
+      // Look up markDistribution from subjectQuestionType if not provided
+      let markDistribution = distInput.markDistribution
+      if (!markDistribution) {
+        const sqType = await db.subjectQuestionType.findFirst({
+          where: {
+            subjectId: subjectInput.subjectId,
+            questionTypeId: distInput.questionTypeId,
+          },
+          select: { markDistribution: true, sectionId: true, subSectionId: true },
+        })
+        markDistribution = sqType?.markDistribution ?? undefined
+      }
+
+      const attemptCount = distInput.questionsToAttempt ?? distInput.questionCount
+      const totalMarks = distInput.marksPerQuestion * attemptCount
+
+      // Resolve sectionId from matching paper section
+      let sectionId: string | null = null
+      const sqType = await db.subjectQuestionType.findFirst({
+        where: {
+          subjectId: subjectInput.subjectId,
+          questionTypeId: distInput.questionTypeId,
+        },
+        include: { section: true, subSection: true },
+      })
+
+      if (sqType?.section) {
+        const pSec = await tenantDb.questionPaperSection.findFirst({
+          where: {
+            questionPaperId: paper.id,
+            title: sqType.section.nameEn,
+            titleBn: sqType.section.nameBn,
+          },
+        })
+        if (pSec) sectionId = pSec.id
+      }
+
+      const dist = await tenantDb.questionPaperSubjectMarkDistribution.create({
+        data: {
+          paperSubjectId: createdSubject.id,
+          questionTypeId: distInput.questionTypeId,
+          questionTypeName,
+          questionTypeLabel,
+          marksPerQuestion: distInput.marksPerQuestion,
+          markDistribution: markDistribution as any,
+          questionCount: distInput.questionCount,
+          totalMarks,
+          questionsToAttempt: distInput.questionsToAttempt ?? distInput.questionCount,
+          orderIndex: distInput.orderIndex,
+          sectionId,
+        },
+      })
+
+      // Link sub-sections if applicable
+      if (sectionId && sqType?.subSection) {
+        const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
+          where: {
+            sectionId,
+            title: sqType.subSection.nameEn,
+            titleBn: sqType.subSection.nameBn,
+          },
+          orderBy: { orderIndex: "asc" },
+        })
+
+        for (const sub of candidateSubs) {
+          await tenantDb.questionPaperSubSectionDistribution.upsert({
+            where: {
+              subSectionId_distributionId: {
+                subSectionId: sub.id,
+                distributionId: dist.id,
+              },
+            },
+            create: { subSectionId: sub.id, distributionId: dist.id },
+            update: {},
+          }).catch(() => { })
+        }
+
+        // Update section questionsToAttempt
+        if (candidateSubs.length === 1) {
+          await tenantDb.questionPaperSubSection.update({
+            where: { id: candidateSubs[0]!.id },
+            data: { questionsToAttempt: distInput.questionsToAttempt ?? distInput.questionCount },
+          }).catch(() => { })
+        }
+      }
+
+      if (sectionId) {
+        const secSubs = await tenantDb.questionPaperSubSection.findMany({
+          where: { sectionId },
+          select: { questionsToAttempt: true },
+        })
+        const secAttemptSum = secSubs.reduce((sum, s) => sum + (s.questionsToAttempt || 0), 0)
+        if (secAttemptSum > 0) {
+          await tenantDb.questionPaperSection.update({
+            where: { id: sectionId },
+            data: { questionsToAttempt: secAttemptSum },
+          }).catch(() => { })
+        }
+      }
+
+      subjectTotal += totalMarks
+    }
+
+    // Update subject total
+    await tenantDb.questionPaperSubject.update({
+      where: { id: createdSubject.id },
+      data: { subjectTotal },
+    })
+
+    paperTotal += subjectTotal
+  }
+
+  // 4. Update paper total
+  await tenantDb.questionPaper.update({
+    where: { id: paper.id },
+    data: { total: paperTotal },
+  })
+
+  // 5. Log history
+  await logHistory(tenantDb, {
+    questionPaperId: paper.id,
+    action: "CREATED",
+    actorId,
+    changes: {
+      after: paper,
+      subjectsCount: input.subjects.length,
+      distributionsCount: input.subjects.reduce((sum, s) => sum + s.distributions.length, 0),
+    },
   })
 
   return paper
@@ -501,7 +915,12 @@ export async function duplicateQuestionPaper(
         },
       },
       sections: true,
-      questions: true,
+      questions: {
+        where: { parentQuestionId: null },
+        include: {
+          alternatives: true,
+        },
+      },
     },
   })
 
@@ -579,12 +998,20 @@ export async function duplicateQuestionPaper(
 
     const newSectionId = question.sectionId ? sectionIdMap.get(question.sectionId) : null
 
-    await tenantDb.questionPaperQuestion.create({
+    const createdPrimary = await tenantDb.questionPaperQuestion.create({
       data: {
         questionPaperId: duplicate.id,
         mcqId: question.mcqId,
         cqId: question.cqId,
+        csId: question.csId,
         shortAnswerId: question.shortAnswerId,
+        paragraphId: question.paragraphId,
+        amplificationId: question.amplificationId,
+        letterId: question.letterId,
+        applicationId: question.applicationId,
+        summaryId: question.summaryId,
+        essenceId: question.essenceId,
+        essayId: question.essayId,
         distributionId: newDistId,
         sectionId: newSectionId,
         orderIndex: question.orderIndex,
@@ -593,6 +1020,37 @@ export async function duplicateQuestionPaper(
         contentSnapshot: question.contentSnapshot as any,
       },
     })
+
+    if (question.alternatives && question.alternatives.length > 0) {
+      for (const alt of question.alternatives) {
+        const altDistId = distIdMap.get(alt.distributionId) || newDistId
+        await tenantDb.questionPaperQuestion.create({
+          data: {
+            questionPaperId: duplicate.id,
+            parentQuestionId: createdPrimary.id,
+            mcqId: alt.mcqId,
+            cqId: alt.cqId,
+            csId: alt.csId,
+            shortAnswerId: alt.shortAnswerId,
+            paragraphId: alt.paragraphId,
+            amplificationId: alt.amplificationId,
+            letterId: alt.letterId,
+            applicationId: alt.applicationId,
+            summaryId: alt.summaryId,
+            essenceId: alt.essenceId,
+            essayId: alt.essayId,
+            distributionId: altDistId,
+            sectionId: newSectionId,
+            orderIndex: alt.orderIndex,
+            assignedMarks: alt.assignedMarks,
+            orLabel: alt.orLabel || "অথবা",
+            orOrder: alt.orOrder,
+            overrides: alt.overrides ?? {},
+            contentSnapshot: alt.contentSnapshot as any,
+          },
+        })
+      }
+    }
   }
 
   await logHistory(tenantDb, {
@@ -854,7 +1312,7 @@ export async function upsertQuestionPaperSubject(
       } else if (!pSection.instructions && mSec.instructions) {
         pSection = await tenantDb.questionPaperSection.update({
           where: { id: pSection.id },
-          data: { 
+          data: {
             instructions: mSec.instructions ?? pSection.instructions,
           },
         })
@@ -1008,11 +1466,11 @@ export async function upsertQuestionPaperDistribution(
         where: { id: sqType.subSectionId },
       })
       if (mSub) {
-        const existingDists = await tenantDb.questionPaperSubjectMarkDistribution.findMany({
-          where: { paperSubjectId: subject.id },
+        const existingLinks = await tenantDb.questionPaperSubSectionDistribution.findMany({
+          where: { distribution: { paperSubjectId: subject.id } },
           select: { subSectionId: true },
         })
-        const usedSubIds = new Set(existingDists.map((d) => d.subSectionId).filter(Boolean))
+        const usedSubIds = new Set(existingLinks.map((d) => d.subSectionId).filter(Boolean))
 
         const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
           where: {
@@ -1071,7 +1529,6 @@ export async function upsertQuestionPaperDistribution(
         questionsToAttempt: input.questionsToAttempt !== undefined ? input.questionsToAttempt : (existing.questionsToAttempt ?? input.questionCount),
         orderIndex: input.orderIndex ?? existing.orderIndex,
         sectionId: input.sectionId ?? sectionId ?? undefined,
-        subSectionId: input.subSectionId ?? subSectionId ?? undefined,
       },
     })
   } else {
@@ -1088,39 +1545,74 @@ export async function upsertQuestionPaperDistribution(
         questionsToAttempt: input.questionsToAttempt ?? input.questionCount,
         orderIndex: input.orderIndex,
         sectionId: input.sectionId ?? sectionId,
-        subSectionId: input.subSectionId ?? subSectionId,
       },
     })
   }
 
-  const targetSubId = input.subSectionId ?? subSectionId
   const targetSecId = input.sectionId ?? sectionId
+  let targetSubIds: string[] = []
 
-  if (targetSubId) {
+  if (input.subSectionIds && input.subSectionIds.length > 0) {
+    targetSubIds = input.subSectionIds
+  } else if (input.subSectionId) {
+    targetSubIds = [input.subSectionId]
+  } else if (targetSecId) {
+    const linkedSqTypes = await db.subjectQuestionType.findMany({
+      where: {
+        subjectId: subject.subjectId,
+        questionTypeId: input.questionTypeId,
+        sectionId: sqType?.sectionId || undefined,
+      },
+      include: { subSection: true },
+    })
+    const linkedSubNames = linkedSqTypes.map((l) => l.subSection?.nameEn).filter(Boolean) as string[]
+    const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
+      where: {
+        sectionId: targetSecId,
+        ...(linkedSubNames.length > 0 ? {
+          OR: linkedSubNames.map((n) => ({ title: n })),
+        } : {}),
+      },
+    })
+    targetSubIds = candidateSubs.map((s) => s.id)
+  }
+
+  // Link sub-sections in many-to-many join table
+  for (const subId of targetSubIds) {
+    await tenantDb.questionPaperSubSectionDistribution.upsert({
+      where: {
+        subSectionId_distributionId: {
+          subSectionId: subId,
+          distributionId: dist.id,
+        },
+      },
+      create: {
+        subSectionId: subId,
+        distributionId: dist.id,
+      },
+      update: {},
+    }).catch(() => { })
+  }
+
+  if (targetSubIds.length > 0) {
     if (input.id && input.subSectionId && input.questionsToAttempt !== undefined && input.questionsToAttempt !== null) {
       await tenantDb.questionPaperSubSection.update({
-        where: { id: targetSubId },
+        where: { id: input.subSectionId },
         data: { questionsToAttempt: input.questionsToAttempt },
       }).catch(() => { })
     } else {
-      const sharedSqTypes = await db.subjectQuestionType.findMany({
-        where: {
-          subjectId: subject.subjectId,
-          questionTypeId: input.questionTypeId,
-        },
-      })
-
-      const isSharedType = sharedSqTypes.length > 1
-
+      const isSharedType = targetSubIds.length > 1
       if (isSharedType) {
-        await tenantDb.questionPaperSubSection.update({
-          where: { id: targetSubId },
-          data: { questionsToAttempt: 0 },
-        }).catch(() => { })
+        for (const subId of targetSubIds) {
+          await tenantDb.questionPaperSubSection.update({
+            where: { id: subId },
+            data: { questionsToAttempt: 0 },
+          }).catch(() => { })
+        }
       } else {
         const attemptVal = input.questionsToAttempt ?? dist.questionsToAttempt ?? dist.questionCount ?? 1
         await tenantDb.questionPaperSubSection.update({
-          where: { id: targetSubId },
+          where: { id: targetSubIds[0] },
           data: { questionsToAttempt: attemptVal },
         }).catch(() => { })
       }
@@ -1138,7 +1630,7 @@ export async function upsertQuestionPaperDistribution(
 
     await tenantDb.questionPaperSection.update({
       where: { id: targetSecId },
-      data: { 
+      data: {
         questionsToAttempt: finalSecAttempt ?? undefined,
       },
     }).catch(() => { })
@@ -1242,7 +1734,7 @@ export async function addQuestionPaperQuestion(
   })
 
   const finalSectionId = input.sectionId ?? dist?.sectionId ?? null
-  const finalSubSectionId = input.subSectionId ?? dist?.subSectionId ?? null
+  const finalSubSectionId = input.subSectionId ?? null
 
   // Create the junction row
   const paperQuestion = await tenantDb.questionPaperQuestion.create({
@@ -1289,6 +1781,16 @@ export async function removeQuestionPaperQuestion(
     where.paragraphId = input.questionId
   } else if (input.questionType === "AMPLIFICATION") {
     where.amplificationId = input.questionId
+  } else if (input.questionType === "LETTER") {
+    where.letterId = input.questionId
+  } else if (input.questionType === "APPLICATION") {
+    where.applicationId = input.questionId
+  } else if (input.questionType === "SUMMARY") {
+    where.summaryId = input.questionId
+  } else if (input.questionType === "ESSENCE") {
+    where.essenceId = input.questionId
+  } else if (input.questionType === "ESSAY") {
+    where.essayId = input.questionId
   }
 
   const existing = await tenantDb.questionPaperQuestion.findFirst({ where })
@@ -1338,6 +1840,276 @@ export async function reorderQuestionPaperQuestions(
   return { success: true }
 }
 
+export async function addAlternativeQuestion(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: AddAlternativeQuestionInput,
+  actorId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+
+  // 1. Fetch the primary question
+  const primaryQuestion = await tenantDb.questionPaperQuestion.findUnique({
+    where: { id: input.parentQuestionId },
+    include: { distribution: true },
+  })
+  if (!primaryQuestion) throw notFound("Primary Question")
+  if (primaryQuestion.parentQuestionId) {
+    throw new Error("Cannot add an alternative to another alternative question.")
+  }
+
+  // 2. Strict mark validation: Alternative must share exact same mark
+  const primaryMark = primaryQuestion.assignedMarks ?? primaryQuestion.distribution?.marksPerQuestion ?? 0
+
+  // 3. Resolve the alternative question in main DB
+  const typeFieldMap: Record<string, string> = {
+    MCQ: "mcqId",
+    CQ: "cqId",
+    CS: "csId",
+    SA: "shortAnswerId",
+    PARAGRAPH: "paragraphId",
+    AMPLIFICATION: "amplificationId",
+    LETTER: "letterId",
+    APPLICATION: "applicationId",
+    SUMMARY: "summaryId",
+    ESSENCE: "essenceId",
+    NEWS_REPORT: "paragraphId",
+    ESSAY: "paragraphId",
+  }
+
+  const fkField = typeFieldMap[input.questionType]
+  if (!fkField) throw new Error(`Unsupported question type: ${input.questionType}`)
+
+  let altContent: any = null
+
+  if (input.questionType === "MCQ") {
+    altContent = await db.mcq.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "CQ") {
+    altContent = await db.cq.findUnique({ where: { id: input.questionId } })
+    if (altContent?.totalMarks && primaryMark > 0 && altContent.totalMarks !== primaryMark) {
+      throw new Error(`বিকল্প প্রশ্নের মান (${altContent.totalMarks}) মূল প্রশ্নের মানের (${primaryMark}) সমান হতে হবে।`)
+    }
+  } else if (input.questionType === "CS") {
+    altContent = await (db as any).cS.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SA") {
+    altContent = await db.shortAnswer.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "PARAGRAPH") {
+    altContent = await db.paragraph.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "AMPLIFICATION") {
+    altContent = await db.amplification.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "LETTER") {
+    altContent = await (db as any).letter.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "APPLICATION") {
+    altContent = await (db as any).application.findUnique({ where: { id: input.questionId } })
+  }
+  if (!altContent) throw notFound(input.questionType)
+
+  // 4. Verify question is not already added to this paper
+  const existingInPaper = await tenantDb.questionPaperQuestion.findFirst({
+    where: {
+      questionPaperId: input.questionPaperId,
+      [fkField]: input.questionId,
+    },
+  })
+  if (existingInPaper) {
+    throw new Error("এই প্রশ্নটি ইতিমধ্যে এই প্রশ্নপত্রে যোগ করা আছে। অনুগ্রহ করে অন্য কোনো প্রশ্ন নির্বাচন করুন।")
+  }
+
+  // 5. Find highest orOrder
+  const existingAlternatives = await tenantDb.questionPaperQuestion.findMany({
+    where: { parentQuestionId: input.parentQuestionId },
+    orderBy: { orOrder: "desc" },
+    take: 1,
+    select: { orOrder: true },
+  })
+  const nextOrOrder = (existingAlternatives[0]?.orOrder ?? 0) + 1
+
+  const contentSnapshot = paper.status === "Published" ? JSON.parse(JSON.stringify(altContent)) : null
+
+  // 6. Resolve matching distribution for alternative question type in this paper
+  let targetDistributionId = input.distributionId
+
+  if (altContent.questionTypeId) {
+    let isMatching = false
+    if (targetDistributionId) {
+      const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+        where: { id: targetDistributionId },
+        select: { questionTypeId: true },
+      })
+      if (dist && dist.questionTypeId === altContent.questionTypeId) {
+        isMatching = true
+      }
+    }
+
+    if (!isMatching) {
+      const matchingDist = await tenantDb.questionPaperSubjectMarkDistribution.findFirst({
+        where: {
+          questionTypeId: altContent.questionTypeId,
+          paperSubject: { questionPaperId: input.questionPaperId },
+        },
+        select: { id: true },
+      })
+      if (matchingDist) {
+        targetDistributionId = matchingDist.id
+      }
+    }
+  }
+
+  if (!targetDistributionId) {
+    targetDistributionId = primaryQuestion.distributionId
+  }
+
+  // 7. Create the alternative row
+  const alternativeQuestion = await tenantDb.questionPaperQuestion.create({
+    data: {
+      questionPaperId: input.questionPaperId,
+      parentQuestionId: input.parentQuestionId,
+      [fkField]: input.questionId,
+      distributionId: targetDistributionId,
+      sectionId: primaryQuestion.sectionId,
+      subSectionId: primaryQuestion.subSectionId,
+      orderIndex: primaryQuestion.orderIndex,
+      assignedMarks: primaryMark, // Strictly same marks as primary
+      orLabel: input.orLabel || "অথবা",
+      orOrder: nextOrOrder,
+      contentSnapshot,
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_ADDED",
+    actorId,
+    changes: {
+      parentQuestionId: input.parentQuestionId,
+      alternativeQuestionId: alternativeQuestion.id,
+      orLabel: input.orLabel,
+    },
+  })
+
+  return alternativeQuestion
+}
+
+export async function removeAlternativeQuestion(
+  tenantDb: TenantPrismaClient,
+  input: RemoveAlternativeQuestionInput,
+  actorId?: string
+) {
+  const altQuestion = await tenantDb.questionPaperQuestion.findFirst({
+    where: {
+      id: input.alternativeQuestionId,
+      questionPaperId: input.questionPaperId,
+      parentQuestionId: { not: null },
+    },
+  })
+  if (!altQuestion) throw notFound("Alternative Question")
+
+  await tenantDb.questionPaperQuestion.delete({
+    where: { id: altQuestion.id },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_REMOVED",
+    actorId,
+    changes: { alternativeQuestionId: altQuestion.id },
+  })
+
+  return { success: true }
+}
+
+export async function swapAlternativeQuestion(
+  tenantDb: TenantPrismaClient,
+  input: SwapAlternativeQuestionInput,
+  actorId?: string
+) {
+  const primary = await tenantDb.questionPaperQuestion.findUnique({
+    where: { id: input.parentQuestionId },
+  })
+  const alt = await tenantDb.questionPaperQuestion.findUnique({
+    where: { id: input.alternativeQuestionId },
+  })
+  if (!primary || !alt) throw notFound("Question")
+
+  const fkFields = [
+    "mcqId", "cqId", "csId", "shortAnswerId", "paragraphId", "amplificationId",
+    "letterId", "applicationId", "summaryId", "essenceId", "essayId"
+  ] as const
+
+  const questionFields = [
+    ...fkFields,
+    "contentSnapshot", "overrides", "assignedMarks"
+  ] as const
+
+  const primaryData: any = {}
+  const altData: any = {}
+
+  for (const f of questionFields) {
+    primaryData[f] = (alt as any)[f]
+    altData[f] = (primary as any)[f]
+  }
+
+  const nullFks: any = {}
+  for (const f of fkFields) {
+    nullFks[f] = null
+  }
+
+  await tenantDb.$transaction(async (tx) => {
+    // 1. Temporarily clear foreign keys on alt to break unique constraint cycle
+    await tx.questionPaperQuestion.update({
+      where: { id: alt.id },
+      data: nullFks,
+    })
+
+    // 2. Set primary's question data to alt's data
+    await tx.questionPaperQuestion.update({
+      where: { id: primary.id },
+      data: primaryData,
+    })
+
+    // 3. Set alt's question data to primary's data
+    await tx.questionPaperQuestion.update({
+      where: { id: alt.id },
+      data: altData,
+    })
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_REORDERED",
+    actorId,
+    changes: { primaryId: primary.id, alternativeId: alt.id, swap: true },
+  })
+
+  return { success: true }
+}
+
+export async function updateAlternativeQuestion(
+  tenantDb: TenantPrismaClient,
+  input: UpdateAlternativeQuestionInput,
+  actorId?: string
+) {
+  const altQuestion = await tenantDb.questionPaperQuestion.findFirst({
+    where: {
+      id: input.alternativeQuestionId,
+      questionPaperId: input.questionPaperId,
+    },
+  })
+  if (!altQuestion) throw notFound("Alternative Question")
+
+  const updated = await tenantDb.questionPaperQuestion.update({
+    where: { id: altQuestion.id },
+    data: {
+      orLabel: input.orLabel ?? altQuestion.orLabel,
+    },
+  })
+
+  return updated
+}
+
 export async function getQuestionPaperHistory(
   tenantDb: TenantPrismaClient,
   input: GetQuestionPaperInput
@@ -1384,11 +2156,17 @@ export async function getQuestionPaperDistributionStatuses(
   })
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
-  // Count questions per distribution
+  // Count primary questions and alternative questions per distribution
   const countsByDist = new Map<string, number>()
+  const altCountsByDist = new Map<string, number>()
   for (const q of paper.questions) {
-    const cur = countsByDist.get(q.distributionId) || 0
-    countsByDist.set(q.distributionId, cur + 1)
+    if (q.parentQuestionId) {
+      const cur = altCountsByDist.get(q.distributionId) || 0
+      altCountsByDist.set(q.distributionId, cur + 1)
+    } else {
+      const cur = countsByDist.get(q.distributionId) || 0
+      countsByDist.set(q.distributionId, cur + 1)
+    }
   }
 
   const statuses: Array<{
@@ -1401,18 +2179,21 @@ export async function getQuestionPaperDistributionStatuses(
     questionTypeLabel: string | null
     targetCount: number
     addedCount: number
+    alternativeCount: number
     marksPerQuestion: number
     markDistribution: any
     totalMarks: number
     status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE"
     sectionId: string | null
     subSectionId: string | null
+    subSectionIds?: string[]
     questionType: any
   }> = []
 
   for (const sub of paper.subjects) {
     for (const dist of sub.distributions) {
       const addedCount = countsByDist.get(dist.id) || 0
+      const altCount = altCountsByDist.get(dist.id) || 0
       const targetCount = dist.questionCount
 
       const isComplete = addedCount >= targetCount && targetCount > 0
@@ -1428,12 +2209,14 @@ export async function getQuestionPaperDistributionStatuses(
         questionTypeLabel: dist.questionTypeLabel || null,
         targetCount,
         addedCount,
+        alternativeCount: altCount,
         marksPerQuestion: dist.marksPerQuestion,
         markDistribution: dist.markDistribution || null,
         totalMarks: dist.totalMarks,
         status,
         sectionId: dist.sectionId || null,
-        subSectionId: dist.subSectionId || null,
+        subSectionId: (dist as any).subSections?.[0]?.subSectionId || null,
+        subSectionIds: (dist as any).subSections?.map((s: any) => s.subSectionId) || [],
         questionType: qTypeMap.get(dist.questionTypeId) || null,
       })
     }
@@ -1442,40 +2225,186 @@ export async function getQuestionPaperDistributionStatuses(
   return statuses
 }
 
+// ---------------------------------------------------------------------------
+// Available Questions — Category Registry Config
+// ---------------------------------------------------------------------------
+
+type CategoryQueryConfig = {
+  model: string
+  searchFields: string[]
+  includes: Record<string, boolean>
+  excludedIdField: string
+  hasIsActive: boolean
+  fallbackWithoutTypeFilter?: boolean
+}
+
+const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
+  MCQ: {
+    model: "mcq",
+    searchFields: ["question"],
+    includes: { chapter: true, questionType: true, attachments: true },
+    excludedIdField: "mcqId",
+    hasIsActive: true,
+  },
+  CQ: {
+    model: "cq",
+    searchFields: ["questionA", "questionB", "context"],
+    includes: { chapter: true, questionType: true, answer: true, attachments: true },
+    excludedIdField: "cqId",
+    hasIsActive: true,
+  },
+  CS: {
+    model: "cS",
+    searchFields: ["questionA", "questionB"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "csId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  SA: {
+    model: "shortAnswer",
+    searchFields: ["question"],
+    includes: { chapter: true, questionType: true, attachments: true },
+    excludedIdField: "shortAnswerId",
+    hasIsActive: true,
+  },
+  PARAGRAPH: {
+    model: "paragraph",
+    searchFields: ["name"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "paragraphId",
+    hasIsActive: false,
+  },
+  AMPLIFICATION: {
+    model: "amplification",
+    searchFields: ["title"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "amplificationId",
+    hasIsActive: false,
+  },
+  LETTER: {
+    model: "letter",
+    searchFields: ["title"],
+    includes: { questionType: true },
+    excludedIdField: "letterId",
+    hasIsActive: false,
+    fallbackWithoutTypeFilter: true,
+  },
+  APPLICATION: {
+    model: "application",
+    searchFields: ["title"],
+    includes: { questionType: true },
+    excludedIdField: "applicationId",
+    hasIsActive: false,
+    fallbackWithoutTypeFilter: true,
+  },
+  SUMMARY: {
+    model: "paragraph",
+    searchFields: ["name"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "paragraphId",
+    hasIsActive: false,
+  },
+  ESSENCE: {
+    model: "paragraph",
+    searchFields: ["name"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "paragraphId",
+    hasIsActive: false,
+  },
+  NEWS_REPORT: {
+    model: "paragraph",
+    searchFields: ["name"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "paragraphId",
+    hasIsActive: false,
+  },
+  ESSAY: {
+    model: "paragraph",
+    searchFields: ["name"],
+    includes: { chapter: true, questionType: true },
+    excludedIdField: "paragraphId",
+    hasIsActive: false,
+  },
+}
+
+// Normalized name → category code mapping for auto-detection
+const NORMALIZED_TO_CATEGORY: Record<string, string> = {
+  [QUESTION_TYPES.MCQ]: "MCQ",
+  [QUESTION_TYPES.CQ]: "CQ",
+  [QUESTION_TYPES.CS]: "CS",
+  [QUESTION_TYPES.SA]: "SA",
+  [QUESTION_TYPES.PARAGRAPH]: "PARAGRAPH",
+  [QUESTION_TYPES.THOUGHT_EXPANSION]: "AMPLIFICATION",
+  [QUESTION_TYPES.LETTER]: "LETTER",
+  [QUESTION_TYPES.APPLICATION]: "APPLICATION",
+  [QUESTION_TYPES.SUMMARY]: "SUMMARY",
+  [QUESTION_TYPES.ESSENCE]: "ESSENCE",
+  [QUESTION_TYPES.NEWS_REPORT]: "NEWS_REPORT",
+  [QUESTION_TYPES.ESSAY]: "ESSAY",
+}
+
 export async function getAvailableQuestions(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
   const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, year, excludePaperId, limit, cursor } = input
-
-  const excludedMcqIds = new Set<string>()
-  const excludedCqIds = new Set<string>()
-  const excludedCsIds = new Set<string>()
-  const excludedShortIds = new Set<string>()
-  const excludedParagraphIds = new Set<string>()
-  const excludedAmplificationIds = new Set<string>()
-
   console.log(category)
 
-  if (excludePaperId) {
-    const existing = await tenantDb.questionPaperQuestion.findMany({
+  // 1. Build exclusion set and resolve category in parallel
+  const exclusionPromise = excludePaperId
+    ? tenantDb.questionPaperQuestion.findMany({
       where: { questionPaperId: excludePaperId },
+      select: {
+        mcqId: true,
+        cqId: true,
+        csId: true,
+        shortAnswerId: true,
+        paragraphId: true,
+        amplificationId: true,
+        letterId: true,
+        applicationId: true,
+        summaryId: true,
+        essenceId: true,
+        essayId: true,
+      },
     })
-    for (const q of existing) {
-      if (q.mcqId) excludedMcqIds.add(q.mcqId)
-      if (q.cqId) excludedCqIds.add(q.cqId)
-      if (q.csId) excludedCsIds.add(q.csId)
-      if (q.shortAnswerId) excludedShortIds.add(q.shortAnswerId)
-      if (q.paragraphId) excludedParagraphIds.add(q.paragraphId)
-      if (q.amplificationId) excludedAmplificationIds.add(q.amplificationId)
+    : Promise.resolve([])
+
+  const categoryPromise = (async () => {
+    let effectiveCategory = category
+    if ((!effectiveCategory || effectiveCategory === QUESTION_TYPE_CODES.MCQ) && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      const qt = await db.questionType.findUnique({ where: { id: questionTypeId }, select: { nameEn: true, nameBn: true, label: true } })
+      if (qt) {
+        const normalized = normalizeQuestionTypeName(qt.nameEn) || normalizeQuestionTypeName(qt.nameBn) || normalizeQuestionTypeName(qt.label)
+        if (normalized && NORMALIZED_TO_CATEGORY[normalized]) {
+          effectiveCategory = NORMALIZED_TO_CATEGORY[normalized] as typeof effectiveCategory
+        }
+      }
+    }
+    return effectiveCategory || "MCQ"
+  })()
+
+  const [existingQuestions, effectiveCategory] = await Promise.all([exclusionPromise, categoryPromise])
+
+  // Build excluded IDs map by field
+  const excludedIds = new Map<string, Set<string>>()
+  for (const q of existingQuestions) {
+    for (const [field, value] of Object.entries(q)) {
+      if (value) {
+        if (!excludedIds.has(field)) excludedIds.set(field, new Set())
+        excludedIds.get(field)!.add(value as string)
+      }
     }
   }
 
-  const whereCommon: any = {
-    subjectId,
-    isActive: true,
-  }
+  // 2. Look up config for this category
+  const config = CATEGORY_QUERY_CONFIG[effectiveCategory] || CATEGORY_QUERY_CONFIG.MCQ!
+
+  // 3. Build common where clause
+  const whereCommon: any = { subjectId }
+  if (config.hasIsActive) whereCommon.isActive = true
   if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
   if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
   if (year) whereCommon.year = year
@@ -1489,247 +2418,81 @@ export async function getAvailableQuestions(
     }
   }
 
-  let effectiveCategory = category
-  if ((!effectiveCategory || effectiveCategory === "MCQ") && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-    const qt = await db.questionType.findUnique({ where: { id: questionTypeId }, select: { nameEn: true, nameBn: true, label: true } })
-    if (qt) {
-      const qStr = `${qt.nameEn || ""} ${qt.nameBn || ""} ${qt.label || ""}`.toLowerCase()
-      if (/\bcs\b/i.test(qStr) || qStr.includes("creative scenario") || qStr.includes("creative short") || qStr.includes("scenario")) {
-        effectiveCategory = "CS"
-      } else if ((qStr.includes("cq") || qStr.includes("creative") || qStr.includes("সৃজনশীল")) && !qStr.includes("mcq")) {
-        effectiveCategory = "CQ"
-      } else if (qStr.includes("short") || qStr.includes("sa") || qStr.includes("সংক্ষিপ্ত")) {
-        effectiveCategory = "SA"
-      } else if (qStr.includes("paragraph") || qStr.includes("অনুচ্ছেদ")) {
-        effectiveCategory = "PARAGRAPH"
-      } else if (qStr.includes("amplification") || qStr.includes("ভাবসম্প্রসারণ")) {
-        effectiveCategory = "AMPLIFICATION"
-      }
-    }
-  }
-
-  if (effectiveCategory === "CQ") {
-    const where: any = { ...whereCommon }
-    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      where.questionTypeId = questionTypeId
-    }
-    if (search && search.trim()) {
-      where.OR = [
-        { questionA: { contains: search.trim(), mode: "insensitive" } },
-        { questionB: { contains: search.trim(), mode: "insensitive" } },
-        { context: { contains: search.trim(), mode: "insensitive" } },
-      ]
-    }
-    const cqs = await db.cq.findMany({
-      where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      include: {
-        chapter: true,
-        questionType: true,
-        answer: true,
-        attachments: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-
-    const hasNext = cqs.length > limit
-    const items = hasNext ? cqs.slice(0, limit) : cqs
-    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
-
-    return {
-      category: "CQ",
-      items: items.map((c) => ({
-        ...c,
-        isAssigned: excludedCqIds.has(c.id),
-      })),
-      nextCursor,
-    }
-  }
-
-  if (effectiveCategory === "CS") {
-    const where: any = { ...whereCommon }
-    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      where.questionTypeId = questionTypeId
-    }
-    if (search && search.trim()) {
-      where.OR = [
-        { questionA: { contains: search.trim(), mode: "insensitive" } },
-        { questionB: { contains: search.trim(), mode: "insensitive" } },
-      ]
-    }
-    let cses = await (db as any).cS.findMany({
-      where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      include: {
-        chapter: true,
-        questionType: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-
-    if (cses.length === 0 && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      delete where.questionTypeId
-      cses = await (db as any).cS.findMany({
-        where,
-        take: limit + 1,
-        cursor: cursor ? { id: cursor } : undefined,
-        include: {
-          chapter: true,
-          questionType: true,
-        },
-        orderBy: { createdAt: "desc" },
-      })
-    }
-
-    const hasNext = cses.length > limit
-    const items = hasNext ? cses.slice(0, limit) : cses
-    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
-
-    return {
-      category: "CS",
-      items: items.map((c: any) => ({
-        ...c,
-        isAssigned: excludedCsIds.has(c.id),
-      })),
-      nextCursor,
-    }
-  }
-
-  if (effectiveCategory === "PARAGRAPH") {
-    const where: any = { ...whereCommon }
-    delete where.isActive
-    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      where.questionTypeId = questionTypeId
-    }
-    if (search && search.trim()) {
-      where.name = { contains: search.trim(), mode: "insensitive" }
-    }
-    const paragraphs = await db.paragraph.findMany({
-      where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      include: {
-        chapter: true,
-        questionType: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-
-    const hasNext = paragraphs.length > limit
-    const items = hasNext ? paragraphs.slice(0, limit) : paragraphs
-    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
-
-    return {
-      category: "PARAGRAPH",
-      items: items.map((p) => ({
-        ...p,
-        isAssigned: excludedParagraphIds.has(p.id),
-      })),
-      nextCursor,
-    }
-  }
-
-  if (effectiveCategory === "AMPLIFICATION") {
-    const where: any = { ...whereCommon }
-    delete where.isActive
-    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      where.questionTypeId = questionTypeId
-    }
-    if (search && search.trim()) {
-      where.title = { contains: search.trim(), mode: "insensitive" }
-    }
-    const amplifications = await db.amplification.findMany({
-      where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      include: {
-        chapter: true,
-        questionType: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-
-    const hasNext = amplifications.length > limit
-    const items = hasNext ? amplifications.slice(0, limit) : amplifications
-    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
-
-    return {
-      category: "AMPLIFICATION",
-      items: items.map((a) => ({
-        ...a,
-        isAssigned: excludedAmplificationIds.has(a.id),
-      })),
-      nextCursor,
-    }
-  }
-
-  if (effectiveCategory === "SA") {
-    const where: any = { ...whereCommon }
-    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
-      where.questionTypeId = questionTypeId
-    }
-    if (search && search.trim()) {
-      where.question = { contains: search.trim(), mode: "insensitive" }
-    }
-    const shorts = await db.shortAnswer.findMany({
-      where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      include: {
-        chapter: true,
-        questionType: true,
-        attachments: true,
-      },
-      orderBy: { createdAt: "desc" },
-    })
-
-    const hasNext = shorts.length > limit
-    const items = hasNext ? shorts.slice(0, limit) : shorts
-    const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
-
-    return {
-      category: "SA",
-      items: items.map((s) => ({
-        ...s,
-        isAssigned: excludedShortIds.has(s.id),
-      })),
-      nextCursor,
-    }
-  }
-
-  // Default: MCQ
   const where: any = { ...whereCommon }
-  if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+
+  if (effectiveCategory === "APPLICATION" || effectiveCategory === "LETTER") {
+    // Neither letter nor application models have chapterId, source, or year columns
+    delete where.chapterId
+    delete where.source
+    delete where.year
+
+    if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+      const matchWord = effectiveCategory === "APPLICATION" ? "app" : "letter"
+      const matchWordBn = effectiveCategory === "APPLICATION" ? "আবেদন" : "পত্র"
+      const altWordBn = effectiveCategory === "APPLICATION" ? "দরখাস্ত" : "চিঠি"
+      const relatedQts = await db.questionType.findMany({
+        where: {
+          OR: [
+            { nameEn: { contains: matchWord, mode: "insensitive" } },
+            { nameBn: { contains: matchWordBn } },
+            { nameBn: { contains: altWordBn } },
+          ],
+        },
+        select: { id: true },
+      })
+      const relatedIds = relatedQts.map((q) => q.id)
+      relatedIds.push(questionTypeId)
+      where.questionTypeId = { in: Array.from(new Set(relatedIds)) }
+    }
+  } else if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
     where.questionTypeId = questionTypeId
   }
+
+  // 4. Build search filter
   if (search && search.trim()) {
-    where.question = { contains: search.trim(), mode: "insensitive" }
+    const trimmed = search.trim()
+    if (config.searchFields.length === 1) {
+      where[config.searchFields[0]!] = { contains: trimmed, mode: "insensitive" }
+    } else {
+      where.OR = config.searchFields.map((field) => ({
+        [field]: { contains: trimmed, mode: "insensitive" },
+      }))
+    }
   }
-  const mcqs = await db.mcq.findMany({
+
+  // 5. Execute query using the config model
+  const model = (db as any)[config.model]
+  let items = await model.findMany({
     where,
     take: limit + 1,
     cursor: cursor ? { id: cursor } : undefined,
-    include: {
-      chapter: true,
-      questionType: true,
-      attachments: true,
-    },
+    include: config.includes,
     orderBy: { createdAt: "desc" },
   })
 
-  const hasNext = mcqs.length > limit
-  const items = hasNext ? mcqs.slice(0, limit) : mcqs
-  const nextCursor = hasNext ? items[items.length - 1]?.id : undefined
+  // CS-specific fallback: retry without questionTypeId filter if no results
+  if (items.length === 0 && config.fallbackWithoutTypeFilter && where.questionTypeId) {
+    delete where.questionTypeId
+    items = await model.findMany({
+      where,
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: config.includes,
+      orderBy: { createdAt: "desc" },
+    })
+  }
 
-  console.log(items)
+  // 6. Paginate and enrich with isAssigned flag
+  const hasNext = items.length > limit
+  const paginatedItems = hasNext ? items.slice(0, limit) : items
+  const nextCursor = hasNext ? paginatedItems[paginatedItems.length - 1]?.id : undefined
+  const excludedSet = excludedIds.get(config.excludedIdField) || new Set()
 
   return {
-    category: "MCQ",
-    items: items.map((m) => ({
-      ...m,
-      isAssigned: excludedMcqIds.has(m.id),
+    category: effectiveCategory,
+    items: paginatedItems.map((item: any) => ({
+      ...item,
+      isAssigned: excludedSet.has(item.id),
     })),
     nextCursor,
   }
@@ -1752,7 +2515,7 @@ export async function bulkAssignQuestions(
   if (!dist) throw notFound("QuestionPaperSubjectMarkDistribution")
 
   const finalSectionId = input.sectionId ?? dist.sectionId ?? null
-  const finalSubSectionId = input.subSectionId ?? dist.subSectionId ?? null
+  const finalSubSectionId = input.subSectionId ?? null
 
   const highest = await tenantDb.questionPaperQuestion.findFirst({
     where: { questionPaperId: input.questionPaperId },
@@ -1841,6 +2604,71 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.letterIds && input.letterIds.length > 0) {
+    for (const letterId of input.letterIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        letterId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.applicationIds && input.applicationIds.length > 0) {
+    for (const applicationId of input.applicationIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        applicationId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.summaryIds && input.summaryIds.length > 0) {
+    for (const summaryId of input.summaryIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        summaryId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.essenceIds && input.essenceIds.length > 0) {
+    for (const essenceId of input.essenceIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        essenceId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.essayIds && input.essayIds.length > 0) {
+    for (const essayId of input.essayIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        essayId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (recordsToCreate.length === 0) {
     return { success: true, count: 0 }
   }
@@ -1859,6 +2687,10 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.paragraph.findUnique({ where: { id: record.paragraphId } })) as any
       } else if (record.amplificationId) {
         record.contentSnapshot = (await db.amplification.findUnique({ where: { id: record.amplificationId } })) as any
+      } else if (record.letterId) {
+        record.contentSnapshot = (await (db as any).letter.findUnique({ where: { id: record.letterId } })) as any
+      } else if (record.applicationId) {
+        record.contentSnapshot = (await (db as any).application.findUnique({ where: { id: record.applicationId } })) as any
       }
     }
 
@@ -1875,6 +2707,16 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_paragraphId: { questionPaperId: input.questionPaperId, paragraphId: record.paragraphId } };
     } else if (record.amplificationId) {
       whereCondition = { questionPaperId_amplificationId: { questionPaperId: input.questionPaperId, amplificationId: record.amplificationId } };
+    } else if (record.letterId) {
+      whereCondition = { questionPaperId_letterId: { questionPaperId: input.questionPaperId, letterId: record.letterId } };
+    } else if (record.applicationId) {
+      whereCondition = { questionPaperId_applicationId: { questionPaperId: input.questionPaperId, applicationId: record.applicationId } };
+    } else if (record.summaryId) {
+      whereCondition = { questionPaperId_summaryId: { questionPaperId: input.questionPaperId, summaryId: record.summaryId } };
+    } else if (record.essenceId) {
+      whereCondition = { questionPaperId_essenceId: { questionPaperId: input.questionPaperId, essenceId: record.essenceId } };
+    } else if (record.essayId) {
+      whereCondition = { questionPaperId_essayId: { questionPaperId: input.questionPaperId, essayId: record.essayId } };
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -2065,12 +2907,20 @@ export async function generatePaperSets(
           overrides.shuffledOptions = indexed.map((item) => item.opt)
         }
 
-        await tenantDb.questionPaperQuestion.create({
+        const createdPrimary = await tenantDb.questionPaperQuestion.create({
           data: {
             questionPaperId: createdPaper.id,
             mcqId: q.mcqId,
             cqId: q.cqId,
+            csId: q.csId,
             shortAnswerId: q.shortAnswerId,
+            paragraphId: q.paragraphId,
+            amplificationId: q.amplificationId,
+            letterId: q.letterId,
+            applicationId: q.applicationId,
+            summaryId: q.summaryId,
+            essenceId: q.essenceId,
+            essayId: q.essayId,
             distributionId: newDistId,
             sectionId: newSecId,
             orderIndex: globalOrder++,
@@ -2079,6 +2929,36 @@ export async function generatePaperSets(
             contentSnapshot: q.contentSnapshot ?? null,
           },
         })
+
+        if (q.alternatives && q.alternatives.length > 0) {
+          for (const alt of q.alternatives) {
+            const altDistId = distMap.get(alt.distributionId) || newDistId
+            await tenantDb.questionPaperQuestion.create({
+              data: {
+                questionPaperId: createdPaper.id,
+                parentQuestionId: createdPrimary.id,
+                mcqId: alt.mcqId,
+                cqId: alt.cqId,
+                csId: alt.csId,
+                shortAnswerId: alt.shortAnswerId,
+                paragraphId: alt.paragraphId,
+                amplificationId: alt.amplificationId,
+                letterId: alt.letterId,
+                applicationId: alt.applicationId,
+                summaryId: alt.summaryId,
+                essenceId: alt.essenceId,
+                essayId: alt.essayId,
+                distributionId: altDistId,
+                sectionId: newSecId,
+                orderIndex: createdPrimary.orderIndex,
+                assignedMarks: alt.assignedMarks,
+                orLabel: alt.orLabel || "অথবা",
+                orOrder: alt.orOrder,
+                contentSnapshot: alt.contentSnapshot ?? null,
+              },
+            })
+          }
+        }
       }
     }
 

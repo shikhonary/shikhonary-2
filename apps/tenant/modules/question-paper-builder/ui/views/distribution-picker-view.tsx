@@ -8,13 +8,15 @@ import {
   useQuestionPaperById,
   useQuestionPaperDistributionStatuses,
   useAvailableQuestions,
-  useBulkAssignQuestions
+  useBulkAssignQuestions,
+  useAddAlternativeQuestion,
 } from "@/modules/question-paper/services/use-question-paper";
 import { useBuilderStore } from "../../store/use-builder-store";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { toast } from "@workspace/ui/components/sonner";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import {
   Drawer,
@@ -26,7 +28,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@workspace/ui/components/drawer";
-import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionGrid } from "../components/distribution-picker/question-grid";
@@ -54,6 +56,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const urlLimitParam = searchParams.get("limit");
   const urlLimit = urlLimitParam ? parseInt(urlLimitParam, 10) : undefined;
 
+  const isAlternativeMode = searchParams.get("mode") === "alternative" || Boolean(searchParams.get("parentQuestionId"));
+  const parentQuestionId = searchParams.get("parentQuestionId") || undefined;
+  const orLabel = searchParams.get("orLabel") || "অথবা";
+  const primaryMarksParam = searchParams.get("primaryMarks");
+  const masterNumberParam = searchParams.get("masterNumber");
+
   const { data: paperQuery, isLoading: paperLoading } = useQuestionPaperById(paperId);
   const { data: statuses, isLoading: statusesLoading } = useQuestionPaperDistributionStatuses(paperId);
 
@@ -63,8 +71,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [selectedBoard, setSelectedBoard] = useState<string>("All");
 
   const { mutateAsync: bulkAssign, isPending: isAssigning } = useBulkAssignQuestions();
+  const { mutateAsync: addAlternative, isPending: isAddingAlternative } = useAddAlternativeQuestion();
 
-  const distStatus = statuses?.find((s: any) => s.distributionId === distributionId);
+  const distStatus =
+    statuses?.find((s: any) => s.distributionId === distributionId) ||
+    (isAlternativeMode && statuses && statuses.length > 0 ? statuses[0] : null);
 
   const { data: chaptersData } = useQuery({
     ...trpc.academicChapter.list.queryOptions({
@@ -108,8 +119,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       ? (paperQuery?.questions || []).filter((q: any) => q.sectionId === urlSectionId && q.distributionId === distributionId).length
       : (distStatus.addedCount || 0));
 
-  const effectiveTargetCount = urlLimit ?? distStatus.targetCount ?? 0;
-  const maxSelectable = Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
+  const effectiveTargetCount = isAlternativeMode ? 1 : (urlLimit ?? distStatus.targetCount ?? 0);
+  const maxSelectable = isAlternativeMode ? 1 : Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
 
   const qTypeNameEn = (distStatus.questionType?.nameEn || distStatus.questionTypeName || "").toLowerCase();
   const qTypeNameBn = (distStatus.questionType?.nameBn || "").toLowerCase();
@@ -117,25 +128,63 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const qTypeLabel = (distStatus.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
-  const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").toUpperCase();
-  const rawTypeName = (distStatus.questionTypeName || distStatus.questionType?.nameEn || "").trim().toUpperCase();
-  const validCategories = ["MCQ", "CQ", "CS", "SA", "PARAGRAPH", "AMPLIFICATION"];
+  const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
+  const distTypeName = distStatus.questionTypeName || distStatus.questionType?.nameEn || distStatus.questionType?.nameBn || distStatus.questionTypeLabel || "";
+  
+  // Prioritize distribution's actual questionTypeName over urlCategoryParam (especially if url is default MCQ)
+  const rawName = (urlCategoryParam && urlCategoryParam !== "MCQ")
+    ? urlCategoryParam 
+    : (distTypeName || urlCategoryParam);
 
-  let category: "MCQ" | "CQ" | "CS" | "SA" | "PARAGRAPH" | "AMPLIFICATION" = "MCQ";
-  if (validCategories.includes(urlCategoryParam)) {
-    category = urlCategoryParam as any;
-  } else if (validCategories.includes(rawTypeName)) {
-    category = rawTypeName as any;
-  } else if (/\bcs\b/i.test(combinedStr) || combinedStr.includes("creative scenario") || combinedStr.includes("creative short") || combinedStr.includes("scenario")) {
-    category = "CS";
-  } else if ((combinedStr.includes("creative") || combinedStr.includes("cq") || combinedStr.includes("সৃজনশীল")) && !combinedStr.includes("mcq")) {
-    category = "CQ";
-  } else if (combinedStr.includes("short") || combinedStr.includes("sa") || combinedStr.includes("সংক্ষিপ্ত")) {
-    category = "SA";
-  } else if (combinedStr.includes("paragraph") || combinedStr.includes("অনুচ্ছেদ")) {
-    category = "PARAGRAPH";
-  } else if (combinedStr.includes("amplification") || combinedStr.includes("ভাবসম্প্রসারণ")) {
-    category = "AMPLIFICATION";
+  const normalized = 
+    normalizeQuestionTypeName(distTypeName) || 
+    normalizeQuestionTypeName(rawName) || 
+    normalizeQuestionTypeName(distStatus.questionType?.nameEn) || 
+    normalizeQuestionTypeName(distStatus.questionType?.nameBn);
+
+  let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
+  if (isAlternativeMode && urlCategoryParam) {
+    category = urlCategoryParam as QuestionTypeCode;
+  } else if (normalized === QUESTION_TYPES.CS) {
+    category = QUESTION_TYPE_CODES.CS;
+  } else if (normalized === QUESTION_TYPES.CQ) {
+    category = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.SA) {
+    category = QUESTION_TYPE_CODES.SA;
+  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
+    category = QUESTION_TYPE_CODES.PARAGRAPH;
+  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
+    category = QUESTION_TYPE_CODES.AMPLIFICATION;
+  } else if (normalized === QUESTION_TYPES.LETTER) {
+    category = QUESTION_TYPE_CODES.LETTER;
+  } else if (normalized === QUESTION_TYPES.APPLICATION) {
+    category = QUESTION_TYPE_CODES.APPLICATION;
+  } else if (normalized === QUESTION_TYPES.SUMMARY) {
+    category = QUESTION_TYPE_CODES.SUMMARY;
+  } else if (normalized === QUESTION_TYPES.ESSENCE) {
+    category = QUESTION_TYPE_CODES.ESSENCE;
+  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
+    category = QUESTION_TYPE_CODES.NEWS_REPORT;
+  } else if (normalized === QUESTION_TYPES.ESSAY) {
+    category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.MCQ) {
+    category = QUESTION_TYPE_CODES.MCQ;
+  } else {
+    // Robust text fallback from distribution questionTypeName
+    const lowerName = distTypeName.toLowerCase();
+    if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
+      category = QUESTION_TYPE_CODES.LETTER;
+    } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
+      category = QUESTION_TYPE_CODES.APPLICATION;
+    } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
+      category = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("short") || lowerName.includes("সংক্ষিপ্ত") || lowerName.includes("sa")) {
+      category = QUESTION_TYPE_CODES.SA;
+    } else if (lowerName.includes("paragraph") || lowerName.includes("অনুচ্ছেদ")) {
+      category = QUESTION_TYPE_CODES.PARAGRAPH;
+    } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
+      category = QUESTION_TYPE_CODES.AMPLIFICATION;
+    }
   }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All");
@@ -206,6 +255,23 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const currentDistIndex = statuses?.findIndex((s: any) => s.distributionId === distributionId) ?? -1;
   const nextDistStatus = currentDistIndex !== -1 && currentDistIndex < (statuses?.length || 0) - 1 ? statuses?.[currentDistIndex + 1] : null;
 
+  const handleSaveAlternative = async () => {
+    if (!parentQuestionId || selectedIds.length === 0) return;
+    try {
+      await addAlternative({
+        questionPaperId: paperId,
+        parentQuestionId,
+        questionId: selectedIds[0]!,
+        questionType: category,
+        orLabel: orLabel.trim() || "অথবা",
+      });
+      toast.success("বিকল্প (অথবা) প্রশ্ন সফলভাবে যুক্ত করা হয়েছে!");
+      router.push(`/question-papers/${paperId}/builder`);
+    } catch (err: any) {
+      toast.error(err?.message || "বিকল্প প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
+    }
+  };
+
   const handleSaveAndContinue = async (goToNext = false) => {
     if (selectedIds.length === 0) return;
     try {
@@ -226,6 +292,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, paragraphIds: selectedIds });
       } else if (category === "AMPLIFICATION") {
         await bulkAssign({ ...payloadBase, amplificationIds: selectedIds });
+      } else if (category === "LETTER") {
+        await bulkAssign({ ...payloadBase, letterIds: selectedIds });
+      } else if (category === "APPLICATION") {
+        await bulkAssign({ ...payloadBase, applicationIds: selectedIds });
       } else {
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }
@@ -272,14 +342,22 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             </Button>
             <div className="flex items-center gap-2">
               <h1 className="font-bold text-base text-primary font-headline">
-                প্রশ্ন নির্বাচন: {distStatus.questionTypeName || distStatus.subjectName}
+                {isAlternativeMode
+                  ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
+                  : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeName || distStatus.subjectName}`}
               </h1>
-              <span className="text-xs text-muted-foreground font-body bg-muted px-2.5 py-0.5 rounded-full font-medium">
-                টার্গেট: {toBengaliDigits(effectiveTargetCount)}টি • যোগ হয়েছে: {toBengaliDigits(subSectionQuestionsCount)}টি
-              </span>
+              {isAlternativeMode ? (
+                <span className="text-xs text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-bold">
+                  ১টি প্রশ্ন নির্বাচন করুন
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground font-body bg-muted px-2.5 py-0.5 rounded-full font-medium">
+                  টার্গেট: {toBengaliDigits(effectiveTargetCount)}টি • যোগ হয়েছে: {toBengaliDigits(subSectionQuestionsCount)}টি
+                </span>
+              )}
             </div>
           </div>
-          {nextDistStatus && (
+          {!isAlternativeMode && nextDistStatus && (
             <Button
               variant="outline"
               size="sm"
@@ -298,6 +376,40 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       {/* Main Content */}
       <main className="flex-1 overflow-auto p-4 sm:p-6">
         <div className="max-w-6xl mx-auto space-y-6 pb-28">
+
+          {/* Alternative Mode Notification Banner */}
+          {isAlternativeMode && (
+            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Split className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <span>বিকল্প প্রশ্ন নির্বাচন মোড</span>
+                    <Badge className="bg-primary text-white text-[10px] py-0 px-2">
+                      {orLabel}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর জন্য ` : ""}
+                    বিকল্প হিসেবে ১টি প্রশ্ন নির্বাচন করুন।
+                    {primaryMarksParam ? ` (মান: ${toBengaliDigits(primaryMarksParam)})` : ""}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="text-xs border-primary/40 text-primary hover:bg-primary/15 cursor-pointer shrink-0 rounded-lg font-bold"
+              >
+                <Link href={`/question-papers/${paperId}/builder`}>
+                  বাতিল ও ক্যানভাসে ফিরুন
+                </Link>
+              </Button>
+            </div>
+          )}
 
           {/* Primary Filter Toolbar */}
           <div className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-card p-3 sm:p-4 shadow-sm">
@@ -434,7 +546,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           {/* Question Grid */}
           <QuestionGrid
             subjectId={distStatus.subjectId}
-            questionTypeId={urlQuestionTypeIdParam || distStatus.questionTypeId}
+            questionTypeId={isAlternativeMode ? "" : (urlQuestionTypeIdParam || distStatus.questionTypeId)}
             category={category}
             search={search}
             chapterId={selectedChapterId}
@@ -444,7 +556,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             onToggle={(id) => {
               setSelectedIds(prev => {
                 if (prev.includes(id)) {
-                  return prev.filter(x => x !== id);
+                  return [];
+                }
+                if (isAlternativeMode) {
+                  return [id];
                 }
                 if (effectiveTargetCount > 0 && prev.length >= maxSelectable) {
                   if (maxSelectable === 0) {
@@ -473,28 +588,50 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               (প্রয়োজন: {toBengaliDigits(maxSelectable)}টি)
             </span>
           </div>
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            {nextDistStatus && (
+          {isAlternativeMode ? (
+            <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 variant="outline"
-                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 border-primary/40 text-primary hover:bg-primary/10 font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
+                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 border-border text-muted-foreground hover:bg-muted font-medium cursor-pointer text-xs md:text-sm py-2 px-4"
+                asChild
+              >
+                <Link href={`/question-papers/${paperId}/builder`}>
+                  বাতিল
+                </Link>
+              </Button>
+              <Button
+                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-5 shrink-0 shadow-md"
+                disabled={isAddingAlternative}
+                onClick={handleSaveAlternative}
+              >
+                {isAddingAlternative ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Split className="w-3.5 h-3.5" />}
+                <span>বিকল্প প্রশ্ন হিসেবে যুক্ত করুন</span>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              {nextDistStatus && (
+                <Button
+                  variant="outline"
+                  className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 border-primary/40 text-primary hover:bg-primary/10 font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
+                  disabled={isAssigning}
+                  onClick={() => handleSaveAndContinue(true)}
+                >
+                  {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  <span>সংরক্ষণ ও পরবর্তী উপ-বিভাগ</span>
+                  <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                </Button>
+              )}
+              <Button
+                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
                 disabled={isAssigning}
-                onClick={() => handleSaveAndContinue(true)}
+                onClick={() => handleSaveAndContinue(false)}
               >
                 {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                <span>সংরক্ষণ ও পরবর্তী উপ-বিভাগ</span>
-                <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                <span>সংরক্ষণ ও বিল্ডারে ফিরে যান</span>
               </Button>
-            )}
-            <Button
-              className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
-              disabled={isAssigning}
-              onClick={() => handleSaveAndContinue(false)}
-            >
-              {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              <span>সংরক্ষণ ও বিল্ডারে ফিরে যান</span>
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>

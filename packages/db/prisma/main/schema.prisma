@@ -536,6 +536,10 @@ model AcademicSubject {
   paragraphs           Paragraph[]
   amplifications       Amplification[]
   cs                   CS[]
+  letters              Letter[]
+  applications         Application[]
+  summaries            Summary[]
+  essences             Essence[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -613,6 +617,10 @@ model QuestionType {
   paragraphs     Paragraph[]
   amplifications Amplification[]
   cs             CS[]
+  letters        Letter[]
+  applications   Application[]
+  summaries      Summary[]
+  essences       Essence[]
 
   @@index([label])
   @@index([isActive])
@@ -930,6 +938,98 @@ model CS {
   @@index([subjectId])
   @@index([difficulty])
   @@map("cs")
+}
+
+model Letter {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("letter")
+}
+
+model Application {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("application")
+}
+
+model Summary {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("summary")
+}
+
+model Essence {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("essence")
 }
 
 model QuestionReport {

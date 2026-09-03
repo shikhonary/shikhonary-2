@@ -14,6 +14,7 @@
     "seed:main": "node --loader ts-node/esm prisma/seed/main.seed.ts",
     "seed:tenant": "node --loader ts-node/esm prisma/seed/tenant.seed.ts",
     "sync:main": "npx -y tsx prisma/seed/sync-main-migrations.ts",
+    "fetch:question-types": "npx -y tsx prisma/seed/fetch-question-types.ts",
 
     "assign-super-admin": "npx -y tsx prisma/seed/assign-super-admin.ts",
     "seed:subscriptions": "npx -y tsx prisma/seed/seed-subscriptions.ts",
