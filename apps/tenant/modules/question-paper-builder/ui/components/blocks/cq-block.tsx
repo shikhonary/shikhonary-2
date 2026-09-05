@@ -183,37 +183,18 @@ export const CQBlock = ({ item }: { item: any }) => {
   ].filter((sq) => sq.text);
 
   const renderSubQuestionLabel = (label: string) => {
-    const labelStyle = {
-      fontSize: questionStyle.fontSize,
-      fontFamily: questionStyle.fontFamily,
-    };
-
-    switch (settings.optionStyle) {
-      case "dot":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label}.</span>;
-      case "parentheses":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-      case "round":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label})</span>;
-      case "circle":
-        return (
-          <div 
-            className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
-            style={{ 
-              width: "1.6em", 
-              height: "1.6em", 
-              fontSize: `${(questionStyle.fontSize || settings.fontSize) - 2}px`, 
-              marginTop: "2px",
-              fontFamily: settings.fontFamily,
-              lineHeight: "1"
-            }}
-          >
-            {label}
-          </div>
-        );
-      default:
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-    }
+    const cleanLabel = (label || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
   };
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
@@ -245,7 +226,7 @@ export const CQBlock = ({ item }: { item: any }) => {
       <div className="flex justify-between items-start gap-2">
         <div className="flex gap-2 flex-1 relative">
           <span
-            className="font-bold shrink-0"
+            className="font-bold shrink-0 min-w-[1.8em]"
             style={{
               fontSize: questionStyle.fontSize,
               fontFamily: questionStyle.fontFamily,

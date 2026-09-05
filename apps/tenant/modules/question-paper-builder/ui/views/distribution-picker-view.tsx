@@ -184,6 +184,14 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.PARAGRAPH;
     } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
       category = QUESTION_TYPE_CODES.AMPLIFICATION;
+    } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {
+      category = QUESTION_TYPE_CODES.ESSENCE;
+    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ")) {
+      category = QUESTION_TYPE_CODES.SUMMARY;
+    } else if (lowerName.includes("report") || lowerName.includes("প্রতিবেদন")) {
+      category = QUESTION_TYPE_CODES.NEWS_REPORT;
+    } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
+      category = QUESTION_TYPE_CODES.ESSAY;
     }
   }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
@@ -290,12 +298,20 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, csIds: selectedIds });
       } else if (category === "PARAGRAPH") {
         await bulkAssign({ ...payloadBase, paragraphIds: selectedIds });
+      } else if (category === "ESSENCE") {
+        await bulkAssign({ ...payloadBase, essenceIds: selectedIds });
+      } else if (category === "SUMMARY") {
+        await bulkAssign({ ...payloadBase, summaryIds: selectedIds });
       } else if (category === "AMPLIFICATION") {
         await bulkAssign({ ...payloadBase, amplificationIds: selectedIds });
       } else if (category === "LETTER") {
         await bulkAssign({ ...payloadBase, letterIds: selectedIds });
       } else if (category === "APPLICATION") {
         await bulkAssign({ ...payloadBase, applicationIds: selectedIds });
+      } else if (category === "NEWS_REPORT") {
+        await bulkAssign({ ...payloadBase, newsReportIds: selectedIds });
+      } else if (category === "ESSAY") {
+        await bulkAssign({ ...payloadBase, essayIds: selectedIds });
       } else {
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }
@@ -610,18 +626,6 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             </div>
           ) : (
             <div className="flex items-center gap-2 w-full md:w-auto">
-              {nextDistStatus && (
-                <Button
-                  variant="outline"
-                  className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 border-primary/40 text-primary hover:bg-primary/10 font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
-                  disabled={isAssigning}
-                  onClick={() => handleSaveAndContinue(true)}
-                >
-                  {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  <span>সংরক্ষণ ও পরবর্তী উপ-বিভাগ</span>
-                  <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
-                </Button>
-              )}
               <Button
                 className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
                 disabled={isAssigning}

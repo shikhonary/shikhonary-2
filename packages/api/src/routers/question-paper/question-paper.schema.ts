@@ -191,6 +191,14 @@ export const deleteQuestionPaperDistributionSchema = z.object({
 
 export type DeleteQuestionPaperDistributionInput = z.infer<typeof deleteQuestionPaperDistributionSchema>
 
+export const updateDistributionLabelSchema = z.object({
+  questionPaperId: z.string().min(1),
+  id: z.string().min(1),
+  questionTypeLabel: z.string().nullable(),
+})
+
+export type UpdateDistributionLabelInput = z.infer<typeof updateDistributionLabelSchema>
+
 // ---------------------------------------------------------------------------
 // Mutations - Questions Junction
 // ---------------------------------------------------------------------------
@@ -208,6 +216,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   summaryId: z.string().optional().nullable(),
   essenceId: z.string().optional().nullable(),
   essayId: z.string().optional().nullable(),
+  newsReportId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -333,6 +342,7 @@ export const bulkAssignQuestionsSchema = z.object({
   summaryIds: z.array(z.string()).optional(),
   essenceIds: z.array(z.string()).optional(),
   essayIds: z.array(z.string()).optional(),
+  newsReportIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

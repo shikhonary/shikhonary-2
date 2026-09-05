@@ -18,6 +18,7 @@ import {
   deleteQuestionPaperSubjectSchema,
   upsertQuestionPaperDistributionSchema,
   deleteQuestionPaperDistributionSchema,
+  updateDistributionLabelSchema,
   getDistributionStatusesSchema,
   getAvailableQuestionsSchema,
   bulkAssignQuestionsSchema,
@@ -48,6 +49,7 @@ import {
   deleteQuestionPaperSubject,
   upsertQuestionPaperDistribution,
   deleteQuestionPaperDistribution,
+  updateDistributionLabel,
   getQuestionPaperHistory,
   getQuestionPaperDistributionStatuses,
   getAvailableQuestions,
@@ -230,6 +232,12 @@ export const questionPaperRouter = createTRPCRouter({
     .input(deleteQuestionPaperDistributionSchema)
     .mutation(({ ctx, input }) =>
       deleteQuestionPaperDistribution(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  updateDistributionLabel: tenantMemberProcedure
+    .input(updateDistributionLabelSchema)
+    .mutation(({ ctx, input }) =>
+      updateDistributionLabel(ctx.tenantDb, input, ctx.session.user.id)
     ),
 })
 

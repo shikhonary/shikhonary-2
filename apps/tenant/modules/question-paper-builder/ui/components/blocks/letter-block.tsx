@@ -7,6 +7,7 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
+import { EditableSectionLabel } from "./editable-section-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -109,8 +110,8 @@ export const LetterBlock = ({ item }: { item: any }) => {
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
-  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId));
-  const rawMarkDist = item.markDistribution || item.distribution?.markDistribution || distStatus?.markDistribution;
+  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId || item.distribution?.id));
+  const rawMarkDist = distStatus?.markDistribution || item.distribution?.markDistribution || item.markDistribution;
   let markDist = rawMarkDist;
   if (typeof rawMarkDist === "string") {
     try {
@@ -121,51 +122,76 @@ export const LetterBlock = ({ item }: { item: any }) => {
   }
 
   const getQuestionMark = (index: number, defaultMark?: number) => {
-    if ((data.mark ?? data.marks ?? item.assignedMarks) !== undefined && (data.mark ?? data.marks ?? item.assignedMarks) !== null) {
-      return Number(data.mark ?? data.marks ?? item.assignedMarks);
-    }
-    if (!markDist) return defaultMark;
+    if (markDist) {
+      if (Array.isArray(markDist)) {
+        if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
+          return Number(markDist[index]);
+        }
+      } else if (typeof markDist === "object" && markDist !== null) {
+        const alphaKeys = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const upperAlphaKeys = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        const bengaliKeys = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
 
-    if (Array.isArray(markDist)) {
-      if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
-        return Number(markDist[index]);
-      }
-    } else if (typeof markDist === "object" && markDist !== null) {
-      const alphaKeys = ["a", "b", "c", "d", "e", "f", "g", "h"];
-      const upperAlphaKeys = ["A", "B", "C", "D", "E", "F", "G", "H"];
-      const bengaliKeys = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
+        const keysToTry = [
+          alphaKeys[index],
+          upperAlphaKeys[index],
+          bengaliKeys[index],
+          String(index + 1),
+          String(index),
+          `q${index + 1}`,
+          `mark${index + 1}`,
+          `q${alphaKeys[index]}`,
+        ].filter(Boolean) as string[];
 
-      const keysToTry = [
-        alphaKeys[index],
-        upperAlphaKeys[index],
-        bengaliKeys[index],
-        String(index + 1),
-        String(index),
-        `q${index + 1}`,
-        `mark${index + 1}`,
-        `q${alphaKeys[index]}`,
-      ].filter(Boolean) as string[];
+        for (const k of keysToTry) {
+          if (markDist[k] !== undefined && markDist[k] !== null && !isNaN(Number(markDist[k]))) {
+            return Number(markDist[k]);
+          }
+        }
 
-      for (const k of keysToTry) {
-        if (markDist[k] !== undefined && markDist[k] !== null && !isNaN(Number(markDist[k]))) {
-          return Number(markDist[k]);
+        // If object has numeric values, pick by index or fallback to the first entry
+        const values = Object.values(markDist).filter((v: any) => v !== undefined && v !== null && !isNaN(Number(v)));
+        if (values.length > 0) {
+          if (values[index] !== undefined) {
+            return Number(values[index]);
+          }
+          return Number(values[0]);
         }
       }
-
-      // If object has numeric values, pick by index or fallback to the first entry
-      const values = Object.values(markDist).filter((v: any) => v !== undefined && v !== null && !isNaN(Number(v)));
-      if (values.length > 0) {
-        if (values[index] !== undefined) {
-          return Number(values[index]);
-        }
-        return Number(values[0]);
-      }
     }
+
+    if (item.assignedMarks !== undefined && item.assignedMarks !== null) return Number(item.assignedMarks);
+    if ((data.mark ?? data.marks) !== undefined && (data.mark ?? data.marks) !== null) return Number(data.mark ?? data.marks);
     return defaultMark;
   };
 
-  const marksPerQuestion = getQuestionMark(item.orderIndex, item.marksPerQuestion || distStatus?.marksPerQuestion || 10);
+  const defaultMark = Number(
+    distStatus?.marksPerQuestion ??
+    item.distribution?.marksPerQuestion ??
+    item.marksPerQuestion ??
+    item.assignedMarks ??
+    data.mark ??
+    data.marks ??
+    10
+  );
+
+  const marksPerQuestion = getQuestionMark(item.orderIndex, defaultMark) || 10;
   const mark = marksPerQuestion;
+  const attemptCount = Number(
+    (distStatus as any)?.questionsToAttempt ??
+    item.distribution?.questionsToAttempt ??
+    item.attemptCount ??
+    distStatus?.targetCount ??
+    item.totalQuestions ??
+    1
+  );
+
+  const rawLabel = 
+    distStatus?.questionTypeLabel ||
+    item.distribution?.questionTypeLabel ||
+    item.questionTypeLabel ||
+    distStatus?.questionTypeName ||
+    item.distribution?.questionTypeName;
 
   const questionType = item.type === "APPLICATION" ? "APPLICATION" : "LETTER";
 
@@ -190,12 +216,33 @@ export const LetterBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
+  const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const label = subLabels[item.orderIndex] || "";
+
+  const renderSubQuestionLabel = (labelStr: string) => {
+    const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
+  };
+
+  const isFirst = item.isFirstLetter !== undefined ? item.isFirstLetter : (item.orderIndex === 0);
+  const masterNum = item.masterNumber || (item.orderIndex + 1);
+
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
   const titleText = data.title || data.name || "";
 
   return (
-    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-1 mb-2">
+    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
       <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button
@@ -218,18 +265,58 @@ export const LetterBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      <div className="flex justify-between items-start gap-2">
-        <div className="flex gap-1 flex-1 relative flex-col">
-          <div className="flex gap-2 items-start w-full">
+      {isFirst && (
+        <div className="flex justify-between items-start w-full">
+          <div 
+            className="font-bold ml-[0px] flex items-baseline gap-2" 
+            style={{
+              fontSize: questionStyle.fontSize,
+              fontFamily: questionStyle.fontFamily,
+            }}
+          >
             <span
-              className="font-bold shrink-0"
+              className="font-bold shrink-0 min-w-[1.8em]"
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
               }}
             >
-              {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
+              {toBengaliDigits(masterNum)}।
             </span>
+            <EditableSectionLabel
+              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+              initialLabel={rawLabel}
+              fallbackLabel="যেকোনো একটি বিষয়ে পত্র লেখো:"
+              questionType="LETTER"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            />
+          </div>
+          <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
+            fontSize: questionStyle.fontSize,
+            fontFamily: questionStyle.fontFamily,
+          }}>
+            {toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-between items-start gap-2 w-full">
+        <div className="flex gap-1 flex-1 relative flex-col">
+          <div className="flex gap-2 items-start w-full">
+            <span
+              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+              aria-hidden="true"
+            >
+              {toBengaliDigits(masterNum)}।
+            </span>
+            {renderSubQuestionLabel(label)}
             <div className="flex-1 w-full min-w-0">
               <LetterEditableText 
                 text={titleText}
@@ -238,17 +325,6 @@ export const LetterBlock = ({ item }: { item: any }) => {
                 className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
               />
             </div>
-            {mark !== undefined && mark !== null && (
-              <span 
-                className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                style={{
-                  fontSize: questionStyle.fontSize,
-                  fontFamily: questionStyle.fontFamily,
-                }}
-              >
-                {toBengaliDigits(mark)}
-              </span>
-            )}
           </div>
 
           {/* Attached Alternatives */}

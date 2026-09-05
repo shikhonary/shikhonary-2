@@ -10,8 +10,6 @@ const FONT_FAMILIES = [
   { value: "Kalpurush", label: "কালপুরুষ" },
   { value: "Nikosh", label: "নিকষ" },
   { value: "AdorshoLipi", label: "আদর্শলিপি" },
-  { value: "Arial", label: "Arial" },
-  { value: "Times New Roman", label: "Times New Roman" },
 ];
 
 export const TypographyCard: React.FC = () => {

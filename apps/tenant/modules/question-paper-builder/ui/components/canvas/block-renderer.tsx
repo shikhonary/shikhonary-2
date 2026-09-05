@@ -6,9 +6,13 @@ import { CQBlock } from "../blocks/cq-block";
 import { CSBlock } from "../blocks/cs-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
 import { ParagraphBlock } from "../blocks/paragraph-block";
+import { EssenceBlock } from "../blocks/essence-block";
+import { SummaryBlock } from "../blocks/summary-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
 import { LetterBlock } from "../blocks/letter-block";
 import { ApplicationBlock } from "../blocks/application-block";
+import { NewsReportBlock } from "../blocks/news-report-block";
+import { EssayBlock } from "../blocks/essay-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
@@ -144,14 +148,34 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const DistTitleBlock = ({ data }: { data: any }) => {
-  const { dist, attemptCount, totalProvided, isCq, isMcq } = data || {};
+  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs } = data || {};
   if (dist?.questionTypeLabel && dist.questionTypeLabel.trim() !== "") return null;
 
-  const instructionText = (isCq || !isMcq) && attemptCount < totalProvided && attemptCount > 0 
-    ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-    : (isCq || !isMcq) && attemptCount > 0 
-    ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-    : null;
+  const isCS = isCs
+    || dist?.questionType?.code === "CS"
+    || dist?.questionTypeName?.toLowerCase().includes("scenario")
+    || dist?.questionType?.nameEn?.toLowerCase().includes("scenario")
+    || dist?.questionType?.nameBn?.includes("সৃজনশীল (CS)");
+
+  const distQuestionCount = Number(dist?.questionCount ?? totalProvided ?? 0);
+  const distQuestionsToAttempt = (dist?.questionsToAttempt !== undefined && dist?.questionsToAttempt !== null)
+    ? Number(dist.questionsToAttempt)
+    : Number(attemptCount ?? distQuestionCount);
+
+  let instructionText: string | null = null;
+  if (isCS) {
+    if (distQuestionCount > 0 && distQuestionsToAttempt > 0 && distQuestionsToAttempt < distQuestionCount) {
+      instructionText = `[যেকোনো ${toBengaliDigits(distQuestionsToAttempt)}টি প্রশ্নের উত্তর দিতে হবে]`;
+    } else {
+      instructionText = `[সবগুলো প্রশ্নের উত্তর দিতে হবে]`;
+    }
+  } else {
+    instructionText = (isCq || !isMcq) && attemptCount < totalProvided && attemptCount > 0 
+      ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
+      : (isCq || !isMcq) && attemptCount > 0 
+      ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
+      : null;
+  }
 
   const titleText = dist.questionType?.nameBn || dist.questionTypeName || (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist.questionType?.nameEn);
 
@@ -231,12 +255,20 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ShortAnswerBlock item={block.data.item} />;
     case "question-paragraph":
       return <ParagraphBlock item={block.data.item} />;
+    case "question-essence":
+      return <EssenceBlock item={block.data.item} />;
+    case "question-summary":
+      return <SummaryBlock item={block.data.item} />;
     case "question-amplification":
       return <AmplificationBlock item={block.data.item} />;
     case "question-letter":
       return <LetterBlock item={block.data.item} />;
     case "question-application":
       return <ApplicationBlock item={block.data.item} />;
+    case "question-news-report":
+      return <NewsReportBlock item={block.data.item} />;
+    case "question-essay":
+      return <EssayBlock item={block.data.item} />;
     case "dist-action":
       return <DistActionBlock blockData={block.data} />;
     case "empty":

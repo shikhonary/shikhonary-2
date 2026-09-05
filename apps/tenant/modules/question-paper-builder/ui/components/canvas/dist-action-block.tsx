@@ -126,6 +126,12 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.PARAGRAPH;
     } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
       resolvedCategory = QUESTION_TYPE_CODES.AMPLIFICATION;
+    } else if (lowerName.includes("report") || lowerName.includes("প্রতিবেদন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
+    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ") || lowerName.includes("সারমর্ম")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
+    } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
     }
   }
 
@@ -167,10 +173,10 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const dropdownMaxOptions = maxAllowedRequired;
 
-  const rawAttempt = subSectionId 
-    ? (blockData?.subQuestionsToAttempt ?? dist.questionsToAttempt ?? 0)
-    : (dist.questionsToAttempt ?? 0);
-  const currentAttempt = (rawAttempt && rawAttempt > 0) ? String(Math.min(rawAttempt, Math.max(1, dropdownMaxOptions))) : "";
+  const rawAttempt = (blockData?.subQuestionsToAttempt && blockData.subQuestionsToAttempt > 0) 
+    ? blockData.subQuestionsToAttempt 
+    : 0;
+  const currentAttempt = (rawAttempt > 0) ? String(Math.min(rawAttempt, Math.max(1, dropdownMaxOptions))) : "";
 
   if (status !== "COMPLETED") {
     return (
@@ -192,7 +198,18 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
               }}
               onChange={async (e) => {
                 const val = parseInt(e.target.value, 10);
-                if (!val || isNaN(val)) return;
+                if (isNaN(val) || !val) {
+                  try {
+                    await upsertSubSection({
+                      id: subSectionId,
+                      questionsToAttempt: 0,
+                    });
+                    toast.success("আবশ্যক প্রশ্নের সংখ্যা রিসেট করা হয়েছে");
+                  } catch (err: any) {
+                    toast.error(err?.message || "হালনাগাদ করতে ব্যর্থ হয়েছে");
+                  }
+                  return;
+                }
 
                 if (maxAllowedRequired <= 0) {
                   toast.error(`সেকশনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sectionQuestionsToAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`);
@@ -216,7 +233,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
               }}
               className="bg-transparent font-bold cursor-pointer focus:outline-none text-primary"
             >
-              <option value="" disabled className="text-muted-foreground">
+              <option value="" className="text-muted-foreground">
                 {maxAllowedRequired <= 0 ? "কোটা পূর্ণ" : "নির্বাচন করুন"}
               </option>
               {Array.from({ length: dropdownMaxOptions }, (_, i) => i + 1).map((n) => (

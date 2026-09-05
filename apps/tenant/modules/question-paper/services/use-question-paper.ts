@@ -197,6 +197,16 @@ export function useDeleteDistribution() {
   })
 }
 
+export function useUpdateDistributionLabel() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.updateDistributionLabel.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Builder Specific Hooks
 // ---------------------------------------------------------------------------

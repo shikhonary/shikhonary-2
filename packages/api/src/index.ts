@@ -238,4 +238,36 @@ export type {
   ImportEssencesInput,
 } from "./routers/essence/essence.schema"
 
+export type {
+  ListThoughtExpansionsInput,
+  ThoughtExpansionStatsInput,
+  GetThoughtExpansionInput,
+  CreateThoughtExpansionInput,
+  UpdateThoughtExpansionInput,
+  DeleteThoughtExpansionInput,
+  BulkDeleteThoughtExpansionsInput,
+  ImportThoughtExpansionsInput,
+} from "./routers/thought-expansion/thought-expansion.schema"
+
+export type {
+  ListNewsReportsInput,
+  NewsReportStatsInput,
+  GetNewsReportInput,
+  CreateNewsReportInput,
+  UpdateNewsReportInput,
+  DeleteNewsReportInput,
+  BulkDeleteNewsReportsInput,
+  ImportNewsReportsInput,
+} from "./routers/news-report/news-report.schema"
+
+export type {
+  ListEssaysInput,
+  EssayStatsInput,
+  GetEssayInput,
+  CreateEssayInput,
+  UpdateEssayInput,
+  DeleteEssayInput,
+  BulkDeleteEssaysInput,
+  ImportEssaysInput,
+} from "./routers/essay/essay.schema"
 

@@ -36,6 +36,9 @@ import { letterRouter } from "./routers/letter/letter.router"
 import { applicationRouter } from "./routers/application/application.router"
 import { summaryRouter } from "./routers/summary/summary.router"
 import { essenceRouter } from "./routers/essence/essence.router"
+import { thoughtExpansionRouter } from "./routers/thought-expansion/thought-expansion.router"
+import { newsReportRouter } from "./routers/news-report/news-report.router"
+import { essayRouter } from "./routers/essay/essay.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -66,6 +69,9 @@ export const appRouter = createTRPCRouter({
   application: applicationRouter,
   summary: summaryRouter,
   essence: essenceRouter,
+  thoughtExpansion: thoughtExpansionRouter,
+  newsReport: newsReportRouter,
+  essay: essayRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

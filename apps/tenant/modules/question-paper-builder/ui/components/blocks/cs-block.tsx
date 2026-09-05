@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
-import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
-import { AddAlternativeModal } from "../modals/add-alternative-modal";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -167,54 +165,24 @@ export const CSBlock = ({ item }: { item: any }) => {
   ].filter((sq) => sq.text);
 
   const renderSubQuestionLabel = (label: string) => {
-    const labelStyle = {
-      fontSize: questionStyle.fontSize,
-      fontFamily: questionStyle.fontFamily,
-    };
-
-    switch (settings.optionStyle) {
-      case "dot":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label}.</span>;
-      case "parentheses":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-      case "round":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label})</span>;
-      case "circle":
-        return (
-          <div 
-            className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
-            style={{ 
-              width: "1.6em", 
-              height: "1.6em", 
-              fontSize: `${(questionStyle.fontSize || settings.fontSize) - 2}px`, 
-              marginTop: "2px",
-              fontFamily: settings.fontFamily,
-              lineHeight: "1"
-            }}
-          >
-            {label}
-          </div>
-        );
-      default:
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-    }
+    const cleanLabel = (label || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
   };
-
-  const [showAddAlternative, setShowAddAlternative] = useState(false);
 
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-2 break-inside-avoid">
       {/* Hover Controls */}
       <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-        <button
-          type="button"
-          onClick={() => setShowAddAlternative(true)}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
-        >
-          <Split className="w-3 h-3" />
-          অথবা
-        </button>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
@@ -229,7 +197,7 @@ export const CSBlock = ({ item }: { item: any }) => {
       <div className="flex justify-between items-start gap-2">
         <div className="flex gap-2 flex-1 relative">
           <span
-            className="font-bold shrink-0"
+            className="font-bold shrink-0 min-w-[1.8em]"
             style={{
               fontSize: questionStyle.fontSize,
               fontFamily: questionStyle.fontFamily,
@@ -258,34 +226,9 @@ export const CSBlock = ({ item }: { item: any }) => {
                 ))}
               </div>
             )}
-
-            {/* Attached Alternatives */}
-            {item.alternatives && item.alternatives.length > 0 && (
-              <AlternativeQuestionRenderer
-                paperId={paperId || ""}
-                parentQuestionId={item.id}
-                alternatives={item.alternatives}
-                settings={settings}
-                masterNumber={item.masterNumber || (item.orderIndex + 1)}
-                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? 10}
-              />
-            )}
           </div>
         </div>
       </div>
-
-      <AddAlternativeModal
-        open={showAddAlternative}
-        onOpenChange={setShowAddAlternative}
-        paperId={paperId || ""}
-        primaryQuestionId={item.id}
-        primaryQuestionContentId={data.id}
-        primaryQuestionType="CS"
-        subjectId={item.subjectId || distStatus?.subjectId || ""}
-        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? 10}
-        masterNumber={item.masterNumber || (item.orderIndex + 1)}
-        distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
-      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
+import { EditableSectionLabel } from "./editable-section-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -107,8 +108,8 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
-  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId));
-  const rawMarkDist = item.markDistribution || item.distribution?.markDistribution || distStatus?.markDistribution;
+  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId || item.distribution?.id));
+  const rawMarkDist = distStatus?.markDistribution || item.distribution?.markDistribution || item.markDistribution;
   let markDist = rawMarkDist;
   if (typeof rawMarkDist === "string") {
     try {
@@ -119,25 +120,67 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   }
 
   const getQuestionMark = (index: number, defaultMark: number) => {
-    if ((data.mark ?? data.marks) !== undefined) return data.mark ?? data.marks;
-    if (!markDist) return defaultMark;
+    if (markDist) {
+      if (Array.isArray(markDist)) {
+        if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
+          return Number(markDist[index]);
+        }
+      } else if (typeof markDist === "object" && markDist !== null) {
+        const alphaKeys = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const upperAlphaKeys = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        const bengaliKeys = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
 
-    if (Array.isArray(markDist)) {
-      if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
-        return Number(markDist[index]);
-      }
-    } else if (typeof markDist === "object") {
-      const keysToTry = [String(index + 1), String(index), `q${index + 1}`, `mark${index + 1}`];
-      for (const k of keysToTry) {
-        if (markDist[k] !== undefined && !isNaN(Number(markDist[k]))) {
-          return Number(markDist[k]);
+        const keysToTry = [
+          alphaKeys[index],
+          upperAlphaKeys[index],
+          bengaliKeys[index],
+          String(index + 1),
+          String(index),
+          `q${index + 1}`,
+          `mark${index + 1}`,
+          `q${alphaKeys[index]}`,
+        ].filter(Boolean) as string[];
+
+        for (const k of keysToTry) {
+          if (markDist[k] !== undefined && markDist[k] !== null && !isNaN(Number(markDist[k]))) {
+            return Number(markDist[k]);
+          }
+        }
+
+        const values = Object.values(markDist).filter((v: any) => v !== undefined && v !== null && !isNaN(Number(v)));
+        if (values.length > 0) {
+          if (values[index] !== undefined) {
+            return Number(values[index]);
+          }
+          return Number(values[0]);
         }
       }
     }
+
+    if (item.assignedMarks !== undefined && item.assignedMarks !== null) return Number(item.assignedMarks);
+    if ((data.mark ?? data.marks) !== undefined && (data.mark ?? data.marks) !== null) return Number(data.mark ?? data.marks);
     return defaultMark;
   };
 
-  const marksPerQuestion = getQuestionMark(item.orderIndex, item.marksPerQuestion || distStatus?.marksPerQuestion || 2);
+  const defaultMark = Number(
+    distStatus?.marksPerQuestion ??
+    item.distribution?.marksPerQuestion ??
+    item.marksPerQuestion ??
+    item.assignedMarks ??
+    data.mark ??
+    data.marks ??
+    2
+  );
+
+  const marksPerQuestion = getQuestionMark(item.orderIndex, defaultMark);
+  const attemptCount = Number(
+    (distStatus as any)?.questionsToAttempt ??
+    item.distribution?.questionsToAttempt ??
+    item.attemptCount ??
+    distStatus?.targetCount ??
+    item.totalQuestions ??
+    1
+  );
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -164,37 +207,18 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   const label = subLabels[item.orderIndex] || "";
 
   const renderSubQuestionLabel = (labelStr: string) => {
-    const labelStyle = {
-      fontSize: questionStyle.fontSize,
-      fontFamily: questionStyle.fontFamily,
-    };
-
-    switch (settings.optionStyle) {
-      case "dot":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{labelStr}.</span>;
-      case "parentheses":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({labelStr})</span>;
-      case "round":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{labelStr})</span>;
-      case "circle":
-        return (
-          <div 
-            className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
-            style={{ 
-              width: "1.6em", 
-              height: "1.6em", 
-              fontSize: `${(questionStyle.fontSize || settings.fontSize) - 2}px`, 
-              marginTop: "2px",
-              fontFamily: settings.fontFamily,
-              lineHeight: "1"
-            }}
-          >
-            {labelStr}
-          </div>
-        );
-      default:
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({labelStr})</span>;
-    }
+    const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
   };
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
@@ -224,27 +248,55 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
       </div>
 
       {item.isFirstShortAnswer && (
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start w-full">
           <div 
-            className="font-bold ml-[0px]" 
+            className="font-bold ml-[0px] flex items-baseline gap-2" 
             style={{
               fontSize: questionStyle.fontSize,
               fontFamily: questionStyle.fontFamily,
             }}
           >
-            {toBengaliDigits(item.masterNumber || 1)}। সংক্ষিপ্ত-উত্তর প্রশ্নের উত্তর দাও:
+            <span
+              className="font-bold shrink-0 min-w-[1.8em]"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            >
+              {toBengaliDigits(item.masterNumber || 1)}।
+            </span>
+            <EditableSectionLabel
+              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              fallbackLabel="সংক্ষিপ্ত-উত্তর প্রশ্নের উত্তর দাও:"
+              questionType="SA"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            />
           </div>
           <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
-            {toBengaliDigits(marksPerQuestion)} <span className="font-sans px-1">×</span> {toBengaliDigits(item.attemptCount || item.totalQuestions || 1)} = {toBengaliDigits((marksPerQuestion) * (item.attemptCount || item.totalQuestions || 1))}
+            {toBengaliDigits(marksPerQuestion)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((marksPerQuestion) * (attemptCount || 1))}
           </div>
         </div>
       )}
-      <div className="flex justify-between items-start gap-2 pl-4">
-        <div className="flex gap-2 flex-1 relative flex-col">
+      <div className="flex justify-between items-start gap-2 w-full">
+        <div className="flex gap-1 flex-1 relative flex-col">
           <div className="flex gap-2 items-start w-full">
+            <span
+              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+              aria-hidden="true"
+            >
+              {toBengaliDigits(item.masterNumber || 1)}।
+            </span>
             {renderSubQuestionLabel(label)}
             <div className="flex-1 w-full min-w-0">
               <ShortAnswerEditableText 

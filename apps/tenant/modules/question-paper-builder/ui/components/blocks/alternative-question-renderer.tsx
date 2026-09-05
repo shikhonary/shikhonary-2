@@ -109,7 +109,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
   const renderNumberSpacer = () => (
     <span
-      className="font-bold shrink-0 invisible select-none pointer-events-none"
+      className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
       style={{
         fontSize: questionStyle.fontSize,
         fontFamily: questionStyle.fontFamily,
@@ -121,62 +121,46 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
   );
 
   const renderSubQuestionLabel = (label: string) => {
-    const labelStyle = {
-      fontSize: questionStyle.fontSize,
-      fontFamily: questionStyle.fontFamily,
-    };
-
-    switch (activeSettings?.optionStyle) {
-      case "dot":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label}.</span>;
-      case "parentheses":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-      case "round":
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>{label})</span>;
-      case "circle":
-        return (
-          <div 
-            className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
-            style={{ 
-              width: "1.6em", 
-              height: "1.6em", 
-              fontSize: `${(questionStyle.fontSize || activeSettings?.fontSize || 13) - 2}px`, 
-              marginTop: "2px",
-              fontFamily: activeSettings?.fontFamily,
-              lineHeight: "1"
-            }}
-          >
-            {label}
-          </div>
-        );
-      default:
-        return <span className="font-bold shrink-0 min-w-[1.6em]" style={labelStyle}>({label})</span>;
-    }
+    const cleanLabel = (label || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
   };
 
   return (
-    <div className="w-full flex flex-col mt-0.5">
+    <div className="w-full flex flex-col mt-0">
       {alternatives.map((alt) => {
         const cq = alt.cq;
         const sa = alt.shortAnswer;
         const paragraph = alt.paragraph;
+        const essence = alt.essence;
+        const summary = alt.summary;
         const amplification = alt.amplification;
         const letter = alt.letter;
         const application = alt.application;
+        const newsReport = alt.newsReport;
+        const essay = alt.essay;
         const cs = alt.cs;
         const mcq = alt.mcq;
 
         return (
           <div key={alt.id} className="w-full flex flex-col group/alt relative">
             {/* ── OR DIVIDER ── */}
-            <div className="my-1 flex items-center justify-center gap-2 w-full relative">
-              <div className="h-px bg-on-surface/20 flex-1"></div>
+            <div className="py-0 my-0 flex items-center justify-center w-full relative">
               {editingLabelId === alt.id ? (
                 <div className="flex items-center gap-1 z-10 print:hidden">
                   <Input
                     value={labelValue}
                     onChange={(e) => setLabelValue(e.target.value)}
-                    className="h-5 w-16 text-[11px] text-center font-bold px-1 py-0"
+                    className="h-5 w-16 text-xs text-center font-bold px-1 py-0"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleSaveLabel(alt.id);
@@ -198,17 +182,20 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                     setEditingLabelId(alt.id);
                     setLabelValue(alt.orLabel || "অথবা");
                   }}
-                  className="px-2.5 py-0 text-[11px] font-bold bg-background text-foreground border border-on-surface/20 rounded cursor-pointer hover:border-primary transition-colors select-none leading-tight"
+                  className="font-bold text-center text-foreground cursor-pointer hover:text-primary transition-colors select-none leading-none py-0.5"
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
                   title="লেবেল সম্পাদনা করতে ক্লিক করুন (যেমন: অথবা, বা, OR)"
                 >
                   {alt.orLabel || "অথবা"}
                 </div>
               )}
-              <div className="h-px bg-on-surface/20 flex-1"></div>
             </div>
 
             {/* ── ALTERNATIVE QUESTION CONTENT (EXACT BLOCK REPRESENTATION WITH NUMBER ALIGNMENT) ── */}
-            <div className="relative rounded-lg hover:bg-muted/15 transition-colors py-0.5 w-full">
+            <div className="relative rounded-lg hover:bg-muted/15 transition-colors py-0 w-full">
               {/* Hover actions */}
               <div className="absolute top-0 right-1 opacity-0 group-hover/alt:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-20 print:hidden text-[11px]">
                 <button
@@ -233,6 +220,60 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 </button>
               </div>
 
+              {/* 0.9 EXACT ESSAY BLOCK REPRESENTATION */}
+              {essay && (() => {
+                const essayDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === essay.questionTypeId ||
+                      d.questionTypeName?.includes("রচনা") ||
+                      d.questionTypeName?.includes("প্রবন্ধ") ||
+                      d.questionTypeName?.toLowerCase().includes("essay")
+                  ) || alt.distribution;
+
+                const rawLabel = essayDist?.questionTypeLabel || essay.questionType?.label;
+                const esLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {esLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{esLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("খ")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={essay.title || essay.name || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 1. EXACT PARAGRAPH BLOCK REPRESENTATION */}
               {paragraph && (() => {
                 const paragraphDist =
@@ -247,8 +288,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const pLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
                   : null;
-                const marksPerQuestion = alt.assignedMarks ?? paragraphDist?.marksPerQuestion ?? primaryMarks ?? 10;
-                const attemptCount = paragraphDist?.questionsToAttempt || paragraphDist?.attemptCount || 1;
 
                 return (
                   <div className="w-full flex flex-col">
@@ -256,7 +295,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                     {pLabel && (
                       <div className="flex justify-between items-start w-full mb-0.5">
                         <div
-                          className="font-bold ml-[0px] flex items-baseline gap-1"
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
@@ -265,26 +304,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                           {renderNumberSpacer()}
                           <span>{pLabel}</span>
                         </div>
-                        <div
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                          style={{
-                            fontSize: questionStyle.fontSize,
-                            fontFamily: questionStyle.fontFamily,
-                          }}
-                        >
-                          {toBengaliDigits(marksPerQuestion)}{" "}
-                          <span className="font-sans px-1">×</span>{" "}
-                          {toBengaliDigits(attemptCount)} ={" "}
-                          {toBengaliDigits(marksPerQuestion * attemptCount)}
-                        </div>
                       </div>
                     )}
 
-                    {/* Body: pl-4 with subquestion label (ক) and paragraph name */}
-                    <div className={`flex justify-between items-start gap-2 ${pLabel ? "pl-4 mt-0.5" : "w-full"}`}>
+                    {/* Body: aligned with renderNumberSpacer and subquestion label (খ) */}
+                    <div className="flex justify-between items-start gap-2 w-full">
                       <div className="flex gap-2 items-start flex-1 min-w-0">
-                        {!pLabel && renderNumberSpacer()}
-                        {pLabel && renderSubQuestionLabel("ক")}
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("খ")}
                         <div className="flex-1 w-full min-w-0">
                           <div
                             className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -298,17 +325,102 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                           </div>
                         </div>
                       </div>
-                      {!pLabel && (
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 1.1 EXACT ESSENCE BLOCK REPRESENTATION */}
+              {essence && (() => {
+                const essenceDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === essence.questionTypeId ||
+                      d.questionTypeName?.includes("সারমর্ম") ||
+                      d.questionTypeName?.toLowerCase().includes("essence")
+                  ) || alt.distribution;
+
+                const rawLabel = essenceDist?.questionTypeLabel || essence.questionType?.label;
+                const eLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      {renderSubQuestionLabel("খ")}
+                      <div className="flex-1 w-full min-w-0">
+                        {eLabel && (
+                          <span
+                            className="font-bold mr-1.5"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                            }}
+                          >
+                            {eLabel}
+                          </span>
+                        )}
                         <span
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
+                          className="font-medium text-foreground whitespace-pre-wrap"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          {toBengaliDigits(marksPerQuestion)}
+                          <RenderMath text={essence.title || essence.name || ""} />
                         </span>
-                      )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 1.2 EXACT SUMMARY BLOCK REPRESENTATION */}
+              {summary && (() => {
+                const summaryDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === summary.questionTypeId ||
+                      d.questionTypeName?.includes("সারাংশ") ||
+                      d.questionTypeName?.toLowerCase().includes("summary")
+                  ) || alt.distribution;
+
+                const rawLabel = summaryDist?.questionTypeLabel || summary.questionType?.label;
+                const sLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      {renderSubQuestionLabel("খ")}
+                      <div className="flex-1 w-full min-w-0">
+                        {sLabel && (
+                          <span
+                            className="font-bold mr-1.5"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                            }}
+                          >
+                            {sLabel}
+                          </span>
+                        )}
+                        <span
+                          className="font-medium text-foreground whitespace-pre-wrap"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={summary.title || summary.name || ""} />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -316,21 +428,11 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 2. EXACT LETTER BLOCK REPRESENTATION */}
               {letter && (() => {
-                const letterDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === letter.questionTypeId ||
-                      d.questionTypeName?.includes("চিঠি") ||
-                      d.questionTypeName?.includes("পত্র") ||
-                      d.questionTypeName?.toLowerCase().includes("letter")
-                  ) || alt.distribution;
-
-                const mark = alt.assignedMarks ?? letterDist?.marksPerQuestion ?? primaryMarks ?? 10;
-
                 return (
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
                       {renderNumberSpacer()}
+                      {renderSubQuestionLabel("খ")}
                       <div className="flex-1 w-full min-w-0">
                         <div
                           className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -344,38 +446,17 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         </div>
                       </div>
                     </div>
-                    {mark !== undefined && mark !== null && (
-                      <span
-                        className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                        style={{
-                          fontSize: questionStyle.fontSize,
-                          fontFamily: questionStyle.fontFamily,
-                        }}
-                      >
-                        {toBengaliDigits(mark)}
-                      </span>
-                    )}
                   </div>
                 );
               })()}
 
               {/* 3. EXACT APPLICATION BLOCK REPRESENTATION */}
               {application && (() => {
-                const appDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === application.questionTypeId ||
-                      d.questionTypeName?.includes("আবেদন") ||
-                      d.questionTypeName?.includes("দরখাস্ত") ||
-                      d.questionTypeName?.toLowerCase().includes("application")
-                  ) || alt.distribution;
-
-                const mark = alt.assignedMarks ?? appDist?.marksPerQuestion ?? primaryMarks ?? 10;
-
                 return (
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
                       {renderNumberSpacer()}
+                      {renderSubQuestionLabel("খ")}
                       <div className="flex-1 w-full min-w-0">
                         <div
                           className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -389,17 +470,30 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         </div>
                       </div>
                     </div>
-                    {mark !== undefined && mark !== null && (
-                      <span
-                        className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                        style={{
-                          fontSize: questionStyle.fontSize,
-                          fontFamily: questionStyle.fontFamily,
-                        }}
-                      >
-                        {toBengaliDigits(mark)}
-                      </span>
-                    )}
+                  </div>
+                );
+              })()}
+
+              {/* 3.1 EXACT NEWS REPORT BLOCK REPRESENTATION */}
+              {newsReport && (() => {
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      {renderSubQuestionLabel("খ")}
+                      <div className="flex-1 w-full min-w-0">
+                        <div
+                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={newsReport.title || newsReport.name || ""} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 );
               })()}
@@ -418,7 +512,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const ampLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
                   : null;
-                const mark = alt.assignedMarks ?? ampDist?.marksPerQuestion ?? primaryMarks ?? 10;
 
                 return (
                   <div className="w-full flex flex-col">
@@ -433,15 +526,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         >
                           {renderNumberSpacer()}
                           <span>{ampLabel}</span>
-                        </div>
-                        <div
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                          style={{
-                            fontSize: questionStyle.fontSize,
-                            fontFamily: questionStyle.fontFamily,
-                          }}
-                        >
-                          {toBengaliDigits(mark)}
                         </div>
                       </div>
                     )}
@@ -461,17 +545,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                           </div>
                         </div>
                       </div>
-                      {!ampLabel && mark !== undefined && mark !== null && (
-                        <span
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                          style={{
-                            fontSize: questionStyle.fontSize,
-                            fontFamily: questionStyle.fontFamily,
-                          }}
-                        >
-                          {toBengaliDigits(mark)}
-                        </span>
-                      )}
                     </div>
                   </div>
                 );
@@ -576,8 +649,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const saLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
                   : null;
-                const mark = alt.assignedMarks ?? saDist?.marksPerQuestion ?? primaryMarks ?? 2;
-                const attemptCount = saDist?.questionsToAttempt || saDist?.attemptCount || 1;
 
                 return (
                   <div className="w-full flex flex-col">
@@ -592,18 +663,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         >
                           {renderNumberSpacer()}
                           <span>{saLabel}</span>
-                        </div>
-                        <div
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                          style={{
-                            fontSize: questionStyle.fontSize,
-                            fontFamily: questionStyle.fontFamily,
-                          }}
-                        >
-                          {toBengaliDigits(mark)}{" "}
-                          <span className="font-sans px-1">×</span>{" "}
-                          {toBengaliDigits(attemptCount)} ={" "}
-                          {toBengaliDigits(mark * attemptCount)}
                         </div>
                       </div>
                     )}
@@ -624,24 +683,13 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                           </div>
                         </div>
                       </div>
-                      {!saLabel && (
-                        <span
-                          className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                          style={{
-                            fontSize: questionStyle.fontSize,
-                            fontFamily: questionStyle.fontFamily,
-                          }}
-                        >
-                          {toBengaliDigits(mark)}
-                        </span>
-                      )}
                     </div>
                   </div>
                 );
               })()}
 
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !letter && !application && !amplification && !cq && !sa && (
+              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !sa && !newsReport && !essay && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}
@@ -658,17 +706,6 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       </div>
                     </div>
                   </div>
-                  {primaryMarks !== undefined && primaryMarks !== null && (
-                    <span
-                      className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                      style={{
-                        fontSize: questionStyle.fontSize,
-                        fontFamily: questionStyle.fontFamily,
-                      }}
-                    >
-                      {toBengaliDigits(primaryMarks)}
-                    </span>
-                  )}
                 </div>
               )}
             </div>

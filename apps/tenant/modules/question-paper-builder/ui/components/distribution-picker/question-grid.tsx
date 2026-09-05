@@ -9,9 +9,13 @@ import { CqPickerCard } from "./cq-picker-card";
 import { CsPickerCard } from "./cs-picker-card";
 import { SaPickerCard } from "./sa-picker-card";
 import { ParagraphPickerCard } from "./paragraph-picker-card";
+import { EssencePickerCard } from "./essence-picker-card";
+import { SummaryPickerCard } from "./summary-picker-card";
 import { AmplificationPickerCard } from "./amplification-picker-card";
 import { LetterPickerCard } from "./letter-picker-card";
 import { ApplicationPickerCard } from "./application-picker-card";
+import { NewsReportPickerCard } from "./news-report-picker-card";
+import { EssayPickerCard } from "./essay-picker-card";
 
 export interface QuestionGridProps {
   subjectId: string;
@@ -70,6 +74,18 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   const renderCard = (q: any) => {
     const isSelected = selectedIds.includes(q.id);
 
+    if (effectiveCategory === "ESSAY") {
+      return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "ESSENCE") {
+      return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "SUMMARY") {
+      return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
     // If it has title without MCQ/CQ specific fields, check if it's application or letter
     if (q.title && !q.options && !q.question && !q.context && !q.questionA) {
       if (q.title.includes("দরখাস্ত") || q.title.includes("আবেদন")) {
@@ -78,7 +94,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
-    switch (effectiveCategory) {
+    switch (effectiveCategory as string) {
       case "CQ":
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CS":
@@ -87,10 +103,18 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <SaPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "PARAGRAPH":
         return <ParagraphPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "ESSENCE":
+        return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SUMMARY":
+        return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "AMPLIFICATION":
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "APPLICATION":
         return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "NEWS_REPORT":
+        return <NewsReportPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "ESSAY":
+        return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "LETTER":
         return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "MCQ":

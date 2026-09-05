@@ -148,11 +148,48 @@ export function StepSubjectsDistribution({
       toast.info("চেষ্টার সংখ্যা অনুযায়ী মোট প্রশ্ন সংখ্যা সমন্বয় করা হয়েছে।")
     }
 
+    const marksNum = parseFloat(distForm.marksPerQuestion)
+
+    // Check if preset exists in subjectDetail
+    const preset = subjectDetail?.subjectQuestionTypes?.find(
+      (sqt: any) => sqt.questionTypeId === distForm.questionTypeId
+    )
+
+    let markDist: any = preset?.markDistribution
+    if (typeof markDist === "string") {
+      try {
+        markDist = JSON.parse(markDist)
+      } catch {
+        markDist = null
+      }
+    }
+
+    if (markDist && typeof markDist === "object" && !Array.isArray(markDist)) {
+      const keys = Object.keys(markDist)
+      if (keys.length === 1) {
+        markDist = { [keys[0]!]: marksNum }
+      } else if (keys.length > 1) {
+        const sum = Object.values(markDist).reduce((acc: number, val: any) => acc + (Number(val) || 0), 0)
+        if (sum !== marksNum && sum > 0) {
+          const ratio = marksNum / sum
+          const scaled: Record<string, number> = {}
+          for (const k of keys) {
+            scaled[k] = Math.round(((Number(markDist[k]) || 0) * ratio) * 100) / 100
+          }
+          markDist = scaled
+        }
+      }
+    } else {
+      markDist = { a: marksNum }
+    }
+
     const distribution: WizardDistribution = {
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
       questionTypeName: matched.nameBn || matched.nameEn,
-      marksPerQuestion: parseFloat(distForm.marksPerQuestion),
+      questionTypeLabel: (preset as any)?.questionTypeLabel || (matched as any).label || matched.nameBn || matched.nameEn,
+      marksPerQuestion: marksNum,
+      markDistribution: markDist,
       questionCount: finalQuestionCount,
       questionsToAttempt: finalQuestionsToAttempt,
       orderIndex: 0,

@@ -18,6 +18,8 @@ import {
   GraduationCap,
   BookOpen,
   HelpCircle,
+  Newspaper,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -68,6 +70,9 @@ const navGroups: NavGroup[] = [
       { href: "/applications", label: "Applications", icon: HelpCircle },
       { href: "/summaries", label: "Summaries", icon: HelpCircle },
       { href: "/essences", label: "Essences", icon: HelpCircle },
+      { href: "/thought-expansions", label: "Thought Expansions", icon: HelpCircle },
+      { href: "/news-reports", label: "News Reports", icon: Newspaper },
+      { href: "/essays", label: "Essays", icon: ScrollText },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },

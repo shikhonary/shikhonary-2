@@ -55,10 +55,41 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.SA;
   } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
     category = QUESTION_TYPE_CODES.PARAGRAPH;
+  } else if (normalized === QUESTION_TYPES.SUMMARY) {
+    category = QUESTION_TYPE_CODES.SUMMARY;
+  } else if (normalized === QUESTION_TYPES.ESSENCE) {
+    category = QUESTION_TYPE_CODES.ESSENCE;
   } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
     category = QUESTION_TYPE_CODES.AMPLIFICATION;
+  } else if (normalized === QUESTION_TYPES.LETTER) {
+    category = QUESTION_TYPE_CODES.LETTER;
+  } else if (normalized === QUESTION_TYPES.APPLICATION) {
+    category = QUESTION_TYPE_CODES.APPLICATION;
+  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
+    category = QUESTION_TYPE_CODES.NEWS_REPORT;
+  } else if (normalized === QUESTION_TYPES.ESSAY) {
+    category = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     category = QUESTION_TYPE_CODES.MCQ;
+  } else {
+    const lower = rawName.toLowerCase();
+    if (lower.includes("essence") || lower.includes("সারমর্ম")) {
+      category = QUESTION_TYPE_CODES.ESSENCE;
+    } else if (lower.includes("summary") || lower.includes("সারাংশ")) {
+      category = QUESTION_TYPE_CODES.SUMMARY;
+    } else if (lower.includes("paragraph") || lower.includes("অনুচ্ছেদ")) {
+      category = QUESTION_TYPE_CODES.PARAGRAPH;
+    } else if (lower.includes("expansion") || lower.includes("amplification") || lower.includes("ভাব")) {
+      category = QUESTION_TYPE_CODES.AMPLIFICATION;
+    } else if (lower.includes("letter") || lower.includes("চিঠি") || lower.includes("পত্র")) {
+      category = QUESTION_TYPE_CODES.LETTER;
+    } else if (lower.includes("application") || lower.includes("আবেদন") || lower.includes("দরখাস্ত")) {
+      category = QUESTION_TYPE_CODES.APPLICATION;
+    } else if (lower.includes("report") || lower.includes("প্রতিবেদন")) {
+      category = QUESTION_TYPE_CODES.NEWS_REPORT;
+    } else if (lower.includes("essay") || lower.includes("রচনা") || lower.includes("প্রবন্ধ")) {
+      category = QUESTION_TYPE_CODES.ESSAY;
+    }
   }
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
@@ -122,8 +153,20 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, csIds: [questionId] });
       } else if (category === "PARAGRAPH") {
         await assignQuestion({ ...payloadBase, paragraphIds: [questionId] });
+      } else if (category === "ESSENCE") {
+        await assignQuestion({ ...payloadBase, essenceIds: [questionId] });
+      } else if (category === "SUMMARY") {
+        await assignQuestion({ ...payloadBase, summaryIds: [questionId] });
       } else if (category === "AMPLIFICATION") {
         await assignQuestion({ ...payloadBase, amplificationIds: [questionId] });
+      } else if (category === "LETTER") {
+        await assignQuestion({ ...payloadBase, letterIds: [questionId] });
+      } else if (category === "APPLICATION") {
+        await assignQuestion({ ...payloadBase, applicationIds: [questionId] });
+      } else if (category === "NEWS_REPORT") {
+        await assignQuestion({ ...payloadBase, newsReportIds: [questionId] });
+      } else if (category === "ESSAY") {
+        await assignQuestion({ ...payloadBase, essayIds: [questionId] });
       } else {
         await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
@@ -290,9 +333,9 @@ export const QuestionPickerPanel: React.FC = () => {
                     {category === "CQ" || category === "CS" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
                     ) : category === "PARAGRAPH" ? (
-                      <RenderMath text={q.name || ""} />
-                    ) : category === "AMPLIFICATION" ? (
-                      <RenderMath text={q.title || ""} />
+                      <RenderMath text={q.name || q.title || ""} />
+                    ) : category === "SUMMARY" || category === "AMPLIFICATION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" ? (
+                      <RenderMath text={q.title || q.name || ""} />
                     ) : (
                       <RenderMath text={q.question || ""} />
                     )}

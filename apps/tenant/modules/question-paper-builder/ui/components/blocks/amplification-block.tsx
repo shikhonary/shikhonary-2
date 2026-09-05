@@ -5,6 +5,7 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
+import { EditableSectionLabel } from "./editable-section-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -107,8 +108,8 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
-  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId));
-  const rawMarkDist = item.markDistribution || item.distribution?.markDistribution || distStatus?.markDistribution;
+  const distStatus = statuses?.find((s: any) => s.distributionId === (item.distributionId || data.distributionId || item.distribution?.id));
+  const rawMarkDist = distStatus?.markDistribution || item.distribution?.markDistribution || item.markDistribution;
   let markDist = rawMarkDist;
   if (typeof rawMarkDist === "string") {
     try {
@@ -118,26 +119,81 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
     }
   }
 
-  const getQuestionMark = (index: number, defaultMark?: number) => {
-    if ((data.mark ?? data.marks) !== undefined) return data.mark ?? data.marks;
-    if (!markDist) return defaultMark;
+  const getQuestionMark = (index: number, defaultMark: number) => {
+    if (markDist) {
+      if (Array.isArray(markDist)) {
+        if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
+          return Number(markDist[index]);
+        }
+      } else if (typeof markDist === "object" && markDist !== null) {
+        const alphaKeys = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const upperAlphaKeys = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        const bengaliKeys = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
 
-    if (Array.isArray(markDist)) {
-      if (markDist[index] !== undefined && !isNaN(Number(markDist[index]))) {
-        return Number(markDist[index]);
-      }
-    } else if (typeof markDist === "object") {
-      const keysToTry = [String(index + 1), String(index), `q${index + 1}`, `mark${index + 1}`];
-      for (const k of keysToTry) {
-        if (markDist[k] !== undefined && !isNaN(Number(markDist[k]))) {
-          return Number(markDist[k]);
+        const keysToTry = [
+          alphaKeys[index],
+          upperAlphaKeys[index],
+          bengaliKeys[index],
+          String(index + 1),
+          String(index),
+          `q${index + 1}`,
+          `mark${index + 1}`,
+          `q${alphaKeys[index]}`,
+        ].filter(Boolean) as string[];
+
+        for (const k of keysToTry) {
+          if (markDist[k] !== undefined && markDist[k] !== null && !isNaN(Number(markDist[k]))) {
+            return Number(markDist[k]);
+          }
+        }
+
+        const values = Object.values(markDist).filter((v: any) => v !== undefined && v !== null && !isNaN(Number(v)));
+        if (values.length > 0) {
+          if (values[index] !== undefined) {
+            return Number(values[index]);
+          }
+          return Number(values[0]);
         }
       }
     }
+
+    if (item.assignedMarks !== undefined && item.assignedMarks !== null) return Number(item.assignedMarks);
+    if ((data.mark ?? data.marks) !== undefined && (data.mark ?? data.marks) !== null) return Number(data.mark ?? data.marks);
     return defaultMark;
   };
 
-  const mark = getQuestionMark(item.orderIndex, item.marksPerQuestion || distStatus?.marksPerQuestion);
+  const defaultMark = Number(
+    distStatus?.marksPerQuestion ??
+    item.distribution?.marksPerQuestion ??
+    item.marksPerQuestion ??
+    item.assignedMarks ??
+    data.mark ??
+    data.marks ??
+    10
+  );
+
+  const marksPerQuestion = getQuestionMark(item.orderIndex, defaultMark);
+  const attemptCount = Number(
+    (distStatus as any)?.questionsToAttempt ??
+    item.distribution?.questionsToAttempt ??
+    item.attemptCount ??
+    distStatus?.targetCount ??
+    item.totalQuestions ??
+    1
+  );
+
+  const rawLabel = 
+    distStatus?.questionTypeLabel ||
+    item.distribution?.questionTypeLabel ||
+    item.questionTypeLabel ||
+    distStatus?.questionTypeName ||
+    item.distribution?.questionTypeName ||
+    distStatus?.questionType?.nameBn ||
+    item.distribution?.questionType?.nameBn;
+
+  const displayLabel = rawLabel
+    ? (rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`)
+    : "ভাব-সম্প্রসারণ করো:";
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -160,10 +216,28 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
+  const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const label = subLabels[item.orderIndex] || "";
+
+  const renderSubQuestionLabel = (labelStr: string) => {
+    const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
+    return (
+      <span
+        className="font-bold shrink-0 min-w-[1.6em]"
+        style={{
+          fontSize: questionStyle.fontSize,
+          fontFamily: questionStyle.fontFamily,
+        }}
+      >
+        ({cleanLabel})
+      </span>
+    );
+  };
+
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
   return (
-    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-2 break-inside-avoid py-1">
+    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${item.isFirstAmplification ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
       <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button
@@ -186,31 +260,65 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      <div className="flex justify-between items-start gap-2">
-        <div className="flex gap-2 flex-1 relative flex-col">
-          <div className="flex gap-2 items-start w-full">
+      {item.isFirstAmplification && (
+        <div className="flex justify-between items-start w-full">
+          <div 
+            className="font-bold ml-[0px] flex items-baseline gap-2" 
+            style={{
+              fontSize: questionStyle.fontSize,
+              fontFamily: questionStyle.fontFamily,
+            }}
+          >
             <span
-              className="font-bold shrink-0"
+              className="font-bold shrink-0 min-w-[1.8em]"
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
               }}
             >
-              {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
+              {toBengaliDigits(item.masterNumber || 1)}।
             </span>
+            <EditableSectionLabel
+              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+              initialLabel={rawLabel}
+              fallbackLabel="যেকোনো একটির ভাব-সম্প্রসারণ করো:"
+              questionType="AMPLIFICATION"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            />
+          </div>
+          <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
+            fontSize: questionStyle.fontSize,
+            fontFamily: questionStyle.fontFamily,
+          }}>
+            {toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+          </div>
+        </div>
+      )}
+      <div className="flex justify-between items-start gap-2 w-full">
+        <div className="flex gap-1 flex-1 relative flex-col">
+          <div className="flex gap-2 items-start w-full">
+            <span
+              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+              aria-hidden="true"
+            >
+              {toBengaliDigits(item.masterNumber || 1)}।
+            </span>
+            {renderSubQuestionLabel(label)}
             <div className="flex-1 w-full min-w-0">
               <AmplificationEditableText 
-                text={data.title}
+                text={data.title || data.name || ""}
                 itemKey={`${item.id}-question`}
                 defaultStyle={questionStyle}
                 className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
               />
             </div>
-            {mark !== undefined && (
-              <span className="font-bold text-sm text-[12px] ml-2 shrink-0">
-                {toBengaliDigits(mark)}
-              </span>
-            )}
           </div>
 
           {/* Attached Alternatives */}
@@ -221,7 +329,7 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
               alternatives={item.alternatives}
               settings={settings}
               masterNumber={item.masterNumber || (item.orderIndex + 1)}
-              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
             />
           )}
         </div>
@@ -235,7 +343,7 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
         primaryQuestionContentId={data.id}
         primaryQuestionType="AMPLIFICATION"
         subjectId={item.subjectId || distStatus?.subjectId || ""}
-        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
         masterNumber={item.masterNumber || (item.orderIndex + 1)}
         distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
       />

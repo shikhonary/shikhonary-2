@@ -540,6 +540,9 @@ model AcademicSubject {
   applications         Application[]
   summaries            Summary[]
   essences             Essence[]
+  thoughtExpansions    ThoughtExpansion[]
+  newsReports          NewsReport[]
+  essays               Essay[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -612,15 +615,18 @@ model QuestionType {
   cqs          Cq[]
   shortAnswers ShortAnswer[]
 
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  paragraphs     Paragraph[]
-  amplifications Amplification[]
-  cs             CS[]
-  letters        Letter[]
-  applications   Application[]
-  summaries      Summary[]
-  essences       Essence[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  paragraphs        Paragraph[]
+  amplifications    Amplification[]
+  cs                CS[]
+  letters           Letter[]
+  applications      Application[]
+  summaries         Summary[]
+  essences          Essence[]
+  thoughtExpansions ThoughtExpansion[]
+  newsReports       NewsReport[]
+  essays            Essay[]
 
   @@index([label])
   @@index([isActive])
@@ -1030,6 +1036,75 @@ model Essence {
   @@index([subjectId])
   @@index([difficulty])
   @@map("essence")
+}
+
+model ThoughtExpansion {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("thought_expansion")
+}
+
+model NewsReport {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("news_report")
+}
+
+model Essay {
+  id        String   @id @default(cuid())
+  title     String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("essay")
 }
 
 model QuestionReport {

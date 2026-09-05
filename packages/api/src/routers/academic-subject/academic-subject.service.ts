@@ -101,15 +101,8 @@ export async function getAcademicSubjectById(
         },
       },
       subjectQuestionTypes: {
-        select: {
-          id: true,
-          questionTypeId: true,
-          sectionId: true,
-          subSectionId: true,
-          mark: true,
-          totalQuestions: true,
-          requiredCount: true,
-          markDistribution: true,
+        include: {
+          questionType: true,
         },
       },
       sections: {

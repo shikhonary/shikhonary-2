@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -13,8 +13,10 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
-import { Split, ArrowRight, BookOpen, Layers } from "lucide-react";
-import { QUESTION_TYPE_CODES, type QuestionTypeCode } from "@workspace/utils";
+import { Split, ArrowRight, BookOpen, Layers, Loader2 } from "lucide-react";
+import { trpc } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -43,10 +45,13 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.LETTER, nameBn: "চিঠি / পত্র", nameEn: "Letter", desc: "ব্যক্তিগত বা আনুষ্ঠানিক চিঠি" },
   { code: QUESTION_TYPE_CODES.APPLICATION, nameBn: "আবেদনপত্র / দরখাস্ত", nameEn: "Application", desc: "দাপ্তরিক বা শিক্ষাপ্রতিষ্ঠানের আবেদন" },
   { code: QUESTION_TYPE_CODES.PARAGRAPH, nameBn: "অনুচ্ছেদ", nameEn: "Paragraph", desc: "বিষয়ভিত্তিক অনুচ্ছেদ লিখন" },
+  { code: QUESTION_TYPE_CODES.ESSENCE, nameBn: "সারমর্ম", nameEn: "Essence", desc: "পদ্যাংশের সারমর্ম লিখন" },
+  { code: QUESTION_TYPE_CODES.SUMMARY, nameBn: "সারাংশ", nameEn: "Summary", desc: "গদ্যাংশের সারাংশ লিখন" },
   { code: QUESTION_TYPE_CODES.AMPLIFICATION, nameBn: "ভাব-সম্প্রসারণ", nameEn: "Amplification", desc: "উক্তি বা কবিতার ভাব-সম্প্রসারণ" },
+  { code: QUESTION_TYPE_CODES.NEWS_REPORT, nameBn: "সংবাদ প্রতিবেদন", nameEn: "News Report", desc: "সংবাদপত্র বা অনুষ্ঠানের প্রতিবেদন লিখন" },
+  { code: QUESTION_TYPE_CODES.ESSAY, nameBn: "রচনা / প্রবন্ধ", nameEn: "Essay", desc: "প্রবন্ধ বা বিষয়ভিত্তিক রচনা লিখন" },
   { code: QUESTION_TYPE_CODES.CQ, nameBn: "সৃজনশীল", nameEn: "Creative (CQ)", desc: "উদ্দীপক ও ৪টি স্তরের সৃজনশীল প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SA, nameBn: "সংক্ষিপ্ত-উত্তর", nameEn: "Short Answer", desc: "সংক্ষিপ্ত রচনামূলক প্রশ্ন" },
-  { code: QUESTION_TYPE_CODES.CS, nameBn: "সহপাঠ", nameEn: "Creative Scenario", desc: "নাটক বা উপন্যাস অংশ" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
@@ -62,15 +67,76 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
   masterNumber,
 }) => {
   const router = useRouter();
+
+  // Fetch subject detail to restrict question types to this subject
+  const { data: subjectDetail, isLoading: isSubjectLoading } = useQuery({
+    ...trpc.academicSubject.byId.queryOptions({ id: subjectId }),
+    enabled: Boolean(subjectId && open),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const availableOptions = useMemo(() => {
+    if (!subjectDetail) return CATEGORY_OPTIONS;
+
+    const codeSet = new Set<string>();
+
+    const checkAndAdd = (item: any) => {
+      const qType = item?.questionType;
+      const code = qType?.code;
+      const nameEn = qType?.nameEn || "";
+      const nameBn = qType?.nameBn || "";
+
+      if (code && typeof code === "string") {
+        codeSet.add(code.toUpperCase());
+      }
+      const norm = normalizeQuestionTypeName(nameEn) || normalizeQuestionTypeName(nameBn);
+      if (norm) {
+        const mappedCode = QUESTION_TYPE_MAP[norm]?.code;
+        if (mappedCode) {
+          codeSet.add(mappedCode.toUpperCase());
+        }
+      }
+    };
+
+    if (Array.isArray(subjectDetail.subjectQuestionTypes)) {
+      subjectDetail.subjectQuestionTypes.forEach(checkAndAdd);
+    }
+
+    if (Array.isArray(subjectDetail.sections)) {
+      subjectDetail.sections.forEach((sec: any) => {
+        if (Array.isArray(sec.subjectQuestionTypes)) {
+          sec.subjectQuestionTypes.forEach(checkAndAdd);
+        }
+        if (Array.isArray(sec.subSections)) {
+          sec.subSections.forEach((sub: any) => {
+            if (Array.isArray(sub.subjectQuestionTypes)) {
+              sub.subjectQuestionTypes.forEach(checkAndAdd);
+            }
+          });
+        }
+      });
+    }
+
+    if (codeSet.size === 0) return CATEGORY_OPTIONS;
+
+    const filtered = CATEGORY_OPTIONS.filter((opt) => codeSet.has(opt.code.toUpperCase()));
+    return filtered.length > 0 ? filtered : CATEGORY_OPTIONS;
+  }, [subjectDetail]);
+
   const [selectedCategory, setSelectedCategory] = useState<QuestionTypeCode>(primaryQuestionType);
   const [orLabel, setOrLabel] = useState("অথবা");
 
   useEffect(() => {
     if (open) {
-      setSelectedCategory(primaryQuestionType);
+      if (availableOptions.some((opt) => opt.code === primaryQuestionType)) {
+        setSelectedCategory(primaryQuestionType);
+      } else if (availableOptions.length > 0) {
+        setSelectedCategory(availableOptions[0]!.code);
+      }
       setOrLabel("অথবা");
     }
-  }, [open, primaryQuestionType]);
+  }, [open, primaryQuestionType, availableOptions]);
 
   const handleProceedToPicker = () => {
     const distId = distributionId || "default";
@@ -130,12 +196,20 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
         <div className="space-y-4 my-2">
           {/* Question Type Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-primary" />
-              বিকল্প প্রশ্নের ধরন (Question Type):
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-primary" />
+                বিকল্প প্রশ্নের ধরন (Question Type):
+              </label>
+              {isSubjectLoading && (
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                  <span>লোড হচ্ছে...</span>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 gap-2 max-h-56 overflow-y-auto pr-1">
-              {CATEGORY_OPTIONS.map((opt) => {
+              {availableOptions.map((opt) => {
                 const isSelected = selectedCategory === opt.code;
                 return (
                   <button

@@ -139,20 +139,30 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
       const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
-        const questions = subjectQuestions.filter((q: any) => {
-          if (renderedQuestionIds.has(q.id)) return false;
-          if (extraOptions?.subSectionId) {
-            return q.subSectionId === extraOptions.subSectionId || (q.distributionId === dist.id && (!q.subSectionId || q.subSectionId === extraOptions.subSectionId));
-          }
-          if (extraOptions?.sectionId) {
-            return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (q.distributionId === dist.id && !q.subSectionId);
-          }
-          return q.distributionId === dist.id;
-        });
+        const questions = subjectQuestions
+          .filter((q: any) => {
+            if (renderedQuestionIds.has(q.id)) return false;
+            if (extraOptions?.subSectionId) {
+              return q.subSectionId === extraOptions.subSectionId || (q.distributionId === dist.id && (!q.subSectionId || q.subSectionId === extraOptions.subSectionId));
+            }
+            if (extraOptions?.sectionId) {
+              return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (q.distributionId === dist.id && !q.subSectionId);
+            }
+            return q.distributionId === dist.id;
+          })
+          .sort((a: any, b: any) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+
+        const siblingQuestions = questions.map((q: any, i: number) => ({
+          id: q.id,
+          orderIndex: q.orderIndex ?? i,
+        }));
 
         const totalProvided = Number(dist.questionCount || 0);
-        const attemptCount = Number(dist.questionsToAttempt || totalProvided);
+        const attemptCount = dist.questionsToAttempt !== undefined && dist.questionsToAttempt !== null
+          ? Number(dist.questionsToAttempt)
+          : totalProvided;
         const nameEn = dist.questionType?.nameEn?.toLowerCase() || "";
+        const isCs = dist.questionType?.code === "CS" || nameEn.includes("cs") || nameEn.includes("scenario") || dist.questionTypeName?.toLowerCase().includes("scenario") || dist.questionType?.nameBn?.includes("সৃজনশীল (CS)");
         const isCq = (!nameEn.includes("mcq") && (nameEn.includes("cq") || nameEn.includes("cs") || nameEn.includes("creative"))) || dist.questionType?.nameBn?.includes("সৃজনশীল");
         const isMcq = nameEn.includes("mcq") || nameEn.includes("multiple choice") || dist.questionType?.nameBn?.includes("বহুনির্বাচনি");
         const hasQuestionTypeLabel = Boolean(dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "");
@@ -164,14 +174,45 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           newBlocks.push({
             id: `dist-${dist.id}${subPrefix}`,
             type: "dist-title",
-            data: { dist, statusInfo, attemptCount, totalProvided, questionsLen: questions.length, isCq, isMcq },
+            data: {
+              dist,
+              statusInfo,
+              attemptCount,
+              totalProvided,
+              questionsLen: questions.length,
+              isCq,
+              isMcq,
+              isCs,
+            },
             gap: 0
           });
         }
 
+        let essenceIdx = 0;
+        let summaryIdx = 0;
+        let paragraphIdx = 0;
+        let amplificationIdx = 0;
+        let shortAnswerIdx = 0;
+        let letterIdx = 0;
+        let applicationIdx = 0;
+        let newsReportIdx = 0;
+        let essayIdx = 0;
+        const totalEssences = questions.filter((q: any) => q.essence).length;
+        const totalSummaries = questions.filter((q: any) => q.summary).length;
+        const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
+        const totalAmplifications = questions.filter((q: any) => q.amplification).length;
+        const totalShortAnswers = questions.filter((q: any) => q.shortAnswer).length;
+        const totalLetters = questions.filter((q: any) => q.letter).length;
+        const totalApplications = questions.filter((q: any) => q.application).length;
+        const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
+        const totalEssays = questions.filter((q: any) => q.essay).length;
+
         questions.forEach((q: any, idx: number) => {
           if (renderedQuestionIds.has(q.id)) return;
           renderedQuestionIds.add(q.id);
+          const canMoveUp = idx > 0;
+          const canMoveDown = idx < questions.length - 1;
+
           if (q.mcq) {
             let hideContext = false;
             let contextInstruction = "";
@@ -213,7 +254,21 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-mcq",
-              data: { item: { id: q.id, type: "MCQ", data: q.mcq, orderIndex: idx }, hideContext, contextInstruction },
+              data: {
+                item: {
+                  id: q.id,
+                  type: "MCQ",
+                  data: q.mcq,
+                  orderIndex: idx,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  distributionId: dist.id,
+                  paperId,
+                },
+                hideContext,
+                contextInstruction
+              },
               gap: 0
             });
           }
@@ -229,12 +284,16 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   data: q.cq,
                   orderIndex: idx,
                   masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
               gap: 4
@@ -252,19 +311,23 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   data: q.cs,
                   orderIndex: idx,
                   masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
               gap: 4
             });
           }
           if (q.shortAnswer) {
-            if (idx === 0) {
+            if (shortAnswerIdx === 0) {
               globalWrittenNumber++;
             }
             newBlocks.push({
@@ -273,27 +336,103 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               data: {
                 item: {
                   id: q.id,
-                  type: "SHORT",
+                  type: "SA",
                   data: q.shortAnswer,
-                  orderIndex: idx,
+                  orderIndex: shortAnswerIdx,
                   masterNumber: globalWrittenNumber,
-                  isFirstShortAnswer: idx === 0,
-                  totalQuestions: questions.length,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstShortAnswer: shortAnswerIdx === 0,
+                  totalQuestions: totalShortAnswers,
                   attemptCount,
                   marksPerQuestion: dist.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
                   markDistribution: dist.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
-              gap: idx === questions.length - 1 ? 4 : 0
+              gap: shortAnswerIdx === totalShortAnswers - 1 ? 4 : 0
             });
+            shortAnswerIdx++;
+          }
+          if (q.essence) {
+            if (essenceIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-essence",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "ESSENCE",
+                  data: q.essence,
+                  orderIndex: essenceIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstEssence: essenceIdx === 0,
+                  totalQuestions: totalEssences,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: essenceIdx === totalEssences - 1 ? 4 : 0,
+            });
+            essenceIdx++;
+          }
+          if (q.summary) {
+            if (summaryIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-summary",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SUMMARY",
+                  data: q.summary,
+                  orderIndex: summaryIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstSummary: summaryIdx === 0,
+                  totalQuestions: totalSummaries,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: summaryIdx === totalSummaries - 1 ? 4 : 0,
+            });
+            summaryIdx++;
           }
           if (q.paragraph) {
-            if (idx === 0) {
+            if (paragraphIdx === 0) {
               globalWrittenNumber++;
             }
             newBlocks.push({
@@ -304,26 +443,33 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   id: q.id, 
                   type: "PARAGRAPH", 
                   data: q.paragraph, 
-                  orderIndex: idx, 
+                  orderIndex: paragraphIdx, 
                   masterNumber: globalWrittenNumber, 
-                  isFirstParagraph: idx === 0, 
-                  totalQuestions: questions.length, 
-                  attemptCount,
-                  marksPerQuestion: dist.marksPerQuestion,
-                  questionTypeLabel: dist.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ",
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstParagraph: paragraphIdx === 0, 
+                  totalQuestions: totalParagraphs, 
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ",
                   distributionId: dist.id,
                   distribution: dist,
-                  markDistribution: dist.markDistribution,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 } 
               },
-              gap: idx === questions.length - 1 ? 4 : 0
+              gap: paragraphIdx === totalParagraphs - 1 ? 4 : 0
             });
+            paragraphIdx++;
           }
           if (q.amplification) {
-            globalWrittenNumber++;
+            if (amplificationIdx === 0) {
+              globalWrittenNumber++;
+            }
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-amplification",
@@ -332,21 +478,33 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   id: q.id,
                   type: "AMPLIFICATION",
                   data: q.amplification,
-                  orderIndex: idx,
+                  orderIndex: amplificationIdx,
                   masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstAmplification: amplificationIdx === 0,
+                  totalQuestions: totalAmplifications,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.nameBn || dist.questionTypeName || "ভাব-সম্প্রসারণ করো",
                   distributionId: dist.id,
                   distribution: dist,
-                  markDistribution: dist.markDistribution,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
-              gap: 4
+              gap: amplificationIdx === totalAmplifications - 1 ? 4 : 0
             });
+            amplificationIdx++;
           }
           if (q.letter) {
-            globalWrittenNumber++;
+            if (letterIdx === 0) {
+              globalWrittenNumber++;
+            }
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-letter",
@@ -355,24 +513,33 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   id: q.id,
                   type: "LETTER",
                   data: q.letter,
-                  orderIndex: idx,
+                  orderIndex: letterIdx,
                   masterNumber: globalWrittenNumber,
-                  totalQuestions: questions.length,
-                  attemptCount,
-                  marksPerQuestion: dist.marksPerQuestion,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstLetter: letterIdx === 0,
+                  totalQuestions: totalLetters,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
-                  markDistribution: dist.markDistribution,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
-              gap: 4
+              gap: letterIdx === totalLetters - 1 ? 4 : 0,
             });
+            letterIdx++;
           }
           if (q.application) {
-            globalWrittenNumber++;
+            if (applicationIdx === 0) {
+              globalWrittenNumber++;
+            }
             newBlocks.push({
               id: `q-${q.id}`,
               type: "question-application",
@@ -381,21 +548,98 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   id: q.id,
                   type: "APPLICATION",
                   data: q.application,
-                  orderIndex: idx,
+                  orderIndex: applicationIdx,
                   masterNumber: globalWrittenNumber,
-                  totalQuestions: questions.length,
-                  attemptCount,
-                  marksPerQuestion: dist.marksPerQuestion,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstApplication: applicationIdx === 0,
+                  totalQuestions: totalApplications,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
-                  markDistribution: dist.markDistribution,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
                   assignedMarks: q.assignedMarks,
+                  paperId,
                 },
               },
-              gap: 4
+              gap: applicationIdx === totalApplications - 1 ? 4 : 0,
             });
+            applicationIdx++;
+          }
+          if (q.newsReport) {
+            if (newsReportIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-news-report",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "NEWS_REPORT",
+                  data: q.newsReport,
+                  orderIndex: newsReportIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstNewsReport: newsReportIdx === 0,
+                  totalQuestions: totalNewsReports,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: newsReportIdx === totalNewsReports - 1 ? 4 : 0,
+            });
+            newsReportIdx++;
+          }
+          if (q.essay) {
+            if (essayIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-essay",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "ESSAY",
+                  data: q.essay,
+                  orderIndex: essayIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstEssay: essayIdx === 0,
+                  totalQuestions: totalEssays,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.nameBn || dist.questionTypeName || "প্রবন্ধ রচনা লিখ:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: essayIdx === totalEssays - 1 ? 4 : 0,
+            });
+            essayIdx++;
           }
         });
 
@@ -671,16 +915,39 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                 ? Math.min(subDistCount, secRemainingQuota)
                 : secRemainingQuota;
 
-              const subDistAttempt = targetDist?.questionsToAttempt;
-              const subReq = (sub.questionsToAttempt && sub.questionsToAttempt > 0) ? sub.questionsToAttempt : 0;
-              const subProv = targetDist?.questionCount || 0;
+              const distQuestionCount = Number(targetDist?.questionCount || 0);
+              const distQuestionsToAttempt = (targetDist?.questionsToAttempt !== undefined && targetDist?.questionsToAttempt !== null)
+                ? Number(targetDist.questionsToAttempt)
+                : (sub.questionsToAttempt && sub.questionsToAttempt > 0 ? Number(sub.questionsToAttempt) : distQuestionCount);
 
-              let finalSubInstruction = (sub.instructions && sub.instructions.trim() !== "") ? sub.instructions : null;
-              if (finalSubInstruction) {
-                if (subProv > 0 && subProv !== subReq && (finalSubInstruction.includes("প্রশ্ন থেকে") || finalSubInstruction.includes("প্রশ্নের উত্তর"))) {
-                  finalSubInstruction = finalSubInstruction.replace(/([০-৯\d]+)টি প্রশ্ন থেকে\s*(যে কোনো|যেকোনো)?\s*([০-৯\d]+)টি/, `${toBengaliDigits(subProv)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(subReq)}টি`);
-                } else if (subReq > 0 && (finalSubInstruction.includes("যে কোনো") || finalSubInstruction.includes("যেকোনো"))) {
-                  finalSubInstruction = finalSubInstruction.replace(/(যে কোনো|যেকোনো)\s*([০-৯\d]+)টি/, `যে কোনো ${toBengaliDigits(subReq)}টি`);
+              const subReq = distQuestionsToAttempt;
+              const subProv = distQuestionCount;
+
+              const isCS = targetDist?.questionType?.code === "CS"
+                || targetDists.some((d: any) => d.questionType?.code === "CS")
+                || targetDist?.questionTypeName?.toLowerCase().includes("scenario")
+                || targetDist?.questionType?.nameEn?.toLowerCase().includes("scenario")
+                || targetDist?.questionType?.nameBn?.includes("সৃজনশীল (CS)")
+                || sub.title?.toLowerCase().includes("scenario")
+                || sub.titleBn?.includes("সহপাঠ")
+                || sub.titleBn?.includes("উপন্যাস")
+                || sub.titleBn?.includes("নাটক");
+
+              let finalSubInstruction: string | null = null;
+              if (isCS) {
+                if (subProv > 0 && subReq > 0 && subReq < subProv) {
+                  finalSubInstruction = `[যেকোনো ${toBengaliDigits(subReq)}টি প্রশ্নের উত্তর দিতে হবে]`;
+                } else {
+                  finalSubInstruction = "[সবগুলো প্রশ্নের উত্তর দিতে হবে]";
+                }
+              } else {
+                finalSubInstruction = (sub.instructions && sub.instructions.trim() !== "") ? sub.instructions : null;
+                if (finalSubInstruction) {
+                  if (subProv > 0 && subProv !== subReq && (finalSubInstruction.includes("প্রশ্ন থেকে") || finalSubInstruction.includes("প্রশ্নের উত্তর"))) {
+                    finalSubInstruction = finalSubInstruction.replace(/([০-৯\d]+)টি প্রশ্ন থেকে\s*(যে কোনো|যেকোনো)?\s*([০-৯\d]+)টি/, `${toBengaliDigits(subProv)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(subReq)}টি`);
+                  } else if (subReq > 0 && (finalSubInstruction.includes("যে কোনো") || finalSubInstruction.includes("যেকোনো"))) {
+                    finalSubInstruction = finalSubInstruction.replace(/(যে কোনো|যেকোনো)\s*([০-৯\d]+)টি/, `যে কোনো ${toBengaliDigits(subReq)}টি`);
+                  }
                 }
               }
 

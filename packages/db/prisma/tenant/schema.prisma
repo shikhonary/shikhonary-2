@@ -229,6 +229,7 @@ model QuestionPaperQuestion {
     summaryId       String?
     essenceId       String?
     essayId         String?
+    newsReportId    String?
 
     // ── Alternative / OR Question Relationship ─────────────────
     // If null, this is the primary question slot.
@@ -277,6 +278,7 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, summaryId])
     @@unique([questionPaperId, essenceId])
     @@unique([questionPaperId, essayId])
+    @@unique([questionPaperId, newsReportId])
     @@index([parentQuestionId])
     @@index([questionPaperId])
     @@index([mcqId])
@@ -290,6 +292,7 @@ model QuestionPaperQuestion {
     @@index([summaryId])
     @@index([essenceId])
     @@index([essayId])
+    @@index([newsReportId])
     @@index([distributionId])
     @@index([sectionId])
     @@index([subSectionId])
