@@ -7,6 +7,7 @@ import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react"
 import {
@@ -26,6 +27,7 @@ export interface ShortAnswerItem {
   source?: string | null
   reference: string[]
   isActive: boolean
+  attachments?: QuestionAttachmentItemData[]
   createdAt: Date | string
   updatedAt: Date | string
   subject?: {
@@ -259,6 +261,13 @@ export function ShortAnswerTable({
                           {item.isActive ? "Active" : "Inactive"}
                         </button>
                       </div>
+
+                      {/* Attachments Section (Images, Tables, Context Texts) */}
+                      {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+                        <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+                          <QuestionAttachments attachments={item.attachments} isMath={true} />
+                        </div>
+                      )}
 
                       {/* Question Segment */}
                       <div className="space-y-3.5 pl-4 border-l-2 border-primary/40 py-1 bg-surface-container-low/30 rounded-r-2xl p-4">

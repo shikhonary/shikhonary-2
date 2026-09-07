@@ -118,10 +118,14 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps) {
         year: parsedYear,
         source: data.source?.trim() || null,
         isActive: data.isActive,
-        attachments: saData?.attachments?.map((att) => ({
+        attachments: saData?.attachments?.map((att: any) => ({
           url: att.url,
           type: att.type || "image",
           caption: att.caption,
+          content: att.content,
+          table: att.table,
+          bottomContent: att.bottomContent,
+          tableBorder: att.tableBorder,
           position: att.position,
         })) || [],
       })

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface CqPickerCardProps {
@@ -30,6 +31,8 @@ export const CqPickerCard: React.FC<CqPickerCardProps> = ({
             <RenderMath text={q.context} />
           </div>
         )}
+        <QuestionAttachments attachments={q.attachments} compact />
+
         <div className="space-y-2 mt-1">
           {q.questionA && (
             <div className="flex items-start gap-2">

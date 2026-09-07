@@ -796,10 +796,14 @@ model QuestionAttachment {
   cq          Cq?          @relation(fields: [cqId], references: [id], onDelete: Cascade)
   shortAnswer ShortAnswer? @relation(fields: [shortAnswerId], references: [id], onDelete: Cascade)
 
-  url      String
-  type     String  @default("image")
-  caption  String?
-  position Int     @default(0)
+  type          String
+  caption       String?
+  content       String?
+  url           String?
+  table         Json?
+  bottomContent String?
+  tableBorder   Boolean? @default(false)
+  position      Int      @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

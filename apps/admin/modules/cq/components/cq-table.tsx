@@ -7,6 +7,7 @@ import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react"
 import {
@@ -30,6 +31,7 @@ export interface CqItem {
   source?: string | null
   marks?: any
   isActive: boolean
+  attachments?: QuestionAttachmentItemData[]
   createdAt: Date | string
   updatedAt: Date | string
   subject: {
@@ -282,19 +284,10 @@ export function CqTable({
                         </button>
                       </div>
 
-                      {/* Context / Stimulus Passage */}
-                      {item.context && (
-                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
-                          <div className="font-bold text-secondary flex items-center gap-1.5 mb-1.5 text-xs uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-sm">article</span>
-                            Stimulus / Passage Context:
-                          </div>
-                          <div className={cn(
-                            "whitespace-pre-wrap font-medium",
-                            /[\u0980-\u09FF]/.test(item.context) && "font-solaiman text-base"
-                          )}>
-                            <RenderMath text={item.context} isMath={true} />
-                          </div>
+                      {/* Attachments (Images, Tables, Context Texts) */}
+                      {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+                        <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+                          <QuestionAttachments attachments={item.attachments} isMath={true} />
                         </div>
                       )}
 

@@ -85,7 +85,11 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
             mark: true,
           },
         },
-        attachments: true,
+        attachments: {
+          orderBy: {
+            position: "asc",
+          },
+        },
       },
     }),
     db.mcq.count({ where }),
@@ -107,6 +111,11 @@ export async function getMcqById(db: PrismaClient, input: GetMcqInput) {
       subject: true,
       chapter: true,
       questionType: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 
@@ -188,11 +197,15 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0 ? {
-        create: allAttachments.map((att) => ({
-          url: att.url,
+        create: allAttachments.map((att, idx) => ({
           type: att.type ?? "image",
           caption: att.caption ?? null,
-          position: att.position ?? 0,
+          content: att.content ?? null,
+          url: att.url ?? null,
+          table: att.table ?? undefined,
+          bottomContent: att.bottomContent ?? null,
+          tableBorder: att.tableBorder ?? false,
+          position: att.position !== undefined && att.position !== null ? att.position : idx,
         })),
       } : undefined,
     } as any,
@@ -273,11 +286,15 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
       isActive: data.isActive,
       attachments: allAttachments ? {
         deleteMany: {},
-        create: allAttachments.map((att) => ({
-          url: att.url,
+        create: allAttachments.map((att, idx) => ({
           type: att.type ?? "image",
           caption: att.caption ?? null,
-          position: att.position ?? 0,
+          content: att.content ?? null,
+          url: att.url ?? null,
+          table: att.table ?? undefined,
+          bottomContent: att.bottomContent ?? null,
+          tableBorder: att.tableBorder ?? false,
+          position: att.position !== undefined && att.position !== null ? att.position : idx,
         })),
       } : undefined,
     } as any,
@@ -323,8 +340,6 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
     select: { id: true },
   })
 
-  const subjectQtCache: Record<string, string> = {}
-
   // Use transaction to support nested attachments with a timeout limit
   const created = await db.$transaction(
     async (tx) => {
@@ -343,10 +358,7 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
 
         let resolvedQuestionTypeId = data.questionTypeId
         if (!resolvedQuestionTypeId) {
-          const subId = data.subjectId
-          if (subjectQtCache[subId]) {
-            resolvedQuestionTypeId = subjectQtCache[subId]
-          } else {
+          if (data.subjectId) {
             const qt = await tx.questionType.findFirst({
               where: {
                 OR: [
@@ -356,7 +368,7 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
                 isActive: true,
                 subjects: {
                   some: {
-                    subjectId: subId,
+                    subjectId: data.subjectId,
                   },
                 },
               },
@@ -364,10 +376,11 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
             })
             if (qt) {
               resolvedQuestionTypeId = qt.id
-              subjectQtCache[subId] = qt.id
             } else if (defaultMcqQt) {
               resolvedQuestionTypeId = defaultMcqQt.id
             }
+          } else if (defaultMcqQt) {
+            resolvedQuestionTypeId = defaultMcqQt.id
           }
         }
 
@@ -391,11 +404,15 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0 ? {
-              create: allAttachments.map((att) => ({
-                url: att.url,
+              create: allAttachments.map((att, idx) => ({
                 type: att.type ?? "image",
                 caption: att.caption ?? null,
-                position: att.position ?? 0,
+                content: att.content ?? null,
+                url: att.url ?? null,
+                table: att.table ?? undefined,
+                bottomContent: att.bottomContent ?? null,
+                tableBorder: att.tableBorder ?? false,
+                position: att.position !== undefined && att.position !== null ? att.position : idx,
               })),
             } : undefined,
           } as any,

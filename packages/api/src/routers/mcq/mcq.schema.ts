@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { idSchema, paginationSchema } from "../../schemas/common"
+import { idSchema, paginationSchema, questionAttachmentSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listMcqsSchema = paginationSchema.extend({
@@ -43,12 +43,7 @@ export const createMcqSchema = z.object({
   source: z.string().optional().nullable(),
   questionTypeId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
-  attachments: z.array(z.object({
-    url: z.string().min(1, "Attachment URL is required"),
-    type: z.string().default("image"),
-    caption: z.string().optional().nullable(),
-    position: z.number().int().default(0),
-  })).optional().default([]),
+  attachments: z.array(questionAttachmentSchema).optional().default([]),
 })
 
 export type CreateMcqInput = z.infer<typeof createMcqSchema>

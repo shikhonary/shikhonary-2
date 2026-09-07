@@ -2,6 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface McqPickerCardProps {
@@ -61,32 +62,9 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
         <div className="text-sm font-semibold text-on-surface">
           <RenderMath text={q.question || q.title || q.name || ""} />
         </div>
-        {Array.isArray(q.attachments) && q.attachments.length > 0 && (
-          <div className="flex flex-wrap gap-3 mt-1">
-            {q.attachments.map((att: any, attIdx: number) => {
-              const isImage =
-                att.type === "image" ||
-                /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(att.url);
-              if (isImage && att.url !== "text-context") {
-                return (
-                  <div key={attIdx} className="space-y-1">
-                    <img
-                      src={att.url}
-                      alt={att.caption || "Attachment"}
-                      className="max-h-36 rounded-lg border border-outline-variant/60 object-contain bg-muted/20"
-                    />
-                    {att.caption && (
-                      <p className="text-[10px] text-outline font-medium italic pl-1">
-                        {att.caption}
-                      </p>
-                    )}
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        )}
+        {/* Attachments */}
+        <QuestionAttachments attachments={q.attachments} compact />
+
         {q.options && q.options.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1">
             {q.options.map((opt: string, i: number) => {

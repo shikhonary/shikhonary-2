@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import {
@@ -9,11 +11,11 @@ import {
   WandSparkles,
 } from "lucide-react";
 
-import { Button } from "./button.js";
-import { Badge } from "./badge.js";
-import { Separator } from "./separator.js";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover.js";
-import { Input } from "./input.js";
+import { Button } from "@workspace/ui/components/button";
+import { Badge } from "@workspace/ui/components/badge";
+import { Separator } from "@workspace/ui/components/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
+import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 
 const multiSelectVariants = cva(

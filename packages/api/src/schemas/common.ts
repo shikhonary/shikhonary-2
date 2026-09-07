@@ -54,3 +54,21 @@ export const searchSchema = z.object({
 })
 
 export type SearchInput = z.infer<typeof searchSchema>
+
+// ---------------------------------------------------------------------------
+// Question Attachments
+// ---------------------------------------------------------------------------
+
+export const questionAttachmentSchema = z.object({
+  id: z.string().optional(),
+  type: z.string().optional().default("image"),
+  caption: z.string().nullable().optional(),
+  content: z.string().nullable().optional(),
+  url: z.string().nullable().optional(),
+  table: z.any().nullable().optional(),
+  bottomContent: z.string().nullable().optional(),
+  tableBorder: z.boolean().nullable().optional(),
+  position: z.number().int().optional().default(0),
+})
+
+export type QuestionAttachmentInput = z.infer<typeof questionAttachmentSchema>

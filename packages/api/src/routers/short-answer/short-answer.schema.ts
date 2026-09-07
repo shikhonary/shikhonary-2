@@ -1,5 +1,6 @@
 import { z } from "zod"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { questionAttachmentSchema } from "../../schemas/common"
 
 export const listShortAnswersSchema = z.object({
   limit: z.number().min(1).max(100).default(10),
@@ -48,16 +49,7 @@ export const createShortAnswerSchema = z.object({
   reference: z.array(z.string()).default([]),
   questionTypeId: z.string().nullable().optional(),
   isActive: z.boolean().default(true),
-  attachments: z
-    .array(
-      z.object({
-        url: z.string(),
-        type: z.string().default("image"),
-        caption: z.string().nullable().optional(),
-        position: z.number().default(0),
-      })
-    )
-    .default([]),
+  attachments: z.array(questionAttachmentSchema).optional().default([]),
 })
 
 export const updateShortAnswerSchema = createShortAnswerSchema.extend({
@@ -77,16 +69,7 @@ export const importShortAnswersSchema = z.object({
       reference: z.array(z.string()).default([]),
       questionTypeId: z.string().nullable().optional(),
       isActive: z.boolean().default(true),
-      attachments: z
-        .array(
-          z.object({
-            url: z.string(),
-            type: z.string().default("image"),
-            caption: z.string().nullable().optional(),
-            position: z.number().default(0),
-          })
-        )
-        .optional(),
+      attachments: z.array(questionAttachmentSchema).optional().default([]),
     })
   ),
 })

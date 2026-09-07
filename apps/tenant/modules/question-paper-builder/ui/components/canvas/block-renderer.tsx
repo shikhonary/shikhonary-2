@@ -82,7 +82,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const SubSectionTitleBlock = ({ data }: { data: any }) => {
-  const { id, subSectionId, sectionId, title, titleBn, instructions, nextSubSectionId, nextSubSectionTitle, hasQuestions, hideTitle, isSectionFilled, isFirstSubSection } = data || {};
+  const { id, subSectionId, sectionId, title, titleBn, instructions, nextSubSectionId, nextSubSectionTitle, hasQuestions, hideTitle, isSectionFilled, isFirstSubSection, marksPerQuestion, attemptCount, showMarkDistribution } = data || {};
   const subId = id || subSectionId;
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
@@ -90,16 +90,24 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
   const formattedInst = instructions
-    ? instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
+    ? instructions.trim().startsWith("(") && instructions.trim().endsWith(")")
       ? instructions.trim()
-      : `[${instructions.trim()}]`
+      : instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
+      ? `(${instructions.trim().slice(1, -1)})`
+      : `(${instructions.trim()})`
     : null;
+
+  const marks = marksPerQuestion ? Number(marksPerQuestion) : 0;
+  const attempts = attemptCount ? Number(attemptCount) : 0;
+  const totalMarks = marks * attempts;
+  const canShowMarkFormula = showMarkDistribution !== false && marks > 0 && attempts > 0;
+  const canShowBottomRow = Boolean(formattedInst || canShowMarkFormula);
 
   return (
     <div 
       onClick={() => subId && setActiveTarget({ sectionId: sectionId || null, subSectionId: subId })}
-      className={`group relative w-full ${isFirstSubSection ? "mt-1" : "mt-4"} mb-2 flex flex-col items-center cursor-pointer transition-all ${
-        isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded p-1" : "hover:bg-muted/20"
+      className={`group relative -mx-4 px-4 ${isFirstSubSection ? "mt-0.5" : "mt-3"} mb-1 flex flex-col items-start cursor-pointer transition-all ${
+        isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded" : "hover:bg-muted/20"
       }`}
     >
       <div className="flex items-center justify-between w-full">
@@ -140,8 +148,17 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
           </div>
         )}
       </div>
-      {formattedInst && (
-        <p className="text-[9px] text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
+      {canShowBottomRow && (
+        <div className="flex justify-between items-center w-full mt-0.5 mb-0.5 text-[12px] text-black">
+          <div className="text-left font-normal text-black ml-[30px]">
+            {formattedInst}
+          </div>
+          {canShowMarkFormula && (
+            <div className="text-right font-bold whitespace-nowrap shrink-0 text-black">
+              {toBengaliDigits(marks)} <span className="font-sans px-1">×</span> {toBengaliDigits(attempts)} = {toBengaliDigits(totalMarks)}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

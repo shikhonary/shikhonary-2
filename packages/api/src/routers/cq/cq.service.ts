@@ -94,7 +94,11 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
           },
         },
         answer: true,
-        attachments: true,
+        attachments: {
+          orderBy: {
+            position: "asc",
+          },
+        },
       },
     }),
     db.cq.count({ where }),
@@ -121,7 +125,11 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
       chapter: true,
       questionType: true,
       answer: true,
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 
@@ -219,18 +227,26 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
         : undefined,
       attachments: allAttachments.length > 0
         ? {
-            create: allAttachments.map((att) => ({
-              url: att.url,
+            create: allAttachments.map((att, idx) => ({
               type: att.type ?? "image",
               caption: att.caption ?? null,
-              position: att.position ?? 0,
+              content: att.content ?? null,
+              url: att.url ?? null,
+              table: att.table ?? undefined,
+              bottomContent: att.bottomContent ?? null,
+              tableBorder: att.tableBorder ?? false,
+              position: att.position !== undefined && att.position !== null ? att.position : idx,
             })),
           }
         : undefined,
     } as any,
     include: {
       answer: true,
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
@@ -289,13 +305,13 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
       questionA: data.questionA,
       questionB: data.questionB,
       questionC: data.questionC,
-      questionD: data.questionD,
-      context: data.context,
+      questionD: data.questionD !== undefined ? (data.questionD || null) : undefined,
+      context: data.context !== undefined ? (data.context || null) : undefined,
       reference: data.reference,
       difficulty: data.difficulty,
       year: data.year,
       source: data.source,
-      marks: marksDistribution || undefined,
+      marks: marksDistribution !== undefined ? marksDistribution : undefined,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       answer: answer
@@ -320,17 +336,25 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
         : undefined,
       attachments: allAttachments.length > 0 ? {
         deleteMany: {},
-        create: allAttachments.map((att) => ({
-          url: att.url,
+        create: allAttachments.map((att, idx) => ({
           type: att.type ?? "image",
           caption: att.caption ?? null,
-          position: att.position ?? 0,
+          content: att.content ?? null,
+          url: att.url ?? null,
+          table: att.table ?? undefined,
+          bottomContent: att.bottomContent ?? null,
+          tableBorder: att.tableBorder ?? false,
+          position: att.position !== undefined && att.position !== null ? att.position : idx,
         })),
-      } : undefined,
+      } : { deleteMany: {} },
     } as any,
     include: {
       answer: true,
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
@@ -394,10 +418,7 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
 
         let resolvedQuestionTypeId = data.questionTypeId
         if (!resolvedQuestionTypeId) {
-          const subId = data.subjectId
-          if (subjectQtCache[subId]) {
-            resolvedQuestionTypeId = subjectQtCache[subId]
-          } else {
+          if (data.subjectId) {
             const qt = await tx.questionType.findFirst({
               where: {
                 OR: [
@@ -409,7 +430,7 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
                 isActive: true,
                 subjects: {
                   some: {
-                    subjectId: subId,
+                    subjectId: data.subjectId,
                   },
                 },
               },
@@ -417,10 +438,11 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
             })
             if (qt) {
               resolvedQuestionTypeId = qt.id
-              subjectQtCache[subId] = qt.id
             } else if (defaultCqQt) {
               resolvedQuestionTypeId = defaultCqQt.id
             }
+          } else if (defaultCqQt) {
+            resolvedQuestionTypeId = defaultCqQt.id
           }
         }
 
@@ -455,11 +477,15 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
               : undefined,
             attachments: allAttachments.length > 0
               ? {
-                  create: allAttachments.map((att) => ({
-                    url: att.url,
+                  create: allAttachments.map((att, idx) => ({
                     type: att.type ?? "image",
                     caption: att.caption ?? null,
-                    position: att.position ?? 0,
+                    content: att.content ?? null,
+                    url: att.url ?? null,
+                    table: att.table ?? undefined,
+                    bottomContent: att.bottomContent ?? null,
+                    tableBorder: att.tableBorder ?? false,
+                    position: att.position !== undefined && att.position !== null ? att.position : idx,
                   })),
                 }
               : undefined,

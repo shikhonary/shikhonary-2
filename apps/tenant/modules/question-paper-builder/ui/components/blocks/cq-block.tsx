@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
@@ -245,6 +246,9 @@ export const CQBlock = ({ item }: { item: any }) => {
                 />
               ) : null}
             </div>
+
+            {/* Attachments (e.g. diagrams, stems, tables) */}
+            <QuestionAttachments attachments={data.attachments} />
 
             {subQuestions.length > 0 && (
               <div className="mt-1 space-y-0.5">

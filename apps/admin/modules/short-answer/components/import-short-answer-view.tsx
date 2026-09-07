@@ -25,6 +25,7 @@ import {
 } from "@workspace/ui/components/select"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import {
   PlusIcon,
@@ -46,7 +47,19 @@ const sampleJsonTemplate = `[
     "difficulty": "EASY",
     "year": 2024,
     "source": "Dhaka Board",
-    "reference": ["Physics Ch1"]
+    "reference": ["Physics Ch1"],
+    "attachments": [
+      {
+        "type": "image",
+        "caption": "চিত্র ১: নাল ভেক্টরের নির্দেশক",
+        "content": null,
+        "url": "https://images.unsplash.com/photo-1543269865-cbf427effbad",
+        "table": null,
+        "bottomContent": null,
+        "tableBorder": false,
+        "position": 0
+      }
+    ]
   }
 ]`
 
@@ -331,6 +344,16 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
       </div>
 
       <div className="p-5 space-y-4">
+        {/* Attachments Section (Images, Tables, Context Texts) */}
+        {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
+              Attachments ({item.attachments.length})
+            </span>
+            <QuestionAttachments attachments={item.attachments} isMath={true} />
+          </div>
+        )}
+
         {/* Question Text */}
         <EditableField
           label="Question Text *"
@@ -474,6 +497,25 @@ export function ImportShortAnswerView() {
           errors.push(`Item #${itemNum}: Missing 'chapterId'. Select chapter default or append to JSON.`)
         }
 
+        const attachmentsArray = Array.isArray(item.attachments)
+          ? item.attachments
+          : Array.isArray(item.attachment)
+          ? item.attachment
+          : []
+
+        const mappedAttachments = attachmentsArray
+          .filter((att: any) => att && typeof att === "object")
+          .map((att: any, aIdx: number) => ({
+            type: String(att.type || (att.url ? "image" : att.table ? "table" : "text")),
+            caption: att.caption ? String(att.caption) : null,
+            content: att.content ? String(att.content) : null,
+            url: att.url && att.url !== "text-context" ? String(att.url) : null,
+            table: att.table !== undefined ? att.table : null,
+            bottomContent: att.bottomContent ? String(att.bottomContent) : null,
+            tableBorder: att.tableBorder !== undefined ? Boolean(att.tableBorder) : false,
+            position: att.position !== undefined && att.position !== null ? Number(att.position) : aIdx,
+          }))
+
         validated.push({
           subjectId,
           chapterId,
@@ -484,6 +526,7 @@ export function ImportShortAnswerView() {
           source: item.source?.trim() || null,
           reference: Array.isArray(item.reference) ? item.reference : [],
           isActive: item.isActive !== false,
+          attachments: mappedAttachments,
         })
       })
 
@@ -603,7 +646,7 @@ export function ImportShortAnswerView() {
         source: item.source?.trim() || null,
         reference: Array.isArray(item.reference) ? item.reference : [],
         isActive: item.isActive !== false,
-        attachments: [],
+        attachments: Array.isArray(item.attachments) ? item.attachments : [],
       }))
 
       const res = await importMutation.mutateAsync({ shortAnswers: payload })

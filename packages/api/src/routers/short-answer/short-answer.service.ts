@@ -71,7 +71,11 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
             mark: true,
           },
         },
-        attachments: true,
+        attachments: {
+          orderBy: {
+            position: "asc",
+          },
+        },
       },
     }),
     db.shortAnswer.count({ where }),
@@ -97,7 +101,11 @@ export async function getShortAnswerById(db: PrismaClient, input: GetShortAnswer
       },
       chapter: true,
       questionType: true,
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 
@@ -169,17 +177,25 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
       isActive: data.isActive,
       attachments: allAttachments.length > 0
         ? {
-          create: allAttachments.map((att) => ({
-            url: att.url,
+          create: allAttachments.map((att, idx) => ({
             type: att.type ?? "image",
             caption: att.caption ?? null,
-            position: att.position ?? 0,
+            content: att.content ?? null,
+            url: att.url ?? null,
+            table: att.table ?? undefined,
+            bottomContent: att.bottomContent ?? null,
+            tableBorder: att.tableBorder ?? false,
+            position: att.position !== undefined && att.position !== null ? att.position : idx,
           })),
         }
         : undefined,
     } as any,
     include: {
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
@@ -232,17 +248,25 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
       attachments: allAttachments.length > 0
         ? {
           deleteMany: {},
-          create: allAttachments.map((att) => ({
-            url: att.url,
+          create: allAttachments.map((att, idx) => ({
             type: att.type ?? "image",
             caption: att.caption ?? null,
-            position: att.position ?? 0,
+            content: att.content ?? null,
+            url: att.url ?? null,
+            table: att.table ?? undefined,
+            bottomContent: att.bottomContent ?? null,
+            tableBorder: att.tableBorder ?? false,
+            position: att.position !== undefined && att.position !== null ? att.position : idx,
           })),
         }
         : { deleteMany: {} },
     } as any,
     include: {
-      attachments: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
@@ -394,11 +418,15 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0
               ? {
-                create: allAttachments.map((att) => ({
-                  url: att.url,
+                create: allAttachments.map((att, idx) => ({
                   type: att.type ?? "image",
                   caption: att.caption ?? null,
-                  position: att.position ?? 0,
+                  content: att.content ?? null,
+                  url: att.url ?? null,
+                  table: att.table ?? undefined,
+                  bottomContent: att.bottomContent ?? null,
+                  tableBorder: att.tableBorder ?? false,
+                  position: att.position !== undefined && att.position !== null ? att.position : idx,
                 })),
               }
               : undefined,

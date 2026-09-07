@@ -21,6 +21,7 @@ import {
 } from "@workspace/ui/components/select"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import {
   PlusIcon,
@@ -47,17 +48,22 @@ const sampleJsonTemplate = `[
     "questionB": "নিউটনের গতিবিদ্যার ২য় সূত্রটি ব্যাখ্যা কর।",
     "questionC": "বস্তুটির ত্বরণ নির্ণয় কর।",
     "questionD": "বস্তুটির বেগ দ্বিগুণ করতে কত বল লাগবে গাণিতিক বিশ্লেষণ দাও।",
-    "answer": {
-      "answerA": "যা বস্তুর অবস্থার পরিবর্তন করতে বাধ্য করে তাকে বল বলে।",
-      "answerB": "বস্তুর ভরবেগের পরিবর্তনের হার তার ওপর প্রযুক্ত বলের সমানুপাতিক...",
-      "answerC": "f = ma সূত্র হতে, a = f/m = ১০/৫ = ২ ms^-2",
-      "answerD": "বেগ দ্বিগুণ করতে ত্বরণ দ্বিগুণ হতে হবে, তাই প্রযুক্ত বল হবে ২ গুণ...",
-      "explanation": "গতিবিদ্যা সূত্র প্রয়োগের গাণিতিক সমস্যা"
-    },
     "difficulty": "MEDIUM",
     "year": 2024,
     "source": "Physics Board",
-    "reference": ["Board 2024"]
+    "reference": ["Board 2024"],
+    "attachments": [
+      {
+        "type": "image",
+        "caption": "চিত্র ১: গতিশীল বস্তুর চিত্র",
+        "content": null,
+        "url": "https://images.unsplash.com/photo-1543269865-cbf427effbad",
+        "table": null,
+        "bottomContent": null,
+        "tableBorder": false,
+        "position": 0
+      }
+    ]
   }
 ]`
 
@@ -387,14 +393,15 @@ function EditableCqCard({
       </div>
 
       <div className="p-5 space-y-4">
-        {/* Context */}
-        <EditableField
-          label="Passage Context / Stimulus"
-          value={item.context || ""}
-          multiline
-          placeholder="Enter stimulus text..."
-          onSave={(newVal) => onChange({ ...item, context: newVal })}
-        />
+        {/* Attachments Section (Images, Tables, Context Texts) */}
+        {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
+              Attachments ({item.attachments.length})
+            </span>
+            <QuestionAttachments attachments={item.attachments} isMath={true} />
+          </div>
+        )}
 
         {/* Stems Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
@@ -599,6 +606,25 @@ export function ImportCqView() {
           errors.push(`Item #${itemNum}: Missing 'chapterId'. Select default Chapter or add to JSON.`)
         }
 
+        const attachmentsArray = Array.isArray(item.attachments)
+          ? item.attachments
+          : Array.isArray(item.attachment)
+          ? item.attachment
+          : []
+
+        const mappedAttachments = attachmentsArray
+          .filter((att: any) => att && typeof att === "object")
+          .map((att: any, aIdx: number) => ({
+            type: String(att.type || (att.url ? "image" : att.table ? "table" : "text")),
+            caption: att.caption ? String(att.caption) : null,
+            content: att.content ? String(att.content) : null,
+            url: att.url && att.url !== "text-context" ? String(att.url) : null,
+            table: att.table !== undefined ? att.table : null,
+            bottomContent: att.bottomContent ? String(att.bottomContent) : null,
+            tableBorder: att.tableBorder !== undefined ? Boolean(att.tableBorder) : false,
+            position: att.position !== undefined && att.position !== null ? Number(att.position) : aIdx,
+          }))
+
         validated.push({
           subjectId,
           chapterId,
@@ -612,13 +638,14 @@ export function ImportCqView() {
           source: item.source?.trim() || null,
           reference: Array.isArray(item.reference) ? item.reference : [],
           isActive: item.isActive !== false,
-          answer: {
+          attachments: mappedAttachments,
+          answer: item.answer ? {
             answerA: item.answer?.answerA?.trim() || null,
             answerB: item.answer?.answerB?.trim() || null,
             answerC: item.answer?.answerC?.trim() || null,
             answerD: item.answer?.answerD?.trim() || null,
             explanation: item.answer?.explanation?.trim() || null,
-          },
+          } : null,
         })
       })
 
@@ -767,7 +794,7 @@ export function ImportCqView() {
             answerD: item.answer.answerD?.trim() || null,
             explanation: item.answer.explanation?.trim() || null,
           } : null,
-          attachments: [],
+          attachments: Array.isArray(item.attachments) ? item.attachments : [],
         }
       })
 

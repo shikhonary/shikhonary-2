@@ -22,6 +22,7 @@ import {
 import type { CreateMcqInput } from "@workspace/api"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import {
   PlusIcon,
@@ -59,9 +60,13 @@ const sampleJsonTemplate = `[
     "isActive": true,
     "attachments": [
       {
-        "url": "https://images.unsplash.com/photo-1543269865-cbf427effbad",
         "type": "image",
         "caption": "Figure 1: Illustration",
+        "content": null,
+        "url": "https://images.unsplash.com/photo-1543269865-cbf427effbad",
+        "table": null,
+        "bottomContent": null,
+        "tableBorder": false,
         "position": 0
       }
     ]
@@ -545,15 +550,15 @@ function EditableMcqCard({
 
       {/* Card Content */}
       <div className="p-5 space-y-4">
-        {/* Passage Context / Stimulus (Optional) */}
-        <EditableField
-          label="Passage Context / Stimulus (Optional)"
-          value={item.context || ""}
-          isMath={item.isMath}
-          multiline
-          placeholder="Enter stimulus/passage text (উদ্দীপক)..."
-          onSave={(newCtx) => onChange({ ...item, context: newCtx || undefined })}
-        />
+        {/* Attachments Section (Images, Tables, Context Texts) */}
+        {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
+              Attachments ({item.attachments.length})
+            </span>
+            <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
+          </div>
+        )}
 
         {/* Question Text */}
         <EditableField
@@ -563,14 +568,6 @@ function EditableMcqCard({
           multiline
           placeholder="Enter question text..."
           onSave={(newQ) => onChange({ ...item, question: newQ })}
-        />
-
-        {/* Optional Context ID */}
-        <EditableField
-          label="Stimulus / Passage Context ID (Optional)"
-          value={item.contextId || ""}
-          placeholder="Add context/passage ID (optional)..."
-          onSave={(newCtxId) => onChange({ ...item, contextId: newCtxId || undefined })}
         />
 
         {/* Statements Section (e.g. i. Statement 1, ii. Statement 2) */}
@@ -898,48 +895,24 @@ export function ImportMcqView() {
         let questionText = String(item.question || "").trim()
         let contextText = item.context ? String(item.context).trim() : undefined
 
-        // Extract context from attachments if type is text/text-context or if url is null/empty (implying text context)
         const attachmentsArray = Array.isArray(item.attachments)
           ? item.attachments
           : Array.isArray(item.attachment)
           ? item.attachment
           : []
-        console.log("Item attachments array:", attachmentsArray)
 
-        if (!contextText && attachmentsArray.length > 0) {
-          const textAttachment = attachmentsArray.find(
-            (att: any) =>
-              att &&
-              (att.type === "text" ||
-                att.url === "text-context" ||
-                !att.url ||
-                String(att.type).toLowerCase() === "text" ||
-                String(att.url).toLowerCase() === "text-context")
-          )
-          console.log("Found textAttachment:", textAttachment)
-          if (textAttachment) {
-            const potentialText =
-              textAttachment.caption ||
-              textAttachment.content ||
-              textAttachment.text ||
-              (textAttachment.url && textAttachment.url !== "text-context" ? textAttachment.url : "")
-            console.log("Extracted potentialText:", potentialText)
-            if (potentialText) {
-              contextText = String(potentialText).trim()
-            }
-          }
-        }
-
-        // Filter out text attachments since they will be reconstructed from the context field on the backend
-        const filteredAttachments = attachmentsArray.filter(
-          (att: any) =>
-            att &&
-            att.type !== "text" &&
-            att.url !== "text-context" &&
-            att.url &&
-            String(att.type).toLowerCase() !== "text" &&
-            String(att.url).toLowerCase() !== "text-context"
-        )
+        const mappedAttachments = attachmentsArray
+          .filter((att: any) => att && typeof att === "object")
+          .map((att: any, idx: number) => ({
+            type: String(att.type || (att.url ? "image" : att.table ? "table" : "text")),
+            caption: att.caption ? String(att.caption) : null,
+            content: att.content ? String(att.content) : null,
+            url: att.url && att.url !== "text-context" ? String(att.url) : null,
+            table: att.table !== undefined ? att.table : null,
+            bottomContent: att.bottomContent ? String(att.bottomContent) : null,
+            tableBorder: att.tableBorder !== undefined ? Boolean(att.tableBorder) : false,
+            position: att.position !== undefined && att.position !== null ? Number(att.position) : idx,
+          }))
 
         // Smart extraction of stimulus/context if embedded in the question stem
         if (!contextText && questionText.includes("\n\n")) {
@@ -987,12 +960,7 @@ export function ImportMcqView() {
           subjectId,
           chapterId,
           isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
-          attachments: filteredAttachments.map((att: any) => ({
-            url: String(att.url || ""),
-            type: String(att.type || "image"),
-            caption: att.caption ? String(att.caption) : null,
-            position: att.position !== undefined ? Number(att.position) : 0,
-          })),
+          attachments: mappedAttachments,
         } as any)
       })
 

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface SaPickerCardProps {
@@ -28,6 +29,7 @@ export const SaPickerCard: React.FC<SaPickerCardProps> = ({
         <div className="text-sm font-semibold text-on-surface">
           <RenderMath text={q.question} />
         </div>
+        <QuestionAttachments attachments={q.attachments} compact />
         {q.answer && (
           <div className="text-xs text-muted-foreground mt-1 border-l-2 border-primary/40 pl-3">
             <span className="font-semibold text-primary block mb-0.5">উত্তর:</span>

@@ -7,6 +7,7 @@ import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import {
@@ -36,13 +37,7 @@ export interface McqItem {
   createdAt: Date | string
   updatedAt: Date | string
   difficulty?: string | null
-  attachments?: {
-    id: string
-    url: string
-    type: string
-    caption?: string | null
-    position: number
-  }[]
+  attachments?: QuestionAttachmentItemData[]
   subject: {
     id: string
     nameEn: string
@@ -283,37 +278,12 @@ export function McqTable({
                         </button>
                       </div>
 
-                      {/* Context / Comprehension Passage (If Present) */}
-                      {(() => {
-                        const textAttachment = Array.isArray(item.attachments)
-                          ? item.attachments.find(
-                              (att: any) =>
-                                att &&
-                                (att.type === "text" ||
-                                  att.url === "text-context" ||
-                                  !att.url ||
-                                  String(att.type).toLowerCase() === "text" ||
-                                  String(att.url).toLowerCase() === "text-context")
-                            )
-                          : null;
-                        const displayContext =
-                          item.context ||
-                          (textAttachment
-                            ? textAttachment.caption || (textAttachment.url && textAttachment.url !== "text-context" ? textAttachment.url : "")
-                            : null);
-
-                        return displayContext ? (
-                          <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-3.5 text-xs text-on-surface-variant leading-relaxed">
-                            <div className="font-bold text-secondary flex items-center gap-1.5 mb-1 text-[11px] uppercase tracking-wider">
-                              <span className="material-symbols-outlined text-sm">article</span>
-                              Context / Passage:
-                            </div>
-                            <p className="whitespace-pre-wrap">
-                              <RenderMath text={displayContext} isMath={item.isMath} />
-                            </p>
-                          </div>
-                        ) : null;
-                      })()}
+                      {/* Attachments Section (Images, Tables, Context Texts) */}
+                      {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+                        <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+                          <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
+                        </div>
+                      )}
 
                       {/* Question Text */}
                       <Link
@@ -325,32 +295,6 @@ export function McqTable({
                       >
                         <RenderMath text={item.question} isMath={item.isMath} />
                       </Link>
-
-                      {/* Attachments Section */}
-                      {Array.isArray(item.attachments) && item.attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-4 mt-2">
-                          {item.attachments.map((att, attIdx) => {
-                            if (att.type === "image" || att.url) {
-                              const isImage = att.type === "image" || /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(att.url)
-                              if (isImage && att.url !== "text-context") {
-                                return (
-                                  <div key={attIdx} className="space-y-1 max-w-sm">
-                                    <img
-                                      src={att.url}
-                                      alt={att.caption || "Attachment"}
-                                      className="max-h-48 rounded-lg border border-outline-variant/60 object-contain bg-surface-container-low"
-                                    />
-                                    {att.caption && (
-                                      <p className="text-[10px] text-outline font-medium italic pl-1">{att.caption}</p>
-                                    )}
-                                  </div>
-                                )
-                              }
-                            }
-                            return null
-                          })}
-                        </div>
-                      )}
 
                       {/* Statements / Sub-questions (If Present) */}
                       {Array.isArray(item.statements) && item.statements.length > 0 && (

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
@@ -223,6 +224,9 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
               defaultStyle={{ ...questionStyle, fontWeight: "bold" }}
             />
           </div>
+
+          {/* Attachments */}
+          <QuestionAttachments attachments={data.attachments} />
           
           {data.statements && data.statements.length > 0 && (
             <>

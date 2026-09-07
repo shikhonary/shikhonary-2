@@ -14,6 +14,7 @@ import {
   useBulkAssignQuestions
 } from "@/modules/question-paper/services/use-question-paper";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { toast } from "@workspace/ui/components/sonner";
 import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import Link from "next/link";
@@ -342,25 +343,8 @@ export const QuestionPickerPanel: React.FC = () => {
                   </div>
 
                   {/* Attachments */}
-                  {Array.isArray(q.attachments) && q.attachments.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {q.attachments.map((att: any, attIdx: number) => {
-                        const isImage = att.type === "image" || /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(att.url);
-                        if (isImage && att.url !== "text-context") {
-                          return (
-                            <div key={attIdx} className="space-y-1">
-                              <img
-                                src={att.url}
-                                alt={att.caption || "Attachment"}
-                                className="max-h-24 rounded-lg border border-outline-variant/60 object-contain bg-muted/20"
-                              />
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  )}
+                  <QuestionAttachments attachments={q.attachments} compact />
+
 
                   {/* References */}
                   {Array.isArray(q.reference) && q.reference.length > 0 && (
