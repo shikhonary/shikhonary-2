@@ -50,6 +50,7 @@ export const saveSubjectQuestionTypesSchema = z.object({
   questionTypes: z.array(
     z.object({
       questionTypeId: z.string().min(1),
+      customLabel: z.string().optional().nullable(),
       mark: z.number().min(0),
       requiredCount: z.number().int().min(0),
       totalQuestions: z.number().int().min(0),

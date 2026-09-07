@@ -21,6 +21,7 @@ import { useQuestionTypesList } from "../../question-type/services/use-question-
 // Schema matching the unified save structure endpoint
 const questionTypeConfigSchema = z.object({
   questionTypeId: z.string().min(1, "Question Type is required"),
+  customLabel: z.string().optional().nullable(),
   mark: z.coerce.number().min(0, "Mark must be at least 0"),
   requiredCount: z.coerce.number().int().min(0, "Required count must be at least 0"),
   totalQuestions: z.coerce.number().int().min(0, "Total questions must be at least 0"),
@@ -52,6 +53,7 @@ const subjectQuestionStructureSchema = z.object({
 
 interface QuestionTypeConfig {
   questionTypeId: string
+  customLabel?: string | null
   mark: number
   requiredCount: number
   totalQuestions: number
@@ -184,6 +186,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
                 }
                 return {
                   questionTypeId: sqt.questionTypeId,
+                  customLabel: sqt.customLabel ?? "",
                   mark: sqt.mark,
                   requiredCount: sqt.requiredCount,
                   totalQuestions: sqt.totalQuestions,
@@ -211,6 +214,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
             }
             return {
               questionTypeId: sqt.questionTypeId,
+              customLabel: sqt.customLabel ?? "",
               mark: sqt.mark,
               requiredCount: sqt.requiredCount,
               totalQuestions: sqt.totalQuestions,
@@ -267,6 +271,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
 
             return {
               questionTypeId: c.questionTypeId,
+              customLabel: c.customLabel?.trim() || null,
               mark: c.mark,
               requiredCount: c.requiredCount,
               totalQuestions: c.totalQuestions,
@@ -510,7 +515,7 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
             <Button
               type="button"
               variant="outline"
-              onClick={() => appendDirectQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+              onClick={() => appendDirectQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
               className="flex items-center gap-1 text-xs h-8 border-outline text-primary hover:bg-primary/5"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -572,7 +577,7 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => appendDirectQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+                  onClick={() => appendDirectQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
                   className="text-xs text-primary font-bold hover:bg-primary/5 h-7 px-2"
                 >
                   + Add Type
@@ -650,7 +655,7 @@ function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questio
           <Button
             type="button"
             variant="outline"
-            onClick={() => appendSubQt({ questionTypeId: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+            onClick={() => appendSubQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
             className="flex items-center gap-1 text-[11px] h-7 border-outline text-primary hover:bg-primary/5 bg-white"
           >
             <Plus className="h-3 w-3" />
@@ -718,7 +723,7 @@ interface QuestionTypeRowProps {
 function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: QuestionTypeRowProps) {
   return (
     <div className="flex flex-wrap sm:flex-nowrap items-end gap-3 bg-white p-3 rounded-lg border border-outline-variant/60 shadow-xs relative">
-      <div className="w-full sm:flex-1 min-w-[150px]">
+      <div className="w-full sm:flex-1 min-w-[140px]">
         <Label className="text-[10px] text-outline font-semibold uppercase">Question Format</Label>
         <Controller
           control={control}
@@ -740,7 +745,24 @@ function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: 
         />
       </div>
 
-      <div className="w-[100px] shrink-0">
+      <div className="w-full sm:flex-1 min-w-[140px]">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Label Override (Optional)</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.customLabel`}
+          render={({ field }) => (
+            <Input
+              type="text"
+              placeholder="e.g. Seen MCQ / ক-বিভাগ"
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              className="h-9 text-xs"
+            />
+          )}
+        />
+      </div>
+
+      <div className="w-[85px] shrink-0">
         <Label className="text-[10px] text-outline font-semibold uppercase">Total Mark</Label>
         <Controller
           control={control}
@@ -758,7 +780,7 @@ function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: 
         />
       </div>
 
-      <div className="flex-1 min-w-[120px]">
+      <div className="flex-1 min-w-[100px]">
         <Label className="text-[10px] text-outline font-semibold uppercase">Mark Distribution</Label>
         <Controller
           control={control}
@@ -775,8 +797,8 @@ function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: 
         />
       </div>
 
-      <div className="w-[100px] shrink-0">
-        <Label className="text-[10px] text-outline font-semibold uppercase">Required Count</Label>
+      <div className="w-[85px] shrink-0">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Required</Label>
         <Controller
           control={control}
           name={`${namePrefix}.requiredCount`}
@@ -792,7 +814,7 @@ function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: 
         />
       </div>
 
-      <div className="w-[100px] shrink-0">
+      <div className="w-[85px] shrink-0">
         <Label className="text-[10px] text-outline font-semibold uppercase">Total Count</Label>
         <Controller
           control={control}

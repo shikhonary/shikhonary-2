@@ -51,7 +51,9 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.NEWS_REPORT, nameBn: "সংবাদ প্রতিবেদন", nameEn: "News Report", desc: "সংবাদপত্র বা অনুষ্ঠানের প্রতিবেদন লিখন" },
   { code: QUESTION_TYPE_CODES.ESSAY, nameBn: "রচনা / প্রবন্ধ", nameEn: "Essay", desc: "প্রবন্ধ বা বিষয়ভিত্তিক রচনা লিখন" },
   { code: QUESTION_TYPE_CODES.CQ, nameBn: "সৃজনশীল", nameEn: "Creative (CQ)", desc: "উদ্দীপক ও ৪টি স্তরের সৃজনশীল প্রশ্ন" },
+  { code: QUESTION_TYPE_CODES.PBQ, nameBn: "অনুচ্ছেদভিত্তিক প্রশ্ন", nameEn: "Passage Based (PBQ)", desc: "অনুচ্ছেদ ও ৫টি স্তরের প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SA, nameBn: "সংক্ষিপ্ত-উত্তর", nameEn: "Short Answer", desc: "সংক্ষিপ্ত রচনামূলক প্রশ্ন" },
+  { code: QUESTION_TYPE_CODES.PARTS_OF_SPEECH, nameBn: "পদ প্রকরণ / Parts of Speech", nameEn: "Parts of Speech", desc: "শব্দের পদ চিহ্নিতকরণ ও ব্যাকরণ" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({

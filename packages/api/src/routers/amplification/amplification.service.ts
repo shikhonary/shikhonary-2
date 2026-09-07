@@ -44,7 +44,7 @@ export async function listAmplifications(db: PrismaClient, input: ListAmplificat
   const where: any = {}
 
   if (subjectId) where.subjectId = subjectId
-  if (chapterId) where.chapterId = chapterId
+  if (chapterId) where.academicChapterId = chapterId
   if (difficulty) where.difficulty = difficulty
 
   if (query) {
@@ -81,7 +81,7 @@ export async function listAmplifications(db: PrismaClient, input: ListAmplificat
             nameBn: true,
           },
         },
-        chapter: {
+        academicChapter: {
           select: {
             id: true,
             nameEn: true,
@@ -103,7 +103,11 @@ export async function listAmplifications(db: PrismaClient, input: ListAmplificat
   ])
 
   return {
-    items,
+    items: items.map((a) => ({
+      ...a,
+      chapter: a.academicChapter,
+      chapterId: a.academicChapterId,
+    })),
     totalItems,
     totalPages: Math.ceil(totalItems / resolvedLimit) || 1,
     page: resolvedPage,
@@ -120,7 +124,7 @@ export async function getAmplificationById(db: PrismaClient, input: GetAmplifica
           classSubjects: true,
         },
       },
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
@@ -132,29 +136,39 @@ export async function getAmplificationById(db: PrismaClient, input: GetAmplifica
     })
   }
 
-  return amplification
+  return {
+    ...amplification,
+    chapter: amplification.academicChapter,
+    chapterId: amplification.academicChapterId,
+  }
 }
 
 export async function createAmplification(db: PrismaClient, input: CreateAmplificationInput) {
   const data = input
   const resolvedQuestionTypeId = await resolveAmplificationQuestionTypeId(db)
 
-  return db.amplification.create({
+  const created = await db.amplification.create({
     data: {
       title: data.title,
       reference: data.reference ?? [],
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
-      chapterId: data.chapterId || null,
+      academicChapterId: data.chapterId || null,
       questionTypeId: resolvedQuestionTypeId,
     },
     include: {
       subject: true,
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
+
+  return {
+    ...created,
+    chapter: created.academicChapter,
+    chapterId: created.academicChapterId,
+  }
 }
 
 export async function updateAmplification(db: PrismaClient, input: UpdateAmplificationInput) {
@@ -164,7 +178,7 @@ export async function updateAmplification(db: PrismaClient, input: UpdateAmplifi
   await getAmplificationById(db, { id })
   const resolvedQuestionTypeId = await resolveAmplificationQuestionTypeId(db)
 
-  return db.amplification.update({
+  const updated = await db.amplification.update({
     where: { id },
     data: {
       title: data.title,
@@ -172,15 +186,21 @@ export async function updateAmplification(db: PrismaClient, input: UpdateAmplifi
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
-      chapterId: data.chapterId || null,
+      academicChapterId: data.chapterId !== undefined ? data.chapterId : undefined,
       questionTypeId: resolvedQuestionTypeId,
     },
     include: {
       subject: true,
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
+
+  return {
+    ...updated,
+    chapter: updated.academicChapter,
+    chapterId: updated.academicChapterId,
+  }
 }
 
 export async function deleteAmplification(db: PrismaClient, input: DeleteAmplificationInput) {
@@ -209,18 +229,18 @@ export async function importAmplifications(db: PrismaClient, input: ImportAmplif
       for (const p of input.amplifications) {
         const data = p
 
-        const createdParagraph = await tx.amplification.create({
+        const createdAmplification = await tx.amplification.create({
           data: {
             title: data.title,
             reference: data.reference || [],
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
-            chapterId: data.chapterId || null,
+            academicChapterId: data.chapterId || null,
             questionTypeId: resolvedQuestionTypeId,
           },
         })
-        results.push(createdParagraph)
+        results.push(createdAmplification)
       }
       return results
     },
@@ -235,7 +255,7 @@ export async function importAmplifications(db: PrismaClient, input: ImportAmplif
 export async function getAmplificationStats(db: PrismaClient, input: AmplificationStatsInput = {}) {
   const where: any = {}
   if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.chapterId = input.chapterId
+  if (input.chapterId) where.academicChapterId = input.chapterId
 
   const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.amplification.count({ where }),

@@ -11,6 +11,11 @@ import { Pool } from "pg"
 
 config({ path: resolve(import.meta.dirname, "../../.env") })
 
+if (process.env.NODE_ENV === "production") {
+  console.error("\x1b[31m✖ Cannot run clean-tenant-databases script in production environment!\x1b[0m")
+  process.exit(1)
+}
+
 function parseConnectionString(connectionString: string) {
   const url = new URL(connectionString)
   return {

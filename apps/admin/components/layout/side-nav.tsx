@@ -62,6 +62,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
+      { href: "/pbqs", label: "PBQs", icon: HelpCircle },
       { href: "/cs", label: "CS", icon: HelpCircle },
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
@@ -73,6 +74,8 @@ const navGroups: NavGroup[] = [
       { href: "/thought-expansions", label: "Thought Expansions", icon: HelpCircle },
       { href: "/news-reports", label: "News Reports", icon: Newspaper },
       { href: "/essays", label: "Essays", icon: ScrollText },
+      { href: "/parts-of-speech", label: "Parts of Speech", icon: HelpCircle },
+      { href: "/fill-in-the-blanks-with-clues", label: "Fill in Blanks (Clues)", icon: HelpCircle },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },

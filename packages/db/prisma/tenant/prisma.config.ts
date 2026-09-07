@@ -8,7 +8,7 @@ config({ path: resolve(import.meta.dirname, "../../.env") })
 function getDirectUrl(url?: string) {
   if (!url) return url
   if (process.env.DIRECT_URL) return process.env.DIRECT_URL
-  return url.replace("-pooler.", ".")
+  return url.replace("-pooler.", ".").replace(":6543", ":5432")
 }
 
 export default defineConfig({

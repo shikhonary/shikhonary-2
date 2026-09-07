@@ -20,20 +20,14 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   if (input.type) where.type = input.type
 
   if (input.board) {
-    const parts = input.board.split("-")
-    const yearPart = parts[parts.length - 1]
-    const sourcePart = parts.slice(0, parts.length - 1).join("-")
-    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
-      where.source = sourcePart
-      where.year = Number(yearPart)
-    }
+    where.reference = { has: input.board }
   }
 
   if (input.query) {
     where.OR = [
       { question: { contains: input.query, mode: "insensitive" } },
       { explanation: { contains: input.query, mode: "insensitive" } },
-      { source: { contains: input.query, mode: "insensitive" } },
+      { reference: { has: input.query } },
     ]
   }
 
@@ -177,6 +171,14 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
     }
   }
 
+  const refList = Array.isArray(data.reference) ? [...data.reference] : []
+  if (data.source || data.year) {
+    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+    if (legacyRef && !refList.includes(legacyRef)) {
+      refList.push(legacyRef)
+    }
+  }
+
   return db.mcq.create({
     data: {
       subjectId: data.subjectId,
@@ -187,13 +189,10 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
       statements: data.statements,
       type: data.type,
       isMath: data.isMath,
-      reference: data.reference,
+      reference: refList,
       explanation: data.explanation,
       questionUrl: data.questionUrl,
-      contextId: data.contextId,
       difficulty: data.difficulty,
-      year: data.year,
-      source: data.source,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0 ? {
@@ -264,6 +263,18 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
     }
   }
 
+  let resolvedReference = data.reference
+  if (data.source || data.year) {
+    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+    if (legacyRef) {
+      const currentRefs = Array.isArray(data.reference) ? [...data.reference] : []
+      if (!currentRefs.includes(legacyRef)) {
+        currentRefs.push(legacyRef)
+      }
+      resolvedReference = currentRefs
+    }
+  }
+
   return db.mcq.update({
     where: { id },
     data: {
@@ -275,13 +286,10 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
       statements: data.statements,
       type: data.type,
       isMath: data.isMath,
-      reference: data.reference,
+      reference: resolvedReference,
       explanation: data.explanation,
       questionUrl: data.questionUrl,
-      contextId: data.contextId,
       difficulty: data.difficulty,
-      year: data.year,
-      source: data.source,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments ? {
@@ -384,6 +392,14 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
           }
         }
 
+        const refList = Array.isArray(data.reference) ? [...data.reference] : []
+        if (data.source || data.year) {
+          const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+          if (legacyRef && !refList.includes(legacyRef)) {
+            refList.push(legacyRef)
+          }
+        }
+
         const createdMcq = await tx.mcq.create({
           data: {
             subjectId: data.subjectId,
@@ -394,13 +410,10 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
             statements: data.statements || [],
             type: data.type,
             isMath: data.isMath ?? false,
-            reference: data.reference || [],
+            reference: refList,
             explanation: data.explanation,
             questionUrl: data.questionUrl,
-            contextId: data.contextId,
             difficulty: data.difficulty ?? "MEDIUM",
-            year: data.year,
-            source: data.source,
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0 ? {
@@ -472,21 +485,33 @@ export async function getBoardYears(
 ) {
   const where: any = {
     subjectId: input.subjectId,
-    source: { not: null },
-    year: { not: null },
+    NOT: { reference: { equals: [] } },
   }
   if (input.chapterId) where.chapterId = input.chapterId
 
-  const groups = await db.mcq.groupBy({
-    by: ["source", "year"],
+  const questions = await db.mcq.findMany({
     where,
-    _count: { id: true },
+    select: { reference: true },
   })
 
-  return groups.map((g) => ({
-    rawRef: `${g.source}-${g.year}`,
-    boardName: g.source || "",
-    year: g.year || 0,
-    count: g._count.id,
-  }))
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

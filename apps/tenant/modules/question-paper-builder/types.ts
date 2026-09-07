@@ -5,7 +5,7 @@ export interface ElementStyle {
   fontWeight?: string | number;
 }
 
-export type PaperItemType = "MCQ" | "CQ" | "CS" | "HEADER";
+export type PaperItemType = "MCQ" | "CQ" | "CS" | "PBQ" | "HEADER";
 
 export interface BasePaperItem {
   id: string;

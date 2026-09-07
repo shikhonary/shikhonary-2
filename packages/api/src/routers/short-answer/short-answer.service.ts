@@ -21,14 +21,18 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (year !== undefined) where.year = year
+  if (source || year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    if (boardRef) {
+      where.reference = { has: boardRef }
+    }
+  }
 
   if (query) {
     where.OR = [
       { question: { contains: query, mode: "insensitive" } },
       { answer: { contains: query, mode: "insensitive" } },
-      { source: { contains: query, mode: "insensitive" } },
+      { reference: { has: query } },
     ]
   }
 
@@ -163,6 +167,14 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
     }
   }
 
+  const refList = Array.isArray(data.reference) ? [...data.reference] : []
+  if (data.source || data.year) {
+    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+    if (legacyRef && !refList.includes(legacyRef)) {
+      refList.push(legacyRef)
+    }
+  }
+
   return db.shortAnswer.create({
     data: {
       subjectId: data.subjectId,
@@ -170,9 +182,7 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
       question: data.question,
       answer: data.answer || null,
       difficulty: data.difficulty,
-      year: data.year,
-      source: data.source,
-      reference: data.reference,
+      reference: refList,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0
@@ -232,6 +242,18 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
     }
   }
 
+  let resolvedReference = data.reference
+  if (data.source || data.year) {
+    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+    if (legacyRef) {
+      const currentRefs = Array.isArray(data.reference) ? [...data.reference] : []
+      if (!currentRefs.includes(legacyRef)) {
+        currentRefs.push(legacyRef)
+      }
+      resolvedReference = currentRefs
+    }
+  }
+
   return db.shortAnswer.update({
     where: { id },
     data: {
@@ -240,9 +262,7 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
       question: data.question,
       answer: data.answer,
       difficulty: data.difficulty,
-      year: data.year,
-      source: data.source,
-      reference: data.reference,
+      reference: resolvedReference,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0
@@ -328,25 +348,37 @@ export async function getShortAnswerBoardYears(
   input: { subjectId?: string; chapterId?: string }
 ) {
   const where: any = {
-    source: { not: null },
-    year: { not: null },
+    NOT: { reference: { equals: [] } },
   }
 
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
 
-  const groups = await db.shortAnswer.groupBy({
-    by: ["source", "year"],
+  const questions = await db.shortAnswer.findMany({
     where,
-    _count: { id: true },
+    select: { reference: true },
   })
 
-  return groups.map((g) => ({
-    rawRef: `${g.source}-${g.year}`,
-    boardName: g.source || "",
-    year: g.year || 0,
-    count: g._count.id,
-  }))
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }
 
 export async function importShortAnswers(db: PrismaClient, input: ImportShortAnswersInput) {
@@ -404,6 +436,14 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
           }
         }
 
+        const refList = Array.isArray(data.reference) ? [...data.reference] : []
+        if (data.source || data.year) {
+          const legacyRef = [data.source, data.year].filter(Boolean).join("-")
+          if (legacyRef && !refList.includes(legacyRef)) {
+            refList.push(legacyRef)
+          }
+        }
+
         const createdSa = await tx.shortAnswer.create({
           data: {
             subjectId: data.subjectId,
@@ -411,9 +451,7 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
             question: data.question,
             answer: data.answer || null,
             difficulty: data.difficulty ?? "MEDIUM",
-            year: data.year,
-            source: data.source,
-            reference: data.reference || [],
+            reference: refList,
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0

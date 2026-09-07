@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server"
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName } from "@workspace/utils"
@@ -119,6 +120,26 @@ async function freezeQuestionSnapshots(
       content = await db.cq.findUnique({ where: { id: pq.cqId } })
     } else if (pq.shortAnswerId) {
       content = await db.shortAnswer.findUnique({ where: { id: pq.shortAnswerId } })
+    } else if (pq.csId) {
+      content = await db.cS.findUnique({ where: { id: pq.csId } })
+    } else if (pq.paragraphId) {
+      content = await db.paragraph.findUnique({ where: { id: pq.paragraphId } })
+    } else if (pq.amplificationId) {
+      content = await db.amplification.findUnique({ where: { id: pq.amplificationId } })
+    } else if (pq.letterId) {
+      content = await db.letter.findUnique({ where: { id: pq.letterId } })
+    } else if (pq.applicationId) {
+      content = await db.application.findUnique({ where: { id: pq.applicationId } })
+    } else if (pq.summaryId) {
+      content = await db.summary.findUnique({ where: { id: pq.summaryId } })
+    } else if (pq.essenceId) {
+      content = await db.essence.findUnique({ where: { id: pq.essenceId } })
+    } else if (pq.essayId) {
+      content = await db.essay.findUnique({ where: { id: pq.essayId } })
+    } else if (pq.newsReportId) {
+      content = await db.newsReport.findUnique({ where: { id: pq.newsReportId } })
+    } else if (pq.partsOfSpeechId) {
+      content = await db.partsOfSpeech.findUnique({ where: { id: pq.partsOfSpeechId } })
     }
 
     if (content) {
@@ -267,6 +288,7 @@ export async function getQuestionPaperById(
   const cqIds = allPaperQuestions.map((q) => q.cqId).filter(Boolean) as string[]
   const csIds = allPaperQuestions.map((q: any) => q.csId).filter(Boolean) as string[]
   const shortAnswerIds = allPaperQuestions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
+  const pbqIds = allPaperQuestions.map((q: any) => q.pbqId).filter(Boolean) as string[]
   const paragraphIds = allPaperQuestions.map((q) => q.paragraphId).filter(Boolean) as string[]
   const amplificationIds = allPaperQuestions.map((q) => q.amplificationId).filter(Boolean) as string[]
   const letterIds = allPaperQuestions.map((q: any) => q.letterId).filter(Boolean) as string[]
@@ -275,6 +297,7 @@ export async function getQuestionPaperById(
   const essenceIds = allPaperQuestions.map((q: any) => q.essenceId).filter(Boolean) as string[]
   const newsReportIds = allPaperQuestions.map((q: any) => q.newsReportId).filter(Boolean) as string[]
   const essayIds = allPaperQuestions.map((q: any) => q.essayId).filter(Boolean) as string[]
+  const partsOfSpeechIds = allPaperQuestions.map((q: any) => q.partsOfSpeechId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -286,6 +309,7 @@ export async function getQuestionPaperById(
     cqs,
     cses,
     shortAnswers,
+    pbqs,
     paragraphs,
     amplifications,
     letters,
@@ -294,6 +318,7 @@ export async function getQuestionPaperById(
     essences,
     newsReports,
     essays,
+    partsOfSpeeches,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -338,11 +363,20 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    pbqIds.length > 0
+      ? db.pBQ.findMany({
+        where: { id: { in: pbqIds } },
+        include: {
+          academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
     paragraphIds.length > 0
       ? db.paragraph.findMany({
         where: { id: { in: paragraphIds } },
         include: {
-          chapter: true,
+          academicChapter: true,
           questionType: true,
         },
       })
@@ -351,6 +385,7 @@ export async function getQuestionPaperById(
       ? db.amplification.findMany({
         where: { id: { in: amplificationIds } },
         include: {
+          academicChapter: true,
           questionType: true,
         },
       })
@@ -403,6 +438,15 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    partsOfSpeechIds.length > 0
+      ? db.partsOfSpeech.findMany({
+        where: { id: { in: partsOfSpeechIds } },
+        include: {
+          academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
     questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
@@ -412,14 +456,16 @@ export async function getQuestionPaperById(
   const cqMap = new Map(cqs.map((c) => [c.id, c]))
   const csMap = new Map(cses.map((c: any) => [c.id, c]))
   const shortMap = new Map(shortAnswers.map((s) => [s.id, s]))
-  const paragraphMap = new Map(paragraphs.map((p) => [p.id, p]))
-  const amplificationMap = new Map(amplifications.map((a) => [a.id, a]))
+  const pbqMap = new Map(pbqs.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
+  const paragraphMap = new Map(paragraphs.map((p) => [p.id, { ...p, chapter: p.academicChapter }]))
+  const amplificationMap = new Map(amplifications.map((a) => [a.id, { ...a, chapter: a.academicChapter }]))
   const letterMap = new Map(letters.map((l: any) => [l.id, l]))
   const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
   const summaryMap = new Map(summaries.map((s: any) => [s.id, s]))
   const essenceMap = new Map(essences.map((e: any) => [e.id, e]))
   const newsReportMap = new Map(newsReports.map((n: any) => [n.id, n]))
   const essayMap = new Map(essays.map((e: any) => [e.id, e]))
+  const partsOfSpeechMap = new Map(partsOfSpeeches.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -442,6 +488,7 @@ export async function getQuestionPaperById(
     let resolvedCq = q.cqId ? cqMap.get(q.cqId) || null : null
     let resolvedCs = q.csId ? csMap.get(q.csId) || null : null
     let resolvedShort = q.shortAnswerId ? shortMap.get(q.shortAnswerId) || null : null
+    let resolvedPbq = q.pbqId ? pbqMap.get(q.pbqId) || null : null
     let resolvedParagraph = q.paragraphId ? paragraphMap.get(q.paragraphId) || null : null
     let resolvedAmplification = q.amplificationId ? amplificationMap.get(q.amplificationId) || null : null
     let resolvedLetter = q.letterId ? letterMap.get(q.letterId) || null : null
@@ -450,6 +497,7 @@ export async function getQuestionPaperById(
     let resolvedEssence = q.essenceId ? essenceMap.get(q.essenceId) || null : null
     let resolvedNewsReport = q.newsReportId ? newsReportMap.get(q.newsReportId) || null : null
     let resolvedEssay = q.essayId ? essayMap.get(q.essayId) || null : null
+    let resolvedPartsOfSpeech = q.partsOfSpeechId ? partsOfSpeechMap.get(q.partsOfSpeechId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -463,6 +511,9 @@ export async function getQuestionPaperById(
     }
     if (!resolvedShort && q.shortAnswerId && q.contentSnapshot) {
       resolvedShort = q.contentSnapshot as any
+    }
+    if (!resolvedPbq && q.pbqId && q.contentSnapshot) {
+      resolvedPbq = q.contentSnapshot as any
     }
     if (!resolvedParagraph && q.paragraphId && q.contentSnapshot) {
       resolvedParagraph = q.contentSnapshot as any
@@ -488,10 +539,14 @@ export async function getQuestionPaperById(
     if (!resolvedEssay && q.essayId && q.contentSnapshot) {
       resolvedEssay = q.contentSnapshot as any
     }
+    if (!resolvedPartsOfSpeech && q.partsOfSpeechId && q.contentSnapshot) {
+      resolvedPartsOfSpeech = q.contentSnapshot as any
+    }
 
     let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
 
     const actualQuestionTypeId =
+      (resolvedPartsOfSpeech as any)?.questionTypeId ||
       (resolvedEssay as any)?.questionTypeId ||
       (resolvedNewsReport as any)?.questionTypeId ||
       (resolvedEssence as any)?.questionTypeId ||
@@ -500,6 +555,7 @@ export async function getQuestionPaperById(
       (resolvedLetter as any)?.questionTypeId ||
       (resolvedApplication as any)?.questionTypeId ||
       (resolvedAmplification as any)?.questionTypeId ||
+      (resolvedPbq as any)?.questionTypeId ||
       (resolvedCq as any)?.questionTypeId ||
       (resolvedShort as any)?.questionTypeId
 
@@ -507,6 +563,7 @@ export async function getQuestionPaperById(
       for (const dist of distMap.values()) {
         const matchesExact = dist.questionTypeId === actualQuestionTypeId
         const matchesCategory =
+          (resolvedPartsOfSpeech && (dist.questionTypeName?.toLowerCase().includes("parts of speech") || dist.questionTypeName?.toLowerCase().includes("part of speech"))) ||
           (resolvedEssay && (dist.questionTypeName?.includes("রচনা") || dist.questionTypeName?.toLowerCase().includes("essay"))) ||
           (resolvedNewsReport && (dist.questionTypeName?.includes("প্রতিবেদন") || dist.questionTypeName?.toLowerCase().includes("report"))) ||
           (resolvedEssence && (dist.questionTypeName?.includes("সারমর্ম") || dist.questionTypeName?.toLowerCase().includes("essence"))) ||
@@ -515,6 +572,7 @@ export async function getQuestionPaperById(
           (resolvedLetter && (dist.questionTypeName?.includes("চিঠি") || dist.questionTypeName?.includes("পত্র") || dist.questionTypeName?.toLowerCase().includes("letter"))) ||
           (resolvedApplication && (dist.questionTypeName?.includes("আবেদন") || dist.questionTypeName?.includes("দরখাস্ত") || dist.questionTypeName?.toLowerCase().includes("application"))) ||
           (resolvedAmplification && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
+          (resolvedPbq && (dist.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") || dist.questionTypeName?.toLowerCase().includes("pbq") || dist.questionTypeName?.toLowerCase().includes("passage"))) ||
           (resolvedShort && (dist.questionTypeName?.includes("সংক্ষিপ্ত") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
           (resolvedCq && (dist.questionTypeName?.includes("সৃজনশীল") || dist.questionTypeName?.toLowerCase().includes("cq")))
 
@@ -532,6 +590,7 @@ export async function getQuestionPaperById(
       cq: resolvedCq,
       cs: resolvedCs,
       shortAnswer: resolvedShort,
+      pbq: resolvedPbq,
       paragraph: resolvedParagraph,
       amplification: resolvedAmplification,
       letter: resolvedLetter,
@@ -540,6 +599,7 @@ export async function getQuestionPaperById(
       essence: resolvedEssence,
       newsReport: resolvedNewsReport,
       essay: resolvedEssay,
+      partsOfSpeech: resolvedPartsOfSpeech,
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
   }
@@ -807,10 +867,6 @@ export async function createQuestionPaperFull(
     let subjectTotal = 0
 
     for (const distInput of subjectInput.distributions) {
-      const qType = qTypeMap.get(distInput.questionTypeId)
-      const questionTypeName = qType?.nameEn || qType?.nameBn || distInput.questionTypeName
-      const questionTypeLabel = distInput.questionTypeLabel || qType?.label || qType?.nameBn || qType?.nameEn || null
-
       // Resolve sqType from main DB upfront for section & distribution defaults
       const sqType = await db.subjectQuestionType.findFirst({
         where: {
@@ -819,6 +875,16 @@ export async function createQuestionPaperFull(
         },
         include: { section: true, subSection: true },
       })
+
+      const qType = qTypeMap.get(distInput.questionTypeId)
+      const questionTypeName = qType?.nameEn || qType?.nameBn || distInput.questionTypeName
+      const questionTypeLabel =
+        distInput.questionTypeLabel ||
+        sqType?.customLabel ||
+        qType?.label ||
+        qType?.nameBn ||
+        qType?.nameEn ||
+        null
 
       const markDistribution = syncMarkDistribution(
         distInput.marksPerQuestion,
@@ -995,12 +1061,31 @@ export async function deleteQuestionPaper(
     where: { id: input.id },
   })
 
-  if (!existing) {
+  if (!existing || existing.deletedAt) {
     throw notFound("QuestionPaper")
   }
 
-  await tenantDb.questionPaper.delete({
+  if (existing.status === "Published") {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Published question papers cannot be deleted directly. Unpublish the paper first.",
+    })
+  }
+
+  const updated = await tenantDb.questionPaper.update({
     where: { id: input.id },
+    data: {
+      deletedAt: new Date(),
+      isActive: false,
+      deletedBy: actorId,
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.id,
+    action: "DELETED",
+    actorId,
+    changes: { deletedAt: updated.deletedAt },
   })
 
   return { success: true }
@@ -1119,6 +1204,7 @@ export async function duplicateQuestionPaper(
         essenceId: question.essenceId,
         essayId: question.essayId,
         newsReportId: question.newsReportId,
+        partsOfSpeechId: question.partsOfSpeechId,
         distributionId: newDistId,
         sectionId: newSectionId,
         orderIndex: question.orderIndex,
@@ -1147,6 +1233,7 @@ export async function duplicateQuestionPaper(
             essenceId: alt.essenceId,
             essayId: alt.essayId,
             newsReportId: alt.newsReportId,
+            partsOfSpeechId: alt.partsOfSpeechId,
             distributionId: altDistId,
             sectionId: newSectionId,
             orderIndex: alt.orderIndex,
@@ -1856,9 +1943,25 @@ export async function addQuestionPaperQuestion(
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
 
   // Ensure only one type is set
-  const idsSet = [input.mcqId, input.cqId, input.shortAnswerId].filter(Boolean)
+  const idsSet = [
+    input.mcqId,
+    input.cqId,
+    input.shortAnswerId,
+    input.csId,
+    input.pbqId,
+    input.paragraphId,
+    input.amplificationId,
+    input.letterId,
+    input.applicationId,
+    input.summaryId,
+    input.essenceId,
+    input.essayId,
+    input.newsReportId,
+    input.partsOfSpeechId,
+  ].filter(Boolean)
+
   if (idsSet.length !== 1) {
-    throw new Error("Exactly one of mcqId, cqId, or shortAnswerId must be specified")
+    throw new Error("Exactly one question type ID must be specified")
   }
 
   // Check existence in main DB & capture snapshot if paper is published
@@ -1866,26 +1969,75 @@ export async function addQuestionPaperQuestion(
   let questionLabel = ""
 
   if (input.mcqId) {
-    const mcq = await db.mcq.findUnique({ where: { id: input.mcqId } })
-    if (!mcq) throw notFound("Mcq")
-    questionLabel = "MCQ: " + mcq.id
-    if (paper.status === "Published") {
-      contentSnapshot = JSON.parse(JSON.stringify(mcq))
-    }
+    const item = await db.mcq.findUnique({ where: { id: input.mcqId } })
+    if (!item) throw notFound("Mcq")
+    questionLabel = "MCQ: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.cqId) {
-    const cq = await db.cq.findUnique({ where: { id: input.cqId } })
-    if (!cq) throw notFound("Cq")
-    questionLabel = "CQ: " + cq.id
-    if (paper.status === "Published") {
-      contentSnapshot = JSON.parse(JSON.stringify(cq))
-    }
+    const item = await db.cq.findUnique({ where: { id: input.cqId } })
+    if (!item) throw notFound("Cq")
+    questionLabel = "CQ: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.shortAnswerId) {
-    const short = await db.shortAnswer.findUnique({ where: { id: input.shortAnswerId } })
-    if (!short) throw notFound("ShortAnswer")
-    questionLabel = "ShortAnswer: " + short.id
-    if (paper.status === "Published") {
-      contentSnapshot = JSON.parse(JSON.stringify(short))
-    }
+    const item = await db.shortAnswer.findUnique({ where: { id: input.shortAnswerId } })
+    if (!item) throw notFound("ShortAnswer")
+    questionLabel = "ShortAnswer: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.csId) {
+    const item = await db.cS.findUnique({ where: { id: input.csId } })
+    if (!item) throw notFound("CS")
+    questionLabel = "CS: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.pbqId) {
+    const item = await db.pBQ.findUnique({ where: { id: input.pbqId } })
+    if (!item) throw notFound("PBQ")
+    questionLabel = "PBQ: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.paragraphId) {
+    const item = await db.paragraph.findUnique({ where: { id: input.paragraphId } })
+    if (!item) throw notFound("Paragraph")
+    questionLabel = "Paragraph: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.amplificationId) {
+    const item = await db.amplification.findUnique({ where: { id: input.amplificationId } })
+    if (!item) throw notFound("Amplification")
+    questionLabel = "Amplification: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.letterId) {
+    const item = await db.letter.findUnique({ where: { id: input.letterId } })
+    if (!item) throw notFound("Letter")
+    questionLabel = "Letter: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.applicationId) {
+    const item = await db.application.findUnique({ where: { id: input.applicationId } })
+    if (!item) throw notFound("Application")
+    questionLabel = "Application: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.summaryId) {
+    const item = await db.summary.findUnique({ where: { id: input.summaryId } })
+    if (!item) throw notFound("Summary")
+    questionLabel = "Summary: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.essenceId) {
+    const item = await db.essence.findUnique({ where: { id: input.essenceId } })
+    if (!item) throw notFound("Essence")
+    questionLabel = "Essence: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.essayId) {
+    const item = await db.essay.findUnique({ where: { id: input.essayId } })
+    if (!item) throw notFound("Essay")
+    questionLabel = "Essay: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.newsReportId) {
+    const item = await db.newsReport.findUnique({ where: { id: input.newsReportId } })
+    if (!item) throw notFound("NewsReport")
+    questionLabel = "NewsReport: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.partsOfSpeechId) {
+    const item = await db.partsOfSpeech.findUnique({ where: { id: input.partsOfSpeechId } })
+    if (!item) throw notFound("PartsOfSpeech")
+    questionLabel = "PartsOfSpeech: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
@@ -1902,12 +2054,24 @@ export async function addQuestionPaperQuestion(
       mcqId: input.mcqId,
       cqId: input.cqId,
       shortAnswerId: input.shortAnswerId,
+      csId: input.csId,
+      pbqId: input.pbqId,
+      paragraphId: input.paragraphId,
+      amplificationId: input.amplificationId,
+      letterId: input.letterId,
+      applicationId: input.applicationId,
+      summaryId: input.summaryId,
+      essenceId: input.essenceId,
+      essayId: input.essayId,
+      newsReportId: input.newsReportId,
+      partsOfSpeechId: input.partsOfSpeechId,
       distributionId: input.distributionId,
       sectionId: finalSectionId,
       subSectionId: finalSubSectionId,
       orderIndex: input.orderIndex,
       assignedMarks: input.assignedMarks,
       overrides: input.overrides ?? {},
+      addedBy: actorId,
       contentSnapshot,
     },
   })
@@ -1936,6 +2100,8 @@ export async function removeQuestionPaperQuestion(
     where.csId = input.questionId
   } else if (input.questionType === "SA") {
     where.shortAnswerId = input.questionId
+  } else if (input.questionType === "PBQ") {
+    where.pbqId = input.questionId
   } else if (input.questionType === "PARAGRAPH") {
     where.paragraphId = input.questionId
   } else if (input.questionType === "AMPLIFICATION") {
@@ -1952,6 +2118,8 @@ export async function removeQuestionPaperQuestion(
     where.essayId = input.questionId
   } else if (input.questionType === "NEWS_REPORT") {
     where.newsReportId = input.questionId
+  } else if (input.questionType === "PARTS_OF_SPEECH") {
+    where.partsOfSpeechId = input.questionId
   }
 
   const existing = await tenantDb.questionPaperQuestion.findFirst({ where })
@@ -2030,6 +2198,7 @@ export async function addAlternativeQuestion(
     MCQ: "mcqId",
     CQ: "cqId",
     CS: "csId",
+    PBQ: "pbqId",
     SA: "shortAnswerId",
     PARAGRAPH: "paragraphId",
     AMPLIFICATION: "amplificationId",
@@ -2039,6 +2208,7 @@ export async function addAlternativeQuestion(
     ESSENCE: "essenceId",
     NEWS_REPORT: "newsReportId",
     ESSAY: "essayId",
+    PARTS_OF_SPEECH: "partsOfSpeechId",
   }
 
   const fkField = typeFieldMap[input.questionType]
@@ -2055,6 +2225,8 @@ export async function addAlternativeQuestion(
     }
   } else if (input.questionType === "CS") {
     altContent = await (db as any).cS.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "PBQ") {
+    altContent = await db.pBQ.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SA") {
     altContent = await db.shortAnswer.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "PARAGRAPH") {
@@ -2073,6 +2245,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).newsReport.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "ESSAY") {
     altContent = await (db as any).essay.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "PARTS_OF_SPEECH") {
+    altContent = await db.partsOfSpeech.findUnique({ where: { id: input.questionId } })
   }
   if (!altContent) throw notFound(input.questionType)
 
@@ -2204,8 +2378,8 @@ export async function swapAlternativeQuestion(
   if (!primary || !alt) throw notFound("Question")
 
   const fkFields = [
-    "mcqId", "cqId", "csId", "shortAnswerId", "paragraphId", "amplificationId",
-    "letterId", "applicationId", "summaryId", "essenceId", "essayId"
+    "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
+    "letterId", "applicationId", "summaryId", "essenceId", "essayId", "newsReportId", "partsOfSpeechId"
   ] as const
 
   const questionFields = [
@@ -2414,19 +2588,29 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     includes: { chapter: true, questionType: true, attachments: true },
     excludedIdField: "mcqId",
     hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
   },
   CQ: {
     model: "cq",
-    searchFields: ["questionA", "questionB", "context"],
+    searchFields: ["questionA", "questionB", "questionC", "questionD", "context"],
     includes: { chapter: true, questionType: true, answer: true, attachments: true },
     excludedIdField: "cqId",
     hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
   },
   CS: {
     model: "cS",
-    searchFields: ["questionA", "questionB"],
+    searchFields: ["questionA", "questionB", "questionC", "questionD", "context"],
     includes: { chapter: true, questionType: true },
     excludedIdField: "csId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  PBQ: {
+    model: "pBQ",
+    searchFields: ["questionA", "questionB", "questionC", "questionD", "questionE", "context"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "pbqId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
@@ -2436,27 +2620,30 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     includes: { chapter: true, questionType: true, attachments: true },
     excludedIdField: "shortAnswerId",
     hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
   },
   PARAGRAPH: {
     model: "paragraph",
     searchFields: ["name"],
-    includes: { chapter: true, questionType: true },
+    includes: { academicChapter: true, questionType: true },
     excludedIdField: "paragraphId",
-    hasIsActive: false,
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
   },
   AMPLIFICATION: {
     model: "amplification",
     searchFields: ["title"],
-    includes: { chapter: true, questionType: true },
+    includes: { academicChapter: true, questionType: true },
     excludedIdField: "amplificationId",
-    hasIsActive: false,
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
   },
   LETTER: {
     model: "letter",
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "letterId",
-    hasIsActive: false,
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
   APPLICATION: {
@@ -2464,7 +2651,7 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "applicationId",
-    hasIsActive: false,
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
   SUMMARY: {
@@ -2472,7 +2659,7 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "summaryId",
-    hasIsActive: false,
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
   ESSENCE: {
@@ -2480,7 +2667,7 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "essenceId",
-    hasIsActive: false,
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
   NEWS_REPORT: {
@@ -2488,7 +2675,7 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "newsReportId",
-    hasIsActive: false,
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
   ESSAY: {
@@ -2496,7 +2683,15 @@ const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "essayId",
-    hasIsActive: false,
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  PARTS_OF_SPEECH: {
+    model: "partsOfSpeech",
+    searchFields: ["content"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "partsOfSpeechId",
+    hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
 }
@@ -2507,6 +2702,7 @@ const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.CQ]: "CQ",
   [QUESTION_TYPES.CS]: "CS",
   [QUESTION_TYPES.SA]: "SA",
+  [QUESTION_TYPES.PBQ]: "PBQ",
   [QUESTION_TYPES.PARAGRAPH]: "PARAGRAPH",
   [QUESTION_TYPES.THOUGHT_EXPANSION]: "AMPLIFICATION",
   [QUESTION_TYPES.LETTER]: "LETTER",
@@ -2515,6 +2711,7 @@ const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.ESSENCE]: "ESSENCE",
   [QUESTION_TYPES.NEWS_REPORT]: "NEWS_REPORT",
   [QUESTION_TYPES.ESSAY]: "ESSAY",
+  [QUESTION_TYPES.PARTS_OF_SPEECH]: "PARTS_OF_SPEECH",
 }
 
 export async function getAvailableQuestions(
@@ -2522,8 +2719,7 @@ export async function getAvailableQuestions(
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
-  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, year, excludePaperId, limit, cursor } = input
-  console.log(category)
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, excludePaperId, limit, cursor } = input
 
   // 1. Build exclusion set and resolve category in parallel
   const exclusionPromise = excludePaperId
@@ -2533,6 +2729,7 @@ export async function getAvailableQuestions(
         mcqId: true,
         cqId: true,
         csId: true,
+        pbqId: true,
         shortAnswerId: true,
         paragraphId: true,
         amplificationId: true,
@@ -2542,6 +2739,7 @@ export async function getAvailableQuestions(
         essenceId: true,
         essayId: true,
         newsReportId: true,
+        partsOfSpeechId: true,
       },
     })
     : Promise.resolve([])
@@ -2577,27 +2775,25 @@ export async function getAvailableQuestions(
   const config = CATEGORY_QUERY_CONFIG[effectiveCategory] || CATEGORY_QUERY_CONFIG.MCQ!
 
   // 3. Build common where clause
-  const whereCommon: any = { subjectId }
+  const whereCommon: any = { subjectId, isGlobal: true, deletedAt: null }
   if (config.hasIsActive) whereCommon.isActive = true
   if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
   if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
-  if (year) whereCommon.year = year
   if (board && board !== "all" && board !== "All") {
-    const parts = board.split("-")
-    const yearPart = parts[parts.length - 1]
-    const sourcePart = parts.slice(0, parts.length - 1).join("-")
-    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
-      whereCommon.source = sourcePart
-      whereCommon.year = Number(yearPart)
-    }
+    whereCommon.reference = { has: board }
   }
 
   const where: any = { ...whereCommon }
 
   if (["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY"].includes(effectiveCategory)) {
     delete where.chapterId
-    delete where.source
-    delete where.year
+  }
+
+  if (effectiveCategory === "PARAGRAPH" || effectiveCategory === "AMPLIFICATION" || effectiveCategory === "PBQ" || effectiveCategory === "PARTS_OF_SPEECH") {
+    if (chapterId && chapterId !== "all" && chapterId !== "All") {
+      where.academicChapterId = chapterId
+    }
+    delete where.chapterId
   }
 
   if (effectiveCategory === "APPLICATION" || effectiveCategory === "LETTER") {
@@ -2645,9 +2841,21 @@ export async function getAvailableQuestions(
     orderBy: { createdAt: "desc" },
   })
 
-  // CS-specific fallback: retry without questionTypeId filter if no results
-  if (items.length === 0 && config.fallbackWithoutTypeFilter && where.questionTypeId) {
+  // Fallback 1: retry without questionTypeId filter if no results
+  if (items.length === 0 && (config.fallbackWithoutTypeFilter || where.questionTypeId) && where.questionTypeId) {
     delete where.questionTypeId
+    items = await model.findMany({
+      where,
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      include: config.includes,
+      orderBy: { createdAt: "desc" },
+    })
+  }
+
+  // Fallback 2: retry without isActive filter if no results
+  if (items.length === 0 && where.isActive !== undefined) {
+    delete where.isActive
     items = await model.findMany({
       where,
       take: limit + 1,
@@ -2667,6 +2875,8 @@ export async function getAvailableQuestions(
     category: effectiveCategory,
     items: paginatedItems.map((item: any) => ({
       ...item,
+      chapter: item.academicChapter || item.chapter,
+      chapterId: item.academicChapterId || item.chapterId,
       isAssigned: excludedSet.has(item.id),
     })),
     nextCursor,
@@ -2732,6 +2942,19 @@ export async function bulkAssignQuestions(
       recordsToCreate.push({
         questionPaperId: input.questionPaperId,
         csId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.pbqIds && input.pbqIds.length > 0) {
+    for (const pbqId of input.pbqIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        pbqId,
         distributionId: input.distributionId,
         sectionId: finalSectionId,
         subSectionId: finalSubSectionId,
@@ -2857,6 +3080,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.partsOfSpeechIds && input.partsOfSpeechIds.length > 0) {
+    for (const partsOfSpeechId of input.partsOfSpeechIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        partsOfSpeechId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (recordsToCreate.length === 0) {
     return { success: true, count: 0 }
   }
@@ -2869,6 +3105,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.cq.findUnique({ where: { id: record.cqId } })) as any
       } else if (record.csId) {
         record.contentSnapshot = (await (db as any).cS.findUnique({ where: { id: record.csId } })) as any
+      } else if (record.pbqId) {
+        record.contentSnapshot = (await db.pBQ.findUnique({ where: { id: record.pbqId } })) as any
       } else if (record.shortAnswerId) {
         record.contentSnapshot = (await db.shortAnswer.findUnique({ where: { id: record.shortAnswerId } })) as any
       } else if (record.paragraphId) {
@@ -2887,6 +3125,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).essay.findUnique({ where: { id: record.essayId } })) as any
       } else if (record.newsReportId) {
         record.contentSnapshot = (await (db as any).newsReport.findUnique({ where: { id: record.newsReportId } })) as any
+      } else if (record.partsOfSpeechId) {
+        record.contentSnapshot = (await (db as any).partsOfSpeech.findUnique({ where: { id: record.partsOfSpeechId } })) as any
       }
     }
 
@@ -2897,6 +3137,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_cqId: { questionPaperId: input.questionPaperId, cqId: record.cqId } };
     } else if (record.csId) {
       whereCondition = { questionPaperId_csId: { questionPaperId: input.questionPaperId, csId: record.csId } };
+    } else if (record.pbqId) {
+      whereCondition = { questionPaperId_pbqId: { questionPaperId: input.questionPaperId, pbqId: record.pbqId } };
     } else if (record.shortAnswerId) {
       whereCondition = { questionPaperId_shortAnswerId: { questionPaperId: input.questionPaperId, shortAnswerId: record.shortAnswerId } };
     } else if (record.paragraphId) {
@@ -2915,6 +3157,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_essayId: { questionPaperId: input.questionPaperId, essayId: record.essayId } };
     } else if (record.newsReportId) {
       whereCondition = { questionPaperId_newsReportId: { questionPaperId: input.questionPaperId, newsReportId: record.newsReportId } };
+    } else if (record.partsOfSpeechId) {
+      whereCondition = { questionPaperId_partsOfSpeechId: { questionPaperId: input.questionPaperId, partsOfSpeechId: record.partsOfSpeechId } };
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -2951,7 +3195,18 @@ export async function bulkRemoveQuestions(
         { id: { in: input.questionIds } },
         { mcqId: { in: input.questionIds } },
         { cqId: { in: input.questionIds } },
+        { csId: { in: input.questionIds } },
+        { pbqId: { in: input.questionIds } },
         { shortAnswerId: { in: input.questionIds } },
+        { paragraphId: { in: input.questionIds } },
+        { amplificationId: { in: input.questionIds } },
+        { letterId: { in: input.questionIds } },
+        { applicationId: { in: input.questionIds } },
+        { summaryId: { in: input.questionIds } },
+        { essenceId: { in: input.questionIds } },
+        { essayId: { in: input.questionIds } },
+        { newsReportId: { in: input.questionIds } },
+        { partsOfSpeechId: { in: input.questionIds } },
       ],
     },
   })
@@ -3120,6 +3375,7 @@ export async function generatePaperSets(
             essenceId: q.essenceId,
             essayId: q.essayId,
             newsReportId: q.newsReportId,
+            partsOfSpeechId: q.partsOfSpeechId,
             distributionId: newDistId,
             sectionId: newSecId,
             orderIndex: globalOrder++,
@@ -3148,6 +3404,7 @@ export async function generatePaperSets(
                 essenceId: alt.essenceId,
                 essayId: alt.essayId,
                 newsReportId: alt.newsReportId,
+                partsOfSpeechId: alt.partsOfSpeechId,
                 distributionId: altDistId,
                 sectionId: newSecId,
                 orderIndex: createdPrimary.orderIndex,

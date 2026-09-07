@@ -1,0 +1,519 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { useTogglePbqActive } from "../services/use-pbq"
+import { toast } from "@workspace/ui/components/sonner"
+import { Button } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import { RenderMath } from "@workspace/ui/components/render-math"
+import "katex/dist/katex.min.css"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+
+export interface PbqItem {
+  id: string
+  context: string
+  questionA: string
+  questionB: string
+  questionC: string
+  questionD: string
+  questionE: string
+  reference: string[]
+  difficulty: string
+  marks?: any
+  popularityCount?: number
+  isActive: boolean
+  createdAt: Date | string
+  updatedAt: Date | string
+  subject: {
+    id: string
+    nameEn: string
+    nameBn: string
+    code?: string | null
+  }
+  academicChapter?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    position?: number
+  } | null
+  chapter?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    position?: number
+  } | null
+  questionType?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    label: string
+    mark: number
+  } | null
+}
+
+interface PbqTableProps {
+  items: PbqItem[]
+  isLoading: boolean
+  isError: boolean
+  onDelete: (id: string, contextSnippet: string) => void
+  onBulkDelete: (selectedIds: string[]) => void
+  currentPage: number
+  itemsPerPage: number
+  totalItems: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  onLimitChange?: (limit: number) => void
+}
+
+export function PbqTable({
+  items,
+  isLoading,
+  isError,
+  onDelete,
+  onBulkDelete,
+  currentPage,
+  itemsPerPage,
+  totalItems,
+  totalPages,
+  onPageChange,
+  onLimitChange,
+}: PbqTableProps) {
+  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
+  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const toggleActiveMutation = useTogglePbqActive()
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(items.map((item) => item.id))
+    } else {
+      setSelectedIds([])
+    }
+  }
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds((prev) => [...prev, id])
+    } else {
+      setSelectedIds((prev) => prev.filter((item) => item !== id))
+    }
+  }
+
+  const handleToggleActive = async (id: string, currentActive: boolean) => {
+    try {
+      await toggleActiveMutation.mutateAsync({
+        id,
+        isActive: !currentActive,
+      })
+      toast.success(!currentActive ? "PBQ activated." : "PBQ deactivated.")
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update PBQ status")
+    }
+  }
+
+  const allSelected =
+    items.length > 0 && items.every((item) => selectedIds.includes(item.id))
+
+  return (
+    <div className="w-full space-y-6">
+      {/* Selection Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={(e) => handleSelectAll(e.target.checked)}
+              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
+            />
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
+              Select All ({items.length})
+            </span>
+          </div>
+
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
+              <span className="font-label-sm text-xs font-semibold text-primary">
+                {selectedIds.length} items selected
+              </span>
+              <Button
+                type="button"
+                onClick={() => onBulkDelete(selectedIds)}
+                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
+              >
+                <span className="material-symbols-outlined text-base">delete</span>
+                <span>Delete Selected</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <span className="material-symbols-outlined animate-spin text-4xl text-primary">
+              progress_activity
+            </span>
+            <span className="font-body-md text-sm font-medium">Loading PBQ question bank...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {isError && !isLoading && (
+        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-4xl">error</span>
+            <span className="font-body-md text-sm font-medium">
+              Error loading PBQ questions. Please try refreshing.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !isError && items.length === 0 && (
+        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <span className="material-symbols-outlined text-5xl text-outline">
+              quiz
+            </span>
+            <p className="font-headline-md text-xl font-bold text-on-surface">
+              No PBQs Found
+            </p>
+            <p className="font-body-md text-sm text-outline max-w-md">
+              Try adjusting filters or add a new passage-based question to the bank.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* CARD VIEW LAYOUT */}
+      {!isLoading && !isError && items.length > 0 && (
+        <div className="grid grid-cols-1 gap-6">
+          {items.map((item, idx) => {
+            const isSelected = selectedIds.includes(item.id)
+            const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+            const chapter = item.academicChapter || item.chapter
+
+            // Mark distribution parsing (default 2 marks each, total 10)
+            const marksA = item.marks?.a ?? 2
+            const marksB = item.marks?.b ?? 2
+            const marksC = item.marks?.c ?? 2
+            const marksD = item.marks?.d ?? 2
+            const marksE = item.marks?.e ?? 2
+            const totalPbqMarks = Number(marksA) + Number(marksB) + Number(marksC) + Number(marksD) + Number(marksE)
+
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
+                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+                )}
+              >
+                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                  {/* Selection Checkbox & Main Info */}
+                  <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => handleSelectOne(item.id, e.target.checked)}
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                    />
+
+                    <div className="flex-1 space-y-4 min-w-0">
+                      {/* Badges Row */}
+                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
+                        {/* Global Index Badge */}
+                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
+                          #{globalIndex}
+                        </span>
+
+                        {/* Subject Badge */}
+                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
+                          {item.subject.nameBn || item.subject.nameEn}
+                        </span>
+
+                        {/* Chapter Badge */}
+                        {chapter && (
+                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
+                            {chapter.nameBn || chapter.nameEn}
+                          </span>
+                        )}
+
+                        {/* Question Type Badge */}
+                        {item.questionType && (
+                          <span className="px-2.5 py-0.5 bg-purple-50 text-purple-700 rounded font-label-sm text-[11px] font-bold border border-purple-100">
+                            {item.questionType.label || item.questionType.nameEn}
+                          </span>
+                        )}
+
+                        {/* Marks Badge */}
+                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
+                          {totalPbqMarks} Marks
+                        </span>
+
+                        {/* Difficulty Badge */}
+                        <span className={cn(
+                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
+                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
+                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
+                        )}>
+                          {item.difficulty}
+                        </span>
+
+                        {/* Active Status Badge Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(item.id, item.isActive)}
+                          className={cn(
+                            "px-2.5 py-0.5 rounded font-label-sm text-xs font-bold transition-all cursor-pointer",
+                            item.isActive
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              : "bg-gray-100 text-gray-600 border border-gray-200"
+                          )}
+                        >
+                          {item.isActive ? "Active" : "Inactive"}
+                        </button>
+                      </div>
+
+                      {/* Reading Passage / Stimulus Context */}
+                      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider">
+                          <span className="material-symbols-outlined text-sm">article</span>
+                          <span>উদ্দীপক / অনুচ্ছেদ (Passage Context):</span>
+                        </div>
+                        <div className={cn(
+                          "text-sm text-on-surface leading-relaxed whitespace-pre-wrap",
+                          /[\u0980-\u09FF]/.test(item.context) && "font-solaiman text-[15px]"
+                        )}>
+                          <RenderMath text={item.context} isMath={true} />
+                        </div>
+                      </div>
+
+                      {/* 5 Sub-Questions Stems: A, B, C, D, E */}
+                      <div className="space-y-3.5 pl-4 border-l-2 border-primary/40 py-1 bg-surface-container-low/30 rounded-r-2xl p-4">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-outline block mb-1">
+                          প্রশ্নের বিষয়বস্তু / Sub-questions:
+                        </span>
+
+                        {/* Question A */}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                              ক
+                            </span>
+                            <span className="text-xs text-outline font-semibold">
+                              Part A [{marksA} {marksA > 1 ? "marks" : "mark"}]
+                            </span>
+                          </div>
+                          <p className={cn(
+                            "text-sm text-on-surface pl-7 font-medium",
+                            /[\u0980-\u09FF]/.test(item.questionA) && "font-solaiman text-[15px]"
+                          )}>
+                            <RenderMath text={item.questionA} isMath={true} />
+                          </p>
+                        </div>
+
+                        {/* Question B */}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                              খ
+                            </span>
+                            <span className="text-xs text-outline font-semibold">
+                              Part B [{marksB} {marksB > 1 ? "marks" : "mark"}]
+                            </span>
+                          </div>
+                          <p className={cn(
+                            "text-sm text-on-surface pl-7 font-medium",
+                            /[\u0980-\u09FF]/.test(item.questionB) && "font-solaiman text-[15px]"
+                          )}>
+                            <RenderMath text={item.questionB} isMath={true} />
+                          </p>
+                        </div>
+
+                        {/* Question C */}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                              গ
+                            </span>
+                            <span className="text-xs text-outline font-semibold">
+                              Part C [{marksC} {marksC > 1 ? "marks" : "mark"}]
+                            </span>
+                          </div>
+                          <p className={cn(
+                            "text-sm text-on-surface pl-7 font-medium",
+                            /[\u0980-\u09FF]/.test(item.questionC) && "font-solaiman text-[15px]"
+                          )}>
+                            <RenderMath text={item.questionC} isMath={true} />
+                          </p>
+                        </div>
+
+                        {/* Question D */}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                              ঘ
+                            </span>
+                            <span className="text-xs text-outline font-semibold">
+                              Part D [{marksD} {marksD > 1 ? "marks" : "mark"}]
+                            </span>
+                          </div>
+                          <p className={cn(
+                            "text-sm text-on-surface pl-7 font-medium",
+                            /[\u0980-\u09FF]/.test(item.questionD) && "font-solaiman text-[15px]"
+                          )}>
+                            <RenderMath text={item.questionD} isMath={true} />
+                          </p>
+                        </div>
+
+                        {/* Question E */}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                              ঙ
+                            </span>
+                            <span className="text-xs text-outline font-semibold">
+                              Part E [{marksE} {marksE > 1 ? "marks" : "mark"}]
+                            </span>
+                          </div>
+                          <p className={cn(
+                            "text-sm text-on-surface pl-7 font-medium",
+                            /[\u0980-\u09FF]/.test(item.questionE) && "font-solaiman text-[15px]"
+                          )}>
+                            <RenderMath text={item.questionE} isMath={true} />
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Reference Tags & ID Footer */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
+                            item.reference.map((ref, rIdx) => (
+                              <span
+                                key={rIdx}
+                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
+                              >
+                                🏷️ {ref}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                          )}
+                        </div>
+
+                        <span className="text-[11px] font-mono text-outline/60">
+                          ID: {item.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions Column */}
+                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
+                    <Link
+                      href={`/pbqs/${item.id}/edit`}
+                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
+                      title="Edit PBQ"
+                    >
+                      <span className="material-symbols-outlined text-xl block">edit</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => onDelete(item.id, item.context || item.questionA)}
+                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
+                      title="Delete PBQ"
+                    >
+                      <span className="material-symbols-outlined text-xl block">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Pagination Footer */}
+      {!isLoading && !isError && totalItems > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
+          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
+              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> questions
+            </p>
+            {onLimitChange && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-outline font-medium">Rows per page:</span>
+                <Select
+                  value={String(itemsPerPage)}
+                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
+                >
+                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
+                    <SelectValue placeholder="Per Page" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
+                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
+                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
+                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
+                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage <= 1}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <Button
+                key={pageNum}
+                variant={currentPage === pageNum ? "default" : "ghost"}
+                onClick={() => onPageChange(pageNum)}
+                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
+                  currentPage === pageNum
+                    ? "bg-primary font-bold text-white hover:bg-primary"
+                    : "hover:bg-surface-container-high text-on-surface"
+                }`}
+              >
+                {pageNum}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

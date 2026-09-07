@@ -4,6 +4,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { MCQBlock } from "../blocks/mcq-block";
 import { CQBlock } from "../blocks/cq-block";
 import { CSBlock } from "../blocks/cs-block";
+import { PBQBlock } from "../blocks/pbq-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
 import { ParagraphBlock } from "../blocks/paragraph-block";
 import { EssenceBlock } from "../blocks/essence-block";
@@ -13,6 +14,7 @@ import { LetterBlock } from "../blocks/letter-block";
 import { ApplicationBlock } from "../blocks/application-block";
 import { NewsReportBlock } from "../blocks/news-report-block";
 import { EssayBlock } from "../blocks/essay-block";
+import { PartsOfSpeechBlock } from "../blocks/parts-of-speech-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
@@ -268,6 +270,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <CQBlock item={block.data.item} />;
     case "question-cs":
       return <CSBlock item={block.data.item} />;
+    case "question-pbq":
+      return <PBQBlock item={block.data.item} />;
     case "question-short":
       return <ShortAnswerBlock item={block.data.item} />;
     case "question-paragraph":
@@ -286,6 +290,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <NewsReportBlock item={block.data.item} />;
     case "question-essay":
       return <EssayBlock item={block.data.item} />;
+    case "question-parts-of-speech":
+      return <PartsOfSpeechBlock item={block.data.item} />;
     case "dist-action":
       return <DistActionBlock blockData={block.data} />;
     case "empty":

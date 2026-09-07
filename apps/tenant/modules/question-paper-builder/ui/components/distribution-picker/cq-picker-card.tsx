@@ -26,11 +26,6 @@ export const CqPickerCard: React.FC<CqPickerCardProps> = ({
       typeLabel="সৃজনশীল (CQ)"
     >
       <div className="flex flex-col gap-3 font-body">
-        {q.context && (
-          <div className="text-xs text-on-surface-variant bg-muted/40 p-3 rounded-xl whitespace-pre-wrap border border-outline-variant">
-            <RenderMath text={q.context} />
-          </div>
-        )}
         <QuestionAttachments attachments={q.attachments} compact />
 
         <div className="space-y-2 mt-1">

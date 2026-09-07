@@ -91,6 +91,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     resolvedCategory = QUESTION_TYPE_CODES.CS;
   } else if (normalized === QUESTION_TYPES.CQ) {
     resolvedCategory = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.PBQ) {
+    resolvedCategory = QUESTION_TYPE_CODES.PBQ;
   } else if (normalized === QUESTION_TYPES.SA) {
     resolvedCategory = QUESTION_TYPE_CODES.SA;
   } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
@@ -109,12 +111,18 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
+    resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     resolvedCategory = QUESTION_TYPE_CODES.MCQ;
   } else {
     // Robust fallback based on distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
+    if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.PBQ;
+    } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
       resolvedCategory = QUESTION_TYPE_CODES.LETTER;
     } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
       resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;

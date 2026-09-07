@@ -231,6 +231,7 @@ export async function saveSubjectQuestionTypes(
         data: questionTypes.map((qt) => ({
           subjectId,
           questionTypeId: qt.questionTypeId,
+          customLabel: qt.customLabel?.trim() || null,
           mark: qt.mark,
           requiredCount: qt.requiredCount,
           totalQuestions: qt.totalQuestions,

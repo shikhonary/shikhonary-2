@@ -52,7 +52,6 @@ const sampleJsonTemplate = `[
     "reference": ["Physics Board 2024"],
     "explanation": "Force equals mass times acceleration.",
     "questionUrl": null,
-    "contextId": null,
     "difficulty": "MEDIUM",
     "year": 2024,
     "source": "Physics Board",
@@ -943,13 +942,11 @@ export function ImportMcqView() {
               /\$[^$\n]+\$/.test(questionText || "") ||
               /\$[^$\n]+\$/.test(item.answer || "") ||
               (Array.isArray(item.options) && item.options.some((opt: any) => /\$[^$\n]+\$/.test(String(opt)))) ||
-              (Array.isArray(item.statements) && item.statements.some((stmt: any) => /\$[^$\n]+\$/.test(String(stmt)))) ||
-              /\$[^$\n]+\$/.test(item.contextId || "")
+              (Array.isArray(item.statements) && item.statements.some((stmt: any) => /\$[^$\n]+\$/.test(String(stmt))))
             ),
           reference: Array.isArray(item.reference) ? item.reference.map(String) : [],
           explanation: item.explanation ? String(item.explanation) : undefined,
           questionUrl: item.questionUrl ? String(item.questionUrl) : undefined,
-          contextId: item.contextId ? String(item.contextId) : undefined,
           context: contextText,
           difficulty: (item.difficulty && typeof item.difficulty === "string" && ["EASY", "MEDIUM", "HARD"].includes(item.difficulty.toUpperCase()))
             ? (item.difficulty.toUpperCase() as any)

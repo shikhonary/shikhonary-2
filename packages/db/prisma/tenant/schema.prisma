@@ -13,7 +13,7 @@ datasource db {
 
 // ── Root entity: one row per question paper ────────────────────
 model QuestionPaper {
-    id          String  @id @default(uuid())
+    id          String  @id @default(cuid())
     title       String
     examName    String
     description String?
@@ -42,8 +42,13 @@ model QuestionPaper {
     total         Float @default(0)
     timeInMinutes Int   @default(0)
 
-    // Logical reference to main.User who created this paper
-    createdBy String?
+    // ── Audit & Versioning ──────────────────────────────────────
+    version     Int       @default(1)
+    createdBy   String?
+    updatedBy   String?
+    publishedAt DateTime?
+    publishedBy String?
+    deletedBy   String?
 
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
@@ -60,6 +65,8 @@ model QuestionPaper {
     @@index([isTemplate])
     @@index([createdAt])
     @@index([classId])
+    @@index([deletedAt])
+    @@index([deletedAt, isTemplate, createdAt])
     @@map("question_paper")
 }
 
@@ -71,7 +78,7 @@ model QuestionPaper {
 //    optionally a section (presentation/layout).
 //
 model QuestionPaperSection {
-    id              String        @id @default(uuid())
+    id              String        @id @default(cuid())
     questionPaperId String
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
@@ -91,11 +98,12 @@ model QuestionPaperSection {
     updatedAt DateTime @updatedAt
 
     @@index([questionPaperId])
+    @@index([questionPaperId, orderIndex])
     @@map("question_paper_section")
 }
 
 model QuestionPaperSubSection {
-    id        String               @id @default(uuid())
+    id        String               @id @default(cuid())
     sectionId String
     section   QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
@@ -120,7 +128,7 @@ model QuestionPaperSubSection {
 
 // ── One row per (paper × subject) ──────────────────────────────
 model QuestionPaperSubject {
-    id              String @id @default(uuid())
+    id              String @id @default(cuid())
     questionPaperId String
 
     // Logical reference to main.AcademicSubject (no @relation — cross-DB)
@@ -137,8 +145,10 @@ model QuestionPaperSubject {
     // The per-question-type breakdown rows live here
     distributions QuestionPaperSubjectMarkDistribution[]
 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
     @@unique([questionPaperId, subjectId])
-    @@index([questionPaperId])
     @@index([subjectId])
     @@map("question_paper_subject")
 }
@@ -150,7 +160,7 @@ model QuestionPaperSubject {
 //    "Essay", "Fill-in-the-Blank", "True/False"
 //
 model QuestionPaperSubjectMarkDistribution {
-    id String @id @default(uuid())
+    id String @id @default(cuid())
 
     // Logical reference to main.QuestionType (no @relation — cross-DB)
     questionTypeId    String
@@ -192,7 +202,7 @@ model QuestionPaperSubjectMarkDistribution {
 }
 
 model QuestionPaperSubSectionDistribution {
-    id             String                                @id @default(uuid())
+    id             String                                @id @default(cuid())
     subSectionId   String
     subSection     QuestionPaperSubSection               @relation(fields: [subSectionId], references: [id], onDelete: Cascade)
     distributionId String
@@ -201,7 +211,6 @@ model QuestionPaperSubSectionDistribution {
     createdAt DateTime @default(now())
 
     @@unique([subSectionId, distributionId])
-    @@index([subSectionId])
     @@index([distributionId])
     @@map("question_paper_sub_section_distribution")
 }
@@ -213,7 +222,7 @@ model QuestionPaperSubSectionDistribution {
 //    (no @relation — cross-DB). Enforced at the service layer.
 //
 model QuestionPaperQuestion {
-    id              String        @id @default(uuid())
+    id              String        @id @default(cuid())
     questionPaperId String
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
@@ -221,6 +230,7 @@ model QuestionPaperQuestion {
     mcqId           String?
     cqId            String?
     csId            String?
+    pbqId           String?
     shortAnswerId   String?
     paragraphId     String?
     amplificationId String?
@@ -230,6 +240,7 @@ model QuestionPaperQuestion {
     essenceId       String?
     essayId         String?
     newsReportId    String?
+    partsOfSpeechId String?
 
     // ── Alternative / OR Question Relationship ─────────────────
     // If null, this is the primary question slot.
@@ -245,7 +256,7 @@ model QuestionPaperQuestion {
 
     // Associate with subject and distribution breakdown
     distributionId String
-    distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+    distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Restrict)
 
     // Optional section grouping (presentation layer)
     sectionId    String?
@@ -253,9 +264,11 @@ model QuestionPaperQuestion {
     subSectionId String?
     subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
-    orderIndex    Int    @default(0)
-    assignedMarks Float? // Override mark for this specific question
-    overrides     Json   @default("{}") // per-question style overrides
+    orderIndex    Int     @default(0)
+    assignedMarks Float?  // Override mark for this specific question
+    overrides     Json    @default("{}") // per-question style overrides
+    addedBy       String?
+    updatedBy     String?
 
     // ── Content snapshot ────────────────────────────────────────
     //    Frozen copy of the question content at publish time.
@@ -270,6 +283,7 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, mcqId])
     @@unique([questionPaperId, cqId])
     @@unique([questionPaperId, csId])
+    @@unique([questionPaperId, pbqId])
     @@unique([questionPaperId, shortAnswerId])
     @@unique([questionPaperId, paragraphId])
     @@unique([questionPaperId, amplificationId])
@@ -279,11 +293,14 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, essenceId])
     @@unique([questionPaperId, essayId])
     @@unique([questionPaperId, newsReportId])
+    @@unique([questionPaperId, partsOfSpeechId])
     @@index([parentQuestionId])
     @@index([questionPaperId])
+    @@index([questionPaperId, parentQuestionId, orderIndex])
     @@index([mcqId])
     @@index([cqId])
     @@index([csId])
+    @@index([pbqId])
     @@index([shortAnswerId])
     @@index([paragraphId])
     @@index([amplificationId])
@@ -293,6 +310,7 @@ model QuestionPaperQuestion {
     @@index([essenceId])
     @@index([essayId])
     @@index([newsReportId])
+    @@index([partsOfSpeechId])
     @@index([distributionId])
     @@index([sectionId])
     @@index([subSectionId])
@@ -305,9 +323,9 @@ model QuestionPaperQuestion {
 //    Enables "undo last AI change", diff views, and accountability.
 //
 model QuestionPaperHistory {
-    id              String        @id @default(uuid())
-    questionPaperId String
-    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+    id              String         @id @default(cuid())
+    questionPaperId String?
+    questionPaper   QuestionPaper? @relation(fields: [questionPaperId], references: [id], onDelete: SetNull)
 
     // What happened
     action String // "CREATED" | "SETTINGS_UPDATED" | "QUESTION_ADDED"
@@ -319,6 +337,8 @@ model QuestionPaperHistory {
     // Who did it
     actorId   String? // Logical ref to main.User (null for system actions)
     actorType String  @default("USER") // "USER" | "AI" | "SYSTEM"
+    ipAddress String?
+    userAgent String?
 
     // What changed — before/after diff
     // e.g. { "field": "settings", "before": {...}, "after": {...} }
@@ -332,6 +352,8 @@ model QuestionPaperHistory {
     createdAt DateTime @default(now())
 
     @@index([questionPaperId])
+    @@index([questionPaperId, createdAt])
+    @@index([actorId])
     @@index([actorType])
     @@index([createdAt])
     @@map("question_paper_history")

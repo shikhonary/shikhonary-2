@@ -13,6 +13,7 @@ import {
 } from "@/modules/question-paper/services/use-question-paper";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { toast } from "@workspace/ui/components/sonner";
+import { RenderPartsOfSpeechContent } from "./parts-of-speech-block";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -139,6 +140,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
     <div className="w-full flex flex-col mt-0">
       {alternatives.map((alt) => {
         const cq = alt.cq;
+        const pbq = alt.pbq;
         const sa = alt.shortAnswer;
         const paragraph = alt.paragraph;
         const essence = alt.essence;
@@ -148,6 +150,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const application = alt.application;
         const newsReport = alt.newsReport;
         const essay = alt.essay;
+        const partsOfSpeech = alt.partsOfSpeech;
         const cs = alt.cs;
         const mcq = alt.mcq;
 
@@ -635,6 +638,105 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 5.1 EXACT PBQ BLOCK REPRESENTATION */}
+              {pbq && (() => {
+                const pbqDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === pbq.questionTypeId ||
+                      d.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") ||
+                      d.questionTypeName?.toLowerCase().includes("pbq")
+                  ) || alt.distribution;
+
+                const rawLabel = pbqDist?.questionTypeLabel || pbq.questionType?.label;
+                const pbqLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                const getSubQuestionMark = (id: string, index: number, defaultMark: number) => {
+                  if (pbq.marks && typeof pbq.marks === "object") {
+                    const keyLower = id.toLowerCase();
+                    if (pbq.marks[keyLower] !== undefined && !isNaN(Number(pbq.marks[keyLower]))) {
+                      return Number(pbq.marks[keyLower]);
+                    }
+                    if (pbq.marks[id] !== undefined && !isNaN(Number(pbq.marks[id]))) {
+                      return Number(pbq.marks[id]);
+                    }
+                  }
+                  return defaultMark;
+                };
+
+                const subQuestions = [
+                  { id: "A", label: "ক", text: pbq.questionA, marks: getSubQuestionMark("A", 0, 2) },
+                  { id: "B", label: "খ", text: pbq.questionB, marks: getSubQuestionMark("B", 1, 2) },
+                  { id: "C", label: "গ", text: pbq.questionC, marks: getSubQuestionMark("C", 2, 2) },
+                  { id: "D", label: "ঘ", text: pbq.questionD, marks: getSubQuestionMark("D", 3, 2) },
+                  { id: "E", label: "ঙ", text: pbq.questionE, marks: getSubQuestionMark("E", 4, 2) },
+                ].filter((sq) => sq.text);
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {pbqLabel && (
+                      <div
+                        className="font-bold ml-[0px] mb-0.5 flex items-baseline gap-1"
+                        style={{
+                          fontSize: questionStyle.fontSize,
+                          fontFamily: questionStyle.fontFamily,
+                        }}
+                      >
+                        {renderNumberSpacer()}
+                        <span>{pbqLabel}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2 items-start w-full">
+                      {!pbqLabel && renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        {pbq.context && (
+                          <div
+                            className="m-0 text-foreground whitespace-pre-wrap w-full mb-1 leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={pbq.context} />
+                          </div>
+                        )}
+                        {subQuestions.length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {subQuestions.map((sq, idx) => (
+                              <div key={idx} className="flex gap-2 items-start w-full">
+                                {renderSubQuestionLabel(sq.label)}
+                                <div
+                                  className="m-0 w-full flex-1 min-w-0"
+                                  style={{
+                                    fontSize: questionStyle.fontSize,
+                                    fontFamily: questionStyle.fontFamily,
+                                    lineHeight: questionStyle.lineHeight,
+                                  }}
+                                >
+                                  <RenderMath text={sq.text} />
+                                </div>
+                                <span
+                                  className="font-bold text-sm text-[12px] ml-2 shrink-0"
+                                  style={{
+                                    fontSize: questionStyle.fontSize,
+                                    fontFamily: questionStyle.fontFamily,
+                                  }}
+                                >
+                                  {toBengaliDigits(sq.marks)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 6. EXACT SHORT ANSWER BLOCK REPRESENTATION */}
               {sa && (() => {
                 const saDist =
@@ -688,8 +790,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.5 EXACT PARTS OF SPEECH BLOCK REPRESENTATION */}
+              {partsOfSpeech && (() => {
+                const posDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === partsOfSpeech.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("parts of speech") ||
+                      d.questionTypeName?.toLowerCase().includes("part of speech")
+                  ) || alt.distribution;
+
+                const rawLabel = posDist?.questionTypeLabel || partsOfSpeech.questionType?.label;
+                const posLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {posLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{posLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderPartsOfSpeechContent text={partsOfSpeech.content || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !sa && !newsReport && !essay && (
+              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

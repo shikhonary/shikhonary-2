@@ -271,3 +271,39 @@ export type {
   ImportEssaysInput,
 } from "./routers/essay/essay.schema"
 
+export type {
+  ListPbqsInput,
+  PbqStatsInput,
+  GetPbqInput,
+  CreatePbqInput,
+  UpdatePbqInput,
+  DeletePbqInput,
+  BulkDeletePbqsInput,
+  TogglePbqActiveInput,
+  ImportPbqsInput,
+} from "./routers/pbq/pbq.schema"
+
+export type {
+  ListPartsOfSpeechInput,
+  PartsOfSpeechStatsInput,
+  GetPartsOfSpeechInput,
+  CreatePartsOfSpeechInput,
+  UpdatePartsOfSpeechInput,
+  DeletePartsOfSpeechInput,
+  BulkDeletePartsOfSpeechInput,
+  ImportPartsOfSpeechInput,
+} from "./routers/parts-of-speech/parts-of-speech.schema"
+
+export type {
+  ListFillInTheBlanksWithCluesInput,
+  FillInTheBlanksWithCluesStatsInput,
+  GetFillInTheBlanksWithCluesInput,
+  CreateFillInTheBlanksWithCluesInput,
+  UpdateFillInTheBlanksWithCluesInput,
+  DeleteFillInTheBlanksWithCluesInput,
+  BulkDeleteFillInTheBlanksWithCluesInput,
+  ImportFillInTheBlanksWithCluesInput,
+} from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.schema"
+
+
+

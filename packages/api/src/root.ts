@@ -27,6 +27,7 @@ import { academicYearRouter } from "./routers/academic-year/academic-year.router
 import { questionTypeRouter } from "./routers/question-type/question-type.router"
 import { mcqRouter } from "./routers/mcq/mcq.router"
 import { cqRouter } from "./routers/cq/cq.router"
+import { pbqRouter } from "./routers/pbq/pbq.router"
 import { csRouter } from "./routers/cs/cs.router"
 import { shortAnswerRouter } from "./routers/short-answer/short-answer.router"
 import { subjectStructureRouter } from "./routers/subject-structure/subject-structure.router"
@@ -39,6 +40,8 @@ import { essenceRouter } from "./routers/essence/essence.router"
 import { thoughtExpansionRouter } from "./routers/thought-expansion/thought-expansion.router"
 import { newsReportRouter } from "./routers/news-report/news-report.router"
 import { essayRouter } from "./routers/essay/essay.router"
+import { partsOfSpeechRouter } from "./routers/parts-of-speech/parts-of-speech.router"
+import { fillInTheBlanksWithCluesRouter } from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -60,6 +63,7 @@ export const appRouter = createTRPCRouter({
   questionType: questionTypeRouter,
   mcq: mcqRouter,
   cq: cqRouter,
+  pbq: pbqRouter,
   cs: csRouter,
   shortAnswer: shortAnswerRouter,
   subjectStructure: subjectStructureRouter,
@@ -72,6 +76,8 @@ export const appRouter = createTRPCRouter({
   thoughtExpansion: thoughtExpansionRouter,
   newsReport: newsReportRouter,
   essay: essayRouter,
+  partsOfSpeech: partsOfSpeechRouter,
+  fillInTheBlanksWithClues: fillInTheBlanksWithCluesRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

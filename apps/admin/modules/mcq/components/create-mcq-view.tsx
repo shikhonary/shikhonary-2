@@ -37,7 +37,6 @@ const createMcqFormSchema = z.object({
   referenceText: z.string().optional(),
   explanation: z.string().optional(),
   questionUrl: z.string().optional(),
-  contextId: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   year: z.string().optional(),
   source: z.string().optional(),
@@ -83,7 +82,6 @@ export function CreateMcqView() {
       referenceText: "",
       explanation: "",
       questionUrl: "",
-      contextId: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       year: "",
       source: "",
@@ -144,7 +142,6 @@ export function CreateMcqView() {
         reference: referenceArray,
         explanation: data.explanation?.trim() || null,
         questionUrl: data.questionUrl?.trim() || null,
-        contextId: data.contextId?.trim() || null,
         difficulty: data.difficulty,
         year: parsedYear,
         source: data.source?.trim() || null,
@@ -710,23 +707,6 @@ export function CreateMcqView() {
                   />
                   {errors.year && (
                     <p className="text-xs text-error">{errors.year.message}</p>
-                  )}
-                </div>
-
-                {/* Stimulus Context ID */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Stimulus / Passage Context ID (Optional)
-                  </Label>
-                  <Input
-                    type="text"
-                    disabled={isSubmitting}
-                    placeholder="Enter context/passage identifier..."
-                    {...register("contextId")}
-                    className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                  />
-                  {errors.contextId && (
-                    <p className="text-xs text-error">{errors.contextId.message}</p>
                   )}
                 </div>
 

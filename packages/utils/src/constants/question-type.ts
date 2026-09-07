@@ -7,6 +7,7 @@ export const QUESTION_TYPES = {
   CQ: "CQ",
   SA: "SA",
   CS: "CS",
+  PBQ: "Passage Based",
   PARAGRAPH: "Paragraph",
   LETTER: "Letter",
   APPLICATION: "Application",
@@ -15,6 +16,8 @@ export const QUESTION_TYPES = {
   THOUGHT_EXPANSION: "Thought Expansion",
   NEWS_REPORT: "News report",
   ESSAY: "Essay",
+  PARTS_OF_SPEECH: "Parts of Speech",
+  FILL_IN_THE_BLANKS_WITH_CLUES: "Fill in the Blanks with Clues",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -24,6 +27,7 @@ export const QUESTION_TYPE_CODES = {
   CQ: "CQ",
   SA: "SA",
   CS: "CS",
+  PBQ: "PBQ",
   PARAGRAPH: "PARAGRAPH",
   LETTER: "LETTER",
   APPLICATION: "APPLICATION",
@@ -32,6 +36,8 @@ export const QUESTION_TYPE_CODES = {
   AMPLIFICATION: "AMPLIFICATION",
   NEWS_REPORT: "NEWS_REPORT",
   ESSAY: "ESSAY",
+  PARTS_OF_SPEECH: "PARTS_OF_SPEECH",
+  FILL_IN_THE_BLANKS_WITH_CLUES: "FILL_IN_THE_BLANKS_WITH_CLUES",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -72,6 +78,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.CS,
     defaultMark: 10,
     defaultPosition: 2,
+  },
+  [QUESTION_TYPES.PBQ]: {
+    nameEn: QUESTION_TYPES.PBQ,
+    nameBn: "অনুচ্ছেদভিত্তিক প্রশ্ন",
+    code: QUESTION_TYPE_CODES.PBQ,
+    defaultMark: 10,
+    defaultPosition: 3,
   },
   [QUESTION_TYPES.PARAGRAPH]: {
     nameEn: QUESTION_TYPES.PARAGRAPH,
@@ -129,6 +142,20 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     defaultMark: 20,
     defaultPosition: 8,
   },
+  [QUESTION_TYPES.PARTS_OF_SPEECH]: {
+    nameEn: QUESTION_TYPES.PARTS_OF_SPEECH,
+    nameBn: "পদ নির্ণয়",
+    code: QUESTION_TYPE_CODES.PARTS_OF_SPEECH,
+    defaultMark: 5,
+    defaultPosition: 9,
+  },
+  [QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES]: {
+    nameEn: QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES,
+    nameBn: "শূন্যস্থান পূরণ (ক্লুসহ)",
+    code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES,
+    defaultMark: 5,
+    defaultPosition: 10,
+  },
 } as const
 
 export const QUESTION_TYPE_OPTIONS = Object.values(QUESTION_TYPE_MAP).map((qt) => ({
@@ -180,6 +207,9 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   if (lower === "cs" || lower.includes("creative scenario") || lower.includes("সহপাঠ")) {
     return QUESTION_TYPES.CS
   }
+  if (lower === "pbq" || lower.includes("passage based") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
+    return QUESTION_TYPES.PBQ
+  }
   if (lower === "paragraph" || lower.includes("অনুচ্ছেদ")) {
     return QUESTION_TYPES.PARAGRAPH
   }
@@ -203,6 +233,22 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   }
   if (lower === "essay" || lower.includes("রচনা")) {
     return QUESTION_TYPES.ESSAY
+  }
+  if (lower === "parts of speech" || lower === "parts_of_speech" || lower.includes("parts of speech") || lower.includes("পদ নির্ণয়") || lower.includes("পদ নির্নয়")) {
+    return QUESTION_TYPES.PARTS_OF_SPEECH
+  }
+  if (
+    lower === "fill in the blanks with clues" ||
+    lower.includes("fill in the blanks with clues") ||
+    lower.includes("with clues") ||
+    lower.includes("words from the box") ||
+    lower.includes("from the box") ||
+    lower.includes("cloze test with clues") ||
+    lower.includes("gap filling with clues") ||
+    lower.includes("শূন্যস্থান পূরণ (ক্লুসহ)") ||
+    lower.includes("ক্লুসহ")
+  ) {
+    return QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES
   }
 
   return null

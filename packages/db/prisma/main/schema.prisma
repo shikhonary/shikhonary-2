@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String?  @unique
+  id        String    @id @default(cuid())
+  email     String?   @unique
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   emailVerified       Boolean        @default(false)
   image               String?
@@ -24,8 +25,45 @@ model User {
   memberships         TenantMember[]
   tenants             Tenant[]       @relation("TenantOwner")
 
-  @@index([email])
-  @@index([phoneNumber])
+  // ── Authoring Relations ──
+  createdMcqs              Mcq[]              @relation("McqCreator")
+  updatedMcqs              Mcq[]              @relation("McqUpdater")
+  createdCqs               Cq[]               @relation("CqCreator")
+  updatedCqs               Cq[]               @relation("CqUpdater")
+  createdPbqs              PBQ[]              @relation("PbqCreator")
+  updatedPbqs              PBQ[]              @relation("PbqUpdater")
+  createdShortAnswers      ShortAnswer[]      @relation("ShortAnswerCreator")
+  updatedShortAnswers      ShortAnswer[]      @relation("ShortAnswerUpdater")
+  createdParagraphs        Paragraph[]        @relation("ParagraphCreator")
+  updatedParagraphs        Paragraph[]        @relation("ParagraphUpdater")
+  createdAmplifications    Amplification[]    @relation("AmplificationCreator")
+  updatedAmplifications    Amplification[]    @relation("AmplificationUpdater")
+  createdCs                CS[]               @relation("CsCreator")
+  updatedCs                CS[]               @relation("CsUpdater")
+  createdLetters           Letter[]           @relation("LetterCreator")
+  updatedLetters           Letter[]           @relation("LetterUpdater")
+  createdApplications      Application[]      @relation("ApplicationCreator")
+  updatedApplications      Application[]      @relation("ApplicationUpdater")
+  createdSummaries         Summary[]          @relation("SummaryCreator")
+  updatedSummaries         Summary[]          @relation("SummaryUpdater")
+  createdEssences          Essence[]          @relation("EssenceCreator")
+  updatedEssences          Essence[]          @relation("EssenceUpdater")
+  createdThoughtExpansions ThoughtExpansion[] @relation("ThoughtExpansionCreator")
+  updatedThoughtExpansions ThoughtExpansion[] @relation("ThoughtExpansionUpdater")
+  createdNewsReports       NewsReport[]       @relation("NewsReportCreator")
+  updatedNewsReports       NewsReport[]       @relation("NewsReportUpdater")
+  createdEssays            Essay[]            @relation("EssayCreator")
+  updatedEssays            Essay[]            @relation("EssayUpdater")
+  createdPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechCreator")
+  updatedPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechUpdater")
+  createdFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesCreator")
+  updatedFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesUpdater")
+
+  // ── Moderation / Reports ──
+  reportedQuestions QuestionReport[] @relation("ReportedQuestions")
+  resolvedReports   QuestionReport[] @relation("ResolvedReports")
+
+  @@index([deletedAt])
   @@map("user")
 }
 
@@ -42,6 +80,7 @@ model Session {
 
   @@unique([token])
   @@index([userId])
+  @@index([expiresAt])
   @@map("session")
 }
 
@@ -61,6 +100,7 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@unique([providerId, accountId])
   @@index([userId])
   @@map("account")
 }
@@ -74,6 +114,7 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@index([identifier])
+  @@index([expiresAt])
   @@map("verification")
 }
 
@@ -181,9 +222,29 @@ model Tenant {
   invitations        TenantInvitation[]
   creditTransactions CreditTransaction[]
   fiscalYears        FiscalYear[]
+  invoices           Invoice[]
 
-  @@index([slug])
+  // ── Question Bank Resources ──────────────────────────────
+  mcqs              Mcq[]
+  cqs               Cq[]
+  shortAnswers      ShortAnswer[]
+  paragraphs        Paragraph[]
+  amplifications    Amplification[]
+  cs                CS[]
+  letters           Letter[]
+  applications      Application[]
+  summaries         Summary[]
+  essences          Essence[]
+  thoughtExpansions ThoughtExpansion[]
+  newsReports       NewsReport[]
+  essays            Essay[]
+  pbqs              PBQ[]
+  partsOfSpeech            PartsOfSpeech[]
+  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+
   @@index([isActive])
+  @@index([deletedAt, isActive])
+  @@index([createdById])
   @@index([currentFiscalYearId])
   @@index([divisionId])
   @@index([districtId])
@@ -206,7 +267,6 @@ model TenantMember {
 
   @@unique([userId, tenantId])
   @@index([tenantId])
-  @@index([userId])
   @@map("tenant_member")
 }
 
@@ -229,10 +289,8 @@ model TenantInvitation {
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@unique([email, tenantId])
-  @@index([email])
   @@index([status])
   @@index([tenantId])
-  @@index([token])
   @@map("tenant_invitation")
 }
 
@@ -315,14 +373,13 @@ model Subscription {
   @@index([currentPeriodEnd])
   @@index([planId])
   @@index([status])
-  @@index([tenantId])
   @@map("subscription")
 }
 
 model CreditTransaction {
   id       String @id @default(cuid())
   tenantId String
-  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
 
   type    String // SUBSCRIPTION_REFRESH | PURCHASE | USAGE | REFUND | ADMIN_ADJUSTMENT
   amount  Int // positive for credits in, negative for credits out
@@ -333,6 +390,7 @@ model CreditTransaction {
   createdAt DateTime @default(now())
 
   @@index([tenantId])
+  @@index([tenantId, createdAt])
   @@index([type])
   @@index([createdAt])
   @@map("credit_transaction")
@@ -355,12 +413,14 @@ model SubscriptionHistory {
 
   @@index([createdAt])
   @@index([subscriptionId])
+  @@index([subscriptionId, createdAt])
   @@map("subscription_history")
 }
 
 model Invoice {
   id            String @id @default(cuid())
   tenantId      String
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   invoiceNumber String @unique
   amount        Int
   currency      String @default("BDT")
@@ -380,13 +440,14 @@ model Invoice {
   description String?
   notes       String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([dueDate])
-  @@index([invoiceNumber])
   @@index([status])
   @@index([tenantId])
+  @@index([deletedAt])
   @@map("invoice")
 }
 
@@ -405,6 +466,7 @@ model FiscalYear {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([tenantId, year])
   @@index([tenantId])
   @@index([isCurrent])
   @@map("fiscal_year")
@@ -427,7 +489,7 @@ model District {
   nameBn     String
   url        String?
   divisionId String
-  division   Division  @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  division   Division  @relation(fields: [divisionId], references: [id], onDelete: Restrict)
   upazilas   Upazila[]
   tenants    Tenant[]
 
@@ -441,7 +503,7 @@ model Upazila {
   nameBn     String
   url        String?
   districtId String
-  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  district   District @relation(fields: [districtId], references: [id], onDelete: Restrict)
   unions     Union[]
   posts      Post[]
   tenants    Tenant[]
@@ -456,7 +518,7 @@ model Union {
   nameBn    String
   url       String?
   upazilaId String
-  upazila   Upazila  @relation(fields: [upazilaId], references: [id], onDelete: Cascade)
+  upazila   Upazila  @relation(fields: [upazilaId], references: [id], onDelete: Restrict)
   tenants   Tenant[]
 
   @@index([upazilaId])
@@ -469,9 +531,10 @@ model Post {
   postOfficeBn String?
   postCode     String
   upazilaId    String
-  upazila      Upazila @relation(fields: [upazilaId], references: [id], onDelete: Cascade)
+  upazila      Upazila @relation(fields: [upazilaId], references: [id], onDelete: Restrict)
 
   @@index([upazilaId])
+  @@index([postCode])
   @@map("post")
 }
 
@@ -521,7 +584,7 @@ model AcademicSubject {
   isActive Boolean @default(true)
 
   academicYearId String?
-  academicYear   AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  academicYear   AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -543,9 +606,13 @@ model AcademicSubject {
   thoughtExpansions    ThoughtExpansion[]
   newsReports          NewsReport[]
   essays               Essay[]
+  pbqs                     PBQ[]
+  partsOfSpeech            PartsOfSpeech[]
+  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
 
   @@index([isActive])
   @@index([academicYearId])
+  @@index([code])
   @@map("academic_subject")
 }
 
@@ -560,7 +627,6 @@ model AcademicClassSubject {
   academicSubject AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([classId, subjectId])
-  @@index([classId])
   @@index([subjectId])
   @@map("academic_class_subject")
 }
@@ -576,18 +642,22 @@ model AcademicChapter {
   subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
   academicYearId String?
-  academicYear   AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  academicYear   AcademicYear? @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   mcqs           Mcq[]
   cqs            Cq[]
+  pbqs           PBQ[]
   shortAnswers   ShortAnswer[]
   paragraphs     Paragraph[]
   amplifications Amplification[]
-  cs             CS[]
+  cs                       CS[]
+  partsOfSpeech            PartsOfSpeech[]
+  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
 
+  @@unique([subjectId, position])
   @@index([isActive])
   @@index([subjectId])
   @@index([academicYearId])
@@ -600,7 +670,7 @@ model AcademicChapter {
 
 model QuestionType {
   id            String  @id @default(cuid())
-  nameEn        String
+  nameEn        String  @unique
   nameBn        String
   label         String?
   mark          Float
@@ -627,6 +697,9 @@ model QuestionType {
   thoughtExpansions ThoughtExpansion[]
   newsReports       NewsReport[]
   essays            Essay[]
+  pbqs                     PBQ[]
+  partsOfSpeech            PartsOfSpeech[]
+  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
 
   @@index([label])
   @@index([isActive])
@@ -640,10 +713,11 @@ model SubjectQuestionType {
   sectionId      String?
   subSectionId   String?
 
+  customLabel      String?
   mark             Float
   markDistribution Json?
-  totalQuestions   Int   @default(0)
-  requiredCount    Int   @default(0)
+  totalQuestions   Int     @default(0)
+  requiredCount    Int     @default(0)
 
   subject      AcademicSubject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   questionType QuestionType               @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
@@ -707,13 +781,10 @@ model Mcq {
   reference   String[] @default([])
   explanation String?
   questionUrl String?
-  contextId   String?
 
   // ── Enrichment Fields ──
-  difficulty      String?
-  year            Int?
-  source          String?
-  popularityCount Int     @default(0)
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
 
   // ── Academic Hierarchy (required, Restrict delete) ──
   subjectId String
@@ -725,19 +796,35 @@ model Mcq {
   questionTypeId String?
   questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("McqCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("McqUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
   isActive Boolean @default(true)
 
   // ── Child Relations ──
   attachments QuestionAttachment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  @@index([chapterId])
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([chapterId, type])
   @@index([isMath])
   @@index([subjectId, chapterId])
-  @@index([subjectId])
   @@index([subjectId, type])
   @@index([type])
   @@index([difficulty])
@@ -754,11 +841,9 @@ model Cq {
   reference String[] @default([])
 
   // ── Enrichment Fields ──
-  difficulty      String  @default("MEDIUM")
-  year            Int?
-  source          String?
+  difficulty      String @default("MEDIUM")
   marks           Json?
-  popularityCount Int     @default(0)
+  popularityCount Int    @default(0)
 
   // ── Academic Hierarchy ──
   subjectId String
@@ -770,15 +855,34 @@ model Cq {
   questionTypeId String?
   questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("CqCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("CqUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
   isActive Boolean @default(true)
 
   // ── Child Relations ──
   attachments QuestionAttachment[]
   answer      CqAnswer?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId, chapterId])
   @@index([chapterId])
   @@index([subjectId])
   @@index([difficulty])
@@ -831,6 +935,61 @@ model CqAnswer {
   @@map("cq_answer")
 }
 
+model PBQ {
+  id        String   @id @default(cuid())
+  questionA String
+  questionB String
+  questionC String
+  questionD String
+  questionE String
+  context   String
+  reference String[] @default([])
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  marks           Json?
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("PbqCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("PbqUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([academicChapterId])
+  @@index([difficulty])
+  @@map("pbq")
+}
+
 model ShortAnswer {
   id        String   @id @default(cuid())
   question  String
@@ -838,10 +997,8 @@ model ShortAnswer {
   reference String[] @default([])
 
   // ── Enrichment Fields ──
-  difficulty      String  @default("MEDIUM")
-  year            Int?
-  source          String?
-  popularityCount Int     @default(0)
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
 
   // ── Academic Hierarchy ──
   subjectId String
@@ -853,14 +1010,33 @@ model ShortAnswer {
   questionTypeId String?
   questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ShortAnswerCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("ShortAnswerUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
   isActive Boolean @default(true)
 
   // ── Child Relations ──
   attachments QuestionAttachment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId, chapterId])
   @@index([chapterId])
   @@index([subjectId])
   @@index([difficulty])
@@ -876,18 +1052,38 @@ model Paragraph {
   popularityCount Int    @default(0)
 
   subjectId String
-  chapterId String?
-  subject   AcademicSubject  @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
   // ── Question Type (required) ──
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ParagraphCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
-  @@index([chapterId])
+  updatedById String?
+  updater     User?   @relation("ParagraphUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+  academicChapterId String?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
   @@index([subjectId])
   @@index([difficulty])
   @@map("paragraph")
@@ -902,18 +1098,38 @@ model Amplification {
   popularityCount Int    @default(0)
 
   subjectId String
-  chapterId String?
-  subject   AcademicSubject  @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-  chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
   // ── Question Type (required) ──
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("AmplificationCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
-  @@index([chapterId])
+  updatedById String?
+  updater     User?   @relation("AmplificationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+  academicChapterId String?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
   @@index([subjectId])
   @@index([difficulty])
   @@map("amplification")
@@ -939,11 +1155,30 @@ model CS {
   questionTypeId String?
   questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("CsCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("CsUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
   isActive Boolean @default(true)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId, chapterId])
   @@index([chapterId])
   @@index([subjectId])
   @@index([difficulty])
@@ -965,9 +1200,29 @@ model Letter {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("LetterCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("LetterUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("letter")
@@ -988,9 +1243,29 @@ model Application {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ApplicationCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("ApplicationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("application")
@@ -1011,9 +1286,29 @@ model Summary {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("SummaryCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("SummaryUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("summary")
@@ -1034,9 +1329,29 @@ model Essence {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("EssenceCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("EssenceUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("essence")
@@ -1057,9 +1372,29 @@ model ThoughtExpansion {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ThoughtExpansionCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("ThoughtExpansionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("thought_expansion")
@@ -1080,9 +1415,29 @@ model NewsReport {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("NewsReportCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("NewsReportUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("news_report")
@@ -1103,12 +1458,127 @@ model Essay {
   questionTypeId String
   questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("EssayCreator", fields: [createdById], references: [id], onDelete: SetNull)
 
+  updatedById String?
+  updater     User?   @relation("EssayUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
   @@index([subjectId])
   @@index([difficulty])
   @@map("essay")
+}
+
+model PartsOfSpeech {
+  id        String   @id @default(cuid())
+  content   String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("PartsOfSpeechCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("PartsOfSpeechUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("parts_of_speech")
+}
+
+model FillInTheBlanksWithClues {
+  id        String   @id @default(cuid())
+  content   String
+  clues     String[] @default([])
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("FillInTheBlanksWithCluesCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("FillInTheBlanksWithCluesUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("fill_in_the_blanks_with_clues")
 }
 
 model QuestionReport {
@@ -1121,10 +1591,19 @@ model QuestionReport {
   status       String  @default("PENDING")
   resolvedNote String?
 
+  reportedById String?
+  reporter     User?   @relation("ReportedQuestions", fields: [reportedById], references: [id], onDelete: SetNull)
+
+  resolvedById String?
+  resolver     User?     @relation("ResolvedReports", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolvedAt   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([entityType, entityId])
   @@index([status])
+  @@index([reportedById])
+  @@index([resolvedById])
   @@map("question_report")
 }

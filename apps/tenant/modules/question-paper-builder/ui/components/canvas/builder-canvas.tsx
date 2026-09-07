@@ -197,6 +197,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let applicationIdx = 0;
         let newsReportIdx = 0;
         let essayIdx = 0;
+        let partsOfSpeechIdx = 0;
+        let pbqIdx = 0;
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
         const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
@@ -206,6 +208,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalApplications = questions.filter((q: any) => q.application).length;
         const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
         const totalEssays = questions.filter((q: any) => q.essay).length;
+        const totalPartsOfSpeech = questions.filter((q: any) => q.partsOfSpeech).length;
+        const totalPbqs = questions.filter((q: any) => q.pbq).length;
 
         questions.forEach((q: any, idx: number) => {
           if (renderedQuestionIds.has(q.id)) return;
@@ -218,27 +222,46 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             let contextInstruction = "";
 
             const currMcq = q.mcq as any;
-            const currText = currMcq?.questionContext?.text || currMcq?.context;
+            const isCombined = currMcq?.type === "COMBINED";
 
-            if (idx > 0 && questions[idx - 1]?.mcq) {
+            const getStimulusKey = (mcqItem: any) => {
+              if (!mcqItem) return null;
+              if (mcqItem.questionContext?.text) return `ctx:${mcqItem.questionContext.text.trim()}`;
+              if (mcqItem.context) return `ctx:${mcqItem.context.trim()}`;
+              if (Array.isArray(mcqItem.attachments) && mcqItem.attachments.length > 0) {
+                const attSig = mcqItem.attachments.map((a: any) => 
+                  `${a.type || ""}_${a.url || ""}_${a.caption || ""}_${a.content || ""}_${JSON.stringify(a.table || "")}`
+                ).join("|");
+                return `att:${attSig}`;
+              }
+              return null;
+            };
+
+            const currStimulusKey = isCombined ? getStimulusKey(currMcq) : null;
+
+            if (isCombined && idx > 0 && questions[idx - 1]?.mcq?.type === "COMBINED") {
               const prevMcq = questions[idx - 1]?.mcq as any;
-              const prevText = prevMcq?.questionContext?.text || prevMcq?.context;
-              if (currText && prevText === currText) {
+              const prevStimulusKey = getStimulusKey(prevMcq);
+              if (currStimulusKey && prevStimulusKey === currStimulusKey) {
                 hideContext = true;
               }
             }
 
-            if (!hideContext && currText) {
+            if (isCombined && !hideContext) {
               let sharedCount = 1;
-              for (let j = idx + 1; j < questions.length; j++) {
-                const nextMcq = questions[j]?.mcq as any;
-                const nextText = nextMcq?.questionContext?.text || nextMcq?.context;
-                if (nextText && nextText === currText) {
-                  sharedCount++;
-                } else {
-                  break;
+              if (currStimulusKey) {
+                for (let j = idx + 1; j < questions.length; j++) {
+                  const nextMcq = questions[j]?.mcq as any;
+                  if (nextMcq?.type !== "COMBINED") break;
+                  const nextStimulusKey = getStimulusKey(nextMcq);
+                  if (nextStimulusKey && nextStimulusKey === currStimulusKey) {
+                    sharedCount++;
+                  } else {
+                    break;
+                  }
                 }
               }
+
               const startNumBn = toBengaliDigits(idx + 1);
               if (sharedCount === 1) {
                 contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} নং প্রশ্নের উত্তর দাও:`;
@@ -325,6 +348,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               },
               gap: 4
             });
+          }
+          if (q.pbq) {
+            if (pbqIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-pbq",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "PBQ",
+                  data: q.pbq,
+                  orderIndex: pbqIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPbq: pbqIdx === 0,
+                  totalQuestions: totalPbqs,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: pbqIdx === totalPbqs - 1 ? 4 : 0
+            });
+            pbqIdx++;
           }
           if (q.shortAnswer) {
             if (shortAnswerIdx === 0) {
@@ -640,6 +698,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: essayIdx === totalEssays - 1 ? 4 : 0,
             });
             essayIdx++;
+          }
+          if (q.partsOfSpeech) {
+            if (partsOfSpeechIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-parts-of-speech",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "PARTS_OF_SPEECH",
+                  data: q.partsOfSpeech,
+                  orderIndex: partsOfSpeechIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPartsOfSpeech: partsOfSpeechIdx === 0,
+                  totalQuestions: totalPartsOfSpeech,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Read the following text and identify the parts of speech of the underlined words:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: partsOfSpeechIdx === totalPartsOfSpeech - 1 ? 4 : 0,
+            });
+            partsOfSpeechIdx++;
           }
         });
 

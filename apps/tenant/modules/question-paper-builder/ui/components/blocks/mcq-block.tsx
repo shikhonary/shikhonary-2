@@ -194,28 +194,50 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
         </button>
       </div>
 
-      {!hideContext && data.questionContext?.text && (
-        <div className="flex gap-2">
-          <span className="font-semibold shrink-0 opacity-0 select-none pointer-events-none" aria-hidden="true">
-            {toBengaliDigits(item.orderIndex + 1)}.
+      {/* Top Banner & Stimulus: ONLY for COMBINED questions */}
+      {data.type === "COMBINED" && !hideContext && (
+        <div className="flex items-start gap-2 w-full pt-1.5 mb-0.5">
+          <span
+            className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+            style={{
+              fontSize: questionStyle.fontSize,
+              fontFamily: questionStyle.fontFamily,
+            }}
+            aria-hidden="true"
+          >
+            {toBengaliDigits(item.orderIndex + 1)}।
           </span>
           <div className="flex-1 w-full min-w-0">
             {contextInstruction && (
-              <div className="font-bold">{contextInstruction}</div>
+              <div className="font-bold text-xs mb-0.5 leading-snug">
+                {contextInstruction}
+              </div>
             )}
-            <div className="italic opacity-80 whitespace-pre-wrap w-full">
-              <EditableItem 
-                content={<RenderMath text={data.questionContext.text} />}
-                itemKey={`${item.id}-context`}
-                defaultStyle={contextStyle}
-              />
-            </div>
+            {data.questionContext?.text && (
+              <div className="italic opacity-80 whitespace-pre-wrap w-full mb-0.5">
+                <EditableItem 
+                  content={<RenderMath text={data.questionContext.text} />}
+                  itemKey={`${item.id}-context`}
+                  defaultStyle={contextStyle}
+                />
+              </div>
+            )}
+            {/* Shared Attachments for COMBINED questions */}
+            <QuestionAttachments attachments={data.attachments} />
           </div>
         </div>
       )}
 
-      <div className="flex gap-2">
-        <span className="font-semibold shrink-0">{toBengaliDigits(item.orderIndex + 1)}.</span>
+      <div className="flex items-start gap-2">
+        <span
+          className="font-bold shrink-0 min-w-[1.8em]"
+          style={{
+            fontSize: questionStyle.fontSize,
+            fontFamily: questionStyle.fontFamily,
+          }}
+        >
+          {toBengaliDigits(item.orderIndex + 1)}।
+        </span>
         <div className="flex-1 w-full min-w-0">
           <div className="font-bold w-full">
             <EditableItem 
@@ -225,9 +247,11 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
             />
           </div>
 
-          {/* Attachments */}
-          <QuestionAttachments attachments={data.attachments} />
-          
+          {/* Attachments for SINGLE and MULTIPLE questions rendered directly below question */}
+          {data.type !== "COMBINED" && Array.isArray(data.attachments) && data.attachments.length > 0 && (
+            <QuestionAttachments attachments={data.attachments} />
+          )}
+              
           {data.statements && data.statements.length > 0 && (
             <>
               <div>

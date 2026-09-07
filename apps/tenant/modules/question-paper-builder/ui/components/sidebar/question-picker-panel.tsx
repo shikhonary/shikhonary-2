@@ -52,6 +52,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.CS;
   } else if (normalized === QUESTION_TYPES.CQ) {
     category = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.PBQ) {
+    category = QUESTION_TYPE_CODES.PBQ;
   } else if (normalized === QUESTION_TYPES.SA) {
     category = QUESTION_TYPE_CODES.SA;
   } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
@@ -70,11 +72,17 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
+    category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     category = QUESTION_TYPE_CODES.MCQ;
   } else {
     const lower = rawName.toLowerCase();
-    if (lower.includes("essence") || lower.includes("সারমর্ম")) {
+    if (lower.includes("parts of speech") || lower.includes("part of speech") || lower.includes("পদ প্রকরণ")) {
+      category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lower.includes("pbq") || lower.includes("passage") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
+      category = QUESTION_TYPE_CODES.PBQ;
+    } else if (lower.includes("essence") || lower.includes("সারমর্ম")) {
       category = QUESTION_TYPE_CODES.ESSENCE;
     } else if (lower.includes("summary") || lower.includes("সারাংশ")) {
       category = QUESTION_TYPE_CODES.SUMMARY;
@@ -152,6 +160,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, cqIds: [questionId] });
       } else if (category === "CS") {
         await assignQuestion({ ...payloadBase, csIds: [questionId] });
+      } else if (category === "PBQ") {
+        await assignQuestion({ ...payloadBase, pbqIds: [questionId] });
       } else if (category === "PARAGRAPH") {
         await assignQuestion({ ...payloadBase, paragraphIds: [questionId] });
       } else if (category === "ESSENCE") {
@@ -168,6 +178,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, newsReportIds: [questionId] });
       } else if (category === "ESSAY") {
         await assignQuestion({ ...payloadBase, essayIds: [questionId] });
+      } else if (category === "PARTS_OF_SPEECH") {
+        await assignQuestion({ ...payloadBase, partsOfSpeechIds: [questionId] });
       } else {
         await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
@@ -253,13 +265,14 @@ export const QuestionPickerPanel: React.FC = () => {
           </div>
         )}
 
+        {/* Search */}
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input 
             placeholder="প্রশ্ন খুঁজুন..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs font-body" 
+            className="pl-8 h-8 text-xs font-body bg-card" 
           />
         </div>
       </div>
@@ -331,8 +344,12 @@ export const QuestionPickerPanel: React.FC = () => {
                   )}
 
                   <div className="font-body text-on-surface line-clamp-3 leading-relaxed mb-2">
-                    {category === "CQ" || category === "CS" ? (
+                    {category === "PARTS_OF_SPEECH" ? (
+                      <RenderMath text={q.content || ""} />
+                    ) : category === "CQ" || category === "CS" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
+                    ) : category === "PBQ" ? (
+                      <RenderMath text={q.context || q.questionA || "অনুচ্ছেদভিত্তিক প্রশ্ন"} />
                     ) : category === "PARAGRAPH" ? (
                       <RenderMath text={q.name || q.title || ""} />
                     ) : category === "SUMMARY" || category === "AMPLIFICATION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" ? (

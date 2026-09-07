@@ -42,7 +42,7 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
   const where: any = {}
 
   if (subjectId) where.subjectId = subjectId
-  if (chapterId) where.chapterId = chapterId
+  if (chapterId) where.academicChapterId = chapterId
   if (difficulty) where.difficulty = difficulty
 
   if (query) {
@@ -79,7 +79,7 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
             nameBn: true,
           },
         },
-        chapter: {
+        academicChapter: {
           select: {
             id: true,
             nameEn: true,
@@ -101,7 +101,11 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
   ])
 
   return {
-    items,
+    items: items.map((p) => ({
+      ...p,
+      chapter: p.academicChapter,
+      chapterId: p.academicChapterId,
+    })),
     totalItems,
     totalPages: Math.ceil(totalItems / resolvedLimit) || 1,
     page: resolvedPage,
@@ -118,7 +122,7 @@ export async function getParagraphById(db: PrismaClient, input: GetParagraphInpu
           classSubjects: true,
         },
       },
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
@@ -130,29 +134,39 @@ export async function getParagraphById(db: PrismaClient, input: GetParagraphInpu
     })
   }
 
-  return paragraph
+  return {
+    ...paragraph,
+    chapter: paragraph.academicChapter,
+    chapterId: paragraph.academicChapterId,
+  }
 }
 
 export async function createParagraph(db: PrismaClient, input: CreateParagraphInput) {
   const data = input
   const resolvedQuestionTypeId = await resolveParagraphQuestionTypeId(db)
 
-  return db.paragraph.create({
+  const created = await db.paragraph.create({
     data: {
       name: data.name,
       reference: data.reference ?? [],
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
-      chapterId: data.chapterId || null,
+      academicChapterId: data.chapterId || null,
       questionTypeId: resolvedQuestionTypeId,
     },
     include: {
       subject: true,
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
+
+  return {
+    ...created,
+    chapter: created.academicChapter,
+    chapterId: created.academicChapterId,
+  }
 }
 
 export async function updateParagraph(db: PrismaClient, input: UpdateParagraphInput) {
@@ -162,7 +176,7 @@ export async function updateParagraph(db: PrismaClient, input: UpdateParagraphIn
   await getParagraphById(db, { id })
   const resolvedQuestionTypeId = await resolveParagraphQuestionTypeId(db)
 
-  return db.paragraph.update({
+  const updated = await db.paragraph.update({
     where: { id },
     data: {
       name: data.name,
@@ -170,15 +184,21 @@ export async function updateParagraph(db: PrismaClient, input: UpdateParagraphIn
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
-      chapterId: data.chapterId || null,
+      academicChapterId: data.chapterId !== undefined ? data.chapterId : undefined,
       questionTypeId: resolvedQuestionTypeId,
     },
     include: {
       subject: true,
-      chapter: true,
+      academicChapter: true,
       questionType: true,
     },
   })
+
+  return {
+    ...updated,
+    chapter: updated.academicChapter,
+    chapterId: updated.academicChapterId,
+  }
 }
 
 export async function deleteParagraph(db: PrismaClient, input: DeleteParagraphInput) {
@@ -214,7 +234,7 @@ export async function importParagraphs(db: PrismaClient, input: ImportParagraphs
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
-            chapterId: data.chapterId || null,
+            academicChapterId: data.chapterId || null,
             questionTypeId: resolvedQuestionTypeId,
           },
         })
@@ -233,7 +253,7 @@ export async function importParagraphs(db: PrismaClient, input: ImportParagraphs
 export async function getParagraphStats(db: PrismaClient, input: ParagraphStatsInput = {}) {
   const where: any = {}
   if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.chapterId = input.chapterId
+  if (input.chapterId) where.academicChapterId = input.chapterId
 
   const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.paragraph.count({ where }),

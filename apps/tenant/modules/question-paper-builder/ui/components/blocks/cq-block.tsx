@@ -236,17 +236,6 @@ export const CQBlock = ({ item }: { item: any }) => {
             {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
           </span>
           <div className="flex-1 w-full min-w-0">
-            <div className="mb-0">
-              {data.context ? (
-                <CQEditableText 
-                  text={data.context}
-                  itemKey={`${item.id}-context`}
-                  defaultStyle={contextStyle}
-                  className="m-0 text-foreground whitespace-pre-wrap w-full"
-                />
-              ) : null}
-            </div>
-
             {/* Attachments (e.g. diagrams, stems, tables) */}
             <QuestionAttachments attachments={data.attachments} />
 

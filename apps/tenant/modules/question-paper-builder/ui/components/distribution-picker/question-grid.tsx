@@ -16,6 +16,8 @@ import { LetterPickerCard } from "./letter-picker-card";
 import { ApplicationPickerCard } from "./application-picker-card";
 import { NewsReportPickerCard } from "./news-report-picker-card";
 import { EssayPickerCard } from "./essay-picker-card";
+import { PbqPickerCard } from "./pbq-picker-card";
+import { PartsOfSpeechPickerCard } from "./parts-of-speech-picker-card";
 
 export interface QuestionGridProps {
   subjectId: string;
@@ -74,6 +76,10 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   const renderCard = (q: any) => {
     const isSelected = selectedIds.includes(q.id);
 
+    if (effectiveCategory === "PARTS_OF_SPEECH") {
+      return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
     if (effectiveCategory === "ESSAY") {
       return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
@@ -95,8 +101,12 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     }
 
     switch (effectiveCategory as string) {
+      case "PARTS_OF_SPEECH":
+        return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CQ":
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "PBQ":
+        return <PbqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CS":
         return <CsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SA":

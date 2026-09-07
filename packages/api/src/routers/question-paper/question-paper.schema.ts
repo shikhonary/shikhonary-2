@@ -209,6 +209,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   cqId: z.string().optional().nullable(),
   csId: z.string().optional().nullable(),
   shortAnswerId: z.string().optional().nullable(),
+  pbqId: z.string().optional().nullable(),
   paragraphId: z.string().optional().nullable(),
   amplificationId: z.string().optional().nullable(),
   letterId: z.string().optional().nullable(),
@@ -217,6 +218,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   essenceId: z.string().optional().nullable(),
   essayId: z.string().optional().nullable(),
   newsReportId: z.string().optional().nullable(),
+  partsOfSpeechId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -232,6 +234,7 @@ export const questionTypeCategorySchema = z.enum([
   QUESTION_TYPE_CODES.CQ,
   QUESTION_TYPE_CODES.CS,
   QUESTION_TYPE_CODES.SA,
+  QUESTION_TYPE_CODES.PBQ,
   QUESTION_TYPE_CODES.PARAGRAPH,
   QUESTION_TYPE_CODES.AMPLIFICATION,
   QUESTION_TYPE_CODES.LETTER,
@@ -240,6 +243,7 @@ export const questionTypeCategorySchema = z.enum([
   QUESTION_TYPE_CODES.ESSENCE,
   QUESTION_TYPE_CODES.NEWS_REPORT,
   QUESTION_TYPE_CODES.ESSAY,
+  QUESTION_TYPE_CODES.PARTS_OF_SPEECH,
 ])
 
 export const removeQuestionPaperQuestionSchema = z.object({
@@ -334,6 +338,7 @@ export const bulkAssignQuestionsSchema = z.object({
   mcqIds: z.array(z.string()).optional(),
   cqIds: z.array(z.string()).optional(),
   csIds: z.array(z.string()).optional(),
+  pbqIds: z.array(z.string()).optional(),
   shortAnswerIds: z.array(z.string()).optional(),
   paragraphIds: z.array(z.string()).optional(),
   amplificationIds: z.array(z.string()).optional(),
@@ -343,6 +348,7 @@ export const bulkAssignQuestionsSchema = z.object({
   essenceIds: z.array(z.string()).optional(),
   essayIds: z.array(z.string()).optional(),
   newsReportIds: z.array(z.string()).optional(),
+  partsOfSpeechIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

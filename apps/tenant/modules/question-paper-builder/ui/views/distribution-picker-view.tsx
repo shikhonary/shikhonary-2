@@ -149,6 +149,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     category = QUESTION_TYPE_CODES.CS;
   } else if (normalized === QUESTION_TYPES.CQ) {
     category = QUESTION_TYPE_CODES.CQ;
+  } else if (normalized === QUESTION_TYPES.PBQ) {
+    category = QUESTION_TYPE_CODES.PBQ;
   } else if (normalized === QUESTION_TYPES.SA) {
     category = QUESTION_TYPE_CODES.SA;
   } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
@@ -167,12 +169,18 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
+    category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     category = QUESTION_TYPE_CODES.MCQ;
   } else {
     // Robust text fallback from distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
+    if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
+      category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
+      category = QUESTION_TYPE_CODES.PBQ;
+    } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
       category = QUESTION_TYPE_CODES.LETTER;
     } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
       category = QUESTION_TYPE_CODES.APPLICATION;
@@ -296,6 +304,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, cqIds: selectedIds });
       } else if (category === "CS") {
         await bulkAssign({ ...payloadBase, csIds: selectedIds });
+      } else if (category === "PBQ") {
+        await bulkAssign({ ...payloadBase, pbqIds: selectedIds });
       } else if (category === "PARAGRAPH") {
         await bulkAssign({ ...payloadBase, paragraphIds: selectedIds });
       } else if (category === "ESSENCE") {
@@ -312,6 +322,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, newsReportIds: selectedIds });
       } else if (category === "ESSAY") {
         await bulkAssign({ ...payloadBase, essayIds: selectedIds });
+      } else if (category === "PARTS_OF_SPEECH") {
+        await bulkAssign({ ...payloadBase, partsOfSpeechIds: selectedIds });
       } else {
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }

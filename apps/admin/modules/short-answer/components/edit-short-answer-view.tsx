@@ -85,8 +85,8 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps) {
         answer: saData.answer || "",
         difficulty: saData.difficulty as any || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: (saData.reference || []).join(", "),
-        year: saData.year ? String(saData.year) : "",
-        source: saData.source || "",
+        year: (saData as any).year ? String((saData as any).year) : "",
+        source: (saData as any).source || "",
         isActive: saData.isActive,
       })
     }

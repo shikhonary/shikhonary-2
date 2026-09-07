@@ -113,7 +113,7 @@ export function QuestionAttachmentItem({
   const isText = type === "text" || type === "context" || (!isImage && !isTable)
 
   const tableData = isTable && attachment.table ? normalizeTableData(attachment.table) : null
-  const hasBorder = attachment.tableBorder ?? false
+  const hasBorder = attachment.tableBorder ?? true
 
   const hasAnyContent = Boolean(
     attachment.caption ||
@@ -128,8 +128,7 @@ export function QuestionAttachmentItem({
   return (
     <div
       className={cn(
-        "space-y-1.5 my-1.5 w-full max-w-full overflow-hidden",
-        isText && !isImage && !isTable && "p-2.5 rounded-xl border border-border/60 bg-muted/30 text-xs leading-relaxed",
+        "space-y-0.5 w-full max-w-full",
         className
       )}
     >
@@ -137,31 +136,29 @@ export function QuestionAttachmentItem({
       {attachment.caption && (
         <div
           className={cn(
-            "font-semibold text-xs text-foreground",
-            isTable && "text-[11px] text-muted-foreground",
-            isImage && "text-xs font-semibold text-foreground mb-0.5"
+            "font-semibold text-xs text-foreground leading-tight mb-0.5"
           )}
         >
-          <RenderMath text={attachment.caption} isMath={isMath} />
+          <RenderMath text={attachment.caption.trim()} isMath={isMath} />
         </div>
       )}
 
       {/* 2. Attachment Content */}
       {attachment.content && (
-        <div className="text-xs text-foreground/90 whitespace-pre-wrap leading-relaxed">
-          <RenderMath text={attachment.content} isMath={isMath} />
+        <div className="text-xs text-foreground whitespace-pre-wrap leading-snug">
+          <RenderMath text={attachment.content.trim()} isMath={isMath} />
         </div>
       )}
 
       {/* 3. Image (if present) */}
       {isImage && attachment.url && attachment.url !== "text-context" && (
-        <div className="relative group/att-img inline-block my-1">
+        <div className="relative group/att-img inline-block my-0">
           <img
             src={attachment.url}
             alt={attachment.caption || "Question Attachment"}
             className={cn(
-              "rounded-lg border border-border/80 object-contain bg-muted/20",
-              compact ? "max-h-28" : "max-h-60",
+              "rounded-md border border-foreground/40 object-contain bg-muted/20 block",
+              compact ? "max-h-16" : "max-h-24",
               imageClassName
             )}
           />
@@ -170,11 +167,11 @@ export function QuestionAttachmentItem({
 
       {/* 4. Table (if present) */}
       {isTable && tableData && tableData.rows.length > 0 && (
-        <div className="overflow-x-auto w-full my-1 rounded-md">
+        <div className="overflow-x-auto w-full my-0.5 p-px">
           <table
             className={cn(
               "w-full text-xs text-left border-collapse",
-              hasBorder ? "border border-border" : "border-b border-border/50"
+              hasBorder ? "border border-foreground" : "border-b border-foreground"
             )}
           >
             {tableData.headers.length > 0 && (
@@ -184,8 +181,8 @@ export function QuestionAttachmentItem({
                     <th
                       key={idx}
                       className={cn(
-                        compact ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs",
-                        hasBorder ? "border border-border" : "border-b border-border font-bold"
+                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-xs leading-tight",
+                        hasBorder ? "border border-foreground" : "border-b border-foreground font-bold"
                       )}
                     >
                       <RenderMath text={header} isMath={isMath} />
@@ -201,8 +198,8 @@ export function QuestionAttachmentItem({
                     <td
                       key={cIdx}
                       className={cn(
-                        compact ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs text-foreground/90",
-                        hasBorder ? "border border-border" : "border-b border-border/30"
+                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-xs leading-tight text-foreground",
+                        hasBorder ? "border border-foreground" : "border-b border-foreground/60"
                       )}
                     >
                       <RenderMath text={cell} isMath={isMath} />
@@ -217,13 +214,8 @@ export function QuestionAttachmentItem({
 
       {/* 5. Attachment Bottom Content / Bottom Caption (End) */}
       {attachment.bottomContent && (
-        <div
-          className={cn(
-            "text-[11px] text-muted-foreground italic whitespace-pre-wrap mt-0.5",
-            isText && !isImage && !isTable && "border-t border-border/40 pt-1"
-          )}
-        >
-          <RenderMath text={attachment.bottomContent} isMath={isMath} />
+        <div className="text-[11px] text-foreground font-medium italic whitespace-pre-wrap leading-tight mt-0.5 mb-0">
+          <RenderMath text={attachment.bottomContent.trim()} isMath={isMath} />
         </div>
       )}
     </div>
@@ -246,7 +238,7 @@ export function QuestionAttachments({
   )
 
   return (
-    <div className={cn("flex flex-col gap-2 w-full my-1", className)}>
+    <div className={cn("flex flex-col gap-0.5 w-full my-0", className)}>
       {sorted.map((att, idx) => (
         <QuestionAttachmentItem
           key={att.id || idx}

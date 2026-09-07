@@ -12,6 +12,11 @@ import { PrismaClient } from '../../generated/main/client.js';
 
 config({ path: resolve(import.meta.dirname, '../../.env') });
 
+if (process.env.NODE_ENV === 'production') {
+  console.error('\x1b[31m✖ Cannot run database reset script in production environment!\x1b[0m');
+  process.exit(1);
+}
+
 const connectionString = process.env.MAIN_DATABASE_URL;
 if (!connectionString) {
   console.error('\x1b[31m✖ MAIN_DATABASE_URL is not set in .env\x1b[0m');

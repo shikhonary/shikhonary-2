@@ -18,7 +18,10 @@ const globalForPrisma = globalThis as unknown as {
 function createTenantDb() {
   const connectionString = process.env.TENANT_DATABASE_URL || process.env.DATABASE_URL
   if (!connectionString) {
-    console.warn("TENANT_DATABASE_URL is not set in the environment. Using fallback for build phase.")
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[DB Tenant] TENANT_DATABASE_URL (or DATABASE_URL) environment variable is required in production.")
+    }
+    console.warn("[DB Tenant] TENANT_DATABASE_URL is not set. Using fallback for build phase.")
   }
   const adapter = new PrismaPg({
     connectionString: connectionString || "postgresql://postgres:postgres@localhost:5432/dummy_tenant",
@@ -28,7 +31,7 @@ function createTenantDb() {
 
 export const tenantDb = globalForPrisma.tenantDb ?? createTenantDb()
 
-if (process.env.NODE_ENV !== "production") {
+if (!globalForPrisma.tenantDb) {
   globalForPrisma.tenantDb = tenantDb
 }
 
@@ -36,7 +39,7 @@ if (process.env.NODE_ENV !== "production") {
 const tenantClientCache: Map<string, PrismaClient> =
   globalForPrisma.tenantClientCache ?? new Map()
 
-if (process.env.NODE_ENV !== "production") {
+if (!globalForPrisma.tenantClientCache) {
   globalForPrisma.tenantClientCache = tenantClientCache
 }
 

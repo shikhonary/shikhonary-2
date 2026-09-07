@@ -24,6 +24,8 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "LETTER" && (l.includes("প্রতিবেদন") || l.includes("আবেদনপত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "APPLICATION" && (l.includes("সংবাদ প্রতিবেদন") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "NEWS_REPORT" && (l.includes("আবেদনপত্র") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
+  if (questionType === "PARTS_OF_SPEECH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "PBQ" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   return false;
 };
 
