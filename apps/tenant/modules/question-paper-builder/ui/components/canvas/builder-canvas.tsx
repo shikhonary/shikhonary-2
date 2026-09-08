@@ -198,6 +198,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let newsReportIdx = 0;
         let essayIdx = 0;
         let partsOfSpeechIdx = 0;
+        let rightFormOfVerbIdx = 0;
+        let changingSentenceIdx = 0;
+        let fillInTheBlanksWithCluesIdx = 0;
+        let substitutionTableIdx = 0;
+        let punctuationIdx = 0;
+        let shortCompositionIdx = 0;
         let pbqIdx = 0;
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
@@ -209,6 +215,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
         const totalEssays = questions.filter((q: any) => q.essay).length;
         const totalPartsOfSpeech = questions.filter((q: any) => q.partsOfSpeech).length;
+        const totalRightFormOfVerbs = questions.filter((q: any) => q.rightFormOfVerb).length;
+        const totalChangingSentences = questions.filter((q: any) => q.changingSentence).length;
+        const totalFillInTheBlanksWithClues = questions.filter((q: any) => q.fillInTheBlanksWithClues).length;
+        const totalSubstitutionTables = questions.filter((q: any) => q.substitutionTable).length;
+        const totalPunctuation = questions.filter((q: any) => q.punctuation).length;
+        const totalShortCompositions = questions.filter((q: any) => q.shortComposition).length;
         const totalPbqs = questions.filter((q: any) => q.pbq).length;
 
         questions.forEach((q: any, idx: number) => {
@@ -733,6 +745,216 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: partsOfSpeechIdx === totalPartsOfSpeech - 1 ? 4 : 0,
             });
             partsOfSpeechIdx++;
+          }
+          if (q.rightFormOfVerb) {
+            if (rightFormOfVerbIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-right-form-of-verb",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "RIGHT_FORM_OF_VERBS",
+                  data: q.rightFormOfVerb,
+                  orderIndex: rightFormOfVerbIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstRightFormOfVerb: rightFormOfVerbIdx === 0,
+                  totalQuestions: totalRightFormOfVerbs,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Fill in the blanks with the correct form of the verbs given in the brackets:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: rightFormOfVerbIdx === totalRightFormOfVerbs - 1 ? 4 : 0,
+            });
+            rightFormOfVerbIdx++;
+          }
+          if (q.changingSentence) {
+            if (changingSentenceIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-changing-sentence",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "CHANGING_SENTENCES",
+                  data: q.changingSentence,
+                  orderIndex: changingSentenceIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstChangingSentence: changingSentenceIdx === 0,
+                  totalQuestions: totalChangingSentences,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Change the sentences according to directions:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: changingSentenceIdx === totalChangingSentences - 1 ? 4 : 0,
+            });
+            changingSentenceIdx++;
+          }
+          if (q.fillInTheBlanksWithClues) {
+            if (fillInTheBlanksWithCluesIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-fill-in-the-blanks-with-clues",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "FILL_IN_THE_BLANKS_WITH_CLUES",
+                  data: q.fillInTheBlanksWithClues,
+                  orderIndex: fillInTheBlanksWithCluesIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstFillInTheBlanksWithClues: fillInTheBlanksWithCluesIdx === 0,
+                  totalQuestions: totalFillInTheBlanksWithClues,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Fill in the blanks with the words from the box. You may need to change the forms of some words. You may use one word more than once:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: fillInTheBlanksWithCluesIdx === totalFillInTheBlanksWithClues - 1 ? 4 : 0,
+            });
+            fillInTheBlanksWithCluesIdx++;
+          }
+          if (q.substitutionTable) {
+            if (substitutionTableIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-substitution-table",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SUBSTITUTION_TABLE",
+                  data: q.substitutionTable,
+                  orderIndex: substitutionTableIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstSubstitutionTable: substitutionTableIdx === 0,
+                  totalQuestions: totalSubstitutionTables,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Make meaningful sentences using parts of sentences given in the following substitution table:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: substitutionTableIdx === totalSubstitutionTables - 1 ? 4 : 0,
+            });
+            substitutionTableIdx++;
+          }
+          if (q.punctuation) {
+            if (punctuationIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-punctuation",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "PUNCTUATION",
+                  data: q.punctuation,
+                  orderIndex: punctuationIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPunctuation: punctuationIdx === 0,
+                  totalQuestions: totalPunctuation,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Use appropriate punctuation marks and capital letters where necessary in the following text:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: punctuationIdx === totalPunctuation - 1 ? 4 : 0,
+            });
+            punctuationIdx++;
+          }
+          if (q.shortComposition) {
+            if (shortCompositionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-short-composition",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SHORT_COMPOSITION",
+                  data: q.shortComposition,
+                  orderIndex: shortCompositionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstShortComposition: shortCompositionIdx === 0,
+                  totalQuestions: totalShortCompositions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Write a short composition on the following topic:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: shortCompositionIdx === totalShortCompositions - 1 ? 4 : 0,
+            });
+            shortCompositionIdx++;
           }
         });
 

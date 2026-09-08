@@ -57,6 +57,7 @@ export const createQuestionPaperFullSchema = z.object({
     distributions: z.array(z.object({
       questionTypeId: z.string().min(1),
       questionTypeName: z.string().min(1),
+      questionTypeNameBn: z.string().optional().nullable(),
       questionTypeLabel: z.string().optional().nullable(),
       marksPerQuestion: z.number().positive(),
       markDistribution: z.any().optional().nullable(),
@@ -171,6 +172,7 @@ export const upsertQuestionPaperDistributionSchema = z.object({
   paperSubjectId: z.string().min(1),
   questionTypeId: z.string().min(1),
   questionTypeName: z.string().min(1),
+  questionTypeNameBn: z.string().optional().nullable(),
   questionTypeLabel: z.string().optional().nullable(),
   marksPerQuestion: z.number().positive(),
   markDistribution: z.any().optional().nullable(),
@@ -219,6 +221,12 @@ export const addQuestionPaperQuestionSchema = z.object({
   essayId: z.string().optional().nullable(),
   newsReportId: z.string().optional().nullable(),
   partsOfSpeechId: z.string().optional().nullable(),
+  rightFormOfVerbId: z.string().optional().nullable(),
+  changingSentenceId: z.string().optional().nullable(),
+  fillInTheBlanksWithCluesId: z.string().optional().nullable(),
+  substitutionTableId: z.string().optional().nullable(),
+  punctuationId: z.string().optional().nullable(),
+  shortCompositionId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -244,6 +252,12 @@ export const questionTypeCategorySchema = z.enum([
   QUESTION_TYPE_CODES.NEWS_REPORT,
   QUESTION_TYPE_CODES.ESSAY,
   QUESTION_TYPE_CODES.PARTS_OF_SPEECH,
+  QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS,
+  QUESTION_TYPE_CODES.CHANGING_SENTENCES,
+  QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES,
+  QUESTION_TYPE_CODES.SUBSTITUTION_TABLE,
+  QUESTION_TYPE_CODES.PUNCTUATION,
+  QUESTION_TYPE_CODES.SHORT_COMPOSITION,
 ])
 
 export const removeQuestionPaperQuestionSchema = z.object({
@@ -349,6 +363,12 @@ export const bulkAssignQuestionsSchema = z.object({
   essayIds: z.array(z.string()).optional(),
   newsReportIds: z.array(z.string()).optional(),
   partsOfSpeechIds: z.array(z.string()).optional(),
+  rightFormOfVerbIds: z.array(z.string()).optional(),
+  changingSentenceIds: z.array(z.string()).optional(),
+  fillInTheBlanksWithCluesIds: z.array(z.string()).optional(),
+  substitutionTableIds: z.array(z.string()).optional(),
+  punctuationIds: z.array(z.string()).optional(),
+  shortCompositionIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

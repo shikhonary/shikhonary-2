@@ -164,6 +164,7 @@ export function CreateQuestionPaperStepper() {
           distributions: subject.distributions.map((dist) => ({
             questionTypeId: dist.questionTypeId,
             questionTypeName: dist.questionTypeName,
+            questionTypeNameBn: dist.questionTypeNameBn ?? null,
             questionTypeLabel: dist.questionTypeLabel,
             marksPerQuestion: dist.marksPerQuestion,
             markDistribution: dist.markDistribution ?? { a: dist.marksPerQuestion },

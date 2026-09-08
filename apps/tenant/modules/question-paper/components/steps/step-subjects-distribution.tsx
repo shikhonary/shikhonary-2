@@ -186,7 +186,8 @@ export function StepSubjectsDistribution({
     const distribution: WizardDistribution = {
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
-      questionTypeName: matched.nameBn || matched.nameEn,
+      questionTypeName: matched.nameEn || matched.nameBn,
+      questionTypeNameBn: matched.nameBn || null,
       questionTypeLabel: (preset as any)?.customLabel || (preset as any)?.questionTypeLabel || (matched as any).label || matched.nameBn || matched.nameEn,
       marksPerQuestion: marksNum,
       markDistribution: markDist,
@@ -375,7 +376,7 @@ export function StepSubjectsDistribution({
                             <tbody>
                               {subject.distributions.map((dist) => (
                                 <tr key={dist.tempId} className="border-b border-outline-variant/20 last:border-0">
-                                  <td className="py-2 px-2 font-medium text-on-surface">{dist.questionTypeName}</td>
+                                  <td className="py-2 px-2 font-medium text-on-surface">{dist.questionTypeNameBn || dist.questionTypeName}</td>
                                   <td className="py-2 px-2 text-center text-on-surface-variant">{dist.marksPerQuestion}</td>
                                   <td className="py-2 px-2 text-center text-on-surface-variant">{dist.questionCount}</td>
                                   <td className="py-2 px-2 text-center text-on-surface-variant">

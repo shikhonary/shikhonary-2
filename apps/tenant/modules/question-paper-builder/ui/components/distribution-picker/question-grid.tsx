@@ -18,6 +18,12 @@ import { NewsReportPickerCard } from "./news-report-picker-card";
 import { EssayPickerCard } from "./essay-picker-card";
 import { PbqPickerCard } from "./pbq-picker-card";
 import { PartsOfSpeechPickerCard } from "./parts-of-speech-picker-card";
+import { RightFormOfVerbPickerCard } from "./right-form-of-verb-picker-card";
+import { FillInTheBlanksWithCluesPickerCard } from "./fill-in-the-blanks-with-clues-picker-card";
+import { SubstitutionTablePickerCard } from "./substitution-table-picker-card";
+import { ChangingSentencePickerCard } from "./changing-sentence-picker-card";
+import { PunctuationPickerCard } from "./punctuation-picker-card";
+import { ShortCompositionPickerCard } from "./short-composition-picker-card";
 
 export interface QuestionGridProps {
   subjectId: string;
@@ -80,6 +86,30 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
+    if (effectiveCategory === "RIGHT_FORM_OF_VERBS") {
+      return <RightFormOfVerbPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "CHANGING_SENTENCES") {
+      return <ChangingSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "FILL_IN_THE_BLANKS_WITH_CLUES") {
+      return <FillInTheBlanksWithCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "SUBSTITUTION_TABLE") {
+      return <SubstitutionTablePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "PUNCTUATION") {
+      return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "SHORT_COMPOSITION") {
+      return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
     if (effectiveCategory === "ESSAY") {
       return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
@@ -103,6 +133,18 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     switch (effectiveCategory as string) {
       case "PARTS_OF_SPEECH":
         return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "RIGHT_FORM_OF_VERBS":
+        return <RightFormOfVerbPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "CHANGING_SENTENCES":
+        return <ChangingSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "FILL_IN_THE_BLANKS_WITH_CLUES":
+        return <FillInTheBlanksWithCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SUBSTITUTION_TABLE":
+        return <SubstitutionTablePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "PUNCTUATION":
+        return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SHORT_COMPOSITION":
+        return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CQ":
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "PBQ":

@@ -123,13 +123,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const maxSelectable = isAlternativeMode ? 1 : Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
 
   const qTypeNameEn = (distStatus.questionType?.nameEn || distStatus.questionTypeName || "").toLowerCase();
-  const qTypeNameBn = (distStatus.questionType?.nameBn || "").toLowerCase();
+  const qTypeNameBn = (distStatus.questionType?.nameBn || distStatus.questionTypeNameBn || "").toLowerCase();
   const qTypeCode = (distStatus.questionType?.code || "").toLowerCase();
   const qTypeLabel = (distStatus.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
   const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
-  const distTypeName = distStatus.questionTypeName || distStatus.questionType?.nameEn || distStatus.questionType?.nameBn || distStatus.questionTypeLabel || "";
+  const distTypeName = distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.questionType?.nameEn || distStatus.questionType?.nameBn || distStatus.questionTypeLabel || "";
   
   // Prioritize distribution's actual questionTypeName over urlCategoryParam (especially if url is default MCQ)
   const rawName = (urlCategoryParam && urlCategoryParam !== "MCQ")
@@ -169,15 +169,37 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
+    category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
     category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
+    category = QUESTION_TYPE_CODES.PUNCTUATION;
+  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
+    category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
+    category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
+    category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
+    category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     category = QUESTION_TYPE_CODES.MCQ;
   } else {
     // Robust text fallback from distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
+    if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
+      category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
+    } else if (lowerName.includes("changing sentence") || lowerName.includes("changing sentences") || lowerName.includes("transformation of sentence") || lowerName.includes("change the sentence") || lowerName.includes("directed in bracket") || lowerName.includes("বাক্য রূপান্তর") || lowerName.includes("বাক্য পরিবর্তন")) {
+      category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+    } else if (lowerName.includes("right form") || lowerName.includes("verbs in brackets") || lowerName.includes("correct form of verb") || lowerName.includes("ভার্ব")) {
+      category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+    } else if (lowerName.includes("fill in the blanks") || lowerName.includes("with clues") || lowerName.includes("words from the box") || lowerName.includes("from the box") || lowerName.includes("cloze test") || lowerName.includes("ক্লুসহ")) {
+      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+    } else if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
       category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lowerName.includes("punctuation") || lowerName.includes("capitalization") || lowerName.includes("বিরাম চিহ্ন") || lowerName.includes("যতিচিহ্ন")) {
+      category = QUESTION_TYPE_CODES.PUNCTUATION;
     } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
       category = QUESTION_TYPE_CODES.PBQ;
     } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
@@ -200,6 +222,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.NEWS_REPORT;
     } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
       category = QUESTION_TYPE_CODES.ESSAY;
+    } else if (lowerName.includes("composition") || lowerName.includes("কম্পোজিশন")) {
+      category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
   }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
@@ -215,32 +239,36 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     setSelectedBoard("All");
   };
 
+  const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
+
   const renderSelectFilters = (isMobile = false) => (
     <>
       {/* Chapter Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            অধ্যায়
-          </label>
-        )}
-        <Select
-          value={selectedChapterId}
-          onValueChange={(val) => setSelectedChapterId(val ?? "All")}
-        >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
-            <SelectValue placeholder="সকল অধ্যায়" />
-          </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All">সকল অধ্যায়</SelectItem>
-            {chapters.map((ch: any) => (
-              <SelectItem key={ch.id} value={ch.id}>
-                {ch.nameBn || ch.nameEn}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {isChapterApplicable && (
+        <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
+          {isMobile && (
+            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              অধ্যায়
+            </label>
+          )}
+          <Select
+            value={selectedChapterId}
+            onValueChange={(val) => setSelectedChapterId(val ?? "All")}
+          >
+            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+              <SelectValue placeholder="সকল অধ্যায়" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+              <SelectItem value="All">সকল অধ্যায়</SelectItem>
+              {chapters.map((ch: any) => (
+                <SelectItem key={ch.id} value={ch.id}>
+                  {ch.nameBn || ch.nameEn}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {/* Board Filter */}
       <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
@@ -324,6 +352,18 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, essayIds: selectedIds });
       } else if (category === "PARTS_OF_SPEECH") {
         await bulkAssign({ ...payloadBase, partsOfSpeechIds: selectedIds });
+      } else if (category === "PUNCTUATION") {
+        await bulkAssign({ ...payloadBase, punctuationIds: selectedIds });
+      } else if (category === "SHORT_COMPOSITION") {
+        await bulkAssign({ ...payloadBase, shortCompositionIds: selectedIds });
+      } else if (category === "RIGHT_FORM_OF_VERBS") {
+        await bulkAssign({ ...payloadBase, rightFormOfVerbIds: selectedIds });
+      } else if (category === "CHANGING_SENTENCES") {
+        await bulkAssign({ ...payloadBase, changingSentenceIds: selectedIds });
+      } else if (category === "FILL_IN_THE_BLANKS_WITH_CLUES") {
+        await bulkAssign({ ...payloadBase, fillInTheBlanksWithCluesIds: selectedIds });
+      } else if (category === "SUBSTITUTION_TABLE") {
+        await bulkAssign({ ...payloadBase, substitutionTableIds: selectedIds });
       } else {
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }
@@ -372,7 +412,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               <h1 className="font-bold text-base text-primary font-headline">
                 {isAlternativeMode
                   ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
-                  : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeName || distStatus.subjectName}`}
+                  : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
               </h1>
               {isAlternativeMode ? (
                 <span className="text-xs text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-bold">

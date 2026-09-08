@@ -26,38 +26,48 @@ model User {
   tenants             Tenant[]       @relation("TenantOwner")
 
   // ── Authoring Relations ──
-  createdMcqs              Mcq[]              @relation("McqCreator")
-  updatedMcqs              Mcq[]              @relation("McqUpdater")
-  createdCqs               Cq[]               @relation("CqCreator")
-  updatedCqs               Cq[]               @relation("CqUpdater")
-  createdPbqs              PBQ[]              @relation("PbqCreator")
-  updatedPbqs              PBQ[]              @relation("PbqUpdater")
-  createdShortAnswers      ShortAnswer[]      @relation("ShortAnswerCreator")
-  updatedShortAnswers      ShortAnswer[]      @relation("ShortAnswerUpdater")
-  createdParagraphs        Paragraph[]        @relation("ParagraphCreator")
-  updatedParagraphs        Paragraph[]        @relation("ParagraphUpdater")
-  createdAmplifications    Amplification[]    @relation("AmplificationCreator")
-  updatedAmplifications    Amplification[]    @relation("AmplificationUpdater")
-  createdCs                CS[]               @relation("CsCreator")
-  updatedCs                CS[]               @relation("CsUpdater")
-  createdLetters           Letter[]           @relation("LetterCreator")
-  updatedLetters           Letter[]           @relation("LetterUpdater")
-  createdApplications      Application[]      @relation("ApplicationCreator")
-  updatedApplications      Application[]      @relation("ApplicationUpdater")
-  createdSummaries         Summary[]          @relation("SummaryCreator")
-  updatedSummaries         Summary[]          @relation("SummaryUpdater")
-  createdEssences          Essence[]          @relation("EssenceCreator")
-  updatedEssences          Essence[]          @relation("EssenceUpdater")
-  createdThoughtExpansions ThoughtExpansion[] @relation("ThoughtExpansionCreator")
-  updatedThoughtExpansions ThoughtExpansion[] @relation("ThoughtExpansionUpdater")
-  createdNewsReports       NewsReport[]       @relation("NewsReportCreator")
-  updatedNewsReports       NewsReport[]       @relation("NewsReportUpdater")
-  createdEssays            Essay[]            @relation("EssayCreator")
-  updatedEssays            Essay[]            @relation("EssayUpdater")
+  createdMcqs                     Mcq[]                      @relation("McqCreator")
+  updatedMcqs                     Mcq[]                      @relation("McqUpdater")
+  createdCqs                      Cq[]                       @relation("CqCreator")
+  updatedCqs                      Cq[]                       @relation("CqUpdater")
+  createdPbqs                     PBQ[]                      @relation("PbqCreator")
+  updatedPbqs                     PBQ[]                      @relation("PbqUpdater")
+  createdShortAnswers             ShortAnswer[]              @relation("ShortAnswerCreator")
+  updatedShortAnswers             ShortAnswer[]              @relation("ShortAnswerUpdater")
+  createdParagraphs               Paragraph[]                @relation("ParagraphCreator")
+  updatedParagraphs               Paragraph[]                @relation("ParagraphUpdater")
+  createdAmplifications           Amplification[]            @relation("AmplificationCreator")
+  updatedAmplifications           Amplification[]            @relation("AmplificationUpdater")
+  createdCs                       CS[]                       @relation("CsCreator")
+  updatedCs                       CS[]                       @relation("CsUpdater")
+  createdLetters                  Letter[]                   @relation("LetterCreator")
+  updatedLetters                  Letter[]                   @relation("LetterUpdater")
+  createdApplications             Application[]              @relation("ApplicationCreator")
+  updatedApplications             Application[]              @relation("ApplicationUpdater")
+  createdSummaries                Summary[]                  @relation("SummaryCreator")
+  updatedSummaries                Summary[]                  @relation("SummaryUpdater")
+  createdEssences                 Essence[]                  @relation("EssenceCreator")
+  updatedEssences                 Essence[]                  @relation("EssenceUpdater")
+  createdThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionCreator")
+  updatedThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionUpdater")
+  createdNewsReports              NewsReport[]               @relation("NewsReportCreator")
+  updatedNewsReports              NewsReport[]               @relation("NewsReportUpdater")
+  createdEssays                   Essay[]                    @relation("EssayCreator")
+  updatedEssays                   Essay[]                    @relation("EssayUpdater")
   createdPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechCreator")
   updatedPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechUpdater")
+  createdRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbCreator")
+  updatedRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbUpdater")
+  createdChangingSentences        ChangingSentence[]         @relation("ChangingSentenceCreator")
+  updatedChangingSentences        ChangingSentence[]         @relation("ChangingSentenceUpdater")
   createdFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesCreator")
   updatedFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesUpdater")
+  createdSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableCreator")
+  updatedSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableUpdater")
+  createdPunctuations             Punctuation[]              @relation("PunctuationCreator")
+  updatedPunctuations             Punctuation[]              @relation("PunctuationUpdater")
+  createdShortCompositions        ShortComposition[]         @relation("ShortCompositionCreator")
+  updatedShortCompositions        ShortComposition[]         @relation("ShortCompositionUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -225,22 +235,27 @@ model Tenant {
   invoices           Invoice[]
 
   // ── Question Bank Resources ──────────────────────────────
-  mcqs              Mcq[]
-  cqs               Cq[]
-  shortAnswers      ShortAnswer[]
-  paragraphs        Paragraph[]
-  amplifications    Amplification[]
-  cs                CS[]
-  letters           Letter[]
-  applications      Application[]
-  summaries         Summary[]
-  essences          Essence[]
-  thoughtExpansions ThoughtExpansion[]
-  newsReports       NewsReport[]
-  essays            Essay[]
-  pbqs              PBQ[]
+  mcqs                     Mcq[]
+  cqs                      Cq[]
+  shortAnswers             ShortAnswer[]
+  paragraphs               Paragraph[]
+  amplifications           Amplification[]
+  cs                       CS[]
+  letters                  Letter[]
+  applications             Application[]
+  summaries                Summary[]
+  essences                 Essence[]
+  thoughtExpansions        ThoughtExpansion[]
+  newsReports              NewsReport[]
+  essays                   Essay[]
+  pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  rightFormOfVerbs         RightFormOfVerb[]
+  changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  substitutionTables       SubstitutionTable[]
+  punctuations             Punctuation[]
+  shortCompositions        ShortComposition[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -589,26 +604,31 @@ model AcademicSubject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  classSubjects        AcademicClassSubject[]
-  chapters             AcademicChapter[]
-  subjectQuestionTypes SubjectQuestionType[]
-  sections             SubjectQuestionSection[]
-  mcqs                 Mcq[]
-  cqs                  Cq[]
-  shortAnswers         ShortAnswer[]
-  paragraphs           Paragraph[]
-  amplifications       Amplification[]
-  cs                   CS[]
-  letters              Letter[]
-  applications         Application[]
-  summaries            Summary[]
-  essences             Essence[]
-  thoughtExpansions    ThoughtExpansion[]
-  newsReports          NewsReport[]
-  essays               Essay[]
+  classSubjects            AcademicClassSubject[]
+  chapters                 AcademicChapter[]
+  subjectQuestionTypes     SubjectQuestionType[]
+  sections                 SubjectQuestionSection[]
+  mcqs                     Mcq[]
+  cqs                      Cq[]
+  shortAnswers             ShortAnswer[]
+  paragraphs               Paragraph[]
+  amplifications           Amplification[]
+  cs                       CS[]
+  letters                  Letter[]
+  applications             Application[]
+  summaries                Summary[]
+  essences                 Essence[]
+  thoughtExpansions        ThoughtExpansion[]
+  newsReports              NewsReport[]
+  essays                   Essay[]
   pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  rightFormOfVerbs         RightFormOfVerb[]
+  changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  substitutionTables       SubstitutionTable[]
+  punctuations             Punctuation[]
+  shortCompositions        ShortComposition[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -647,14 +667,15 @@ model AcademicChapter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mcqs           Mcq[]
-  cqs            Cq[]
-  pbqs           PBQ[]
-  shortAnswers   ShortAnswer[]
-  paragraphs     Paragraph[]
-  amplifications Amplification[]
+  mcqs                     Mcq[]
+  cqs                      Cq[]
+  pbqs                     PBQ[]
+  shortAnswers             ShortAnswer[]
+  paragraphs               Paragraph[]
+  amplifications           Amplification[]
   cs                       CS[]
   partsOfSpeech            PartsOfSpeech[]
+  rightFormOfVerbs         RightFormOfVerb[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
 
   @@unique([subjectId, position])
@@ -685,21 +706,26 @@ model QuestionType {
   cqs          Cq[]
   shortAnswers ShortAnswer[]
 
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  paragraphs        Paragraph[]
-  amplifications    Amplification[]
-  cs                CS[]
-  letters           Letter[]
-  applications      Application[]
-  summaries         Summary[]
-  essences          Essence[]
-  thoughtExpansions ThoughtExpansion[]
-  newsReports       NewsReport[]
-  essays            Essay[]
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  paragraphs               Paragraph[]
+  amplifications           Amplification[]
+  cs                       CS[]
+  letters                  Letter[]
+  applications             Application[]
+  summaries                Summary[]
+  essences                 Essence[]
+  thoughtExpansions        ThoughtExpansion[]
+  newsReports              NewsReport[]
+  essays                   Essay[]
   pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  rightFormOfVerbs         RightFormOfVerb[]
+  changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  substitutionTables       SubstitutionTable[]
+  punctuations             Punctuation[]
+  shortCompositions        ShortComposition[]
 
   @@index([label])
   @@index([isActive])
@@ -1486,6 +1512,97 @@ model Essay {
   @@map("essay")
 }
 
+model ChangingSentence {
+  id        String   @id @default(cuid())
+  content   String?
+  options   String[] @default([])
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ChangingSentenceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("ChangingSentenceUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("changing_sentence")
+}
+
+model RightFormOfVerb {
+  id        String   @id @default(cuid())
+  content   String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("RightFormOfVerbCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("RightFormOfVerbUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("right_form_of_verb")
+}
+
 model PartsOfSpeech {
   id        String   @id @default(cuid())
   content   String
@@ -1579,6 +1696,138 @@ model FillInTheBlanksWithClues {
   @@index([subjectId])
   @@index([difficulty])
   @@map("fill_in_the_blanks_with_clues")
+}
+
+model SubstitutionTable {
+  id        String   @id @default(cuid())
+  columnA   String[] @default([])
+  columnB   String[] @default([])
+  columnC   String[] @default([])
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("SubstitutionTableCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("SubstitutionTableUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("substitution_table")
+}
+
+model Punctuation {
+  id        String   @id @default(cuid())
+  content   String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("PunctuationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("PunctuationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("punctuation")
+}
+
+model ShortComposition {
+  id        String   @id @default(cuid())
+  title     String
+  wordLimit Int?
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ShortCompositionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("ShortCompositionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("short_composition")
 }
 
 model QuestionReport {

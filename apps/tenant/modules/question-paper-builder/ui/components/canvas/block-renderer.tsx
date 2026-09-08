@@ -15,6 +15,12 @@ import { ApplicationBlock } from "../blocks/application-block";
 import { NewsReportBlock } from "../blocks/news-report-block";
 import { EssayBlock } from "../blocks/essay-block";
 import { PartsOfSpeechBlock } from "../blocks/parts-of-speech-block";
+import { RightFormOfVerbBlock } from "../blocks/right-form-of-verb-block";
+import { ChangingSentenceBlock } from "../blocks/changing-sentence-block";
+import { FillInTheBlanksWithCluesBlock } from "../blocks/fill-in-the-blanks-with-clues-block";
+import { SubstitutionTableBlock } from "../blocks/substitution-table-block";
+import { PunctuationBlock } from "../blocks/punctuation-block";
+import { ShortCompositionBlock } from "../blocks/short-composition-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
@@ -196,7 +202,7 @@ const DistTitleBlock = ({ data }: { data: any }) => {
       : null;
   }
 
-  const titleText = dist.questionType?.nameBn || dist.questionTypeName || (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist.questionType?.nameEn);
+  const titleText = dist.questionType?.nameBn || dist.questionTypeNameBn || dist.questionTypeName || (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist.questionType?.nameEn);
 
   return (
     <div className="flex flex-col items-stretch w-full mb-1">
@@ -292,6 +298,18 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <EssayBlock item={block.data.item} />;
     case "question-parts-of-speech":
       return <PartsOfSpeechBlock item={block.data.item} />;
+    case "question-right-form-of-verb":
+      return <RightFormOfVerbBlock item={block.data.item} />;
+    case "question-changing-sentence":
+      return <ChangingSentenceBlock item={block.data.item} />;
+    case "question-fill-in-the-blanks-with-clues":
+      return <FillInTheBlanksWithCluesBlock item={block.data.item} />;
+    case "question-substitution-table":
+      return <SubstitutionTableBlock item={block.data.item} />;
+    case "question-punctuation":
+      return <PunctuationBlock item={block.data.item} />;
+    case "question-short-composition":
+      return <ShortCompositionBlock item={block.data.item} />;
     case "dist-action":
       return <DistActionBlock blockData={block.data} />;
     case "empty":

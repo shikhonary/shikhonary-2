@@ -107,7 +107,7 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
                         <tbody>
                           {subject.distributions.map((d) => (
                             <tr key={d.tempId} className="border-b border-outline-variant/20 last:border-0">
-                              <td className="py-1.5 px-2 text-on-surface">{d.questionTypeName}</td>
+                              <td className="py-1.5 px-2 text-on-surface">{d.questionTypeNameBn || d.questionTypeName}</td>
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.marksPerQuestion}</td>
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionCount}</td>
                               <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionsToAttempt ?? "সব"}</td>

@@ -295,6 +295,28 @@ export type {
 } from "./routers/parts-of-speech/parts-of-speech.schema"
 
 export type {
+  ListRightFormOfVerbsInput,
+  RightFormOfVerbsStatsInput,
+  GetRightFormOfVerbInput,
+  CreateRightFormOfVerbInput,
+  UpdateRightFormOfVerbInput,
+  DeleteRightFormOfVerbInput,
+  BulkDeleteRightFormOfVerbsInput,
+  ImportRightFormOfVerbsInput,
+} from "./routers/right-form-of-verb/right-form-of-verb.schema"
+
+export type {
+  ListChangingSentencesInput,
+  ChangingSentencesStatsInput,
+  GetChangingSentenceInput,
+  CreateChangingSentenceInput,
+  UpdateChangingSentenceInput,
+  DeleteChangingSentenceInput,
+  BulkDeleteChangingSentencesInput,
+  ImportChangingSentencesInput,
+} from "./routers/changing-sentence/changing-sentence.schema"
+
+export type {
   ListFillInTheBlanksWithCluesInput,
   FillInTheBlanksWithCluesStatsInput,
   GetFillInTheBlanksWithCluesInput,
@@ -304,6 +326,42 @@ export type {
   BulkDeleteFillInTheBlanksWithCluesInput,
   ImportFillInTheBlanksWithCluesInput,
 } from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.schema"
+
+export type {
+  ListSubstitutionTablesInput,
+  SubstitutionTableStatsInput,
+  GetSubstitutionTableInput,
+  CreateSubstitutionTableInput,
+  UpdateSubstitutionTableInput,
+  DeleteSubstitutionTableInput,
+  BulkDeleteSubstitutionTablesInput,
+  ImportSubstitutionTablesInput,
+} from "./routers/substitution-table/substitution-table.schema"
+
+export type {
+  ListPunctuationInput,
+  PunctuationStatsInput,
+  GetPunctuationInput,
+  CreatePunctuationInput,
+  UpdatePunctuationInput,
+  DeletePunctuationInput,
+  BulkDeletePunctuationInput,
+  ImportPunctuationInput,
+} from "./routers/punctuation/punctuation.schema"
+
+export type {
+  ListShortCompositionInput,
+  ShortCompositionStatsInput,
+  GetShortCompositionInput,
+  CreateShortCompositionInput,
+  UpdateShortCompositionInput,
+  DeleteShortCompositionInput,
+  BulkDeleteShortCompositionInput,
+  ImportShortCompositionInput,
+} from "./routers/short-composition/short-composition.schema"
+
+
+
 
 
 

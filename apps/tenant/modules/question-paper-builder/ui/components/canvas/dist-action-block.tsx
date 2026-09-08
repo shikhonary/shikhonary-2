@@ -56,7 +56,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
   }
 
   const nameEn = (dist.questionTypeName || dist.questionType?.nameEn || "").toLowerCase();
-  const nameBn = (dist.questionType?.nameBn || "").toLowerCase();
+  const nameBn = (dist.questionTypeNameBn || dist.questionType?.nameBn || "").toLowerCase();
   const label = (dist.questionTypeLabel || dist.questionType?.label || "").toLowerCase();
   const code = (dist.questionType?.code || "").toLowerCase();
 
@@ -83,7 +83,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const combinedStr = `${nameEn} ${nameBn} ${label} ${code} ${subTitleStr} ${secTitleStr}`.toLowerCase();
 
-  const distTypeName = dist?.questionTypeName || dist?.questionType?.nameEn || dist?.questionType?.nameBn || dist?.questionTypeLabel || "";
+  const distTypeName = dist?.questionTypeNameBn || dist?.questionTypeName || dist?.questionType?.nameEn || dist?.questionType?.nameBn || dist?.questionTypeLabel || "";
   const normalized = normalizeQuestionTypeName(distTypeName) || normalizeQuestionTypeName(dist?.questionType?.nameEn) || normalizeQuestionTypeName(dist?.questionType?.nameBn);
 
   let resolvedCategory: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
@@ -111,15 +111,37 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
+    resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
     resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
+    resolvedCategory = QUESTION_TYPE_CODES.PUNCTUATION;
+  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
+    resolvedCategory = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
+    resolvedCategory = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
+    resolvedCategory = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
+    resolvedCategory = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     resolvedCategory = QUESTION_TYPE_CODES.MCQ;
   } else {
     // Robust fallback based on distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
+    if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
+    } else if (lowerName.includes("changing sentence") || lowerName.includes("transformation of sentence") || lowerName.includes("বাক্য রূপান্তর") || lowerName.includes("changing sentences")) {
+      resolvedCategory = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+    } else if (lowerName.includes("right form") || lowerName.includes("verbs in brackets") || lowerName.includes("correct form of verb") || lowerName.includes("ভার্ব")) {
+      resolvedCategory = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+    } else if (lowerName.includes("fill in the blanks") || lowerName.includes("with clues") || lowerName.includes("words from the box") || lowerName.includes("from the box") || lowerName.includes("cloze test") || lowerName.includes("ক্লুসহ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+    } else if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
       resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lowerName.includes("punctuation") || lowerName.includes("capitalization") || lowerName.includes("বিরাম চিহ্ন") || lowerName.includes("যতিচিহ্ন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.PUNCTUATION;
     } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
       resolvedCategory = QUESTION_TYPE_CODES.PBQ;
     } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
@@ -140,6 +162,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
     } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
       resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
+    } else if (lowerName.includes("composition") || lowerName.includes("কম্পোজিশন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
   }
 
@@ -190,7 +214,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     return (
       <div className="border-2 border-dashed border-primary/40 bg-primary/5 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center gap-2.5 text-center transition-colors hover:bg-primary/10 my-2 print:hidden">
         <p className="text-xs sm:text-sm font-semibold text-primary">
-          {dist.questionTypeLabel || dist.questionType?.nameBn || dist.questionType?.nameEn} ({toBengaliDigits(subAddedCount)}/{toBengaliDigits(subTargetCount)}টি)
+          {dist.questionTypeNameBn || dist.questionTypeName || dist.questionType?.nameBn || dist.questionTypeLabel || dist.questionType?.nameEn} ({toBengaliDigits(subAddedCount)}/{toBengaliDigits(subTargetCount)}টি)
         </p>
 
         {subSectionId && isSharedQuestionType && (

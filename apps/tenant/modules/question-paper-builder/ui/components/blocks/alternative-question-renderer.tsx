@@ -14,6 +14,12 @@ import {
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { toast } from "@workspace/ui/components/sonner";
 import { RenderPartsOfSpeechContent } from "./parts-of-speech-block";
+import { RenderPunctuationContent } from "./punctuation-block";
+import { RenderRightFormOfVerbContent } from "./right-form-of-verb-block";
+import { RenderChangingSentenceContent } from "./changing-sentence-block";
+import { RenderFillInTheBlanksContent, RenderCluesTable } from "./fill-in-the-blanks-with-clues-block";
+import { RenderSubstitutionTable } from "./substitution-table-block";
+import { formatShortCompositionPrompt } from "./short-composition-block";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -151,6 +157,12 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const newsReport = alt.newsReport;
         const essay = alt.essay;
         const partsOfSpeech = alt.partsOfSpeech;
+        const punctuation = alt.punctuation;
+        const rightFormOfVerb = alt.rightFormOfVerb;
+        const changingSentence = alt.changingSentence;
+        const fillInTheBlanksWithClues = alt.fillInTheBlanksWithClues;
+        const substitutionTable = alt.substitutionTable;
+        const shortComposition = alt.shortComposition;
         const cs = alt.cs;
         const mcq = alt.mcq;
 
@@ -222,6 +234,45 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   মুছুন
                 </button>
               </div>
+
+              {/* 0.85 EXACT SHORT COMPOSITION BLOCK REPRESENTATION */}
+              {shortComposition && (() => {
+                const scDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === shortComposition.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("composition")
+                  ) || alt.distribution;
+
+                const rawLabel = scDist?.questionTypeLabel || shortComposition.questionType?.label;
+                const formattedPrompt = formatShortCompositionPrompt(
+                  rawLabel,
+                  shortComposition.title || shortComposition.name || "",
+                  shortComposition.wordLimit
+                );
+
+                return (
+                  <div className="w-full flex flex-col">
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-normal text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedPrompt} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* 0.9 EXACT ESSAY BLOCK REPRESENTATION */}
               {essay && (() => {
@@ -843,8 +894,316 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.51 EXACT PUNCTUATION BLOCK REPRESENTATION */}
+              {punctuation && (() => {
+                const puncDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === punctuation.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("punctuation") ||
+                      d.questionTypeName?.toLowerCase().includes("capitalization") ||
+                      d.questionTypeName?.includes("বিরাম চিহ্ন") ||
+                      d.questionTypeName?.includes("যতিচিহ্ন")
+                  ) || alt.distribution;
+
+                const rawLabel = puncDist?.questionTypeLabel || punctuation.questionType?.label;
+                const puncLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {puncLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{puncLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderPunctuationContent text={punctuation.content || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.55 EXACT RIGHT FORM OF VERBS BLOCK REPRESENTATION */}
+              {rightFormOfVerb && (() => {
+                const rfvDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === rightFormOfVerb.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("right form") ||
+                      d.questionTypeName?.toLowerCase().includes("verbs in brackets") ||
+                      d.questionTypeName?.includes("ভার্ব")
+                  ) || alt.distribution;
+
+                const rawLabel = rfvDist?.questionTypeLabel || rightFormOfVerb.questionType?.label;
+                const rfvLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {rfvLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{rfvLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderRightFormOfVerbContent text={rightFormOfVerb.content || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.6 EXACT FILL IN THE BLANKS WITH CLUES BLOCK REPRESENTATION */}
+              {fillInTheBlanksWithClues && (() => {
+                const fitbDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === fillInTheBlanksWithClues.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("fill in the blanks") ||
+                      d.questionTypeName?.toLowerCase().includes("with clues") ||
+                      d.questionTypeName?.includes("ক্লুসহ")
+                  ) || alt.distribution;
+
+                const rawLabel = fitbDist?.questionTypeLabel || fillInTheBlanksWithClues.questionType?.label;
+                const fitbLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {fitbLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{fitbLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0 flex flex-col items-center">
+                          {fillInTheBlanksWithClues.clues && fillInTheBlanksWithClues.clues.length > 0 && (
+                            <RenderCluesTable clues={fillInTheBlanksWithClues.clues} />
+                          )}
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderFillInTheBlanksContent text={fillInTheBlanksWithClues.content || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.7 EXACT SUBSTITUTION TABLE BLOCK REPRESENTATION */}
+              {substitutionTable && (() => {
+                const subTableDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === substitutionTable.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("substitution table") ||
+                      d.questionTypeName?.includes("সাবস্টিটিউশন টেবিল")
+                  ) || alt.distribution;
+
+                const rawLabel = subTableDist?.questionTypeLabel || substitutionTable.questionType?.label;
+                const subTableLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {subTableLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{subTableLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0 flex flex-col items-center">
+                          <RenderSubstitutionTable
+                            columnA={substitutionTable.columnA || []}
+                            columnB={substitutionTable.columnB || []}
+                            columnC={substitutionTable.columnC || []}
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.8 EXACT CHANGING SENTENCE BLOCK REPRESENTATION */}
+              {changingSentence && (() => {
+                const csDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === changingSentence.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("changing sentence") ||
+                      d.questionTypeName?.includes("বাক্য পরিবর্তন")
+                  ) || alt.distribution;
+
+                const rawLabel = csDist?.questionTypeLabel || changingSentence.questionType?.label;
+                const csLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                const hasOptions = Array.isArray(changingSentence.options) && changingSentence.options.length > 0;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {csLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{csLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0">
+                          {hasOptions ? (
+                            <div
+                              className="flex flex-col gap-1.5 w-full font-medium text-foreground"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                              }}
+                            >
+                              {changingSentence.options.map((option: string, optIdx: number) => {
+                                const match = option.match(/^\s*\(?([a-zA-Z0-9]+)\)[\s.:-]*(.*)$/);
+                                const optLabel = match ? match[1] : (["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"][optIdx] || String(optIdx + 1));
+                                const optText = match ? match[2] : option;
+
+                                return (
+                                  <div key={optIdx} className="flex gap-2 items-start w-full leading-relaxed">
+                                    <span
+                                      className="font-bold shrink-0 min-w-[1.6em]"
+                                      style={{
+                                        fontSize: questionStyle.fontSize,
+                                        fontFamily: questionStyle.fontFamily,
+                                      }}
+                                    >
+                                      ({optLabel})
+                                    </span>
+                                    <div className="flex-1 min-w-0">
+                                      <RenderChangingSentenceContent text={optText || ""} />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div
+                              className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                              }}
+                            >
+                              <RenderChangingSentenceContent text={changingSentence.content || ""} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && (
+              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !substitutionTable && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

@@ -20,6 +20,10 @@ import {
   HelpCircle,
   Newspaper,
   ScrollText,
+  TableProperties,
+  Shuffle,
+  Quote,
+  PenTool,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -75,7 +79,12 @@ const navGroups: NavGroup[] = [
       { href: "/news-reports", label: "News Reports", icon: Newspaper },
       { href: "/essays", label: "Essays", icon: ScrollText },
       { href: "/parts-of-speech", label: "Parts of Speech", icon: HelpCircle },
+      { href: "/right-form-of-verbs", label: "Right Form of Verbs", icon: HelpCircle },
+      { href: "/changing-sentences", label: "Changing Sentences", icon: Shuffle },
       { href: "/fill-in-the-blanks-with-clues", label: "Fill in Blanks (Clues)", icon: HelpCircle },
+      { href: "/substitution-tables", label: "Substitution Tables", icon: TableProperties },
+      { href: "/punctuation", label: "Punctuation", icon: Quote },
+      { href: "/short-composition", label: "Short Composition", icon: PenTool },
       { href: "/question-types", label: "Question Types", icon: HelpCircle },
     ],
   },

@@ -18,6 +18,11 @@ export const QUESTION_TYPES = {
   ESSAY: "Essay",
   PARTS_OF_SPEECH: "Parts of Speech",
   FILL_IN_THE_BLANKS_WITH_CLUES: "Fill in the Blanks with Clues",
+  RIGHT_FORM_OF_VERBS: "Right Form of Verbs",
+  CHANGING_SENTENCES: "Changing Sentences",
+  SUBSTITUTION_TABLE: "Substitution Table",
+  PUNCTUATION: "Punctuation and Capitalization",
+  SHORT_COMPOSITION: "Short Composition",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -38,6 +43,11 @@ export const QUESTION_TYPE_CODES = {
   ESSAY: "ESSAY",
   PARTS_OF_SPEECH: "PARTS_OF_SPEECH",
   FILL_IN_THE_BLANKS_WITH_CLUES: "FILL_IN_THE_BLANKS_WITH_CLUES",
+  RIGHT_FORM_OF_VERBS: "RIGHT_FORM_OF_VERBS",
+  CHANGING_SENTENCES: "CHANGING_SENTENCES",
+  SUBSTITUTION_TABLE: "SUBSTITUTION_TABLE",
+  PUNCTUATION: "PUNCTUATION",
+  SHORT_COMPOSITION: "SHORT_COMPOSITION",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -156,6 +166,41 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     defaultMark: 5,
     defaultPosition: 10,
   },
+  [QUESTION_TYPES.RIGHT_FORM_OF_VERBS]: {
+    nameEn: QUESTION_TYPES.RIGHT_FORM_OF_VERBS,
+    nameBn: "ক্রিয়ার সঠিক রূপ (Right Form of Verbs)",
+    code: QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS,
+    defaultMark: 5,
+    defaultPosition: 11,
+  },
+  [QUESTION_TYPES.CHANGING_SENTENCES]: {
+    nameEn: QUESTION_TYPES.CHANGING_SENTENCES,
+    nameBn: "বাক্য রূপান্তর (Changing Sentences)",
+    code: QUESTION_TYPE_CODES.CHANGING_SENTENCES,
+    defaultMark: 5,
+    defaultPosition: 12,
+  },
+  [QUESTION_TYPES.SUBSTITUTION_TABLE]: {
+    nameEn: QUESTION_TYPES.SUBSTITUTION_TABLE,
+    nameBn: "প্রতিস্থাপন সারণি",
+    code: QUESTION_TYPE_CODES.SUBSTITUTION_TABLE,
+    defaultMark: 5,
+    defaultPosition: 13,
+  },
+  [QUESTION_TYPES.PUNCTUATION]: {
+    nameEn: QUESTION_TYPES.PUNCTUATION,
+    nameBn: "বিরাম চিহ্ন ও ক্যাপিটালাইজেশন (Punctuation and Capitalization)",
+    code: QUESTION_TYPE_CODES.PUNCTUATION,
+    defaultMark: 5,
+    defaultPosition: 14,
+  },
+  [QUESTION_TYPES.SHORT_COMPOSITION]: {
+    nameEn: QUESTION_TYPES.SHORT_COMPOSITION,
+    nameBn: "শর্ট কম্পোজিশন (Short Composition)",
+    code: QUESTION_TYPE_CODES.SHORT_COMPOSITION,
+    defaultMark: 10,
+    defaultPosition: 15,
+  },
 } as const
 
 export const QUESTION_TYPE_OPTIONS = Object.values(QUESTION_TYPE_MAP).map((qt) => ({
@@ -249,6 +294,73 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("ক্লুসহ")
   ) {
     return QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES
+  }
+  if (
+    lower === "right form of verbs" ||
+    lower === "right form of verb" ||
+    lower === "right forms of verbs" ||
+    lower.includes("right form of verb") ||
+    lower.includes("right forms of verb") ||
+    lower.includes("correct form of verb") ||
+    lower.includes("correct form of the verb") ||
+    lower.includes("verbs given in the brackets") ||
+    lower.includes("verbs in the bracket") ||
+    lower.includes("verbs in brackets") ||
+    lower.includes("ক্রিয়ার সঠিক রূপ") ||
+    lower.includes("রাইট ফর্ম অফ ভার্ব")
+  ) {
+    return QUESTION_TYPES.RIGHT_FORM_OF_VERBS
+  }
+  if (
+    lower === "changing sentences" ||
+    lower === "changing sentence" ||
+    lower === "transformation of sentences" ||
+    lower === "transformation of sentence" ||
+    lower.includes("changing sentence") ||
+    lower.includes("change the following sentence") ||
+    lower.includes("change the sentence") ||
+    lower.includes("as directed in brackets") ||
+    lower.includes("directed in bracket") ||
+    lower.includes("directed in brackets") ||
+    lower.includes("transformation of sentence") ||
+    lower.includes("বাক্য রূপান্তর") ||
+    lower.includes("বাক্য পরিবর্তন")
+  ) {
+    return QUESTION_TYPES.CHANGING_SENTENCES
+  }
+  if (
+    lower === "substitution table" ||
+    lower.includes("substitution table") ||
+    lower.includes("substitution") ||
+    lower.includes("meaningful sentences from the following") ||
+    lower.includes("প্রতিস্থাপন সারণি") ||
+    lower.includes("সাবস্টিটিউশন")
+  ) {
+    return QUESTION_TYPES.SUBSTITUTION_TABLE
+  }
+  if (
+    lower === "punctuation" ||
+    lower === "punctuation and capitalization" ||
+    lower === "punctuation and capital letters" ||
+    lower === "capitalization" ||
+    lower.includes("punctuation") ||
+    lower.includes("capitalization") ||
+    lower.includes("capital letter") ||
+    lower.includes("capital letters") ||
+    lower.includes("punctuation marks") ||
+    lower.includes("বিরাম চিহ্ন") ||
+    lower.includes("যতিচিহ্ন")
+  ) {
+    return QUESTION_TYPES.PUNCTUATION
+  }
+  if (
+    lower === "short composition" ||
+    lower === "composition" ||
+    lower.includes("short composition") ||
+    lower.includes("composition") ||
+    lower.includes("কম্পোজিশন")
+  ) {
+    return QUESTION_TYPES.SHORT_COMPOSITION
   }
 
   return null

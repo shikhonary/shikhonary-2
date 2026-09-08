@@ -54,6 +54,12 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.PBQ, nameBn: "অনুচ্ছেদভিত্তিক প্রশ্ন", nameEn: "Passage Based (PBQ)", desc: "অনুচ্ছেদ ও ৫টি স্তরের প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SA, nameBn: "সংক্ষিপ্ত-উত্তর", nameEn: "Short Answer", desc: "সংক্ষিপ্ত রচনামূলক প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.PARTS_OF_SPEECH, nameBn: "পদ প্রকরণ / Parts of Speech", nameEn: "Parts of Speech", desc: "শব্দের পদ চিহ্নিতকরণ ও ব্যাকরণ" },
+  { code: QUESTION_TYPE_CODES.PUNCTUATION, nameBn: "বিরাম চিহ্ন ও ক্যাপিটালাইজেশন", nameEn: "Punctuation and Capitalization", desc: "উপযুক্ত বিরাম চিহ্ন ও ক্যাপিটাল লেটার ব্যবহার" },
+  { code: QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS, nameBn: "Right Form of Verbs", nameEn: "Right Form of Verbs", desc: "বন্ধনীতে প্রদত্ত ক্রিয়ার সঠিক রূপ ব্যবহার" },
+  { code: QUESTION_TYPE_CODES.CHANGING_SENTENCES, nameBn: "Changing Sentences", nameEn: "Changing Sentences", desc: "নির্দেশনা অনুযায়ী বাক্য রূপান্তর (Transformation of Sentences)" },
+  { code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES, nameBn: "শূন্যস্থান পূরণ (ক্লুসহ)", nameEn: "Fill in the Blanks with Clues", desc: "বক্স থেকে উপযুক্ত শব্দ নিয়ে শূন্যস্থান পূরণ" },
+  { code: QUESTION_TYPE_CODES.SUBSTITUTION_TABLE, nameBn: "সাবস্টিটিউশন টেবিল", nameEn: "Substitution Table", desc: "৩-কলামের টেবিল থেকে বাক্য গঠন" },
+  { code: QUESTION_TYPE_CODES.SHORT_COMPOSITION, nameBn: "Short Composition", nameEn: "Short Composition", desc: "সংক্ষিপ্ত রচনা বা কম্পোজিশন লিখন" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({

@@ -41,7 +41,12 @@ import { thoughtExpansionRouter } from "./routers/thought-expansion/thought-expa
 import { newsReportRouter } from "./routers/news-report/news-report.router"
 import { essayRouter } from "./routers/essay/essay.router"
 import { partsOfSpeechRouter } from "./routers/parts-of-speech/parts-of-speech.router"
+import { rightFormOfVerbRouter } from "./routers/right-form-of-verb/right-form-of-verb.router"
+import { changingSentenceRouter } from "./routers/changing-sentence/changing-sentence.router"
 import { fillInTheBlanksWithCluesRouter } from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.router"
+import { substitutionTableRouter } from "./routers/substitution-table/substitution-table.router"
+import { punctuationRouter } from "./routers/punctuation/punctuation.router"
+import { shortCompositionRouter } from "./routers/short-composition/short-composition.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -77,7 +82,12 @@ export const appRouter = createTRPCRouter({
   newsReport: newsReportRouter,
   essay: essayRouter,
   partsOfSpeech: partsOfSpeechRouter,
+  rightFormOfVerb: rightFormOfVerbRouter,
+  changingSentence: changingSentenceRouter,
   fillInTheBlanksWithClues: fillInTheBlanksWithCluesRouter,
+  substitutionTable: substitutionTableRouter,
+  punctuation: punctuationRouter,
+  shortComposition: shortCompositionRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

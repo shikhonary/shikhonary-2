@@ -25,6 +25,12 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "APPLICATION" && (l.includes("সংবাদ প্রতিবেদন") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "NEWS_REPORT" && (l.includes("আবেদনপত্র") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "PARTS_OF_SPEECH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "PUNCTUATION" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "RIGHT_FORM_OF_VERBS" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "CHANGING_SENTENCES" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "FILL_IN_THE_BLANKS_WITH_CLUES" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "SUBSTITUTION_TABLE" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "SHORT_COMPOSITION" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "PBQ" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   return false;
 };

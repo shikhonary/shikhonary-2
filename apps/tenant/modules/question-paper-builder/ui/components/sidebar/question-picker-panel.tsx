@@ -39,12 +39,12 @@ export const QuestionPickerPanel: React.FC = () => {
   const activeDistId = activeDist?.distributionId || "";
 
   const qTypeNameEn = (activeDist?.questionType?.nameEn || activeDist?.questionTypeName || "").toLowerCase();
-  const qTypeNameBn = (activeDist?.questionType?.nameBn || "").toLowerCase();
+  const qTypeNameBn = (activeDist?.questionType?.nameBn || activeDist?.questionTypeNameBn || "").toLowerCase();
   const qTypeCode = (activeDist?.questionType?.code || "").toLowerCase();
   const qTypeLabel = (activeDist?.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
-  const rawName = activeDist?.questionTypeName || activeDist?.questionType?.nameEn || activeDist?.questionType?.nameBn || activeDist?.questionTypeLabel || "";
+  const rawName = activeDist?.questionTypeNameBn || activeDist?.questionTypeName || activeDist?.questionType?.nameEn || activeDist?.questionType?.nameBn || activeDist?.questionTypeLabel || "";
   const normalized = normalizeQuestionTypeName(rawName) || normalizeQuestionTypeName(activeDist?.questionType?.nameEn) || normalizeQuestionTypeName(activeDist?.questionType?.nameBn);
 
   let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
@@ -72,14 +72,36 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
+    category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
     category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
+    category = QUESTION_TYPE_CODES.PUNCTUATION;
+  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
+    category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
+    category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
+    category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
+    category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
   } else if (normalized === QUESTION_TYPES.MCQ) {
     category = QUESTION_TYPE_CODES.MCQ;
   } else {
     const lower = rawName.toLowerCase();
-    if (lower.includes("parts of speech") || lower.includes("part of speech") || lower.includes("পদ প্রকরণ")) {
+    if (lower.includes("substitution table") || lower.includes("সাবস্টিটিউশন টেবিল")) {
+      category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
+    } else if (lower.includes("changing sentence") || lower.includes("transformation of sentence") || lower.includes("বাক্য রূপান্তর") || lower.includes("changing sentences")) {
+      category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+    } else if (lower.includes("right form") || lower.includes("verbs in brackets") || lower.includes("correct form of verb") || lower.includes("ভার্ব")) {
+      category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+    } else if (lower.includes("fill in the blanks") || lower.includes("with clues") || lower.includes("ক্লুসহ")) {
+      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+    } else if (lower.includes("parts of speech") || lower.includes("part of speech") || lower.includes("পদ প্রকরণ")) {
       category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lower.includes("punctuation") || lower.includes("capitalization") || lower.includes("বিরাম চিহ্ন") || lower.includes("যতিচিহ্ন")) {
+      category = QUESTION_TYPE_CODES.PUNCTUATION;
     } else if (lower.includes("pbq") || lower.includes("passage") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
       category = QUESTION_TYPE_CODES.PBQ;
     } else if (lower.includes("essence") || lower.includes("সারমর্ম")) {
@@ -98,6 +120,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.NEWS_REPORT;
     } else if (lower.includes("essay") || lower.includes("রচনা") || lower.includes("প্রবন্ধ")) {
       category = QUESTION_TYPE_CODES.ESSAY;
+    } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
+      category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
   }
 
@@ -180,6 +204,18 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, essayIds: [questionId] });
       } else if (category === "PARTS_OF_SPEECH") {
         await assignQuestion({ ...payloadBase, partsOfSpeechIds: [questionId] });
+      } else if (category === "PUNCTUATION") {
+        await assignQuestion({ ...payloadBase, punctuationIds: [questionId] });
+      } else if (category === "SHORT_COMPOSITION") {
+        await assignQuestion({ ...payloadBase, shortCompositionIds: [questionId] });
+      } else if (category === "RIGHT_FORM_OF_VERBS") {
+        await assignQuestion({ ...payloadBase, rightFormOfVerbIds: [questionId] });
+      } else if (category === "CHANGING_SENTENCES") {
+        await assignQuestion({ ...payloadBase, changingSentenceIds: [questionId] });
+      } else if (category === "FILL_IN_THE_BLANKS_WITH_CLUES") {
+        await assignQuestion({ ...payloadBase, fillInTheBlanksWithCluesIds: [questionId] });
+      } else if (category === "SUBSTITUTION_TABLE") {
+        await assignQuestion({ ...payloadBase, substitutionTableIds: [questionId] });
       } else {
         await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
@@ -230,7 +266,7 @@ export const QuestionPickerPanel: React.FC = () => {
                       : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container border-outline-variant"
                   }`}
                 >
-                  <span>{st.questionTypeName || st.subjectName}</span>
+                  <span>{st.questionTypeNameBn || st.questionTypeName || st.subjectName}</span>
                   <span className={`ml-1.5 text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : isComplete ? "bg-emerald-500/10 text-emerald-600 font-bold" : "bg-muted text-muted-foreground"}`}>
                     {st.addedCount}/{st.targetCount}
                   </span>
@@ -344,16 +380,29 @@ export const QuestionPickerPanel: React.FC = () => {
                   )}
 
                   <div className="font-body text-on-surface line-clamp-3 leading-relaxed mb-2">
-                    {category === "PARTS_OF_SPEECH" ? (
+                    {category === "CHANGING_SENTENCES" ? (
+                      <RenderMath text={q.content || (Array.isArray(q.options) && q.options.length > 0 ? q.options.join("\n") : "")} />
+                    ) : category === "PARTS_OF_SPEECH" || category === "PUNCTUATION" || category === "RIGHT_FORM_OF_VERBS" || category === "FILL_IN_THE_BLANKS_WITH_CLUES" ? (
                       <RenderMath text={q.content || ""} />
+                    ) : category === "SUBSTITUTION_TABLE" ? (
+                      <span className="text-xs">
+                        টেবিল ({q.columnA?.length || 0} সারি) — {q.columnA?.[0] || ""} | {q.columnB?.[0] || ""} | {q.columnC?.[0] || ""}
+                      </span>
                     ) : category === "CQ" || category === "CS" ? (
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
                     ) : category === "PBQ" ? (
                       <RenderMath text={q.context || q.questionA || "অনুচ্ছেদভিত্তিক প্রশ্ন"} />
                     ) : category === "PARAGRAPH" ? (
                       <RenderMath text={q.name || q.title || ""} />
-                    ) : category === "SUMMARY" || category === "AMPLIFICATION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" ? (
-                      <RenderMath text={q.title || q.name || ""} />
+                    ) : category === "SUMMARY" || category === "AMPLIFICATION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" || category === "SHORT_COMPOSITION" ? (
+                      <div className="flex flex-col gap-1">
+                        <RenderMath text={q.title || q.name || ""} />
+                        {q.wordLimit ? (
+                          <span className="text-[10px] text-primary font-medium">
+                            [{q.wordLimit} words]
+                          </span>
+                        ) : null}
+                      </div>
                     ) : (
                       <RenderMath text={q.question || ""} />
                     )}

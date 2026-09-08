@@ -4,6 +4,7 @@ export interface WizardDistribution {
   tempId: string
   questionTypeId: string
   questionTypeName: string
+  questionTypeNameBn?: string | null
   questionTypeLabel?: string | null
   marksPerQuestion: number
   markDistribution?: any

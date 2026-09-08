@@ -163,9 +163,10 @@ model QuestionPaperSubjectMarkDistribution {
     id String @id @default(cuid())
 
     // Logical reference to main.QuestionType (no @relation — cross-DB)
-    questionTypeId    String
-    questionTypeName  String
-    questionTypeLabel String?
+    questionTypeId     String
+    questionTypeName   String
+    questionTypeNameBn String?
+    questionTypeLabel  String?
 
     paperSubjectId String
     paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
@@ -240,7 +241,13 @@ model QuestionPaperQuestion {
     essenceId       String?
     essayId         String?
     newsReportId    String?
-    partsOfSpeechId String?
+    partsOfSpeechId              String?
+    rightFormOfVerbId            String?
+    changingSentenceId           String?
+    fillInTheBlanksWithCluesId   String?
+    substitutionTableId          String?
+    punctuationId                String?
+    shortCompositionId           String?
 
     // ── Alternative / OR Question Relationship ─────────────────
     // If null, this is the primary question slot.
@@ -294,6 +301,12 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, essayId])
     @@unique([questionPaperId, newsReportId])
     @@unique([questionPaperId, partsOfSpeechId])
+    @@unique([questionPaperId, punctuationId])
+    @@unique([questionPaperId, rightFormOfVerbId])
+    @@unique([questionPaperId, changingSentenceId])
+    @@unique([questionPaperId, fillInTheBlanksWithCluesId])
+    @@unique([questionPaperId, substitutionTableId])
+    @@unique([questionPaperId, shortCompositionId])
     @@index([parentQuestionId])
     @@index([questionPaperId])
     @@index([questionPaperId, parentQuestionId, orderIndex])
@@ -311,6 +324,12 @@ model QuestionPaperQuestion {
     @@index([essayId])
     @@index([newsReportId])
     @@index([partsOfSpeechId])
+    @@index([punctuationId])
+    @@index([rightFormOfVerbId])
+    @@index([changingSentenceId])
+    @@index([fillInTheBlanksWithCluesId])
+    @@index([substitutionTableId])
+    @@index([shortCompositionId])
     @@index([distributionId])
     @@index([sectionId])
     @@index([subSectionId])
