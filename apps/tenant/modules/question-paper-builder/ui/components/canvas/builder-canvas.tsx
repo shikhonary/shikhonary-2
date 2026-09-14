@@ -189,6 +189,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         }
 
         let essenceIdx = 0;
+        let poemIdx = 0;
         let summaryIdx = 0;
         let paragraphIdx = 0;
         let amplificationIdx = 0;
@@ -204,12 +205,15 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let substitutionTableIdx = 0;
         let punctuationIdx = 0;
         let shortCompositionIdx = 0;
+        let shortQuestionIdx = 0;
         let pbqIdx = 0;
         const totalEssences = questions.filter((q: any) => q.essence).length;
+        const totalPoems = questions.filter((q: any) => q.poem).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
         const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
         const totalAmplifications = questions.filter((q: any) => q.amplification).length;
         const totalShortAnswers = questions.filter((q: any) => q.shortAnswer).length;
+        const totalShortQuestions = questions.filter((q: any) => q.shortQuestion).length;
         const totalLetters = questions.filter((q: any) => q.letter).length;
         const totalApplications = questions.filter((q: any) => q.application).length;
         const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
@@ -431,6 +435,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             shortAnswerIdx++;
           }
+          if (q.shortQuestion) {
+            if (shortQuestionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-short-question",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SHORT_QUESTION",
+                  data: q.shortQuestion,
+                  orderIndex: shortQuestionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstShortQuestion: shortQuestionIdx === 0,
+                  totalQuestions: totalShortQuestions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "সংক্ষিপ্ত প্রশ্ন",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: shortQuestionIdx === totalShortQuestions - 1 ? 4 : 0
+            });
+            shortQuestionIdx++;
+          }
           if (q.essence) {
             if (essenceIdx === 0) {
               globalWrittenNumber++;
@@ -465,6 +504,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: essenceIdx === totalEssences - 1 ? 4 : 0,
             });
             essenceIdx++;
+          }
+          if (q.poem) {
+            if (poemIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-poem",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "POEM",
+                  data: q.poem,
+                  orderIndex: poemIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPoem: poemIdx === 0,
+                  totalQuestions: totalPoems,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: poemIdx === totalPoems - 1 ? 4 : 0,
+            });
+            poemIdx++;
           }
           if (q.summary) {
             if (summaryIdx === 0) {

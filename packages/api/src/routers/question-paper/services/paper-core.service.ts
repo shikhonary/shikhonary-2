@@ -154,6 +154,7 @@ export async function getQuestionPaperById(
   const applicationIds = allPaperQuestions.map((q: any) => q.applicationId).filter(Boolean) as string[]
   const summaryIds = allPaperQuestions.map((q: any) => q.summaryId).filter(Boolean) as string[]
   const essenceIds = allPaperQuestions.map((q: any) => q.essenceId).filter(Boolean) as string[]
+  const poemIds = allPaperQuestions.map((q: any) => q.poemId).filter(Boolean) as string[]
   const newsReportIds = allPaperQuestions.map((q: any) => q.newsReportId).filter(Boolean) as string[]
   const essayIds = allPaperQuestions.map((q: any) => q.essayId).filter(Boolean) as string[]
   const partsOfSpeechIds = allPaperQuestions.map((q: any) => q.partsOfSpeechId).filter(Boolean) as string[]
@@ -163,6 +164,7 @@ export async function getQuestionPaperById(
   const substitutionTableIds = allPaperQuestions.map((q: any) => q.substitutionTableId).filter(Boolean) as string[]
   const punctuationIds = allPaperQuestions.map((q: any) => q.punctuationId).filter(Boolean) as string[]
   const shortCompositionIds = allPaperQuestions.map((q: any) => q.shortCompositionId).filter(Boolean) as string[]
+  const shortQuestionIds = allPaperQuestions.map((q: any) => q.shortQuestionId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -181,6 +183,7 @@ export async function getQuestionPaperById(
     applications,
     summaries,
     essences,
+    poems,
     newsReports,
     essays,
     partsOfSpeeches,
@@ -190,6 +193,7 @@ export async function getQuestionPaperById(
     substitutionTables,
     punctuations,
     shortCompositions,
+    shortQuestions,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -295,6 +299,14 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    poemIds.length > 0
+      ? (db as any).poem.findMany({
+        where: { id: { in: poemIds } },
+        include: {
+          questionType: true,
+        },
+      })
+      : [],
     newsReportIds.length > 0
       ? (db as any).newsReport.findMany({
         where: { id: { in: newsReportIds } },
@@ -373,6 +385,16 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    shortQuestionIds.length > 0
+      ? (db as any).shortQuestion.findMany({
+        where: { id: { in: shortQuestionIds } },
+        include: {
+          questionType: true,
+          subject: true,
+          chapter: true,
+        },
+      })
+      : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
     questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
@@ -389,6 +411,7 @@ export async function getQuestionPaperById(
   const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
   const summaryMap = new Map(summaries.map((s: any) => [s.id, s]))
   const essenceMap = new Map(essences.map((e: any) => [e.id, e]))
+  const poemMap = new Map(poems.map((p: any) => [p.id, p]))
   const newsReportMap = new Map(newsReports.map((n: any) => [n.id, n]))
   const essayMap = new Map(essays.map((e: any) => [e.id, e]))
   const partsOfSpeechMap = new Map(partsOfSpeeches.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
@@ -398,6 +421,7 @@ export async function getQuestionPaperById(
   const substitutionTableMap = new Map(substitutionTables.map((s: any) => [s.id, s]))
   const punctuationMap = new Map(punctuations.map((p: any) => [p.id, p]))
   const shortCompositionMap = new Map(shortCompositions.map((s: any) => [s.id, s]))
+  const shortQuestionMap = new Map((shortQuestions as any[]).map((s: any) => [s.id, s]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -427,6 +451,7 @@ export async function getQuestionPaperById(
     let resolvedApplication = q.applicationId ? applicationMap.get(q.applicationId) || null : null
     let resolvedSummary = q.summaryId ? summaryMap.get(q.summaryId) || null : null
     let resolvedEssence = q.essenceId ? essenceMap.get(q.essenceId) || null : null
+    let resolvedPoem = q.poemId ? poemMap.get(q.poemId) || null : null
     let resolvedNewsReport = q.newsReportId ? newsReportMap.get(q.newsReportId) || null : null
     let resolvedEssay = q.essayId ? essayMap.get(q.essayId) || null : null
     let resolvedPartsOfSpeech = q.partsOfSpeechId ? partsOfSpeechMap.get(q.partsOfSpeechId) || null : null
@@ -436,6 +461,7 @@ export async function getQuestionPaperById(
     let resolvedSubstitutionTable = q.substitutionTableId ? substitutionTableMap.get(q.substitutionTableId) || null : null
     let resolvedPunctuation = q.punctuationId ? punctuationMap.get(q.punctuationId) || null : null
     let resolvedShortComposition = q.shortCompositionId ? shortCompositionMap.get(q.shortCompositionId) || null : null
+    let resolvedShortQuestion = q.shortQuestionId ? shortQuestionMap.get(q.shortQuestionId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -471,6 +497,9 @@ export async function getQuestionPaperById(
     if (!resolvedEssence && q.essenceId && q.contentSnapshot) {
       resolvedEssence = q.contentSnapshot as any
     }
+    if (!resolvedPoem && q.poemId && q.contentSnapshot) {
+      resolvedPoem = q.contentSnapshot as any
+    }
     if (!resolvedNewsReport && q.newsReportId && q.contentSnapshot) {
       resolvedNewsReport = q.contentSnapshot as any
     }
@@ -498,10 +527,14 @@ export async function getQuestionPaperById(
     if (!resolvedShortComposition && q.shortCompositionId && q.contentSnapshot) {
       resolvedShortComposition = q.contentSnapshot as any
     }
+    if (!resolvedShortQuestion && q.shortQuestionId && q.contentSnapshot) {
+      resolvedShortQuestion = q.contentSnapshot as any
+    }
 
     let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
 
     const actualQuestionTypeId =
+      (resolvedShortQuestion as any)?.questionTypeId ||
       (resolvedShortComposition as any)?.questionTypeId ||
       (resolvedPunctuation as any)?.questionTypeId ||
       (resolvedSubstitutionTable as any)?.questionTypeId ||
@@ -511,6 +544,7 @@ export async function getQuestionPaperById(
       (resolvedPartsOfSpeech as any)?.questionTypeId ||
       (resolvedEssay as any)?.questionTypeId ||
       (resolvedNewsReport as any)?.questionTypeId ||
+      (resolvedPoem as any)?.questionTypeId ||
       (resolvedEssence as any)?.questionTypeId ||
       (resolvedSummary as any)?.questionTypeId ||
       (resolvedParagraph as any)?.questionTypeId ||
@@ -525,6 +559,7 @@ export async function getQuestionPaperById(
       for (const dist of distMap.values()) {
         const matchesExact = dist.questionTypeId === actualQuestionTypeId
         const matchesCategory =
+          (resolvedShortQuestion && (dist.questionTypeName?.toLowerCase().includes("short question") || dist.questionTypeName?.includes("সংক্ষিপ্ত প্রশ্ন") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
           (resolvedShortComposition && (dist.questionTypeName?.toLowerCase().includes("composition") || dist.questionTypeName?.toLowerCase().includes("short composition") || dist.questionTypeName?.includes("কম্পোজিশন") || dist.questionTypeName?.includes("শর্ট কম্পোজিশন"))) ||
           (resolvedPunctuation && (dist.questionTypeName?.toLowerCase().includes("punctuation") || dist.questionTypeName?.toLowerCase().includes("capitalization") || dist.questionTypeName?.toLowerCase().includes("capital letter") || dist.questionTypeName?.includes("বিরাম চিহ্ন") || dist.questionTypeName?.includes("যতিচিহ্ন"))) ||
           (resolvedSubstitutionTable && (dist.questionTypeName?.toLowerCase().includes("substitution table") || dist.questionTypeName?.includes("সাবস্টিটিউশন টেবিল"))) ||
@@ -535,6 +570,7 @@ export async function getQuestionPaperById(
           (resolvedEssay && (dist.questionTypeName?.includes("রচনা") || dist.questionTypeName?.toLowerCase().includes("essay"))) ||
           (resolvedNewsReport && (dist.questionTypeName?.includes("প্রতিবেদন") || dist.questionTypeName?.toLowerCase().includes("report"))) ||
           (resolvedEssence && (dist.questionTypeName?.includes("সারমর্ম") || dist.questionTypeName?.toLowerCase().includes("essence"))) ||
+          (resolvedPoem && (dist.questionTypeName?.includes("কবিতা") || dist.questionTypeName?.toLowerCase().includes("poem"))) ||
           (resolvedSummary && (dist.questionTypeName?.includes("সারাংশ") || dist.questionTypeName?.toLowerCase().includes("summary"))) ||
           (resolvedParagraph && (dist.questionTypeName?.includes("অনুচ্ছেদ") || dist.questionTypeName?.toLowerCase().includes("paragraph"))) ||
           (resolvedLetter && (dist.questionTypeName?.includes("চিঠি") || dist.questionTypeName?.includes("পত্র") || dist.questionTypeName?.toLowerCase().includes("letter"))) ||
@@ -566,6 +602,7 @@ export async function getQuestionPaperById(
       application: resolvedApplication,
       summary: resolvedSummary,
       essence: resolvedEssence,
+      poem: resolvedPoem,
       newsReport: resolvedNewsReport,
       essay: resolvedEssay,
       partsOfSpeech: resolvedPartsOfSpeech,
@@ -575,6 +612,7 @@ export async function getQuestionPaperById(
       substitutionTable: resolvedSubstitutionTable,
       punctuation: resolvedPunctuation,
       shortComposition: resolvedShortComposition,
+      shortQuestion: resolvedShortQuestion,
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
   }
@@ -735,7 +773,7 @@ export async function createQuestionPaperFull(
       const pSection = await tenantDb.questionPaperSection.create({
         data: {
           questionPaperId: paper.id,
-          title: mSec.nameEn,
+          title: mSec.nameEn || mSec.nameBn || "Section",
           titleBn: mSec.nameBn,
           orderIndex: mSec.position,
           instructions: mSec.instructions ?? null,
@@ -773,7 +811,7 @@ export async function createQuestionPaperFull(
           for (let idx = 0; idx < requiredInstances; idx++) {
             subSectionsToCreate.push({
               sectionId: pSection.id,
-              title: mSub.nameEn,
+              title: mSub.nameEn || mSub.nameBn || "Sub-section",
               titleBn: mSub.nameBn,
               orderIndex: mSub.position + idx,
               instructions: mSub.instructions ?? null,
@@ -827,7 +865,7 @@ export async function createQuestionPaperFull(
         const pSec = await tenantDb.questionPaperSection.findFirst({
           where: {
             questionPaperId: paper.id,
-            title: sqType.section.nameEn,
+            title: sqType.section.nameEn || sqType.section.nameBn || "",
             titleBn: sqType.section.nameBn,
           },
         })
@@ -855,7 +893,7 @@ export async function createQuestionPaperFull(
         const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
           where: {
             sectionId,
-            title: sqType.subSection.nameEn,
+            title: sqType.subSection.nameEn || sqType.subSection.nameBn || "",
             titleBn: sqType.subSection.nameBn,
           },
           orderBy: { orderIndex: "asc" },
@@ -1120,6 +1158,7 @@ export async function duplicateQuestionPaper(
         applicationId: question.applicationId,
         summaryId: question.summaryId,
         essenceId: question.essenceId,
+        poemId: question.poemId,
         essayId: question.essayId,
         newsReportId: question.newsReportId,
         partsOfSpeechId: question.partsOfSpeechId,
@@ -1129,6 +1168,7 @@ export async function duplicateQuestionPaper(
         substitutionTableId: question.substitutionTableId,
         punctuationId: question.punctuationId,
         shortCompositionId: question.shortCompositionId,
+        shortQuestionId: question.shortQuestionId,
         distributionId: newDistId,
         sectionId: newSectionId,
         orderIndex: question.orderIndex,
@@ -1155,6 +1195,7 @@ export async function duplicateQuestionPaper(
             applicationId: alt.applicationId,
             summaryId: alt.summaryId,
             essenceId: alt.essenceId,
+            poemId: alt.poemId,
             essayId: alt.essayId,
             newsReportId: alt.newsReportId,
             partsOfSpeechId: alt.partsOfSpeechId,
@@ -1164,6 +1205,7 @@ export async function duplicateQuestionPaper(
             substitutionTableId: alt.substitutionTableId,
             punctuationId: alt.punctuationId,
             shortCompositionId: alt.shortCompositionId,
+            shortQuestionId: alt.shortQuestionId,
             distributionId: altDistId,
             sectionId: newSectionId,
             orderIndex: alt.orderIndex,

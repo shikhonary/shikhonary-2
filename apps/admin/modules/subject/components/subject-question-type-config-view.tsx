@@ -32,15 +32,15 @@ const subjectQuestionStructureSchema = z.object({
   sections: z.array(
     z.object({
       id: z.string().optional(),
-      nameEn: z.string().min(1, "English section name is required"),
-      nameBn: z.string().min(1, "Bangla section name is required"),
+      nameEn: z.string().optional().nullable(),
+      nameBn: z.string().optional().nullable(),
       position: z.number().int().default(0),
       instructions: z.string().optional().nullable(),
       subSections: z.array(
         z.object({
           id: z.string().optional(),
-          nameEn: z.string().min(1, "English sub-section name is required"),
-          nameBn: z.string().min(1, "Bangla sub-section name is required"),
+          nameEn: z.string().optional().nullable(),
+          nameBn: z.string().optional().nullable(),
           position: z.number().int().default(0),
           instructions: z.string().optional().nullable(),
           questionTypes: z.array(questionTypeConfigSchema).default([]),
@@ -232,7 +232,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       console.error("Validation Errors Details:", errors)
-      toast.error("Please fill in all section & sub-section names and ensure all question types are configured correctly.")
+      toast.error("Please ensure all question types are configured correctly.")
     }
   }, [errors])
 

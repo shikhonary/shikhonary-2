@@ -291,9 +291,11 @@ export const RightFormOfVerbBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="Fill in the blanks with the correct form of the verbs given in the brackets:"
               questionType="RIGHT_FORM_OF_VERBS"
+              questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+              questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,

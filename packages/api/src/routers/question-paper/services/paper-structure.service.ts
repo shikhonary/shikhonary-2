@@ -229,7 +229,7 @@ export async function upsertQuestionPaperSubject(
       let pSection = await tenantDb.questionPaperSection.findFirst({
         where: {
           questionPaperId: input.questionPaperId,
-          title: mSec.nameEn,
+          title: mSec.nameEn || mSec.nameBn || "",
           titleBn: mSec.nameBn,
         },
       })
@@ -237,7 +237,7 @@ export async function upsertQuestionPaperSubject(
         pSection = await tenantDb.questionPaperSection.create({
           data: {
             questionPaperId: input.questionPaperId,
-            title: mSec.nameEn,
+            title: mSec.nameEn || mSec.nameBn || "Section",
             titleBn: mSec.nameBn,
             orderIndex: mSec.position,
             instructions: mSec.instructions ?? null,
@@ -272,7 +272,7 @@ export async function upsertQuestionPaperSubject(
         const existingSubs = await tenantDb.questionPaperSubSection.findMany({
           where: {
             sectionId: pSection.id,
-            title: mSub.nameEn,
+            title: mSub.nameEn || mSub.nameBn || "",
             titleBn: mSub.nameBn,
           },
           orderBy: { orderIndex: "asc" },
@@ -283,7 +283,7 @@ export async function upsertQuestionPaperSubject(
           await tenantDb.questionPaperSubSection.create({
             data: {
               sectionId: pSection.id,
-              title: mSub.nameEn,
+              title: mSub.nameEn || mSub.nameBn || "Sub-section",
               titleBn: mSub.nameBn,
               orderIndex: mSub.position + existingSubs.length + i,
               instructions: mSub.instructions ?? null,

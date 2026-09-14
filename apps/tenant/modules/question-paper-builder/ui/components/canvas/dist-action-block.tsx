@@ -107,12 +107,16 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
   } else if (normalized === QUESTION_TYPES.ESSENCE) {
     resolvedCategory = QUESTION_TYPE_CODES.ESSENCE;
+  } else if (normalized === QUESTION_TYPES.POEM) {
+    resolvedCategory = QUESTION_TYPE_CODES.POEM;
   } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
     resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
     resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
+  } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
+    resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
     resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
   } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
@@ -150,20 +154,10 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
     } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
       resolvedCategory = QUESTION_TYPE_CODES.CQ;
-    } else if (lowerName.includes("short") || lowerName.includes("সংক্ষিপ্ত") || lowerName.includes("sa")) {
+    } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
       resolvedCategory = QUESTION_TYPE_CODES.SA;
-    } else if (lowerName.includes("paragraph") || lowerName.includes("অনুচ্ছেদ")) {
-      resolvedCategory = QUESTION_TYPE_CODES.PARAGRAPH;
-    } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
-      resolvedCategory = QUESTION_TYPE_CODES.AMPLIFICATION;
-    } else if (lowerName.includes("report") || lowerName.includes("প্রতিবেদন")) {
-      resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
-    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ") || lowerName.includes("সারমর্ম")) {
-      resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
-    } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
-      resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
-    } else if (lowerName.includes("composition") || lowerName.includes("কম্পোজিশন")) {
-      resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
   }
 

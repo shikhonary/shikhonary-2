@@ -165,12 +165,16 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     category = QUESTION_TYPE_CODES.SUMMARY;
   } else if (normalized === QUESTION_TYPES.ESSENCE) {
     category = QUESTION_TYPE_CODES.ESSENCE;
+  } else if (normalized === QUESTION_TYPES.POEM) {
+    category = QUESTION_TYPE_CODES.POEM;
   } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
     category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
+  } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
+    category = QUESTION_TYPE_CODES.SHORT_QUESTION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
     category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
   } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
@@ -208,22 +212,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.APPLICATION;
     } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
       category = QUESTION_TYPE_CODES.CQ;
-    } else if (lowerName.includes("short") || lowerName.includes("সংক্ষিপ্ত") || lowerName.includes("sa")) {
+    } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
+      category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
       category = QUESTION_TYPE_CODES.SA;
-    } else if (lowerName.includes("paragraph") || lowerName.includes("অনুচ্ছেদ")) {
-      category = QUESTION_TYPE_CODES.PARAGRAPH;
-    } else if (lowerName.includes("expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব")) {
-      category = QUESTION_TYPE_CODES.AMPLIFICATION;
-    } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {
-      category = QUESTION_TYPE_CODES.ESSENCE;
-    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ")) {
-      category = QUESTION_TYPE_CODES.SUMMARY;
-    } else if (lowerName.includes("report") || lowerName.includes("প্রতিবেদন")) {
-      category = QUESTION_TYPE_CODES.NEWS_REPORT;
-    } else if (lowerName.includes("essay") || lowerName.includes("রচনা") || lowerName.includes("প্রবন্ধ")) {
-      category = QUESTION_TYPE_CODES.ESSAY;
-    } else if (lowerName.includes("composition") || lowerName.includes("কম্পোজিশন")) {
-      category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
   }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
@@ -239,7 +231,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     setSelectedBoard("All");
   };
 
-  const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
+  const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
 
   const renderSelectFilters = (isMobile = false) => (
     <>
@@ -338,6 +330,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, paragraphIds: selectedIds });
       } else if (category === "ESSENCE") {
         await bulkAssign({ ...payloadBase, essenceIds: selectedIds });
+      } else if (category === "POEM") {
+        await bulkAssign({ ...payloadBase, poemIds: selectedIds });
       } else if (category === "SUMMARY") {
         await bulkAssign({ ...payloadBase, summaryIds: selectedIds });
       } else if (category === "AMPLIFICATION") {
@@ -356,6 +350,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, punctuationIds: selectedIds });
       } else if (category === "SHORT_COMPOSITION") {
         await bulkAssign({ ...payloadBase, shortCompositionIds: selectedIds });
+      } else if (category === "SHORT_QUESTION") {
+        await bulkAssign({ ...payloadBase, shortQuestionIds: selectedIds });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
         await bulkAssign({ ...payloadBase, rightFormOfVerbIds: selectedIds });
       } else if (category === "CHANGING_SENTENCES") {

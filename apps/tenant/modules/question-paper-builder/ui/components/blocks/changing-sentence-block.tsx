@@ -296,9 +296,11 @@ export const ChangingSentenceBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="Change the sentences according to directions:"
               questionType="CHANGING_SENTENCES"
+              questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+              questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,

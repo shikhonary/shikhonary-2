@@ -266,7 +266,7 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="Use appropriate punctuation marks and capital letters where necessary in the following text:"
               questionType="PUNCTUATION"
               style={{

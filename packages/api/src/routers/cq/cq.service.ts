@@ -140,7 +140,7 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
 export async function createCq(db: PrismaClient, input: CreateCqInput) {
   const { attachments, answer, ...data } = input
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (data.context && data.context.trim()) {
+  if (data.context && data.context.trim() && allAttachments.length === 0) {
     allAttachments.push({
       url: "text-context",
       type: "text",
@@ -200,7 +200,7 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
     }
   }
 
-  return db.cq.create({
+  const createdCq = await db.cq.create({
     data: {
       subjectId: data.subjectId,
       chapterId: data.chapterId,
@@ -249,6 +249,31 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
       },
     },
   })
+
+  // Check if any attachment is of type 'image' but has missing or placeholder URL
+  const missingImageAttachments = allAttachments.filter(
+    (att) =>
+      att.type?.toLowerCase() === "image" &&
+      (!att.url || !att.url.trim() || att.url === "text-context" || att.url.toLowerCase() === "null")
+  )
+
+  if (missingImageAttachments.length > 0) {
+    const captions = missingImageAttachments
+      .map((att, i) => (att.caption ? `"${att.caption}"` : `Image #${i + 1}`))
+      .join(", ")
+
+    await db.questionReport.create({
+      data: {
+        entityType: "CQ",
+        entityId: createdCq.id,
+        reportType: "MISSING_IMAGE",
+        description: `Image URL missing for ${missingImageAttachments.length} image attachment(s): ${captions}`,
+        status: "PENDING",
+      },
+    })
+  }
+
+  return createdCq
 }
 
 export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
@@ -258,7 +283,7 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
   await getCqById(db, { id })
 
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (data.context && data.context.trim()) {
+  if (data.context && data.context.trim() && allAttachments.length === 0) {
     allAttachments.push({
       url: "text-context",
       type: "text",
@@ -417,7 +442,7 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
       for (const cq of input.cqs) {
         const { attachments, answer, ...data } = cq
         const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-        if (data.context && data.context.trim()) {
+        if (data.context && data.context.trim() && allAttachments.length === 0) {
           allAttachments.push({
             url: "text-context",
             type: "text",
@@ -507,6 +532,30 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
               : undefined,
           } as any,
         })
+
+        // Check if any attachment is of type 'image' but has missing or placeholder URL
+        const missingImageAttachments = allAttachments.filter(
+          (att) =>
+            att.type?.toLowerCase() === "image" &&
+            (!att.url || !att.url.trim() || att.url === "text-context" || att.url.toLowerCase() === "null")
+        )
+
+        if (missingImageAttachments.length > 0) {
+          const captions = missingImageAttachments
+            .map((att, i) => (att.caption ? `"${att.caption}"` : `Image #${i + 1}`))
+            .join(", ")
+
+          await tx.questionReport.create({
+            data: {
+              entityType: "CQ",
+              entityId: createdCq.id,
+              reportType: "MISSING_IMAGE",
+              description: `Image URL missing for ${missingImageAttachments.length} image attachment(s): ${captions}`,
+              status: "PENDING",
+            },
+          })
+        }
+
         results.push(createdCq)
       }
       return results

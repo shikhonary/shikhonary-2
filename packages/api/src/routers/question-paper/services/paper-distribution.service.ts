@@ -44,7 +44,7 @@ export async function upsertQuestionPaperDistribution(
         const pSec = await tenantDb.questionPaperSection.findFirst({
           where: {
             questionPaperId: subject.questionPaperId,
-            title: mSec.nameEn,
+            title: mSec.nameEn || mSec.nameBn || "",
             titleBn: mSec.nameBn,
           },
         })
@@ -60,7 +60,7 @@ export async function upsertQuestionPaperDistribution(
         const pSub = await tenantDb.questionPaperSubSection.findFirst({
           where: {
             sectionId,
-            title: mSub.nameEn,
+            title: mSub.nameEn || mSub.nameBn || "",
             titleBn: mSub.nameBn,
           },
         })
@@ -156,7 +156,7 @@ export async function upsertQuestionPaperDistribution(
     const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
       where: {
         sectionId: targetSecId,
-        title: sqType.subSection.nameEn,
+        title: sqType.subSection.nameEn || sqType.subSection.nameBn || "",
         titleBn: sqType.subSection.nameBn,
       },
       orderBy: { orderIndex: "asc" },
@@ -361,6 +361,8 @@ export async function getQuestionPaperDistributionStatuses(
     questionTypeName: string
     questionTypeNameBn: string | null
     questionTypeLabel: string | null
+    questionCount: number
+    questionsToAttempt: number
     targetCount: number
     addedCount: number
     alternativeCount: number
@@ -392,6 +394,8 @@ export async function getQuestionPaperDistributionStatuses(
         questionTypeName: dist.questionTypeName,
         questionTypeNameBn: (dist as any).questionTypeNameBn || null,
         questionTypeLabel: dist.questionTypeLabel || null,
+        questionCount: dist.questionCount,
+        questionsToAttempt: dist.questionsToAttempt ?? dist.questionCount,
         targetCount,
         addedCount,
         alternativeCount: altCount,

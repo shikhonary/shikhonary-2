@@ -218,6 +218,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   applicationId: z.string().optional().nullable(),
   summaryId: z.string().optional().nullable(),
   essenceId: z.string().optional().nullable(),
+  poemId: z.string().optional().nullable(),
   essayId: z.string().optional().nullable(),
   newsReportId: z.string().optional().nullable(),
   partsOfSpeechId: z.string().optional().nullable(),
@@ -227,6 +228,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   substitutionTableId: z.string().optional().nullable(),
   punctuationId: z.string().optional().nullable(),
   shortCompositionId: z.string().optional().nullable(),
+  shortQuestionId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -249,6 +251,8 @@ export const questionTypeCategorySchema = z.enum([
   QUESTION_TYPE_CODES.APPLICATION,
   QUESTION_TYPE_CODES.SUMMARY,
   QUESTION_TYPE_CODES.ESSENCE,
+  QUESTION_TYPE_CODES.POEM,
+  QUESTION_TYPE_CODES.SHORT_QUESTION,
   QUESTION_TYPE_CODES.NEWS_REPORT,
   QUESTION_TYPE_CODES.ESSAY,
   QUESTION_TYPE_CODES.PARTS_OF_SPEECH,
@@ -360,6 +364,7 @@ export const bulkAssignQuestionsSchema = z.object({
   applicationIds: z.array(z.string()).optional(),
   summaryIds: z.array(z.string()).optional(),
   essenceIds: z.array(z.string()).optional(),
+  poemIds: z.array(z.string()).optional(),
   essayIds: z.array(z.string()).optional(),
   newsReportIds: z.array(z.string()).optional(),
   partsOfSpeechIds: z.array(z.string()).optional(),
@@ -369,6 +374,7 @@ export const bulkAssignQuestionsSchema = z.object({
   substitutionTableIds: z.array(z.string()).optional(),
   punctuationIds: z.array(z.string()).optional(),
   shortCompositionIds: z.array(z.string()).optional(),
+  shortQuestionIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

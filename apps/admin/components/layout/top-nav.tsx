@@ -78,6 +78,7 @@ const navGroups = [
       { href: "/applications", label: "Applications", icon: HelpCircle },
       { href: "/summaries", label: "Summaries", icon: HelpCircle },
       { href: "/essences", label: "Essences", icon: HelpCircle },
+      { href: "/poems", label: "Poems", icon: HelpCircle },
       { href: "/thought-expansions", label: "Thought Expansions", icon: HelpCircle },
       { href: "/news-reports", label: "News Reports", icon: Newspaper },
       { href: "/essays", label: "Essays", icon: ScrollText },

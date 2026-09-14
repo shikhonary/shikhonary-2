@@ -193,9 +193,11 @@ export const SubstitutionTableBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="Make meaningful sentences using parts of sentences given in the following substitution table:"
               questionType="SUBSTITUTION_TABLE"
+              questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+              questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,

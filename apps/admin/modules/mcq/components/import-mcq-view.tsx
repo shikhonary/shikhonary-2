@@ -19,6 +19,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu"
 import type { CreateMcqInput } from "@workspace/api"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
@@ -32,6 +40,10 @@ import {
   Wand2Icon,
   AlertTriangleIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ArrowLeftRightIcon,
+  ShuffleIcon,
   CodeIcon,
   FileCodeIcon,
   UploadIcon,
@@ -92,10 +104,21 @@ export function repairJsonSyntax(raw: string): string {
   // 3. Strip single-line comments (// comment)
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
-  // 4. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes (b, f, n, r, t)
+  // e.g. \rightarrow, \times, \theta, \frac, \beta, \neq, \mathbf, \text, \tan, etc.
+  cleaned = cleaned.replace(
+    /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
+    "\\\\$1"
+  )
+
+  // 5. Fix any unescaped backslashes that are not valid JSON escape sequences (\", \\, \/, \b, \f, \n, \r, \t, \uXXXX)
+  // e.g. \(, \), \[, \], \alpha, \sum, \sqrt, \int, \le, \ge, \pm, etc.
+  cleaned = cleaned.replace(/(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\")
+
+  // 6. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
-  // 5. Wrap single object in array if not already an array
+  // 7. Wrap single object in array if not already an array
   if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
     cleaned = `[\n${cleaned}\n]`
   }
@@ -392,6 +415,121 @@ function EditableMcqCard({
     })
   }
 
+  const handleSwapOptions = (fromIdx: number, toIdx: number) => {
+    if (
+      fromIdx < 0 ||
+      fromIdx >= item.options.length ||
+      toIdx < 0 ||
+      toIdx >= item.options.length ||
+      fromIdx === toIdx
+    ) {
+      return
+    }
+    const newOptions = [...item.options]
+    const temp = newOptions[fromIdx]!
+    newOptions[fromIdx] = newOptions[toIdx]!
+    newOptions[toIdx] = temp
+
+    onChange({
+      ...item,
+      options: newOptions,
+    })
+  }
+
+  const handleMoveOption = (fromIdx: number, direction: "prev" | "next") => {
+    const targetIdx = direction === "prev" ? fromIdx - 1 : fromIdx + 1
+    handleSwapOptions(fromIdx, targetIdx)
+  }
+
+  const handleShuffleOptions = () => {
+    if (item.options.length <= 1) return
+    const shuffled = [...item.options]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const temp = shuffled[i]!
+      shuffled[i] = shuffled[j]!
+      shuffled[j] = temp
+    }
+    onChange({
+      ...item,
+      options: shuffled,
+    })
+  }
+
+  const handleMoveStatement = (fromIdx: number, direction: "prev" | "next") => {
+    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
+    const targetIdx = direction === "prev" ? fromIdx - 1 : fromIdx + 1
+    if (
+      fromIdx < 0 ||
+      fromIdx >= currentStatements.length ||
+      targetIdx < 0 ||
+      targetIdx >= currentStatements.length
+    ) {
+      return
+    }
+    const temp = currentStatements[fromIdx]!
+    currentStatements[fromIdx] = currentStatements[targetIdx]!
+    currentStatements[targetIdx] = temp
+    onChange({
+      ...item,
+      statements: currentStatements,
+    })
+  }
+
+  const handleUpdateAttachment = (
+    attIdx: number,
+    field: "caption" | "content" | "bottomContent" | "url",
+    val: string
+  ) => {
+    const currentAttachments = Array.isArray(item.attachments)
+      ? [...item.attachments]
+      : []
+    if (!currentAttachments[attIdx]) return
+
+    const updatedAtt = {
+      ...currentAttachments[attIdx],
+      [field]: val.trim() ? val : null,
+    }
+
+    currentAttachments[attIdx] = updatedAtt
+
+    onChange({
+      ...item,
+      attachments: currentAttachments,
+    })
+  }
+
+  const handleRemoveAttachment = (attIdx: number) => {
+    const currentAttachments = Array.isArray(item.attachments)
+      ? [...item.attachments]
+      : []
+    const nextAttachments = currentAttachments.filter((_, idx) => idx !== attIdx)
+    onChange({
+      ...item,
+      attachments: nextAttachments,
+    })
+  }
+
+  const handleAddAttachment = () => {
+    const currentAttachments = Array.isArray(item.attachments)
+      ? [...item.attachments]
+      : []
+    const newAtt = {
+      type: "text",
+      caption: "Context / Stimulus",
+      content: "",
+      bottomContent: null,
+      url: null,
+      table: null,
+      tableBorder: false,
+      position: currentAttachments.length,
+    }
+    onChange({
+      ...item,
+      attachments: [...currentAttachments, newAtt],
+    })
+  }
+
   const handleToggleType = () => {
     onChange({
       ...item,
@@ -550,12 +688,128 @@ function EditableMcqCard({
       {/* Card Content */}
       <div className="p-5 space-y-4">
         {/* Attachments Section (Images, Tables, Context Texts) */}
-        {Array.isArray(item.attachments) && item.attachments.length > 0 && (
-          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
-              Attachments ({item.attachments.length})
-            </span>
-            <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
+        {((Array.isArray(item.attachments) && item.attachments.length > 0) || false) && (
+          <div className="space-y-3 rounded-xl border border-outline-variant/60 bg-surface-container-lowest/40 p-3.5">
+            <div className="flex items-center justify-between">
+              <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+                Attachments & Context / Stimulus ({item.attachments?.length || 0})
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={handleAddAttachment}
+                className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
+              >
+                <PlusIcon className="size-3.5 mr-1" />
+                Add Attachment
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {item.attachments?.map((att: any, attIdx: number) => {
+                const type = (att.type || "").toLowerCase()
+                const isImage =
+                  type === "image" ||
+                  (att.url &&
+                    att.url !== "text-context" &&
+                    /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(att.url))
+                const isTable = type === "table" || Boolean(att.table)
+
+                return (
+                  <div
+                    key={att.id || attIdx}
+                    className="group/att rounded-xl border border-outline-variant/60 bg-white p-3.5 space-y-3 transition-all hover:border-outline-variant hover:shadow-xs"
+                  >
+                    {/* Attachment Header */}
+                    <div className="flex items-center justify-between gap-2 border-b border-outline-variant/30 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-secondary-container/40 text-[11px] font-bold text-secondary font-mono">
+                          #{attIdx + 1}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                        >
+                          {isImage ? "Image Attachment" : isTable ? "Table Attachment" : "Text / Stimulus"}
+                        </Badge>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-xs"
+                        onClick={() => handleRemoveAttachment(attIdx)}
+                        title="Remove attachment"
+                        className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                      >
+                        <Trash2Icon className="size-3.5" />
+                      </Button>
+                    </div>
+
+                    {/* Top Caption Field */}
+                    <EditableField
+                      label="Top Caption (Header / Figure Title)"
+                      value={att.caption || ""}
+                      isMath={item.isMath}
+                      placeholder="Add top caption (e.g. Figure 1 / নিচের উদ্দীপকটি পড়ো)..."
+                      onSave={(val) => handleUpdateAttachment(attIdx, "caption", val)}
+                    />
+
+                    {/* Content Field */}
+                    <EditableField
+                      label="Attachment Content (Passage / Stimulus Text)"
+                      value={att.content || ""}
+                      isMath={item.isMath}
+                      multiline
+                      placeholder="Add attachment content / stimulus text..."
+                      onSave={(val) => handleUpdateAttachment(attIdx, "content", val)}
+                    />
+
+                    {/* Image URL & Visual Preview (if image) */}
+                    {isImage && (
+                      <div className="space-y-2 rounded-lg border border-outline-variant/40 bg-surface-container-low/30 p-2.5">
+                        <EditableField
+                          label="Image URL"
+                          value={att.url || ""}
+                          placeholder="https://example.com/image.png"
+                          onSave={(val) => handleUpdateAttachment(attIdx, "url", val)}
+                        />
+                        {att.url && att.url !== "text-context" && (
+                          <div className="inline-block mt-1">
+                            <img
+                              src={att.url}
+                              alt={att.caption || "Attachment Preview"}
+                              className="max-h-28 rounded-md border border-outline-variant/60 object-contain bg-white"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Table Preview (if table) */}
+                    {isTable && att.table && (
+                      <div className="space-y-1 rounded-lg border border-outline-variant/40 bg-surface-container-low/30 p-2.5">
+                        <span className="font-label-sm text-[11px] font-bold uppercase tracking-wider text-outline block">
+                          Table Preview
+                        </span>
+                        <QuestionAttachments attachments={[att]} isMath={item.isMath} />
+                      </div>
+                    )}
+
+                    {/* Bottom Caption / Footnote Field */}
+                    <EditableField
+                      label="Bottom Caption (Footnote / Source Note)"
+                      value={att.bottomContent || ""}
+                      isMath={item.isMath}
+                      multiline
+                      placeholder="Add bottom caption / footnote (e.g. Source: Board 2024)..."
+                      onSave={(val) => handleUpdateAttachment(attIdx, "bottomContent", val)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
 
@@ -605,14 +859,40 @@ function EditableMcqCard({
                       onSave={(newVal) => handleUpdateStatement(stmtIdx, newVal)}
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveStatement(stmtIdx)}
-                    title="Remove statement"
-                    className="opacity-0 group-hover/stmt:opacity-100 text-destructive hover:text-destructive/80 p-1 cursor-pointer transition-opacity"
-                  >
-                    <Trash2Icon className="size-3.5" />
-                  </button>
+                  <div className="flex items-center gap-0.5 shrink-0 opacity-100 md:opacity-0 md:group-hover/stmt:opacity-100 transition-opacity">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      disabled={stmtIdx === 0}
+                      onClick={() => handleMoveStatement(stmtIdx, "prev")}
+                      title="Move statement up"
+                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
+                    >
+                      <ChevronUpIcon className="size-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      disabled={stmtIdx === (item.statements?.length || 0) - 1}
+                      onClick={() => handleMoveStatement(stmtIdx, "next")}
+                      title="Move statement down"
+                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
+                    >
+                      <ChevronDownIcon className="size-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => handleRemoveStatement(stmtIdx)}
+                      title="Remove statement"
+                      className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                    >
+                      <Trash2Icon className="size-3.5" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -629,16 +909,31 @@ function EditableMcqCard({
             <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
               Option Choices ({item.options.length})
             </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={handleAddOption}
-              className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
-            >
-              <PlusIcon className="size-3.5 mr-1" />
-              Add Option
-            </Button>
+            <div className="flex items-center gap-1.5">
+              {item.options.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleShuffleOptions}
+                  title="Shuffle / Randomize options order"
+                  className="text-xs font-semibold text-on-surface-variant hover:text-primary hover:bg-primary/10 cursor-pointer"
+                >
+                  <ShuffleIcon className="size-3.5 mr-1" />
+                  Shuffle
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                onClick={handleAddOption}
+                className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
+              >
+                <PlusIcon className="size-3.5 mr-1" />
+                Add Option
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -683,17 +978,94 @@ function EditableMcqCard({
                     />
                   </div>
 
-                  {/* Remove Option Button */}
-                  {item.options.length > 2 && (
-                    <button
+                  {/* Option Controls: Move Up/Down, Exchange With, Delete */}
+                  <div className="flex items-center gap-0.5 shrink-0 opacity-100 md:opacity-0 md:group-hover/option:opacity-100 transition-opacity">
+                    {/* Move Previous / Up */}
+                    <Button
                       type="button"
-                      onClick={() => handleRemoveOption(optIdx)}
-                      title="Remove option"
-                      className="opacity-0 group-hover/option:opacity-100 text-destructive hover:text-destructive/80 p-1 cursor-pointer transition-opacity"
+                      variant="ghost"
+                      size="icon-xs"
+                      disabled={optIdx === 0}
+                      onClick={() => handleMoveOption(optIdx, "prev")}
+                      title="Move option up / previous"
+                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
                     >
-                      <Trash2Icon className="size-3.5" />
-                    </button>
-                  )}
+                      <ChevronUpIcon className="size-3.5" />
+                    </Button>
+
+                    {/* Move Next / Down */}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      disabled={optIdx === item.options.length - 1}
+                      onClick={() => handleMoveOption(optIdx, "next")}
+                      title="Move option down / next"
+                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
+                    >
+                      <ChevronDownIcon className="size-3.5" />
+                    </Button>
+
+                    {/* Direct Exchange / Swap Dropdown Menu */}
+                    {item.options.length > 1 && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon-xs"
+                            title={`Exchange position of option ${letter} with another option`}
+                            className="size-6 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
+                          >
+                            <ArrowLeftRightIcon className="size-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-56 bg-white p-1 shadow-lg border border-outline-variant/60 rounded-xl"
+                        >
+                          <DropdownMenuLabel className="text-[10px] uppercase font-bold text-muted-foreground px-2.5 py-1">
+                            Exchange ({letter}) with option:
+                          </DropdownMenuLabel>
+                          {item.options.map((otherOpt, otherIdx) => {
+                            if (otherIdx === optIdx) return null
+                            const otherLetter = optionLetters[otherIdx] || String(otherIdx + 1)
+                            return (
+                              <DropdownMenuItem
+                                key={otherIdx}
+                                onClick={() => handleSwapOptions(optIdx, otherIdx)}
+                                className="cursor-pointer text-xs flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
+                              >
+                                <span className="flex items-center gap-2 font-medium truncate">
+                                  <span className="flex size-5 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container font-solaiman shrink-0">
+                                    {otherLetter}
+                                  </span>
+                                  <span className="truncate max-w-[130px] text-on-surface text-xs">
+                                    {otherOpt || `Option ${otherLetter}`}
+                                  </span>
+                                </span>
+                                <ArrowLeftRightIcon className="size-3 text-muted-foreground/70 shrink-0" />
+                              </DropdownMenuItem>
+                            )
+                          })}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+
+                    {/* Remove Option Button */}
+                    {item.options.length > 2 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-xs"
+                        onClick={() => handleRemoveOption(optIdx)}
+                        title="Remove option"
+                        className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                      >
+                        <Trash2Icon className="size-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )
             })}

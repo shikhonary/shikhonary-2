@@ -33,6 +33,8 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).summary.findUnique({ where: { id: pq.summaryId } })
     } else if (pq.essenceId) {
       content = await (db as any).essence.findUnique({ where: { id: pq.essenceId } })
+    } else if (pq.poemId) {
+      content = await (db as any).poem.findUnique({ where: { id: pq.poemId } })
     } else if (pq.essayId) {
       content = await (db as any).essay.findUnique({ where: { id: pq.essayId } })
     } else if (pq.newsReportId) {
@@ -47,6 +49,12 @@ export async function freezeQuestionSnapshots(
       content = await db.fillInTheBlanksWithClues.findUnique({ where: { id: pq.fillInTheBlanksWithCluesId } })
     } else if (pq.substitutionTableId) {
       content = await db.substitutionTable.findUnique({ where: { id: pq.substitutionTableId } })
+    } else if (pq.punctuationId) {
+      content = await (db as any).punctuation.findUnique({ where: { id: pq.punctuationId } })
+    } else if (pq.shortCompositionId) {
+      content = await (db as any).shortComposition.findUnique({ where: { id: pq.shortCompositionId } })
+    } else if (pq.shortQuestionId) {
+      content = await (db as any).shortQuestion.findUnique({ where: { id: pq.shortQuestionId } })
     }
 
     if (content) {

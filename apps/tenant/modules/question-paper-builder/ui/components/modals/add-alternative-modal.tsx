@@ -46,6 +46,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.APPLICATION, nameBn: "আবেদনপত্র / দরখাস্ত", nameEn: "Application", desc: "দাপ্তরিক বা শিক্ষাপ্রতিষ্ঠানের আবেদন" },
   { code: QUESTION_TYPE_CODES.PARAGRAPH, nameBn: "অনুচ্ছেদ", nameEn: "Paragraph", desc: "বিষয়ভিত্তিক অনুচ্ছেদ লিখন" },
   { code: QUESTION_TYPE_CODES.ESSENCE, nameBn: "সারমর্ম", nameEn: "Essence", desc: "পদ্যাংশের সারমর্ম লিখন" },
+  { code: QUESTION_TYPE_CODES.POEM, nameBn: "কবিতা", nameEn: "Poem", desc: "কবিতা বা পদ্যাংশ ভিত্তিক প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SUMMARY, nameBn: "সারাংশ", nameEn: "Summary", desc: "গদ্যাংশের সারাংশ লিখন" },
   { code: QUESTION_TYPE_CODES.AMPLIFICATION, nameBn: "ভাব-সম্প্রসারণ", nameEn: "Amplification", desc: "উক্তি বা কবিতার ভাব-সম্প্রসারণ" },
   { code: QUESTION_TYPE_CODES.NEWS_REPORT, nameBn: "সংবাদ প্রতিবেদন", nameEn: "News Report", desc: "সংবাদপত্র বা অনুষ্ঠানের প্রতিবেদন লিখন" },
@@ -60,6 +61,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES, nameBn: "শূন্যস্থান পূরণ (ক্লুসহ)", nameEn: "Fill in the Blanks with Clues", desc: "বক্স থেকে উপযুক্ত শব্দ নিয়ে শূন্যস্থান পূরণ" },
   { code: QUESTION_TYPE_CODES.SUBSTITUTION_TABLE, nameBn: "সাবস্টিটিউশন টেবিল", nameEn: "Substitution Table", desc: "৩-কলামের টেবিল থেকে বাক্য গঠন" },
   { code: QUESTION_TYPE_CODES.SHORT_COMPOSITION, nameBn: "Short Composition", nameEn: "Short Composition", desc: "সংক্ষিপ্ত রচনা বা কম্পোজিশন লিখন" },
+  { code: QUESTION_TYPE_CODES.SHORT_QUESTION, nameBn: "সংক্ষিপ্ত প্রশ্ন", nameEn: "Short Question", desc: "সরাসরি সংক্ষেপে উত্তরদানের প্রশ্ন" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({

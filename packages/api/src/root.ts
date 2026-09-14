@@ -47,6 +47,9 @@ import { fillInTheBlanksWithCluesRouter } from "./routers/fill-in-the-blanks-wit
 import { substitutionTableRouter } from "./routers/substitution-table/substitution-table.router"
 import { punctuationRouter } from "./routers/punctuation/punctuation.router"
 import { shortCompositionRouter } from "./routers/short-composition/short-composition.router"
+import { poemRouter } from "./routers/poem/poem.router"
+import { descriptiveQuestionRouter } from "./routers/descriptive-question/descriptive-question.router"
+import { shortQuestionRouter } from "./routers/short-question/short-question.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -71,6 +74,8 @@ export const appRouter = createTRPCRouter({
   pbq: pbqRouter,
   cs: csRouter,
   shortAnswer: shortAnswerRouter,
+  descriptiveQuestion: descriptiveQuestionRouter,
+  shortQuestion: shortQuestionRouter,
   subjectStructure: subjectStructureRouter,
   paragraph: paragraphRouter,
   amplification: amplificationRouter,
@@ -88,6 +93,7 @@ export const appRouter = createTRPCRouter({
   substitutionTable: substitutionTableRouter,
   punctuation: punctuationRouter,
   shortComposition: shortCompositionRouter,
+  poem: poemRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

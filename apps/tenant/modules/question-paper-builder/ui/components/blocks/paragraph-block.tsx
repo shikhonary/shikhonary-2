@@ -267,9 +267,11 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="যেকোনো একটি বিষয়ে অনুচ্ছেদ রচনা করো:"
               questionType="PARAGRAPH"
+              questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+              questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
@@ -280,7 +282,9 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
-            {toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+            {attemptCount > 1
+              ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+              : toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
           </div>
         </div>
       )}

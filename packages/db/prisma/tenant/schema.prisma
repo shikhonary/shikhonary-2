@@ -239,6 +239,7 @@ model QuestionPaperQuestion {
     applicationId   String?
     summaryId       String?
     essenceId       String?
+    poemId          String?
     essayId         String?
     newsReportId    String?
     partsOfSpeechId              String?
@@ -248,6 +249,7 @@ model QuestionPaperQuestion {
     substitutionTableId          String?
     punctuationId                String?
     shortCompositionId           String?
+    shortQuestionId              String?
 
     // ── Alternative / OR Question Relationship ─────────────────
     // If null, this is the primary question slot.
@@ -298,6 +300,7 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, applicationId])
     @@unique([questionPaperId, summaryId])
     @@unique([questionPaperId, essenceId])
+    @@unique([questionPaperId, poemId])
     @@unique([questionPaperId, essayId])
     @@unique([questionPaperId, newsReportId])
     @@unique([questionPaperId, partsOfSpeechId])
@@ -307,6 +310,7 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, fillInTheBlanksWithCluesId])
     @@unique([questionPaperId, substitutionTableId])
     @@unique([questionPaperId, shortCompositionId])
+    @@unique([questionPaperId, shortQuestionId])
     @@index([parentQuestionId])
     @@index([questionPaperId])
     @@index([questionPaperId, parentQuestionId, orderIndex])
@@ -321,6 +325,7 @@ model QuestionPaperQuestion {
     @@index([applicationId])
     @@index([summaryId])
     @@index([essenceId])
+    @@index([poemId])
     @@index([essayId])
     @@index([newsReportId])
     @@index([partsOfSpeechId])
@@ -330,6 +335,7 @@ model QuestionPaperQuestion {
     @@index([fillInTheBlanksWithCluesId])
     @@index([substitutionTableId])
     @@index([shortCompositionId])
+    @@index([shortQuestionId])
     @@index([distributionId])
     @@index([sectionId])
     @@index([subSectionId])

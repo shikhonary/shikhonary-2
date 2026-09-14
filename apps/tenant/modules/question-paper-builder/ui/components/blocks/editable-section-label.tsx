@@ -4,11 +4,23 @@ import { useUpdateDistributionLabel } from "@/modules/question-paper/services/us
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { toast } from "sonner";
 
+const toBengaliDigits = (num?: number | string | null): string => {
+  if (num === null || num === undefined || num === "") return "";
+  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return num
+    .toString()
+    .split("")
+    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
+    .join("");
+};
+
 interface EditableSectionLabelProps {
   distributionId?: string;
   initialLabel?: string | null;
   fallbackLabel: string;
   questionType?: string;
+  questionCount?: number | null;
+  questionsToAttempt?: number | null;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -21,6 +33,7 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "PARAGRAPH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম"))) return true;
   if (questionType === "SUMMARY" && (l.includes("সারমর্ম") || l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ"))) return true;
   if (questionType === "ESSENCE" && (l.includes("সারাংশ") || l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ"))) return true;
+  if (questionType === "POEM" && (l === "poem" || l === "poem:" || l === "কবিতা" || l === "কবিতা:" || l.includes("সারাংশ") || l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ"))) return true;
   if (questionType === "LETTER" && (l.includes("প্রতিবেদন") || l.includes("আবেদনপত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "APPLICATION" && (l.includes("সংবাদ প্রতিবেদন") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "NEWS_REPORT" && (l.includes("আবেদনপত্র") || l.includes("ব্যক্তিগত পত্র") || l.includes("অনুচ্ছেদ"))) return true;
@@ -32,6 +45,7 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "SUBSTITUTION_TABLE" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "SHORT_COMPOSITION" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "PBQ" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "SHORT_QUESTION" && (l === "short_question" || l === "short question" || l === "সংক্ষিপ্ত প্রশ্ন" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   return false;
 };
 
@@ -40,6 +54,8 @@ export const EditableSectionLabel = ({
   initialLabel,
   fallbackLabel,
   questionType,
+  questionCount,
+  questionsToAttempt,
   className = "",
   style = {},
 }: EditableSectionLabelProps) => {
@@ -102,7 +118,20 @@ export const EditableSectionLabel = ({
     }
   };
 
-  const formattedDisplay = value.endsWith(":") || value.endsWith("।") ? value : `${value}:`;
+  const hasAttemptDiff =
+    questionCount != null &&
+    questionsToAttempt != null &&
+    questionCount > 0 &&
+    questionsToAttempt > 0 &&
+    questionCount !== questionsToAttempt;
+
+  const attemptSuffix = hasAttemptDiff && !value.includes("যেকোনো")
+    ? ` (যেকোনো ${toBengaliDigits(questionsToAttempt)}টি)`
+    : "";
+
+  const baseLabel = value.replace(/[:।]$/, "").trim();
+  const trailingChar = value.endsWith("।") ? "।" : ":";
+  const formattedDisplay = `${baseLabel}${attemptSuffix}${trailingChar}`;
 
   if (isEditing) {
     return (

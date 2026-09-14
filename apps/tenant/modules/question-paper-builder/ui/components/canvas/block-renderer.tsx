@@ -8,6 +8,7 @@ import { PBQBlock } from "../blocks/pbq-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
 import { ParagraphBlock } from "../blocks/paragraph-block";
 import { EssenceBlock } from "../blocks/essence-block";
+import { PoemBlock } from "../blocks/poem-block";
 import { SummaryBlock } from "../blocks/summary-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
 import { LetterBlock } from "../blocks/letter-block";
@@ -21,6 +22,7 @@ import { FillInTheBlanksWithCluesBlock } from "../blocks/fill-in-the-blanks-with
 import { SubstitutionTableBlock } from "../blocks/substitution-table-block";
 import { PunctuationBlock } from "../blocks/punctuation-block";
 import { ShortCompositionBlock } from "../blocks/short-composition-block";
+import { ShortQuestionBlock } from "../blocks/short-question-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
@@ -284,6 +286,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ParagraphBlock item={block.data.item} />;
     case "question-essence":
       return <EssenceBlock item={block.data.item} />;
+    case "question-poem":
+      return <PoemBlock item={block.data.item} />;
     case "question-summary":
       return <SummaryBlock item={block.data.item} />;
     case "question-amplification":
@@ -310,6 +314,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <PunctuationBlock item={block.data.item} />;
     case "question-short-composition":
       return <ShortCompositionBlock item={block.data.item} />;
+    case "question-short-question":
+      return <ShortQuestionBlock item={block.data.item} />;
     case "dist-action":
       return <DistActionBlock blockData={block.data} />;
     case "empty":

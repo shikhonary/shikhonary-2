@@ -28,8 +28,8 @@ export async function saveSubjectStructure(
       const createdSection = await tx.subjectQuestionSection.create({
         data: {
           subjectId,
-          nameEn: sec.nameEn,
-          nameBn: sec.nameBn,
+          nameEn: sec.nameEn ?? null,
+          nameBn: sec.nameBn ?? null,
           position: sec.position,
           instructions: sec.instructions ?? null,
         },
@@ -56,8 +56,8 @@ export async function saveSubjectStructure(
         const createdSubSection = await tx.subjectQuestionSubSection.create({
           data: {
             sectionId: createdSection.id,
-            nameEn: sub.nameEn,
-            nameBn: sub.nameBn,
+            nameEn: sub.nameEn ?? null,
+            nameBn: sub.nameBn ?? null,
             position: sub.position,
             instructions: sub.instructions ?? null,
           },

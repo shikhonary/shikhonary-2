@@ -291,7 +291,7 @@ export const PartsOfSpeechBlock = ({ item }: { item: any }) => {
             </span>
             <EditableSectionLabel
               distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={item.questionTypeLabel || distStatus?.questionTypeLabel}
+              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
               fallbackLabel="Read the following text and identify the parts of speech of the underlined words:"
               questionType="PARTS_OF_SPEECH"
               style={{

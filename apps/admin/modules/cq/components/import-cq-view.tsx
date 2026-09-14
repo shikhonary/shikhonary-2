@@ -82,10 +82,21 @@ export function repairJsonSyntax(raw: string): string {
   // 3. Strip single-line comments (// comment)
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
-  // 4. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes (b, f, n, r, t)
+  // e.g. \rightarrow, \times, \theta, \frac, \beta, \neq, \mathbf, \text, \tan, etc.
+  cleaned = cleaned.replace(
+    /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
+    "\\\\$1"
+  )
+
+  // 5. Fix any unescaped backslashes that are not valid JSON escape sequences (\", \\, \/, \b, \f, \n, \r, \t, \uXXXX)
+  // e.g. \(, \), \[, \], \alpha, \sum, \sqrt, \int, \le, \ge, \pm, etc.
+  cleaned = cleaned.replace(/(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\")
+
+  // 6. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
-  // 5. Wrap single object in array if not already an array
+  // 7. Wrap single object in array if not already an array
   if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
     cleaned = `[\n${cleaned}\n]`
   }
@@ -403,6 +414,20 @@ function EditableCqCard({
           </div>
         )}
 
+        {/* Stimulus / Context (উদ্দীপক) */}
+        {item.context && (
+          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
+            <EditableField
+              label="উদ্দীপক / Context (Stimulus)"
+              value={item.context}
+              multiline={true}
+              placeholder="উদ্দীপক / Context text..."
+              onSave={(newVal) => onChange({ ...item, context: newVal || null })}
+              isMath={true}
+            />
+          </div>
+        )}
+
         {/* Stems Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
           <EditableField
@@ -559,7 +584,7 @@ export function ImportCqView() {
           rawData = JSON.parse(repaired)
           textToParse = repaired
           setJsonText(repaired)
-          toast.success("Auto-repaired JSON formatting (smart quotes / trailing commas)!")
+          toast.success("Auto-repaired JSON formatting (smart quotes / LaTeX escapes / trailing commas)!")
         } catch {
           // Both failed
         }

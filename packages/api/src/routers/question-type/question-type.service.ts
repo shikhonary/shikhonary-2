@@ -89,11 +89,22 @@ export async function createQuestionType(
   db: PrismaClient,
   input: CreateQuestionTypeInput,
 ) {
+  // Check unique nameEn
+  const existingName = await db.questionType.findFirst({
+    where: {
+      nameEn: { equals: input.nameEn, mode: "insensitive" },
+    },
+  })
+  if (existingName) {
+    throw conflict(`Question type with English name "${input.nameEn}" already exists.`)
+  }
+
+  // Check unique label if provided
   if (input.label) {
-    const existing = await db.questionType.findFirst({
-      where: { label: input.label },
+    const existingLabel = await db.questionType.findFirst({
+      where: { label: { equals: input.label, mode: "insensitive" } },
     })
-    if (existing) {
+    if (existingLabel) {
       throw conflict(`Question type with label "${input.label}" already exists.`)
     }
   }
@@ -122,9 +133,24 @@ export async function updateQuestionType(
   })
   if (!existing) throw notFound("QuestionType")
 
+  if (data.nameEn && data.nameEn.toLowerCase() !== existing.nameEn.toLowerCase()) {
+    const conflictName = await db.questionType.findFirst({
+      where: {
+        id: { not: id },
+        nameEn: { equals: data.nameEn, mode: "insensitive" },
+      },
+    })
+    if (conflictName) {
+      throw conflict(`Question type with English name "${data.nameEn}" already exists.`)
+    }
+  }
+
   if (data.label && data.label !== existing.label) {
     const conflictLabel = await db.questionType.findFirst({
-      where: { label: data.label },
+      where: {
+        id: { not: id },
+        label: { equals: data.label, mode: "insensitive" },
+      },
     })
     if (conflictLabel) {
       throw conflict(`Question type with label "${data.label}" already exists.`)

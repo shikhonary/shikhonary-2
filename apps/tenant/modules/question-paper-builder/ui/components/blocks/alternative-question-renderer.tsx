@@ -150,6 +150,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const sa = alt.shortAnswer;
         const paragraph = alt.paragraph;
         const essence = alt.essence;
+        const poem = alt.poem;
         const summary = alt.summary;
         const amplification = alt.amplification;
         const letter = alt.letter;
@@ -425,6 +426,41 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                           }}
                         >
                           <RenderMath text={essence.title || essence.name || ""} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 1.1.1 EXACT POEM BLOCK REPRESENTATION */}
+              {poem && (() => {
+                const poemDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === poem.questionTypeId ||
+                      d.questionTypeName?.includes("কবিতা") ||
+                      d.questionTypeName?.toLowerCase().includes("poem")
+                  ) || alt.distribution;
+
+                const rawLabel = poemDist?.questionTypeLabel || poem.questionType?.label;
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <span
+                          className="font-bold mr-1.5"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {pLabel || `কবি ও কবিতার নামসহ '${poem.title || poem.name || ""}' কবিতাটি লেখো।`}
                         </span>
                       </div>
                     </div>
@@ -1203,7 +1239,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
               })()}
 
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !substitutionTable && (
+              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !substitutionTable && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

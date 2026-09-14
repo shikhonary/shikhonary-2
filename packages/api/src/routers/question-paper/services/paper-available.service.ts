@@ -101,6 +101,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  POEM: {
+    model: "poem",
+    searchFields: ["title"],
+    includes: { questionType: true },
+    excludedIdField: "poemId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   NEWS_REPORT: {
     model: "newsReport",
     searchFields: ["title"],
@@ -173,6 +181,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  SHORT_QUESTION: {
+    model: "shortQuestion",
+    searchFields: ["question", "reference"],
+    includes: { questionType: true, subject: true, chapter: true },
+    excludedIdField: "shortQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
 }
 
 export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
@@ -187,6 +203,8 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.APPLICATION]: "APPLICATION",
   [QUESTION_TYPES.SUMMARY]: "SUMMARY",
   [QUESTION_TYPES.ESSENCE]: "ESSENCE",
+  [QUESTION_TYPES.POEM]: "POEM",
+  [QUESTION_TYPES.SHORT_QUESTION]: "SHORT_QUESTION",
   [QUESTION_TYPES.NEWS_REPORT]: "NEWS_REPORT",
   [QUESTION_TYPES.ESSAY]: "ESSAY",
   [QUESTION_TYPES.PARTS_OF_SPEECH]: "PARTS_OF_SPEECH",
@@ -221,6 +239,7 @@ export async function getAvailableQuestions(
         applicationId: true,
         summaryId: true,
         essenceId: true,
+        poemId: true,
         essayId: true,
         newsReportId: true,
         partsOfSpeechId: true,
@@ -230,6 +249,7 @@ export async function getAvailableQuestions(
         substitutionTableId: true,
         punctuationId: true,
         shortCompositionId: true,
+        shortQuestionId: true,
       },
     })
     : Promise.resolve([])

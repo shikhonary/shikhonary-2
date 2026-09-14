@@ -360,6 +360,41 @@ export type {
   ImportShortCompositionInput,
 } from "./routers/short-composition/short-composition.schema"
 
+export type {
+  ListPoemsInput,
+  PoemStatsInput,
+  GetPoemInput,
+  CreatePoemInput,
+  UpdatePoemInput,
+  DeletePoemInput,
+  BulkDeletePoemsInput,
+  ImportPoemsInput,
+} from "./routers/poem/poem.schema"
+
+export type {
+  ListDescriptiveQuestionsInput,
+  DescriptiveQuestionStatsInput,
+  GetDescriptiveQuestionInput,
+  CreateDescriptiveQuestionInput,
+  UpdateDescriptiveQuestionInput,
+  DeleteDescriptiveQuestionInput,
+  BulkDeleteDescriptiveQuestionsInput,
+  ImportDescriptiveQuestionsInput,
+} from "./routers/descriptive-question/descriptive-question.schema"
+
+export type {
+  ListShortQuestionsInput,
+  ShortQuestionStatsInput,
+  GetShortQuestionInput,
+  CreateShortQuestionInput,
+  UpdateShortQuestionInput,
+  DeleteShortQuestionInput,
+  BulkDeleteShortQuestionsInput,
+  ImportShortQuestionsInput,
+} from "./routers/short-question/short-question.schema"
+
+
+
 
 
 

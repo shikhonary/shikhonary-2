@@ -13,6 +13,9 @@ export const QUESTION_TYPES = {
   APPLICATION: "Application",
   SUMMARY: "Summary",
   ESSENCE: "Essence",
+  POEM: "Poem",
+  DESCRIPTIVE_QUESTION: "Descriptive Question",
+  SHORT_QUESTION: "Short Question",
   THOUGHT_EXPANSION: "Thought Expansion",
   NEWS_REPORT: "News report",
   ESSAY: "Essay",
@@ -38,6 +41,9 @@ export const QUESTION_TYPE_CODES = {
   APPLICATION: "APPLICATION",
   SUMMARY: "SUMMARY",
   ESSENCE: "ESSENCE",
+  POEM: "POEM",
+  DESCRIPTIVE_QUESTION: "DESCRIPTIVE_QUESTION",
+  SHORT_QUESTION: "SHORT_QUESTION",
   AMPLIFICATION: "AMPLIFICATION",
   NEWS_REPORT: "NEWS_REPORT",
   ESSAY: "ESSAY",
@@ -130,6 +136,27 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.ESSENCE,
     defaultMark: 10,
     defaultPosition: 5,
+  },
+  [QUESTION_TYPES.POEM]: {
+    nameEn: QUESTION_TYPES.POEM,
+    nameBn: "কবিতা",
+    code: QUESTION_TYPE_CODES.POEM,
+    defaultMark: 10,
+    defaultPosition: 16,
+  },
+  [QUESTION_TYPES.DESCRIPTIVE_QUESTION]: {
+    nameEn: QUESTION_TYPES.DESCRIPTIVE_QUESTION,
+    nameBn: "রচনামূলক প্রশ্ন",
+    code: QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION,
+    defaultMark: 10,
+    defaultPosition: 18,
+  },
+  [QUESTION_TYPES.SHORT_QUESTION]: {
+    nameEn: QUESTION_TYPES.SHORT_QUESTION,
+    nameBn: "সংক্ষিপ্ত প্রশ্ন",
+    code: QUESTION_TYPE_CODES.SHORT_QUESTION,
+    defaultMark: 2,
+    defaultPosition: 17,
   },
   [QUESTION_TYPES.THOUGHT_EXPANSION]: {
     nameEn: QUESTION_TYPES.THOUGHT_EXPANSION,
@@ -246,29 +273,34 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   if (lower === "cq" || lower.includes("creative") || lower.includes("সৃজনশীল")) {
     return QUESTION_TYPES.CQ
   }
-  if (lower === "sa" || lower.includes("short answer") || lower.includes("সংক্ষিপ্ত")) {
+  if (
+    lower === "dq" ||
+    lower === "descriptive" ||
+    lower === "descriptive question" ||
+    lower === "descriptivequestion" ||
+    lower === "descriptive_question" ||
+    lower.includes("descriptive") ||
+    lower.includes("রচনামূলক")
+  ) {
+    return QUESTION_TYPES.DESCRIPTIVE_QUESTION
+  }
+  if (
+    lower === "sq" ||
+    lower === "short question" ||
+    lower === "shortquestion" ||
+    lower === "short_question" ||
+    lower.includes("short question") ||
+    lower.includes("সংক্ষিপ্ত প্রশ্ন")
+  ) {
+    return QUESTION_TYPES.SHORT_QUESTION
+  }
+  if (
+    lower === "sa" ||
+    lower === "short answer" ||
+    lower.includes("short answer") ||
+    (lower.includes("সংক্ষিপ্ত") && !lower.includes("প্রশ্ন") && !lower.includes("কম্পোজিশন"))
+  ) {
     return QUESTION_TYPES.SA
-  }
-  if (lower === "cs" || lower.includes("creative scenario") || lower.includes("সহপাঠ")) {
-    return QUESTION_TYPES.CS
-  }
-  if (lower === "pbq" || lower.includes("passage based") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
-    return QUESTION_TYPES.PBQ
-  }
-  if (lower === "paragraph" || lower.includes("অনুচ্ছেদ")) {
-    return QUESTION_TYPES.PARAGRAPH
-  }
-  if (lower === "letter" || lower.includes("চিঠি") || lower.includes("পত্র")) {
-    return QUESTION_TYPES.LETTER
-  }
-  if (lower === "application" || lower === "applicaion" || lower.includes("আবেদন") || lower.includes("দরখাস্ত")) {
-    return QUESTION_TYPES.APPLICATION
-  }
-  if (lower === "summary" || lower.includes("সারাংশ")) {
-    return QUESTION_TYPES.SUMMARY
-  }
-  if (lower === "essence" || lower.includes("সারমর্ম")) {
-    return QUESTION_TYPES.ESSENCE
   }
   if (lower === "thought expansion" || lower === "amplification" || lower.includes("ভাব-সম্প্রসারণ") || lower.includes("ভাবসম্প্রসারণ")) {
     return QUESTION_TYPES.THOUGHT_EXPANSION

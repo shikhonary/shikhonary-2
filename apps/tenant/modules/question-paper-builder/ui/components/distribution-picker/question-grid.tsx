@@ -10,6 +10,7 @@ import { CsPickerCard } from "./cs-picker-card";
 import { SaPickerCard } from "./sa-picker-card";
 import { ParagraphPickerCard } from "./paragraph-picker-card";
 import { EssencePickerCard } from "./essence-picker-card";
+import { PoemPickerCard } from "./poem-picker-card";
 import { SummaryPickerCard } from "./summary-picker-card";
 import { AmplificationPickerCard } from "./amplification-picker-card";
 import { LetterPickerCard } from "./letter-picker-card";
@@ -24,6 +25,7 @@ import { SubstitutionTablePickerCard } from "./substitution-table-picker-card";
 import { ChangingSentencePickerCard } from "./changing-sentence-picker-card";
 import { PunctuationPickerCard } from "./punctuation-picker-card";
 import { ShortCompositionPickerCard } from "./short-composition-picker-card";
+import { ShortQuestionPickerCard } from "./short-question-picker-card";
 
 export interface QuestionGridProps {
   subjectId: string;
@@ -110,12 +112,20 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
+    if (effectiveCategory === "SHORT_QUESTION") {
+      return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
     if (effectiveCategory === "ESSAY") {
       return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
     if (effectiveCategory === "ESSENCE") {
       return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
+    if (effectiveCategory === "POEM") {
+      return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
     if (effectiveCategory === "SUMMARY") {
@@ -145,6 +155,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SHORT_COMPOSITION":
         return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SHORT_QUESTION":
+        return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CQ":
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "PBQ":
@@ -157,6 +169,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <ParagraphPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "ESSENCE":
         return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "POEM":
+        return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SUMMARY":
         return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "AMPLIFICATION":

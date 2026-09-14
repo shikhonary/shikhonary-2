@@ -33,6 +33,7 @@ export async function addQuestionPaperQuestion(
     input.applicationId,
     input.summaryId,
     input.essenceId,
+    input.poemId,
     input.essayId,
     input.newsReportId,
     input.partsOfSpeechId,
@@ -42,6 +43,7 @@ export async function addQuestionPaperQuestion(
     input.substitutionTableId,
     input.punctuationId,
     input.shortCompositionId,
+    input.shortQuestionId,
   ].filter(Boolean)
 
   if (idsSet.length !== 1) {
@@ -106,6 +108,11 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("Essence")
     questionLabel = "Essence: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.poemId) {
+    const item = await (db as any).poem.findUnique({ where: { id: input.poemId } })
+    if (!item) throw notFound("Poem")
+    questionLabel = "Poem: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.essayId) {
     const item = await (db as any).essay.findUnique({ where: { id: input.essayId } })
     if (!item) throw notFound("Essay")
@@ -151,6 +158,11 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("ShortComposition")
     questionLabel = "ShortComposition: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.shortQuestionId) {
+    const item = await (db as any).shortQuestion.findUnique({ where: { id: input.shortQuestionId } })
+    if (!item) throw notFound("ShortQuestion")
+    questionLabel = "ShortQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
@@ -174,6 +186,7 @@ export async function addQuestionPaperQuestion(
       applicationId: input.applicationId,
       summaryId: input.summaryId,
       essenceId: input.essenceId,
+      poemId: input.poemId,
       essayId: input.essayId,
       newsReportId: input.newsReportId,
       partsOfSpeechId: input.partsOfSpeechId,
@@ -183,6 +196,7 @@ export async function addQuestionPaperQuestion(
       substitutionTableId: input.substitutionTableId,
       punctuationId: input.punctuationId,
       shortCompositionId: input.shortCompositionId,
+      shortQuestionId: input.shortQuestionId,
       distributionId: input.distributionId,
       sectionId: finalSectionId,
       subSectionId: finalSubSectionId,
@@ -237,6 +251,8 @@ export async function removeQuestionPaperQuestion(
     where.summaryId = input.questionId
   } else if (input.questionType === "ESSENCE") {
     where.essenceId = input.questionId
+  } else if (input.questionType === "POEM") {
+    where.poemId = input.questionId
   } else if (input.questionType === "ESSAY") {
     where.essayId = input.questionId
   } else if (input.questionType === "NEWS_REPORT") {
@@ -474,6 +490,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.poemIds && input.poemIds.length > 0) {
+    for (const poemId of input.poemIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        poemId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.essayIds && input.essayIds.length > 0) {
     for (const essayId of input.essayIds) {
       recordsToCreate.push({
@@ -591,6 +620,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.shortQuestionIds && input.shortQuestionIds.length > 0) {
+    for (const shortQuestionId of input.shortQuestionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        shortQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (recordsToCreate.length === 0) {
     return { success: true, count: 0 }
   }
@@ -619,6 +661,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).summary.findUnique({ where: { id: record.summaryId } })) as any
       } else if (record.essenceId) {
         record.contentSnapshot = (await (db as any).essence.findUnique({ where: { id: record.essenceId } })) as any
+      } else if (record.poemId) {
+        record.contentSnapshot = (await (db as any).poem.findUnique({ where: { id: record.poemId } })) as any
       } else if (record.essayId) {
         record.contentSnapshot = (await (db as any).essay.findUnique({ where: { id: record.essayId } })) as any
       } else if (record.newsReportId) {
@@ -637,6 +681,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).punctuation.findUnique({ where: { id: record.punctuationId } })) as any
       } else if (record.shortCompositionId) {
         record.contentSnapshot = (await (db as any).shortComposition.findUnique({ where: { id: record.shortCompositionId } })) as any
+      } else if (record.shortQuestionId) {
+        record.contentSnapshot = (await (db as any).shortQuestion.findUnique({ where: { id: record.shortQuestionId } })) as any
       }
     }
 
@@ -663,6 +709,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_summaryId: { questionPaperId: input.questionPaperId, summaryId: record.summaryId } }
     } else if (record.essenceId) {
       whereCondition = { questionPaperId_essenceId: { questionPaperId: input.questionPaperId, essenceId: record.essenceId } }
+    } else if (record.poemId) {
+      whereCondition = { questionPaperId_poemId: { questionPaperId: input.questionPaperId, poemId: record.poemId } }
     } else if (record.essayId) {
       whereCondition = { questionPaperId_essayId: { questionPaperId: input.questionPaperId, essayId: record.essayId } }
     } else if (record.newsReportId) {
@@ -681,6 +729,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_punctuationId: { questionPaperId: input.questionPaperId, punctuationId: record.punctuationId } }
     } else if (record.shortCompositionId) {
       whereCondition = { questionPaperId_shortCompositionId: { questionPaperId: input.questionPaperId, shortCompositionId: record.shortCompositionId } }
+    } else if (record.shortQuestionId) {
+      whereCondition = { questionPaperId_shortQuestionId: { questionPaperId: input.questionPaperId, shortQuestionId: record.shortQuestionId } }
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -726,6 +776,7 @@ export async function bulkRemoveQuestions(
         { applicationId: { in: input.questionIds } },
         { summaryId: { in: input.questionIds } },
         { essenceId: { in: input.questionIds } },
+        { poemId: { in: input.questionIds } },
         { essayId: { in: input.questionIds } },
         { newsReportId: { in: input.questionIds } },
         { partsOfSpeechId: { in: input.questionIds } },
@@ -735,6 +786,7 @@ export async function bulkRemoveQuestions(
         { substitutionTableId: { in: input.questionIds } },
         { punctuationId: { in: input.questionIds } },
         { shortCompositionId: { in: input.questionIds } },
+        { shortQuestionId: { in: input.questionIds } },
       ],
     },
   })

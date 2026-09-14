@@ -126,7 +126,7 @@ export async function getMcqById(db: PrismaClient, input: GetMcqInput) {
 export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
   const { attachments, context, ...data } = input
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (context && context.trim()) {
+  if (context && context.trim() && allAttachments.length === 0) {
     allAttachments.push({
       url: "text-context",
       type: "text",
@@ -218,7 +218,7 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
   await getMcqById(db, { id })
 
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (context && context.trim()) {
+  if (context && context.trim() && allAttachments.length === 0) {
     allAttachments.push({
       url: "text-context",
       type: "text",
@@ -355,7 +355,7 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
       for (const mcq of input.mcqs) {
         const { attachments, context, ...data } = mcq
         const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-        if (context && context.trim()) {
+        if (context && context.trim() && allAttachments.length === 0) {
           allAttachments.push({
             url: "text-context",
             type: "text",
@@ -430,6 +430,30 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
             } : undefined,
           } as any,
         })
+
+        // Check if any attachment is of type 'image' but has missing or placeholder URL
+        const missingImageAttachments = allAttachments.filter(
+          (att) =>
+            att.type?.toLowerCase() === "image" &&
+            (!att.url || !att.url.trim() || att.url === "text-context" || att.url.toLowerCase() === "null")
+        )
+
+        if (missingImageAttachments.length > 0) {
+          const captions = missingImageAttachments
+            .map((att, i) => (att.caption ? `"${att.caption}"` : `Image #${i + 1}`))
+            .join(", ")
+
+          await tx.questionReport.create({
+            data: {
+              entityType: "MCQ",
+              entityId: createdMcq.id,
+              reportType: "MISSING_IMAGE",
+              description: `Image URL missing for ${missingImageAttachments.length} image attachment(s): ${captions}`,
+              status: "PENDING",
+            },
+          })
+        }
+
         results.push(createdMcq)
       }
       return results

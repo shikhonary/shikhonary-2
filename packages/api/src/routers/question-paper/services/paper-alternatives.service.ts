@@ -46,6 +46,7 @@ export async function addAlternativeQuestion(
     APPLICATION: "applicationId",
     SUMMARY: "summaryId",
     ESSENCE: "essenceId",
+    POEM: "poemId",
     NEWS_REPORT: "newsReportId",
     ESSAY: "essayId",
     PARTS_OF_SPEECH: "partsOfSpeechId",
@@ -55,6 +56,7 @@ export async function addAlternativeQuestion(
     SUBSTITUTION_TABLE: "substitutionTableId",
     PUNCTUATION: "punctuationId",
     SHORT_COMPOSITION: "shortCompositionId",
+    SHORT_QUESTION: "shortQuestionId",
   }
 
   const fkField = typeFieldMap[input.questionType]
@@ -87,6 +89,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).summary.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "ESSENCE") {
     altContent = await (db as any).essence.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "POEM") {
+    altContent = await (db as any).poem.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "NEWS_REPORT") {
     altContent = await (db as any).newsReport.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "ESSAY") {
@@ -105,6 +109,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).punctuation.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SHORT_COMPOSITION") {
     altContent = await (db as any).shortComposition.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SHORT_QUESTION") {
+    altContent = await (db as any).shortQuestion.findUnique({ where: { id: input.questionId } })
   }
   if (!altContent) throw notFound(input.questionType)
 
@@ -237,7 +243,7 @@ export async function swapAlternativeQuestion(
 
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
-    "letterId", "applicationId", "summaryId", "essenceId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "substitutionTableId", "punctuationId", "shortCompositionId"
+    "letterId", "applicationId", "summaryId", "essenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "substitutionTableId", "punctuationId", "shortCompositionId"
   ] as const
 
   const questionFields = [
