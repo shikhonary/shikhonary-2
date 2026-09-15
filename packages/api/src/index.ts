@@ -393,6 +393,65 @@ export type {
   ImportShortQuestionsInput,
 } from "./routers/short-question/short-question.schema"
 
+export type {
+  ListMakeSentencesInput,
+  MakeSentencesStatsInput,
+  GetMakeSentencesInput,
+  CreateMakeSentencesInput,
+  UpdateMakeSentencesInput,
+  DeleteMakeSentencesInput,
+  BulkDeleteMakeSentencesInput,
+  ImportMakeSentencesInput,
+} from "./routers/make-sentences/make-sentences.schema"
+
+export type {
+  ListJuktobornoInput,
+  JuktobornoStatsInput,
+  GetJuktobornoInput,
+  CreateJuktobornoInput,
+  UpdateJuktobornoInput,
+  DeleteJuktobornoInput,
+  BulkDeleteJuktobornoInput,
+  ImportJuktobornoInput,
+} from "./routers/juktoborno/juktoborno.schema"
+
+export type {
+  ListWordMeaningInput,
+  WordMeaningStatsInput,
+  GetWordMeaningInput,
+  CreateWordMeaningInput,
+  UpdateWordMeaningInput,
+  DeleteWordMeaningInput,
+  BulkDeleteWordMeaningInput,
+  ImportWordMeaningInput,
+} from "./routers/word-meaning/word-meaning.schema"
+
+export type {
+  ListGenderChangeInput,
+  GenderChangeStatsInput,
+  GetGenderChangeInput,
+  CreateGenderChangeInput,
+  UpdateGenderChangeInput,
+  DeleteGenderChangeInput,
+  BulkDeleteGenderChangeInput,
+  ImportGenderChangeInput,
+} from "./routers/gender-change/gender-change.schema"
+
+export type {
+  ListSynonymInput,
+  SynonymStatsInput,
+  GetSynonymInput,
+  CreateSynonymInput,
+  UpdateSynonymInput,
+  DeleteSynonymInput,
+  BulkDeleteSynonymInput,
+  ImportSynonymInput,
+} from "./routers/synonym/synonym.schema"
+
+
+
+
+
 
 
 

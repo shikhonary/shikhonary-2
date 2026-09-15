@@ -53,6 +53,8 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).punctuation.findUnique({ where: { id: pq.punctuationId } })
     } else if (pq.shortCompositionId) {
       content = await (db as any).shortComposition.findUnique({ where: { id: pq.shortCompositionId } })
+    } else if (pq.descriptiveQuestionId) {
+      content = await (db as any).descriptiveQuestion.findUnique({ where: { id: pq.descriptiveQuestionId } })
     } else if (pq.shortQuestionId) {
       content = await (db as any).shortQuestion.findUnique({ where: { id: pq.shortQuestionId } })
     }

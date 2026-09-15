@@ -228,6 +228,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   substitutionTableId: z.string().optional().nullable(),
   punctuationId: z.string().optional().nullable(),
   shortCompositionId: z.string().optional().nullable(),
+  descriptiveQuestionId: z.string().optional().nullable(),
   shortQuestionId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
@@ -252,6 +253,7 @@ export const questionTypeCategorySchema = z.enum([
   QUESTION_TYPE_CODES.SUMMARY,
   QUESTION_TYPE_CODES.ESSENCE,
   QUESTION_TYPE_CODES.POEM,
+  QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION,
   QUESTION_TYPE_CODES.SHORT_QUESTION,
   QUESTION_TYPE_CODES.NEWS_REPORT,
   QUESTION_TYPE_CODES.ESSAY,
@@ -374,6 +376,7 @@ export const bulkAssignQuestionsSchema = z.object({
   substitutionTableIds: z.array(z.string()).optional(),
   punctuationIds: z.array(z.string()).optional(),
   shortCompositionIds: z.array(z.string()).optional(),
+  descriptiveQuestionIds: z.array(z.string()).optional(),
   shortQuestionIds: z.array(z.string()).optional(),
 })
 

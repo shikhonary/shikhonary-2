@@ -43,6 +43,7 @@ export async function addQuestionPaperQuestion(
     input.substitutionTableId,
     input.punctuationId,
     input.shortCompositionId,
+    input.descriptiveQuestionId,
     input.shortQuestionId,
   ].filter(Boolean)
 
@@ -158,6 +159,11 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("ShortComposition")
     questionLabel = "ShortComposition: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.descriptiveQuestionId) {
+    const item = await (db as any).descriptiveQuestion.findUnique({ where: { id: input.descriptiveQuestionId } })
+    if (!item) throw notFound("DescriptiveQuestion")
+    questionLabel = "DescriptiveQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.shortQuestionId) {
     const item = await (db as any).shortQuestion.findUnique({ where: { id: input.shortQuestionId } })
     if (!item) throw notFound("ShortQuestion")
@@ -196,6 +202,7 @@ export async function addQuestionPaperQuestion(
       substitutionTableId: input.substitutionTableId,
       punctuationId: input.punctuationId,
       shortCompositionId: input.shortCompositionId,
+      descriptiveQuestionId: input.descriptiveQuestionId,
       shortQuestionId: input.shortQuestionId,
       distributionId: input.distributionId,
       sectionId: finalSectionId,
@@ -271,6 +278,10 @@ export async function removeQuestionPaperQuestion(
     where.punctuationId = input.questionId
   } else if (input.questionType === "SHORT_COMPOSITION") {
     where.shortCompositionId = input.questionId
+  } else if (input.questionType === "DESCRIPTIVE_QUESTION") {
+    where.descriptiveQuestionId = input.questionId
+  } else if (input.questionType === "SHORT_QUESTION") {
+    where.shortQuestionId = input.questionId
   }
 
   const existing = await tenantDb.questionPaperQuestion.findFirst({ where })
@@ -620,6 +631,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.descriptiveQuestionIds && input.descriptiveQuestionIds.length > 0) {
+    for (const descriptiveQuestionId of input.descriptiveQuestionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        descriptiveQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.shortQuestionIds && input.shortQuestionIds.length > 0) {
     for (const shortQuestionId of input.shortQuestionIds) {
       recordsToCreate.push({
@@ -681,8 +705,10 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).punctuation.findUnique({ where: { id: record.punctuationId } })) as any
       } else if (record.shortCompositionId) {
         record.contentSnapshot = (await (db as any).shortComposition.findUnique({ where: { id: record.shortCompositionId } })) as any
+      } else if (record.descriptiveQuestionId) {
+        record.contentSnapshot = (await (db as any).descriptiveQuestion.findUnique({ where: { id: record.descriptiveQuestionId } })) as any
       } else if (record.shortQuestionId) {
-        record.contentSnapshot = (await (db as any).shortQuestion.findUnique({ where: { id: record.shortQuestionId } })) as any
+        record.contentSnapshot = (await db.shortQuestion.findUnique({ where: { id: record.shortQuestionId } })) as any
       }
     }
 
@@ -729,6 +755,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_punctuationId: { questionPaperId: input.questionPaperId, punctuationId: record.punctuationId } }
     } else if (record.shortCompositionId) {
       whereCondition = { questionPaperId_shortCompositionId: { questionPaperId: input.questionPaperId, shortCompositionId: record.shortCompositionId } }
+    } else if (record.descriptiveQuestionId) {
+      whereCondition = { questionPaperId_descriptiveQuestionId: { questionPaperId: input.questionPaperId, descriptiveQuestionId: record.descriptiveQuestionId } }
     } else if (record.shortQuestionId) {
       whereCondition = { questionPaperId_shortQuestionId: { questionPaperId: input.questionPaperId, shortQuestionId: record.shortQuestionId } }
     }
@@ -786,6 +814,7 @@ export async function bulkRemoveQuestions(
         { substitutionTableId: { in: input.questionIds } },
         { punctuationId: { in: input.questionIds } },
         { shortCompositionId: { in: input.questionIds } },
+        { descriptiveQuestionId: { in: input.questionIds } },
         { shortQuestionId: { in: input.questionIds } },
       ],
     },

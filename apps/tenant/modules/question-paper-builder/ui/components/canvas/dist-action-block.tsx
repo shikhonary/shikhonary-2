@@ -115,6 +115,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
     resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
+  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
+    resolvedCategory = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
   } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
     resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
@@ -154,6 +156,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
     } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
       resolvedCategory = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {

@@ -164,6 +164,7 @@ export async function getQuestionPaperById(
   const substitutionTableIds = allPaperQuestions.map((q: any) => q.substitutionTableId).filter(Boolean) as string[]
   const punctuationIds = allPaperQuestions.map((q: any) => q.punctuationId).filter(Boolean) as string[]
   const shortCompositionIds = allPaperQuestions.map((q: any) => q.shortCompositionId).filter(Boolean) as string[]
+  const descriptiveQuestionIds = allPaperQuestions.map((q: any) => q.descriptiveQuestionId).filter(Boolean) as string[]
   const shortQuestionIds = allPaperQuestions.map((q: any) => q.shortQuestionId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
@@ -193,6 +194,7 @@ export async function getQuestionPaperById(
     substitutionTables,
     punctuations,
     shortCompositions,
+    descriptiveQuestions,
     shortQuestions,
     academicClass,
     academicSubjects,
@@ -385,6 +387,16 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    descriptiveQuestionIds.length > 0
+      ? (db as any).descriptiveQuestion.findMany({
+        where: { id: { in: descriptiveQuestionIds } },
+        include: {
+          questionType: true,
+          subject: true,
+          chapter: true,
+        },
+      })
+      : [],
     shortQuestionIds.length > 0
       ? (db as any).shortQuestion.findMany({
         where: { id: { in: shortQuestionIds } },
@@ -421,6 +433,7 @@ export async function getQuestionPaperById(
   const substitutionTableMap = new Map(substitutionTables.map((s: any) => [s.id, s]))
   const punctuationMap = new Map(punctuations.map((p: any) => [p.id, p]))
   const shortCompositionMap = new Map(shortCompositions.map((s: any) => [s.id, s]))
+  const descriptiveQuestionMap = new Map((descriptiveQuestions as any[]).map((d: any) => [d.id, d]))
   const shortQuestionMap = new Map((shortQuestions as any[]).map((s: any) => [s.id, s]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
@@ -461,6 +474,7 @@ export async function getQuestionPaperById(
     let resolvedSubstitutionTable = q.substitutionTableId ? substitutionTableMap.get(q.substitutionTableId) || null : null
     let resolvedPunctuation = q.punctuationId ? punctuationMap.get(q.punctuationId) || null : null
     let resolvedShortComposition = q.shortCompositionId ? shortCompositionMap.get(q.shortCompositionId) || null : null
+    let resolvedDescriptiveQuestion = q.descriptiveQuestionId ? descriptiveQuestionMap.get(q.descriptiveQuestionId) || null : null
     let resolvedShortQuestion = q.shortQuestionId ? shortQuestionMap.get(q.shortQuestionId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
@@ -526,6 +540,9 @@ export async function getQuestionPaperById(
     }
     if (!resolvedShortComposition && q.shortCompositionId && q.contentSnapshot) {
       resolvedShortComposition = q.contentSnapshot as any
+    }
+    if (!resolvedDescriptiveQuestion && q.descriptiveQuestionId && q.contentSnapshot) {
+      resolvedDescriptiveQuestion = q.contentSnapshot as any
     }
     if (!resolvedShortQuestion && q.shortQuestionId && q.contentSnapshot) {
       resolvedShortQuestion = q.contentSnapshot as any
@@ -612,6 +629,7 @@ export async function getQuestionPaperById(
       substitutionTable: resolvedSubstitutionTable,
       punctuation: resolvedPunctuation,
       shortComposition: resolvedShortComposition,
+      descriptiveQuestion: resolvedDescriptiveQuestion,
       shortQuestion: resolvedShortQuestion,
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }

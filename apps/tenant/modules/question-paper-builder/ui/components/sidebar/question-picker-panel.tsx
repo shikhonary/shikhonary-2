@@ -76,6 +76,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
     category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
+  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
+    category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
   } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
     category = QUESTION_TYPE_CODES.SHORT_QUESTION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
@@ -126,6 +128,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.NEWS_REPORT;
     } else if (lower.includes("essay") || lower.includes("রচনা") || lower.includes("প্রবন্ধ")) {
       category = QUESTION_TYPE_CODES.ESSAY;
+    } else if (lower.includes("descriptive question") || lower.includes("descriptive_question") || lower.includes("dq") || lower.includes("রচনামূলক প্রশ্ন")) {
+      category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
     } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
@@ -218,6 +222,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, punctuationIds: [questionId] });
       } else if (category === "SHORT_COMPOSITION") {
         await assignQuestion({ ...payloadBase, shortCompositionIds: [questionId] });
+      } else if (category === "DESCRIPTIVE_QUESTION") {
+        await assignQuestion({ ...payloadBase, descriptiveQuestionIds: [questionId] });
       } else if (category === "SHORT_QUESTION") {
         await assignQuestion({ ...payloadBase, shortQuestionIds: [questionId] });
       } else if (category === "RIGHT_FORM_OF_VERBS") {

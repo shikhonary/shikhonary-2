@@ -249,6 +249,7 @@ model QuestionPaperQuestion {
     substitutionTableId          String?
     punctuationId                String?
     shortCompositionId           String?
+    descriptiveQuestionId        String?
     shortQuestionId              String?
 
     // ── Alternative / OR Question Relationship ─────────────────
@@ -310,6 +311,7 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, fillInTheBlanksWithCluesId])
     @@unique([questionPaperId, substitutionTableId])
     @@unique([questionPaperId, shortCompositionId])
+    @@unique([questionPaperId, descriptiveQuestionId])
     @@unique([questionPaperId, shortQuestionId])
     @@index([parentQuestionId])
     @@index([questionPaperId])
@@ -335,6 +337,7 @@ model QuestionPaperQuestion {
     @@index([fillInTheBlanksWithCluesId])
     @@index([substitutionTableId])
     @@index([shortCompositionId])
+    @@index([descriptiveQuestionId])
     @@index([shortQuestionId])
     @@index([distributionId])
     @@index([sectionId])

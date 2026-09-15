@@ -26,6 +26,11 @@ export const QUESTION_TYPES = {
   SUBSTITUTION_TABLE: "Substitution Table",
   PUNCTUATION: "Punctuation and Capitalization",
   SHORT_COMPOSITION: "Short Composition",
+  MAKE_SENTENCES: "Make Sentences",
+  JUKTOBORNO: "Juktoborno",
+  WORD_MEANING: "Word Meaning",
+  GENDER_CHANGE: "Gender Change",
+  SYNONYM: "Synonym",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -54,6 +59,11 @@ export const QUESTION_TYPE_CODES = {
   SUBSTITUTION_TABLE: "SUBSTITUTION_TABLE",
   PUNCTUATION: "PUNCTUATION",
   SHORT_COMPOSITION: "SHORT_COMPOSITION",
+  MAKE_SENTENCES: "MAKE_SENTENCES",
+  JUKTOBORNO: "JUKTOBORNO",
+  WORD_MEANING: "WORD_MEANING",
+  GENDER_CHANGE: "GENDER_CHANGE",
+  SYNONYM: "SYNONYM",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -228,6 +238,41 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     defaultMark: 10,
     defaultPosition: 15,
   },
+  [QUESTION_TYPES.MAKE_SENTENCES]: {
+    nameEn: QUESTION_TYPES.MAKE_SENTENCES,
+    nameBn: "বাক্য গঠন",
+    code: QUESTION_TYPE_CODES.MAKE_SENTENCES,
+    defaultMark: 5,
+    defaultPosition: 19,
+  },
+  [QUESTION_TYPES.JUKTOBORNO]: {
+    nameEn: QUESTION_TYPES.JUKTOBORNO,
+    nameBn: "যুক্তবর্ণ",
+    code: QUESTION_TYPE_CODES.JUKTOBORNO,
+    defaultMark: 5,
+    defaultPosition: 20,
+  },
+  [QUESTION_TYPES.WORD_MEANING]: {
+    nameEn: QUESTION_TYPES.WORD_MEANING,
+    nameBn: "শব্দার্থ",
+    code: QUESTION_TYPE_CODES.WORD_MEANING,
+    defaultMark: 5,
+    defaultPosition: 21,
+  },
+  [QUESTION_TYPES.GENDER_CHANGE]: {
+    nameEn: QUESTION_TYPES.GENDER_CHANGE,
+    nameBn: "লিঙ্গ পরিবর্তন",
+    code: QUESTION_TYPE_CODES.GENDER_CHANGE,
+    defaultMark: 5,
+    defaultPosition: 22,
+  },
+  [QUESTION_TYPES.SYNONYM]: {
+    nameEn: QUESTION_TYPES.SYNONYM,
+    nameBn: "সমার্থক শব্দ",
+    code: QUESTION_TYPE_CODES.SYNONYM,
+    defaultMark: 5,
+    defaultPosition: 23,
+  },
 } as const
 
 export const QUESTION_TYPE_OPTIONS = Object.values(QUESTION_TYPE_MAP).map((qt) => ({
@@ -393,6 +438,75 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("কম্পোজিশন")
   ) {
     return QUESTION_TYPES.SHORT_COMPOSITION
+  }
+  if (
+    lower === "make sentences" ||
+    lower === "make sentence" ||
+    lower === "sentence making" ||
+    lower === "sentence formation" ||
+    lower.includes("make sentence") ||
+    lower.includes("sentence making") ||
+    lower.includes("বাক্য গঠন") ||
+    lower.includes("বাক্য রচনা") ||
+    lower.includes("একটি করে বাক্য তৈরি") ||
+    lower.includes("বাক্য তৈরি")
+  ) {
+    return QUESTION_TYPES.MAKE_SENTENCES
+  }
+  if (
+    lower === "juktoborno" ||
+    lower === "jukto borno" ||
+    lower === "jukto_borno" ||
+    lower === "conjunct letters" ||
+    lower.includes("juktoborno") ||
+    lower.includes("jukto borno") ||
+    lower.includes("যুক্তবর্ণ") ||
+    lower.includes("যুক্তবর্ণ ভেঙে") ||
+    lower.includes("যুক্তবর্ণ বিভাজন")
+  ) {
+    return QUESTION_TYPES.JUKTOBORNO
+  }
+  if (
+    lower === "word meaning" ||
+    lower === "word meanings" ||
+    lower === "word_meaning" ||
+    lower === "word_meanings" ||
+    lower.includes("word meaning") ||
+    lower.includes("word meanings") ||
+    lower.includes("শব্দার্থ") ||
+    lower.includes("শব্দগুলোর অর্থ") ||
+    lower.includes("শব্দ অর্থ") ||
+    lower.includes("অর্থ লেখো") ||
+    lower.includes("অর্থ লিখ")
+  ) {
+    return QUESTION_TYPES.WORD_MEANING
+  }
+  if (
+    lower === "gender change" ||
+    lower === "gender transformation" ||
+    lower === "gender_change" ||
+    lower === "gender_transformation" ||
+    lower.includes("gender change") ||
+    lower.includes("gender transformation") ||
+    lower.includes("লিঙ্গ পরিবর্তন") ||
+    lower.includes("লিঙ্গান্তর") ||
+    lower.includes("পুরুষবাচক") ||
+    lower.includes("স্ত্রীবাচক")
+  ) {
+    return QUESTION_TYPES.GENDER_CHANGE
+  }
+  if (
+    lower === "synonym" ||
+    lower === "synonyms" ||
+    lower === "synonym_word" ||
+    lower === "synonym_words" ||
+    lower.includes("synonym") ||
+    lower.includes("synonyms") ||
+    lower.includes("সমার্থক শব্দ") ||
+    lower.includes("সমার্থক") ||
+    lower.includes("প্রতিশব্দ")
+  ) {
+    return QUESTION_TYPES.SYNONYM
   }
 
   return null

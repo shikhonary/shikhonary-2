@@ -181,11 +181,27 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  DESCRIPTIVE_QUESTION: {
+    model: "descriptiveQuestion",
+    searchFields: ["question", "answer", "reference"],
+    includes: { questionType: true, subject: true, chapter: true },
+    excludedIdField: "descriptiveQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   SHORT_QUESTION: {
     model: "shortQuestion",
     searchFields: ["question", "reference"],
     includes: { questionType: true, subject: true, chapter: true },
     excludedIdField: "shortQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  MAKE_SENTENCES: {
+    model: "makeSentences",
+    searchFields: ["word", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "makeSentencesId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
@@ -204,6 +220,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.SUMMARY]: "SUMMARY",
   [QUESTION_TYPES.ESSENCE]: "ESSENCE",
   [QUESTION_TYPES.POEM]: "POEM",
+  [QUESTION_TYPES.DESCRIPTIVE_QUESTION]: "DESCRIPTIVE_QUESTION",
   [QUESTION_TYPES.SHORT_QUESTION]: "SHORT_QUESTION",
   [QUESTION_TYPES.NEWS_REPORT]: "NEWS_REPORT",
   [QUESTION_TYPES.ESSAY]: "ESSAY",
@@ -214,6 +231,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.SUBSTITUTION_TABLE]: "SUBSTITUTION_TABLE",
   [QUESTION_TYPES.PUNCTUATION]: "PUNCTUATION",
   [QUESTION_TYPES.SHORT_COMPOSITION]: "SHORT_COMPOSITION",
+  [QUESTION_TYPES.MAKE_SENTENCES]: "MAKE_SENTENCES",
 }
 
 export async function getAvailableQuestions(
@@ -249,6 +267,7 @@ export async function getAvailableQuestions(
         substitutionTableId: true,
         punctuationId: true,
         shortCompositionId: true,
+        descriptiveQuestionId: true,
         shortQuestionId: true,
       },
     })

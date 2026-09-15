@@ -205,14 +205,18 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let substitutionTableIdx = 0;
         let punctuationIdx = 0;
         let shortCompositionIdx = 0;
+        let descriptiveQuestionIdx = 0;
         let shortQuestionIdx = 0;
         let pbqIdx = 0;
+        let mcqIdx = 0;
+        const totalMcqs = questions.filter((q: any) => q.mcq).length;
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalPoems = questions.filter((q: any) => q.poem).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
         const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
         const totalAmplifications = questions.filter((q: any) => q.amplification).length;
         const totalShortAnswers = questions.filter((q: any) => q.shortAnswer).length;
+        const totalDescriptiveQuestions = questions.filter((q: any) => q.descriptiveQuestion).length;
         const totalShortQuestions = questions.filter((q: any) => q.shortQuestion).length;
         const totalLetters = questions.filter((q: any) => q.letter).length;
         const totalApplications = questions.filter((q: any) => q.application).length;
@@ -290,26 +294,67 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               }
             }
 
-            newBlocks.push({
-              id: `q-${q.id}`,
-              type: "question-mcq",
-              data: {
-                item: {
-                  id: q.id,
-                  type: "MCQ",
-                  data: q.mcq,
-                  orderIndex: idx,
-                  canMoveUp,
-                  canMoveDown,
-                  siblingQuestions,
-                  distributionId: dist.id,
-                  paperId,
+            const hasQuestionTypeLabel = Boolean(
+              (dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "") ||
+              q.distribution?.questionTypeLabel ||
+              statusInfo?.questionTypeLabel
+            );
+
+            if (hasQuestionTypeLabel) {
+              if (mcqIdx === 0) {
+                globalWrittenNumber++;
+              }
+              newBlocks.push({
+                id: `q-${q.id}`,
+                type: "question-correct-answer",
+                data: {
+                  item: {
+                    id: q.id,
+                    type: "MCQ",
+                    data: q.mcq,
+                    orderIndex: mcqIdx,
+                    masterNumber: globalWrittenNumber,
+                    canMoveUp,
+                    canMoveDown,
+                    siblingQuestions,
+                    isFirstCorrectAnswer: mcqIdx === 0,
+                    totalQuestions: totalMcqs,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "সঠিক উত্তরটি উত্তরপত্রে লেখো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    paperId,
+                  },
+                  hideContext,
+                  contextInstruction
                 },
-                hideContext,
-                contextInstruction
-              },
-              gap: 0
-            });
+                gap: 0
+              });
+              mcqIdx++;
+            } else {
+              newBlocks.push({
+                id: `q-${q.id}`,
+                type: "question-mcq",
+                data: {
+                  item: {
+                    id: q.id,
+                    type: "MCQ",
+                    data: q.mcq,
+                    orderIndex: idx,
+                    canMoveUp,
+                    canMoveDown,
+                    siblingQuestions,
+                    distributionId: dist.id,
+                    paperId,
+                  },
+                  hideContext,
+                  contextInstruction
+                },
+                gap: 0
+              });
+            }
           }
           if (q.cq) {
             globalWrittenNumber++;
@@ -434,6 +479,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: shortAnswerIdx === totalShortAnswers - 1 ? 4 : 0
             });
             shortAnswerIdx++;
+          }
+          if (q.descriptiveQuestion) {
+            if (descriptiveQuestionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-descriptive-question",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "DESCRIPTIVE_QUESTION",
+                  data: q.descriptiveQuestion,
+                  orderIndex: descriptiveQuestionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstDescriptiveQuestion: descriptiveQuestionIdx === 0,
+                  totalQuestions: totalDescriptiveQuestions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "রচনামূলক প্রশ্ন",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: descriptiveQuestionIdx === totalDescriptiveQuestions - 1 ? 4 : 0
+            });
+            descriptiveQuestionIdx++;
           }
           if (q.shortQuestion) {
             if (shortQuestionIdx === 0) {

@@ -50,6 +50,11 @@ import { shortCompositionRouter } from "./routers/short-composition/short-compos
 import { poemRouter } from "./routers/poem/poem.router"
 import { descriptiveQuestionRouter } from "./routers/descriptive-question/descriptive-question.router"
 import { shortQuestionRouter } from "./routers/short-question/short-question.router"
+import { makeSentencesRouter } from "./routers/make-sentences/make-sentences.router"
+import { juktobornoRouter } from "./routers/juktoborno/juktoborno.router"
+import { wordMeaningRouter } from "./routers/word-meaning/word-meaning.router"
+import { genderChangeRouter } from "./routers/gender-change/gender-change.router"
+import { synonymRouter } from "./routers/synonym/synonym.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -76,6 +81,11 @@ export const appRouter = createTRPCRouter({
   shortAnswer: shortAnswerRouter,
   descriptiveQuestion: descriptiveQuestionRouter,
   shortQuestion: shortQuestionRouter,
+  makeSentences: makeSentencesRouter,
+  juktoborno: juktobornoRouter,
+  wordMeaning: wordMeaningRouter,
+  genderChange: genderChangeRouter,
+  synonym: synonymRouter,
   subjectStructure: subjectStructureRouter,
   paragraph: paragraphRouter,
   amplification: amplificationRouter,

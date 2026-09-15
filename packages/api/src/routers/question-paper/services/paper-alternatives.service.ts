@@ -56,6 +56,7 @@ export async function addAlternativeQuestion(
     SUBSTITUTION_TABLE: "substitutionTableId",
     PUNCTUATION: "punctuationId",
     SHORT_COMPOSITION: "shortCompositionId",
+    DESCRIPTIVE_QUESTION: "descriptiveQuestionId",
     SHORT_QUESTION: "shortQuestionId",
   }
 
@@ -109,6 +110,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).punctuation.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SHORT_COMPOSITION") {
     altContent = await (db as any).shortComposition.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "DESCRIPTIVE_QUESTION") {
+    altContent = await (db as any).descriptiveQuestion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SHORT_QUESTION") {
     altContent = await (db as any).shortQuestion.findUnique({ where: { id: input.questionId } })
   }

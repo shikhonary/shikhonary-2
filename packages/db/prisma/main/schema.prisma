@@ -74,6 +74,16 @@ model User {
   updatedShortCompositions        ShortComposition[]         @relation("ShortCompositionUpdater")
   createdPoems                    Poem[]                     @relation("PoemCreator")
   updatedPoems                    Poem[]                     @relation("PoemUpdater")
+  createdMakeSentences            MakeSentences[]            @relation("MakeSentencesCreator")
+  updatedMakeSentences            MakeSentences[]            @relation("MakeSentencesUpdater")
+  createdJuktobornos              Juktoborno[]               @relation("JuktobornoCreator")
+  updatedJuktobornos              Juktoborno[]               @relation("JuktobornoUpdater")
+  createdWordMeanings             WordMeaning[]              @relation("WordMeaningCreator")
+  updatedWordMeanings             WordMeaning[]              @relation("WordMeaningUpdater")
+  createdGenderChanges            GenderChange[]             @relation("GenderChangeCreator")
+  updatedGenderChanges            GenderChange[]             @relation("GenderChangeUpdater")
+  createdSynonyms                 Synonym[]                  @relation("SynonymCreator")
+  updatedSynonyms                 Synonym[]                  @relation("SynonymUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -265,6 +275,11 @@ model Tenant {
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
+  makeSentences            MakeSentences[]
+  juktobornos              Juktoborno[]
+  wordMeanings             WordMeaning[]
+  genderChanges            GenderChange[]
+  synonyms                 Synonym[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -641,6 +656,11 @@ model AcademicSubject {
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
+  makeSentences            MakeSentences[]
+  juktobornos              Juktoborno[]
+  wordMeanings             WordMeaning[]
+  genderChanges            GenderChange[]
+  synonyms                 Synonym[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -691,6 +711,11 @@ model AcademicChapter {
   partsOfSpeech            PartsOfSpeech[]
   rightFormOfVerbs         RightFormOfVerb[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  makeSentences            MakeSentences[]
+  juktobornos              Juktoborno[]
+  wordMeanings             WordMeaning[]
+  genderChanges            GenderChange[]
+  synonyms                 Synonym[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -743,6 +768,11 @@ model QuestionType {
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
+  makeSentences            MakeSentences[]
+  juktobornos              Juktoborno[]
+  wordMeanings             WordMeaning[]
+  genderChanges            GenderChange[]
+  synonyms                 Synonym[]
 
   @@index([label])
   @@index([isActive])
@@ -1999,6 +2029,245 @@ model Poem {
   @@index([subjectId])
   @@index([difficulty])
   @@map("poem")
+}
+
+model Juktoborno {
+  id        String   @id @default(cuid())
+  juktoborno String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("JuktobornoCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("JuktobornoUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("juktoborno")
+}
+
+model Synonym {
+  id          String   @id @default(cuid())
+  word        String
+  synonymWord String?
+  synonyms    String[] @default([])
+  reference   String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("SynonymCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("SynonymUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("synonym")
+}
+
+model GenderChange {
+  id         String   @id @default(cuid())
+  word       String
+  genderWord String?
+  reference  String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("GenderChangeCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("GenderChangeUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("gender_change")
+}
+
+model WordMeaning {
+  id        String   @id @default(cuid())
+  word      String
+  meaning   String?
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("WordMeaningCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("WordMeaningUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("word_meaning")
+}
+
+model MakeSentences {
+  id        String   @id @default(cuid())
+  word      String
+  reference String[] @default([])
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("MakeSentencesCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("MakeSentencesUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("make_sentences")
 }
 
 model QuestionReport {

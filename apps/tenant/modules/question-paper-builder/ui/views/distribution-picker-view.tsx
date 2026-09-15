@@ -173,6 +173,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     category = QUESTION_TYPE_CODES.ESSAY;
   } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
     category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
+  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
+    category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
   } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
     category = QUESTION_TYPE_CODES.SHORT_QUESTION;
   } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
@@ -212,6 +214,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.APPLICATION;
     } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
       category = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
+      category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
@@ -350,6 +354,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, punctuationIds: selectedIds });
       } else if (category === "SHORT_COMPOSITION") {
         await bulkAssign({ ...payloadBase, shortCompositionIds: selectedIds });
+      } else if (category === "DESCRIPTIVE_QUESTION") {
+        await bulkAssign({ ...payloadBase, descriptiveQuestionIds: selectedIds });
       } else if (category === "SHORT_QUESTION") {
         await bulkAssign({ ...payloadBase, shortQuestionIds: selectedIds });
       } else if (category === "RIGHT_FORM_OF_VERBS") {

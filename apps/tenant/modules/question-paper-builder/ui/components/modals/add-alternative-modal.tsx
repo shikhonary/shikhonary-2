@@ -61,6 +61,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES, nameBn: "শূন্যস্থান পূরণ (ক্লুসহ)", nameEn: "Fill in the Blanks with Clues", desc: "বক্স থেকে উপযুক্ত শব্দ নিয়ে শূন্যস্থান পূরণ" },
   { code: QUESTION_TYPE_CODES.SUBSTITUTION_TABLE, nameBn: "সাবস্টিটিউশন টেবিল", nameEn: "Substitution Table", desc: "৩-কলামের টেবিল থেকে বাক্য গঠন" },
   { code: QUESTION_TYPE_CODES.SHORT_COMPOSITION, nameBn: "Short Composition", nameEn: "Short Composition", desc: "সংক্ষিপ্ত রচনা বা কম্পোজিশন লিখন" },
+  { code: QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION, nameBn: "রচনামূলক প্রশ্ন", nameEn: "Descriptive Question", desc: "রচনামূলক বা বিস্তারিত উত্তরদানের প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SHORT_QUESTION, nameBn: "সংক্ষিপ্ত প্রশ্ন", nameEn: "Short Question", desc: "সরাসরি সংক্ষেপে উত্তরদানের প্রশ্ন" },
 ];
 

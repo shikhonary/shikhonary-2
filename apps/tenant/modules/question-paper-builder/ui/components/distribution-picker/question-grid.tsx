@@ -25,6 +25,7 @@ import { SubstitutionTablePickerCard } from "./substitution-table-picker-card";
 import { ChangingSentencePickerCard } from "./changing-sentence-picker-card";
 import { PunctuationPickerCard } from "./punctuation-picker-card";
 import { ShortCompositionPickerCard } from "./short-composition-picker-card";
+import { DescriptiveQuestionPickerCard } from "./descriptive-question-picker-card";
 import { ShortQuestionPickerCard } from "./short-question-picker-card";
 
 export interface QuestionGridProps {
@@ -112,6 +113,10 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
 
+    if (effectiveCategory === "DESCRIPTIVE_QUESTION") {
+      return <DescriptiveQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+    }
+
     if (effectiveCategory === "SHORT_QUESTION") {
       return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
     }
@@ -155,6 +160,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SHORT_COMPOSITION":
         return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "DESCRIPTIVE_QUESTION":
+        return <DescriptiveQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SHORT_QUESTION":
         return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "CQ":
