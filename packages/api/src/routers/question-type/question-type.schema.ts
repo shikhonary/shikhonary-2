@@ -23,6 +23,7 @@ export const createQuestionTypeSchema = z.object({
   position: z.number().int().min(0).default(0),
   descriptionEn: z.string().optional().nullable(),
   descriptionBn: z.string().optional().nullable(),
+  creditCost: z.number().int().min(0, "Credit cost must be at least 0").default(1),
   isActive: z.boolean().default(true),
 })
 
@@ -37,6 +38,7 @@ export const updateQuestionTypeSchema = z.object({
   position: z.number().int().min(0).optional(),
   descriptionEn: z.string().optional().nullable(),
   descriptionBn: z.string().optional().nullable(),
+  creditCost: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
 })
 

@@ -12,7 +12,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { HelpCircle, Loader2, Save, Award, Hash, Tag, Sparkles } from "lucide-react"
+import { HelpCircle, Loader2, Save, Award, Hash, Tag, Sparkles, Coins } from "lucide-react"
 import { QUESTION_TYPES, QUESTION_TYPE_OPTIONS, QUESTION_TYPE_MAP, type QuestionTypeName } from "@workspace/utils"
 
 import { useCreateQuestionType } from "../services/use-question-type"
@@ -23,6 +23,7 @@ const createQuestionTypeFormSchema = z.object({
   label: z.string().optional().or(z.literal("")),
   mark: z.coerce.number().min(0, "Mark must be at least 0"),
   position: z.coerce.number().int().min(0, "Position must be at least 0"),
+  creditCost: z.coerce.number().int().min(0, "Credit cost must be at least 0"),
   descriptionEn: z.string().optional().or(z.literal("")),
   descriptionBn: z.string().optional().or(z.literal("")),
   isActive: z.boolean(),
@@ -49,6 +50,7 @@ export function CreateQuestionTypeView() {
       label: "",
       mark: 0,
       position: 0,
+      creditCost: 1,
       descriptionEn: "",
       descriptionBn: "",
       isActive: true,
@@ -205,8 +207,8 @@ export function CreateQuestionTypeView() {
                 </div>
               </div>
 
-              {/* Label, Mark & Position */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {/* Label, Mark, Credit Cost & Position */}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
                 {/* Label */}
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -245,6 +247,27 @@ export function CreateQuestionTypeView() {
                   </div>
                   {errors.mark && (
                     <p className="text-xs text-error">{errors.mark.message}</p>
+                  )}
+                </div>
+
+                {/* Credit Cost */}
+                <div className="space-y-2">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Credit Cost *
+                  </Label>
+                  <div className="group relative">
+                    <Coins className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
+                    <Input
+                      type="number"
+                      min="0"
+                      disabled={isSubmitting}
+                      placeholder="e.g. 1"
+                      {...register("creditCost")}
+                      className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
+                    />
+                  </div>
+                  {errors.creditCost && (
+                    <p className="text-xs text-error">{errors.creditCost.message}</p>
                   )}
                 </div>
 

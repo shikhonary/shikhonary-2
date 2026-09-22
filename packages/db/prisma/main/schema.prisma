@@ -425,6 +425,7 @@ model CreditTransaction {
   balance Int // Running balance after this transaction
 
   description String
+  metadata    Json   @default("{}")
 
   createdAt DateTime @default(now())
 
@@ -737,6 +738,7 @@ model QuestionType {
   position      Int     @default(0)
   descriptionEn String?
   descriptionBn String?
+  creditCost    Int     @default(1)
   isActive      Boolean @default(true)
 
   // ── Relations ──

@@ -9,12 +9,19 @@ import type {
   BulkRemoveQuestionsInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
+import {
+  chargeTenantCredits,
+  refundTenantCredits,
+  getQuestionTypeCreditCost,
+  getQuestionTypesCreditCosts,
+} from "./helpers/credit-charge"
 
 export async function addQuestionPaperQuestion(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: AddQuestionPaperQuestionInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const paper = await tenantDb.questionPaper.findUnique({
     where: { id: input.questionPaperId },
@@ -53,120 +60,144 @@ export async function addQuestionPaperQuestion(
 
   let contentSnapshot: any = null
   let questionLabel = ""
+  let resolvedQuestionTypeId: string | null = null
 
   if (input.mcqId) {
     const item = await db.mcq.findUnique({ where: { id: input.mcqId } })
     if (!item) throw notFound("Mcq")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "MCQ: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.cqId) {
     const item = await db.cq.findUnique({ where: { id: input.cqId } })
     if (!item) throw notFound("Cq")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "CQ: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.shortAnswerId) {
     const item = await db.shortAnswer.findUnique({ where: { id: input.shortAnswerId } })
     if (!item) throw notFound("ShortAnswer")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "ShortAnswer: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.csId) {
     const item = await (db as any).cS.findUnique({ where: { id: input.csId } })
     if (!item) throw notFound("CS")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "CS: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.pbqId) {
     const item = await db.pBQ.findUnique({ where: { id: input.pbqId } })
     if (!item) throw notFound("PBQ")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "PBQ: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.paragraphId) {
     const item = await db.paragraph.findUnique({ where: { id: input.paragraphId } })
     if (!item) throw notFound("Paragraph")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "Paragraph: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.amplificationId) {
     const item = await db.amplification.findUnique({ where: { id: input.amplificationId } })
     if (!item) throw notFound("Amplification")
+    resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "Amplification: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.letterId) {
     const item = await (db as any).letter.findUnique({ where: { id: input.letterId } })
     if (!item) throw notFound("Letter")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Letter: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.applicationId) {
     const item = await (db as any).application.findUnique({ where: { id: input.applicationId } })
     if (!item) throw notFound("Application")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Application: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.summaryId) {
     const item = await (db as any).summary.findUnique({ where: { id: input.summaryId } })
     if (!item) throw notFound("Summary")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Summary: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.essenceId) {
     const item = await (db as any).essence.findUnique({ where: { id: input.essenceId } })
     if (!item) throw notFound("Essence")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Essence: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.poemId) {
     const item = await (db as any).poem.findUnique({ where: { id: input.poemId } })
     if (!item) throw notFound("Poem")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Poem: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.essayId) {
     const item = await (db as any).essay.findUnique({ where: { id: input.essayId } })
     if (!item) throw notFound("Essay")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Essay: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.newsReportId) {
     const item = await (db as any).newsReport.findUnique({ where: { id: input.newsReportId } })
     if (!item) throw notFound("NewsReport")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "NewsReport: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.partsOfSpeechId) {
     const item = await db.partsOfSpeech.findUnique({ where: { id: input.partsOfSpeechId } })
     if (!item) throw notFound("PartsOfSpeech")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "PartsOfSpeech: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.rightFormOfVerbId) {
     const item = await (db as any).rightFormOfVerb.findUnique({ where: { id: input.rightFormOfVerbId } })
     if (!item) throw notFound("RightFormOfVerb")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "RightFormOfVerb: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.changingSentenceId) {
     const item = await (db as any).changingSentence.findUnique({ where: { id: input.changingSentenceId } })
     if (!item) throw notFound("ChangingSentence")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "ChangingSentence: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.fillInTheBlanksWithCluesId) {
     const item = await db.fillInTheBlanksWithClues.findUnique({ where: { id: input.fillInTheBlanksWithCluesId } })
     if (!item) throw notFound("FillInTheBlanksWithClues")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "FillInTheBlanksWithClues: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.substitutionTableId) {
     const item = await db.substitutionTable.findUnique({ where: { id: input.substitutionTableId } })
     if (!item) throw notFound("SubstitutionTable")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "SubstitutionTable: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.punctuationId) {
     const item = await (db as any).punctuation.findUnique({ where: { id: input.punctuationId } })
     if (!item) throw notFound("Punctuation")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Punctuation: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.shortCompositionId) {
     const item = await (db as any).shortComposition.findUnique({ where: { id: input.shortCompositionId } })
     if (!item) throw notFound("ShortComposition")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "ShortComposition: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.descriptiveQuestionId) {
     const item = await (db as any).descriptiveQuestion.findUnique({ where: { id: input.descriptiveQuestionId } })
     if (!item) throw notFound("DescriptiveQuestion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "DescriptiveQuestion: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.shortQuestionId) {
     const item = await (db as any).shortQuestion.findUnique({ where: { id: input.shortQuestionId } })
     if (!item) throw notFound("ShortQuestion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "ShortQuestion: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
@@ -174,6 +205,24 @@ export async function addQuestionPaperQuestion(
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
     where: { id: input.distributionId },
   })
+
+  // Determine credit cost and charge tenant if tenantId is provided
+  const finalQuestionTypeId = resolvedQuestionTypeId ?? dist?.questionTypeId ?? null
+  const creditCost = await getQuestionTypeCreditCost(db, finalQuestionTypeId)
+
+  if (tenantId && creditCost > 0) {
+    await chargeTenantCredits(db, {
+      tenantId,
+      amount: creditCost,
+      description: `Question added to paper (${paper.title}): ${questionLabel}`,
+      metadata: {
+        questionPaperId: input.questionPaperId,
+        questionLabel,
+        questionTypeId: finalQuestionTypeId,
+        creditCost,
+      },
+    })
+  }
 
   const finalSectionId = input.sectionId ?? dist?.sectionId ?? null
   const finalSubSectionId = input.subSectionId ?? null
@@ -219,16 +268,18 @@ export async function addQuestionPaperQuestion(
     questionPaperId: input.questionPaperId,
     action: "QUESTION_ADDED",
     actorId,
-    changes: { questionId: paperQuestion.id, label: questionLabel, distributionId: input.distributionId },
+    changes: { questionId: paperQuestion.id, label: questionLabel, distributionId: input.distributionId, creditCost },
   })
 
   return paperQuestion
 }
 
 export async function removeQuestionPaperQuestion(
+  db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: RemoveQuestionPaperQuestionInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const paper = await tenantDb.questionPaper.findUnique({
     where: { id: input.questionPaperId },
@@ -287,15 +338,38 @@ export async function removeQuestionPaperQuestion(
   const existing = await tenantDb.questionPaperQuestion.findFirst({ where })
   if (!existing) throw notFound("QuestionPaperQuestion")
 
+  let refundAmount = 0
+  if (tenantId) {
+    const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+      where: { id: existing.distributionId },
+      select: { questionTypeId: true },
+    })
+    refundAmount = await getQuestionTypeCreditCost(db, dist?.questionTypeId)
+  }
+
   await tenantDb.questionPaperQuestion.delete({
     where: { id: existing.id },
   })
+
+  if (tenantId && refundAmount > 0) {
+    await refundTenantCredits(db, {
+      tenantId,
+      amount: refundAmount,
+      description: `Refund for removed ${input.questionType} question from paper (${paper.title})`,
+      metadata: {
+        questionPaperId: input.questionPaperId,
+        questionId: input.questionId,
+        questionType: input.questionType,
+        refundAmount,
+      },
+    })
+  }
 
   await logHistory(tenantDb, {
     questionPaperId: input.questionPaperId,
     action: "QUESTION_REMOVED",
     actorId,
-    changes: { questionId: existing.id, type: input.questionType },
+    changes: { questionId: existing.id, type: input.questionType, refundAmount },
   })
 
   return { success: true }
@@ -334,7 +408,8 @@ export async function bulkAssignQuestions(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: BulkAssignQuestionsInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const paper = await tenantDb.questionPaper.findUnique({
     where: { id: input.questionPaperId },
@@ -661,6 +736,30 @@ export async function bulkAssignQuestions(
     return { success: true, count: 0 }
   }
 
+  let creditCostPerItem = 0
+  let totalCredits = 0
+
+  if (tenantId) {
+    creditCostPerItem = await getQuestionTypeCreditCost(db, dist.questionTypeId)
+    totalCredits = recordsToCreate.length * creditCostPerItem
+
+    if (totalCredits > 0) {
+      await chargeTenantCredits(db, {
+        tenantId,
+        amount: totalCredits,
+        description: `Bulk added ${recordsToCreate.length} question(s) to paper (${paper.title})`,
+        metadata: {
+          questionPaperId: input.questionPaperId,
+          distributionId: input.distributionId,
+          questionTypeId: dist.questionTypeId,
+          count: recordsToCreate.length,
+          creditCostPerItem,
+          totalCredits,
+        },
+      })
+    }
+  }
+
   for (const record of recordsToCreate) {
     if (paper.status === "Published") {
       if (record.mcqId) {
@@ -772,23 +871,25 @@ export async function bulkAssignQuestions(
     questionPaperId: input.questionPaperId,
     action: "QUESTION_ADDED",
     actorId,
-    changes: { count: recordsToCreate.length, distributionId: input.distributionId },
+    changes: { count: recordsToCreate.length, distributionId: input.distributionId, totalCredits },
   })
 
   return { success: true, count: recordsToCreate.length }
 }
 
 export async function bulkRemoveQuestions(
+  db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: BulkRemoveQuestionsInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const paper = await tenantDb.questionPaper.findUnique({
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
 
-  await tenantDb.questionPaperQuestion.deleteMany({
+  const targetQuestions = await tenantDb.questionPaperQuestion.findMany({
     where: {
       questionPaperId: input.questionPaperId,
       OR: [
@@ -818,13 +919,54 @@ export async function bulkRemoveQuestions(
         { shortQuestionId: { in: input.questionIds } },
       ],
     },
+    select: { id: true, distributionId: true },
   })
+
+  let totalRefund = 0
+  if (tenantId && targetQuestions.length > 0) {
+    const distIds = Array.from(new Set(targetQuestions.map((q) => q.distributionId).filter(Boolean)))
+    const distributions = await tenantDb.questionPaperSubjectMarkDistribution.findMany({
+      where: { id: { in: distIds } },
+      select: { id: true, questionTypeId: true },
+    })
+    const distTypeMap = new Map(distributions.map((d) => [d.id, d.questionTypeId]))
+    const costMap = await getQuestionTypesCreditCosts(
+      db,
+      distributions.map((d) => d.questionTypeId)
+    )
+
+    for (const q of targetQuestions) {
+      const qTypeId = distTypeMap.get(q.distributionId)
+      const cost = qTypeId ? costMap.get(qTypeId) ?? 1 : 1
+      totalRefund += cost
+    }
+  }
+
+  await tenantDb.questionPaperQuestion.deleteMany({
+    where: {
+      questionPaperId: input.questionPaperId,
+      id: { in: targetQuestions.map((q) => q.id) },
+    },
+  })
+
+  if (tenantId && totalRefund > 0) {
+    await refundTenantCredits(db, {
+      tenantId,
+      amount: totalRefund,
+      description: `Refund for bulk removed ${targetQuestions.length} question(s) from paper (${paper.title})`,
+      metadata: {
+        questionPaperId: input.questionPaperId,
+        count: targetQuestions.length,
+        totalRefund,
+      },
+    })
+  }
 
   await logHistory(tenantDb, {
     questionPaperId: input.questionPaperId,
     action: "QUESTION_REMOVED",
     actorId,
-    changes: { count: input.questionIds.length },
+    changes: { count: targetQuestions.length, totalRefund },
   })
 
   return { success: true }

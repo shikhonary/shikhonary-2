@@ -14,6 +14,7 @@ import { roleRouter } from "./routers/role/role.router"
 import { tenantRouter } from "./routers/tenant/tenant.router"
 import { subscriptionRouter } from "./routers/subscription/subscription.router"
 import { subscriptionPlanRouter } from "./routers/subscription-plan/subscription-plan.router"
+import { creditRouter } from "./routers/credit/credit.router"
 import { fiscalYearRouter } from "./routers/fiscal-year/fiscal-year.router"
 import { questionPaperRouter } from "./routers/question-paper/question-paper.router"
 import { dashboardRouter } from "./routers/dashboard/dashboard.router"
@@ -63,6 +64,7 @@ export const appRouter = createTRPCRouter({
   tenant: tenantRouter,
   subscription: subscriptionRouter,
   subscriptionPlan: subscriptionPlanRouter,
+  credit: creditRouter,
   fiscalYear: fiscalYearRouter,
   questionPaper: questionPaperRouter,
   dashboard: dashboardRouter,

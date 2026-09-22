@@ -13,10 +13,13 @@ import {
   GraduationCap,
   Settings,
   FileText,
+  Coins,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import { authClient } from "@workspace/auth/client";
 import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
+import { useQuery } from "@tanstack/react-query";
+import { trpc } from "@/trpc/client";
 
 type NavItem = {
   href: string;
@@ -41,6 +44,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { tenant, user } = useTenant();
+  const { data: creditData } = useQuery(trpc.credit.getBalance.queryOptions());
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -145,6 +149,25 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
       {/* Footer */}
       <div className="mt-auto flex flex-col gap-3 p-4 border-t border-outline-variant/30 bg-muted/20">
+        {/* Credit Balance Badge */}
+        {!collapsed ? (
+          <div className="flex items-center justify-between rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-xs">
+            <div className="flex items-center gap-1.5 font-bold text-amber-900">
+              <Coins className="h-4 w-4 text-amber-600 shrink-0" />
+              <span>ক্রেডিট ব্যালেন্স</span>
+            </div>
+            <span className="font-extrabold text-amber-700 bg-white/80 px-2 py-0.5 rounded-md border border-amber-500/30">
+              {creditData?.creditBalance ?? 0}
+            </span>
+          </div>
+        ) : (
+          <div className="flex justify-center" title={`ক্রেডিট ব্যালেন্স: ${creditData?.creditBalance ?? 0}`}>
+            <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+              <Coins className="h-4 w-4" />
+            </div>
+          </div>
+        )}
+
         {!collapsed && (
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">

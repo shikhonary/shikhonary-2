@@ -8,12 +8,14 @@ import type {
   UpdateAlternativeQuestionInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
+import { chargeTenantCredits, refundTenantCredits, getQuestionTypeCreditCost } from "./helpers/credit-charge"
 
 export async function addAlternativeQuestion(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: AddAlternativeQuestionInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const paper = await tenantDb.questionPaper.findUnique({
     where: { id: input.questionPaperId },
@@ -172,6 +174,24 @@ export async function addAlternativeQuestion(
     targetDistributionId = primaryQuestion.distributionId
   }
 
+  const altQuestionTypeId = altContent?.questionTypeId ?? null
+  const creditCost = await getQuestionTypeCreditCost(db, altQuestionTypeId)
+
+  if (tenantId && creditCost > 0) {
+    await chargeTenantCredits(db, {
+      tenantId,
+      amount: creditCost,
+      description: `Alternative question added to paper (${paper.title}): ${input.questionType}`,
+      metadata: {
+        questionPaperId: input.questionPaperId,
+        questionId: input.questionId,
+        parentQuestionId: input.parentQuestionId,
+        questionType: input.questionType,
+        creditCost,
+      },
+    })
+  }
+
   // 7. Create the alternative row
   const alternativeQuestion = await tenantDb.questionPaperQuestion.create({
     data: {
@@ -197,6 +217,7 @@ export async function addAlternativeQuestion(
       parentQuestionId: input.parentQuestionId,
       alternativeQuestionId: alternativeQuestion.id,
       orLabel: input.orLabel,
+      creditCost,
     },
   })
 
@@ -204,9 +225,11 @@ export async function addAlternativeQuestion(
 }
 
 export async function removeAlternativeQuestion(
+  db: PrismaClient,
   tenantDb: TenantPrismaClient,
   input: RemoveAlternativeQuestionInput,
-  actorId?: string
+  actorId?: string,
+  tenantId?: string
 ) {
   const altQuestion = await tenantDb.questionPaperQuestion.findFirst({
     where: {
@@ -217,15 +240,41 @@ export async function removeAlternativeQuestion(
   })
   if (!altQuestion) throw notFound("Alternative Question")
 
+  let refundAmount = 0
+  if (tenantId) {
+    const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+      where: { id: altQuestion.distributionId },
+      select: { questionTypeId: true },
+    })
+    refundAmount = await getQuestionTypeCreditCost(db, dist?.questionTypeId)
+  }
+
   await tenantDb.questionPaperQuestion.delete({
     where: { id: altQuestion.id },
   })
+
+  if (tenantId && refundAmount > 0) {
+    const paper = await tenantDb.questionPaper.findUnique({
+      where: { id: input.questionPaperId },
+      select: { title: true },
+    })
+    await refundTenantCredits(db, {
+      tenantId,
+      amount: refundAmount,
+      description: `Refund for removed alternative question from paper (${paper?.title || input.questionPaperId})`,
+      metadata: {
+        questionPaperId: input.questionPaperId,
+        alternativeQuestionId: altQuestion.id,
+        refundAmount,
+      },
+    })
+  }
 
   await logHistory(tenantDb, {
     questionPaperId: input.questionPaperId,
     action: "QUESTION_REMOVED",
     actorId,
-    changes: { alternativeQuestionId: altQuestion.id },
+    changes: { alternativeQuestionId: altQuestion.id, refundAmount },
   })
 
   return { success: true }

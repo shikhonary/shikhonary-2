@@ -118,6 +118,7 @@ export async function createQuestionType(
       position: input.position,
       descriptionEn: input.descriptionEn ?? null,
       descriptionBn: input.descriptionBn ?? null,
+      creditCost: input.creditCost,
       isActive: input.isActive,
     },
   })
@@ -167,6 +168,7 @@ export async function updateQuestionType(
       position: data.position,
       descriptionEn: data.descriptionEn === undefined ? undefined : data.descriptionEn,
       descriptionBn: data.descriptionBn === undefined ? undefined : data.descriptionBn,
+      creditCost: data.creditCost,
       isActive: data.isActive,
     },
   })

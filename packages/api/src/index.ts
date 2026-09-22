@@ -448,6 +448,11 @@ export type {
   ImportSynonymInput,
 } from "./routers/synonym/synonym.schema"
 
+export type {
+  ListCreditTransactionsInput,
+  EstimatePaperCostInput,
+} from "./routers/credit/credit.schema"
+
 
 
 

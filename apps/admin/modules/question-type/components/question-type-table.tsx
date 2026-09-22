@@ -25,7 +25,8 @@ import {
   ToggleLeft,
   ToggleRight,
   Hash,
-  Award
+  Award,
+  Coins
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
@@ -37,6 +38,7 @@ export interface QuestionTypeItem {
   label?: string | null
   mark: number
   position: number
+  creditCost?: number
   isActive: boolean
   descriptionEn?: string | null
   descriptionBn?: string | null
@@ -168,6 +170,7 @@ export function QuestionTypeTable({
 
                   <div className="flex items-center gap-1.5 border-t border-outline-variant/20 pt-2 text-[10px] text-on-surface-variant font-medium justify-between">
                     <span className="flex items-center gap-1"><Award className="h-3.5 w-3.5" /> Mark: <span className="font-bold text-on-surface">{qt.mark}</span></span>
+                    <span className="flex items-center gap-1"><Coins className="h-3.5 w-3.5 text-amber-500" /> Credit: <span className="font-bold text-on-surface">{qt.creditCost ?? 1}</span></span>
                     <span className="flex items-center gap-1"><Hash className="h-3.5 w-3.5" /> Position: <span className="font-bold text-on-surface">{qt.position}</span></span>
                   </div>
                 </div>
@@ -191,6 +194,9 @@ export function QuestionTypeTable({
                   </TableHead>
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
                     Mark
+                  </TableHead>
+                  <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
+                    Credit Cost
                   </TableHead>
                   <TableHead className="px-6 py-4 font-label-sm font-semibold tracking-wider text-outline uppercase h-auto">
                     Position
@@ -220,6 +226,12 @@ export function QuestionTypeTable({
                       </TableCell>
                       <TableCell className="py-4 group-hover:py-5 px-6 text-on-surface transition-all duration-200 ease-in-out">
                         {qt.mark}
+                      </TableCell>
+                      <TableCell className="py-4 group-hover:py-5 px-6 text-on-surface font-semibold transition-all duration-200 ease-in-out">
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-700">
+                          <Coins className="h-3.5 w-3.5 text-amber-500" />
+                          {qt.creditCost ?? 1}
+                        </span>
                       </TableCell>
                       <TableCell className="py-4 group-hover:py-5 px-6 text-on-surface-variant transition-all duration-200 ease-in-out">
                         {qt.position}

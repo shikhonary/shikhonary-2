@@ -135,25 +135,25 @@ export const questionPaperRouter = createTRPCRouter({
   addQuestion: tenantMemberProcedure
     .input(addQuestionPaperQuestionSchema)
     .mutation(({ ctx, input }) =>
-      addQuestionPaperQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+      addQuestionPaperQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   removeQuestion: tenantMemberProcedure
     .input(removeQuestionPaperQuestionSchema)
     .mutation(({ ctx, input }) =>
-      removeQuestionPaperQuestion(ctx.tenantDb, input, ctx.session.user.id)
+      removeQuestionPaperQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   bulkAssignQuestions: tenantMemberProcedure
     .input(bulkAssignQuestionsSchema)
     .mutation(({ ctx, input }) =>
-      bulkAssignQuestions(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+      bulkAssignQuestions(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   bulkRemoveQuestions: tenantMemberProcedure
     .input(bulkRemoveQuestionsSchema)
     .mutation(({ ctx, input }) =>
-      bulkRemoveQuestions(ctx.tenantDb, input, ctx.session.user.id)
+      bulkRemoveQuestions(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   reorderQuestions: tenantMemberProcedure
@@ -165,13 +165,13 @@ export const questionPaperRouter = createTRPCRouter({
   addAlternative: tenantMemberProcedure
     .input(addAlternativeQuestionSchema)
     .mutation(({ ctx, input }) =>
-      addAlternativeQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+      addAlternativeQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   removeAlternative: tenantMemberProcedure
     .input(removeAlternativeQuestionSchema)
     .mutation(({ ctx, input }) =>
-      removeAlternativeQuestion(ctx.tenantDb, input, ctx.session.user.id)
+      removeAlternativeQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 
   swapAlternative: tenantMemberProcedure
