@@ -21,6 +21,8 @@ export interface MakeSentencesItem {
   difficulty: string
   reference: string[]
   popularityCount: number
+  source?: string | null
+  session?: string | null
   isActive: boolean
   createdAt: Date | string
   updatedAt: Date | string
@@ -240,6 +242,11 @@ export function MakeSentencesTable({
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {(item.source || item.session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -250,7 +257,9 @@ export function MakeSentencesTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !(item.source || item.session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 

@@ -21,6 +21,7 @@ export const QUESTION_TYPES = {
   ESSAY: "Essay",
   PARTS_OF_SPEECH: "Parts of Speech",
   FILL_IN_THE_BLANKS_WITH_CLUES: "Fill in the Blanks with Clues",
+  FILL_IN_THE_BLANKS_WITHOUT_CLUES: "Fill in the Blanks without Clues",
   RIGHT_FORM_OF_VERBS: "Right Form of Verbs",
   CHANGING_SENTENCES: "Changing Sentences",
   SUBSTITUTION_TABLE: "Substitution Table",
@@ -54,6 +55,7 @@ export const QUESTION_TYPE_CODES = {
   ESSAY: "ESSAY",
   PARTS_OF_SPEECH: "PARTS_OF_SPEECH",
   FILL_IN_THE_BLANKS_WITH_CLUES: "FILL_IN_THE_BLANKS_WITH_CLUES",
+  FILL_IN_THE_BLANKS_WITHOUT_CLUES: "FILL_IN_THE_BLANKS_WITHOUT_CLUES",
   RIGHT_FORM_OF_VERBS: "RIGHT_FORM_OF_VERBS",
   CHANGING_SENTENCES: "CHANGING_SENTENCES",
   SUBSTITUTION_TABLE: "SUBSTITUTION_TABLE",
@@ -202,6 +204,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES,
     defaultMark: 5,
     defaultPosition: 10,
+  },
+  [QUESTION_TYPES.FILL_IN_THE_BLANKS_WITHOUT_CLUES]: {
+    nameEn: QUESTION_TYPES.FILL_IN_THE_BLANKS_WITHOUT_CLUES,
+    nameBn: "শূন্যস্থান পূরণ (ক্লু ছাড়া)",
+    code: QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES,
+    defaultMark: 5,
+    defaultPosition: 11,
   },
   [QUESTION_TYPES.RIGHT_FORM_OF_VERBS]: {
     nameEn: QUESTION_TYPES.RIGHT_FORM_OF_VERBS,
@@ -371,6 +380,19 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("ক্লুসহ")
   ) {
     return QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES
+  }
+  if (
+    lower === "fill in the blanks without clues" ||
+    lower.includes("fill in the blanks without clues") ||
+    lower.includes("without clues") ||
+    lower.includes("without clue") ||
+    lower.includes("cloze test without clues") ||
+    lower.includes("gap filling without clues") ||
+    lower.includes("শূন্যস্থান পূরণ (ক্লু ছাড়া)") ||
+    lower.includes("ক্লু ছাড়া") ||
+    lower.includes("ক্লু ছাড়া")
+  ) {
+    return QUESTION_TYPES.FILL_IN_THE_BLANKS_WITHOUT_CLUES
   }
   if (
     lower === "right form of verbs" ||

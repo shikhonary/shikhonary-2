@@ -328,6 +328,17 @@ export type {
 } from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.schema"
 
 export type {
+  ListFillInTheBlanksWithoutCluesInput,
+  FillInTheBlanksWithoutCluesStatsInput,
+  GetFillInTheBlanksWithoutCluesInput,
+  CreateFillInTheBlanksWithoutCluesInput,
+  UpdateFillInTheBlanksWithoutCluesInput,
+  DeleteFillInTheBlanksWithoutCluesInput,
+  BulkDeleteFillInTheBlanksWithoutCluesInput,
+  ImportFillInTheBlanksWithoutCluesInput,
+} from "./routers/fill-in-the-blanks-without-clues/fill-in-the-blanks-without-clues.schema"
+
+export type {
   ListSubstitutionTablesInput,
   SubstitutionTableStatsInput,
   GetSubstitutionTableInput,
@@ -414,6 +425,17 @@ export type {
   BulkDeleteJuktobornoInput,
   ImportJuktobornoInput,
 } from "./routers/juktoborno/juktoborno.schema"
+
+export type {
+  ListOppositeWordInput,
+  OppositeWordStatsInput,
+  GetOppositeWordInput,
+  CreateOppositeWordInput,
+  UpdateOppositeWordInput,
+  DeleteOppositeWordInput,
+  BulkDeleteOppositeWordInput,
+  ImportOppositeWordInput,
+} from "./routers/opposite-word/opposite-word.schema"
 
 export type {
   ListWordMeaningInput,

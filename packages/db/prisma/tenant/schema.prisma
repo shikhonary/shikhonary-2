@@ -246,6 +246,7 @@ model QuestionPaperQuestion {
     rightFormOfVerbId            String?
     changingSentenceId           String?
     fillInTheBlanksWithCluesId   String?
+    fillInTheBlanksWithoutCluesId String?
     substitutionTableId          String?
     punctuationId                String?
     shortCompositionId           String?
@@ -308,7 +309,8 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, punctuationId])
     @@unique([questionPaperId, rightFormOfVerbId])
     @@unique([questionPaperId, changingSentenceId])
-    @@unique([questionPaperId, fillInTheBlanksWithCluesId])
+    @@unique([questionPaperId, fillInTheBlanksWithCluesId], map: "qpq_qp_id_fitb_with_clues_key")
+    @@unique([questionPaperId, fillInTheBlanksWithoutCluesId], map: "qpq_qp_id_fitb_without_clues_key")
     @@unique([questionPaperId, substitutionTableId])
     @@unique([questionPaperId, shortCompositionId])
     @@unique([questionPaperId, descriptiveQuestionId])
@@ -334,7 +336,8 @@ model QuestionPaperQuestion {
     @@index([punctuationId])
     @@index([rightFormOfVerbId])
     @@index([changingSentenceId])
-    @@index([fillInTheBlanksWithCluesId])
+    @@index([fillInTheBlanksWithCluesId], map: "qpq_fitb_with_clues_idx")
+    @@index([fillInTheBlanksWithoutCluesId], map: "qpq_fitb_without_clues_idx")
     @@index([substitutionTableId])
     @@index([shortCompositionId])
     @@index([descriptiveQuestionId])

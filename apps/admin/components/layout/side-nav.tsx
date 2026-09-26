@@ -24,6 +24,7 @@ import {
   Shuffle,
   Quote,
   PenTool,
+  ArrowLeftRight,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -73,6 +74,7 @@ const navGroups: NavGroup[] = [
       { href: "/short-questions", label: "Short Questions", icon: HelpCircle },
       { href: "/make-sentences", label: "Make Sentences", icon: HelpCircle },
       { href: "/juktoborno", label: "Juktoborno", icon: HelpCircle },
+      { href: "/opposite-words", label: "Opposite Words", icon: ArrowLeftRight },
       { href: "/word-meaning", label: "Word Meaning", icon: HelpCircle },
       { href: "/gender-change", label: "Gender Change", icon: HelpCircle },
       { href: "/synonyms", label: "Synonym", icon: HelpCircle },
@@ -90,6 +92,7 @@ const navGroups: NavGroup[] = [
       { href: "/right-form-of-verbs", label: "Right Form of Verbs", icon: HelpCircle },
       { href: "/changing-sentences", label: "Changing Sentences", icon: Shuffle },
       { href: "/fill-in-the-blanks-with-clues", label: "Fill in Blanks (Clues)", icon: HelpCircle },
+      { href: "/fill-in-the-blanks-without-clues", label: "Fill in Blanks (No Clues)", icon: HelpCircle },
       { href: "/substitution-tables", label: "Substitution Tables", icon: TableProperties },
       { href: "/punctuation", label: "Punctuation", icon: Quote },
       { href: "/short-composition", label: "Short Composition", icon: PenTool },

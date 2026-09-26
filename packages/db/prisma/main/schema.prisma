@@ -66,6 +66,8 @@ model User {
   updatedChangingSentences        ChangingSentence[]         @relation("ChangingSentenceUpdater")
   createdFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesCreator")
   updatedFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesUpdater")
+  createdFillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[] @relation("FillInTheBlanksWithoutCluesCreator")
+  updatedFillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[] @relation("FillInTheBlanksWithoutCluesUpdater")
   createdSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableCreator")
   updatedSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableUpdater")
   createdPunctuations             Punctuation[]              @relation("PunctuationCreator")
@@ -78,6 +80,8 @@ model User {
   updatedMakeSentences            MakeSentences[]            @relation("MakeSentencesUpdater")
   createdJuktobornos              Juktoborno[]               @relation("JuktobornoCreator")
   updatedJuktobornos              Juktoborno[]               @relation("JuktobornoUpdater")
+  createdOppositeWords            OppositeWord[]             @relation("OppositeWordCreator")
+  updatedOppositeWords            OppositeWord[]             @relation("OppositeWordUpdater")
   createdWordMeanings             WordMeaning[]              @relation("WordMeaningCreator")
   updatedWordMeanings             WordMeaning[]              @relation("WordMeaningUpdater")
   createdGenderChanges            GenderChange[]             @relation("GenderChangeCreator")
@@ -271,12 +275,14 @@ model Tenant {
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
   substitutionTables       SubstitutionTable[]
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
   makeSentences            MakeSentences[]
   juktobornos              Juktoborno[]
+  oppositeWords            OppositeWord[]
   wordMeanings             WordMeaning[]
   genderChanges            GenderChange[]
   synonyms                 Synonym[]
@@ -653,12 +659,14 @@ model AcademicSubject {
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
   substitutionTables       SubstitutionTable[]
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
   makeSentences            MakeSentences[]
   juktobornos              Juktoborno[]
+  oppositeWords            OppositeWord[]
   wordMeanings             WordMeaning[]
   genderChanges            GenderChange[]
   synonyms                 Synonym[]
@@ -712,8 +720,10 @@ model AcademicChapter {
   partsOfSpeech            PartsOfSpeech[]
   rightFormOfVerbs         RightFormOfVerb[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
   makeSentences            MakeSentences[]
   juktobornos              Juktoborno[]
+  oppositeWords            OppositeWord[]
   wordMeanings             WordMeaning[]
   genderChanges            GenderChange[]
   synonyms                 Synonym[]
@@ -766,12 +776,14 @@ model QuestionType {
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
   substitutionTables       SubstitutionTable[]
   punctuations             Punctuation[]
   shortCompositions        ShortComposition[]
   poems                    Poem[]
   makeSentences            MakeSentences[]
   juktobornos              Juktoborno[]
+  oppositeWords            OppositeWord[]
   wordMeanings             WordMeaning[]
   genderChanges            GenderChange[]
   synonyms                 Synonym[]
@@ -854,6 +866,8 @@ model Mcq {
   type        String
   isMath      Boolean  @default(false)
   reference   String[] @default([])
+  source      String?
+  session     String?
   explanation String?
   questionUrl String?
 
@@ -914,6 +928,8 @@ model Cq {
   questionD String?
   context   String?
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1025,6 +1041,8 @@ model PBQ {
   questionE String
   context   String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1076,6 +1094,8 @@ model ShortAnswer {
   question  String
   answer    String?
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1129,6 +1149,8 @@ model DescriptiveQuestion {
   question  String
   answer    String?
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1181,6 +1203,8 @@ model ShortQuestion {
   id        String   @id @default(cuid())
   question  String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1233,6 +1257,8 @@ model Paragraph {
   id        String   @id @default(cuid())
   name      String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1279,6 +1305,8 @@ model Amplification {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1326,6 +1354,8 @@ model CS {
   questionA String
   questionB String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   // ── Enrichment Fields ──
   difficulty      String @default("MEDIUM")
@@ -1375,6 +1405,8 @@ model Letter {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1418,6 +1450,8 @@ model Application {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1461,6 +1495,8 @@ model Summary {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1504,6 +1540,8 @@ model Essence {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1547,6 +1585,8 @@ model ThoughtExpansion {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1590,6 +1630,8 @@ model NewsReport {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1633,6 +1675,8 @@ model Essay {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1677,6 +1721,8 @@ model ChangingSentence {
   content   String?
   options   String[] @default([])
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1720,6 +1766,8 @@ model RightFormOfVerb {
   id        String   @id @default(cuid())
   content   String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1767,6 +1815,8 @@ model PartsOfSpeech {
   id        String   @id @default(cuid())
   content   String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1815,6 +1865,8 @@ model FillInTheBlanksWithClues {
   content   String
   clues     String[] @default([])
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1858,12 +1910,64 @@ model FillInTheBlanksWithClues {
   @@map("fill_in_the_blanks_with_clues")
 }
 
+model FillInTheBlanksWithoutClues {
+  id        String   @id @default(cuid())
+  content   String?
+  options   String[] @default([])
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──────────────────────────────
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("FillInTheBlanksWithoutCluesCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("FillInTheBlanksWithoutCluesUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("fill_in_the_blanks_without_clues")
+}
+
 model SubstitutionTable {
   id        String   @id @default(cuid())
   columnA   String[] @default([])
   columnB   String[] @default([])
   columnC   String[] @default([])
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1907,6 +2011,8 @@ model Punctuation {
   id        String   @id @default(cuid())
   content   String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1951,6 +2057,8 @@ model ShortComposition {
   title     String
   wordLimit Int?
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -1994,6 +2102,8 @@ model Poem {
   id        String   @id @default(cuid())
   title     String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2034,9 +2144,11 @@ model Poem {
 }
 
 model Juktoborno {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   juktoborno String
-  reference String[] @default([])
+  reference  String[] @default([])
+  source     String?
+  session    String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2086,6 +2198,8 @@ model Synonym {
   synonymWord String?
   synonyms    String[] @default([])
   reference   String[] @default([])
+  source      String?
+  session     String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2134,6 +2248,8 @@ model GenderChange {
   word       String
   genderWord String?
   reference  String[] @default([])
+  source     String?
+  session    String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2177,11 +2293,64 @@ model GenderChange {
   @@map("gender_change")
 }
 
+model OppositeWord {
+  id            String   @id @default(cuid())
+  word          String
+  oppositeWord  String?
+  oppositeWords String[] @default([])
+  reference     String[] @default([])
+  source        String?
+  session       String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("OppositeWordCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("OppositeWordUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("opposite_word")
+}
+
 model WordMeaning {
   id        String   @id @default(cuid())
   word      String
   meaning   String?
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2229,6 +2398,8 @@ model MakeSentences {
   id        String   @id @default(cuid())
   word      String
   reference String[] @default([])
+  source    String?
+  session   String?
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)

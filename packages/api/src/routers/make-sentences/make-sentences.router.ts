@@ -35,11 +35,11 @@ export const makeSentencesRouter = createTRPCRouter({
 
   create: superAdminProcedure
     .input(createMakeSentencesSchema)
-    .mutation(({ ctx, input }) => createMakeSentences(ctx.db, input)),
+    .mutation(({ ctx, input }) => createMakeSentences(ctx.db, input, ctx.session?.user?.id)),
 
   update: superAdminProcedure
     .input(updateMakeSentencesSchema)
-    .mutation(({ ctx, input }) => updateMakeSentences(ctx.db, input)),
+    .mutation(({ ctx, input }) => updateMakeSentences(ctx.db, input, ctx.session?.user?.id)),
 
   delete: superAdminProcedure
     .input(deleteMakeSentencesSchema)
@@ -51,5 +51,5 @@ export const makeSentencesRouter = createTRPCRouter({
 
   import: superAdminProcedure
     .input(importMakeSentencesSchema)
-    .mutation(({ ctx, input }) => importMakeSentences(ctx.db, input)),
+    .mutation(({ ctx, input }) => importMakeSentences(ctx.db, input, ctx.session?.user?.id)),
 })

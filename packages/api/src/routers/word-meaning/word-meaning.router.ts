@@ -35,11 +35,11 @@ export const wordMeaningRouter = createTRPCRouter({
 
   create: superAdminProcedure
     .input(createWordMeaningSchema)
-    .mutation(({ ctx, input }) => createWordMeaning(ctx.db, input)),
+    .mutation(({ ctx, input }) => createWordMeaning(ctx.db, input, ctx.session?.user?.id)),
 
   update: superAdminProcedure
     .input(updateWordMeaningSchema)
-    .mutation(({ ctx, input }) => updateWordMeaning(ctx.db, input)),
+    .mutation(({ ctx, input }) => updateWordMeaning(ctx.db, input, ctx.session?.user?.id)),
 
   delete: superAdminProcedure
     .input(deleteWordMeaningSchema)
@@ -51,5 +51,5 @@ export const wordMeaningRouter = createTRPCRouter({
 
   import: superAdminProcedure
     .input(importWordMeaningSchema)
-    .mutation(({ ctx, input }) => importWordMeaning(ctx.db, input)),
+    .mutation(({ ctx, input }) => importWordMeaning(ctx.db, input, ctx.session?.user?.id)),
 })

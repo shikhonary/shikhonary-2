@@ -45,7 +45,7 @@ async function resolveWordMeaningQuestionTypeId(db: any) {
 }
 
 export async function listWordMeaning(db: PrismaClient, input: ListWordMeaningInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -56,11 +56,15 @@ export async function listWordMeaning(db: PrismaClient, input: ListWordMeaningIn
   if (subjectId) where.subjectId = subjectId
   if (targetChapterId) where.academicChapterId = targetChapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
       { word: { contains: query, mode: "insensitive" } },
       { meaning: { contains: query, mode: "insensitive" } },
+      { source: { contains: query, mode: "insensitive" } },
+      { session: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
     ]
   }
@@ -146,21 +150,25 @@ export async function getWordMeaningById(db: PrismaClient, input: GetWordMeaning
   return item
 }
 
-export async function createWordMeaning(db: PrismaClient, input: CreateWordMeaningInput) {
+export async function createWordMeaning(db: PrismaClient, input: CreateWordMeaningInput, userId?: string | null) {
   const data = input
   const resolvedQuestionTypeId = await resolveWordMeaningQuestionTypeId(db)
   const targetChapterId = data.academicChapterId || data.chapterId || null
+  const currentYear = new Date().getFullYear().toString()
 
   return db.wordMeaning.create({
     data: {
       word: data.word,
       meaning: data.meaning || null,
       reference: data.reference ?? [],
+      source: data.source ? data.source.trim() : "গাইড বুক",
+      session: data.session ? data.session.trim() : currentYear,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      ...(userId ? { createdById: userId } : {}),
     },
     include: {
       subject: true,
@@ -170,12 +178,13 @@ export async function createWordMeaning(db: PrismaClient, input: CreateWordMeani
   })
 }
 
-export async function updateWordMeaning(db: PrismaClient, input: UpdateWordMeaningInput) {
+export async function updateWordMeaning(db: PrismaClient, input: UpdateWordMeaningInput, userId?: string | null) {
   const { id, ...data } = input
 
   await getWordMeaningById(db, { id })
   const resolvedQuestionTypeId = await resolveWordMeaningQuestionTypeId(db)
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
+  const currentYear = new Date().getFullYear().toString()
 
   const updateData: any = {
     word: data.word,
@@ -185,6 +194,15 @@ export async function updateWordMeaning(db: PrismaClient, input: UpdateWordMeani
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
     questionTypeId: resolvedQuestionTypeId,
+    ...(userId ? { updatedById: userId } : {}),
+  }
+
+  if (data.source !== undefined) {
+    updateData.source = data.source ? data.source.trim() : null
+  }
+
+  if (data.session !== undefined) {
+    updateData.session = data.session ? data.session.trim() : currentYear
   }
 
   if (targetChapterId !== undefined) {
@@ -219,8 +237,9 @@ export async function bulkDeleteWordMeaning(db: PrismaClient, input: BulkDeleteW
   return { deletedCount: res.count }
 }
 
-export async function importWordMeaning(db: PrismaClient, input: ImportWordMeaningInput) {
+export async function importWordMeaning(db: PrismaClient, input: ImportWordMeaningInput, userId?: string | null) {
   const resolvedQuestionTypeId = await resolveWordMeaningQuestionTypeId(db)
+  const currentYear = new Date().getFullYear().toString()
 
   const created = await db.$transaction(
     async (tx) => {
@@ -234,11 +253,14 @@ export async function importWordMeaning(db: PrismaClient, input: ImportWordMeani
             word: data.word,
             meaning: data.meaning || null,
             reference: data.reference || [],
+            source: data.source ? data.source.trim() : "গাইড বুক",
+            session: currentYear,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            ...(userId ? { createdById: userId } : {}),
           },
         })
         results.push(createdItem)

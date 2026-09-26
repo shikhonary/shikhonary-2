@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { MCQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createMcqFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -40,6 +41,7 @@ const createMcqFormSchema = z.object({
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   year: z.string().optional(),
   source: z.string().optional(),
+  session: z.string().optional(),
   questionTypeId: z.string().optional(),
   isActive: z.boolean(),
 })
@@ -84,7 +86,8 @@ export function CreateMcqView() {
       questionUrl: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       year: "",
-      source: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       questionTypeId: "",
       isActive: true,
     },
@@ -144,7 +147,8 @@ export function CreateMcqView() {
         questionUrl: data.questionUrl?.trim() || null,
         difficulty: data.difficulty,
         year: parsedYear,
-        source: data.source?.trim() || null,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: data.session?.trim() || new Date().getFullYear().toString(),
         questionTypeId: data.questionTypeId || null,
         isActive: data.isActive,
       })
@@ -679,17 +683,51 @@ export function CreateMcqView() {
                 {/* Source */}
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Source / Board (Optional)
+                    Source
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:ring-2 focus:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
+                          <SelectValue placeholder="Select Source...">
+                            {field.value}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                          {MCQ_SOURCE_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.source && (
+                    <p className="text-xs text-error">{errors.source.message}</p>
+                  )}
+                </div>
+
+                {/* Session */}
+                <div className="space-y-2">
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Session
                   </Label>
                   <Input
                     type="text"
                     disabled={isSubmitting}
-                    placeholder="e.g. Dhaka Board, Cadet College"
-                    {...register("source")}
+                    placeholder="e.g. 2026"
+                    {...register("session")}
                     className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
                   />
-                  {errors.source && (
-                    <p className="text-xs text-error">{errors.source.message}</p>
+                  {errors.session && (
+                    <p className="text-xs text-error">{errors.session.message}</p>
                   )}
                 </div>
 

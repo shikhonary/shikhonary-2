@@ -149,6 +149,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  FILL_IN_THE_BLANKS_WITHOUT_CLUES: {
+    model: "fillInTheBlanksWithoutClues",
+    searchFields: ["content"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "fillInTheBlanksWithoutCluesId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   SUBSTITUTION_TABLE: {
     model: "substitutionTable",
     searchFields: ["columnA", "columnB", "columnC", "reference"],
@@ -264,6 +272,7 @@ export async function getAvailableQuestions(
         rightFormOfVerbId: true,
         changingSentenceId: true,
         fillInTheBlanksWithCluesId: true,
+        fillInTheBlanksWithoutCluesId: true,
         substitutionTableId: true,
         punctuationId: true,
         shortCompositionId: true,

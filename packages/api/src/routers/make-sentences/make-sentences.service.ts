@@ -48,7 +48,7 @@ async function resolveMakeSentencesQuestionTypeId(db: any) {
 }
 
 export async function listMakeSentences(db: PrismaClient, input: ListMakeSentencesInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -59,10 +59,14 @@ export async function listMakeSentences(db: PrismaClient, input: ListMakeSentenc
   if (subjectId) where.subjectId = subjectId
   if (targetChapterId) where.academicChapterId = targetChapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
       { word: { contains: query, mode: "insensitive" } },
+      { source: { contains: query, mode: "insensitive" } },
+      { session: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
     ]
   }
@@ -148,20 +152,24 @@ export async function getMakeSentencesById(db: PrismaClient, input: GetMakeSente
   return item
 }
 
-export async function createMakeSentences(db: PrismaClient, input: CreateMakeSentencesInput) {
+export async function createMakeSentences(db: PrismaClient, input: CreateMakeSentencesInput, userId?: string | null) {
   const data = input
   const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
   const targetChapterId = data.academicChapterId || data.chapterId || null
+  const currentYear = new Date().getFullYear().toString()
 
   return db.makeSentences.create({
     data: {
       word: data.word,
       reference: data.reference ?? [],
+      source: data.source ? data.source.trim() : "গাইড বুক",
+      session: data.session ? data.session.trim() : currentYear,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      ...(userId ? { createdById: userId } : {}),
     },
     include: {
       subject: true,
@@ -171,12 +179,13 @@ export async function createMakeSentences(db: PrismaClient, input: CreateMakeSen
   })
 }
 
-export async function updateMakeSentences(db: PrismaClient, input: UpdateMakeSentencesInput) {
+export async function updateMakeSentences(db: PrismaClient, input: UpdateMakeSentencesInput, userId?: string | null) {
   const { id, ...data } = input
 
   await getMakeSentencesById(db, { id })
   const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
+  const currentYear = new Date().getFullYear().toString()
 
   const updateData: any = {
     word: data.word,
@@ -185,6 +194,15 @@ export async function updateMakeSentences(db: PrismaClient, input: UpdateMakeSen
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
     questionTypeId: resolvedQuestionTypeId,
+    ...(userId ? { updatedById: userId } : {}),
+  }
+
+  if (data.source !== undefined) {
+    updateData.source = data.source ? data.source.trim() : null
+  }
+
+  if (data.session !== undefined) {
+    updateData.session = data.session ? data.session.trim() : currentYear
   }
 
   if (targetChapterId !== undefined) {
@@ -219,8 +237,9 @@ export async function bulkDeleteMakeSentences(db: PrismaClient, input: BulkDelet
   return { deletedCount: res.count }
 }
 
-export async function importMakeSentences(db: PrismaClient, input: ImportMakeSentencesInput) {
+export async function importMakeSentences(db: PrismaClient, input: ImportMakeSentencesInput, userId?: string | null) {
   const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
+  const currentYear = new Date().getFullYear().toString()
 
   const created = await db.$transaction(
     async (tx) => {
@@ -233,11 +252,14 @@ export async function importMakeSentences(db: PrismaClient, input: ImportMakeSen
           data: {
             word: data.word,
             reference: data.reference || [],
+            source: data.source ? data.source.trim() : "গাইড বুক",
+            session: currentYear,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            ...(userId ? { createdById: userId } : {}),
           },
         })
         results.push(createdItem)

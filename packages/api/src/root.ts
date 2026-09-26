@@ -45,6 +45,7 @@ import { partsOfSpeechRouter } from "./routers/parts-of-speech/parts-of-speech.r
 import { rightFormOfVerbRouter } from "./routers/right-form-of-verb/right-form-of-verb.router"
 import { changingSentenceRouter } from "./routers/changing-sentence/changing-sentence.router"
 import { fillInTheBlanksWithCluesRouter } from "./routers/fill-in-the-blanks-with-clues/fill-in-the-blanks-with-clues.router"
+import { fillInTheBlanksWithoutCluesRouter } from "./routers/fill-in-the-blanks-without-clues/fill-in-the-blanks-without-clues.router"
 import { substitutionTableRouter } from "./routers/substitution-table/substitution-table.router"
 import { punctuationRouter } from "./routers/punctuation/punctuation.router"
 import { shortCompositionRouter } from "./routers/short-composition/short-composition.router"
@@ -53,6 +54,7 @@ import { descriptiveQuestionRouter } from "./routers/descriptive-question/descri
 import { shortQuestionRouter } from "./routers/short-question/short-question.router"
 import { makeSentencesRouter } from "./routers/make-sentences/make-sentences.router"
 import { juktobornoRouter } from "./routers/juktoborno/juktoborno.router"
+import { oppositeWordRouter } from "./routers/opposite-word/opposite-word.router"
 import { wordMeaningRouter } from "./routers/word-meaning/word-meaning.router"
 import { genderChangeRouter } from "./routers/gender-change/gender-change.router"
 import { synonymRouter } from "./routers/synonym/synonym.router"
@@ -85,6 +87,7 @@ export const appRouter = createTRPCRouter({
   shortQuestion: shortQuestionRouter,
   makeSentences: makeSentencesRouter,
   juktoborno: juktobornoRouter,
+  oppositeWord: oppositeWordRouter,
   wordMeaning: wordMeaningRouter,
   genderChange: genderChangeRouter,
   synonym: synonymRouter,
@@ -102,6 +105,7 @@ export const appRouter = createTRPCRouter({
   rightFormOfVerb: rightFormOfVerbRouter,
   changingSentence: changingSentenceRouter,
   fillInTheBlanksWithClues: fillInTheBlanksWithCluesRouter,
+  fillInTheBlanksWithoutClues: fillInTheBlanksWithoutCluesRouter,
   substitutionTable: substitutionTableRouter,
   punctuation: punctuationRouter,
   shortComposition: shortCompositionRouter,

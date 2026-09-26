@@ -52,6 +52,7 @@ import {
   HelpCircleIcon
 } from "lucide-react"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { MCQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -66,7 +67,8 @@ const sampleJsonTemplate = `[
     "questionUrl": null,
     "difficulty": "MEDIUM",
     "year": 2024,
-    "source": "Physics Board",
+    "source": "গাইড বুক",
+    "session": "2026",
     "questionTypeId": null,
     "isActive": true,
     "attachments": [
@@ -551,6 +553,15 @@ function EditableMcqCard({
     })
   }
 
+  const handleToggleDifficulty = () => {
+    const current = item.difficulty || "MEDIUM"
+    const next = current === "EASY" ? "MEDIUM" : current === "MEDIUM" ? "HARD" : "EASY"
+    onChange({
+      ...item,
+      difficulty: next as any,
+    })
+  }
+
   const referenceString = Array.isArray(item.reference) ? item.reference.join(", ") : ""
 
   const handleSaveReferences = (val: string) => {
@@ -581,6 +592,26 @@ function EditableMcqCard({
 
         {/* Interactive Controls & Badges */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Difficulty Toggle Badge */}
+          <button
+            type="button"
+            onClick={handleToggleDifficulty}
+            title="Click to cycle EASY / MEDIUM / HARD"
+            className="cursor-pointer"
+          >
+            <Badge
+              variant="outline"
+              className={cn(
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
+                item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-300",
+                (item.difficulty === "MEDIUM" || !item.difficulty) && "bg-amber-50 text-amber-700 border-amber-300",
+                item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-300"
+              )}
+            >
+              Difficulty: {item.difficulty || "MEDIUM"}
+            </Badge>
+          </button>
+
           {/* Question Type Toggle */}
           <button
             type="button"
@@ -1099,7 +1130,9 @@ function EditableMcqCard({
               onValueChange={(val) => onChange({ ...item, difficulty: val as any })}
             >
               <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-1 px-3 text-xs focus:ring-1 focus:ring-primary h-8 justify-between">
-                <SelectValue />
+                <SelectValue placeholder="Select Difficulty">
+                  {item.difficulty || "MEDIUM"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg text-xs">
                 {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
@@ -1112,11 +1145,33 @@ function EditableMcqCard({
           </div>
 
           {/* Source */}
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-outline uppercase tracking-wider">Source</span>
+            <Select
+              value={item.source || DEFAULT_SOURCE}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-1 px-3 text-xs focus:ring-1 focus:ring-primary h-8 justify-between">
+                <SelectValue placeholder="Select Source">
+                  {item.source || DEFAULT_SOURCE}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg text-xs">
+                {MCQ_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Session */}
           <EditableField
-            label="Source / Board (Optional)"
-            value={item.source || ""}
-            placeholder="e.g. Dhaka Board..."
-            onSave={(newSrc) => onChange({ ...item, source: newSrc || undefined })}
+            label="Session"
+            value={(item as any).session || new Date().getFullYear().toString()}
+            placeholder="e.g. 2026"
+            onSave={(newSess) => onChange({ ...item, session: newSess || undefined } as any)}
           />
 
           {/* Year */}
@@ -1158,6 +1213,8 @@ export function ImportMcqView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>(QUESTION_DIFFICULTY.MEDIUM)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<CreateMcqInput[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -1185,7 +1242,7 @@ export function ImportMcqView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
       }
     }
     reader.readAsText(file)
@@ -1195,7 +1252,9 @@ export function ImportMcqView() {
     text: string,
     overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string
+    overrideChapterId: string,
+    overrideSource?: string,
+    overrideDifficulty?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -1241,6 +1300,10 @@ export function ImportMcqView() {
 
       const validated: CreateMcqInput[] = []
       const errors: string[] = []
+
+      const fallbackSource = overrideSource || selectedSource || DEFAULT_SOURCE
+      const fallbackSession = new Date().getFullYear().toString()
+      const fallbackDifficulty = overrideDifficulty || selectedDifficulty || QUESTION_DIFFICULTY.MEDIUM
 
       itemsArray.forEach((item: any, idx: number) => {
         const itemNum = idx + 1
@@ -1302,6 +1365,34 @@ export function ImportMcqView() {
           }
         }
 
+        const rawDiffStr = (
+          item.difficulty ||
+          item.difficultyLevel ||
+          item.level ||
+          item.diff ||
+          item.Difficulty ||
+          item.DifficultyLevel ||
+          ""
+        ).toString().trim()
+
+        let itemDifficulty = fallbackDifficulty
+
+        if (rawDiffStr) {
+          const upper = rawDiffStr.toUpperCase()
+          if (upper === "EASY" || upper === "সহজ" || upper.includes("EASY") || upper === "1") {
+            itemDifficulty = "EASY"
+          } else if (upper === "HARD" || upper === "কঠিন" || upper.includes("HARD") || upper === "3") {
+            itemDifficulty = "HARD"
+          } else if (upper === "MEDIUM" || upper === "মধ্যম" || upper === "সাধারণ" || upper.includes("MED") || upper === "2") {
+            itemDifficulty = "MEDIUM"
+          } else if (["EASY", "MEDIUM", "HARD"].includes(upper)) {
+            itemDifficulty = upper as any
+          }
+        }
+
+        const itemSource = item.source || item.sourceBook || fallbackSource
+        const itemSession = item.session ? String(item.session).trim() : fallbackSession
+
         validated.push({
           question: questionText,
           answer: String(item.answer || "").trim(),
@@ -1316,15 +1407,20 @@ export function ImportMcqView() {
               (Array.isArray(item.options) && item.options.some((opt: any) => /\$[^$\n]+\$/.test(String(opt)))) ||
               (Array.isArray(item.statements) && item.statements.some((stmt: any) => /\$[^$\n]+\$/.test(String(stmt))))
             ),
-          reference: Array.isArray(item.reference) ? item.reference.map(String) : [],
+          reference: Array.isArray(item.reference)
+            ? item.reference.map(String)
+            : Array.isArray(item.references)
+              ? item.references.map(String)
+              : typeof item.reference === "string" && item.reference.trim()
+                ? [item.reference.trim()]
+                : [],
           explanation: item.explanation ? String(item.explanation) : undefined,
           questionUrl: item.questionUrl ? String(item.questionUrl) : undefined,
           context: contextText,
-          difficulty: (item.difficulty && typeof item.difficulty === "string" && ["EASY", "MEDIUM", "HARD"].includes(item.difficulty.toUpperCase()))
-            ? (item.difficulty.toUpperCase() as any)
-            : undefined,
+          difficulty: itemDifficulty,
           year: item.year !== undefined && item.year !== null && !isNaN(Number(item.year)) ? Number(item.year) : undefined,
-          source: item.source ? String(item.source) : undefined,
+          source: itemSource,
+          session: itemSession,
           questionTypeId: item.questionTypeId ? String(item.questionTypeId) : undefined,
           subjectId,
           chapterId,
@@ -1347,7 +1443,7 @@ export function ImportMcqView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -1360,7 +1456,7 @@ export function ImportMcqView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -1369,7 +1465,7 @@ export function ImportMcqView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource, selectedDifficulty)
     }
   }
 
@@ -1378,7 +1474,7 @@ export function ImportMcqView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource, selectedDifficulty)
     }
   }
 
@@ -1386,7 +1482,7 @@ export function ImportMcqView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource, selectedDifficulty)
     }
   }
 
@@ -1421,11 +1517,13 @@ export function ImportMcqView() {
       isMath: false,
       reference: [],
       isActive: true,
-      difficulty: "MEDIUM",
+      difficulty: selectedDifficulty || "MEDIUM",
+      source: selectedSource || DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       attachments: [],
       subjectId: selectedSubjectId || "",
       chapterId: selectedChapterId || "",
-    }
+    } as any
     const next = [...parsedItems, newMcq]
     syncParsedItemsToText(next)
   }
@@ -1444,6 +1542,9 @@ export function ImportMcqView() {
     try {
       const result = await importMutation.mutateAsync({
         mcqs: parsedItems,
+        source: selectedSource || DEFAULT_SOURCE,
+        session: new Date().getFullYear().toString(),
+        difficulty: selectedDifficulty as any,
       })
 
       toast.success(`Successfully imported ${result.importedCount} MCQ questions!`)
@@ -1524,8 +1625,8 @@ export function ImportMcqView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject & Chapter 3-Column Dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Academic Class, Subject, Chapter & Source 4-Column Dropdowns */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -1594,6 +1695,35 @@ export function ImportMcqView() {
                   {chapters.map((ch) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Default Source
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => {
+                  setSelectedSource(val)
+                  if (jsonText) {
+                    validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, selectedChapterId, val)
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source...">
+                    {selectedSource}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {MCQ_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

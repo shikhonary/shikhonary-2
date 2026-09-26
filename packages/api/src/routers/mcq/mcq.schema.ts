@@ -6,6 +6,9 @@ export const listMcqsSchema = paginationSchema.extend({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   board: z.string().optional(),
+  difficulty: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
   type: z.string().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
@@ -40,6 +43,7 @@ export const createMcqSchema = z.object({
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   year: z.number().int().optional().nullable(),
   source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   questionTypeId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   attachments: z.array(questionAttachmentSchema).optional().default([]),
@@ -70,6 +74,9 @@ export const toggleMcqActiveSchema = z.object({
 export type ToggleMcqActiveInput = z.infer<typeof toggleMcqActiveSchema>
 
 export const importMcqsSchema = z.object({
+  source: z.string().optional(),
+  session: z.string().optional(),
+  difficulty: z.nativeEnum(QUESTION_DIFFICULTY).optional(),
   mcqs: z.array(createMcqSchema).min(1, "At least one MCQ is required"),
 })
 

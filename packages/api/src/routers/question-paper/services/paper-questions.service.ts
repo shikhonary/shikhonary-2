@@ -47,6 +47,7 @@ export async function addQuestionPaperQuestion(
     input.rightFormOfVerbId,
     input.changingSentenceId,
     input.fillInTheBlanksWithCluesId,
+    input.fillInTheBlanksWithoutCluesId,
     input.substitutionTableId,
     input.punctuationId,
     input.shortCompositionId,
@@ -170,6 +171,12 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "FillInTheBlanksWithClues: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.fillInTheBlanksWithoutCluesId) {
+    const item = await db.fillInTheBlanksWithoutClues.findUnique({ where: { id: input.fillInTheBlanksWithoutCluesId } })
+    if (!item) throw notFound("FillInTheBlanksWithoutClues")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "FillInTheBlanksWithoutClues: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.substitutionTableId) {
     const item = await db.substitutionTable.findUnique({ where: { id: input.substitutionTableId } })
     if (!item) throw notFound("SubstitutionTable")
@@ -248,6 +255,7 @@ export async function addQuestionPaperQuestion(
       rightFormOfVerbId: input.rightFormOfVerbId,
       changingSentenceId: input.changingSentenceId,
       fillInTheBlanksWithCluesId: input.fillInTheBlanksWithCluesId,
+      fillInTheBlanksWithoutCluesId: input.fillInTheBlanksWithoutCluesId,
       substitutionTableId: input.substitutionTableId,
       punctuationId: input.punctuationId,
       shortCompositionId: input.shortCompositionId,
@@ -667,6 +675,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.fillInTheBlanksWithoutCluesIds && input.fillInTheBlanksWithoutCluesIds.length > 0) {
+    for (const fillInTheBlanksWithoutCluesId of input.fillInTheBlanksWithoutCluesIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        fillInTheBlanksWithoutCluesId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.substitutionTableIds && input.substitutionTableIds.length > 0) {
     for (const substitutionTableId of input.substitutionTableIds) {
       recordsToCreate.push({
@@ -798,6 +819,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).changingSentence.findUnique({ where: { id: record.changingSentenceId } })) as any
       } else if (record.fillInTheBlanksWithCluesId) {
         record.contentSnapshot = (await (db as any).fillInTheBlanksWithClues.findUnique({ where: { id: record.fillInTheBlanksWithCluesId } })) as any
+      } else if (record.fillInTheBlanksWithoutCluesId) {
+        record.contentSnapshot = (await (db as any).fillInTheBlanksWithoutClues.findUnique({ where: { id: record.fillInTheBlanksWithoutCluesId } })) as any
       } else if (record.substitutionTableId) {
         record.contentSnapshot = (await (db as any).substitutionTable.findUnique({ where: { id: record.substitutionTableId } })) as any
       } else if (record.punctuationId) {
@@ -848,6 +871,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_changingSentenceId: { questionPaperId: input.questionPaperId, changingSentenceId: record.changingSentenceId } }
     } else if (record.fillInTheBlanksWithCluesId) {
       whereCondition = { questionPaperId_fillInTheBlanksWithCluesId: { questionPaperId: input.questionPaperId, fillInTheBlanksWithCluesId: record.fillInTheBlanksWithCluesId } }
+    } else if (record.fillInTheBlanksWithoutCluesId) {
+      whereCondition = { questionPaperId_fillInTheBlanksWithoutCluesId: { questionPaperId: input.questionPaperId, fillInTheBlanksWithoutCluesId: record.fillInTheBlanksWithoutCluesId } }
     } else if (record.substitutionTableId) {
       whereCondition = { questionPaperId_substitutionTableId: { questionPaperId: input.questionPaperId, substitutionTableId: record.substitutionTableId } }
     } else if (record.punctuationId) {
@@ -912,6 +937,7 @@ export async function bulkRemoveQuestions(
         { rightFormOfVerbId: { in: input.questionIds } },
         { changingSentenceId: { in: input.questionIds } },
         { fillInTheBlanksWithCluesId: { in: input.questionIds } },
+        { fillInTheBlanksWithoutCluesId: { in: input.questionIds } },
         { substitutionTableId: { in: input.questionIds } },
         { punctuationId: { in: input.questionIds } },
         { shortCompositionId: { in: input.questionIds } },

@@ -27,6 +27,8 @@
     "clean:databases:except-mandori": "npx -y tsx prisma/seed/clean-except-mandori.ts",
     "clean:branches": "npx -y tsx scripts/delete-branches.ts",
     "clean:mcq-references": "npx -y tsx scripts/clean-mcq-references.ts",
+    "update:question-source-session": "npx -y tsx scripts/update-question-source-session.ts",
+    "update:today-word-meaning-source": "npx -y tsx scripts/update-today-word-meaning-source.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

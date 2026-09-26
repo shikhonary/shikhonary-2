@@ -18,6 +18,9 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
   if (input.type) where.type = input.type
+  if (input.difficulty) where.difficulty = input.difficulty
+  if (input.source) where.source = input.source
+  if (input.session) where.session = input.session
 
   if (input.board) {
     where.reference = { has: input.board }
@@ -171,13 +174,11 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
     }
   }
 
-  const refList = Array.isArray(data.reference) ? [...data.reference] : []
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef && !refList.includes(legacyRef)) {
-      refList.push(legacyRef)
-    }
-  }
+  const refList = Array.isArray(data.reference) ? data.reference : []
+
+  const currentYear = new Date().getFullYear().toString()
+  const itemSource = data.source ? data.source.trim() : "গাইড বুক"
+  const itemSession = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
 
   return db.mcq.create({
     data: {
@@ -190,6 +191,8 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
       type: data.type,
       isMath: data.isMath,
       reference: refList,
+      source: itemSource,
+      session: itemSession,
       explanation: data.explanation,
       questionUrl: data.questionUrl,
       difficulty: data.difficulty,
@@ -264,48 +267,48 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
   }
 
   let resolvedReference = data.reference
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef) {
-      const currentRefs = Array.isArray(data.reference) ? [...data.reference] : []
-      if (!currentRefs.includes(legacyRef)) {
-        currentRefs.push(legacyRef)
-      }
-      resolvedReference = currentRefs
-    }
+
+  const updateData: any = {
+    subjectId: data.subjectId,
+    chapterId: data.chapterId,
+    question: data.question,
+    answer: data.answer,
+    options: data.options,
+    statements: data.statements,
+    type: data.type,
+    isMath: data.isMath,
+    reference: resolvedReference,
+    explanation: data.explanation,
+    questionUrl: data.questionUrl,
+    difficulty: data.difficulty,
+    questionTypeId: resolvedQuestionTypeId || undefined,
+    isActive: data.isActive,
+    attachments: allAttachments ? {
+      deleteMany: {},
+      create: allAttachments.map((att, idx) => ({
+        type: att.type ?? "image",
+        caption: att.caption ?? null,
+        content: att.content ?? null,
+        url: att.url ?? null,
+        table: att.table ?? undefined,
+        bottomContent: att.bottomContent ?? null,
+        tableBorder: att.tableBorder ?? false,
+        position: att.position !== undefined && att.position !== null ? att.position : idx,
+      })),
+    } : undefined,
+  }
+
+  if (data.source !== undefined) {
+    updateData.source = data.source ? data.source.trim() : null
+  }
+
+  if (data.session !== undefined) {
+    updateData.session = data.session ? data.session.trim() : null
   }
 
   return db.mcq.update({
     where: { id },
-    data: {
-      subjectId: data.subjectId,
-      chapterId: data.chapterId,
-      question: data.question,
-      answer: data.answer,
-      options: data.options,
-      statements: data.statements,
-      type: data.type,
-      isMath: data.isMath,
-      reference: resolvedReference,
-      explanation: data.explanation,
-      questionUrl: data.questionUrl,
-      difficulty: data.difficulty,
-      questionTypeId: resolvedQuestionTypeId || undefined,
-      isActive: data.isActive,
-      attachments: allAttachments ? {
-        deleteMany: {},
-        create: allAttachments.map((att, idx) => ({
-          type: att.type ?? "image",
-          caption: att.caption ?? null,
-          content: att.content ?? null,
-          url: att.url ?? null,
-          table: att.table ?? undefined,
-          bottomContent: att.bottomContent ?? null,
-          tableBorder: att.tableBorder ?? false,
-          position: att.position !== undefined && att.position !== null ? att.position : idx,
-        })),
-      } : undefined,
-    } as any,
+    data: updateData,
   })
 }
 
@@ -347,6 +350,11 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
     },
     select: { id: true },
   })
+
+  const currentYear = new Date().getFullYear().toString()
+  const fallbackSource = input.source?.trim() || "গাইড বুক"
+  const fallbackSession = input.session?.trim() || currentYear
+  const fallbackDifficulty = input.difficulty || "MEDIUM"
 
   // Use transaction to support nested attachments with a timeout limit
   const created = await db.$transaction(
@@ -392,13 +400,10 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
           }
         }
 
-        const refList = Array.isArray(data.reference) ? [...data.reference] : []
-        if (data.source || data.year) {
-          const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-          if (legacyRef && !refList.includes(legacyRef)) {
-            refList.push(legacyRef)
-          }
-        }
+        const refList = Array.isArray(data.reference) ? data.reference : []
+
+        const itemSource = data.source ? data.source.trim() : fallbackSource
+        const itemSession = data.session ? data.session.trim() : (data.year ? String(data.year) : fallbackSession)
 
         const createdMcq = await tx.mcq.create({
           data: {
@@ -411,9 +416,11 @@ export async function importMcqs(db: PrismaClient, input: ImportMcqsInput) {
             type: data.type,
             isMath: data.isMath ?? false,
             reference: refList,
+            source: itemSource,
+            session: itemSession,
             explanation: data.explanation,
             questionUrl: data.questionUrl,
-            difficulty: data.difficulty ?? "MEDIUM",
+            difficulty: data.difficulty ?? fallbackDifficulty,
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0 ? {

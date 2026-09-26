@@ -22,6 +22,8 @@ export interface WordMeaningItem {
   difficulty: string
   reference: string[]
   popularityCount: number
+  source?: string | null
+  session?: string | null
   isActive: boolean
   createdAt: Date | string
   updatedAt: Date | string
@@ -247,6 +249,11 @@ export function WordMeaningTable({
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {((item as any).source || (item as any).session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -257,7 +264,9 @@ export function WordMeaningTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !((item as any).source || (item as any).session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 

@@ -55,6 +55,7 @@ export async function addAlternativeQuestion(
     RIGHT_FORM_OF_VERBS: "rightFormOfVerbId",
     CHANGING_SENTENCES: "changingSentenceId",
     FILL_IN_THE_BLANKS_WITH_CLUES: "fillInTheBlanksWithCluesId",
+    FILL_IN_THE_BLANKS_WITHOUT_CLUES: "fillInTheBlanksWithoutCluesId",
     SUBSTITUTION_TABLE: "substitutionTableId",
     PUNCTUATION: "punctuationId",
     SHORT_COMPOSITION: "shortCompositionId",
@@ -106,6 +107,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).changingSentence.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "FILL_IN_THE_BLANKS_WITH_CLUES") {
     altContent = await db.fillInTheBlanksWithClues.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "FILL_IN_THE_BLANKS_WITHOUT_CLUES") {
+    altContent = await db.fillInTheBlanksWithoutClues.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SUBSTITUTION_TABLE") {
     altContent = await db.substitutionTable.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "PUNCTUATION") {
@@ -295,7 +298,7 @@ export async function swapAlternativeQuestion(
 
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
-    "letterId", "applicationId", "summaryId", "essenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "substitutionTableId", "punctuationId", "shortCompositionId"
+    "letterId", "applicationId", "summaryId", "essenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId"
   ] as const
 
   const questionFields = [

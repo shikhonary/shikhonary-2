@@ -161,6 +161,7 @@ export async function getQuestionPaperById(
   const rightFormOfVerbIds = allPaperQuestions.map((q: any) => q.rightFormOfVerbId).filter(Boolean) as string[]
   const changingSentenceIds = allPaperQuestions.map((q: any) => q.changingSentenceId).filter(Boolean) as string[]
   const fillInTheBlanksWithCluesIds = allPaperQuestions.map((q: any) => q.fillInTheBlanksWithCluesId).filter(Boolean) as string[]
+  const fillInTheBlanksWithoutCluesIds = allPaperQuestions.map((q: any) => q.fillInTheBlanksWithoutCluesId).filter(Boolean) as string[]
   const substitutionTableIds = allPaperQuestions.map((q: any) => q.substitutionTableId).filter(Boolean) as string[]
   const punctuationIds = allPaperQuestions.map((q: any) => q.punctuationId).filter(Boolean) as string[]
   const shortCompositionIds = allPaperQuestions.map((q: any) => q.shortCompositionId).filter(Boolean) as string[]
@@ -191,6 +192,7 @@ export async function getQuestionPaperById(
     rightFormOfVerbs,
     changingSentences,
     fillInTheBlanksWithClueses,
+    fillInTheBlanksWithoutClueses,
     substitutionTables,
     punctuations,
     shortCompositions,
@@ -361,6 +363,15 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    fillInTheBlanksWithoutCluesIds.length > 0
+      ? (db as any).fillInTheBlanksWithoutClues.findMany({
+        where: { id: { in: fillInTheBlanksWithoutCluesIds } },
+        include: {
+          academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
     substitutionTableIds.length > 0
       ? db.substitutionTable.findMany({
         where: { id: { in: substitutionTableIds } },
@@ -430,6 +441,7 @@ export async function getQuestionPaperById(
   const rightFormOfVerbMap = new Map(rightFormOfVerbs.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const changingSentenceMap = new Map(changingSentences.map((p: any) => [p.id, p]))
   const fillInTheBlanksWithCluesMap = new Map(fillInTheBlanksWithClueses.map((f: any) => [f.id, { ...f, chapter: f.academicChapter }]))
+  const fillInTheBlanksWithoutCluesMap = new Map(fillInTheBlanksWithoutClueses.map((f: any) => [f.id, { ...f, chapter: f.academicChapter }]))
   const substitutionTableMap = new Map(substitutionTables.map((s: any) => [s.id, s]))
   const punctuationMap = new Map(punctuations.map((p: any) => [p.id, p]))
   const shortCompositionMap = new Map(shortCompositions.map((s: any) => [s.id, s]))
@@ -471,6 +483,7 @@ export async function getQuestionPaperById(
     let resolvedRightFormOfVerb = q.rightFormOfVerbId ? rightFormOfVerbMap.get(q.rightFormOfVerbId) || null : null
     let resolvedChangingSentence = q.changingSentenceId ? changingSentenceMap.get(q.changingSentenceId) || null : null
     let resolvedFillInTheBlanksWithClues = q.fillInTheBlanksWithCluesId ? fillInTheBlanksWithCluesMap.get(q.fillInTheBlanksWithCluesId) || null : null
+    let resolvedFillInTheBlanksWithoutClues = q.fillInTheBlanksWithoutCluesId ? fillInTheBlanksWithoutCluesMap.get(q.fillInTheBlanksWithoutCluesId) || null : null
     let resolvedSubstitutionTable = q.substitutionTableId ? substitutionTableMap.get(q.substitutionTableId) || null : null
     let resolvedPunctuation = q.punctuationId ? punctuationMap.get(q.punctuationId) || null : null
     let resolvedShortComposition = q.shortCompositionId ? shortCompositionMap.get(q.shortCompositionId) || null : null
@@ -532,6 +545,9 @@ export async function getQuestionPaperById(
     if (!resolvedFillInTheBlanksWithClues && q.fillInTheBlanksWithCluesId && q.contentSnapshot) {
       resolvedFillInTheBlanksWithClues = q.contentSnapshot as any
     }
+    if (!resolvedFillInTheBlanksWithoutClues && q.fillInTheBlanksWithoutCluesId && q.contentSnapshot) {
+      resolvedFillInTheBlanksWithoutClues = q.contentSnapshot as any
+    }
     if (!resolvedSubstitutionTable && q.substitutionTableId && q.contentSnapshot) {
       resolvedSubstitutionTable = q.contentSnapshot as any
     }
@@ -556,6 +572,7 @@ export async function getQuestionPaperById(
       (resolvedPunctuation as any)?.questionTypeId ||
       (resolvedSubstitutionTable as any)?.questionTypeId ||
       (resolvedFillInTheBlanksWithClues as any)?.questionTypeId ||
+      (resolvedFillInTheBlanksWithoutClues as any)?.questionTypeId ||
       (resolvedChangingSentence as any)?.questionTypeId ||
       (resolvedRightFormOfVerb as any)?.questionTypeId ||
       (resolvedPartsOfSpeech as any)?.questionTypeId ||
@@ -581,6 +598,7 @@ export async function getQuestionPaperById(
           (resolvedPunctuation && (dist.questionTypeName?.toLowerCase().includes("punctuation") || dist.questionTypeName?.toLowerCase().includes("capitalization") || dist.questionTypeName?.toLowerCase().includes("capital letter") || dist.questionTypeName?.includes("বিরাম চিহ্ন") || dist.questionTypeName?.includes("যতিচিহ্ন"))) ||
           (resolvedSubstitutionTable && (dist.questionTypeName?.toLowerCase().includes("substitution table") || dist.questionTypeName?.includes("সাবস্টিটিউশন টেবিল"))) ||
           (resolvedFillInTheBlanksWithClues && (dist.questionTypeName?.toLowerCase().includes("fill in the blanks") || dist.questionTypeName?.toLowerCase().includes("with clues") || dist.questionTypeName?.includes("ক্লুসহ"))) ||
+          (resolvedFillInTheBlanksWithoutClues && (dist.questionTypeName?.toLowerCase().includes("without clues") || dist.questionTypeName?.toLowerCase().includes("without clue") || dist.questionTypeName?.includes("ক্লু ছাড়া") || dist.questionTypeName?.includes("ক্লু ছাড়া"))) ||
           (resolvedChangingSentence && (dist.questionTypeName?.toLowerCase().includes("changing sentence") || dist.questionTypeName?.toLowerCase().includes("changing sentences") || dist.questionTypeName?.toLowerCase().includes("change the sentence") || dist.questionTypeName?.toLowerCase().includes("directed in bracket") || dist.questionTypeName?.includes("বাক্য রূপান্তর") || dist.questionTypeName?.includes("বাক্য পরিবর্তন"))) ||
           (resolvedRightFormOfVerb && (dist.questionTypeName?.toLowerCase().includes("right form") || dist.questionTypeName?.toLowerCase().includes("verbs in brackets") || dist.questionTypeName?.includes("ভার্ব") || dist.questionTypeName?.toLowerCase().includes("verb"))) ||
           (resolvedPartsOfSpeech && (dist.questionTypeName?.toLowerCase().includes("parts of speech") || dist.questionTypeName?.toLowerCase().includes("part of speech"))) ||
@@ -626,6 +644,7 @@ export async function getQuestionPaperById(
       rightFormOfVerb: resolvedRightFormOfVerb,
       changingSentence: resolvedChangingSentence,
       fillInTheBlanksWithClues: resolvedFillInTheBlanksWithClues,
+      fillInTheBlanksWithoutClues: resolvedFillInTheBlanksWithoutClues,
       substitutionTable: resolvedSubstitutionTable,
       punctuation: resolvedPunctuation,
       shortComposition: resolvedShortComposition,
@@ -1183,6 +1202,7 @@ export async function duplicateQuestionPaper(
         rightFormOfVerbId: question.rightFormOfVerbId,
         changingSentenceId: question.changingSentenceId,
         fillInTheBlanksWithCluesId: question.fillInTheBlanksWithCluesId,
+        fillInTheBlanksWithoutCluesId: question.fillInTheBlanksWithoutCluesId,
         substitutionTableId: question.substitutionTableId,
         punctuationId: question.punctuationId,
         shortCompositionId: question.shortCompositionId,
@@ -1220,6 +1240,7 @@ export async function duplicateQuestionPaper(
             rightFormOfVerbId: alt.rightFormOfVerbId,
             changingSentenceId: alt.changingSentenceId,
             fillInTheBlanksWithCluesId: alt.fillInTheBlanksWithCluesId,
+            fillInTheBlanksWithoutCluesId: alt.fillInTheBlanksWithoutCluesId,
             substitutionTableId: alt.substitutionTableId,
             punctuationId: alt.punctuationId,
             shortCompositionId: alt.shortCompositionId,
