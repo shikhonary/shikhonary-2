@@ -47,7 +47,7 @@ async function resolveDescriptiveQuestionTypeId(db: any) {
 }
 
 export async function listDescriptiveQuestions(db: PrismaClient, input: ListDescriptiveQuestionsInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -57,6 +57,8 @@ export async function listDescriptiveQuestions(db: PrismaClient, input: ListDesc
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
@@ -155,6 +157,8 @@ export async function createDescriptiveQuestion(db: PrismaClient, input: CreateD
       question: data.question,
       answer: data.answer ?? null,
       reference: data.reference ?? [],
+      source: data.source ?? "গাইড বুক",
+      session: data.session ?? new Date().getFullYear().toString(),
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -182,6 +186,8 @@ export async function updateDescriptiveQuestion(db: PrismaClient, input: UpdateD
       question: data.question,
       answer: data.answer,
       reference: data.reference,
+      source: data.source,
+      session: data.session,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
@@ -227,6 +233,8 @@ export async function importDescriptiveQuestions(db: PrismaClient, input: Import
             question: data.question,
             answer: data.answer ?? null,
             reference: data.reference || [],
+            source: data.source ?? "গাইড বুক",
+            session: data.session ?? new Date().getFullYear().toString(),
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

@@ -6,6 +6,8 @@ export const listShortQuestionsSchema = paginationSchema.extend({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   difficulty: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
@@ -26,6 +28,8 @@ export type GetShortQuestionInput = z.infer<typeof getShortQuestionSchema>
 export const createShortQuestionSchema = z.object({
   question: z.string().min(1, "Question text is required"),
   reference: z.array(z.string()).optional().default([]),
+  source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),

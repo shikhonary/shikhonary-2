@@ -47,7 +47,7 @@ async function resolveShortQuestionTypeId(db: any) {
 }
 
 export async function listShortQuestions(db: PrismaClient, input: ListShortQuestionsInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -57,6 +57,8 @@ export async function listShortQuestions(db: PrismaClient, input: ListShortQuest
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
@@ -154,6 +156,8 @@ export async function createShortQuestion(db: PrismaClient, input: CreateShortQu
     data: {
       question: data.question,
       reference: data.reference ?? [],
+      source: data.source ?? "গাইড বুক",
+      session: data.session ?? new Date().getFullYear().toString(),
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -180,6 +184,8 @@ export async function updateShortQuestion(db: PrismaClient, input: UpdateShortQu
     data: {
       question: data.question,
       reference: data.reference,
+      source: data.source,
+      session: data.session,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
@@ -224,6 +230,8 @@ export async function importShortQuestions(db: PrismaClient, input: ImportShortQ
           data: {
             question: data.question,
             reference: data.reference || [],
+            source: data.source ?? "গাইড বুক",
+            session: data.session ?? new Date().getFullYear().toString(),
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

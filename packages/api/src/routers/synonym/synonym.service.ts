@@ -47,7 +47,7 @@ async function resolveSynonymTypeId(db: any) {
 }
 
 export async function listSynonym(db: PrismaClient, input: ListSynonymInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -59,6 +59,8 @@ export async function listSynonym(db: PrismaClient, input: ListSynonymInput) {
   if (subjectId) where.subjectId = subjectId
   if (targetChapterId) where.academicChapterId = targetChapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
@@ -154,6 +156,7 @@ export async function createSynonym(db: PrismaClient, input: CreateSynonymInput)
   const questionTypeId = await resolveSynonymTypeId(db)
 
   const chapterId = input.academicChapterId || input.chapterId || null
+  const currentYear = new Date().getFullYear().toString()
 
   return db.synonym.create({
     data: {
@@ -161,6 +164,8 @@ export async function createSynonym(db: PrismaClient, input: CreateSynonymInput)
       synonymWord: input.synonymWord || null,
       synonyms: input.synonyms ?? [],
       reference: input.reference ?? [],
+      source: input.source ? input.source.trim() : "গাইড বুক",
+      session: input.session ? input.session.trim() : currentYear,
       difficulty: input.difficulty ?? "MEDIUM",
       popularityCount: input.popularityCount ?? 0,
       subjectId: input.subjectId,
@@ -281,12 +286,15 @@ export async function bulkDeleteSynonym(db: PrismaClient, input: BulkDeleteSynon
 
 export async function importSynonym(db: PrismaClient, input: ImportSynonymInput) {
   const questionTypeId = await resolveSynonymTypeId(db)
+  const currentYear = new Date().getFullYear().toString()
 
   const records = input.questions.map((q) => ({
     word: q.word,
     synonymWord: q.synonymWord || null,
     synonyms: q.synonyms ?? [],
     reference: q.reference ?? [],
+    source: q.source ? q.source.trim() : "গাইড বুক",
+    session: q.session ? q.session.trim() : currentYear,
     difficulty: q.difficulty ?? "MEDIUM",
     popularityCount: q.popularityCount ?? 0,
     subjectId: q.subjectId,

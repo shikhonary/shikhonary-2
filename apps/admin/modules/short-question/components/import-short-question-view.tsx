@@ -38,6 +38,7 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
+import { SHORT_QUESTION_SOURCE_OPTIONS } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -382,6 +383,42 @@ function EditableShortQuestionCard({
             onSave={(newVal) => onChange({ ...item, popularityCount: newVal && !isNaN(Number(newVal)) ? Number(newVal) : 0 })}
           />
         </div>
+
+        {/* Source & Auto-assigned Session */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3 items-center">
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || "গাইড বুক"}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {SHORT_QUESTION_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{new Date().getFullYear()}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
+        </div>
       </div>
     </Card>
   )
@@ -395,6 +432,7 @@ export function ImportShortQuestionView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -417,7 +455,7 @@ export function ImportShortQuestionView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
       }
     }
     reader.readAsText(file)
@@ -427,7 +465,8 @@ export function ImportShortQuestionView() {
     text: string,
     overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string
+    overrideChapterId: string,
+    overrideSource?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -470,6 +509,7 @@ export function ImportShortQuestionView() {
         return
       }
 
+      const currentDefaultSource = overrideSource || selectedSource || "গাইড বুক"
       const validated: any[] = []
       const errors: string[] = []
 
@@ -493,6 +533,7 @@ export function ImportShortQuestionView() {
           difficulty: item.difficulty || "MEDIUM",
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
         })
       })
 
@@ -510,7 +551,7 @@ export function ImportShortQuestionView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -523,7 +564,7 @@ export function ImportShortQuestionView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -532,7 +573,7 @@ export function ImportShortQuestionView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource)
     }
   }
 
@@ -541,7 +582,7 @@ export function ImportShortQuestionView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
     }
   }
 
@@ -549,7 +590,18 @@ export function ImportShortQuestionView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
+    }
+  }
+
+  const handleSourceChange = (val: string) => {
+    setSelectedSource(val)
+    if (parsedItems.length > 0) {
+      const next = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || val,
+      }))
+      syncParsedItemsToText(next)
     }
   }
 
@@ -583,6 +635,7 @@ export function ImportShortQuestionView() {
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
+      source: selectedSource || "গাইড বুক",
     }
     const next = [...parsedItems, newQuestion]
     syncParsedItemsToText(next)
@@ -607,6 +660,7 @@ export function ImportShortQuestionView() {
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
+        source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
       }))
 
       const res = await importMutation.mutateAsync({ questions: payload as any })
@@ -688,8 +742,8 @@ export function ImportShortQuestionView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject & Chapter dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Academic Class, Subject, Chapter & Source dropdowns */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -755,6 +809,28 @@ export function ImportShortQuestionView() {
                   {chapters.map((ch) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn} ({ch.nameBn})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={handleSourceChange}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Default Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {SHORT_QUESTION_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

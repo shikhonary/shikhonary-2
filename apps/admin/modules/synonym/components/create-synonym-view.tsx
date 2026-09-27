@@ -30,12 +30,14 @@ import { QUESTION_DIFFICULTY } from "@workspace/utils"
 const createSynonymFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
+  chapterId: z.string().optional(),
   word: z.string().min(1, "Word text is required"),
   synonymWord: z.string().optional(),
   synonymsText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
 })
 
 type CreateSynonymFormData = z.infer<typeof createSynonymFormSchema>
@@ -102,13 +104,15 @@ export function CreateSynonymView() {
 
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
-        chapterId: data.chapterId,
-        academicChapterId: data.chapterId,
+        chapterId: data.chapterId || null,
+        academicChapterId: data.chapterId || null,
         word: data.word.trim(),
         synonymWord: primarySynonym,
         synonyms: synonymsArray.length > 0 ? synonymsArray : (primarySynonym ? [primarySynonym] : []),
         difficulty: data.difficulty,
         reference: referenceArray,
+        source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
       })
 
       toast.success("Synonym entry created successfully.")
@@ -229,7 +233,7 @@ export function CreateSynonymView() {
 
             {/* Chapter */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Chapter *</Label>
+              <Label className="text-xs font-bold text-on-surface">Chapter (Optional)</Label>
               <Controller
                 name="chapterId"
                 control={control}

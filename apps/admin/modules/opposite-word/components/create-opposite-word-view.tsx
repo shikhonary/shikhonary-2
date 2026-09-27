@@ -31,7 +31,7 @@ import { OPPOSITE_WORD_SOURCE_OPTIONS } from "../constants"
 const createOppositeWordFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
+  chapterId: z.string().optional(),
   word: z.string().min(1, "Word is required"),
   oppositeWord: z.string().optional(),
   oppositeWordsText: z.string().optional(),
@@ -104,8 +104,8 @@ export function CreateOppositeWordView() {
 
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
-        chapterId: data.chapterId,
-        academicChapterId: data.chapterId,
+        chapterId: data.chapterId || null,
+        academicChapterId: data.chapterId || null,
         word: data.word.trim(),
         oppositeWord: data.oppositeWord?.trim() || null,
         oppositeWords: oppositeWordsArray,
@@ -233,7 +233,7 @@ export function CreateOppositeWordView() {
 
             {/* Chapter */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Chapter *</Label>
+              <Label className="text-xs font-bold text-on-surface">Chapter (Optional)</Label>
               <Controller
                 name="chapterId"
                 control={control}

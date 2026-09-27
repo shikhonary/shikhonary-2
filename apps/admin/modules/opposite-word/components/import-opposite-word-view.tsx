@@ -695,18 +695,22 @@ export function ImportOppositeWordView() {
     }
 
     try {
-      const payload = parsedItems.map((item) => ({
-        subjectId: selectedSubjectId,
-        chapterId: selectedChapterId || null,
-        academicChapterId: selectedChapterId || null,
-        word: item.word.trim(),
-        oppositeWord: item.oppositeWord ? item.oppositeWord.trim() : null,
-        oppositeWords: Array.isArray(item.oppositeWords) ? item.oppositeWords : [],
-        difficulty: item.difficulty as any,
-        popularityCount: Number(item.popularityCount) || 0,
-        reference: Array.isArray(item.reference) ? item.reference : [],
-        source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
-      }))
+      const payload = parsedItems.map((item) => {
+        const subId = item.subjectId || selectedSubjectId
+        const chId = item.academicChapterId || item.chapterId || selectedChapterId || null
+        return {
+          subjectId: subId,
+          chapterId: chId,
+          academicChapterId: chId,
+          word: item.word.trim(),
+          oppositeWord: item.oppositeWord ? item.oppositeWord.trim() : null,
+          oppositeWords: Array.isArray(item.oppositeWords) ? item.oppositeWords : [],
+          difficulty: item.difficulty as any,
+          popularityCount: Number(item.popularityCount) || 0,
+          reference: Array.isArray(item.reference) ? item.reference : [],
+          source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
+        }
+      })
 
       const res = await importMutation.mutateAsync({ questions: payload as any })
       toast.success(`Successfully imported ${res.importedCount} Opposite Word Entries!`)
@@ -783,7 +787,7 @@ export function ImportOppositeWordView() {
             Class, Subject & Chapter Hierarchy (Default Assignee)
           </CardTitle>
           <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Select Academic Class and Subject. Chapter is required. Opposite word items will be assigned subject and chapter from the selection below.
+            Select Academic Class and Subject. Chapter is optional. Opposite word items will be assigned subject and chapter from the selection below.
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
@@ -839,7 +843,7 @@ export function ImportOppositeWordView() {
             {/* Chapter Select */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Chapter *
+                Academic Chapter (Optional)
               </Label>
               <Select
                 value={selectedChapterId || "none"}
@@ -1008,7 +1012,7 @@ export function ImportOppositeWordView() {
         <Button
           type="button"
           onClick={handleImport}
-          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId || !selectedChapterId}
+          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-40 h-11 cursor-pointer"
         >
           {importMutation.isPending ? (
