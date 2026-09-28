@@ -239,10 +239,14 @@ model QuestionPaperQuestion {
     applicationId   String?
     summaryId       String?
     essenceId       String?
+    poemEssenceId   String?
+    proseEssenceId  String?
+    sadhuToCholitoId String?
     poemId          String?
     essayId         String?
     newsReportId    String?
     partsOfSpeechId              String?
+    podNirnoyId                  String?
     rightFormOfVerbId            String?
     changingSentenceId           String?
     fillInTheBlanksWithCluesId   String?
@@ -302,10 +306,14 @@ model QuestionPaperQuestion {
     @@unique([questionPaperId, applicationId])
     @@unique([questionPaperId, summaryId])
     @@unique([questionPaperId, essenceId])
+    @@unique([questionPaperId, poemEssenceId])
+    @@unique([questionPaperId, proseEssenceId])
+    @@unique([questionPaperId, sadhuToCholitoId])
     @@unique([questionPaperId, poemId])
     @@unique([questionPaperId, essayId])
     @@unique([questionPaperId, newsReportId])
     @@unique([questionPaperId, partsOfSpeechId])
+    @@unique([questionPaperId, podNirnoyId])
     @@unique([questionPaperId, punctuationId])
     @@unique([questionPaperId, rightFormOfVerbId])
     @@unique([questionPaperId, changingSentenceId])
@@ -329,10 +337,14 @@ model QuestionPaperQuestion {
     @@index([applicationId])
     @@index([summaryId])
     @@index([essenceId])
+    @@index([poemEssenceId])
+    @@index([proseEssenceId])
+    @@index([sadhuToCholitoId])
     @@index([poemId])
     @@index([essayId])
     @@index([newsReportId])
     @@index([partsOfSpeechId])
+    @@index([podNirnoyId])
     @@index([punctuationId])
     @@index([rightFormOfVerbId])
     @@index([changingSentenceId])

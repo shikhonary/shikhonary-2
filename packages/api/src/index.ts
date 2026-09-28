@@ -449,6 +449,39 @@ export type {
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
+  ListPodNirnoyInput,
+  PodNirnoyStatsInput,
+  GetPodNirnoyInput,
+  CreatePodNirnoyInput,
+  UpdatePodNirnoyInput,
+  DeletePodNirnoyInput,
+  BulkDeletePodNirnoyInput,
+  ImportPodNirnoyInput,
+} from "./routers/pod-nirnoy/pod-nirnoy.schema"
+
+export type {
+  ListVerbTenseInput,
+  VerbTenseStatsInput,
+  GetVerbTenseInput,
+  CreateVerbTenseInput,
+  UpdateVerbTenseInput,
+  DeleteVerbTenseInput,
+  BulkDeleteVerbTenseInput,
+  ImportVerbTenseInput,
+} from "./routers/verb-tense/verb-tense.schema"
+
+export type {
+  ListSadhuToCholitoInput,
+  SadhuToCholitoStatsInput,
+  GetSadhuToCholitoInput,
+  CreateSadhuToCholitoInput,
+  UpdateSadhuToCholitoInput,
+  DeleteSadhuToCholitoInput,
+  BulkDeleteSadhuToCholitoInput,
+  ImportSadhuToCholitoInput,
+} from "./routers/sadhu-to-cholito/sadhu-to-cholito.schema"
+
+export type {
   ListGenderChangeInput,
   GenderChangeStatsInput,
   GetGenderChangeInput,
@@ -471,9 +504,27 @@ export type {
 } from "./routers/synonym/synonym.schema"
 
 export type {
-  ListCreditTransactionsInput,
-  EstimatePaperCostInput,
-} from "./routers/credit/credit.schema"
+  ListPoemEssenceInput,
+  PoemEssenceStatsInput,
+  GetPoemEssenceInput,
+  CreatePoemEssenceInput,
+  UpdatePoemEssenceInput,
+  DeletePoemEssenceInput,
+  BulkDeletePoemEssenceInput,
+  ImportPoemEssenceInput,
+} from "./routers/poem-essence/poem-essence.schema"
+
+export type {
+  ListProseEssenceInput,
+  ProseEssenceStatsInput,
+  GetProseEssenceInput,
+  CreateProseEssenceInput,
+  UpdateProseEssenceInput,
+  DeleteProseEssenceInput,
+  BulkDeleteProseEssenceInput,
+  ImportProseEssenceInput,
+} from "./routers/prose-essence/prose-essence.schema"
+
 
 
 

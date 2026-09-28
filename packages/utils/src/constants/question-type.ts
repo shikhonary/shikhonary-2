@@ -32,6 +32,11 @@ export const QUESTION_TYPES = {
   WORD_MEANING: "Word Meaning",
   GENDER_CHANGE: "Gender Change",
   SYNONYM: "Synonym",
+  POEM_ESSENCE: "Poem Essence",
+  PROSE_ESSENCE: "Prose Essence",
+  SADHU_TO_CHOLITO: "Sadhu to Cholito",
+  POD_NIRNOY: "Pod Nirnoy",
+  VERB_TENSE: "Verb Tense",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -66,6 +71,11 @@ export const QUESTION_TYPE_CODES = {
   WORD_MEANING: "WORD_MEANING",
   GENDER_CHANGE: "GENDER_CHANGE",
   SYNONYM: "SYNONYM",
+  POEM_ESSENCE: "POEM_ESSENCE",
+  PROSE_ESSENCE: "PROSE_ESSENCE",
+  SADHU_TO_CHOLITO: "SADHU_TO_CHOLITO",
+  POD_NIRNOY: "POD_NIRNOY",
+  VERB_TENSE: "VERB_TENSE",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -281,6 +291,41 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.SYNONYM,
     defaultMark: 5,
     defaultPosition: 23,
+  },
+  [QUESTION_TYPES.POEM_ESSENCE]: {
+    nameEn: QUESTION_TYPES.POEM_ESSENCE,
+    nameBn: "কবিতার মূলভাব",
+    code: QUESTION_TYPE_CODES.POEM_ESSENCE,
+    defaultMark: 5,
+    defaultPosition: 24,
+  },
+  [QUESTION_TYPES.PROSE_ESSENCE]: {
+    nameEn: QUESTION_TYPES.PROSE_ESSENCE,
+    nameBn: "গদ্য অনুচ্ছেদের মূলভাব",
+    code: QUESTION_TYPE_CODES.PROSE_ESSENCE,
+    defaultMark: 5,
+    defaultPosition: 25,
+  },
+  [QUESTION_TYPES.SADHU_TO_CHOLITO]: {
+    nameEn: QUESTION_TYPES.SADHU_TO_CHOLITO,
+    nameBn: "সাধুরীতি থেকে চলিত রীতি",
+    code: QUESTION_TYPE_CODES.SADHU_TO_CHOLITO,
+    defaultMark: 5,
+    defaultPosition: 26,
+  },
+  [QUESTION_TYPES.POD_NIRNOY]: {
+    nameEn: QUESTION_TYPES.POD_NIRNOY,
+    nameBn: "পদ নির্ণয়",
+    code: QUESTION_TYPE_CODES.POD_NIRNOY,
+    defaultMark: 5,
+    defaultPosition: 27,
+  },
+  [QUESTION_TYPES.VERB_TENSE]: {
+    nameEn: QUESTION_TYPES.VERB_TENSE,
+    nameBn: "ক্রিয়াপদের রূপ",
+    code: QUESTION_TYPE_CODES.VERB_TENSE,
+    defaultMark: 5,
+    defaultPosition: 28,
   },
 } as const
 
@@ -529,6 +574,55 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("প্রতিশব্দ")
   ) {
     return QUESTION_TYPES.SYNONYM
+  }
+  if (
+    lower === "poem essence" ||
+    lower === "poem_essence" ||
+    lower.includes("poem essence") ||
+    lower.includes("কবিতার মূলভাব")
+  ) {
+    return QUESTION_TYPES.POEM_ESSENCE
+  }
+  if (
+    lower === "prose essence" ||
+    lower === "prose_essence" ||
+    lower.includes("prose essence") ||
+    lower.includes("গদ্য অনুচ্ছেদের মূলভাব") ||
+    lower.includes("গদ্যের মূলভাব")
+  ) {
+    return QUESTION_TYPES.PROSE_ESSENCE
+  }
+  if (
+    lower === "sadhu to cholito" ||
+    lower === "sadhu_to_cholito" ||
+    lower === "sadhu to cholito text" ||
+    lower.includes("sadhu to cholito") ||
+    lower.includes("সাধুরীতি থেকে চলিত রীতি") ||
+    lower.includes("সাধু থেকে চলিত") ||
+    lower.includes("সাধু ও চলিত") ||
+    lower.includes("ভাষারীতির পরিবর্তন")
+  ) {
+    return QUESTION_TYPES.SADHU_TO_CHOLITO
+  }
+  if (
+    lower === "pod nirnoy" ||
+    lower === "pod_nirnoy" ||
+    lower === "pod nirnoy text" ||
+    lower.includes("pod nirnoy") ||
+    lower.includes("পদ নির্ণয়") ||
+    lower.includes("পদ নির্ণয়")
+  ) {
+    return QUESTION_TYPES.POD_NIRNOY
+  }
+  if (
+    lower === "verb tense" ||
+    lower === "verb_tense" ||
+    lower.includes("verb tense") ||
+    lower.includes("ক্রিয়াপদের রূপ") ||
+    lower.includes("ক্রিয়াপদের অতীত") ||
+    lower.includes("ক্রিয়াপদের রূপ")
+  ) {
+    return QUESTION_TYPES.VERB_TENSE
   }
 
   return null

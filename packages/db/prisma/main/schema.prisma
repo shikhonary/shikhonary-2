@@ -52,6 +52,12 @@ model User {
   updatedSummaries                Summary[]                  @relation("SummaryUpdater")
   createdEssences                 Essence[]                  @relation("EssenceCreator")
   updatedEssences                 Essence[]                  @relation("EssenceUpdater")
+  createdPoemEssences             PoemEssence[]              @relation("PoemEssenceCreator")
+  updatedPoemEssences             PoemEssence[]              @relation("PoemEssenceUpdater")
+  createdProseEssences            ProseEssence[]             @relation("ProseEssenceCreator")
+  updatedProseEssences            ProseEssence[]             @relation("ProseEssenceUpdater")
+  createdSadhuToCholitos          SadhuToCholito[]           @relation("SadhuToCholitoCreator")
+  updatedSadhuToCholitos          SadhuToCholito[]           @relation("SadhuToCholitoUpdater")
   createdThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionCreator")
   updatedThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionUpdater")
   createdNewsReports              NewsReport[]               @relation("NewsReportCreator")
@@ -60,6 +66,10 @@ model User {
   updatedEssays                   Essay[]                    @relation("EssayUpdater")
   createdPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechCreator")
   updatedPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechUpdater")
+  createdPodNirnoys               PodNirnoy[]                @relation("PodNirnoyCreator")
+  updatedPodNirnoys               PodNirnoy[]                @relation("PodNirnoyUpdater")
+  createdVerbTenses               VerbTense[]                @relation("VerbTenseCreator")
+  updatedVerbTenses               VerbTense[]                @relation("VerbTenseUpdater")
   createdRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbCreator")
   updatedRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbUpdater")
   createdChangingSentences        ChangingSentence[]         @relation("ChangingSentenceCreator")
@@ -267,11 +277,16 @@ model Tenant {
   applications             Application[]
   summaries                Summary[]
   essences                 Essence[]
+  poemEssences             PoemEssence[]
+  proseEssences            ProseEssence[]
+  sadhuToCholitos          SadhuToCholito[]
   thoughtExpansions        ThoughtExpansion[]
   newsReports              NewsReport[]
   essays                   Essay[]
   pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  podNirnoys               PodNirnoy[]
+  verbTenses               VerbTense[]
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
@@ -651,11 +666,16 @@ model AcademicSubject {
   applications             Application[]
   summaries                Summary[]
   essences                 Essence[]
+  poemEssences             PoemEssence[]
+  proseEssences            ProseEssence[]
+  sadhuToCholitos          SadhuToCholito[]
   thoughtExpansions        ThoughtExpansion[]
   newsReports              NewsReport[]
   essays                   Essay[]
   pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  podNirnoys               PodNirnoy[]
+  verbTenses               VerbTense[]
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
@@ -718,6 +738,8 @@ model AcademicChapter {
   amplifications           Amplification[]
   cs                       CS[]
   partsOfSpeech            PartsOfSpeech[]
+  podNirnoys               PodNirnoy[]
+  verbTenses               VerbTense[]
   rightFormOfVerbs         RightFormOfVerb[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
   fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
@@ -727,6 +749,9 @@ model AcademicChapter {
   wordMeanings             WordMeaning[]
   genderChanges            GenderChange[]
   synonyms                 Synonym[]
+  poemEssences             PoemEssence[]
+  proseEssences            ProseEssence[]
+  sadhuToCholitos          SadhuToCholito[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -768,11 +793,16 @@ model QuestionType {
   applications             Application[]
   summaries                Summary[]
   essences                 Essence[]
+  poemEssences             PoemEssence[]
+  proseEssences            ProseEssence[]
+  sadhuToCholitos          SadhuToCholito[]
   thoughtExpansions        ThoughtExpansion[]
   newsReports              NewsReport[]
   essays                   Essay[]
   pbqs                     PBQ[]
   partsOfSpeech            PartsOfSpeech[]
+  podNirnoys               PodNirnoy[]
+  verbTenses               VerbTense[]
   rightFormOfVerbs         RightFormOfVerb[]
   changingSentences        ChangingSentence[]
   fillInTheBlanksWithClues FillInTheBlanksWithClues[]
@@ -1581,6 +1611,153 @@ model Essence {
   @@map("essence")
 }
 
+model PoemEssence {
+  id         String   @id @default(cuid())
+  title      String
+  poemStanza String?
+  mainTheme  String?
+  reference  String[] @default([])
+  source     String?
+  session    String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("PoemEssenceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("PoemEssenceUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([academicChapterId])
+  @@index([difficulty])
+  @@map("poem_essence")
+}
+
+model ProseEssence {
+  id           String   @id @default(cuid())
+  title        String
+  prosePassage String?
+  mainTheme    String?
+  reference    String[] @default([])
+  source       String?
+  session      String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ProseEssenceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("ProseEssenceUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([academicChapterId])
+  @@index([difficulty])
+  @@map("prose_essence")
+}
+
+model SadhuToCholito {
+  id               String   @id @default(cuid())
+  sadhuText        String
+  cholitoText      String?
+  alternativeTexts String[] @default([])
+  reference        String[] @default([])
+  source           String?
+  session          String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("SadhuToCholitoCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("SadhuToCholitoUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([academicChapterId])
+  @@index([difficulty])
+  @@map("sadhu_to_cholito")
+}
+
 model ThoughtExpansion {
   id        String   @id @default(cuid())
   title     String
@@ -1858,6 +2035,107 @@ model PartsOfSpeech {
   @@index([subjectId])
   @@index([difficulty])
   @@map("parts_of_speech")
+}
+
+model PodNirnoy {
+  id        String   @id @default(cuid())
+  content   String?
+  word      String?
+  words     String[] @default([])
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("PodNirnoyCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("PodNirnoyUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("pod_nirnoy")
+}
+
+model VerbTense {
+  id          String   @id @default(cuid())
+  verb        String
+  presentForm String?
+  pastForm    String?
+  futureForm  String?
+  content     String?
+  reference   String[] @default([])
+  source      String?
+  session     String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  createdById String?
+  creator     User?   @relation("VerbTenseCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("VerbTenseUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("verb_tense")
 }
 
 model FillInTheBlanksWithClues {

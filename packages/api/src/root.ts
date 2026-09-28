@@ -56,6 +56,11 @@ import { makeSentencesRouter } from "./routers/make-sentences/make-sentences.rou
 import { juktobornoRouter } from "./routers/juktoborno/juktoborno.router"
 import { oppositeWordRouter } from "./routers/opposite-word/opposite-word.router"
 import { wordMeaningRouter } from "./routers/word-meaning/word-meaning.router"
+import { podNirnoyRouter } from "./routers/pod-nirnoy/pod-nirnoy.router"
+import { verbTenseRouter } from "./routers/verb-tense/verb-tense.router"
+import { sadhuToCholitoRouter } from "./routers/sadhu-to-cholito/sadhu-to-cholito.router"
+import { poemEssenceRouter } from "./routers/poem-essence/poem-essence.router"
+import { proseEssenceRouter } from "./routers/prose-essence/prose-essence.router"
 import { genderChangeRouter } from "./routers/gender-change/gender-change.router"
 import { synonymRouter } from "./routers/synonym/synonym.router"
 
@@ -89,6 +94,9 @@ export const appRouter = createTRPCRouter({
   juktoborno: juktobornoRouter,
   oppositeWord: oppositeWordRouter,
   wordMeaning: wordMeaningRouter,
+  podNirnoy: podNirnoyRouter,
+  verbTense: verbTenseRouter,
+  sadhuToCholito: sadhuToCholitoRouter,
   genderChange: genderChangeRouter,
   synonym: synonymRouter,
   subjectStructure: subjectStructureRouter,
@@ -110,6 +118,8 @@ export const appRouter = createTRPCRouter({
   punctuation: punctuationRouter,
   shortComposition: shortCompositionRouter,
   poem: poemRouter,
+  poemEssence: poemEssenceRouter,
+  proseEssence: proseEssenceRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

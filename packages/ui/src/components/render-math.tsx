@@ -19,22 +19,27 @@ export function RenderMath({
 }: RenderMathProps) {
   if (!text) return null
 
+  // Normalize escaped newlines "\\n" and "\\r\\n" -> "\n"
+  const normalizedText = typeof text === "string"
+    ? text.replace(/\\r\\n/g, "\n").replace(/\\n/g, "\n").replace(/\r\n/g, "\n")
+    : text
+
   // If isMath is not explicitly false, auto-detect LaTeX math delimiters ($, $$, \(, \[)
   const hasMathDelimiters =
-    /\$[^$\n]+\$/.test(text) ||
-    /\$\$[\s\S]*?\$\$/.test(text) ||
-    /\\\([\s\S]*?\\\)/.test(text) ||
-    /\\\[[\s\S]*?\\\]/.test(text)
+    /\$[^$\n]+\$/.test(normalizedText) ||
+    /\$\$[\s\S]*?\$\$/.test(normalizedText) ||
+    /\\\([\s\S]*?\\\)/.test(normalizedText) ||
+    /\\\[[\s\S]*?\\\]/.test(normalizedText)
   const shouldRenderMath = isMath !== undefined ? (isMath || hasMathDelimiters) : hasMathDelimiters
 
   if (!shouldRenderMath) {
-    return <Component className={className}>{text}</Component>
+    return <Component className={`whitespace-pre-wrap ${className}`}>{normalizedText}</Component>
   }
 
   const htmlContent = useMemo(() => {
     try {
       // 1. Replace \[...\] and $$...$$ (display mode math)
-      let result = text
+      let result = normalizedText
         .replace(
           /\\\[([\s\S]*?)\\\]/g,
           (_: string, expr: string) => {
@@ -91,15 +96,18 @@ export function RenderMath({
           }
         )
 
+      // 3. Convert newlines to <br /> tags for HTML rendering
+      result = result.replace(/\n/g, "<br />")
+
       return result
     } catch {
-      return text
+      return normalizedText
     }
-  }, [text])
+  }, [normalizedText])
 
   return (
     <Component
-      className={`katex-container ${className}`}
+      className={`katex-container whitespace-pre-wrap ${className}`}
       dangerouslySetInnerHTML={{ __html: htmlContent }}
     />
   )
