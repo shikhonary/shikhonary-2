@@ -122,3 +122,15 @@ export function useSubjectsForSelection(input?: { academicClassId?: string }) {
     select: (data) => data.academicSubjects ?? [],
   })
 }
+
+export function useChaptersForSelection(input?: { subjectId?: string }) {
+  const subjectId = input?.subjectId === "All" ? undefined : input?.subjectId
+  return useQuery({
+    ...trpc.academicChapter.list.queryOptions({
+      limit: 100,
+      subjectId,
+    }),
+    select: (data) => data.academicChapters ?? [],
+    enabled: input === undefined || (subjectId !== undefined && subjectId !== ""),
+  })
+}

@@ -8,6 +8,7 @@ import {
   useImportPunctuation,
   useAcademicClassesForSelection,
   useSubjectsForSelection,
+  useChaptersForSelection,
 } from "../services/use-punctuation"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
@@ -36,9 +37,12 @@ import {
   UploadIcon,
 } from "lucide-react"
 
+import { PUNCTUATION_SOURCE_OPTIONS } from "../constants"
+
 const sampleJsonTemplate = `[
   {
     "content": "Use capitals and punctuation marks where necessary in the following text:\\nmy dear brother i received your letter yesterday you have asked me to write about my preparation for the ssc exam",
+    "source": "গাইড বুক",
     "reference": ["Board 2024", "Dhaka Board"],
     "difficulty": "MEDIUM",
     "popularityCount": 0
@@ -352,21 +356,30 @@ function EditablePunctuationCard({
       <CardContent className="p-5 space-y-4">
         {/* Question Passage Content */}
         <EditableField
-          label="Passage Content"
-          value={item.content || ""}
+          label="Passage Content (Unpunctuated Raw Text)"
+          value={item.rawText || item.content || ""}
           multiline
-          onSave={(newVal) => onChange({ ...item, content: newVal })}
+          onSave={(newVal) => onChange({ ...item, rawText: newVal, content: newVal })}
           placeholder="Enter question text requiring punctuation..."
           className="border-b border-outline-variant/30 pb-3"
         />
 
-        {/* References & Popularity */}
+        {/* References */}
+        <EditableField
+          label="Board / Reference Tags (Comma Separated)"
+          value={referenceString}
+          onSave={handleSaveReferences}
+          placeholder="e.g. Dhaka Board 2024, Rajshahi 2023"
+          className="border-b border-outline-variant/30 pb-3"
+        />
+
+        {/* Source & Popularity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
           <EditableField
-            label="Board / Reference Tags (Comma Separated)"
-            value={referenceString}
-            onSave={handleSaveReferences}
-            placeholder="e.g. Dhaka Board 2024, Rajshahi 2023"
+            label="Source / উৎস"
+            value={item.source || ""}
+            onSave={(newVal) => onChange({ ...item, source: newVal || null })}
+            placeholder="e.g. গাইড বুক"
           />
 
           <EditableField
@@ -387,6 +400,8 @@ export function ImportPunctuationView() {
 
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
+  const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
   const [jsonText, setJsonText] = useState("")
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -401,11 +416,15 @@ export function ImportPunctuationView() {
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedAcademicClassId ? { academicClassId: selectedAcademicClassId } : undefined
   )
+  const { data: chapters = [] } = useChaptersForSelection(
+    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+  )
 
   const validateAndParseJson = (
     rawText: string,
     overrideClassId = selectedAcademicClassId,
-    overrideSubjectId = selectedSubjectId
+    overrideSubjectId = selectedSubjectId,
+    overrideChapterId = selectedChapterId
   ) => {
     const trimmed = rawText.trim()
     if (!trimmed) {
@@ -460,7 +479,9 @@ export function ImportPunctuationView() {
 
         validated.push({
           subjectId,
+          academicChapterId: item.academicChapterId || overrideChapterId || null,
           content: String(contentText || "").trim(),
+          source: item.source || selectedSource || null,
           difficulty: item.difficulty || "MEDIUM",
           popularityCount:
             item.popularityCount !== undefined && item.popularityCount !== null
@@ -495,7 +516,7 @@ export function ImportPunctuationView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -508,23 +529,33 @@ export function ImportPunctuationView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
   }
 
   const handleAcademicClassChange = (val: string) => {
     const value = val === "all" ? "" : (val ?? "")
     setSelectedAcademicClassId(value)
     setSelectedSubjectId("")
+    setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "")
+      validateAndParseJson(jsonText, value, "", "")
     }
   }
 
   const handleSubjectChange = (val: string | null) => {
     const value = val ?? ""
     setSelectedSubjectId(value)
+    setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+    }
+  }
+
+  const handleChapterChange = (val: string | null) => {
+    const value = val ?? ""
+    setSelectedChapterId(value)
+    if (jsonText) {
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
     }
   }
 
@@ -537,7 +568,7 @@ export function ImportPunctuationView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
         toast.success(`Loaded JSON file: ${file.name}`)
       }
     }
@@ -574,6 +605,8 @@ export function ImportPunctuationView() {
   const handleAddNewQuestionCard = () => {
     const newItem = {
       content: "Use capitals and punctuation marks where necessary in the following text:\nsentence with text...",
+      source: selectedSource || "গাইড বুক",
+      academicChapterId: selectedChapterId || undefined,
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -596,7 +629,9 @@ export function ImportPunctuationView() {
     try {
       const payload = parsedItems.map((item) => ({
         subjectId: selectedSubjectId,
-        content: item.content.trim(),
+        academicChapterId: item.academicChapterId || selectedChapterId || undefined,
+        rawText: (item.rawText || item.content || "").trim(),
+        source: item.source || selectedSource || undefined,
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
@@ -678,8 +713,8 @@ export function ImportPunctuationView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class & Subject dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Academic Class, Subject, Source & Session dropdowns */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -706,19 +741,67 @@ export function ImportPunctuationView() {
             {/* Default Subject */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+                Academic Subject *
               </Label>
               <Select
-                value={selectedSubjectId}
-                onValueChange={handleSubjectChange}
+                value={selectedSubjectId || "none"}
+                onValueChange={(val) => handleSubjectChange(val === "none" ? null : val)}
+                disabled={!selectedAcademicClassId}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                  <SelectValue placeholder={!selectedAcademicClassId ? "Select Class First" : "Select Subject..."} />
                 </SelectTrigger>
                 <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  <SelectItem value="none" className="text-neutral-900">-- Select Subject --</SelectItem>
                   {subjects.map((sub) => (
                     <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                      {sub.nameEn}
+                      {sub.nameEn} {sub.nameBn ? `(${sub.nameBn})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Academic Chapter */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Academic Chapter (Optional)
+              </Label>
+              <Select
+                value={selectedChapterId || "none"}
+                onValueChange={(val) => handleChapterChange(val === "none" ? null : val)}
+                disabled={!selectedSubjectId}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                  <SelectValue placeholder={!selectedSubjectId ? "Select Subject First" : "Select Chapter..."} />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  <SelectItem value="none" className="text-neutral-900">-- Select Chapter --</SelectItem>
+                  {chapters.map((ch: any) => (
+                    <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
+                      {ch.nameEn} ({ch.nameBn})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Source */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source / উৎস
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => setSelectedSource(val)}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {PUNCTUATION_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

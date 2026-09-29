@@ -903,7 +903,7 @@ export function ImportGenderChangeView() {
         <Button
           type="button"
           onClick={handleImport}
-          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId || !selectedChapterId}
+          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-40 h-11 cursor-pointer"
         >
           {importMutation.isPending ? (

@@ -13,7 +13,7 @@ import type {
 
 // Helper function to resolve 'Punctuation' question type ID
 async function resolvePunctuationQuestionTypeId(db: any) {
-  const qt = await db.questionType.findFirst({
+  let qt = await db.questionType.findFirst({
     where: {
       OR: [
         { nameEn: { equals: "Punctuation and Capitalization", mode: "insensitive" } },
@@ -30,9 +30,17 @@ async function resolvePunctuationQuestionTypeId(db: any) {
   })
 
   if (!qt) {
-    throw new TRPCError({
-      code: "PRECONDITION_FAILED",
-      message: "Required 'Punctuation and Capitalization' Question Type template was not found. Please create it under Question Types first.",
+    qt = await db.questionType.create({
+      data: {
+        nameEn: "Punctuation",
+        nameBn: "বিরামচিহ্ন",
+        label: "Punctuation",
+        mark: 5,
+        position: 25,
+        descriptionEn: "Punctuation and Capitalization",
+        descriptionBn: "জ্যোতি বা বিরামচিহ্নের ব্যবহার",
+      },
+      select: { id: true },
     })
   }
 
@@ -40,7 +48,7 @@ async function resolvePunctuationQuestionTypeId(db: any) {
 }
 
 export async function listPunctuations(db: PrismaClient, input: ListPunctuationInput) {
-  const { page, limit, query, subjectId, difficulty, sort } = input
+  const { page, limit, query, subjectId, academicChapterId, difficulty, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -48,11 +56,14 @@ export async function listPunctuations(db: PrismaClient, input: ListPunctuationI
   const where: any = {}
 
   if (subjectId) where.subjectId = subjectId
+  if (academicChapterId) where.academicChapterId = academicChapterId
   if (difficulty) where.difficulty = difficulty
 
   if (query) {
     where.OR = [
-      { content: { contains: query, mode: "insensitive" } },
+      { rawText: { contains: query, mode: "insensitive" } },
+      { prompt: { contains: query, mode: "insensitive" } },
+      { answerText: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
     ]
   }
@@ -62,10 +73,6 @@ export async function listPunctuations(db: PrismaClient, input: ListPunctuationI
     orderBy = { createdAt: "desc" }
   } else if (sort === "oldest" || sort === "createdAt_asc") {
     orderBy = { createdAt: "asc" }
-  } else if (sort === "content_asc" || sort === "name_asc") {
-    orderBy = { content: "asc" }
-  } else if (sort === "content_desc" || sort === "name_desc") {
-    orderBy = { content: "desc" }
   } else if (sort === "popularity" || sort === "popularity_desc") {
     orderBy = { popularityCount: "desc" }
   }
@@ -78,6 +85,13 @@ export async function listPunctuations(db: PrismaClient, input: ListPunctuationI
       orderBy,
       include: {
         subject: {
+          select: {
+            id: true,
+            nameEn: true,
+            nameBn: true,
+          },
+        },
+        academicChapter: {
           select: {
             id: true,
             nameEn: true,
@@ -112,6 +126,7 @@ export async function getPunctuationById(db: PrismaClient, input: GetPunctuation
     where: { id: input.id },
     include: {
       subject: true,
+      academicChapter: true,
       questionType: true,
       creator: {
         select: {
@@ -138,15 +153,22 @@ export async function createPunctuation(db: PrismaClient, input: CreatePunctuati
 
   const created = await (db as any).punctuation.create({
     data: {
-      content: input.content,
+      rawText: input.rawText,
+      prompt: input.prompt,
+      answerText: input.answerText,
+      totalMarks: input.totalMarks ?? 5,
       reference: input.reference || [],
+      source: input.source,
+      session: input.session,
       difficulty: input.difficulty,
       popularityCount: input.popularityCount,
       subjectId: input.subjectId,
+      academicChapterId: input.academicChapterId,
       questionTypeId: resolvedQuestionTypeId,
     },
     include: {
       subject: true,
+      academicChapter: true,
       questionType: true,
     },
   })
@@ -167,6 +189,7 @@ export async function updatePunctuation(db: PrismaClient, input: UpdatePunctuati
     },
     include: {
       subject: true,
+      academicChapter: true,
       questionType: true,
     },
   })
@@ -201,11 +224,17 @@ export async function importPunctuations(db: PrismaClient, input: ImportPunctuat
     for (const p of input.punctuations) {
       const createdItem = await (tx as any).punctuation.create({
         data: {
-          content: p.content,
+          rawText: p.rawText,
+          prompt: p.prompt,
+          answerText: p.answerText,
+          totalMarks: p.totalMarks ?? 5,
           reference: p.reference || [],
+          source: p.source,
+          session: p.session,
           difficulty: p.difficulty,
           popularityCount: p.popularityCount,
           subjectId: p.subjectId,
+          academicChapterId: p.academicChapterId,
           questionTypeId: resolvedQuestionTypeId,
         },
       })
@@ -222,6 +251,7 @@ export async function importPunctuations(db: PrismaClient, input: ImportPunctuat
 export async function getPunctuationsStats(db: PrismaClient, input: PunctuationStatsInput = {}) {
   const where: any = {}
   if (input.subjectId) where.subjectId = input.subjectId
+  if (input.academicChapterId) where.academicChapterId = input.academicChapterId
 
   const [total, easy, medium, hard] = await Promise.all([
     (db as any).punctuation.count({ where }),

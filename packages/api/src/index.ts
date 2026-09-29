@@ -449,6 +449,17 @@ export type {
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
+  ListEkKothayProkashInput,
+  EkKothayProkashStatsInput,
+  GetEkKothayProkashInput,
+  CreateEkKothayProkashInput,
+  UpdateEkKothayProkashInput,
+  DeleteEkKothayProkashInput,
+  BulkDeleteEkKothayProkashInput,
+  ImportEkKothayProkashInput,
+} from "./routers/ek-kothay-prokash/ek-kothay-prokash.schema"
+
+export type {
   ListPodNirnoyInput,
   PodNirnoyStatsInput,
   GetPodNirnoyInput,
@@ -522,8 +533,18 @@ export type {
   UpdateProseEssenceInput,
   DeleteProseEssenceInput,
   BulkDeleteProseEssenceInput,
-  ImportProseEssenceInput,
 } from "./routers/prose-essence/prose-essence.schema"
+
+export type {
+  ListMakeQuestionInput,
+  MakeQuestionStatsInput,
+  GetMakeQuestionInput,
+  CreateMakeQuestionInput,
+  UpdateMakeQuestionInput,
+  DeleteMakeQuestionInput,
+  BulkDeleteMakeQuestionInput,
+  ImportMakeQuestionInput,
+} from "./routers/make-question/make-question.schema"
 
 
 

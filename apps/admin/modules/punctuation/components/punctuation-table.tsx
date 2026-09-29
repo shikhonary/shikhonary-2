@@ -15,7 +15,13 @@ import {
 
 export interface PunctuationItem {
   id: string
-  content: string
+  content?: string
+  rawText?: string
+  prompt?: string | null
+  answerText?: string | null
+  totalMarks?: number | null
+  source?: string | null
+  session?: string | null
   reference: string[]
   difficulty: string
   popularityCount: number
@@ -26,6 +32,11 @@ export interface PunctuationItem {
     nameEn: string
     nameBn: string
   }
+  academicChapter?: {
+    id: string
+    nameEn: string
+    nameBn: string
+  } | null
 }
 
 interface PunctuationTableProps {
@@ -161,7 +172,8 @@ export function PunctuationTable({
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const plainText = item.content.replace(/<[^>]*>?/gm, "")
+            const textContent = item.rawText || item.content || ""
+            const plainText = textContent.replace(/<[^>]*>?/gm, "")
             const snippet = plainText.length > 80 ? plainText.substring(0, 80) + "..." : plainText
 
             return (
@@ -195,6 +207,13 @@ export function PunctuationTable({
                           {item.subject.nameBn || item.subject.nameEn}
                         </span>
 
+                        {/* Chapter Badge */}
+                        {item.academicChapter && (
+                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
+                            {item.academicChapter.nameBn || item.academicChapter.nameEn}
+                          </span>
+                        )}
+
                         {/* Popularity Badge */}
                         <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
                           👁️ {item.popularityCount} Views
@@ -214,15 +233,31 @@ export function PunctuationTable({
                       </div>
 
                       {/* Content Passage Box */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
+                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed space-y-2">
+                        {item.prompt && (
+                          <p className="text-xs font-semibold text-primary uppercase tracking-wide">
+                            {item.prompt}
+                          </p>
+                        )}
                         <p className="whitespace-pre-wrap font-medium">
-                          {item.content}
+                          {item.rawText || item.content || ""}
                         </p>
+                        {item.answerText && (
+                          <div className="pt-2 border-t border-secondary/20 text-xs font-medium text-emerald-700">
+                            <span className="font-bold">Answer Key: </span>
+                            {item.answerText}
+                          </div>
+                        )}
                       </div>
 
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {(item.source || item.session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -233,7 +268,9 @@ export function PunctuationTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !(item.source || item.session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 

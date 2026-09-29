@@ -38,17 +38,20 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
+import { JUKTOBORNO_SOURCE_OPTIONS } from "../constants"
 
 const sampleJsonTemplate = `[
   {
     "juktoborno": "ক্ষ",
     "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
+    "source": "গাইড বুক",
     "difficulty": "EASY",
     "popularityCount": 12
   },
   {
     "juktoborno": "জ্ঞ",
     "reference": ["চট্টগ্রাম বোর্ড ২০২২"],
+    "source": "বৃত্তি সহায়িকা",
     "difficulty": "MEDIUM",
     "popularityCount": 8
   }
@@ -151,81 +154,117 @@ function EditableField({
   placeholder = "Click to edit...",
   multiline = false,
   onSave,
-  className,
-  textClassName,
+  className = "",
+  textClassName = "",
   badge,
-  isMath = false,
+  isMath = true,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const [tempValue, setTempValue] = useState(value)
+  const [editValue, setEditValue] = useState(value || "")
 
   useEffect(() => {
-    setTempValue(value)
+    setEditValue(value || "")
   }, [value])
 
   const handleBlur = () => {
     setIsEditing(false)
-    if (tempValue.trim() !== value.trim()) {
-      onSave(tempValue)
+    if (editValue.trim() !== (value || "")) {
+      onSave(editValue.trim())
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !multiline) {
+    if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) {
+      e.preventDefault()
       handleBlur()
     } else if (e.key === "Escape") {
-      setTempValue(value)
+      setEditValue(value || "")
       setIsEditing(false)
     }
   }
 
   return (
-    <div className={cn("group relative", className)}>
+    <div className={cn("group relative transition-colors", className)}>
       {label && (
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="font-label-sm text-xs font-semibold text-outline uppercase tracking-wider">
+        <div className="flex items-center justify-between mb-1">
+          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
             {label}
           </span>
           {badge}
         </div>
       )}
-
       {isEditing ? (
-        multiline ? (
-          <Textarea
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            autoFocus
-            rows={3}
-            className="w-full rounded-xl border-2 border-primary bg-white p-3 text-sm font-body-md shadow-sm outline-hidden focus:ring-0"
-          />
-        ) : (
-          <Input
-            value={tempValue}
-            onChange={(e) => setTempValue(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            autoFocus
-            className="w-full rounded-xl border-2 border-primary bg-white px-3 py-2 text-sm font-body-md shadow-sm outline-hidden focus:ring-0"
-          />
-        )
+        <div className="space-y-1.5">
+          {multiline ? (
+            <Textarea
+              autoFocus
+              rows={3}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className={cn(
+                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
+                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
+              )}
+            />
+          ) : (
+            <Input
+              autoFocus
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className={cn(
+                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
+                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
+              )}
+            />
+          )}
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
+            <span>Press Enter to save, Esc to cancel</span>
+            <button
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault()
+                handleBlur()
+              }}
+              className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+            >
+              Save
+            </button>
+          </div>
+        </div>
       ) : (
         <div
-          onClick={() => setIsEditing(true)}
-          className="group/field relative cursor-pointer rounded-xl border border-transparent p-2.5 transition-all hover:border-outline-variant hover:bg-surface-container-high/50"
+          onDoubleClick={() => setIsEditing(true)}
+          title="Double click to edit"
+          className={cn(
+            "group/edit min-h-9 cursor-pointer rounded-lg border border-transparent bg-surface-container-lowest/50 p-2.5 transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-xs",
+            !value && "italic text-outline-variant",
+            textClassName
+          )}
         >
-          <div className={cn("text-sm font-body-md text-on-surface leading-relaxed pr-6", textClassName)}>
-            {value ? (
-              isMath ? <RenderMath text={value} isMath={true} /> : value
-            ) : (
-              <span className="text-outline/60 italic">{placeholder}</span>
-            )}
+          <div className="flex items-start justify-between gap-2">
+            <span
+              className={cn(
+                "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
+                value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
+              )}
+            >
+              <RenderMath text={value || placeholder} isMath={isMath} />
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsEditing(true)
+              }}
+              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 hover:bg-primary/20 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden"
+            >
+              Edit
+            </button>
           </div>
-          <span className="material-symbols-outlined absolute right-2 top-2.5 text-base text-outline opacity-0 transition-opacity group-hover/field:opacity-100">
-            edit
-          </span>
         </div>
       )}
     </div>
@@ -235,7 +274,7 @@ function EditableField({
 interface EditableJuktobornoCardProps {
   index: number
   item: any
-  onChange: (updatedItem: any) => void
+  onChange: (updated: any) => void
   onDelete: () => void
   onDuplicate: () => void
 }
@@ -247,149 +286,149 @@ function EditableJuktobornoCard({
   onDelete,
   onDuplicate,
 }: EditableJuktobornoCardProps) {
-  const [newRefTag, setNewRefTag] = useState("")
-
-  const handleAddRefTag = () => {
-    if (!newRefTag.trim()) return
-    const refs = Array.isArray(item.reference) ? item.reference : []
+  const handleToggleDifficulty = () => {
+    const difficulties = ["EASY", "MEDIUM", "HARD"]
+    const nextIdx = (difficulties.indexOf(item.difficulty || "MEDIUM") + 1) % difficulties.length
     onChange({
       ...item,
-      reference: [...refs, newRefTag.trim()],
+      difficulty: difficulties[nextIdx],
     })
-    setNewRefTag("")
   }
 
-  const handleRemoveRefTag = (rIdx: number) => {
-    const refs = Array.isArray(item.reference) ? item.reference : []
+  const handleSaveReferences = (val: string) => {
+    const refs = val
+      .split(",")
+      .map((r) => r.trim())
+      .filter(Boolean)
     onChange({
       ...item,
-      reference: refs.filter((_: any, i: number) => i !== rIdx),
+      reference: refs,
     })
   }
+
+  const referenceString = Array.isArray(item.reference) ? item.reference.join(", ") : ""
 
   return (
-    <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group">
-      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-        <div className="flex-1 space-y-4 min-w-0 w-full">
-          {/* Top Info Bar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-              #{index + 1}
-            </span>
-
-            {/* Difficulty Selector */}
-            <Select
-              value={item.difficulty || "MEDIUM"}
-              onValueChange={(val) => onChange({ ...item, difficulty: val })}
-            >
-              <SelectTrigger className="h-7 rounded border border-outline-variant bg-white px-2 text-xs font-bold w-auto cursor-pointer">
-                <SelectValue placeholder="Difficulty" />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                <SelectItem value="EASY" className="text-neutral-900">EASY</SelectItem>
-                <SelectItem value="MEDIUM" className="text-neutral-900">MEDIUM</SelectItem>
-                <SelectItem value="HARD" className="text-neutral-900">HARD</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Popularity Count */}
-            <div className="flex items-center gap-1 bg-surface-container-low px-2 py-0.5 rounded border border-outline-variant/40">
-              <span className="text-[11px] font-medium text-outline">Views:</span>
-              <input
-                type="number"
-                value={item.popularityCount ?? 0}
-                onChange={(e) => onChange({ ...item, popularityCount: parseInt(e.target.value, 10) || 0 })}
-                className="w-12 text-xs font-bold bg-transparent text-on-surface text-center focus:outline-hidden"
-              />
-            </div>
-          </div>
-
-          {/* Juktoborno Text Editor */}
-          <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
-            <EditableField
-              label="Juktoborno (যুক্তবর্ণ)"
-              value={item.juktoborno || ""}
-              placeholder="Type juktoborno..."
-              isMath={true}
-              textClassName={cn(
-                "font-bold text-xl text-primary",
-                /[\u0980-\u09FF]/.test(item.juktoborno || "") && "font-solaiman text-2xl"
-              )}
-              onSave={(val) => onChange({ ...item, juktoborno: val })}
-            />
-          </div>
-
-          {/* Reference Tags Bar */}
-          <div className="space-y-2 border-t border-outline-variant/30 pt-3">
-            <span className="font-label-sm text-xs font-semibold text-outline uppercase tracking-wider">
-              Board References
-            </span>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {Array.isArray(item.reference) && item.reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-surface-container-high text-on-surface-variant rounded-md text-xs font-medium border border-outline-variant/40"
-                >
-                  <span>🏷️ {ref}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveRefTag(rIdx)}
-                    className="hover:text-error transition-colors ml-0.5"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-
-              <div className="flex items-center gap-1">
-                <input
-                  type="text"
-                  placeholder="Add board ref..."
-                  value={newRefTag}
-                  onChange={(e) => setNewRefTag(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddRefTag())}
-                  className="h-7 px-2 text-xs rounded border border-outline-variant bg-white focus:outline-hidden w-28"
-                />
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="outline"
-                  onClick={handleAddRefTag}
-                  className="h-7 px-2 text-xs font-bold"
-                >
-                  + Add
-                </Button>
-              </div>
-            </div>
-          </div>
+    <Card className="overflow-hidden rounded-xl border border-outline-variant/60 bg-white shadow-xs transition-shadow hover:shadow-md">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-primary-container font-headline text-xs font-bold text-on-primary-container">
+            #{index + 1}
+          </span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-outline">
+            Juktoborno Entry Preview
+          </span>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onDuplicate}
-            className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center"
-            title="Duplicate Card"
-          >
-            <CopyIcon className="size-4" />
-          </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Difficulty Toggle */}
+          <button type="button" onClick={handleToggleDifficulty} className="cursor-pointer">
+            <Badge
+              variant="outline"
+              className={cn(
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
+                item.difficulty === "EASY" && "border-emerald-500 text-emerald-700 bg-emerald-50",
+                item.difficulty === "MEDIUM" && "border-amber-500 text-amber-700 bg-amber-50",
+                item.difficulty === "HARD" && "border-red-500 text-red-700 bg-red-50"
+              )}
+            >
+              {item.difficulty || "MEDIUM"}
+            </Badge>
+          </button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onDelete}
-            className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 text-center"
-            title="Delete Card"
-          >
-            <Trash2Icon className="size-4" />
-          </Button>
+          {/* Duplicate & Delete Buttons */}
+          <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              onClick={onDuplicate}
+              title="Duplicate Entry"
+              className="text-on-surface-variant hover:bg-surface-container-high cursor-pointer"
+            >
+              <CopyIcon className="size-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              onClick={onDelete}
+              title="Delete Entry from import"
+              className="text-destructive hover:bg-destructive/10 cursor-pointer"
+            >
+              <Trash2Icon className="size-4" />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div className="p-5 space-y-4">
+        {/* Juktoborno Text */}
+        <EditableField
+          label="Juktoborno (যুক্তবর্ণ)"
+          value={item.juktoborno || item.word || item.text || item.title || ""}
+          placeholder="Enter juktoborno text (e.g. ক্ষ, জ্ঞ)..."
+          isMath={true}
+          textClassName={cn(
+            "font-bold text-xl text-primary",
+            /[\u0980-\u09FF]/.test(item.juktoborno || "") && "font-solaiman text-2xl"
+          )}
+          onSave={(newVal) => onChange({ ...item, juktoborno: newVal })}
+        />
+
+        {/* References & Popularity */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
+          <EditableField
+            label="References (Comma-separated)"
+            value={referenceString}
+            placeholder="e.g. ঢাকা বোর্ড ২০২৪..."
+            onSave={handleSaveReferences}
+          />
+          <EditableField
+            label="Popularity Count"
+            value={item.popularityCount !== undefined ? String(item.popularityCount) : "0"}
+            placeholder="e.g. 0..."
+            onSave={(newVal) => onChange({ ...item, popularityCount: newVal && !isNaN(Number(newVal)) ? Number(newVal) : 0 })}
+          />
+        </div>
+
+        {/* Source & Auto-assigned Session */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3 items-center">
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || "গাইড বুক"}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {JUKTOBORNO_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{new Date().getFullYear()}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
   )
 }
 
@@ -397,23 +436,23 @@ export function ImportJuktobornoView() {
   const router = useRouter()
   const importMutation = useImportJuktoborno()
 
-  const [jsonText, setJsonText] = useState("")
+  const [jsonText, setJsonText] = useState<string>("")
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
+  const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
+  const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
-  const [errorContext, setErrorContext] = useState<any | null>(null)
-  const [showSample, setShowSample] = useState(false)
-
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState("")
-  const [selectedSubjectId, setSelectedSubjectId] = useState("")
-  const [selectedChapterId, setSelectedChapterId] = useState("")
+  const [errorContext, setErrorContext] = useState<ReturnType<typeof findJsonErrorPosition>>(null)
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedAcademicClassId ? { academicClassId: selectedAcademicClassId } : undefined
   )
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
-  )
+  const { data: chapters = [] } = useChaptersForSelection({
+    subjectId: selectedSubjectId,
+  })
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -424,47 +463,75 @@ export function ImportJuktobornoView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
       }
     }
     reader.readAsText(file)
   }
 
   const validateAndParseJson = (
-    rawText: string,
-    classId: string,
-    subId: string,
-    chapId: string
+    text: string,
+    overrideClassId: string,
+    overrideSubjectId: string,
+    overrideChapterId: string,
+    overrideSource?: string
   ) => {
-    if (!rawText.trim()) {
-      setParsedItems([])
-      setParseError(null)
-      setErrorContext(null)
-      return
+    setParseError(null)
+    setErrorContext(null)
+    setParsedItems([])
+
+    if (!text.trim()) return
+
+    let textToParse = text
+    let rawData: any = null
+
+    try {
+      rawData = JSON.parse(textToParse)
+    } catch (err: any) {
+      const repaired = repairJsonSyntax(text)
+      if (repaired && repaired !== text) {
+        try {
+          rawData = JSON.parse(repaired)
+          textToParse = repaired
+          setJsonText(repaired)
+          toast.success("Auto-repaired JSON formatting (smart quotes / trailing commas)!")
+        } catch {
+          // Both failed
+        }
+      }
+
+      if (!rawData) {
+        const errMsg = err.message || "Invalid JSON syntax"
+        setParseError(`Syntax Error: ${errMsg}`)
+        const errLoc = findJsonErrorPosition(text, errMsg)
+        setErrorContext(errLoc)
+        return
+      }
     }
 
     try {
-      const repaired = repairJsonSyntax(rawText)
-      const data = JSON.parse(repaired)
+      const itemsArray = Array.isArray(rawData) ? rawData : [rawData]
 
-      if (!Array.isArray(data)) {
-        setParseError("Root JSON structure must be an array of juktoborno objects: [ { ... }, { ... } ]")
-        setParsedItems([])
-        setErrorContext(null)
+      if (itemsArray.length === 0) {
+        setParseError("JSON array is empty.")
         return
       }
 
-      setParseError(null)
-      setErrorContext(null)
-
+      const currentDefaultSource = overrideSource || selectedSource || "গাইড বুক"
       const validated: any[] = []
       const errors: string[] = []
 
-      data.forEach((item: any, idx: number) => {
+      itemsArray.forEach((item: any, idx: number) => {
         const itemNum = idx + 1
-        const juktobornoText = item.juktoborno || item.word || item.text || item.title
+        const subjectId = item.subjectId || overrideSubjectId
+        const chapterId = item.chapterId || item.academicChapterId || overrideChapterId
+
+        const juktobornoText = item.juktoborno || item.word || item.text || item.title || ""
         if (!juktobornoText || typeof juktobornoText !== "string" || !juktobornoText.trim()) {
-          errors.push(`Item #${itemNum}: Missing required 'juktoborno' text field.`)
+          errors.push(`Item #${itemNum}: Missing or invalid 'juktoborno' text field.`)
+        }
+        if (!subjectId) {
+          errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
         }
 
         const difficulty = (item.difficulty || "MEDIUM").toString().toUpperCase()
@@ -478,11 +545,14 @@ export function ImportJuktobornoView() {
         }
 
         validated.push({
-          ...item,
-          juktoborno: juktobornoText ? juktobornoText.trim() : "",
+          subjectId,
+          chapterId: chapterId || null,
+          academicChapterId: chapterId || null,
+          juktoborno: String(juktobornoText).trim(),
           difficulty: validDiff,
-          popularityCount: Number(item.popularityCount) || 0,
+          popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: refArr,
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
         })
       })
 
@@ -492,10 +562,7 @@ export function ImportJuktobornoView() {
 
       setParsedItems(validated)
     } catch (err: any) {
-      const diag = findJsonErrorPosition(rawText, err.message || "")
-      setErrorContext(diag)
-      setParseError(`JSON Syntax Error: ${err.message || "Could not parse JSON payload."}`)
-      setParsedItems([])
+      setParseError(`Validation Error: ${err.message || "Could not validate Juktoborno items."}`)
     }
   }
 
@@ -503,7 +570,7 @@ export function ImportJuktobornoView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -516,7 +583,7 @@ export function ImportJuktobornoView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -525,7 +592,7 @@ export function ImportJuktobornoView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource)
     }
   }
 
@@ -534,7 +601,7 @@ export function ImportJuktobornoView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
     }
   }
 
@@ -542,7 +609,18 @@ export function ImportJuktobornoView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
+    }
+  }
+
+  const handleSourceChange = (val: string) => {
+    setSelectedSource(val)
+    if (parsedItems.length > 0) {
+      const next = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || val,
+      }))
+      syncParsedItemsToText(next)
     }
   }
 
@@ -576,6 +654,7 @@ export function ImportJuktobornoView() {
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
+      source: selectedSource || "গাইড বুক",
     }
     const next = [...parsedItems, newWord]
     syncParsedItemsToText(next)
@@ -601,6 +680,7 @@ export function ImportJuktobornoView() {
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
+        source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
       }))
 
       const res = await importMutation.mutateAsync({ questions: payload as any })
@@ -678,12 +758,12 @@ export function ImportJuktobornoView() {
             Class, Subject & Chapter Hierarchy (Default Assignee)
           </CardTitle>
           <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Select Academic Class and Subject. Chapter is required. Juktoborno items will be assigned subject and chapter from the selection below.
+            Select Academic Class and Subject. Chapter is optional. Juktoborno items will be assigned subject and chapter from the selection below.
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject & Chapter dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Academic Class, Subject, Chapter & Source dropdowns */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -734,7 +814,7 @@ export function ImportJuktobornoView() {
             {/* Chapter Select */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Chapter *
+                Academic Chapter (Optional)
               </Label>
               <Select
                 value={selectedChapterId || "none"}
@@ -746,9 +826,31 @@ export function ImportJuktobornoView() {
                 </SelectTrigger>
                 <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
                   <SelectItem value="none" className="text-neutral-900">-- Select Chapter --</SelectItem>
-                  {chapters.map((ch) => (
+                  {chapters.map((ch: any) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn} ({ch.nameBn})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => handleSourceChange(val ?? "গাইড বুক")}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {JUKTOBORNO_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -881,7 +983,7 @@ export function ImportJuktobornoView() {
         <Button
           type="button"
           onClick={handleImport}
-          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId || !selectedChapterId}
+          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary/90 disabled:opacity-40 h-11 cursor-pointer"
         >
           {importMutation.isPending ? (

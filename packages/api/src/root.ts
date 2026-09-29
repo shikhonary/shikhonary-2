@@ -56,6 +56,8 @@ import { makeSentencesRouter } from "./routers/make-sentences/make-sentences.rou
 import { juktobornoRouter } from "./routers/juktoborno/juktoborno.router"
 import { oppositeWordRouter } from "./routers/opposite-word/opposite-word.router"
 import { wordMeaningRouter } from "./routers/word-meaning/word-meaning.router"
+import { ekKothayProkashRouter } from "./routers/ek-kothay-prokash/ek-kothay-prokash.router"
+import { makeQuestionRouter } from "./routers/make-question/make-question.router"
 import { podNirnoyRouter } from "./routers/pod-nirnoy/pod-nirnoy.router"
 import { verbTenseRouter } from "./routers/verb-tense/verb-tense.router"
 import { sadhuToCholitoRouter } from "./routers/sadhu-to-cholito/sadhu-to-cholito.router"
@@ -94,6 +96,9 @@ export const appRouter = createTRPCRouter({
   juktoborno: juktobornoRouter,
   oppositeWord: oppositeWordRouter,
   wordMeaning: wordMeaningRouter,
+  ekKothayProkash: ekKothayProkashRouter,
+  makeQuestion: makeQuestionRouter,
+  questionMaking: makeQuestionRouter,
   podNirnoy: podNirnoyRouter,
   verbTense: verbTenseRouter,
   sadhuToCholito: sadhuToCholitoRouter,

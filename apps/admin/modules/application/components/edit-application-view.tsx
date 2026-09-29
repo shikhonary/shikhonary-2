@@ -22,11 +22,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { APPLICATION_SOURCE_OPTIONS } from "../constants"
 
 const editApplicationFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   title: z.string().min(1, "Application topic/title is required"),
+  source: z.string().optional(),
+  session: z.string().optional(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
@@ -61,6 +64,8 @@ export function EditApplicationView() {
       classId: "",
       subjectId: "",
       title: "",
+      source: "",
+      session: "",
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",
@@ -74,6 +79,8 @@ export function EditApplicationView() {
         classId: (applicationData as any).subject?.classSubjects?.[0]?.classId || "",
         subjectId: applicationData.subjectId,
         title: applicationData.title,
+        source: (applicationData as any).source || "",
+        session: (applicationData as any).session || "",
         referenceText: applicationData.reference?.join(", ") || "",
         difficulty: applicationData.difficulty as any,
         popularityCount: String(applicationData.popularityCount),
@@ -103,6 +110,8 @@ export function EditApplicationView() {
         id: applicationId,
         subjectId: data.subjectId,
         title: data.title.trim(),
+        source: data.source || null,
+        session: data.session || null,
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
@@ -280,6 +289,47 @@ export function EditApplicationView() {
               <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
                 Metadata & Classification
               </h3>
+
+              {/* Source & Session Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Source Select */}
+                <div className="space-y-2">
+                  <Label htmlFor="source" className="text-sm font-bold text-on-surface">
+                    Source / উৎস
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value || ""} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন (যেমন: গাইড বুক)" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-60">
+                          {APPLICATION_SOURCE_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+
+                {/* Session Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="session" className="text-sm font-bold text-on-surface">
+                    Session / বছর
+                  </Label>
+                  <Input
+                    id="session"
+                    placeholder="e.g. 2024-2025 or 2024"
+                    {...register("session")}
+                    className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
+                  />
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Reference Citations */}

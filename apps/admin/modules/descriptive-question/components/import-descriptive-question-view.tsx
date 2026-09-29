@@ -967,7 +967,7 @@ export function ImportDescriptiveQuestionView() {
             <Button
               type="button"
               onClick={handleImport}
-              disabled={importMutation.isPending || !selectedSubjectId || !selectedChapterId}
+              disabled={importMutation.isPending || !selectedSubjectId}
               className="bg-primary hover:bg-primary/90 text-white px-8 font-bold cursor-pointer"
             >
               {importMutation.isPending

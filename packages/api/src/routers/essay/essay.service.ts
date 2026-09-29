@@ -156,6 +156,8 @@ export async function createEssay(db: PrismaClient, input: CreateEssayInput) {
     data: {
       title: input.title,
       reference: input.reference,
+      source: input.source,
+      session: input.session,
       difficulty: input.difficulty,
       popularityCount: input.popularityCount,
       subjectId: input.subjectId,
@@ -176,6 +178,8 @@ export async function updateEssay(db: PrismaClient, input: UpdateEssayInput) {
     data: {
       ...(data.title !== undefined && { title: data.title }),
       ...(data.reference !== undefined && { reference: data.reference }),
+      ...(data.source !== undefined && { source: data.source }),
+      ...(data.session !== undefined && { session: data.session }),
       ...(data.difficulty !== undefined && { difficulty: data.difficulty }),
       ...(data.popularityCount !== undefined && { popularityCount: data.popularityCount }),
       ...(data.subjectId !== undefined && { subjectId: data.subjectId }),
@@ -206,23 +210,31 @@ export async function bulkDeleteEssays(db: PrismaClient, input: BulkDeleteEssays
 export async function importEssays(db: PrismaClient, input: ImportEssaysInput) {
   const questionTypeId = await resolveEssayQuestionTypeId(db)
 
-  return db.$transaction(async (tx) => {
-    let count = 0
-    for (const t of input.essays) {
-      await tx.essay.create({
-        data: {
-          title: t.title,
-          reference: t.reference,
-          difficulty: t.difficulty,
-          popularityCount: t.popularityCount,
-          subjectId: t.subjectId,
-          questionTypeId,
-        },
-      })
-      count++
+  return db.$transaction(
+    async (tx) => {
+      let count = 0
+      for (const t of input.essays) {
+        await tx.essay.create({
+          data: {
+            title: t.title,
+            reference: t.reference,
+            source: t.source,
+            session: t.session,
+            difficulty: t.difficulty,
+            popularityCount: t.popularityCount,
+            subjectId: t.subjectId,
+            questionTypeId,
+          },
+        })
+        count++
+      }
+      return { importedCount: count }
+    },
+    {
+      maxWait: 10000,
+      timeout: 60000,
     }
-    return { importedCount: count }
-  })
+  )
 }
 
 export async function getEssayStats(db: PrismaClient, input: EssayStatsInput) {

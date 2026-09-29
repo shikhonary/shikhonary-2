@@ -1,10 +1,10 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../../generated/tenant"
+  provider = "prisma-client"
+  output   = "../../generated/tenant"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -13,61 +13,61 @@ datasource db {
 
 // ── Root entity: one row per question paper ────────────────────
 model QuestionPaper {
-    id          String  @id @default(cuid())
-    title       String
-    examName    String
-    description String?
+  id          String  @id @default(cuid())
+  title       String
+  examName    String
+  description String?
 
-    // Logical reference to main.AcademicClass (no @relation — cross-DB)
-    classId   String
-    className String
+  // Logical reference to main.AcademicClass (no @relation — cross-DB)
+  classId   String
+  className String
 
-    // Full paper-level settings JSON (layout, typography, header toggles, etc.)
-    settings Json @default("{}")
+  // Full paper-level settings JSON (layout, typography, header toggles, etc.)
+  settings Json @default("{}")
 
-    // Structured exam instructions shown on the paper
-    // e.g. [{ "text": "Read carefully", "position": "top" }, ...]
-    instructions Json @default("[]")
+  // Structured exam instructions shown on the paper
+  // e.g. [{ "text": "Read carefully", "position": "top" }, ...]
+  instructions Json @default("[]")
 
-    status   String  @default("Draft") // "Draft" | "Published"
-    isActive Boolean @default(true)
+  status   String  @default("Draft") // "Draft" | "Published"
+  isActive Boolean @default(true)
 
-    // ── Template support ────────────────────────────────────────
-    //    When true, this paper acts as a reusable template.
-    //    Duplicate it to create a real paper from the template.
-    isTemplate Boolean @default(false)
+  // ── Template support ────────────────────────────────────────
+  //    When true, this paper acts as a reusable template.
+  //    Duplicate it to create a real paper from the template.
+  isTemplate Boolean @default(false)
 
-    // ── Aggregate totals (denormalised for fast reads) ──────────
-    //    Recomputed whenever subjects / distributions change.
-    total         Float @default(0)
-    timeInMinutes Int   @default(0)
+  // ── Aggregate totals (denormalised for fast reads) ──────────
+  //    Recomputed whenever subjects / distributions change.
+  total         Float @default(0)
+  timeInMinutes Int   @default(0)
 
-    // ── Audit & Versioning ──────────────────────────────────────
-    version     Int       @default(1)
-    createdBy   String?
-    updatedBy   String?
-    publishedAt DateTime?
-    publishedBy String?
-    deletedBy   String?
+  // ── Audit & Versioning ──────────────────────────────────────
+  version     Int       @default(1)
+  createdBy   String?
+  updatedBy   String?
+  publishedAt DateTime?
+  publishedBy String?
+  deletedBy   String?
 
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-    // ── Relations (within tenant schema) ────────────────────────
-    questions QuestionPaperQuestion[]
-    subjects  QuestionPaperSubject[]
-    sections  QuestionPaperSection[]
-    history   QuestionPaperHistory[]
+  // ── Relations (within tenant schema) ────────────────────────
+  questions QuestionPaperQuestion[]
+  subjects  QuestionPaperSubject[]
+  sections  QuestionPaperSection[]
+  history   QuestionPaperHistory[]
 
-    @@index([status])
-    @@index([isActive])
-    @@index([isTemplate])
-    @@index([createdAt])
-    @@index([classId])
-    @@index([deletedAt])
-    @@index([deletedAt, isTemplate, createdAt])
-    @@map("question_paper")
+  @@index([status])
+  @@index([isActive])
+  @@index([isTemplate])
+  @@index([createdAt])
+  @@index([classId])
+  @@index([deletedAt])
+  @@index([deletedAt, isTemplate, createdAt])
+  @@map("question_paper")
 }
 
 // ── Presentation sections ("Section A", "বিভাগ ক") ────────────
@@ -78,79 +78,79 @@ model QuestionPaper {
 //    optionally a section (presentation/layout).
 //
 model QuestionPaperSection {
-    id              String        @id @default(cuid())
-    questionPaperId String
-    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+  id              String        @id @default(cuid())
+  questionPaperId String
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
-    title        String // "Section A", "বিভাগ ক"
-    titleBn      String? // Bengali title (optional)
-    instructions String? // Per-section instructions, e.g. "Answer any 5"
+  title        String // "Section A", "বিভাগ ক"
+  titleBn      String? // Bengali title (optional)
+  instructions String? // Per-section instructions, e.g. "Answer any 5"
 
-    questionsToAttempt Int? // Required question attempt limit for this section
+  questionsToAttempt Int? // Required question attempt limit for this section
 
-    orderIndex Int @default(0)
+  orderIndex Int @default(0)
 
-    questions     QuestionPaperQuestion[]
-    subSections   QuestionPaperSubSection[]
-    distributions QuestionPaperSubjectMarkDistribution[]
+  questions     QuestionPaperQuestion[]
+  subSections   QuestionPaperSubSection[]
+  distributions QuestionPaperSubjectMarkDistribution[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([questionPaperId])
-    @@index([questionPaperId, orderIndex])
-    @@map("question_paper_section")
+  @@index([questionPaperId])
+  @@index([questionPaperId, orderIndex])
+  @@map("question_paper_section")
 }
 
 model QuestionPaperSubSection {
-    id        String               @id @default(cuid())
-    sectionId String
-    section   QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id        String               @id @default(cuid())
+  sectionId String
+  section   QuestionPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
-    title   String // "Arithmetic", "পাটিগণিত"
-    titleBn String? // Bengali title (optional)
+  title   String // "Arithmetic", "পাটিগণিত"
+  titleBn String? // Bengali title (optional)
 
-    instructions String? // Per-sub-section instructions, e.g. "Answer any 3"
+  instructions String? // Per-sub-section instructions, e.g. "Answer any 3"
 
-    questionsToAttempt Int? // Required question attempt limit for this sub-section
+  questionsToAttempt Int? // Required question attempt limit for this sub-section
 
-    orderIndex Int @default(0)
+  orderIndex Int @default(0)
 
-    questions     QuestionPaperQuestion[]
-    distributions QuestionPaperSubSectionDistribution[]
+  questions     QuestionPaperQuestion[]
+  distributions QuestionPaperSubSectionDistribution[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([sectionId])
-    @@map("question_paper_sub_section")
+  @@index([sectionId])
+  @@map("question_paper_sub_section")
 }
 
 // ── One row per (paper × subject) ──────────────────────────────
 model QuestionPaperSubject {
-    id              String @id @default(cuid())
-    questionPaperId String
+  id              String @id @default(cuid())
+  questionPaperId String
 
-    // Logical reference to main.AcademicSubject (no @relation — cross-DB)
-    subjectId   String
-    subjectName String
+  // Logical reference to main.AcademicSubject (no @relation — cross-DB)
+  subjectId   String
+  subjectName String
 
-    orderIndex Int @default(0)
+  orderIndex Int @default(0)
 
-    // Denormalised subject-level total (sum of all distributions below)
-    subjectTotal Float @default(0)
+  // Denormalised subject-level total (sum of all distributions below)
+  subjectTotal Float @default(0)
 
-    questionPaper QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+  questionPaper QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
-    // The per-question-type breakdown rows live here
-    distributions QuestionPaperSubjectMarkDistribution[]
+  // The per-question-type breakdown rows live here
+  distributions QuestionPaperSubjectMarkDistribution[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([questionPaperId, subjectId])
-    @@index([subjectId])
-    @@map("question_paper_subject")
+  @@unique([questionPaperId, subjectId])
+  @@index([subjectId])
+  @@map("question_paper_subject")
 }
 
 // ── One row per question-type within a subject ─────────────────
@@ -160,60 +160,60 @@ model QuestionPaperSubject {
 //    "Essay", "Fill-in-the-Blank", "True/False"
 //
 model QuestionPaperSubjectMarkDistribution {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    // Logical reference to main.QuestionType (no @relation — cross-DB)
-    questionTypeId     String
-    questionTypeName   String
-    questionTypeNameBn String?
-    questionTypeLabel  String?
+  // Logical reference to main.QuestionType (no @relation — cross-DB)
+  questionTypeId     String
+  questionTypeName   String
+  questionTypeNameBn String?
+  questionTypeLabel  String?
 
-    paperSubjectId String
-    paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
+  paperSubjectId String
+  paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
 
-    sectionId String?
-    section   QuestionPaperSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  sectionId String?
+  section   QuestionPaperSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
 
-    subSections QuestionPaperSubSectionDistribution[]
+  subSections QuestionPaperSubSectionDistribution[]
 
-    // ── Marks ───────────────────────────────────────────────────
-    marksPerQuestion Float @default(0) // marks awarded per single question
-    markDistribution Json? // Inherited from main.SubjectQuestionType.markDistribution
-    questionCount    Int   @default(0) // total questions of this type
+  // ── Marks ───────────────────────────────────────────────────
+  marksPerQuestion Float @default(0) // marks awarded per single question
+  markDistribution Json? // Inherited from main.SubjectQuestionType.markDistribution
+  questionCount    Int   @default(0) // total questions of this type
 
-    // Derived: totalMarks = marksPerQuestion × questionCount
-    // Stored for fast aggregation; kept in sync by the service layer.
-    totalMarks Float @default(0)
+  // Derived: totalMarks = marksPerQuestion × questionCount
+  // Stored for fast aggregation; kept in sync by the service layer.
+  totalMarks Float @default(0)
 
-    // ── Optional attempt rules ──────────────────────────────────
-    //    e.g. "answer 5 out of 8 questions"
-    questionsToAttempt Int? // null means all must be attempted
+  // ── Optional attempt rules ──────────────────────────────────
+  //    e.g. "answer 5 out of 8 questions"
+  questionsToAttempt Int? // null means all must be attempted
 
-    // ── Per-distribution ordering ───────────────────────────────
-    orderIndex Int                     @default(0)
-    questions  QuestionPaperQuestion[]
+  // ── Per-distribution ordering ───────────────────────────────
+  orderIndex Int                     @default(0)
+  questions  QuestionPaperQuestion[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([paperSubjectId])
-    @@index([questionTypeId])
-    @@index([sectionId])
-    @@map("question_paper_subject_mark_distribution")
+  @@index([paperSubjectId])
+  @@index([questionTypeId])
+  @@index([sectionId])
+  @@map("question_paper_subject_mark_distribution")
 }
 
 model QuestionPaperSubSectionDistribution {
-    id             String                                @id @default(cuid())
-    subSectionId   String
-    subSection     QuestionPaperSubSection               @relation(fields: [subSectionId], references: [id], onDelete: Cascade)
-    distributionId String
-    distribution   QuestionPaperSubjectMarkDistribution  @relation(fields: [distributionId], references: [id], onDelete: Cascade)
+  id             String                               @id @default(cuid())
+  subSectionId   String
+  subSection     QuestionPaperSubSection              @relation(fields: [subSectionId], references: [id], onDelete: Cascade)
+  distributionId String
+  distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 
-    @@unique([subSectionId, distributionId])
-    @@index([distributionId])
-    @@map("question_paper_sub_section_distribution")
+  @@unique([subSectionId, distributionId])
+  @@index([distributionId])
+  @@map("question_paper_sub_section_distribution")
 }
 
 // ── Junction: which questions belong to a paper, in what order ─
@@ -223,141 +223,144 @@ model QuestionPaperSubSectionDistribution {
 //    (no @relation — cross-DB). Enforced at the service layer.
 //
 model QuestionPaperQuestion {
-    id              String        @id @default(cuid())
-    questionPaperId String
-    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+  id              String        @id @default(cuid())
+  questionPaperId String
+  questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
 
-    // Logical references to main-DB question bank (no @relation — cross-DB)
-    mcqId           String?
-    cqId            String?
-    csId            String?
-    pbqId           String?
-    shortAnswerId   String?
-    paragraphId     String?
-    amplificationId String?
-    letterId        String?
-    applicationId   String?
-    summaryId       String?
-    essenceId       String?
-    poemEssenceId   String?
-    proseEssenceId  String?
-    sadhuToCholitoId String?
-    poemId          String?
-    essayId         String?
-    newsReportId    String?
-    partsOfSpeechId              String?
-    podNirnoyId                  String?
-    rightFormOfVerbId            String?
-    changingSentenceId           String?
-    fillInTheBlanksWithCluesId   String?
-    fillInTheBlanksWithoutCluesId String?
-    substitutionTableId          String?
-    punctuationId                String?
-    shortCompositionId           String?
-    descriptiveQuestionId        String?
-    shortQuestionId              String?
+  // Logical references to main-DB question bank (no @relation — cross-DB)
+  mcqId                         String?
+  cqId                          String?
+  csId                          String?
+  pbqId                         String?
+  shortAnswerId                 String?
+  paragraphId                   String?
+  amplificationId               String?
+  letterId                      String?
+  applicationId                 String?
+  summaryId                     String?
+  essenceId                     String?
+  poemEssenceId                 String?
+  proseEssenceId                String?
+  sadhuToCholitoId              String?
+  poemId                        String?
+  essayId                       String?
+  newsReportId                  String?
+  partsOfSpeechId               String?
+  podNirnoyId                   String?
+  rightFormOfVerbId             String?
+  changingSentenceId            String?
+  fillInTheBlanksWithCluesId    String?
+  fillInTheBlanksWithoutCluesId String?
+  substitutionTableId           String?
+  punctuationId                 String?
+  shortCompositionId            String?
+  descriptiveQuestionId         String?
+  shortQuestionId               String?
+  makeQuestionId                String?
 
-    // ── Alternative / OR Question Relationship ─────────────────
-    // If null, this is the primary question slot.
-    // If set, this question is an "OR" alternative to the parent question.
-    parentQuestionId String?
-    parentQuestion   QuestionPaperQuestion?  @relation("QuestionAlternatives", fields: [parentQuestionId], references: [id], onDelete: Cascade)
-    alternatives     QuestionPaperQuestion[] @relation("QuestionAlternatives")
+  // ── Alternative / OR Question Relationship ─────────────────
+  // If null, this is the primary question slot.
+  // If set, this question is an "OR" alternative to the parent question.
+  parentQuestionId String?
+  parentQuestion   QuestionPaperQuestion?  @relation("QuestionAlternatives", fields: [parentQuestionId], references: [id], onDelete: Cascade)
+  alternatives     QuestionPaperQuestion[] @relation("QuestionAlternatives")
 
-    // Display label rendered between questions: "অথবা" | "বা" | "OR"
-    orLabel          String?                 @default("অথবা")
-    // Order of alternative (0 for primary, 1 for 1st alt, 2 for 2nd alt, etc.)
-    orOrder          Int                     @default(0)
+  // Display label rendered between questions: "অথবা" | "বা" | "OR"
+  orLabel String? @default("অথবা")
+  // Order of alternative (0 for primary, 1 for 1st alt, 2 for 2nd alt, etc.)
+  orOrder Int     @default(0)
 
-    // Associate with subject and distribution breakdown
-    distributionId String
-    distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Restrict)
+  // Associate with subject and distribution breakdown
+  distributionId String
+  distribution   QuestionPaperSubjectMarkDistribution @relation(fields: [distributionId], references: [id], onDelete: Restrict)
 
-    // Optional section grouping (presentation layer)
-    sectionId    String?
-    section      QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
-    subSectionId String?
-    subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
+  // Optional section grouping (presentation layer)
+  sectionId    String?
+  section      QuestionPaperSection?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  subSectionId String?
+  subSection   QuestionPaperSubSection? @relation(fields: [subSectionId], references: [id], onDelete: SetNull)
 
-    orderIndex    Int     @default(0)
-    assignedMarks Float?  // Override mark for this specific question
-    overrides     Json    @default("{}") // per-question style overrides
-    addedBy       String?
-    updatedBy     String?
+  orderIndex    Int     @default(0)
+  assignedMarks Float? // Override mark for this specific question
+  overrides     Json    @default("{}") // per-question style overrides
+  addedBy       String?
+  updatedBy     String?
 
-    // ── Content snapshot ────────────────────────────────────────
-    //    Frozen copy of the question content at publish time.
-    //    Prevents silent changes if the source question is edited
-    //    after being added to a published paper.
-    //    e.g. { "question": "...", "options": [...], "answer": "..." }
-    contentSnapshot Json?
+  // ── Content snapshot ────────────────────────────────────────
+  //    Frozen copy of the question content at publish time.
+  //    Prevents silent changes if the source question is edited
+  //    after being added to a published paper.
+  //    e.g. { "question": "...", "options": [...], "answer": "..." }
+  contentSnapshot Json?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@unique([questionPaperId, mcqId])
-    @@unique([questionPaperId, cqId])
-    @@unique([questionPaperId, csId])
-    @@unique([questionPaperId, pbqId])
-    @@unique([questionPaperId, shortAnswerId])
-    @@unique([questionPaperId, paragraphId])
-    @@unique([questionPaperId, amplificationId])
-    @@unique([questionPaperId, letterId])
-    @@unique([questionPaperId, applicationId])
-    @@unique([questionPaperId, summaryId])
-    @@unique([questionPaperId, essenceId])
-    @@unique([questionPaperId, poemEssenceId])
-    @@unique([questionPaperId, proseEssenceId])
-    @@unique([questionPaperId, sadhuToCholitoId])
-    @@unique([questionPaperId, poemId])
-    @@unique([questionPaperId, essayId])
-    @@unique([questionPaperId, newsReportId])
-    @@unique([questionPaperId, partsOfSpeechId])
-    @@unique([questionPaperId, podNirnoyId])
-    @@unique([questionPaperId, punctuationId])
-    @@unique([questionPaperId, rightFormOfVerbId])
-    @@unique([questionPaperId, changingSentenceId])
-    @@unique([questionPaperId, fillInTheBlanksWithCluesId], map: "qpq_qp_id_fitb_with_clues_key")
-    @@unique([questionPaperId, fillInTheBlanksWithoutCluesId], map: "qpq_qp_id_fitb_without_clues_key")
-    @@unique([questionPaperId, substitutionTableId])
-    @@unique([questionPaperId, shortCompositionId])
-    @@unique([questionPaperId, descriptiveQuestionId])
-    @@unique([questionPaperId, shortQuestionId])
-    @@index([parentQuestionId])
-    @@index([questionPaperId])
-    @@index([questionPaperId, parentQuestionId, orderIndex])
-    @@index([mcqId])
-    @@index([cqId])
-    @@index([csId])
-    @@index([pbqId])
-    @@index([shortAnswerId])
-    @@index([paragraphId])
-    @@index([amplificationId])
-    @@index([letterId])
-    @@index([applicationId])
-    @@index([summaryId])
-    @@index([essenceId])
-    @@index([poemEssenceId])
-    @@index([proseEssenceId])
-    @@index([sadhuToCholitoId])
-    @@index([poemId])
-    @@index([essayId])
-    @@index([newsReportId])
-    @@index([partsOfSpeechId])
-    @@index([podNirnoyId])
-    @@index([punctuationId])
-    @@index([rightFormOfVerbId])
-    @@index([changingSentenceId])
-    @@index([fillInTheBlanksWithCluesId], map: "qpq_fitb_with_clues_idx")
-    @@index([fillInTheBlanksWithoutCluesId], map: "qpq_fitb_without_clues_idx")
-    @@index([substitutionTableId])
-    @@index([shortCompositionId])
-    @@index([descriptiveQuestionId])
-    @@index([shortQuestionId])
-    @@index([distributionId])
-    @@index([sectionId])
-    @@index([subSectionId])
-    @@map("question_paper_question")
+  @@unique([questionPaperId, mcqId])
+  @@unique([questionPaperId, cqId])
+  @@unique([questionPaperId, csId])
+  @@unique([questionPaperId, pbqId])
+  @@unique([questionPaperId, shortAnswerId])
+  @@unique([questionPaperId, paragraphId])
+  @@unique([questionPaperId, amplificationId])
+  @@unique([questionPaperId, letterId])
+  @@unique([questionPaperId, applicationId])
+  @@unique([questionPaperId, summaryId])
+  @@unique([questionPaperId, essenceId])
+  @@unique([questionPaperId, poemEssenceId])
+  @@unique([questionPaperId, proseEssenceId])
+  @@unique([questionPaperId, sadhuToCholitoId])
+  @@unique([questionPaperId, poemId])
+  @@unique([questionPaperId, essayId])
+  @@unique([questionPaperId, newsReportId])
+  @@unique([questionPaperId, partsOfSpeechId])
+  @@unique([questionPaperId, podNirnoyId])
+  @@unique([questionPaperId, punctuationId])
+  @@unique([questionPaperId, rightFormOfVerbId])
+  @@unique([questionPaperId, changingSentenceId])
+  @@unique([questionPaperId, fillInTheBlanksWithCluesId], map: "qpq_qp_id_fitb_with_clues_key")
+  @@unique([questionPaperId, fillInTheBlanksWithoutCluesId], map: "qpq_qp_id_fitb_without_clues_key")
+  @@unique([questionPaperId, substitutionTableId])
+  @@unique([questionPaperId, shortCompositionId])
+  @@unique([questionPaperId, descriptiveQuestionId])
+  @@unique([questionPaperId, shortQuestionId])
+  @@unique([questionPaperId, makeQuestionId])
+  @@index([parentQuestionId])
+  @@index([questionPaperId])
+  @@index([questionPaperId, parentQuestionId, orderIndex])
+  @@index([mcqId])
+  @@index([cqId])
+  @@index([csId])
+  @@index([pbqId])
+  @@index([shortAnswerId])
+  @@index([paragraphId])
+  @@index([amplificationId])
+  @@index([letterId])
+  @@index([applicationId])
+  @@index([summaryId])
+  @@index([essenceId])
+  @@index([poemEssenceId])
+  @@index([proseEssenceId])
+  @@index([sadhuToCholitoId])
+  @@index([poemId])
+  @@index([essayId])
+  @@index([newsReportId])
+  @@index([partsOfSpeechId])
+  @@index([podNirnoyId])
+  @@index([punctuationId])
+  @@index([rightFormOfVerbId])
+  @@index([changingSentenceId])
+  @@index([fillInTheBlanksWithCluesId], map: "qpq_fitb_with_clues_idx")
+  @@index([fillInTheBlanksWithoutCluesId], map: "qpq_fitb_without_clues_idx")
+  @@index([substitutionTableId])
+  @@index([shortCompositionId])
+  @@index([descriptiveQuestionId])
+  @@index([shortQuestionId])
+  @@index([makeQuestionId])
+  @@index([distributionId])
+  @@index([sectionId])
+  @@index([subSectionId])
+  @@map("question_paper_question")
 }
 
 // ── Audit log for AI and user edits ────────────────────────────
@@ -366,38 +369,38 @@ model QuestionPaperQuestion {
 //    Enables "undo last AI change", diff views, and accountability.
 //
 model QuestionPaperHistory {
-    id              String         @id @default(cuid())
-    questionPaperId String?
-    questionPaper   QuestionPaper? @relation(fields: [questionPaperId], references: [id], onDelete: SetNull)
+  id              String         @id @default(cuid())
+  questionPaperId String?
+  questionPaper   QuestionPaper? @relation(fields: [questionPaperId], references: [id], onDelete: SetNull)
 
-    // What happened
-    action String // "CREATED" | "SETTINGS_UPDATED" | "QUESTION_ADDED"
-    // | "QUESTION_REMOVED" | "QUESTION_REORDERED"
-    // | "DISTRIBUTION_CHANGED" | "SECTION_ADDED"
-    // | "SECTION_REMOVED" | "PUBLISHED" | "UNPUBLISHED"
-    // | "MARKS_OVERRIDDEN" | "TEMPLATE_CREATED"
+  // What happened
+  action String // "CREATED" | "SETTINGS_UPDATED" | "QUESTION_ADDED"
+  // | "QUESTION_REMOVED" | "QUESTION_REORDERED"
+  // | "DISTRIBUTION_CHANGED" | "SECTION_ADDED"
+  // | "SECTION_REMOVED" | "PUBLISHED" | "UNPUBLISHED"
+  // | "MARKS_OVERRIDDEN" | "TEMPLATE_CREATED"
 
-    // Who did it
-    actorId   String? // Logical ref to main.User (null for system actions)
-    actorType String  @default("USER") // "USER" | "AI" | "SYSTEM"
-    ipAddress String?
-    userAgent String?
+  // Who did it
+  actorId   String? // Logical ref to main.User (null for system actions)
+  actorType String  @default("USER") // "USER" | "AI" | "SYSTEM"
+  ipAddress String?
+  userAgent String?
 
-    // What changed — before/after diff
-    // e.g. { "field": "settings", "before": {...}, "after": {...} }
-    //   or { "questionId": "abc", "action": "added", "distributionId": "xyz" }
-    changes Json @default("{}")
+  // What changed — before/after diff
+  // e.g. { "field": "settings", "before": {...}, "after": {...} }
+  //   or { "questionId": "abc", "action": "added", "distributionId": "xyz" }
+  changes Json @default("{}")
 
-    // Optional full paper snapshot for major changes (publish, bulk edit)
-    // Allows complete rollback to a previous state
-    snapshot Json?
+  // Optional full paper snapshot for major changes (publish, bulk edit)
+  // Allows complete rollback to a previous state
+  snapshot Json?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 
-    @@index([questionPaperId])
-    @@index([questionPaperId, createdAt])
-    @@index([actorId])
-    @@index([actorType])
-    @@index([createdAt])
-    @@map("question_paper_history")
+  @@index([questionPaperId])
+  @@index([questionPaperId, createdAt])
+  @@index([actorId])
+  @@index([actorType])
+  @@index([createdAt])
+  @@map("question_paper_history")
 }

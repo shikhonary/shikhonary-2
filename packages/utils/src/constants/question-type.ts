@@ -37,6 +37,7 @@ export const QUESTION_TYPES = {
   SADHU_TO_CHOLITO: "Sadhu to Cholito",
   POD_NIRNOY: "Pod Nirnoy",
   VERB_TENSE: "Verb Tense",
+  MAKE_QUESTION: "Make Question",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -76,6 +77,7 @@ export const QUESTION_TYPE_CODES = {
   SADHU_TO_CHOLITO: "SADHU_TO_CHOLITO",
   POD_NIRNOY: "POD_NIRNOY",
   VERB_TENSE: "VERB_TENSE",
+  MAKE_QUESTION: "MAKE_QUESTION",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -326,6 +328,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.VERB_TENSE,
     defaultMark: 5,
     defaultPosition: 28,
+  },
+  [QUESTION_TYPES.MAKE_QUESTION]: {
+    nameEn: QUESTION_TYPES.MAKE_QUESTION,
+    nameBn: "প্রশ্ন তৈরিকরণ",
+    code: QUESTION_TYPE_CODES.MAKE_QUESTION,
+    defaultMark: 5,
+    defaultPosition: 29,
   },
 } as const
 
@@ -623,6 +632,22 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("ক্রিয়াপদের রূপ")
   ) {
     return QUESTION_TYPES.VERB_TENSE
+  }
+  if (
+    lower === "make question" ||
+    lower === "make questions" ||
+    lower === "make_question" ||
+    lower === "make_questions" ||
+    lower === "framing questions" ||
+    lower === "framing question" ||
+    lower === "question formation" ||
+    lower.includes("make question") ||
+    lower.includes("make questions") ||
+    lower.includes("framing question") ||
+    lower.includes("প্রশ্ন তৈরি") ||
+    lower.includes("প্রশ্নকরণ")
+  ) {
+    return QUESTION_TYPES.MAKE_QUESTION
   }
 
   return null

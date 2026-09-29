@@ -26,11 +26,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { PUNCTUATION_SOURCE_OPTIONS } from "../constants"
 
 const createPunctuationFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   content: z.string().min(1, "Question text/passage is required"),
+  source: z.string().optional(),
+  session: z.string().optional(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
@@ -87,7 +90,9 @@ export function CreatePunctuationView() {
 
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
-        content: data.content.trim(),
+        rawText: data.content.trim(),
+        source: data.source || null,
+        session: data.session || null,
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
@@ -293,6 +298,47 @@ export function CreatePunctuationView() {
                   placeholder="0"
                   className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
                   {...register("popularityCount")}
+                />
+              </div>
+            </div>
+
+            {/* Source & Session */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Source Select */}
+              <div className="space-y-2">
+                <Label htmlFor="source" className="font-label-lg text-sm font-bold text-on-surface">
+                  Source / উৎস
+                </Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ""} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+                        <SelectValue placeholder="উৎস নির্বাচন করুন (যেমন: গাইড বুক, বোর্ড প্রশ্ন)" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-60">
+                        {PUNCTUATION_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session Input */}
+              <div className="space-y-2">
+                <Label htmlFor="session" className="font-label-lg text-sm font-bold text-on-surface">
+                  Session / বছর
+                </Label>
+                <Input
+                  id="session"
+                  placeholder="e.g. 2024-2025 or 2024"
+                  className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
+                  {...register("session")}
                 />
               </div>
             </div>

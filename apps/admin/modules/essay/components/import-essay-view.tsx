@@ -33,19 +33,15 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
+import { ESSAY_SOURCE_OPTIONS } from "../constants"
 
 const sampleJsonTemplate = `[
   {
     "title": "দৈনন্দিন জীবনে বিজ্ঞান ও আধুনিক প্রযুক্তি—মানব সভ্যতায় বিজ্ঞানের অবদান ও ভবিষ্যৎ সম্ভাবনা বিষয়ে একটি নাতিদীর্ঘ প্রবন্ধ রচনা করো।",
+    "source": "গাইড বুক",
     "reference": ["Dhaka Board 2024", "Rajshahi Board 2023"],
     "difficulty": "MEDIUM",
     "popularityCount": 15
-  },
-  {
-    "title": "স্বদেশপ্রেম—জাতির অস্তিত্ব, ঐতিহ্য রক্ষা ও দেশ গড়ার প্রত্যয়ে দেশপ্রেমের গুরুত্ব বিশ্লেষণ করে একটি প্রবন্ধ রচনা করো।",
-    "reference": ["Chattogram Board 2024"],
-    "difficulty": "EASY",
-    "popularityCount": 20
   }
 ]`
 
@@ -64,7 +60,7 @@ export function repairJsonSyntax(raw: string): string {
   // 3. Strip single-line comments (// comment)
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
-  // 4. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 4. Remove trailing commas in objects & arrays
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
   // 5. Wrap single object in array if not already an array
@@ -95,7 +91,7 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
       if (line === undefined) continue
-      const lineLen = line.length + 1 // +1 for newline
+      const lineLen = line.length + 1
       if (count + lineLen >= charPos) {
         errorLine = i + 1
         errorCol = charPos - count + 1
@@ -238,10 +234,12 @@ function EditableField({
           )}
         >
           <div className="flex items-start justify-between gap-2">
-            <span className={cn(
-              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
-              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
-            )}>
+            <span
+              className={cn(
+                "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
+                value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
+              )}
+            >
               <RenderMath text={value || placeholder} isMath={isMath} />
             </span>
             <button
@@ -367,7 +365,7 @@ function EditableEssayCard({
           <EditableField
             label="References (Comma-separated)"
             value={referenceString}
-            placeholder="e.g. Board 2024..."
+            placeholder="e.g. Dhaka Board 2024..."
             onSave={handleSaveReferences}
           />
           <EditableField
@@ -376,6 +374,42 @@ function EditableEssayCard({
             placeholder="e.g. 0..."
             onSave={(newVal) => onChange({ ...item, popularityCount: newVal && !isNaN(Number(newVal)) ? Number(newVal) : 0 })}
           />
+        </div>
+
+        {/* Source & Auto-assigned Session */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3 items-center">
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || "গাইড বুক"}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {ESSAY_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{new Date().getFullYear()}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
@@ -389,6 +423,7 @@ export function ImportEssayView() {
   const [jsonText, setJsonText] = useState<string>("")
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -408,7 +443,7 @@ export function ImportEssayView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedSource)
       }
     }
     reader.readAsText(file)
@@ -417,7 +452,8 @@ export function ImportEssayView() {
   const validateAndParseJson = (
     text: string,
     overrideClassId: string,
-    overrideSubjectId: string
+    overrideSubjectId: string,
+    overrideSource?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -431,7 +467,6 @@ export function ImportEssayView() {
     try {
       rawData = JSON.parse(textToParse)
     } catch (err: any) {
-      // Attempt silent auto-repair for common AI paste artifacts
       const repaired = repairJsonSyntax(text)
       if (repaired && repaired !== text) {
         try {
@@ -461,6 +496,7 @@ export function ImportEssayView() {
         return
       }
 
+      const currentDefaultSource = overrideSource || selectedSource || "গাইড বুক"
       const validated: any[] = []
       const errors: string[] = []
 
@@ -479,6 +515,7 @@ export function ImportEssayView() {
         validated.push({
           subjectId,
           title: String(title || "").trim(),
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
           difficulty: item.difficulty || "MEDIUM",
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
@@ -499,7 +536,7 @@ export function ImportEssayView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedSource)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -512,7 +549,7 @@ export function ImportEssayView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -520,7 +557,7 @@ export function ImportEssayView() {
     setSelectedAcademicClassId(value)
     setSelectedSubjectId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "")
+      validateAndParseJson(jsonText, value, "", selectedSource)
     }
   }
 
@@ -528,7 +565,18 @@ export function ImportEssayView() {
     const value = val ?? ""
     setSelectedSubjectId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, selectedSource)
+    }
+  }
+
+  const handleSourceChange = (val: string) => {
+    setSelectedSource(val)
+    if (parsedItems.length > 0) {
+      const next = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || val,
+      }))
+      syncParsedItemsToText(next)
     }
   }
 
@@ -558,7 +606,8 @@ export function ImportEssayView() {
 
   const handleAddNewQuestionCard = () => {
     const newEssay = {
-      title: "নতুন প্রবন্ধের শিরোনাম বা বিষয়...",
+      title: "New Essay Prompt / Topic...",
+      source: selectedSource || "গাইড বুক",
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -582,13 +631,14 @@ export function ImportEssayView() {
       const payload = parsedItems.map((item) => ({
         subjectId: selectedSubjectId,
         title: item.title.trim(),
+        source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
       }))
 
-      const res = await importMutation.mutateAsync({ essays: payload })
-      toast.success(`Successfully imported ${res.importedCount} Essays!`)
+      const res = await importMutation.mutateAsync({ essays: payload as any })
+      toast.success(`Successfully imported ${res.importedCount ?? payload.length} Essays!`)
       setTimeout(() => {
         router.push("/essays")
       }, 1000)
@@ -616,7 +666,7 @@ export function ImportEssayView() {
             Import Essays from JSON
           </h2>
           <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Bulk upload essay and composition prompts or edit individual cards before importing into the question bank.
+            Bulk upload essay topics or edit individual cards before importing into the question bank.
           </p>
         </div>
 
@@ -666,8 +716,8 @@ export function ImportEssayView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class & Subject dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Academic Class, Subject & Source dropdowns */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -694,19 +744,43 @@ export function ImportEssayView() {
             {/* Default Subject */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+                Default Subject *
               </Label>
               <Select
-                value={selectedSubjectId}
-                onValueChange={handleSubjectChange}
+                value={selectedSubjectId || "none"}
+                onValueChange={(val) => handleSubjectChange(val === "none" ? null : val)}
+                disabled={!selectedAcademicClassId}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                  <SelectValue placeholder={!selectedAcademicClassId ? "Select Class First" : "Select Default Subject..."} />
                 </SelectTrigger>
                 <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  <SelectItem value="none" className="text-neutral-900">-- Select Subject --</SelectItem>
                   {subjects.map((sub) => (
                     <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
                       {sub.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => handleSourceChange(val ?? "গাইড বুক")}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {ESSAY_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -722,41 +796,45 @@ export function ImportEssayView() {
             </div>
           )}
 
-          {/* JSON File Uploader */}
-          <div className="border-t border-outline-variant/30 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
-              Upload JSON File
-            </Label>
-            <input
-              type="file"
-              accept=".json,application/json"
-              disabled={!selectedAcademicClassId || !selectedSubjectId}
-              onChange={handleFileUpload}
-              className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
-            />
-          </div>
-
-          {/* Or Paste JSON Textarea */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Or Paste JSON Content Below
+          {/* JSON File Uploader & Textarea */}
+          <div className="space-y-3 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <Label className="font-label-sm text-xs font-bold uppercase tracking-wider text-on-surface">
+                Paste Raw JSON Payload
               </Label>
-              {jsonText.trim() && (
+
+              <div className="flex items-center gap-3">
                 <Button
                   type="button"
                   size="xs"
-                  variant="outline"
+                  variant="ghost"
                   onClick={handleAutoFixJson}
-                  className="text-xs font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+                  disabled={!jsonText.trim()}
+                  className="font-bold text-primary hover:bg-primary/10 cursor-pointer"
                 >
                   <Wand2Icon className="size-3.5 mr-1" />
-                  ⚡ Auto-Fix & Format JSON
+                  Auto-Fix Syntax
                 </Button>
-              )}
+
+                <label className={cn(
+                  "inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline cursor-pointer",
+                  (!selectedAcademicClassId || !selectedSubjectId) && "opacity-50 cursor-not-allowed pointer-events-none"
+                )}>
+                  <UploadIcon className="size-3.5" />
+                  <span>Upload .json file</span>
+                  <input
+                    type="file"
+                    accept=".json,application/json"
+                    disabled={!selectedAcademicClassId || !selectedSubjectId}
+                    onChange={handleFileUpload}
+                    className="sr-only"
+                  />
+                </label>
+              </div>
             </div>
+
             <Textarea
-              rows={6}
+              rows={8}
               disabled={!selectedAcademicClassId || !selectedSubjectId}
               placeholder={
                 !selectedAcademicClassId || !selectedSubjectId
@@ -765,159 +843,108 @@ export function ImportEssayView() {
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-white p-3 font-mono text-xs text-on-surface focus:ring-2 focus:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-outline-variant bg-surface-container-lowest p-4 font-mono text-xs leading-relaxed text-on-surface focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
             />
           </div>
 
-          {/* Validation Status / Diagnostics */}
+          {/* Parse Error & Context Diagnostic */}
           {parseError && (
-            <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-                  <p className="font-bold text-sm">JSON Parsing Diagnostic Error</p>
-                </div>
-                <Button
-                  type="button"
-                  size="xs"
-                  onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
-                >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  Auto-Fix JSON Syntax
-                </Button>
+            <div className="rounded-xl border border-error/40 bg-error-container/20 p-4 text-error space-y-3">
+              <div className="flex items-center gap-2 font-bold text-sm">
+                <AlertTriangleIcon className="size-4 shrink-0" />
+                <span>{parseError}</span>
               </div>
 
-              <p className="font-mono text-xs leading-relaxed bg-white/80 p-2.5 rounded-lg border border-destructive/20 text-destructive">
-                {parseError}
-              </p>
-
-              {/* Code Snippet Error Pointer */}
-              {errorContext && errorContext.linesContext.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-destructive/80">
-                    Syntax Error Location (Line {errorContext.line}
-                    {errorContext.col > 0 ? `, Column ${errorContext.col}` : ""}):
-                  </p>
-                  <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 font-mono text-xs text-gray-200">
-                    {errorContext.linesContext.map((l) => (
-                      <div
-                        key={l.num}
-                        className={cn(
-                          "flex items-center gap-3 px-2 py-0.5 rounded",
-                          l.isError && "bg-red-900/80 text-white font-bold border-l-4 border-red-500"
-                        )}
-                      >
-                        <span className="w-8 shrink-0 text-right text-gray-500 select-none">
-                          {l.num}
-                        </span>
-                        <span className="whitespace-pre">{l.content}</span>
-                        {l.isError && (
-                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-red-600 text-white px-1.5 py-0.5 rounded shrink-0">
-                            Error Here
-                          </span>
-                        )}
-                      </div>
-                    ))}
+              {errorContext && (
+                <div className="overflow-x-auto rounded-lg bg-surface-container-lowest p-3 font-mono text-xs text-on-surface border border-outline-variant/60">
+                  <div className="font-bold text-error mb-1">
+                    Error near Line {errorContext.line}, Column {errorContext.col}:
                   </div>
+                  {errorContext.linesContext.map((l: any) => (
+                    <div
+                      key={l.num}
+                      className={cn(
+                        "flex items-start gap-3 px-2 py-0.5 rounded",
+                        l.isError && "bg-error/15 font-bold text-error"
+                      )}
+                    >
+                      <span className="w-8 text-right font-bold text-outline select-none shrink-0">
+                        {l.num}
+                      </span>
+                      <span className="whitespace-pre-wrap">{l.content}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {!parseError && parsedItems.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
-                <div>
-                  <p className="font-bold">JSON Parsed & Valid!</p>
-                  <p className="text-xs">
-                    {parsedItems.length} essay item(s) parsed successfully.
-                  </p>
-                </div>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
-              >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Essay Card
-              </Button>
-            </div>
-          )}
+      {/* Preview & Edit Cards Section */}
+      {parsedItems.length > 0 && !parseError && (
+        <div className="space-y-6 animate-fade-in mt-8">
+          <div className="flex items-center justify-between">
+            <h3 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
+              <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
+              Parsed Essays ({parsedItems.length} Essays ready for import)
+            </h3>
 
-          {/* Parsed Items Card-based Preview */}
-          {parsedItems.length > 0 && (
-            <div className="border-t border-outline-variant/30 pt-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                    <CodeIcon className="size-4 text-primary shrink-0" />
-                    Card Preview ({parsedItems.length} Essays)
-                  </h4>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddNewQuestionCard}
-                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center"
-                >
-                  <PlusIcon className="size-3.5 mr-1" />
-                  Add Essay
-                </Button>
-              </div>
-
-              {/* Grid of Essay Preview Cards */}
-              <div className="space-y-6">
-                {parsedItems.map((item, idx) => (
-                  <EditableEssayCard
-                    key={idx}
-                    index={idx}
-                    item={item}
-                    onChange={(updated) => handleUpdateParsedItem(idx, updated)}
-                    onDelete={() => handleDeleteParsedItem(idx)}
-                    onDuplicate={() => handleDuplicateParsedItem(idx)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Submit Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6">
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/essays")}
-              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+              size="sm"
+              onClick={handleAddNewQuestionCard}
+              className="rounded-xl border-dashed border-primary text-primary font-bold text-xs hover:bg-primary/10 cursor-pointer"
             >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
-              onClick={handleImport}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
-            >
-              {importMutation.isPending ? (
-                <Wand2Icon className="size-4 animate-spin shrink-0" />
-              ) : (
-                <UploadIcon className="size-4 shrink-0" />
-              )}
-              <span>
-                {importMutation.isPending
-                  ? "Importing..."
-                  : `Import ${parsedItems.length} Essays`}
-              </span>
+              <PlusIcon className="size-4 mr-1" />
+              Add Essay Card
             </Button>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="space-y-6">
+            {parsedItems.map((item, idx) => (
+              <EditableEssayCard
+                key={idx}
+                index={idx}
+                item={item}
+                onChange={(updated) => handleUpdateParsedItem(idx, updated)}
+                onDelete={() => handleDeleteParsedItem(idx)}
+                onDuplicate={() => handleDuplicateParsedItem(idx)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Submit Actions */}
+      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6 mt-8">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push("/essays")}
+          className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending || !selectedSubjectId}
+          onClick={handleImport}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
+        >
+          {importMutation.isPending ? (
+            <Wand2Icon className="size-4 animate-spin shrink-0" />
+          ) : (
+            <UploadIcon className="size-4 shrink-0" />
+          )}
+          <span>
+            {importMutation.isPending
+              ? "Importing..."
+              : `Import ${parsedItems.length} Essays`}
+          </span>
+        </Button>
+      </div>
     </div>
   )
 }

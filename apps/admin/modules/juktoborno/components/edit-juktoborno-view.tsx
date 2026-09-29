@@ -27,12 +27,15 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { JUKTOBORNO_SOURCE_OPTIONS } from "../constants"
 
 const editJuktobornoFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
+  chapterId: z.string().optional(),
   juktoborno: z.string().min(1, "Juktoborno text is required"),
+  source: z.string().optional(),
+  session: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
 })
@@ -64,6 +67,8 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
       subjectId: "",
       chapterId: "",
       juktoborno: "",
+      source: "",
+      session: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
     },
@@ -91,6 +96,8 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
         subjectId: item.subjectId,
         chapterId: item.academicChapterId || "",
         juktoborno: item.juktoborno,
+        source: (item as any).source || "",
+        session: (item as any).session || "",
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
       })
@@ -116,6 +123,8 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
         chapterId: data.chapterId,
         academicChapterId: data.chapterId,
         juktoborno: data.juktoborno.trim(),
+        source: data.source || null,
+        session: data.session || null,
         difficulty: data.difficulty,
         reference: referenceArray,
       })
@@ -266,7 +275,7 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
               {/* Chapter Selection */}
               <div className="space-y-2">
                 <Label htmlFor="chapterId" className="font-semibold">
-                  Chapter <span className="text-error">*</span>
+                  Chapter (Optional)
                 </Label>
                 <Controller
                   name="chapterId"
@@ -341,8 +350,49 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
                 />
               </div>
 
-              {/* Board References */}
+            {/* Source & Session Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Source Select */}
               <div className="space-y-2">
+                <Label htmlFor="source" className="font-semibold">
+                  Source / উৎস
+                </Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || ""} onValueChange={field.onChange}>
+                      <SelectTrigger id="source" className="w-full">
+                        <SelectValue placeholder="উৎস নির্বাচন করুন (যেমন: গাইড বুক)" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant max-h-60">
+                        {JUKTOBORNO_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session Input */}
+              <div className="space-y-2">
+                <Label htmlFor="session" className="font-semibold">
+                  Session / বছর
+                </Label>
+                <Input
+                  id="session"
+                  placeholder="e.g. 2024-2025 or 2024"
+                  {...register("session")}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Board References */}
+            <div className="space-y-2">
                 <Label htmlFor="referenceText" className="font-semibold">
                   Board References (Comma separated)
                 </Label>

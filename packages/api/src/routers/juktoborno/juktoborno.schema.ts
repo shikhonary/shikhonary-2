@@ -28,6 +28,8 @@ export type GetJuktobornoInput = z.infer<typeof getJuktobornoSchema>
 export const createJuktobornoSchema = z.object({
   juktoborno: z.string().min(1, "Juktoborno is required"),
   reference: z.array(z.string()).optional().default([]),
+  source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),

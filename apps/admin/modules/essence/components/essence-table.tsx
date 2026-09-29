@@ -6,7 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Edit3, Trash2, HelpCircle } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -251,6 +251,14 @@ export function EssenceTable({
 
                   {/* Actions Column */}
                   <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
+                    <Link
+                      href={`/make-questions?essenceId=${item.id}`}
+                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-indigo-600 transition-all cursor-pointer border border-outline-variant/40 hover:border-indigo-400/40 text-center flex-1 md:flex-initial"
+                      title="View Questions for this Essence"
+                    >
+                      <HelpCircle className="size-5 mx-auto" />
+                    </Link>
+
                     <Link
                       href={`/essences/${item.id}/edit`}
                       className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"

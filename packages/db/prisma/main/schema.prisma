@@ -26,78 +26,82 @@ model User {
   tenants             Tenant[]       @relation("TenantOwner")
 
   // ── Authoring Relations ──
-  createdMcqs                     Mcq[]                      @relation("McqCreator")
-  updatedMcqs                     Mcq[]                      @relation("McqUpdater")
-  createdCqs                      Cq[]                       @relation("CqCreator")
-  updatedCqs                      Cq[]                       @relation("CqUpdater")
-  createdPbqs                     PBQ[]                      @relation("PbqCreator")
-  updatedPbqs                     PBQ[]                      @relation("PbqUpdater")
-  createdShortAnswers             ShortAnswer[]              @relation("ShortAnswerCreator")
-  updatedShortAnswers             ShortAnswer[]              @relation("ShortAnswerUpdater")
-  createdDescriptiveQuestions     DescriptiveQuestion[]      @relation("DescriptiveQuestionCreator")
-  updatedDescriptiveQuestions     DescriptiveQuestion[]      @relation("DescriptiveQuestionUpdater")
-  createdShortQuestions           ShortQuestion[]            @relation("ShortAnswerCreator")
-  updatedShortQuestions           ShortQuestion[]            @relation("ShortAnswerUpdater")
-  createdParagraphs               Paragraph[]                @relation("ParagraphCreator")
-  updatedParagraphs               Paragraph[]                @relation("ParagraphUpdater")
-  createdAmplifications           Amplification[]            @relation("AmplificationCreator")
-  updatedAmplifications           Amplification[]            @relation("AmplificationUpdater")
-  createdCs                       CS[]                       @relation("CsCreator")
-  updatedCs                       CS[]                       @relation("CsUpdater")
-  createdLetters                  Letter[]                   @relation("LetterCreator")
-  updatedLetters                  Letter[]                   @relation("LetterUpdater")
-  createdApplications             Application[]              @relation("ApplicationCreator")
-  updatedApplications             Application[]              @relation("ApplicationUpdater")
-  createdSummaries                Summary[]                  @relation("SummaryCreator")
-  updatedSummaries                Summary[]                  @relation("SummaryUpdater")
-  createdEssences                 Essence[]                  @relation("EssenceCreator")
-  updatedEssences                 Essence[]                  @relation("EssenceUpdater")
-  createdPoemEssences             PoemEssence[]              @relation("PoemEssenceCreator")
-  updatedPoemEssences             PoemEssence[]              @relation("PoemEssenceUpdater")
-  createdProseEssences            ProseEssence[]             @relation("ProseEssenceCreator")
-  updatedProseEssences            ProseEssence[]             @relation("ProseEssenceUpdater")
-  createdSadhuToCholitos          SadhuToCholito[]           @relation("SadhuToCholitoCreator")
-  updatedSadhuToCholitos          SadhuToCholito[]           @relation("SadhuToCholitoUpdater")
-  createdThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionCreator")
-  updatedThoughtExpansions        ThoughtExpansion[]         @relation("ThoughtExpansionUpdater")
-  createdNewsReports              NewsReport[]               @relation("NewsReportCreator")
-  updatedNewsReports              NewsReport[]               @relation("NewsReportUpdater")
-  createdEssays                   Essay[]                    @relation("EssayCreator")
-  updatedEssays                   Essay[]                    @relation("EssayUpdater")
-  createdPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechCreator")
-  updatedPartsOfSpeech            PartsOfSpeech[]            @relation("PartsOfSpeechUpdater")
-  createdPodNirnoys               PodNirnoy[]                @relation("PodNirnoyCreator")
-  updatedPodNirnoys               PodNirnoy[]                @relation("PodNirnoyUpdater")
-  createdVerbTenses               VerbTense[]                @relation("VerbTenseCreator")
-  updatedVerbTenses               VerbTense[]                @relation("VerbTenseUpdater")
-  createdRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbCreator")
-  updatedRightFormOfVerbs         RightFormOfVerb[]          @relation("RightFormOfVerbUpdater")
-  createdChangingSentences        ChangingSentence[]         @relation("ChangingSentenceCreator")
-  updatedChangingSentences        ChangingSentence[]         @relation("ChangingSentenceUpdater")
-  createdFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesCreator")
-  updatedFillInTheBlanksWithClues FillInTheBlanksWithClues[] @relation("FillInTheBlanksWithCluesUpdater")
+  createdMcqs                        Mcq[]                         @relation("McqCreator")
+  updatedMcqs                        Mcq[]                         @relation("McqUpdater")
+  createdCqs                         Cq[]                          @relation("CqCreator")
+  updatedCqs                         Cq[]                          @relation("CqUpdater")
+  createdPbqs                        PBQ[]                         @relation("PbqCreator")
+  updatedPbqs                        PBQ[]                         @relation("PbqUpdater")
+  createdShortAnswers                ShortAnswer[]                 @relation("ShortAnswerCreator")
+  updatedShortAnswers                ShortAnswer[]                 @relation("ShortAnswerUpdater")
+  createdDescriptiveQuestions        DescriptiveQuestion[]         @relation("DescriptiveQuestionCreator")
+  updatedDescriptiveQuestions        DescriptiveQuestion[]         @relation("DescriptiveQuestionUpdater")
+  createdShortQuestions              ShortQuestion[]               @relation("ShortAnswerCreator")
+  updatedShortQuestions              ShortQuestion[]               @relation("ShortAnswerUpdater")
+  createdParagraphs                  Paragraph[]                   @relation("ParagraphCreator")
+  updatedParagraphs                  Paragraph[]                   @relation("ParagraphUpdater")
+  createdAmplifications              Amplification[]               @relation("AmplificationCreator")
+  updatedAmplifications              Amplification[]               @relation("AmplificationUpdater")
+  createdCs                          CS[]                          @relation("CsCreator")
+  updatedCs                          CS[]                          @relation("CsUpdater")
+  createdLetters                     Letter[]                      @relation("LetterCreator")
+  updatedLetters                     Letter[]                      @relation("LetterUpdater")
+  createdApplications                Application[]                 @relation("ApplicationCreator")
+  updatedApplications                Application[]                 @relation("ApplicationUpdater")
+  createdSummaries                   Summary[]                     @relation("SummaryCreator")
+  updatedSummaries                   Summary[]                     @relation("SummaryUpdater")
+  createdEssences                    Essence[]                     @relation("EssenceCreator")
+  updatedEssences                    Essence[]                     @relation("EssenceUpdater")
+  createdPoemEssences                PoemEssence[]                 @relation("PoemEssenceCreator")
+  updatedPoemEssences                PoemEssence[]                 @relation("PoemEssenceUpdater")
+  createdProseEssences               ProseEssence[]                @relation("ProseEssenceCreator")
+  updatedProseEssences               ProseEssence[]                @relation("ProseEssenceUpdater")
+  createdMakeQuestions               MakeQuestion[]                @relation("MakeQuestionCreator")
+  updatedMakeQuestions               MakeQuestion[]                @relation("MakeQuestionUpdater")
+  createdEkKothayProkashes           EkKothayProkash[]             @relation("EkKothayProkashCreator")
+  updatedEkKothayProkashes           EkKothayProkash[]             @relation("EkKothayProkashUpdater")
+  createdSadhuToCholitos             SadhuToCholito[]              @relation("SadhuToCholitoCreator")
+  updatedSadhuToCholitos             SadhuToCholito[]              @relation("SadhuToCholitoUpdater")
+  createdThoughtExpansions           ThoughtExpansion[]            @relation("ThoughtExpansionCreator")
+  updatedThoughtExpansions           ThoughtExpansion[]            @relation("ThoughtExpansionUpdater")
+  createdNewsReports                 NewsReport[]                  @relation("NewsReportCreator")
+  updatedNewsReports                 NewsReport[]                  @relation("NewsReportUpdater")
+  createdEssays                      Essay[]                       @relation("EssayCreator")
+  updatedEssays                      Essay[]                       @relation("EssayUpdater")
+  createdPartsOfSpeech               PartsOfSpeech[]               @relation("PartsOfSpeechCreator")
+  updatedPartsOfSpeech               PartsOfSpeech[]               @relation("PartsOfSpeechUpdater")
+  createdPodNirnoys                  PodNirnoy[]                   @relation("PodNirnoyCreator")
+  updatedPodNirnoys                  PodNirnoy[]                   @relation("PodNirnoyUpdater")
+  createdVerbTenses                  VerbTense[]                   @relation("VerbTenseCreator")
+  updatedVerbTenses                  VerbTense[]                   @relation("VerbTenseUpdater")
+  createdRightFormOfVerbs            RightFormOfVerb[]             @relation("RightFormOfVerbCreator")
+  updatedRightFormOfVerbs            RightFormOfVerb[]             @relation("RightFormOfVerbUpdater")
+  createdChangingSentences           ChangingSentence[]            @relation("ChangingSentenceCreator")
+  updatedChangingSentences           ChangingSentence[]            @relation("ChangingSentenceUpdater")
+  createdFillInTheBlanksWithClues    FillInTheBlanksWithClues[]    @relation("FillInTheBlanksWithCluesCreator")
+  updatedFillInTheBlanksWithClues    FillInTheBlanksWithClues[]    @relation("FillInTheBlanksWithCluesUpdater")
   createdFillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[] @relation("FillInTheBlanksWithoutCluesCreator")
   updatedFillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[] @relation("FillInTheBlanksWithoutCluesUpdater")
-  createdSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableCreator")
-  updatedSubstitutionTables       SubstitutionTable[]        @relation("SubstitutionTableUpdater")
-  createdPunctuations             Punctuation[]              @relation("PunctuationCreator")
-  updatedPunctuations             Punctuation[]              @relation("PunctuationUpdater")
-  createdShortCompositions        ShortComposition[]         @relation("ShortCompositionCreator")
-  updatedShortCompositions        ShortComposition[]         @relation("ShortCompositionUpdater")
-  createdPoems                    Poem[]                     @relation("PoemCreator")
-  updatedPoems                    Poem[]                     @relation("PoemUpdater")
-  createdMakeSentences            MakeSentences[]            @relation("MakeSentencesCreator")
-  updatedMakeSentences            MakeSentences[]            @relation("MakeSentencesUpdater")
-  createdJuktobornos              Juktoborno[]               @relation("JuktobornoCreator")
-  updatedJuktobornos              Juktoborno[]               @relation("JuktobornoUpdater")
-  createdOppositeWords            OppositeWord[]             @relation("OppositeWordCreator")
-  updatedOppositeWords            OppositeWord[]             @relation("OppositeWordUpdater")
-  createdWordMeanings             WordMeaning[]              @relation("WordMeaningCreator")
-  updatedWordMeanings             WordMeaning[]              @relation("WordMeaningUpdater")
-  createdGenderChanges            GenderChange[]             @relation("GenderChangeCreator")
-  updatedGenderChanges            GenderChange[]             @relation("GenderChangeUpdater")
-  createdSynonyms                 Synonym[]                  @relation("SynonymCreator")
-  updatedSynonyms                 Synonym[]                  @relation("SynonymUpdater")
+  createdSubstitutionTables          SubstitutionTable[]           @relation("SubstitutionTableCreator")
+  updatedSubstitutionTables          SubstitutionTable[]           @relation("SubstitutionTableUpdater")
+  createdPunctuations                Punctuation[]                 @relation("PunctuationCreator")
+  updatedPunctuations                Punctuation[]                 @relation("PunctuationUpdater")
+  createdShortCompositions           ShortComposition[]            @relation("ShortCompositionCreator")
+  updatedShortCompositions           ShortComposition[]            @relation("ShortCompositionUpdater")
+  createdPoems                       Poem[]                        @relation("PoemCreator")
+  updatedPoems                       Poem[]                        @relation("PoemUpdater")
+  createdMakeSentences               MakeSentences[]               @relation("MakeSentencesCreator")
+  updatedMakeSentences               MakeSentences[]               @relation("MakeSentencesUpdater")
+  createdJuktobornos                 Juktoborno[]                  @relation("JuktobornoCreator")
+  updatedJuktobornos                 Juktoborno[]                  @relation("JuktobornoUpdater")
+  createdOppositeWords               OppositeWord[]                @relation("OppositeWordCreator")
+  updatedOppositeWords               OppositeWord[]                @relation("OppositeWordUpdater")
+  createdWordMeanings                WordMeaning[]                 @relation("WordMeaningCreator")
+  updatedWordMeanings                WordMeaning[]                 @relation("WordMeaningUpdater")
+  createdGenderChanges               GenderChange[]                @relation("GenderChangeCreator")
+  updatedGenderChanges               GenderChange[]                @relation("GenderChangeUpdater")
+  createdSynonyms                    Synonym[]                     @relation("SynonymCreator")
+  updatedSynonyms                    Synonym[]                     @relation("SynonymUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -265,42 +269,44 @@ model Tenant {
   invoices           Invoice[]
 
   // ── Question Bank Resources ──────────────────────────────
-  mcqs                     Mcq[]
-  cqs                      Cq[]
-  shortAnswers             ShortAnswer[]
-  descriptiveQuestions     DescriptiveQuestion[]
-  shortQuestions           ShortQuestion[]
-  paragraphs               Paragraph[]
-  amplifications           Amplification[]
-  cs                       CS[]
-  letters                  Letter[]
-  applications             Application[]
-  summaries                Summary[]
-  essences                 Essence[]
-  poemEssences             PoemEssence[]
-  proseEssences            ProseEssence[]
-  sadhuToCholitos          SadhuToCholito[]
-  thoughtExpansions        ThoughtExpansion[]
-  newsReports              NewsReport[]
-  essays                   Essay[]
-  pbqs                     PBQ[]
-  partsOfSpeech            PartsOfSpeech[]
-  podNirnoys               PodNirnoy[]
-  verbTenses               VerbTense[]
-  rightFormOfVerbs         RightFormOfVerb[]
-  changingSentences        ChangingSentence[]
-  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  mcqs                        Mcq[]
+  cqs                         Cq[]
+  shortAnswers                ShortAnswer[]
+  descriptiveQuestions        DescriptiveQuestion[]
+  shortQuestions              ShortQuestion[]
+  paragraphs                  Paragraph[]
+  amplifications              Amplification[]
+  cs                          CS[]
+  letters                     Letter[]
+  applications                Application[]
+  summaries                   Summary[]
+  essences                    Essence[]
+  poemEssences                PoemEssence[]
+  proseEssences               ProseEssence[]
+  makeQuestions               MakeQuestion[]
+  ekKothayProkashes           EkKothayProkash[]
+  sadhuToCholitos             SadhuToCholito[]
+  thoughtExpansions           ThoughtExpansion[]
+  newsReports                 NewsReport[]
+  essays                      Essay[]
+  pbqs                        PBQ[]
+  partsOfSpeech               PartsOfSpeech[]
+  podNirnoys                  PodNirnoy[]
+  verbTenses                  VerbTense[]
+  rightFormOfVerbs            RightFormOfVerb[]
+  changingSentences           ChangingSentence[]
+  fillInTheBlanksWithClues    FillInTheBlanksWithClues[]
   fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
-  substitutionTables       SubstitutionTable[]
-  punctuations             Punctuation[]
-  shortCompositions        ShortComposition[]
-  poems                    Poem[]
-  makeSentences            MakeSentences[]
-  juktobornos              Juktoborno[]
-  oppositeWords            OppositeWord[]
-  wordMeanings             WordMeaning[]
-  genderChanges            GenderChange[]
-  synonyms                 Synonym[]
+  substitutionTables          SubstitutionTable[]
+  punctuations                Punctuation[]
+  shortCompositions           ShortComposition[]
+  poems                       Poem[]
+  makeSentences               MakeSentences[]
+  juktobornos                 Juktoborno[]
+  oppositeWords               OppositeWord[]
+  wordMeanings                WordMeaning[]
+  genderChanges               GenderChange[]
+  synonyms                    Synonym[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -650,46 +656,48 @@ model AcademicSubject {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  classSubjects            AcademicClassSubject[]
-  chapters                 AcademicChapter[]
-  subjectQuestionTypes     SubjectQuestionType[]
-  sections                 SubjectQuestionSection[]
-  mcqs                     Mcq[]
-  cqs                      Cq[]
-  shortAnswers             ShortAnswer[]
-  descriptiveQuestions     DescriptiveQuestion[]
-  shortQuestions           ShortQuestion[]
-  paragraphs               Paragraph[]
-  amplifications           Amplification[]
-  cs                       CS[]
-  letters                  Letter[]
-  applications             Application[]
-  summaries                Summary[]
-  essences                 Essence[]
-  poemEssences             PoemEssence[]
-  proseEssences            ProseEssence[]
-  sadhuToCholitos          SadhuToCholito[]
-  thoughtExpansions        ThoughtExpansion[]
-  newsReports              NewsReport[]
-  essays                   Essay[]
-  pbqs                     PBQ[]
-  partsOfSpeech            PartsOfSpeech[]
-  podNirnoys               PodNirnoy[]
-  verbTenses               VerbTense[]
-  rightFormOfVerbs         RightFormOfVerb[]
-  changingSentences        ChangingSentence[]
-  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  classSubjects               AcademicClassSubject[]
+  chapters                    AcademicChapter[]
+  subjectQuestionTypes        SubjectQuestionType[]
+  sections                    SubjectQuestionSection[]
+  mcqs                        Mcq[]
+  cqs                         Cq[]
+  shortAnswers                ShortAnswer[]
+  descriptiveQuestions        DescriptiveQuestion[]
+  shortQuestions              ShortQuestion[]
+  paragraphs                  Paragraph[]
+  amplifications              Amplification[]
+  cs                          CS[]
+  letters                     Letter[]
+  applications                Application[]
+  summaries                   Summary[]
+  essences                    Essence[]
+  poemEssences                PoemEssence[]
+  proseEssences               ProseEssence[]
+  makeQuestions               MakeQuestion[]
+  ekKothayProkashes           EkKothayProkash[]
+  sadhuToCholitos             SadhuToCholito[]
+  thoughtExpansions           ThoughtExpansion[]
+  newsReports                 NewsReport[]
+  essays                      Essay[]
+  pbqs                        PBQ[]
+  partsOfSpeech               PartsOfSpeech[]
+  podNirnoys                  PodNirnoy[]
+  verbTenses                  VerbTense[]
+  rightFormOfVerbs            RightFormOfVerb[]
+  changingSentences           ChangingSentence[]
+  fillInTheBlanksWithClues    FillInTheBlanksWithClues[]
   fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
-  substitutionTables       SubstitutionTable[]
-  punctuations             Punctuation[]
-  shortCompositions        ShortComposition[]
-  poems                    Poem[]
-  makeSentences            MakeSentences[]
-  juktobornos              Juktoborno[]
-  oppositeWords            OppositeWord[]
-  wordMeanings             WordMeaning[]
-  genderChanges            GenderChange[]
-  synonyms                 Synonym[]
+  substitutionTables          SubstitutionTable[]
+  punctuations                Punctuation[]
+  shortCompositions           ShortComposition[]
+  poems                       Poem[]
+  makeSentences               MakeSentences[]
+  juktobornos                 Juktoborno[]
+  oppositeWords               OppositeWord[]
+  wordMeanings                WordMeaning[]
+  genderChanges               GenderChange[]
+  synonyms                    Synonym[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -728,30 +736,33 @@ model AcademicChapter {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  mcqs                     Mcq[]
-  cqs                      Cq[]
-  pbqs                     PBQ[]
-  shortAnswers             ShortAnswer[]
-  descriptiveQuestions     DescriptiveQuestion[]
-  shortQuestions           ShortQuestion[]
-  paragraphs               Paragraph[]
-  amplifications           Amplification[]
-  cs                       CS[]
-  partsOfSpeech            PartsOfSpeech[]
-  podNirnoys               PodNirnoy[]
-  verbTenses               VerbTense[]
-  rightFormOfVerbs         RightFormOfVerb[]
-  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  mcqs                        Mcq[]
+  cqs                         Cq[]
+  pbqs                        PBQ[]
+  shortAnswers                ShortAnswer[]
+  descriptiveQuestions        DescriptiveQuestion[]
+  shortQuestions              ShortQuestion[]
+  paragraphs                  Paragraph[]
+  amplifications              Amplification[]
+  cs                          CS[]
+  partsOfSpeech               PartsOfSpeech[]
+  podNirnoys                  PodNirnoy[]
+  verbTenses                  VerbTense[]
+  rightFormOfVerbs            RightFormOfVerb[]
+  fillInTheBlanksWithClues    FillInTheBlanksWithClues[]
   fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
-  makeSentences            MakeSentences[]
-  juktobornos              Juktoborno[]
-  oppositeWords            OppositeWord[]
-  wordMeanings             WordMeaning[]
-  genderChanges            GenderChange[]
-  synonyms                 Synonym[]
-  poemEssences             PoemEssence[]
-  proseEssences            ProseEssence[]
-  sadhuToCholitos          SadhuToCholito[]
+  makeSentences               MakeSentences[]
+  juktobornos                 Juktoborno[]
+  oppositeWords               OppositeWord[]
+  wordMeanings                WordMeaning[]
+  genderChanges               GenderChange[]
+  synonyms                    Synonym[]
+  poemEssences                PoemEssence[]
+  proseEssences               ProseEssence[]
+  makeQuestions               MakeQuestion[]
+  ekKothayProkashes           EkKothayProkash[]
+  sadhuToCholitos             SadhuToCholito[]
+  punctuation                 Punctuation[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -784,39 +795,41 @@ model QuestionType {
   descriptiveQuestions DescriptiveQuestion[]
   shortQuestions       ShortQuestion[]
 
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  paragraphs               Paragraph[]
-  amplifications           Amplification[]
-  cs                       CS[]
-  letters                  Letter[]
-  applications             Application[]
-  summaries                Summary[]
-  essences                 Essence[]
-  poemEssences             PoemEssence[]
-  proseEssences            ProseEssence[]
-  sadhuToCholitos          SadhuToCholito[]
-  thoughtExpansions        ThoughtExpansion[]
-  newsReports              NewsReport[]
-  essays                   Essay[]
-  pbqs                     PBQ[]
-  partsOfSpeech            PartsOfSpeech[]
-  podNirnoys               PodNirnoy[]
-  verbTenses               VerbTense[]
-  rightFormOfVerbs         RightFormOfVerb[]
-  changingSentences        ChangingSentence[]
-  fillInTheBlanksWithClues FillInTheBlanksWithClues[]
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime                      @updatedAt
+  paragraphs                  Paragraph[]
+  amplifications              Amplification[]
+  cs                          CS[]
+  letters                     Letter[]
+  applications                Application[]
+  summaries                   Summary[]
+  essences                    Essence[]
+  poemEssences                PoemEssence[]
+  proseEssences               ProseEssence[]
+  makeQuestions               MakeQuestion[]
+  ekKothayProkashes           EkKothayProkash[]
+  sadhuToCholitos             SadhuToCholito[]
+  thoughtExpansions           ThoughtExpansion[]
+  newsReports                 NewsReport[]
+  essays                      Essay[]
+  pbqs                        PBQ[]
+  partsOfSpeech               PartsOfSpeech[]
+  podNirnoys                  PodNirnoy[]
+  verbTenses                  VerbTense[]
+  rightFormOfVerbs            RightFormOfVerb[]
+  changingSentences           ChangingSentence[]
+  fillInTheBlanksWithClues    FillInTheBlanksWithClues[]
   fillInTheBlanksWithoutClues FillInTheBlanksWithoutClues[]
-  substitutionTables       SubstitutionTable[]
-  punctuations             Punctuation[]
-  shortCompositions        ShortComposition[]
-  poems                    Poem[]
-  makeSentences            MakeSentences[]
-  juktobornos              Juktoborno[]
-  oppositeWords            OppositeWord[]
-  wordMeanings             WordMeaning[]
-  genderChanges            GenderChange[]
-  synonyms                 Synonym[]
+  substitutionTables          SubstitutionTable[]
+  punctuations                Punctuation[]
+  shortCompositions           ShortComposition[]
+  poems                       Poem[]
+  makeSentences               MakeSentences[]
+  juktobornos                 Juktoborno[]
+  oppositeWords               OppositeWord[]
+  wordMeanings                WordMeaning[]
+  genderChanges               GenderChange[]
+  synonyms                    Synonym[]
 
   @@index([label])
   @@index([isActive])
@@ -1598,6 +1611,9 @@ model Essence {
 
   isActive Boolean @default(true)
 
+  // ── Child Relations ──
+  makeQuestions MakeQuestion[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -2286,8 +2302,12 @@ model SubstitutionTable {
 }
 
 model Punctuation {
-  id        String   @id @default(cuid())
-  content   String
+  id         String  @id @default(cuid())
+  prompt     String?
+  rawText    String
+  answerText String?
+  totalMarks Int?    @default(5)
+
   reference String[] @default([])
   source    String?
   session   String?
@@ -2297,6 +2317,9 @@ model Punctuation {
 
   subjectId String
   subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
 
   // ── Question Type (required) ──
   questionTypeId String
@@ -2326,6 +2349,7 @@ model Punctuation {
   @@index([questionTypeId])
   @@index([deletedAt])
   @@index([subjectId])
+  @@index([academicChapterId])
   @@index([difficulty])
   @@map("punctuation")
 }
@@ -2655,6 +2679,8 @@ model WordMeaning {
 
   isActive Boolean @default(true)
 
+  ekKothayProkashes EkKothayProkash[]
+
   academicChapterId String?
   academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
 
@@ -2719,6 +2745,128 @@ model MakeSentences {
   @@index([subjectId])
   @@index([difficulty])
   @@map("make_sentences")
+}
+
+model MakeQuestion {
+  id String @id @default(cuid())
+
+  // ── Context & Content ──
+  statement String?
+  answer    String?
+  clue      String?
+  context   String?
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Relation to Parent Essence Context ──
+  essenceId String?
+  essence   Essence? @relation(fields: [essenceId], references: [id], onDelete: SetNull)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("MakeQuestionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("MakeQuestionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([essenceId])
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([subjectId])
+  @@index([academicChapterId])
+  @@index([difficulty])
+  @@map("make_question")
+}
+
+model EkKothayProkash {
+  id String @id @default(cuid())
+
+  // ── Core Content Fields ──
+  phrase  String
+  oneWord String?
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Optional Relation to WordMeaning Dictionary Item ──
+  wordMeaningId String?
+  wordMeaning   WordMeaning? @relation(fields: [wordMeaningId], references: [id], onDelete: SetNull)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("EkKothayProkashCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("EkKothayProkashUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([wordMeaningId])
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("ek_kothay_prokash")
 }
 
 model QuestionReport {

@@ -148,6 +148,8 @@ export async function createApplication(db: PrismaClient, input: CreateApplicati
     data: {
       title: data.title,
       reference: data.reference ?? [],
+      source: data.source,
+      session: data.session,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -172,6 +174,8 @@ export async function updateApplication(db: PrismaClient, input: UpdateApplicati
     data: {
       title: data.title,
       reference: data.reference,
+      source: data.source,
+      session: data.session,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
@@ -214,6 +218,8 @@ export async function importApplications(db: PrismaClient, input: ImportApplicat
           data: {
             title: data.title,
             reference: data.reference || [],
+            source: data.source,
+            session: data.session,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

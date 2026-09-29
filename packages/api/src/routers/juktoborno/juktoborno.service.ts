@@ -154,6 +154,8 @@ export async function createJuktoborno(db: PrismaClient, input: CreateJuktoborno
     data: {
       juktoborno: data.juktoborno,
       reference: data.reference ?? [],
+      source: data.source,
+      session: data.session,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -178,6 +180,8 @@ export async function updateJuktoborno(db: PrismaClient, input: UpdateJuktoborno
   const updateData: any = {
     juktoborno: data.juktoborno,
     reference: data.reference,
+    source: data.source,
+    session: data.session,
     difficulty: data.difficulty,
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
@@ -230,6 +234,8 @@ export async function importJuktoborno(db: PrismaClient, input: ImportJuktoborno
           data: {
             juktoborno: data.juktoborno,
             reference: data.reference || [],
+            source: data.source,
+            session: data.session,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

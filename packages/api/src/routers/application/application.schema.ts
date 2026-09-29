@@ -24,6 +24,8 @@ export type GetApplicationInput = z.infer<typeof getApplicationSchema>
 export const createApplicationSchema = z.object({
   title: z.string().min(1, "Title is required"),
   reference: z.array(z.string()).optional().default([]),
+  source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),
