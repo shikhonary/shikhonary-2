@@ -218,6 +218,8 @@ export const addQuestionPaperQuestionSchema = z.object({
   applicationId: z.string().optional().nullable(),
   summaryId: z.string().optional().nullable(),
   essenceId: z.string().optional().nullable(),
+  poemEssenceId: z.string().optional().nullable(),
+  proseEssenceId: z.string().optional().nullable(),
   poemId: z.string().optional().nullable(),
   essayId: z.string().optional().nullable(),
   newsReportId: z.string().optional().nullable(),
@@ -231,6 +233,17 @@ export const addQuestionPaperQuestionSchema = z.object({
   shortCompositionId: z.string().optional().nullable(),
   descriptiveQuestionId: z.string().optional().nullable(),
   shortQuestionId: z.string().optional().nullable(),
+  makeQuestionId: z.string().optional().nullable(),
+  wordMeaningId: z.string().optional().nullable(),
+  juktobornoId: z.string().optional().nullable(),
+  ekKothayProkashId: z.string().optional().nullable(),
+  makeSentencesId: z.string().optional().nullable(),
+  oppositeWordId: z.string().optional().nullable(),
+  synonymId: z.string().optional().nullable(),
+  sadhuToCholitoId: z.string().optional().nullable(),
+  podNirnoyId: z.string().optional().nullable(),
+  verbTenseId: z.string().optional().nullable(),
+  formFillupId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -241,32 +254,7 @@ export const addQuestionPaperQuestionSchema = z.object({
 
 export type AddQuestionPaperQuestionInput = z.infer<typeof addQuestionPaperQuestionSchema>
 
-export const questionTypeCategorySchema = z.enum([
-  QUESTION_TYPE_CODES.MCQ,
-  QUESTION_TYPE_CODES.CQ,
-  QUESTION_TYPE_CODES.CS,
-  QUESTION_TYPE_CODES.SA,
-  QUESTION_TYPE_CODES.PBQ,
-  QUESTION_TYPE_CODES.PARAGRAPH,
-  QUESTION_TYPE_CODES.AMPLIFICATION,
-  QUESTION_TYPE_CODES.LETTER,
-  QUESTION_TYPE_CODES.APPLICATION,
-  QUESTION_TYPE_CODES.SUMMARY,
-  QUESTION_TYPE_CODES.ESSENCE,
-  QUESTION_TYPE_CODES.POEM,
-  QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION,
-  QUESTION_TYPE_CODES.SHORT_QUESTION,
-  QUESTION_TYPE_CODES.NEWS_REPORT,
-  QUESTION_TYPE_CODES.ESSAY,
-  QUESTION_TYPE_CODES.PARTS_OF_SPEECH,
-  QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS,
-  QUESTION_TYPE_CODES.CHANGING_SENTENCES,
-  QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES,
-  QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES,
-  QUESTION_TYPE_CODES.SUBSTITUTION_TABLE,
-  QUESTION_TYPE_CODES.PUNCTUATION,
-  QUESTION_TYPE_CODES.SHORT_COMPOSITION,
-])
+export const questionTypeCategorySchema = z.nativeEnum(QUESTION_TYPE_CODES)
 
 export const removeQuestionPaperQuestionSchema = z.object({
   questionPaperId: z.string().min(1),
@@ -344,13 +332,33 @@ export const getAvailableQuestionsSchema = z.object({
   difficulty: z.string().optional(),
   search: z.string().optional(),
   board: z.string().optional(),
+  source: z.string().optional(),
   year: z.number().int().optional(),
   excludePaperId: z.string().optional(),
-  limit: z.number().int().min(1).max(100).default(50),
+  page: z.number().int().min(1).default(1).optional(),
+  limit: z.number().int().min(1).max(100).default(20).optional(),
   cursor: z.string().optional(),
 })
 
 export type GetAvailableQuestionsInput = z.infer<typeof getAvailableQuestionsSchema>
+
+export const getAvailableBoardYearsSchema = z.object({
+  subjectId: z.string().min(1),
+  chapterId: z.string().optional(),
+  questionTypeId: z.string().optional(),
+  category: questionTypeCategorySchema.optional(),
+})
+
+export type GetAvailableBoardYearsInput = z.infer<typeof getAvailableBoardYearsSchema>
+
+export const getAvailableSourcesSchema = z.object({
+  subjectId: z.string().min(1),
+  chapterId: z.string().optional(),
+  questionTypeId: z.string().optional(),
+  category: questionTypeCategorySchema.optional(),
+})
+
+export type GetAvailableSourcesInput = z.infer<typeof getAvailableSourcesSchema>
 
 export const bulkAssignQuestionsSchema = z.object({
   questionPaperId: z.string().min(1),
@@ -368,6 +376,8 @@ export const bulkAssignQuestionsSchema = z.object({
   applicationIds: z.array(z.string()).optional(),
   summaryIds: z.array(z.string()).optional(),
   essenceIds: z.array(z.string()).optional(),
+  poemEssenceIds: z.array(z.string()).optional(),
+  proseEssenceIds: z.array(z.string()).optional(),
   poemIds: z.array(z.string()).optional(),
   essayIds: z.array(z.string()).optional(),
   newsReportIds: z.array(z.string()).optional(),
@@ -381,6 +391,17 @@ export const bulkAssignQuestionsSchema = z.object({
   shortCompositionIds: z.array(z.string()).optional(),
   descriptiveQuestionIds: z.array(z.string()).optional(),
   shortQuestionIds: z.array(z.string()).optional(),
+  makeQuestionIds: z.array(z.string()).optional(),
+  wordMeaningIds: z.array(z.string()).optional(),
+  juktobornoIds: z.array(z.string()).optional(),
+  ekKothayProkashIds: z.array(z.string()).optional(),
+  makeSentencesIds: z.array(z.string()).optional(),
+  oppositeWordIds: z.array(z.string()).optional(),
+  synonymIds: z.array(z.string()).optional(),
+  sadhuToCholitoIds: z.array(z.string()).optional(),
+  podNirnoyIds: z.array(z.string()).optional(),
+  verbTenseIds: z.array(z.string()).optional(),
+  formFillupIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

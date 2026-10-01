@@ -257,6 +257,14 @@ model QuestionPaperQuestion {
   descriptiveQuestionId         String?
   shortQuestionId               String?
   makeQuestionId                String?
+  wordMeaningId                 String?
+  juktobornoId                  String?
+  ekKothayProkashId             String?
+  makeSentencesId               String?
+  oppositeWordId                String?
+  synonymId                     String?
+  verbTenseId                   String?
+  formFillupId                  String?
 
   // ── Alternative / OR Question Relationship ─────────────────
   // If null, this is the primary question slot.
@@ -325,6 +333,14 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, descriptiveQuestionId])
   @@unique([questionPaperId, shortQuestionId])
   @@unique([questionPaperId, makeQuestionId])
+  @@unique([questionPaperId, wordMeaningId])
+  @@unique([questionPaperId, makeSentencesId])
+  @@unique([questionPaperId, juktobornoId])
+  @@unique([questionPaperId, ekKothayProkashId])
+  @@unique([questionPaperId, oppositeWordId])
+  @@unique([questionPaperId, synonymId])
+  @@unique([questionPaperId, verbTenseId])
+  @@unique([questionPaperId, formFillupId])
   @@index([parentQuestionId])
   @@index([questionPaperId])
   @@index([questionPaperId, parentQuestionId, orderIndex])
@@ -357,6 +373,14 @@ model QuestionPaperQuestion {
   @@index([descriptiveQuestionId])
   @@index([shortQuestionId])
   @@index([makeQuestionId])
+  @@index([wordMeaningId])
+  @@index([juktobornoId])
+  @@index([ekKothayProkashId])
+  @@index([makeSentencesId])
+  @@index([oppositeWordId])
+  @@index([synonymId])
+  @@index([verbTenseId])
+  @@index([formFillupId])
   @@index([distributionId])
   @@index([sectionId])
   @@index([subSectionId])

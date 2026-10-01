@@ -228,8 +228,10 @@ export function useAvailableQuestions(
     difficulty?: string
     search?: string
     board?: string
+    source?: string
     year?: number
     excludePaperId?: string
+    page?: number
     limit?: number
     cursor?: string
   },

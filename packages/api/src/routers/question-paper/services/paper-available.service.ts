@@ -101,9 +101,25 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  POEM_ESSENCE: {
+    model: "poemEssence",
+    searchFields: ["title", "poemStanza", "mainTheme"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "poemEssenceId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  PROSE_ESSENCE: {
+    model: "proseEssence",
+    searchFields: ["title", "prosePassage", "mainTheme"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "proseEssenceId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   POEM: {
     model: "poem",
-    searchFields: ["title"],
+    searchFields: ["title", "reference"],
     includes: { questionType: true },
     excludedIdField: "poemId",
     hasIsActive: true,
@@ -122,6 +138,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["title"],
     includes: { questionType: true },
     excludedIdField: "essayId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  WORD_MEANING: {
+    model: "wordMeaning",
+    searchFields: ["word", "meaning"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "wordMeaningId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
@@ -151,7 +175,7 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
   },
   FILL_IN_THE_BLANKS_WITHOUT_CLUES: {
     model: "fillInTheBlanksWithoutClues",
-    searchFields: ["content"],
+    searchFields: ["content", "clue", "reference"],
     includes: { academicChapter: true, questionType: true },
     excludedIdField: "fillInTheBlanksWithoutCluesId",
     hasIsActive: true,
@@ -213,6 +237,86 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  MAKE_QUESTION: {
+    model: "makeQuestion",
+    searchFields: ["statement", "clue", "answer", "context", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "makeQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  OPPOSITE_WORD: {
+    model: "oppositeWord",
+    searchFields: ["word", "oppositeWord", "oppositeWords", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "oppositeWordId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  JUKTOBORNO: {
+    model: "juktoborno",
+    searchFields: ["juktoborno", "source", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "juktobornoId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  EK_KOTHAY_PROKASH: {
+    model: "ekKothayProkash",
+    searchFields: ["phrase", "oneWord", "source", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "ekKothayProkashId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  SYNONYM: {
+    model: "synonym",
+    searchFields: ["word", "synonymWord", "synonyms", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "synonymId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  SADHU_TO_CHOLITO: {
+    model: "sadhuToCholito",
+    searchFields: ["sadhuText", "cholitoText", "alternativeTexts", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "sadhuToCholitoId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  POD_NIRNOY: {
+    model: "podNirnoy",
+    searchFields: ["content", "words", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "podNirnoyId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  VERB_TENSE: {
+    model: "verbTense",
+    searchFields: ["verb", "presentForm", "pastForm", "futureForm", "content", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "verbTenseId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  FORM_FILLUP: {
+    model: "formFillup",
+    searchFields: ["scenario", "institution", "title", "description", "declaration", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "formFillupId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  FORM_FILLING: {
+    model: "formFillup",
+    searchFields: ["scenario", "institution", "title", "description", "declaration", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "formFillupId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
 }
 
 export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
@@ -227,6 +331,8 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.APPLICATION]: "APPLICATION",
   [QUESTION_TYPES.SUMMARY]: "SUMMARY",
   [QUESTION_TYPES.ESSENCE]: "ESSENCE",
+  [QUESTION_TYPES.POEM_ESSENCE]: "POEM_ESSENCE",
+  [QUESTION_TYPES.PROSE_ESSENCE]: "PROSE_ESSENCE",
   [QUESTION_TYPES.POEM]: "POEM",
   [QUESTION_TYPES.DESCRIPTIVE_QUESTION]: "DESCRIPTIVE_QUESTION",
   [QUESTION_TYPES.SHORT_QUESTION]: "SHORT_QUESTION",
@@ -236,10 +342,22 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.RIGHT_FORM_OF_VERBS]: "RIGHT_FORM_OF_VERBS",
   [QUESTION_TYPES.CHANGING_SENTENCES]: "CHANGING_SENTENCES",
   [QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES]: "FILL_IN_THE_BLANKS_WITH_CLUES",
+  [QUESTION_TYPES.FILL_IN_THE_BLANKS_WITHOUT_CLUES]: "FILL_IN_THE_BLANKS_WITHOUT_CLUES",
   [QUESTION_TYPES.SUBSTITUTION_TABLE]: "SUBSTITUTION_TABLE",
   [QUESTION_TYPES.PUNCTUATION]: "PUNCTUATION",
   [QUESTION_TYPES.SHORT_COMPOSITION]: "SHORT_COMPOSITION",
+  [QUESTION_TYPES.MAKE_QUESTION]: "MAKE_QUESTION",
   [QUESTION_TYPES.MAKE_SENTENCES]: "MAKE_SENTENCES",
+  [QUESTION_TYPES.WORD_MEANING]: "WORD_MEANING",
+  [QUESTION_TYPES.OPPOSITE_WORD]: "OPPOSITE_WORD",
+  [QUESTION_TYPES.JUKTOBORNO]: "JUKTOBORNO",
+  [QUESTION_TYPES.EK_KOTHAY_PROKASH]: "EK_KOTHAY_PROKASH",
+  [QUESTION_TYPES.SYNONYM]: "SYNONYM",
+  [QUESTION_TYPES.SADHU_TO_CHOLITO]: "SADHU_TO_CHOLITO",
+  [QUESTION_TYPES.POD_NIRNOY]: "POD_NIRNOY",
+  [QUESTION_TYPES.VERB_TENSE]: "VERB_TENSE",
+  [QUESTION_TYPES.FORM_FILLUP]: "FORM_FILLUP",
+  [QUESTION_TYPES.FORM_FILLING]: "FORM_FILLUP",
 }
 
 export async function getAvailableQuestions(
@@ -247,7 +365,7 @@ export async function getAvailableQuestions(
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
-  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, excludePaperId, limit, cursor } = input
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor } = input
 
   // 1. Build exclusion set and resolve category in parallel
   const exclusionPromise = excludePaperId
@@ -265,6 +383,8 @@ export async function getAvailableQuestions(
         applicationId: true,
         summaryId: true,
         essenceId: true,
+        poemEssenceId: true,
+        proseEssenceId: true,
         poemId: true,
         essayId: true,
         newsReportId: true,
@@ -278,6 +398,17 @@ export async function getAvailableQuestions(
         shortCompositionId: true,
         descriptiveQuestionId: true,
         shortQuestionId: true,
+        makeQuestionId: true,
+        wordMeaningId: true,
+        makeSentencesId: true,
+        oppositeWordId: true,
+        juktobornoId: true,
+        ekKothayProkashId: true,
+        synonymId: true,
+        sadhuToCholitoId: true,
+        podNirnoyId: true,
+        verbTenseId: true,
+        formFillupId: true,
       },
     })
     : Promise.resolve([])
@@ -321,14 +452,40 @@ export async function getAvailableQuestions(
   if (board && board !== "all" && board !== "All") {
     whereCommon.reference = { has: board }
   }
+  if (source && source !== "all" && source !== "All") {
+    whereCommon.source = source
+  }
 
   const where: any = { ...whereCommon }
 
-  if (["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
+  if (["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
     delete where.chapterId
   }
 
-  if (effectiveCategory === "PARAGRAPH" || effectiveCategory === "AMPLIFICATION" || effectiveCategory === "PBQ" || effectiveCategory === "PARTS_OF_SPEECH" || effectiveCategory === "FILL_IN_THE_BLANKS_WITH_CLUES") {
+  if (
+    effectiveCategory === "PARAGRAPH" ||
+    effectiveCategory === "AMPLIFICATION" ||
+    effectiveCategory === "PBQ" ||
+    effectiveCategory === "PARTS_OF_SPEECH" ||
+    effectiveCategory === "FILL_IN_THE_BLANKS_WITH_CLUES" ||
+    effectiveCategory === "FILL_IN_THE_BLANKS_WITHOUT_CLUES" ||
+    effectiveCategory === "WORD_MEANING" ||
+    effectiveCategory === "MAKE_SENTENCES" ||
+    effectiveCategory === "OPPOSITE_WORD" ||
+    effectiveCategory === "JUKTOBORNO" ||
+    effectiveCategory === "EK_KOTHAY_PROKASH" ||
+    effectiveCategory === "SYNONYM" ||
+    effectiveCategory === "SADHU_TO_CHOLITO" ||
+    effectiveCategory === "POD_NIRNOY" ||
+    effectiveCategory === "VERB_TENSE" ||
+    effectiveCategory === "FORM_FILLUP" ||
+    effectiveCategory === "FORM_FILLING" ||
+    effectiveCategory === "POEM_ESSENCE" ||
+    effectiveCategory === "PROSE_ESSENCE" ||
+    effectiveCategory === "SHORT_QUESTION" ||
+    effectiveCategory === "MAKE_QUESTION" ||
+    effectiveCategory === "DESCRIPTIVE_QUESTION"
+  ) {
     if (chapterId && chapterId !== "all" && chapterId !== "All") {
       where.academicChapterId = chapterId
     }
@@ -371,11 +528,23 @@ export async function getAvailableQuestions(
   }
 
   // 5. Execute query using the config model
+  const resolvedPage = page && page > 0 ? page : 1
+  const resolvedLimit = limit && limit > 0 ? limit : 20
+  const skip = (resolvedPage - 1) * resolvedLimit
+
   const model = (db as any)[config.model]
+
+  let totalItems = 0
+  try {
+    totalItems = await model.count({ where })
+  } catch {
+    totalItems = 0
+  }
+
   let items = await model.findMany({
     where,
-    take: limit + 1,
-    cursor: cursor ? { id: cursor } : undefined,
+    skip,
+    take: resolvedLimit,
     include: config.includes,
     orderBy: { createdAt: "desc" },
   })
@@ -383,10 +552,15 @@ export async function getAvailableQuestions(
   // Fallback 1: retry without questionTypeId filter if no results
   if (items.length === 0 && (config.fallbackWithoutTypeFilter || where.questionTypeId) && where.questionTypeId) {
     delete where.questionTypeId
+    try {
+      totalItems = await model.count({ where })
+    } catch {
+      totalItems = 0
+    }
     items = await model.findMany({
       where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
+      skip,
+      take: resolvedLimit,
       include: config.includes,
       orderBy: { createdAt: "desc" },
     })
@@ -395,29 +569,177 @@ export async function getAvailableQuestions(
   // Fallback 2: retry without isActive filter if no results
   if (items.length === 0 && where.isActive !== undefined) {
     delete where.isActive
+    try {
+      totalItems = await model.count({ where })
+    } catch {
+      totalItems = 0
+    }
     items = await model.findMany({
       where,
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
+      skip,
+      take: resolvedLimit,
       include: config.includes,
       orderBy: { createdAt: "desc" },
     })
   }
 
-  // 6. Paginate and enrich with isAssigned flag
-  const hasNext = items.length > limit
-  const paginatedItems = hasNext ? items.slice(0, limit) : items
-  const nextCursor = hasNext ? paginatedItems[paginatedItems.length - 1]?.id : undefined
+  // 6. Enrich with isAssigned flag and return pagination metadata
   const excludedSet = excludedIds.get(config.excludedIdField) || new Set()
+  const totalPages = Math.max(1, Math.ceil(totalItems / resolvedLimit))
 
   return {
     category: effectiveCategory,
-    items: paginatedItems.map((item: any) => ({
+    items: items.map((item: any) => ({
       ...item,
       chapter: item.academicChapter || item.chapter,
       chapterId: item.academicChapterId || item.chapterId,
       isAssigned: excludedSet.has(item.id),
     })),
-    nextCursor,
+    totalItems,
+    page: resolvedPage,
+    limit: resolvedLimit,
+    totalPages,
+    hasNextPage: resolvedPage < totalPages,
+    hasPrevPage: resolvedPage > 1,
+  }
+}
+
+export async function getAvailableBoardYears(
+  db: PrismaClient,
+  input: {
+    subjectId: string
+    chapterId?: string
+    questionTypeId?: string
+    category?: string
+  }
+) {
+  let effectiveCategory = input.category || "MCQ"
+  if ((!effectiveCategory || effectiveCategory === QUESTION_TYPE_CODES.MCQ) && input.questionTypeId && input.questionTypeId !== "all" && input.questionTypeId !== "All") {
+    const qt = await db.questionType.findUnique({ where: { id: input.questionTypeId }, select: { nameEn: true, nameBn: true, label: true } })
+    if (qt) {
+      const norm = normalizeQuestionTypeName(qt.nameEn) || normalizeQuestionTypeName(qt.nameBn) || normalizeQuestionTypeName(qt.label)
+      if (norm && NORMALIZED_TO_CATEGORY[norm]) {
+        effectiveCategory = NORMALIZED_TO_CATEGORY[norm] as any
+      }
+    }
+  }
+
+  const config = CATEGORY_QUERY_CONFIG[effectiveCategory] || CATEGORY_QUERY_CONFIG.MCQ!
+  const modelName = config.model
+
+  const where: any = {
+    subjectId: input.subjectId,
+    deletedAt: null,
+    isGlobal: true,
+  }
+  if (config.hasIsActive) {
+    where.isActive = true
+  }
+
+  if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+      where.academicChapterId = input.chapterId
+    } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
+      where.chapterId = input.chapterId
+    }
+  }
+
+  const modelDelegate = (db as any)[modelName]
+  if (!modelDelegate) return []
+
+  try {
+    const records = await modelDelegate.findMany({
+      where,
+      select: { reference: true },
+    })
+
+    const countMap = new Map<string, number>()
+    for (const r of records) {
+      if (Array.isArray(r.reference)) {
+        for (const ref of r.reference) {
+          if (!ref) continue
+          countMap.set(ref, (countMap.get(ref) || 0) + 1)
+        }
+      } else if (typeof r.reference === "string" && r.reference.trim()) {
+        countMap.set(r.reference, (countMap.get(r.reference) || 0) + 1)
+      }
+    }
+
+    return Array.from(countMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([rawRef, count]) => ({
+        rawRef,
+        count,
+      }))
+  } catch {
+    return []
+  }
+}
+
+export async function getAvailableSources(
+  db: PrismaClient,
+  input: {
+    subjectId: string
+    chapterId?: string
+    questionTypeId?: string
+    category?: string
+  }
+) {
+  let effectiveCategory = input.category || "MCQ"
+  if ((!effectiveCategory || effectiveCategory === QUESTION_TYPE_CODES.MCQ) && input.questionTypeId && input.questionTypeId !== "all" && input.questionTypeId !== "All") {
+    const qt = await db.questionType.findUnique({ where: { id: input.questionTypeId }, select: { nameEn: true, nameBn: true, label: true } })
+    if (qt) {
+      const norm = normalizeQuestionTypeName(qt.nameEn) || normalizeQuestionTypeName(qt.nameBn) || normalizeQuestionTypeName(qt.label)
+      if (norm && NORMALIZED_TO_CATEGORY[norm]) {
+        effectiveCategory = NORMALIZED_TO_CATEGORY[norm] as any
+      }
+    }
+  }
+
+  const config = CATEGORY_QUERY_CONFIG[effectiveCategory] || CATEGORY_QUERY_CONFIG.MCQ!
+  const modelName = config.model
+
+  const where: any = {
+    subjectId: input.subjectId,
+    deletedAt: null,
+    isGlobal: true,
+    source: { not: null },
+  }
+  if (config.hasIsActive) {
+    where.isActive = true
+  }
+
+  if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+      where.academicChapterId = input.chapterId
+    } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
+      where.chapterId = input.chapterId
+    }
+  }
+
+  const modelDelegate = (db as any)[modelName]
+  if (!modelDelegate) return []
+
+  try {
+    const records = await modelDelegate.findMany({
+      where,
+      select: { source: true },
+    })
+
+    const countMap = new Map<string, number>()
+    for (const r of records) {
+      const trimmed = r.source?.trim()
+      if (!trimmed) continue
+      countMap.set(trimmed, (countMap.get(trimmed) || 0) + 1)
+    }
+
+    return Array.from(countMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([rawSource, count]) => ({
+        rawSource,
+        count,
+      }))
+  } catch {
+    return []
   }
 }

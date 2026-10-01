@@ -1,0 +1,30 @@
+# Walkthrough - MCQ Practice Service Data Integration
+
+I have integrated real data from the database into the MCQ practice service, enabling users to select subjects, chapters, and topics with accurate question counts.
+
+## Changes Made
+
+### API Layer
+- **[exam.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/exam.ts)**:
+    - Updated `getSubjectsWithChapters` to include topics within each chapter.
+    - Added MCQ counts for each topic.
+    - Switched ordering to `position` for consistency with other services.
+
+### Frontend Layer
+- **[mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Removed `subjectsData` mock constant.
+    - Now consumes real data from `trpc.home.demoExam.getSubjectsWithChapters`.
+    - Updated selection logic (subjects, chapters, topics) to work with database-driven IDs.
+    - Enhanced hero section badges to display real counts for subjects, chapters, and total questions.
+    - Fixed TypeScript linting errors in map callbacks.
+
+## Verification Results
+
+### Dynamic Data Loading
+The component now correctly displays subjects, chapters, and topics fetched from the database.
+
+### Selection & Filtering
+Selection of subjects, chapters, and topics correctly updates the "Total Questions Available" counter and validates the "Start Practice" button based on the requested question count.
+
+### Code Quality
+TypeScript errors regarding implicit `any` types in map callbacks have been resolved by adding explicit types.

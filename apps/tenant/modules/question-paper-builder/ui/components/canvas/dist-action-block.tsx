@@ -3,7 +3,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { Button } from "@workspace/ui/components/button";
 import { useQuestionPaperById, useUpsertSubSection } from "@/modules/question-paper/services/use-question-paper";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -83,65 +83,31 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const combinedStr = `${nameEn} ${nameBn} ${label} ${code} ${subTitleStr} ${secTitleStr}`.toLowerCase();
 
+  const distCode = dist?.questionType?.code || dist?.code;
   const distTypeName = dist?.questionTypeNameBn || dist?.questionTypeName || dist?.questionType?.nameEn || dist?.questionType?.nameBn || dist?.questionTypeLabel || "";
   const normalized = normalizeQuestionTypeName(distTypeName) || normalizeQuestionTypeName(dist?.questionType?.nameEn) || normalizeQuestionTypeName(dist?.questionType?.nameBn);
 
   let resolvedCategory: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
-  if (normalized === QUESTION_TYPES.CS) {
-    resolvedCategory = QUESTION_TYPE_CODES.CS;
-  } else if (normalized === QUESTION_TYPES.CQ) {
-    resolvedCategory = QUESTION_TYPE_CODES.CQ;
-  } else if (normalized === QUESTION_TYPES.PBQ) {
-    resolvedCategory = QUESTION_TYPE_CODES.PBQ;
-  } else if (normalized === QUESTION_TYPES.SA) {
-    resolvedCategory = QUESTION_TYPE_CODES.SA;
-  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
-    resolvedCategory = QUESTION_TYPE_CODES.PARAGRAPH;
-  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
-    resolvedCategory = QUESTION_TYPE_CODES.AMPLIFICATION;
-  } else if (normalized === QUESTION_TYPES.LETTER) {
-    resolvedCategory = QUESTION_TYPE_CODES.LETTER;
-  } else if (normalized === QUESTION_TYPES.APPLICATION) {
-    resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
-  } else if (normalized === QUESTION_TYPES.SUMMARY) {
-    resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
-  } else if (normalized === QUESTION_TYPES.ESSENCE) {
-    resolvedCategory = QUESTION_TYPE_CODES.ESSENCE;
-  } else if (normalized === QUESTION_TYPES.POEM) {
-    resolvedCategory = QUESTION_TYPE_CODES.POEM;
-  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
-    resolvedCategory = QUESTION_TYPE_CODES.NEWS_REPORT;
-  } else if (normalized === QUESTION_TYPES.ESSAY) {
-    resolvedCategory = QUESTION_TYPE_CODES.ESSAY;
-  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
-    resolvedCategory = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
-  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
-    resolvedCategory = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
-  } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
-    resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
-  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
-    resolvedCategory = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
-  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
-    resolvedCategory = QUESTION_TYPE_CODES.PUNCTUATION;
-  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
-    resolvedCategory = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
-  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
-    resolvedCategory = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
-  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
-    resolvedCategory = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
-  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
-    resolvedCategory = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
-  } else if (normalized === QUESTION_TYPES.MCQ) {
-    resolvedCategory = QUESTION_TYPE_CODES.MCQ;
+  if (normalized && QUESTION_TYPE_MAP[normalized]?.code) {
+    resolvedCategory = QUESTION_TYPE_MAP[normalized].code as QuestionTypeCode;
+  } else if (distCode && Object.values(QUESTION_TYPE_CODES).includes(distCode.toUpperCase() as QuestionTypeCode)) {
+    resolvedCategory = distCode.toUpperCase() as QuestionTypeCode;
   } else {
-    // Robust fallback based on distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
+    if (lowerName.includes("form fillup") || lowerName.includes("form filling") || lowerName.includes("form fill up") || lowerName.includes("ফরম পূরণ") || lowerName.includes("ফরমপুরণ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.FORM_FILLUP;
+    } else if (lowerName.includes("poem essence") || lowerName.includes("poem_essence") || lowerName.includes("কবিতার মূলভাব")) {
+      resolvedCategory = QUESTION_TYPE_CODES.POEM_ESSENCE;
+    } else if (lowerName.includes("prose essence") || lowerName.includes("prose_essence") || lowerName.includes("গদ্য অনুচ্ছেদের মূলভাব") || lowerName.includes("গদ্যের মূলভাব")) {
+      resolvedCategory = QUESTION_TYPE_CODES.PROSE_ESSENCE;
+    } else if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
       resolvedCategory = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
     } else if (lowerName.includes("changing sentence") || lowerName.includes("transformation of sentence") || lowerName.includes("বাক্য রূপান্তর") || lowerName.includes("changing sentences")) {
       resolvedCategory = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
     } else if (lowerName.includes("right form") || lowerName.includes("verbs in brackets") || lowerName.includes("correct form of verb") || lowerName.includes("ভার্ব")) {
       resolvedCategory = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+    } else if (lowerName.includes("without clues") || lowerName.includes("without clue") || lowerName.includes("ক্লু ছাড়া") || lowerName.includes("ক্লু ছাড়া") || lowerName.includes("ক্লু ব্যতিরেকে") || lowerName.includes("cloze test without")) {
+      resolvedCategory = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES;
     } else if (lowerName.includes("fill in the blanks") || lowerName.includes("with clues") || lowerName.includes("words from the box") || lowerName.includes("from the box") || lowerName.includes("cloze test") || lowerName.includes("ক্লুসহ")) {
       resolvedCategory = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
     } else if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
@@ -156,12 +122,38 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.APPLICATION;
     } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
       resolvedCategory = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("opposite word") || lowerName.includes("opposite_word") || lowerName.includes("বিপরীত শব্দ") || lowerName.includes("বিপরীত")) {
+      resolvedCategory = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+    } else if (lowerName.includes("juktoborno") || lowerName.includes("যুক্তবর্ণ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.JUKTOBORNO;
+    } else if (lowerName.includes("ek kothay") || lowerName.includes("ek kothai") || lowerName.includes("এক কথায়") || lowerName.includes("এক কথায়")) {
+      resolvedCategory = QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH;
+    } else if (lowerName.includes("synonym") || lowerName.includes("সমার্থক শব্দ") || lowerName.includes("সমার্থক")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SYNONYM;
+    } else if (lowerName.includes("sadhu to cholito") || lowerName.includes("sadhu_to_cholito") || lowerName.includes("সাধু ও চলিত") || lowerName.includes("সাধু থেকে চলিত") || lowerName.includes("চলিত রূপ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SADHU_TO_CHOLITO;
+    } else if (lowerName.includes("pod nirnoy") || lowerName.includes("pod_nirnoy") || lowerName.includes("পদ নির্ণয়") || lowerName.includes("পদ নির্ণয়") || lowerName.includes("পদ নির্নয়")) {
+      resolvedCategory = QUESTION_TYPE_CODES.POD_NIRNOY;
+    } else if (lowerName.includes("verb tense") || lowerName.includes("verb_tense") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("কাল নির্ণয়") || lowerName.includes("কাল নির্ণয়")) {
+      resolvedCategory = QUESTION_TYPE_CODES.VERB_TENSE;
+    } else if (lowerName.includes("word meaning") || lowerName.includes("word_meaning") || lowerName.includes("শব্দার্থ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.WORD_MEANING;
+    } else if (lowerName.includes("make sentence") || lowerName.includes("make_sentence") || lowerName.includes("sentence making") || lowerName.includes("বাক্য রচনা") || lowerName.includes("বাক্য তৈরি") || lowerName.includes("বাক্য গঠন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.MAKE_SENTENCES;
+    } else if (lowerName.includes("make question") || lowerName.includes("make_question") || lowerName.includes("wh question") || lowerName.includes("wh_question") || lowerName.includes("question making") || lowerName.includes("প্রশ্ন তৈরি") || lowerName.includes("প্রশ্ন গঠন")) {
+      resolvedCategory = QUESTION_TYPE_CODES.MAKE_QUESTION;
     } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
       resolvedCategory = QUESTION_TYPE_CODES.SA;
+    } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {
+      resolvedCategory = QUESTION_TYPE_CODES.ESSENCE;
+    } else if (lowerName.includes("poem") || lowerName.includes("কবিতা")) {
+      resolvedCategory = QUESTION_TYPE_CODES.POEM;
+    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SUMMARY;
     }
   }
 

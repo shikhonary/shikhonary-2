@@ -150,6 +150,8 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const sa = alt.shortAnswer;
         const paragraph = alt.paragraph;
         const essence = alt.essence;
+        const poemEssence = alt.poemEssence;
+        const proseEssence = alt.proseEssence;
         const poem = alt.poem;
         const summary = alt.summary;
         const amplification = alt.amplification;
@@ -162,10 +164,20 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const rightFormOfVerb = alt.rightFormOfVerb;
         const changingSentence = alt.changingSentence;
         const fillInTheBlanksWithClues = alt.fillInTheBlanksWithClues;
+        const fillInTheBlanksWithoutClues = alt.fillInTheBlanksWithoutClues;
         const substitutionTable = alt.substitutionTable;
         const shortComposition = alt.shortComposition;
         const cs = alt.cs;
         const mcq = alt.mcq;
+        const descriptiveQuestion = alt.descriptiveQuestion;
+        const shortQuestion = alt.shortQuestion;
+        const wordMeaning = alt.wordMeaning;
+        const makeSentences = alt.makeSentences;
+        const oppositeWord = alt.oppositeWord;
+        const synonym = alt.synonym;
+        const sadhuToCholito = alt.sadhuToCholito;
+        const podNirnoy = alt.podNirnoy;
+        const verbTense = alt.verbTense;
 
         return (
           <div key={alt.id} className="w-full flex flex-col group/alt relative">
@@ -510,6 +522,211 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         >
                           <RenderMath text={summary.title || summary.name || ""} />
                         </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 1.3 EXACT POEM ESSENCE BLOCK REPRESENTATION */}
+              {poemEssence && (() => {
+                const poemDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === poemEssence.questionTypeId ||
+                      d.questionTypeName?.includes("কবিতা") ||
+                      d.questionTypeName?.toLowerCase().includes("poem")
+                  ) || alt.distribution;
+
+                const rawLabel = poemDist?.questionTypeLabel || poemDist?.questionTypeName || poemEssence.questionType?.label;
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : "কবিতার মূলভাব লেখো:";
+
+                const hasStanza = Boolean(poemEssence.poemStanza && poemEssence.poemStanza.trim().length > 0);
+                const pTitle = poemEssence.title || poemEssence.name || "";
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        {hasStanza ? (
+                          <div className="w-full">
+                            <span
+                              className="font-bold mb-1 block"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                              }}
+                            >
+                              {pLabel}
+                            </span>
+                            <div
+                              className="whitespace-pre-line text-foreground"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                              }}
+                            >
+                              <RenderMath text={poemEssence.poemStanza || ""} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            className="font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                            }}
+                          >
+                            <RenderMath text={pTitle || pLabel} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 1.4 EXACT PROSE ESSENCE BLOCK REPRESENTATION */}
+              {proseEssence && (() => {
+                const proseDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === proseEssence.questionTypeId ||
+                      d.questionTypeName?.includes("গদ্য") ||
+                      d.questionTypeName?.toLowerCase().includes("prose")
+                  ) || alt.distribution;
+
+                const rawLabel = proseDist?.questionTypeLabel || proseDist?.questionTypeName || proseEssence.questionType?.label;
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : "গদ্যাংশের মূলভাব লেখো:";
+
+                const hasPassage = Boolean(proseEssence.prosePassage && proseEssence.prosePassage.trim().length > 0);
+                const pTitle = proseEssence.title || proseEssence.name || "";
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        {hasPassage ? (
+                          <div className="w-full">
+                            <span
+                              className="font-bold mb-1 block"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                              }}
+                            >
+                              {pLabel}
+                            </span>
+                            <div
+                              className="whitespace-pre-line text-foreground text-justify"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                                textAlign: "justify",
+                              }}
+                            >
+                              <RenderMath text={proseEssence.prosePassage || ""} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            className="font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                            }}
+                          >
+                            <RenderMath text={pTitle || pLabel} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* EXACT POD NIRNOY BLOCK REPRESENTATION */}
+              {podNirnoy && (() => {
+                const podDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === podNirnoy.questionTypeId ||
+                      d.questionTypeName?.includes("পদ নির্ণয়") ||
+                      d.questionTypeName?.includes("পদ নির্ণয়") ||
+                      d.questionTypeName?.toLowerCase().includes("pod nirnoy") ||
+                      d.questionTypeName?.toLowerCase().includes("pod_nirnoy")
+                  ) || alt.distribution;
+
+                const rawLabel = podDist?.questionTypeLabel || podDist?.questionTypeName || podNirnoy.questionType?.label;
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : "নিচের বাক্যগুলো থেকে পদ নির্ণয় করো:";
+
+                const wordsList = Array.isArray(podNirnoy.words)
+                  ? podNirnoy.words.filter(Boolean)
+                  : typeof podNirnoy.words === "string" && podNirnoy.words.trim()
+                  ? [podNirnoy.words.trim()]
+                  : [];
+
+                const hasContent = Boolean(podNirnoy.content && podNirnoy.content.trim().length > 0);
+
+                return (
+                  <div className="flex justify-between items-start gap-2 w-full">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <div className="w-full">
+                          <span
+                            className="font-bold mb-1 block"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                            }}
+                          >
+                            {pLabel}
+                          </span>
+
+                          {hasContent && (
+                            <div
+                              className="whitespace-pre-line text-foreground text-justify mb-1"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                                textAlign: "justify",
+                              }}
+                            >
+                              <RenderMath text={podNirnoy.content || ""} />
+                            </div>
+                          )}
+
+                          {wordsList.length > 0 && (
+                            <div className="flex flex-col gap-0.5 mt-1">
+                              {wordsList.map((w: string, wIdx: number) => {
+                                const cleanW = w.trim().replace(/^-+\s*|\s*-+$/g, "").trim();
+                                return (
+                                  <div
+                                    key={wIdx}
+                                    className="font-bold text-foreground whitespace-pre-wrap"
+                                    style={{
+                                      fontSize: questionStyle.fontSize,
+                                      fontFamily: questionStyle.fontFamily,
+                                      lineHeight: questionStyle.lineHeight,
+                                    }}
+                                  >
+                                    {cleanW} -
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1096,6 +1313,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.6b EXACT FILL IN THE BLANKS WITHOUT CLUES BLOCK REPRESENTATION */}
+              {fillInTheBlanksWithoutClues && (() => {
+                const fitbDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === fillInTheBlanksWithoutClues.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("without clues") ||
+                      d.questionTypeName?.toLowerCase().includes("without clue") ||
+                      d.questionTypeName?.includes("ক্লু ছাড়া") ||
+                      d.questionTypeName?.includes("ক্লু ছাড়া")
+                  ) || alt.distribution;
+
+                const rawLabel = fitbDist?.questionTypeLabel || fillInTheBlanksWithoutClues.questionType?.label;
+                const fitbLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {fitbLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                          }}
+                        >
+                          {renderNumberSpacer()}
+                          <span>{fitbLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel("b")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderFillInTheBlanksContent text={fillInTheBlanksWithoutClues.content || ""} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 6.7 EXACT SUBSTITUTION TABLE BLOCK REPRESENTATION */}
               {substitutionTable && (() => {
                 const subTableDist =
@@ -1238,8 +1510,80 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.9 DESCRIPTIVE QUESTION BLOCK REPRESENTATION */}
+              {descriptiveQuestion && (() => {
+                const text = descriptiveQuestion.question || descriptiveQuestion.content || "";
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <div
+                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={text} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.10 SHORT QUESTION BLOCK REPRESENTATION */}
+              {shortQuestion && (() => {
+                const text = shortQuestion.question || shortQuestion.content || "";
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <div
+                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={text} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.11 SYNONYM / OPPOSITE WORD / SADHU TO CHOLITO / VERB TENSE / MAKE SENTENCE / WORD MEANING REPRESENTATION */}
+              {(synonym || oppositeWord || sadhuToCholito || verbTense || makeSentences || wordMeaning) && (() => {
+                const wordText = verbTense?.verb || sadhuToCholito?.sadhuText || sadhuToCholito?.word || synonym?.word || oppositeWord?.word || makeSentences?.word || wordMeaning?.word || "";
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <span
+                          className="font-medium text-foreground"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={wordText} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !substitutionTable && (
+              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

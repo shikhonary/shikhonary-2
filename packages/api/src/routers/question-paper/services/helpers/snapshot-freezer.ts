@@ -33,6 +33,10 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).summary.findUnique({ where: { id: pq.summaryId } })
     } else if (pq.essenceId) {
       content = await (db as any).essence.findUnique({ where: { id: pq.essenceId } })
+    } else if (pq.poemEssenceId) {
+      content = await (db as any).poemEssence.findUnique({ where: { id: pq.poemEssenceId } })
+    } else if (pq.proseEssenceId) {
+      content = await (db as any).proseEssence.findUnique({ where: { id: pq.proseEssenceId } })
     } else if (pq.poemId) {
       content = await (db as any).poem.findUnique({ where: { id: pq.poemId } })
     } else if (pq.essayId) {
@@ -57,6 +61,28 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).descriptiveQuestion.findUnique({ where: { id: pq.descriptiveQuestionId } })
     } else if (pq.shortQuestionId) {
       content = await (db as any).shortQuestion.findUnique({ where: { id: pq.shortQuestionId } })
+    } else if (pq.makeQuestionId) {
+      content = await (db as any).makeQuestion.findUnique({ where: { id: pq.makeQuestionId } })
+    } else if (pq.wordMeaningId) {
+      content = await (db as any).wordMeaning.findUnique({ where: { id: pq.wordMeaningId } })
+    } else if (pq.makeSentencesId) {
+      content = await (db as any).makeSentences.findUnique({ where: { id: pq.makeSentencesId } })
+    } else if (pq.oppositeWordId) {
+      content = await (db as any).oppositeWord.findUnique({ where: { id: pq.oppositeWordId } })
+    } else if (pq.juktobornoId) {
+      content = await (db as any).juktoborno.findUnique({ where: { id: pq.juktobornoId } })
+    } else if (pq.ekKothayProkashId) {
+      content = await (db as any).ekKothayProkash.findUnique({ where: { id: pq.ekKothayProkashId } })
+    } else if (pq.synonymId) {
+      content = await (db as any).synonym.findUnique({ where: { id: pq.synonymId } })
+    } else if (pq.sadhuToCholitoId) {
+      content = await (db as any).sadhuToCholito.findUnique({ where: { id: pq.sadhuToCholitoId } })
+    } else if (pq.podNirnoyId) {
+      content = await (db as any).podNirnoy.findUnique({ where: { id: pq.podNirnoyId } })
+    } else if (pq.verbTenseId) {
+      content = await (db as any).verbTense.findUnique({ where: { id: pq.verbTenseId } })
+    } else if (pq.formFillupId) {
+      content = await (db as any).formFillup.findUnique({ where: { id: pq.formFillupId } })
     }
 
     if (content) {

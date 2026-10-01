@@ -55,8 +55,8 @@ export async function listFillInTheBlanksWithoutClues(db: PrismaClient, input: L
   if (query) {
     where.OR = [
       { content: { contains: query, mode: "insensitive" } },
+      { clue: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
-      { options: { has: query } },
     ]
   }
 
@@ -161,8 +161,8 @@ export async function createFillInTheBlanksWithoutClues(
 
   const created = await db.fillInTheBlanksWithoutClues.create({
     data: {
-      content: data.content ? data.content.trim() : null,
-      options: data.options ?? [],
+      content: data.content.trim(),
+      clue: data.clue ? data.clue.trim() : "",
       reference: data.reference ?? [],
       source: data.source ? data.source.trim() : "গাইড বুক",
       session: data.session ? data.session.trim() : currentYear,
@@ -218,11 +218,11 @@ export async function updateFillInTheBlanksWithoutClues(
   }
 
   if (data.content !== undefined) {
-    updateData.content = data.content ? data.content.trim() : null
+    updateData.content = data.content.trim()
   }
 
-  if (data.options !== undefined) {
-    updateData.options = data.options ?? []
+  if (data.clue !== undefined) {
+    updateData.clue = data.clue ? data.clue.trim() : ""
   }
 
   if (data.source !== undefined) {
@@ -299,8 +299,8 @@ export async function importFillInTheBlanksWithoutClues(
 
         const createdItem = await tx.fillInTheBlanksWithoutClues.create({
           data: {
-            content: data.content ? data.content.trim() : null,
-            options: data.options ?? [],
+            content: data.content.trim(),
+            clue: data.clue ? data.clue.trim() : "",
             reference: data.reference || [],
             source: itemSource,
             session: itemSession,

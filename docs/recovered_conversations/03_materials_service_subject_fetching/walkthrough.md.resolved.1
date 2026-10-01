@@ -1,0 +1,39 @@
+# Walkthrough - Dynamic Materials Service
+
+I have replaced the hardcoded subject and material data in [materials-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/materials-service.tsx) with dynamic data fetched via tRPC, mirroring the logic found in the `question-bank` service.
+
+## Changes Made
+
+### [api]
+
+#### [services.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/services.ts)
+- Added `getMaterials` endpoint to `serviceRouter` which fetches subjects with nested chapters and topics.
+
+### [home]
+
+#### [materials-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/materials-service.tsx)
+- Integrated `useTRPC` and `trpc.home.service.getMaterials.useQuery()`.
+- Replaced the static `materialSections` with a dynamic version that uses the fetched `subjects`.
+- Mapped database `chapters` to the UI's `materials` list within each subject card.
+- Added a loading state with a spinner and placeholder animation.
+- Ensured dynamic icon and color assignment using existing utility functions.
+
+## Verification Results
+
+### Manual Verification
+- [x] Navigate to Materials Service: The page now correctly fetches data from the database.
+- [x] Loading State: Verified that the spinner appears while data is loading.
+- [x] Dynamic Data: Subjects and Chapters (as materials) are now correctly displayed based on the database contents.
+- [x] UI Consistency: Maintained the premium look and feel with dynamic colors and icons.
+
+```tsx
+// Example of how chapters are now mapped to materials
+{subject.chapters.map((chapter: any) => (
+  <div key={chapter.id} className="...">
+    <span className="text-sm font-medium truncate">
+      {chapter.name}
+    </span>
+    {/* ... pages and downloads (placeholders for now) */}
+  </div>
+))}
+```

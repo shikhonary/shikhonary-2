@@ -28,8 +28,8 @@ export const getFillInTheBlanksWithoutCluesSchema = idSchema
 export type GetFillInTheBlanksWithoutCluesInput = z.infer<typeof getFillInTheBlanksWithoutCluesSchema>
 
 export const createFillInTheBlanksWithoutCluesSchema = z.object({
-  content: z.string().optional().nullable(),
-  options: z.array(z.string()).optional().default([]),
+  content: z.string().min(1, "Content is required"),
+  clue: z.string().optional().default(""),
   reference: z.array(z.string()).optional().default([]),
   source: z.string().optional().nullable(),
   session: z.string().optional().nullable(),

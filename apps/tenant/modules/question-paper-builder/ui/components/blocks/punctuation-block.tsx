@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
@@ -6,6 +8,16 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+
+const toBengaliDigits = (num?: number | string | null): string => {
+  if (num === null || num === undefined || num === "") return "";
+  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return num
+    .toString()
+    .split("")
+    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
+    .join("");
+};
 
 export function RenderPunctuationContent({ text, className = "" }: { text?: string; className?: string }) {
   if (!text) return null;
@@ -22,19 +34,19 @@ const PunctuationEditableText = ({
   defaultStyle,
   className = ""
 }: { 
-  text: string, 
-  itemKey: string, 
-  defaultStyle: any,
-  className?: string
+  text: string; 
+  itemKey: string; 
+  defaultStyle: any;
+  className?: string;
 }) => {
   const [isActive, setIsActive] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const setItemStyle = useBuilderStore(state => state.setItemStyle);
-  const itemStyles = useBuilderStore(state => state.settings.itemStyles);
+  const setItemStyle = useBuilderStore((state) => state.setItemStyle);
+  const itemStyles = useBuilderStore((state) => state.settings.itemStyles);
   
   const customStyle = itemStyles?.[itemKey] || {};
-  const mergedStyle = { ...defaultStyle, ...customStyle };
+  const mergedStyle = { ...defaultStyle, textAlign: "justify", ...customStyle };
   
   useEffect(() => {
     if (!isActive) return;
@@ -157,7 +169,9 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
     }
 
     if (item.assignedMarks !== undefined && item.assignedMarks !== null) return Number(item.assignedMarks);
-    if ((data.mark ?? data.marks) !== undefined && (data.mark ?? data.marks) !== null) return Number(data.mark ?? data.marks);
+    if ((data.mark ?? data.marks ?? data.totalMarks) !== undefined && (data.mark ?? data.marks ?? data.totalMarks) !== null) {
+      return Number(data.mark ?? data.marks ?? data.totalMarks);
+    }
     return defaultMark;
   };
 
@@ -168,10 +182,11 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
     item.assignedMarks ??
     data.mark ??
     data.marks ??
+    data.totalMarks ??
     5
   );
 
-  const marksPerQuestion = getQuestionMark(item.orderIndex, defaultMark);
+  const marksPerQuestion = getQuestionMark(item.orderIndex || 0, defaultMark);
   const attemptCount = Number(
     (distStatus as any)?.questionsToAttempt ??
     item.distribution?.questionsToAttempt ??
@@ -202,30 +217,30 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
-  const subLabels = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
-  const label = subLabels[item.orderIndex] || "";
-
-  const renderSubQuestionLabel = (labelStr: string) => {
-    const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
-    return (
-      <span
-        className="font-bold shrink-0 min-w-[1.6em]"
-        style={{
-          fontSize: questionStyle.fontSize,
-          fontFamily: questionStyle.fontFamily,
-        }}
-      >
-        ({cleanLabel})
-      </span>
-    );
-  };
-
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
+  const isFirst = item.isFirstPunctuation !== undefined ? item.isFirstPunctuation : (item.orderIndex === 0);
+  const masterNum = item.masterNumber || (item.orderIndex + 1);
+
+  // Dynamic question type label resolving from distStatus or item
+  const rawLabel = 
+    distStatus?.questionTypeLabel ||
+    item.distribution?.questionTypeLabel ||
+    item.questionTypeLabel ||
+    distStatus?.questionTypeName ||
+    item.distribution?.questionTypeName ||
+    distStatus?.questionType?.nameBn ||
+    item.distribution?.questionType?.nameBn ||
+    distStatus?.questionType?.nameEn ||
+    item.distribution?.questionType?.nameEn;
+
+  // Passage text resolution
+  const passageText = data.rawText || data.content || data.prompt || "";
+
   return (
-    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${item.isFirstPunctuation ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
+    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-1">
       {/* Hover Controls */}
-      <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button
           type="button"
           onClick={() => setShowAddAlternative(true)}
@@ -246,65 +261,71 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      {item.isFirstPunctuation && (
-        <div className="flex justify-between items-start w-full mb-1">
-          <div 
-            className="font-bold ml-[0px] flex items-baseline gap-2 flex-1" 
-            style={{
-              fontSize: questionStyle.fontSize,
-              fontFamily: questionStyle.fontFamily,
-            }}
-          >
-            <span
-              className="font-bold shrink-0 min-w-[1.8em]"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            >
-              {item.masterNumber || 1}.
-            </span>
-            <EditableSectionLabel
-              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
-              fallbackLabel="Use appropriate punctuation marks and capital letters where necessary in the following text:"
-              questionType="PUNCTUATION"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            />
-          </div>
-          <div className="font-bold whitespace-nowrap text-right shrink-0 ml-2" style={{
-            fontSize: questionStyle.fontSize,
-            fontFamily: questionStyle.fontFamily,
-          }}>
-            {marksPerQuestion * (attemptCount || 1)}
-          </div>
-        </div>
-      )}
       <div className="flex justify-between items-start gap-2 w-full">
         <div className="flex gap-1 flex-1 relative flex-col">
           <div className="flex gap-2 items-start w-full">
-            <span
-              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-              aria-hidden="true"
-            >
-              {item.masterNumber || 1}.
-            </span>
-            {item.totalQuestions > 1 && renderSubQuestionLabel(label)}
+            {isFirst ? (
+              <span
+                className="font-bold shrink-0 min-w-[1.8em]"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                {toBengaliDigits(masterNum)}।
+              </span>
+            ) : (
+              <span
+                className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+                aria-hidden="true"
+              >
+                {toBengaliDigits(masterNum)}।
+              </span>
+            )}
+            
             <div className="flex-1 w-full min-w-0">
-              <PunctuationEditableText 
-                text={data.content || ""}
-                itemKey={`${item.id}-question`}
-                defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap leading-relaxed"
-              />
+              <div className="w-full">
+                {isFirst && (
+                  <EditableSectionLabel
+                    distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+                    initialLabel={rawLabel}
+                    fallbackLabel="Use appropriate punctuation marks and capital letters where necessary in the following text:"
+                    questionType="PUNCTUATION"
+                    questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+                    questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? attemptCount}
+                    className="font-bold mb-1"
+                    style={{
+                      fontSize: questionStyle.fontSize,
+                      fontFamily: questionStyle.fontFamily,
+                    }}
+                  />
+                )}
+                <PunctuationEditableText 
+                  text={passageText}
+                  itemKey={`${item.id}-passage`}
+                  defaultStyle={{ ...questionStyle, textAlign: "justify" }}
+                  className="whitespace-pre-line text-foreground text-justify"
+                />
+              </div>
             </div>
+
+            {marksPerQuestion !== undefined && marksPerQuestion !== null && (
+              <div
+                className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                {attemptCount > 1 && !isFirst ? null : attemptCount > 1
+                  ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+                  : toBengaliDigits(marksPerQuestion)}
+              </div>
+            )}
           </div>
 
           {/* Attached Alternatives */}
@@ -314,7 +335,7 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
               parentQuestionId={item.id}
               alternatives={item.alternatives}
               settings={settings}
-              masterNumber={item.masterNumber || (item.orderIndex + 1)}
+              masterNumber={masterNum}
               primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
             />
           )}
@@ -330,7 +351,7 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
         primaryQuestionType="PUNCTUATION"
         subjectId={item.subjectId || distStatus?.subjectId || ""}
         primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
-        masterNumber={item.masterNumber || (item.orderIndex + 1)}
+        masterNumber={masterNum}
         distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
       />
     </div>

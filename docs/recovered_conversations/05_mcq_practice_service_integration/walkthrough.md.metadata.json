@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary": "Walkthrough document showing the completed refactoring of MCQ practice service from session-based to direct MCQ fetching approach, including all changes made and the new flow",
+  "updatedAt": "2026-01-22T16:11:26.065140900Z"
+}

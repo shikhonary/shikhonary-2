@@ -1,0 +1,37 @@
+# Walkthrough - Fixed Video Playback in Live Class Service
+
+I have fixed the issue where the embedded video would not play when the play button was clicked in the Live Class Service.
+
+## Changes Made
+
+### 1. Fixed Component Shadowing
+In [live-class-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/live-class-service.tsx), there was a local component named [LiveClassVideo](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx#10-120) that was shadowing the imported component from `../components/live-class-video`. This local component lacked the state management and `onClick` handlers necessary for playback.
+
+- **Action:** Removed the local [LiveClassVideo](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx#10-120) definition.
+- **Action:** Correctly imported and used the component from the `components` directory.
+
+### 2. Added Subject Selection Logic
+The page now tracks which subject is selected, allowing the main video to update when a subject card is clicked.
+
+- **Action:** Added `useState` for `selectedSubject`.
+- **Action:** Added `onClick` handlers to subject video cards.
+
+### 3. Fixed Facebook Autoplay
+Updated the Facebook video embed parameters to ensure it starts playing automatically when the user clicks the initial play button.
+
+- **Action:** Changed `autoplay=1` to `autoplay=true` in [live-class-video.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx).
+
+## Verification Results
+
+### Code Review
+- [live-class-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/live-class-service.tsx) now correctly imports [LiveClassVideo](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx#10-120).
+- `selectedSubject` state is initialized to "Biology".
+- Clicking on a subject card updates `selectedSubject`.
+- [live-class-video.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx) now handles multiple subjects and uses the correct `autoplay` parameter.
+
+### Manual Verification Required
+Since this is a UI interaction with an external iframe, please verify:
+1. Navigate to the Live Class Service page.
+2. Click the large play button on the main video section.
+3. Observe the Facebook video loading and playing.
+4. Click on other subjects (Chemistry, Physics, etc.) and verify the main video section updates.

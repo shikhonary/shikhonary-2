@@ -198,19 +198,38 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let applicationIdx = 0;
         let newsReportIdx = 0;
         let essayIdx = 0;
+        let makeSentencesIdx = 0;
+        let wordMeaningIdx = 0;
+        let poemEssenceIdx = 0;
+        let formFillupIdx = 0;
+        let proseEssenceIdx = 0;
+        let juktobornoIdx = 0;
+        let ekKothayProkashIdx = 0;
+        let oppositeWordIdx = 0;
+        let synonymIdx = 0;
+        let sadhuToCholitoIdx = 0;
+        let podNirnoyIdx = 0;
+        let verbTenseIdx = 0;
         let partsOfSpeechIdx = 0;
         let rightFormOfVerbIdx = 0;
         let changingSentenceIdx = 0;
         let fillInTheBlanksWithCluesIdx = 0;
+        let fillInTheBlanksWithoutCluesIdx = 0;
         let substitutionTableIdx = 0;
         let punctuationIdx = 0;
         let shortCompositionIdx = 0;
         let descriptiveQuestionIdx = 0;
         let shortQuestionIdx = 0;
+        let makeQuestionIdx = 0;
         let pbqIdx = 0;
         let mcqIdx = 0;
         const totalMcqs = questions.filter((q: any) => q.mcq).length;
         const totalEssences = questions.filter((q: any) => q.essence).length;
+        const totalPoemEssences = questions.filter((q: any) => q.poemEssence).length;
+        const totalFormFillups = questions.filter((q: any) => q.formFillup).length;
+        const totalProseEssences = questions.filter((q: any) => q.proseEssence).length;
+        const totalPodNirnoys = questions.filter((q: any) => q.podNirnoy).length;
+        const totalVerbTenses = questions.filter((q: any) => q.verbTense).length;
         const totalPoems = questions.filter((q: any) => q.poem).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
         const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
@@ -218,14 +237,23 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalShortAnswers = questions.filter((q: any) => q.shortAnswer).length;
         const totalDescriptiveQuestions = questions.filter((q: any) => q.descriptiveQuestion).length;
         const totalShortQuestions = questions.filter((q: any) => q.shortQuestion).length;
+        const totalMakeQuestions = questions.filter((q: any) => q.makeQuestion).length;
         const totalLetters = questions.filter((q: any) => q.letter).length;
         const totalApplications = questions.filter((q: any) => q.application).length;
         const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
         const totalEssays = questions.filter((q: any) => q.essay).length;
+        const totalMakeSentences = questions.filter((q: any) => q.makeSentences).length;
+        const totalWordMeanings = questions.filter((q: any) => q.wordMeaning).length;
+        const totalJuktobornos = questions.filter((q: any) => q.juktoborno).length;
+        const totalEkKothayProkash = questions.filter((q: any) => q.ekKothayProkash).length;
+        const totalOppositeWords = questions.filter((q: any) => q.oppositeWord).length;
+        const totalSynonyms = questions.filter((q: any) => q.synonym).length;
+        const totalSadhuToCholitos = questions.filter((q: any) => q.sadhuToCholito).length;
         const totalPartsOfSpeech = questions.filter((q: any) => q.partsOfSpeech).length;
         const totalRightFormOfVerbs = questions.filter((q: any) => q.rightFormOfVerb).length;
         const totalChangingSentences = questions.filter((q: any) => q.changingSentence).length;
         const totalFillInTheBlanksWithClues = questions.filter((q: any) => q.fillInTheBlanksWithClues).length;
+        const totalFillInTheBlanksWithoutClues = questions.filter((q: any) => q.fillInTheBlanksWithoutClues).length;
         const totalSubstitutionTables = questions.filter((q: any) => q.substitutionTable).length;
         const totalPunctuation = questions.filter((q: any) => q.punctuation).length;
         const totalShortCompositions = questions.filter((q: any) => q.shortComposition).length;
@@ -550,6 +578,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             shortQuestionIdx++;
           }
+          if (q.makeQuestion) {
+            if (makeQuestionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-make-question",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "MAKE_QUESTION",
+                  data: q.makeQuestion,
+                  orderIndex: makeQuestionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstMakeQuestion: makeQuestionIdx === 0,
+                  totalQuestions: totalMakeQuestions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Make WH questions from the following statements:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: makeQuestionIdx === totalMakeQuestions - 1 ? 4 : 0
+            });
+            makeQuestionIdx++;
+          }
           if (q.essence) {
             if (essenceIdx === 0) {
               globalWrittenNumber++;
@@ -865,6 +928,454 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             essayIdx++;
           }
+          if (q.makeSentences) {
+            if (makeSentencesIdx === 0) {
+              globalWrittenNumber++;
+              const makeSentencesQuestions = questions.filter((item: any) => item.makeSentences);
+              newBlocks.push({
+                id: `ms-${dist.id || q.id}`,
+                type: "question-make-sentence",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "MAKE_SENTENCES",
+                    words: makeSentencesQuestions.map((msQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(msQ.id);
+                      return {
+                        id: msQ.id,
+                        data: msQ.makeSentences,
+                        orderIndex: wIdx,
+                        alternatives: msQ.alternatives || [],
+                        assignedMarks: msQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: makeSentencesQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "বাক্য রচনা করো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            makeSentencesIdx++;
+          }
+          if (q.poemEssence) {
+            if (poemEssenceIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-poem-essence",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "POEM_ESSENCE",
+                  data: q.poemEssence,
+                  orderIndex: poemEssenceIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPoemEssence: poemEssenceIdx === 0,
+                  totalQuestions: totalPoemEssences,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "কবিতার মূলভাব লেখো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: poemEssenceIdx === totalPoemEssences - 1 ? 4 : 0,
+            });
+            poemEssenceIdx++;
+          }
+          if (q.formFillup) {
+            if (formFillupIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-form-fillup",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "FORM_FILLUP",
+                  data: q.formFillup,
+                  orderIndex: formFillupIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstFormFillup: formFillupIdx === 0,
+                  totalQuestions: totalFormFillups,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: formFillupIdx === totalFormFillups - 1 ? 4 : 0,
+            });
+            formFillupIdx++;
+          }
+          if (q.proseEssence) {
+            if (proseEssenceIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-prose-essence",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "PROSE_ESSENCE",
+                  data: q.proseEssence,
+                  orderIndex: proseEssenceIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstProseEssence: proseEssenceIdx === 0,
+                  totalQuestions: totalProseEssences,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "গদ্যাংশের মূলভাব লেখো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: proseEssenceIdx === totalProseEssences - 1 ? 4 : 0,
+            });
+            proseEssenceIdx++;
+          }
+          if (q.podNirnoy) {
+            if (podNirnoyIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-pod-nirnoy",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "POD_NIRNOY",
+                  data: q.podNirnoy,
+                  orderIndex: podNirnoyIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstPodNirnoy: podNirnoyIdx === 0,
+                  totalQuestions: totalPodNirnoys,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "নিচের বাক্যগুলো থেকে পদ নির্ণয় করো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: podNirnoyIdx === totalPodNirnoys - 1 ? 4 : 0,
+            });
+            podNirnoyIdx++;
+          }
+          if (q.wordMeaning) {
+            if (wordMeaningIdx === 0) {
+              globalWrittenNumber++;
+              const wordMeaningQuestions = questions.filter((item: any) => item.wordMeaning);
+              newBlocks.push({
+                id: `wm-${dist.id || q.id}`,
+                type: "question-word-meaning",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "WORD_MEANING",
+                    words: wordMeaningQuestions.map((wmQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(wmQ.id);
+                      return {
+                        id: wmQ.id,
+                        data: wmQ.wordMeaning,
+                        orderIndex: wIdx,
+                        alternatives: wmQ.alternatives || [],
+                        assignedMarks: wmQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: wordMeaningQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "শব্দার্থ লেখো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            wordMeaningIdx++;
+          }
+          if (q.juktoborno) {
+            if (juktobornoIdx === 0) {
+              globalWrittenNumber++;
+              const juktobornoQuestions = questions.filter((item: any) => item.juktoborno);
+              newBlocks.push({
+                id: `jb-${dist.id || q.id}`,
+                type: "question-juktoborno",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "JUKTOBORNO",
+                    words: juktobornoQuestions.map((jbQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(jbQ.id);
+                      return {
+                        id: jbQ.id,
+                        data: jbQ.juktoborno,
+                        orderIndex: wIdx,
+                        alternatives: jbQ.alternatives || [],
+                        assignedMarks: jbQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: juktobornoQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "যুক্তবর্ণ ভেঙে শব্দ ও বাক্য গঠন করো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            juktobornoIdx++;
+          }
+          if (q.ekKothayProkash) {
+            if (ekKothayProkashIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-ek-kothay-prokash",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "EK_KOTHAY_PROKASH",
+                  data: q.ekKothayProkash,
+                  orderIndex: ekKothayProkashIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstEkKothayProkash: ekKothayProkashIdx === 0,
+                  totalQuestions: totalEkKothayProkash,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "এক কথায় প্রকাশ করো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: ekKothayProkashIdx === totalEkKothayProkash - 1 ? 4 : 0
+            });
+            ekKothayProkashIdx++;
+          }
+          if (q.oppositeWord) {
+            if (oppositeWordIdx === 0) {
+              globalWrittenNumber++;
+              const oppositeWordQuestions = questions.filter((item: any) => item.oppositeWord);
+              newBlocks.push({
+                id: `ow-${dist.id || q.id}`,
+                type: "question-opposite-word",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "OPPOSITE_WORD",
+                    words: oppositeWordQuestions.map((owQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(owQ.id);
+                      return {
+                        id: owQ.id,
+                        data: owQ.oppositeWord,
+                        orderIndex: wIdx,
+                        alternatives: owQ.alternatives || [],
+                        assignedMarks: owQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: oppositeWordQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "বিপরীত শব্দ লেখো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            oppositeWordIdx++;
+          }
+          if (q.synonym) {
+            if (synonymIdx === 0) {
+              globalWrittenNumber++;
+              const synonymQuestions = questions.filter((item: any) => item.synonym);
+              newBlocks.push({
+                id: `syn-${dist.id || q.id}`,
+                type: "question-synonym",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "SYNONYM",
+                    words: synonymQuestions.map((synQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(synQ.id);
+                      return {
+                        id: synQ.id,
+                        data: synQ.synonym,
+                        orderIndex: wIdx,
+                        alternatives: synQ.alternatives || [],
+                        assignedMarks: synQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: synonymQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "সমার্থক শব্দ লেখো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            synonymIdx++;
+          }
+          if (q.sadhuToCholito) {
+            if (sadhuToCholitoIdx === 0) {
+              globalWrittenNumber++;
+              const sadhuToCholitoQuestions = questions.filter((item: any) => item.sadhuToCholito);
+              newBlocks.push({
+                id: `stc-${dist.id || q.id}`,
+                type: "question-sadhu-to-cholito",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "SADHU_TO_CHOLITO",
+                    words: sadhuToCholitoQuestions.map((stcQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(stcQ.id);
+                      return {
+                        id: stcQ.id,
+                        data: stcQ.sadhuToCholito,
+                        orderIndex: wIdx,
+                        alternatives: stcQ.alternatives || [],
+                        assignedMarks: stcQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: sadhuToCholitoQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "সাধু থেকে চলিত রূপ লেখো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            sadhuToCholitoIdx++;
+          }
+          if (q.verbTense) {
+            if (verbTenseIdx === 0) {
+              globalWrittenNumber++;
+              const verbTenseQuestions = questions.filter((item: any) => item.verbTense);
+              newBlocks.push({
+                id: `vt-${dist.id || q.id}`,
+                type: "question-verb-tense",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "VERB_TENSE",
+                    words: verbTenseQuestions.map((vtQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(vtQ.id);
+                      return {
+                        id: vtQ.id,
+                        data: vtQ.verbTense,
+                        orderIndex: wIdx,
+                        alternatives: vtQ.alternatives || [],
+                        assignedMarks: vtQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: verbTenseQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "ক্রিয়াপদের কাল নির্ণয় করো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            verbTenseIdx++;
+          }
           if (q.partsOfSpeech) {
             if (partsOfSpeechIdx === 0) {
               globalWrittenNumber++;
@@ -1004,6 +1515,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: fillInTheBlanksWithCluesIdx === totalFillInTheBlanksWithClues - 1 ? 4 : 0,
             });
             fillInTheBlanksWithCluesIdx++;
+          }
+          if (q.fillInTheBlanksWithoutClues) {
+            if (fillInTheBlanksWithoutCluesIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-fill-in-the-blanks-without-clues",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "FILL_IN_THE_BLANKS_WITHOUT_CLUES",
+                  data: q.fillInTheBlanksWithoutClues,
+                  orderIndex: fillInTheBlanksWithoutCluesIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstFillInTheBlanksWithoutClues: fillInTheBlanksWithoutCluesIdx === 0,
+                  totalQuestions: totalFillInTheBlanksWithoutClues,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "উপযুক্ত শব্দ বসিয়ে শূন্যস্থান পূরণ করো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: fillInTheBlanksWithoutCluesIdx === totalFillInTheBlanksWithoutClues - 1 ? 4 : 0,
+            });
+            fillInTheBlanksWithoutCluesIdx++;
           }
           if (q.substitutionTable) {
             if (substitutionTableIdx === 0) {
@@ -1664,11 +2210,13 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                       marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
                     }}
                   >
-                    {col.map((b, bIdx) => (
-                      <div key={`${b.id}-${bIdx}`} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
-                        <BlockRenderer block={b} />
-                      </div>
-                    ))}
+                    {col.map((b, bIdx) => {
+                      return (
+                        <div key={`${b.id}-${bIdx}`} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
+                          <BlockRenderer block={b} />
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -1709,11 +2257,13 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         <div id="page-content-measurer" style={{ height: `${canvasMinHeight}mm` }} className="w-full"></div>
         {/* We need the column width for accurate text wrapping measurements */}
         <div style={{ width: settings.columns > 1 ? `calc((100% - 40px) / ${settings.columns})` : '100%' }}>
-          {blocks.map((b, idx) => (
-            <div key={`measure-${b.id}-${idx}`} id={`measure-block-${b.id}`}>
-              <BlockRenderer block={b} />
-            </div>
-          ))}
+          {blocks.map((b, idx) => {
+            return (
+              <div key={`measure-${b.id}-${idx}`} id={`measure-block-${b.id}`} className="w-full">
+                <BlockRenderer block={b} />
+              </div>
+            );
+          })}
         </div>
       </div>
 

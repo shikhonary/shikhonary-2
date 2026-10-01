@@ -16,7 +16,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import {
   Drawer,
@@ -69,6 +69,9 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [search, setSearch] = useState("");
   const [selectedChapterId, setSelectedChapterId] = useState<string>("All");
   const [selectedBoard, setSelectedBoard] = useState<string>("All");
+  const [selectedSource, setSelectedSource] = useState<string>("All");
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(20);
 
   const { mutateAsync: bulkAssign, isPending: isAssigning } = useBulkAssignQuestions();
   const { mutateAsync: addAlternative, isPending: isAddingAlternative } = useAddAlternativeQuestion();
@@ -76,6 +79,94 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const distStatus =
     statuses?.find((s: any) => s.distributionId === distributionId) ||
     (isAlternativeMode && statuses && statuses.length > 0 ? statuses[0] : null);
+
+  const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
+  const distCode = distStatus?.questionType?.code;
+  const distTypeName = distStatus?.questionTypeNameBn || distStatus?.questionTypeName || distStatus?.questionType?.nameEn || distStatus?.questionType?.nameBn || distStatus?.questionTypeLabel || "";
+  
+  // Prioritize distribution's actual questionTypeName over urlCategoryParam (especially if url is default MCQ)
+  const rawName = (urlCategoryParam && urlCategoryParam !== "MCQ")
+    ? urlCategoryParam 
+    : (distTypeName || urlCategoryParam);
+
+  const normalized = 
+    normalizeQuestionTypeName(distTypeName) || 
+    normalizeQuestionTypeName(rawName) || 
+    normalizeQuestionTypeName(distStatus?.questionType?.nameEn) || 
+    normalizeQuestionTypeName(distStatus?.questionType?.nameBn);
+
+  let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
+  if (isAlternativeMode && urlCategoryParam) {
+    category = urlCategoryParam as QuestionTypeCode;
+  } else if (normalized && QUESTION_TYPE_MAP[normalized]?.code) {
+    category = QUESTION_TYPE_MAP[normalized].code as QuestionTypeCode;
+  } else if (distCode && Object.values(QUESTION_TYPE_CODES).includes(distCode.toUpperCase() as QuestionTypeCode)) {
+    category = distCode.toUpperCase() as QuestionTypeCode;
+  } else {
+    // Robust text fallback from distribution questionTypeName
+    const lowerName = distTypeName.toLowerCase();
+    if (lowerName.includes("form fillup") || lowerName.includes("form filling") || lowerName.includes("form fill up") || lowerName.includes("ফরম পূরণ") || lowerName.includes("ফরমপুরণ")) {
+      category = QUESTION_TYPE_CODES.FORM_FILLUP;
+    } else if (lowerName.includes("poem essence") || lowerName.includes("poem_essence") || lowerName.includes("কবিতার মূলভাব")) {
+      category = QUESTION_TYPE_CODES.POEM_ESSENCE;
+    } else if (lowerName.includes("prose essence") || lowerName.includes("prose_essence") || lowerName.includes("গদ্য অনুচ্ছেদের মূলভাব") || lowerName.includes("গদ্যের মূলভাব")) {
+      category = QUESTION_TYPE_CODES.PROSE_ESSENCE;
+    } else if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
+      category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
+    } else if (lowerName.includes("changing sentence") || lowerName.includes("changing sentences") || lowerName.includes("transformation of sentence") || lowerName.includes("change the sentence") || lowerName.includes("directed in bracket") || lowerName.includes("বাক্য রূপান্তর") || lowerName.includes("বাক্য পরিবর্তন")) {
+      category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
+    } else if (lowerName.includes("right form") || lowerName.includes("verbs in brackets") || lowerName.includes("correct form of verb") || lowerName.includes("ভার্ব")) {
+      category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
+    } else if (lowerName.includes("without clues") || lowerName.includes("without clue") || lowerName.includes("ক্লু ছাড়া") || lowerName.includes("ক্লু ছাড়া") || lowerName.includes("ক্লু ব্যতিরেকে") || lowerName.includes("cloze test without")) {
+      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES;
+    } else if (lowerName.includes("fill in the blanks") || lowerName.includes("with clues") || lowerName.includes("words from the box") || lowerName.includes("from the box") || lowerName.includes("cloze test") || lowerName.includes("ক্লুসহ")) {
+      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
+    } else if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
+      category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
+    } else if (lowerName.includes("punctuation") || lowerName.includes("capitalization") || lowerName.includes("বিরাম চিহ্ন") || lowerName.includes("যতিচিহ্ন")) {
+      category = QUESTION_TYPE_CODES.PUNCTUATION;
+    } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
+      category = QUESTION_TYPE_CODES.PBQ;
+    } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
+      category = QUESTION_TYPE_CODES.LETTER;
+    } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
+      category = QUESTION_TYPE_CODES.APPLICATION;
+    } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
+      category = QUESTION_TYPE_CODES.CQ;
+    } else if (lowerName.includes("opposite word") || lowerName.includes("opposite_word") || lowerName.includes("বিপরীত শব্দ") || lowerName.includes("বিপরীত")) {
+      category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+    } else if (lowerName.includes("juktoborno") || lowerName.includes("যুক্তবর্ণ")) {
+      category = QUESTION_TYPE_CODES.JUKTOBORNO;
+    } else if (lowerName.includes("ek kothay") || lowerName.includes("ek kothai") || lowerName.includes("এক কথায়") || lowerName.includes("এক কথায়")) {
+      category = QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH;
+    } else if (lowerName.includes("synonym") || lowerName.includes("সমার্থক শব্দ") || lowerName.includes("প্রতিশব্দ") || lowerName.includes("সমার্থক")) {
+      category = QUESTION_TYPE_CODES.SYNONYM;
+    } else if (lowerName.includes("sadhu to cholito") || lowerName.includes("sadhu") || lowerName.includes("সাধু") || lowerName.includes("চলিত")) {
+      category = QUESTION_TYPE_CODES.SADHU_TO_CHOLITO;
+    } else if (lowerName.includes("pod nirnoy") || lowerName.includes("pod_nirnoy") || lowerName.includes("পদ নির্ণয়") || lowerName.includes("পদ নির্ণয়")) {
+      category = QUESTION_TYPE_CODES.POD_NIRNOY;
+    } else if (lowerName.includes("verb tense") || lowerName.includes("verb_tense") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("ক্রিয়ার কাল")) {
+      category = QUESTION_TYPE_CODES.VERB_TENSE;
+    } else if (lowerName.includes("word meaning") || lowerName.includes("word_meaning") || lowerName.includes("শব্দার্থ")) {
+      category = QUESTION_TYPE_CODES.WORD_MEANING;
+    } else if (lowerName.includes("make sentence") || lowerName.includes("make_sentence") || lowerName.includes("sentence making") || lowerName.includes("বাক্য রচনা") || lowerName.includes("বাক্য তৈরি") || lowerName.includes("বাক্য গঠন")) {
+      category = QUESTION_TYPE_CODES.MAKE_SENTENCES;
+    } else if (lowerName.includes("make question") || lowerName.includes("make_question") || lowerName.includes("wh question") || lowerName.includes("wh_question") || lowerName.includes("question making") || lowerName.includes("প্রশ্ন তৈরি") || lowerName.includes("প্রশ্ন গঠন")) {
+      category = QUESTION_TYPE_CODES.MAKE_QUESTION;
+    } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
+      category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
+    } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
+      category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
+      category = QUESTION_TYPE_CODES.SA;
+    } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {
+      category = QUESTION_TYPE_CODES.ESSENCE;
+    } else if (lowerName.includes("poem") || lowerName.includes("কবিতা")) {
+      category = QUESTION_TYPE_CODES.POEM;
+    } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ")) {
+      category = QUESTION_TYPE_CODES.SUMMARY;
+    }
+  }
 
   const { data: chaptersData } = useQuery({
     ...trpc.academicChapter.list.queryOptions({
@@ -87,12 +178,26 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const chapters = chaptersData?.academicChapters || [];
 
   const { data: boardYearsData } = useQuery({
-    ...trpc.mcq.boardYears.queryOptions({
+    ...trpc.questionPaper.getAvailableBoardYears.queryOptions({
       subjectId: distStatus?.subjectId || "",
+      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+      category,
+      questionTypeId: distStatus?.questionTypeId || undefined,
     }),
     enabled: Boolean(distStatus?.subjectId),
   });
   const boardYears = boardYearsData ?? [];
+
+  const { data: sourcesData } = useQuery({
+    ...trpc.questionPaper.getAvailableSources.queryOptions({
+      subjectId: distStatus?.subjectId || "",
+      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+      category,
+      questionTypeId: distStatus?.questionTypeId || undefined,
+    }),
+    enabled: Boolean(distStatus?.subjectId),
+  });
+  const sources = sourcesData ?? [];
 
   if (paperLoading || statusesLoading) {
     return (
@@ -128,111 +233,20 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const qTypeLabel = (distStatus.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
-  const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
-  const distTypeName = distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.questionType?.nameEn || distStatus.questionType?.nameBn || distStatus.questionTypeLabel || "";
-  
-  // Prioritize distribution's actual questionTypeName over urlCategoryParam (especially if url is default MCQ)
-  const rawName = (urlCategoryParam && urlCategoryParam !== "MCQ")
-    ? urlCategoryParam 
-    : (distTypeName || urlCategoryParam);
-
-  const normalized = 
-    normalizeQuestionTypeName(distTypeName) || 
-    normalizeQuestionTypeName(rawName) || 
-    normalizeQuestionTypeName(distStatus.questionType?.nameEn) || 
-    normalizeQuestionTypeName(distStatus.questionType?.nameBn);
-
-  let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
-  if (isAlternativeMode && urlCategoryParam) {
-    category = urlCategoryParam as QuestionTypeCode;
-  } else if (normalized === QUESTION_TYPES.CS) {
-    category = QUESTION_TYPE_CODES.CS;
-  } else if (normalized === QUESTION_TYPES.CQ) {
-    category = QUESTION_TYPE_CODES.CQ;
-  } else if (normalized === QUESTION_TYPES.PBQ) {
-    category = QUESTION_TYPE_CODES.PBQ;
-  } else if (normalized === QUESTION_TYPES.SA) {
-    category = QUESTION_TYPE_CODES.SA;
-  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
-    category = QUESTION_TYPE_CODES.PARAGRAPH;
-  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
-    category = QUESTION_TYPE_CODES.AMPLIFICATION;
-  } else if (normalized === QUESTION_TYPES.LETTER) {
-    category = QUESTION_TYPE_CODES.LETTER;
-  } else if (normalized === QUESTION_TYPES.APPLICATION) {
-    category = QUESTION_TYPE_CODES.APPLICATION;
-  } else if (normalized === QUESTION_TYPES.SUMMARY) {
-    category = QUESTION_TYPE_CODES.SUMMARY;
-  } else if (normalized === QUESTION_TYPES.ESSENCE) {
-    category = QUESTION_TYPE_CODES.ESSENCE;
-  } else if (normalized === QUESTION_TYPES.POEM) {
-    category = QUESTION_TYPE_CODES.POEM;
-  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
-    category = QUESTION_TYPE_CODES.NEWS_REPORT;
-  } else if (normalized === QUESTION_TYPES.ESSAY) {
-    category = QUESTION_TYPE_CODES.ESSAY;
-  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
-    category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
-  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
-    category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
-  } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
-    category = QUESTION_TYPE_CODES.SHORT_QUESTION;
-  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
-    category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
-  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
-    category = QUESTION_TYPE_CODES.PUNCTUATION;
-  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
-    category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
-  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
-    category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
-  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
-    category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
-  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
-    category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
-  } else if (normalized === QUESTION_TYPES.MCQ) {
-    category = QUESTION_TYPE_CODES.MCQ;
-  } else {
-    // Robust text fallback from distribution questionTypeName
-    const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("substitution table") || lowerName.includes("সাবস্টিটিউশন টেবিল")) {
-      category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
-    } else if (lowerName.includes("changing sentence") || lowerName.includes("changing sentences") || lowerName.includes("transformation of sentence") || lowerName.includes("change the sentence") || lowerName.includes("directed in bracket") || lowerName.includes("বাক্য রূপান্তর") || lowerName.includes("বাক্য পরিবর্তন")) {
-      category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
-    } else if (lowerName.includes("right form") || lowerName.includes("verbs in brackets") || lowerName.includes("correct form of verb") || lowerName.includes("ভার্ব")) {
-      category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
-    } else if (lowerName.includes("fill in the blanks") || lowerName.includes("with clues") || lowerName.includes("words from the box") || lowerName.includes("from the box") || lowerName.includes("cloze test") || lowerName.includes("ক্লুসহ")) {
-      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
-    } else if (lowerName.includes("parts of speech") || lowerName.includes("part of speech") || lowerName.includes("পদ প্রকরণ")) {
-      category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
-    } else if (lowerName.includes("punctuation") || lowerName.includes("capitalization") || lowerName.includes("বিরাম চিহ্ন") || lowerName.includes("যতিচিহ্ন")) {
-      category = QUESTION_TYPE_CODES.PUNCTUATION;
-    } else if (lowerName.includes("pbq") || lowerName.includes("passage") || lowerName.includes("অনুচ্ছেদভিত্তিক") || lowerName.includes("বোধ পরীক্ষণ")) {
-      category = QUESTION_TYPE_CODES.PBQ;
-    } else if (lowerName.includes("letter") || lowerName.includes("চিঠি") || lowerName.includes("পত্র")) {
-      category = QUESTION_TYPE_CODES.LETTER;
-    } else if (lowerName.includes("application") || lowerName.includes("আবেদন") || lowerName.includes("দরখাস্ত")) {
-      category = QUESTION_TYPE_CODES.APPLICATION;
-    } else if (lowerName.includes("creative") || lowerName.includes("সৃজনশীল") || lowerName.includes("cq")) {
-      category = QUESTION_TYPE_CODES.CQ;
-    } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
-      category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
-    } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
-      category = QUESTION_TYPE_CODES.SHORT_QUESTION;
-    } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
-      category = QUESTION_TYPE_CODES.SA;
-    }
-  }
   const hasActiveQuery = Boolean(search && search.trim() !== "");
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All");
   const hasActiveBoard = Boolean(selectedBoard && selectedBoard !== "All");
+  const hasActiveSource = Boolean(selectedSource && selectedSource !== "All");
 
-  const hasAnyFilter = hasActiveQuery || hasActiveChapter || hasActiveBoard;
-  const activeFilterCount = (hasActiveChapter ? 1 : 0) + (hasActiveBoard ? 1 : 0);
+  const hasAnyFilter = hasActiveQuery || hasActiveChapter || hasActiveBoard || hasActiveSource;
+  const activeFilterCount = (hasActiveChapter ? 1 : 0) + (hasActiveBoard ? 1 : 0) + (hasActiveSource ? 1 : 0);
 
   const handleResetAll = () => {
     setSearch("");
     setSelectedChapterId("All");
     setSelectedBoard("All");
+    setSelectedSource("All");
+    setPage(1);
   };
 
   const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
@@ -249,7 +263,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           )}
           <Select
             value={selectedChapterId}
-            onValueChange={(val) => setSelectedChapterId(val ?? "All")}
+            onValueChange={(val) => {
+              setSelectedChapterId(val ?? "All");
+              setPage(1);
+            }}
           >
             <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
               <SelectValue placeholder="সকল অধ্যায়" />
@@ -266,30 +283,63 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         </div>
       )}
 
-      {/* Board Filter */}
+      {/* Reference Filter */}
       <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
         {isMobile && (
           <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            বোর্ড / বছর
+            রেফারেন্স
           </label>
         )}
         <Select
           value={selectedBoard}
-          onValueChange={(val) => setSelectedBoard(val ?? "All")}
+          onValueChange={(val) => {
+            setSelectedBoard(val ?? "All");
+            setPage(1);
+          }}
         >
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
-            <SelectValue placeholder="সকল বোর্ড" />
+            <SelectValue placeholder="সকল রেফারেন্স" />
           </SelectTrigger>
           <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All">সকল বোর্ড</SelectItem>
+            <SelectItem value="All">সকল রেফারেন্স</SelectItem>
             {boardYears.map((item: any) => (
               <SelectItem key={item.rawRef} value={item.rawRef}>
-                🎓 {item.boardName} ২০{item.year} ({item.count})
+                🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
+
+      {/* Source Filter */}
+      {sources.length > 0 && (
+        <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
+          {isMobile && (
+            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+              উৎস
+            </label>
+          )}
+          <Select
+            value={selectedSource}
+            onValueChange={(val) => {
+              setSelectedSource(val ?? "All");
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+              <SelectValue placeholder="সকল উৎস" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+              <SelectItem value="All">সকল উৎস</SelectItem>
+              {sources.map((item: any) => (
+                <SelectItem key={item.rawSource} value={item.rawSource}>
+                  📚 {item.rawSource} ({toBengaliDigits(item.count)})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </>
   );
   const currentDistIndex = statuses?.findIndex((s: any) => s.distributionId === distributionId) ?? -1;
@@ -334,6 +384,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, paragraphIds: selectedIds });
       } else if (category === "ESSENCE") {
         await bulkAssign({ ...payloadBase, essenceIds: selectedIds });
+      } else if (category === "POEM_ESSENCE") {
+        await bulkAssign({ ...payloadBase, poemEssenceIds: selectedIds });
+      } else if (category === "FORM_FILLUP" || category === "FORM_FILLING") {
+        await bulkAssign({ ...payloadBase, formFillupIds: selectedIds });
+      } else if (category === "PROSE_ESSENCE") {
+        await bulkAssign({ ...payloadBase, proseEssenceIds: selectedIds });
       } else if (category === "POEM") {
         await bulkAssign({ ...payloadBase, poemIds: selectedIds });
       } else if (category === "SUMMARY") {
@@ -348,6 +404,26 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, newsReportIds: selectedIds });
       } else if (category === "ESSAY") {
         await bulkAssign({ ...payloadBase, essayIds: selectedIds });
+      } else if (category === "WORD_MEANING") {
+        await bulkAssign({ ...payloadBase, wordMeaningIds: selectedIds });
+      } else if (category === "MAKE_SENTENCES") {
+        await bulkAssign({ ...payloadBase, makeSentencesIds: selectedIds });
+      } else if (category === "MAKE_QUESTION") {
+        await bulkAssign({ ...payloadBase, makeQuestionIds: selectedIds });
+      } else if (category === "OPPOSITE_WORD") {
+        await bulkAssign({ ...payloadBase, oppositeWordIds: selectedIds });
+      } else if (category === "JUKTOBORNO") {
+        await bulkAssign({ ...payloadBase, juktobornoIds: selectedIds });
+      } else if (category === "EK_KOTHAY_PROKASH") {
+        await bulkAssign({ ...payloadBase, ekKothayProkashIds: selectedIds });
+      } else if (category === "SYNONYM") {
+        await bulkAssign({ ...payloadBase, synonymIds: selectedIds });
+      } else if (category === "SADHU_TO_CHOLITO") {
+        await bulkAssign({ ...payloadBase, sadhuToCholitoIds: selectedIds });
+      } else if (category === "POD_NIRNOY") {
+        await bulkAssign({ ...payloadBase, podNirnoyIds: selectedIds });
+      } else if (category === "VERB_TENSE") {
+        await bulkAssign({ ...payloadBase, verbTenseIds: selectedIds });
       } else if (category === "PARTS_OF_SPEECH") {
         await bulkAssign({ ...payloadBase, partsOfSpeechIds: selectedIds });
       } else if (category === "PUNCTUATION") {
@@ -364,6 +440,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, changingSentenceIds: selectedIds });
       } else if (category === "FILL_IN_THE_BLANKS_WITH_CLUES") {
         await bulkAssign({ ...payloadBase, fillInTheBlanksWithCluesIds: selectedIds });
+      } else if (category === "FILL_IN_THE_BLANKS_WITHOUT_CLUES") {
+        await bulkAssign({ ...payloadBase, fillInTheBlanksWithoutCluesIds: selectedIds });
       } else if (category === "SUBSTITUTION_TABLE") {
         await bulkAssign({ ...payloadBase, substitutionTableIds: selectedIds });
       } else {
@@ -489,7 +567,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               <Input
                 placeholder="প্রশ্ন বা বিষয় দিয়ে খুঁজুন..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 className="pl-9 bg-muted/50 font-body text-sm rounded-lg border border-outline-variant py-2.5 outline-hidden focus:ring-2 focus:ring-primary/10 h-10"
               />
             </div>
@@ -567,7 +648,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     <span>খোঁজ: "{search}"</span>
                     <button
                       type="button"
-                      onClick={() => setSearch("")}
+                      onClick={() => {
+                        setSearch("");
+                        setPage(1);
+                      }}
                       className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
                       title="Remove search query"
                     >
@@ -584,7 +668,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
                     <button
                       type="button"
-                      onClick={() => setSelectedChapterId("All")}
+                      onClick={() => {
+                        setSelectedChapterId("All");
+                        setPage(1);
+                      }}
                       className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
                       title="Remove chapter filter"
                     >
@@ -598,12 +685,35 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     variant="secondary"
                     className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
                   >
-                    <span>বোর্ড: {selectedBoard}</span>
+                    <span>রেফারেন্স: {selectedBoard}</span>
                     <button
                       type="button"
-                      onClick={() => setSelectedBoard("All")}
+                      onClick={() => {
+                        setSelectedBoard("All");
+                        setPage(1);
+                      }}
                       className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove board filter"
+                      title="Remove reference filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+
+                {hasActiveSource && (
+                  <Badge
+                    variant="secondary"
+                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
+                  >
+                    <span>উৎস: {selectedSource}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSource("All");
+                        setPage(1);
+                      }}
+                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
+                      title="Remove source filter"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -621,8 +731,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             search={search}
             chapterId={selectedChapterId}
             board={selectedBoard}
+            source={selectedSource}
             excludePaperId={paperId}
             selectedIds={selectedIds}
+            page={page}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
             onToggle={(id) => {
               setSelectedIds(prev => {
                 if (prev.includes(id)) {

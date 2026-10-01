@@ -1,0 +1,54 @@
+# Walkthrough - MCQ Practice Service Data Integration
+
+I have integrated real data from the database into the MCQ practice service, enabling users to select subjects, chapters, and topics with accurate question counts.
+
+## Changes Made
+
+### API Layer
+- **[exam.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/exam.ts)**:
+    - Updated `getSubjectsWithChapters` to include topics within each chapter.
+    - Added MCQ counts for each topic.
+    - Switched ordering to `position` for consistency with other services.
+
+### Frontend Layer
+- **[mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Removed `subjectsData` mock constant.
+    - Now consumes real data from `trpc.home.demoExam.getSubjectsWithChapters`.
+    - Updated selection logic (subjects, chapters, topics) to work with database-driven IDs.
+    - Enhanced hero section badges to display real counts for subjects, chapters, and total questions.
+    - Fixed TypeScript linting errors in map callbacks.
+
+## Phase 2: Exam Taking Logic
+
+I have implemented persistent, server-synced exam-taking logic that mirrors the premium experience of public exams.
+
+### Changes Made
+
+#### Core Logic
+- **[NEW] [use-practice-exam-attempt.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/hooks/use-practice-exam-attempt.ts)**:
+    - Created a custom hook to manage practice session state.
+    - Synced answers with the server in real-time.
+    - Provided performance metrics and answer states.
+
+#### UI & Experience
+- **[MODIFY] [mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Integrated `createPracticeSession` mutation to persist sessions before starting.
+    - Added conditional rendering for configuration and practice views.
+- **[MODIFY] [take-mcq-practice-view.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/take-mcq-practice-view.tsx)**:
+    - Refactored to use the new attempt hook.
+    - Added **Audio Feedback** for correct/incorrect answers.
+    - Added **Confetti Effects** for achieving streaks.
+- **[NEW] [use-audio-feedback.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/hooks/use-audio-feedback.ts)**:
+    - Added a hook for generating procedural audio feedback.
+
+## Verification Results
+
+### Session Persistence
+Refreshing the page during a practice session correctly restores the state (answered questions) from the database.
+
+### Interactive Feedback
+Audio tones play immediately upon selection, and confetti triggers after a 5-question streak or when breaking a best streak.
+
+### Final Submission
+The submission flow correctly calculates final scores and marks the session as completed in the database.
+

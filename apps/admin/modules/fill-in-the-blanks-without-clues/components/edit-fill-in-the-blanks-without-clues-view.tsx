@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
-import { useForm, Controller, useFieldArray } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
@@ -19,7 +19,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { HelpCircle, Sparkles, Plus, Trash2 } from "lucide-react"
+import { HelpCircle, Sparkles } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -37,8 +37,8 @@ const editFillInTheBlanksWithoutCluesFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   chapterId: z.string().optional(),
-  content: z.string().optional(),
-  options: z.array(z.object({ value: z.string() })),
+  content: z.string().min(1, "Question / Passage content is required"),
+  clue: z.string().optional(),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
@@ -50,31 +50,39 @@ const editFillInTheBlanksWithoutCluesFormSchema = z.object({
 
 type EditFillInTheBlanksWithoutCluesFormData = z.infer<typeof editFillInTheBlanksWithoutCluesFormSchema>
 
-function ContentPreview({ text }: { text: string }) {
-  if (!text.trim()) {
-    return <span className="text-outline italic text-xs">Type passage above to preview formatted question...</span>
+function ContentPreview({ text, clue }: { text: string; clue?: string }) {
+  if (!text.trim() && !clue?.trim()) {
+    return <span className="text-outline italic text-xs">Type question content above to preview formatted question...</span>
   }
 
   const parts = text.split(/(\([a-z]\)\s*_{2,})/gi)
 
   return (
     <div className="space-y-3">
+      {clue && clue.trim() && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-primary font-medium">
+          💡 <span className="font-bold">Clue / Instructions:</span> {clue.trim()}
+        </div>
+      )}
+
       {/* Text preview */}
-      <div className="leading-relaxed text-sm text-on-surface">
-        {parts.map((part, index) => {
-          if (/^\([a-z]\)\s*_{2,}/i.test(part)) {
-            return (
-              <span
-                key={index}
-                className="inline-flex items-center px-1.5 py-0.5 mx-0.5 rounded font-mono font-bold text-primary bg-primary/10 border border-primary/20"
-              >
-                {part}
-              </span>
-            )
-          }
-          return <span key={index}>{part}</span>
-        })}
-      </div>
+      {text.trim() && (
+        <div className="leading-relaxed text-sm text-on-surface">
+          {parts.map((part, index) => {
+            if (/^\([a-z]\)\s*_{2,}/i.test(part)) {
+              return (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-1.5 py-0.5 mx-0.5 rounded font-mono font-bold text-primary bg-primary/10 border border-primary/20"
+                >
+                  {part}
+                </span>
+              )
+            }
+            return <span key={index}>{part}</span>
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -104,7 +112,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
       subjectId: "",
       chapterId: "",
       content: "",
-      options: [],
+      clue: "",
       referenceText: "",
       source: DEFAULT_SOURCE,
       session: new Date().getFullYear().toString(),
@@ -113,25 +121,17 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
     },
   })
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
-    control,
-    name: "options",
-  })
-
   // Prepopulate form data when record loads
   useEffect(() => {
     if (item) {
       const classId = item.subject?.classSubjects?.[0]?.classId || ""
-      const existingOptions = Array.isArray((item as any).options)
-        ? (item as any).options.map((opt: string) => ({ value: opt }))
-        : []
 
       reset({
         classId: classId,
         subjectId: item.subjectId || "",
         chapterId: item.academicChapterId || "",
         content: item.content || "",
-        options: existingOptions,
+        clue: (item as any).clue || "",
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
         source: (item as any).source || DEFAULT_SOURCE,
         session: (item as any).session || new Date().getFullYear().toString(),
@@ -150,6 +150,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
     selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
   )
   const contentValue = watch("content") || ""
+  const clueValue = watch("clue") || ""
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -176,13 +177,9 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
   const onSubmit = async (data: EditFillInTheBlanksWithoutCluesFormData) => {
     setErrorMessage(null)
 
-    const contentVal = data.content?.trim() || null
-    const optionsList = (data.options || [])
-      .map((opt) => opt.value.trim())
-      .filter(Boolean)
-
-    if (!contentVal && optionsList.length === 0) {
-      const msg = "Please provide either passage content or at least one sentence option."
+    const contentVal = data.content.trim()
+    if (!contentVal) {
+      const msg = "Please provide question or passage content."
       setErrorMessage(msg)
       toast.error(msg)
       return
@@ -201,7 +198,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
         subjectId: data.subjectId,
         chapterId: data.chapterId || null,
         content: contentVal,
-        options: optionsList,
+        clue: data.clue ? data.clue.trim() : "",
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
@@ -258,7 +255,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
             Edit Fill in the Blanks without Clues
           </h2>
           <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Modify question text, passage gaps, reference tags, and academic associations.
+            Modify question text, blank gaps, clue instructions, reference tags, and academic associations.
           </p>
         </div>
       </div>
@@ -282,7 +279,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
               Edit Question Specifications
             </CardTitle>
             <p className="font-body-sm text-xs sm:text-sm text-on-surface-variant">
-              Update academic details and the passage with blank gaps.
+              Update academic details, question / passage text with blank gaps, and optional clue instructions.
             </p>
           </div>
         </CardHeader>
@@ -392,11 +389,11 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
               />
             </div>
 
-            {/* Passage Textarea + Sequential Blank Inserter */}
+            {/* Passage / Question Content Textarea + Sequential Blank Inserter */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="content-textarea" className="font-label-lg text-sm font-bold text-on-surface">
-                  Passage Content <span className="text-xs text-outline font-normal">(For passage-based questions, or optional prompt)</span>
+                  Question / Passage Content <span className="text-error">*</span>
                 </Label>
                 <Button
                   type="button"
@@ -410,13 +407,13 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
                 </Button>
               </div>
               <p className="text-xs text-outline">
-                Use markers like <code className="bg-surface-container-high px-1 rounded font-mono font-bold">(a) _________</code>, <code className="bg-surface-container-high px-1 rounded font-mono font-bold">(b) _________</code> for blanks in the passage.
+                Enter single question or passage text. Use markers like <code className="bg-surface-container-high px-1 rounded font-mono font-bold">(a) _________</code>, <code className="bg-surface-container-high px-1 rounded font-mono font-bold">(b) _________</code> for blanks.
               </p>
               <Textarea
                 id="content-textarea"
                 {...register("content")}
-                rows={6}
-                placeholder="A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day. One day, his axe fell into a deep (d) _________."
+                rows={5}
+                placeholder="A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day."
                 className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10"
               />
               {errors.content && (
@@ -424,69 +421,31 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
               )}
             </div>
 
-            {/* Live Formatted Passage Preview */}
-            {contentValue.trim().length > 0 && (
+            {/* Clue / Instructions Input (Optional) */}
+            <div className="space-y-2">
+              <Label htmlFor="clue" className="font-label-lg text-sm font-bold text-on-surface">
+                Clue / Instructions <span className="text-xs font-normal text-outline">(Optional)</span>
+              </Label>
+              <Input
+                id="clue"
+                {...register("clue")}
+                placeholder="e.g. Fill in the blanks with suitable words / preposition / articles"
+                className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
+              />
+              <p className="text-xs text-outline">
+                Optional instructions, guidance or hint text for this question.
+              </p>
+            </div>
+
+            {/* Live Formatted Question Preview */}
+            {(contentValue.trim().length > 0 || clueValue.trim().length > 0) && (
               <div className="space-y-2 rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-4">
                 <p className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
                   Formatted Preview
                 </p>
-                <ContentPreview text={contentValue} />
+                <ContentPreview text={contentValue} clue={clueValue} />
               </div>
             )}
-
-            {/* Sentence Options Builder (For Options-Based Questions) */}
-            <div className="space-y-3 pt-4 border-t border-outline-variant/30">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <Label className="font-label-lg text-sm font-bold text-on-surface">
-                    Sentence Options <span className="text-xs text-outline font-normal">(For itemized / option-based blanks)</span>
-                  </Label>
-                  <p className="text-xs text-outline">
-                    Add individual sentences with blanks, e.g. <code className="bg-surface-container-high px-1 rounded font-mono font-bold">(a) He is _________ honest man.</code>
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const nextLetter = String.fromCharCode(97 + optionFields.length)
-                    appendOption({ value: `(${nextLetter}) ` })
-                  }}
-                  className="rounded-lg text-xs font-bold border-primary/30 text-primary hover:bg-primary/5 cursor-pointer h-8 gap-1.5 w-fit"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Sentence Option</span>
-                </Button>
-              </div>
-
-              {optionFields.length > 0 && (
-                <div className="space-y-2.5">
-                  {optionFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-outline w-7 text-center shrink-0 font-mono">
-                        #{index + 1}
-                      </span>
-                      <Input
-                        placeholder={`e.g. (${String.fromCharCode(97 + index)}) Sentence text with _________ blank`}
-                        className="w-full rounded-lg border border-outline-variant bg-white p-2.5 font-body-sm text-sm outline-hidden focus:ring-2 focus:ring-primary/10 flex-1"
-                        {...register(`options.${index}.value` as const)}
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeOption(index)}
-                        className="h-8 w-8 text-outline hover:text-error hover:bg-error/10 shrink-0"
-                        title="Remove option"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
             {/* Difficulty & Popularity Count */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

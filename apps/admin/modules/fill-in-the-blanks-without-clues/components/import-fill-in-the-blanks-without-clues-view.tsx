@@ -44,19 +44,15 @@ import {
 const sampleJsonTemplate = `[
   {
     "content": "A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day. One day, his axe fell into a deep (d) _________. He cried for (e) _________.",
-    "options": [],
+    "clue": "Fill in the gaps using suitable words.",
     "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
     "source": "গাইড বুক",
     "difficulty": "MEDIUM",
     "popularityCount": 0
   },
   {
-    "content": null,
-    "options": [
-      "(a) He is _________ honest man.",
-      "(b) She bought _________ umbrella yesterday.",
-      "(c) The earth moves round _________ sun."
-    ],
+    "content": "A good student is (a) _________ to his studies. He is (b) _________ of his duties. He never (c) _________ away his valuable time.",
+    "clue": "Use appropriate prepositions or articles where necessary.",
     "reference": ["চট্টগ্রাম বোর্ড ২০২২"],
     "source": "বৃত্তি সহায়িকা",
     "difficulty": "EASY",
@@ -309,8 +305,7 @@ function EditableCard({
   onDuplicate,
 }: EditableCardProps) {
   const hasContent = Boolean(item.content && item.content.trim())
-  const hasOptions = Boolean(Array.isArray(item.options) && item.options.length > 0)
-  const isInvalid = !hasContent && !hasOptions
+  const isInvalid = !hasContent
 
   return (
     <div
@@ -335,12 +330,12 @@ function EditableCard({
           >
             {item.difficulty || "MEDIUM"}
           </Badge>
-          {Array.isArray(item.options) && item.options.length > 0 && (
+          {item.clue && (
             <Badge
               variant="outline"
-              className="text-[10px] font-semibold bg-violet-50 text-violet-700 border-violet-200"
+              className="text-[10px] font-semibold bg-primary/5 text-primary border-primary/20"
             >
-              📋 {item.options.length} Sentences
+              💡 Has Clue
             </Badge>
           )}
           {item.source && (
@@ -378,69 +373,23 @@ function EditableCard({
       </div>
 
       <div className="space-y-4">
-        {/* Passage Content */}
+        {/* Question / Passage Content */}
         <EditableField
-          label="Passage Content (Optional if sentence options are provided)"
+          label="Question / Passage Content *"
           value={item.content || ""}
-          placeholder="Enter passage content with (a) _________ or leave empty for sentence-based..."
+          placeholder="Enter question or passage content with (a) _________ ..."
           multiline
           renderFormatted
-          onSave={(val) => onChange({ ...item, content: val || null })}
+          onSave={(val) => onChange({ ...item, content: val || "" })}
         />
 
-        {/* Sentence Options */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Sentence Options ({Array.isArray(item.options) ? item.options.length : 0})
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const currentOptions = Array.isArray(item.options) ? item.options : []
-                const nextLetter = String.fromCharCode(97 + currentOptions.length)
-                onChange({ ...item, options: [...currentOptions, `(${nextLetter}) `] })
-              }}
-              className="h-6 text-[10px] font-bold border-primary/30 text-primary hover:bg-primary/5 cursor-pointer px-2"
-            >
-              + Add Option
-            </Button>
-          </div>
-          {Array.isArray(item.options) && item.options.length > 0 && (
-            <div className="space-y-1.5">
-              {item.options.map((opt: string, optIdx: number) => (
-                <div key={optIdx} className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-outline w-6 text-center shrink-0">
-                    #{optIdx + 1}
-                  </span>
-                  <input
-                    value={opt}
-                    onChange={(e) => {
-                      const newOptions = [...item.options]
-                      newOptions[optIdx] = e.target.value
-                      onChange({ ...item, options: newOptions })
-                    }}
-                    placeholder={`e.g. (${String.fromCharCode(97 + optIdx)}) Sentence with _________ blank`}
-                    className="flex-1 rounded-md border border-outline-variant bg-white px-2.5 py-1 text-xs font-medium focus:ring-1 focus:ring-primary focus:outline-hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newOptions = item.options.filter((_: any, i: number) => i !== optIdx)
-                      onChange({ ...item, options: newOptions })
-                    }}
-                    className="text-outline hover:text-error p-1 cursor-pointer"
-                    title="Remove option"
-                  >
-                    <Trash2Icon className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Clue / Instructions */}
+        <EditableField
+          label="Clue / Instructions (Optional)"
+          value={item.clue || ""}
+          placeholder="e.g. Fill in the blanks with suitable words..."
+          onSave={(val) => onChange({ ...item, clue: val || "" })}
+        />
 
         {/* Reference, Source & Difficulty Controls */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-outline-variant/30">
@@ -604,15 +553,12 @@ export function ImportFillInTheBlanksWithoutCluesView() {
         const chapterId = item.chapterId || item.academicChapterId || overrideChapterId
 
         const contentText = item.content || item.passage || item.question || item.text || ""
-        const optionsList = Array.isArray(item.options)
-          ? item.options.map((opt: any) => String(opt).trim()).filter(Boolean)
-          : []
+        const clueText = item.clue || item.instructions || item.instruction || item.hint || ""
 
         const hasContent = Boolean(contentText && typeof contentText === "string" && contentText.trim())
-        const hasOptions = optionsList.length > 0
 
-        if (!hasContent && !hasOptions) {
-          errors.push(`Item #${itemNum}: Must provide either 'content' passage or 'options' sentences.`)
+        if (!hasContent) {
+          errors.push(`Item #${itemNum}: Question or passage 'content' is required.`)
         }
         if (!subjectId) {
           errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
@@ -625,8 +571,8 @@ export function ImportFillInTheBlanksWithoutCluesView() {
           subjectId,
           chapterId: chapterId || null,
           academicChapterId: chapterId || null,
-          content: hasContent ? String(contentText).trim() : null,
-          options: optionsList,
+          content: String(contentText).trim(),
+          clue: clueText ? String(clueText).trim() : "",
           difficulty: normalizedDifficulty,
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
@@ -728,7 +674,7 @@ export function ImportFillInTheBlanksWithoutCluesView() {
   const handleAddNewQuestionCard = () => {
     const newItem = {
       content: "Sample text with (a) _________ gap marker in the sentence.",
-      options: [],
+      clue: "Fill in the blanks with suitable words",
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -759,8 +705,8 @@ export function ImportFillInTheBlanksWithoutCluesView() {
         subjectId: selectedSubjectId,
         chapterId: selectedChapterId || null,
         academicChapterId: selectedChapterId || null,
-        content: item.content ? item.content.trim() : null,
-        options: Array.isArray(item.options) ? item.options : [],
+        content: item.content.trim(),
+        clue: item.clue ? item.clue.trim() : "",
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
@@ -984,7 +930,7 @@ export function ImportFillInTheBlanksWithoutCluesView() {
               rows={8}
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              placeholder="[\n  {\n    &quot;content&quot;: &quot;A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day.&quot;,\n    &quot;reference&quot;: [&quot;ঢাকা বোর্ড ২০২৪&quot;],\n    &quot;difficulty&quot;: &quot;MEDIUM&quot;\n  }\n]"
+              placeholder="[\n  {\n    &quot;content&quot;: &quot;A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day.&quot;,\n    &quot;clue&quot;: &quot;Fill in the blanks with suitable words&quot;,\n    &quot;reference&quot;: [&quot;ঢাকা বোর্ড ২০২৪&quot;],\n    &quot;difficulty&quot;: &quot;MEDIUM&quot;\n  }\n]"
               className="w-full rounded-xl border border-outline-variant bg-surface-container-lowest p-4 font-mono text-xs leading-relaxed text-on-surface focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
             />
           </div>

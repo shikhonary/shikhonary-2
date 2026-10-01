@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Task checklist for refactoring MCQ practice service to use direct MCQ fetching instead of creating demo exam sessions",
+  "updatedAt": "2026-01-22T16:07:46.554154Z"
+}

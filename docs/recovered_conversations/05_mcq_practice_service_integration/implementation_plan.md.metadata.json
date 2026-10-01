@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan for refactoring the MCQ practice service to fetch MCQs directly from the server instead of creating demo exam sessions, following the pattern used in question-bank.tsx",
+  "updatedAt": "2026-01-22T16:07:12.175749700Z"
+}

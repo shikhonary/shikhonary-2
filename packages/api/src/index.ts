@@ -546,6 +546,38 @@ export type {
   ImportMakeQuestionInput,
 } from "./routers/make-question/make-question.schema"
 
+export type {
+  ListFormFillupInput,
+  FormFillupStatsInput,
+  GetFormFillupInput,
+  CreateFormFillupInput,
+  UpdateFormFillupInput,
+  DeleteFormFillupInput,
+  BulkDeleteFormFillupInput,
+  ImportFormFillupInput,
+  ListFormFillingInput,
+  FormFillingStatsInput,
+  GetFormFillingInput,
+  CreateFormFillingInput,
+  UpdateFormFillingInput,
+  DeleteFormFillingInput,
+  BulkDeleteFormFillingInput,
+  ImportFormFillingInput,
+} from "./routers/form-fillup/form-fillup.schema"
+
+export {
+  listFillInTheBlanksWithoutCluesSchema,
+  fillInTheBlanksWithoutCluesStatsSchema,
+  getFillInTheBlanksWithoutCluesSchema,
+  createFillInTheBlanksWithoutCluesSchema,
+  updateFillInTheBlanksWithoutCluesSchema,
+  deleteFillInTheBlanksWithoutCluesSchema,
+  bulkDeleteFillInTheBlanksWithoutCluesSchema,
+  importFillInTheBlanksWithoutCluesSchema,
+} from "./routers/fill-in-the-blanks-without-clues/fill-in-the-blanks-without-clues.schema"
+
+
+
 
 
 

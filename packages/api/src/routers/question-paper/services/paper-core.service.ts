@@ -154,6 +154,8 @@ export async function getQuestionPaperById(
   const applicationIds = allPaperQuestions.map((q: any) => q.applicationId).filter(Boolean) as string[]
   const summaryIds = allPaperQuestions.map((q: any) => q.summaryId).filter(Boolean) as string[]
   const essenceIds = allPaperQuestions.map((q: any) => q.essenceId).filter(Boolean) as string[]
+  const poemEssenceIds = allPaperQuestions.map((q: any) => q.poemEssenceId).filter(Boolean) as string[]
+  const proseEssenceIds = allPaperQuestions.map((q: any) => q.proseEssenceId).filter(Boolean) as string[]
   const poemIds = allPaperQuestions.map((q: any) => q.poemId).filter(Boolean) as string[]
   const newsReportIds = allPaperQuestions.map((q: any) => q.newsReportId).filter(Boolean) as string[]
   const essayIds = allPaperQuestions.map((q: any) => q.essayId).filter(Boolean) as string[]
@@ -167,6 +169,17 @@ export async function getQuestionPaperById(
   const shortCompositionIds = allPaperQuestions.map((q: any) => q.shortCompositionId).filter(Boolean) as string[]
   const descriptiveQuestionIds = allPaperQuestions.map((q: any) => q.descriptiveQuestionId).filter(Boolean) as string[]
   const shortQuestionIds = allPaperQuestions.map((q: any) => q.shortQuestionId).filter(Boolean) as string[]
+  const makeQuestionIds = allPaperQuestions.map((q: any) => q.makeQuestionId).filter(Boolean) as string[]
+  const wordMeaningIds = allPaperQuestions.map((q: any) => q.wordMeaningId).filter(Boolean) as string[]
+  const makeSentencesIds = allPaperQuestions.map((q: any) => q.makeSentencesId).filter(Boolean) as string[]
+  const oppositeWordIds = allPaperQuestions.map((q: any) => q.oppositeWordId).filter(Boolean) as string[]
+  const juktobornoIds = allPaperQuestions.map((q: any) => q.juktobornoId).filter(Boolean) as string[]
+  const ekKothayProkashIds = allPaperQuestions.map((q: any) => q.ekKothayProkashId).filter(Boolean) as string[]
+  const synonymIds = allPaperQuestions.map((q: any) => q.synonymId).filter(Boolean) as string[]
+  const sadhuToCholitoIds = allPaperQuestions.map((q: any) => q.sadhuToCholitoId).filter(Boolean) as string[]
+  const podNirnoyIds = allPaperQuestions.map((q: any) => q.podNirnoyId).filter(Boolean) as string[]
+  const verbTenseIds = allPaperQuestions.map((q: any) => q.verbTenseId).filter(Boolean) as string[]
+  const formFillupIds = allPaperQuestions.map((q: any) => q.formFillupId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -185,6 +198,8 @@ export async function getQuestionPaperById(
     applications,
     summaries,
     essences,
+    poemEssences,
+    proseEssences,
     poems,
     newsReports,
     essays,
@@ -198,6 +213,17 @@ export async function getQuestionPaperById(
     shortCompositions,
     descriptiveQuestions,
     shortQuestions,
+    makeQuestionsList,
+    wordMeanings,
+    makeSentencesList,
+    oppositeWords,
+    juktobornos,
+    ekKothayProkashs,
+    synonyms,
+    sadhuToCholitos,
+    podNirnoys,
+    verbTenses,
+    formFillups,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -297,6 +323,24 @@ export async function getQuestionPaperById(
     essenceIds.length > 0
       ? (db as any).essence.findMany({
         where: { id: { in: essenceIds } },
+        include: {
+          academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
+    poemEssenceIds.length > 0
+      ? (db as any).poemEssence.findMany({
+        where: { id: { in: poemEssenceIds } },
+        include: {
+          academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
+    proseEssenceIds.length > 0
+      ? (db as any).proseEssence.findMany({
+        where: { id: { in: proseEssenceIds } },
         include: {
           academicChapter: true,
           questionType: true,
@@ -418,6 +462,106 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    makeQuestionIds.length > 0
+      ? (db as any).makeQuestion.findMany({
+        where: { id: { in: makeQuestionIds } },
+        include: {
+          questionType: true,
+          subject: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    wordMeaningIds.length > 0
+      ? (db as any).wordMeaning.findMany({
+        where: { id: { in: wordMeaningIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    makeSentencesIds.length > 0
+      ? (db as any).makeSentences.findMany({
+        where: { id: { in: makeSentencesIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    oppositeWordIds.length > 0
+      ? (db as any).oppositeWord.findMany({
+        where: { id: { in: oppositeWordIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    juktobornoIds.length > 0
+      ? (db as any).juktoborno.findMany({
+        where: { id: { in: juktobornoIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    ekKothayProkashIds.length > 0
+      ? (db as any).ekKothayProkash.findMany({
+        where: { id: { in: ekKothayProkashIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    synonymIds.length > 0
+      ? (db as any).synonym.findMany({
+        where: { id: { in: synonymIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    sadhuToCholitoIds.length > 0
+      ? (db as any).sadhuToCholito.findMany({
+        where: { id: { in: sadhuToCholitoIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    podNirnoyIds.length > 0
+      ? (db as any).podNirnoy.findMany({
+        where: { id: { in: podNirnoyIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    verbTenseIds.length > 0
+      ? (db as any).verbTense.findMany({
+        where: { id: { in: verbTenseIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    formFillupIds.length > 0
+      ? (db as any).formFillup.findMany({
+        where: { id: { in: formFillupIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
     questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
@@ -434,6 +578,8 @@ export async function getQuestionPaperById(
   const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
   const summaryMap = new Map(summaries.map((s: any) => [s.id, s]))
   const essenceMap = new Map(essences.map((e: any) => [e.id, e]))
+  const poemEssenceMap = new Map((poemEssences as any[]).map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
+  const proseEssenceMap = new Map((proseEssences as any[]).map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const poemMap = new Map(poems.map((p: any) => [p.id, p]))
   const newsReportMap = new Map(newsReports.map((n: any) => [n.id, n]))
   const essayMap = new Map(essays.map((e: any) => [e.id, e]))
@@ -447,6 +593,17 @@ export async function getQuestionPaperById(
   const shortCompositionMap = new Map(shortCompositions.map((s: any) => [s.id, s]))
   const descriptiveQuestionMap = new Map((descriptiveQuestions as any[]).map((d: any) => [d.id, d]))
   const shortQuestionMap = new Map((shortQuestions as any[]).map((s: any) => [s.id, s]))
+  const makeQuestionMap = new Map((makeQuestionsList as any[]).map((m: any) => [m.id, m]))
+  const wordMeaningMap = new Map((wordMeanings as any[]).map((w: any) => [w.id, w]))
+  const makeSentencesMap = new Map((makeSentencesList as any[]).map((m: any) => [m.id, m]))
+  const oppositeWordMap = new Map((oppositeWords as any[]).map((o: any) => [o.id, o]))
+  const juktobornoMap = new Map((juktobornos as any[]).map((j: any) => [j.id, { ...j, chapter: j.academicChapter }]))
+  const ekKothayProkashMap = new Map((ekKothayProkashs as any[]).map((e: any) => [e.id, { ...e, chapter: e.academicChapter }]))
+  const synonymMap = new Map((synonyms as any[]).map((s: any) => [s.id, s]))
+  const sadhuToCholitoMap = new Map((sadhuToCholitos as any[]).map((s: any) => [s.id, s]))
+  const podNirnoyMap = new Map((podNirnoys as any[]).map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
+  const verbTenseMap = new Map((verbTenses as any[]).map((v: any) => [v.id, { ...v, chapter: v.academicChapter }]))
+  const formFillupMap = new Map((formFillups as any[]).map((f: any) => [f.id, { ...f, chapter: f.academicChapter }]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -476,6 +633,8 @@ export async function getQuestionPaperById(
     let resolvedApplication = q.applicationId ? applicationMap.get(q.applicationId) || null : null
     let resolvedSummary = q.summaryId ? summaryMap.get(q.summaryId) || null : null
     let resolvedEssence = q.essenceId ? essenceMap.get(q.essenceId) || null : null
+    let resolvedPoemEssence = q.poemEssenceId ? poemEssenceMap.get(q.poemEssenceId) || null : null
+    let resolvedProseEssence = q.proseEssenceId ? proseEssenceMap.get(q.proseEssenceId) || null : null
     let resolvedPoem = q.poemId ? poemMap.get(q.poemId) || null : null
     let resolvedNewsReport = q.newsReportId ? newsReportMap.get(q.newsReportId) || null : null
     let resolvedEssay = q.essayId ? essayMap.get(q.essayId) || null : null
@@ -489,6 +648,17 @@ export async function getQuestionPaperById(
     let resolvedShortComposition = q.shortCompositionId ? shortCompositionMap.get(q.shortCompositionId) || null : null
     let resolvedDescriptiveQuestion = q.descriptiveQuestionId ? descriptiveQuestionMap.get(q.descriptiveQuestionId) || null : null
     let resolvedShortQuestion = q.shortQuestionId ? shortQuestionMap.get(q.shortQuestionId) || null : null
+    let resolvedMakeQuestion = q.makeQuestionId ? makeQuestionMap.get(q.makeQuestionId) || null : null
+    let resolvedWordMeaning = q.wordMeaningId ? wordMeaningMap.get(q.wordMeaningId) || null : null
+    let resolvedMakeSentences = q.makeSentencesId ? makeSentencesMap.get(q.makeSentencesId) || null : null
+    let resolvedOppositeWord = q.oppositeWordId ? oppositeWordMap.get(q.oppositeWordId) || null : null
+    let resolvedJuktoborno = q.juktobornoId ? juktobornoMap.get(q.juktobornoId) || null : null
+    let resolvedEkKothayProkash = q.ekKothayProkashId ? ekKothayProkashMap.get(q.ekKothayProkashId) || null : null
+    let resolvedSynonym = q.synonymId ? synonymMap.get(q.synonymId) || null : null
+    let resolvedSadhuToCholito = q.sadhuToCholitoId ? sadhuToCholitoMap.get(q.sadhuToCholitoId) || null : null
+    let resolvedPodNirnoy = q.podNirnoyId ? podNirnoyMap.get(q.podNirnoyId) || null : null
+    let resolvedVerbTense = q.verbTenseId ? verbTenseMap.get(q.verbTenseId) || null : null
+    let resolvedFormFillup = q.formFillupId ? formFillupMap.get(q.formFillupId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -523,6 +693,12 @@ export async function getQuestionPaperById(
     }
     if (!resolvedEssence && q.essenceId && q.contentSnapshot) {
       resolvedEssence = q.contentSnapshot as any
+    }
+    if (!resolvedPoemEssence && q.poemEssenceId && q.contentSnapshot) {
+      resolvedPoemEssence = q.contentSnapshot as any
+    }
+    if (!resolvedProseEssence && q.proseEssenceId && q.contentSnapshot) {
+      resolvedProseEssence = q.contentSnapshot as any
     }
     if (!resolvedPoem && q.poemId && q.contentSnapshot) {
       resolvedPoem = q.contentSnapshot as any
@@ -563,10 +739,54 @@ export async function getQuestionPaperById(
     if (!resolvedShortQuestion && q.shortQuestionId && q.contentSnapshot) {
       resolvedShortQuestion = q.contentSnapshot as any
     }
+    if (!resolvedMakeQuestion && q.makeQuestionId && q.contentSnapshot) {
+      resolvedMakeQuestion = q.contentSnapshot as any
+    }
+    if (!resolvedWordMeaning && q.wordMeaningId && q.contentSnapshot) {
+      resolvedWordMeaning = q.contentSnapshot as any
+    }
+    if (!resolvedMakeSentences && q.makeSentencesId && q.contentSnapshot) {
+      resolvedMakeSentences = q.contentSnapshot as any
+    }
+    if (!resolvedOppositeWord && q.oppositeWordId && q.contentSnapshot) {
+      resolvedOppositeWord = q.contentSnapshot as any
+    }
+    if (!resolvedJuktoborno && q.juktobornoId && q.contentSnapshot) {
+      resolvedJuktoborno = q.contentSnapshot as any
+    }
+    if (!resolvedEkKothayProkash && q.ekKothayProkashId && q.contentSnapshot) {
+      resolvedEkKothayProkash = q.contentSnapshot as any
+    }
+    if (!resolvedSynonym && q.synonymId && q.contentSnapshot) {
+      resolvedSynonym = q.contentSnapshot as any
+    }
+    if (!resolvedSadhuToCholito && q.sadhuToCholitoId && q.contentSnapshot) {
+      resolvedSadhuToCholito = q.contentSnapshot as any
+    }
+    if (!resolvedPodNirnoy && q.podNirnoyId && q.contentSnapshot) {
+      resolvedPodNirnoy = q.contentSnapshot as any
+    }
+    if (!resolvedVerbTense && q.verbTenseId && q.contentSnapshot) {
+      resolvedVerbTense = q.contentSnapshot as any
+    }
+    if (!resolvedFormFillup && q.formFillupId && q.contentSnapshot) {
+      resolvedFormFillup = q.contentSnapshot as any
+    }
 
     let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
 
     const actualQuestionTypeId =
+      (resolvedFormFillup as any)?.questionTypeId ||
+      (resolvedVerbTense as any)?.questionTypeId ||
+      (resolvedPodNirnoy as any)?.questionTypeId ||
+      (resolvedSadhuToCholito as any)?.questionTypeId ||
+      (resolvedSynonym as any)?.questionTypeId ||
+      (resolvedEkKothayProkash as any)?.questionTypeId ||
+      (resolvedJuktoborno as any)?.questionTypeId ||
+      (resolvedOppositeWord as any)?.questionTypeId ||
+      (resolvedMakeSentences as any)?.questionTypeId ||
+      (resolvedMakeQuestion as any)?.questionTypeId ||
+      (resolvedWordMeaning as any)?.questionTypeId ||
       (resolvedShortQuestion as any)?.questionTypeId ||
       (resolvedShortComposition as any)?.questionTypeId ||
       (resolvedPunctuation as any)?.questionTypeId ||
@@ -579,6 +799,8 @@ export async function getQuestionPaperById(
       (resolvedEssay as any)?.questionTypeId ||
       (resolvedNewsReport as any)?.questionTypeId ||
       (resolvedPoem as any)?.questionTypeId ||
+      (resolvedPoemEssence as any)?.questionTypeId ||
+      (resolvedProseEssence as any)?.questionTypeId ||
       (resolvedEssence as any)?.questionTypeId ||
       (resolvedSummary as any)?.questionTypeId ||
       (resolvedParagraph as any)?.questionTypeId ||
@@ -593,6 +815,17 @@ export async function getQuestionPaperById(
       for (const dist of distMap.values()) {
         const matchesExact = dist.questionTypeId === actualQuestionTypeId
         const matchesCategory =
+          (resolvedFormFillup && (dist.questionTypeName?.includes("ফরম পূরণ") || dist.questionTypeName?.includes("ফরমপুরণ") || dist.questionTypeName?.toLowerCase().includes("form fillup") || dist.questionTypeName?.toLowerCase().includes("form_fillup") || dist.questionTypeName?.toLowerCase().includes("form filling") || dist.questionTypeName?.toLowerCase().includes("form_filling"))) ||
+          (resolvedVerbTense && (dist.questionTypeName?.includes("ক্রিয়াপদ") || dist.questionTypeName?.includes("ক্রিয়াপদ") || dist.questionTypeName?.includes("ক্রিয়ার কাল") || dist.questionTypeName?.includes("ক্রিয়ার কাল") || dist.questionTypeName?.toLowerCase().includes("verb tense") || dist.questionTypeName?.toLowerCase().includes("verb_tense"))) ||
+          (resolvedPodNirnoy && (dist.questionTypeName?.includes("পদ নির্ণয়") || dist.questionTypeName?.includes("পদ নির্ণয়") || dist.questionTypeName?.toLowerCase().includes("pod nirnoy") || dist.questionTypeName?.toLowerCase().includes("pod_nirnoy"))) ||
+          (resolvedSadhuToCholito && (dist.questionTypeName?.includes("সাধু") || dist.questionTypeName?.includes("চলিত") || dist.questionTypeName?.toLowerCase().includes("sadhu"))) ||
+          (resolvedSynonym && (dist.questionTypeName?.includes("সমার্থক") || dist.questionTypeName?.includes("প্রতিশব্দ") || dist.questionTypeName?.toLowerCase().includes("synonym"))) ||
+          (resolvedEkKothayProkash && (dist.questionTypeName?.includes("এক কথায়") || dist.questionTypeName?.includes("এক কথায়") || dist.questionTypeName?.toLowerCase().includes("ek kothay") || dist.questionTypeName?.toLowerCase().includes("ek kothai"))) ||
+          (resolvedJuktoborno && (dist.questionTypeName?.includes("যুক্তবর্ণ") || dist.questionTypeName?.toLowerCase().includes("juktoborno"))) ||
+          (resolvedOppositeWord && (dist.questionTypeName?.includes("বিপরীত") || dist.questionTypeName?.toLowerCase().includes("opposite word") || dist.questionTypeName?.toLowerCase().includes("opposite_word"))) ||
+          (resolvedMakeSentences && (dist.questionTypeName?.includes("বাক্য তৈরি") || dist.questionTypeName?.toLowerCase().includes("make sentence") || dist.questionTypeName?.toLowerCase().includes("make_sentence"))) ||
+          (resolvedMakeQuestion && (dist.questionTypeName?.includes("প্রশ্ন তৈরি") || dist.questionTypeName?.toLowerCase().includes("make question") || dist.questionTypeName?.toLowerCase().includes("make_question") || dist.questionTypeName?.toLowerCase().includes("wh question") || dist.questionTypeName?.toLowerCase().includes("wh_question"))) ||
+          (resolvedWordMeaning && (dist.questionTypeName?.includes("শব্দার্থ") || dist.questionTypeName?.toLowerCase().includes("word meaning") || dist.questionTypeName?.toLowerCase().includes("word_meaning"))) ||
           (resolvedShortQuestion && (dist.questionTypeName?.toLowerCase().includes("short question") || dist.questionTypeName?.includes("সংক্ষিপ্ত প্রশ্ন") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
           (resolvedShortComposition && (dist.questionTypeName?.toLowerCase().includes("composition") || dist.questionTypeName?.toLowerCase().includes("short composition") || dist.questionTypeName?.includes("কম্পোজিশন") || dist.questionTypeName?.includes("শর্ট কম্পোজিশন"))) ||
           (resolvedPunctuation && (dist.questionTypeName?.toLowerCase().includes("punctuation") || dist.questionTypeName?.toLowerCase().includes("capitalization") || dist.questionTypeName?.toLowerCase().includes("capital letter") || dist.questionTypeName?.includes("বিরাম চিহ্ন") || dist.questionTypeName?.includes("যতিচিহ্ন"))) ||
@@ -604,6 +837,8 @@ export async function getQuestionPaperById(
           (resolvedPartsOfSpeech && (dist.questionTypeName?.toLowerCase().includes("parts of speech") || dist.questionTypeName?.toLowerCase().includes("part of speech"))) ||
           (resolvedEssay && (dist.questionTypeName?.includes("রচনা") || dist.questionTypeName?.toLowerCase().includes("essay"))) ||
           (resolvedNewsReport && (dist.questionTypeName?.includes("প্রতিবেদন") || dist.questionTypeName?.toLowerCase().includes("report"))) ||
+          (resolvedPoemEssence && (dist.questionTypeName?.includes("কবিতার মূলভাব") || dist.questionTypeName?.toLowerCase().includes("poem essence") || dist.questionTypeName?.toLowerCase().includes("poem_essence"))) ||
+          (resolvedProseEssence && (dist.questionTypeName?.includes("গদ্য") || dist.questionTypeName?.toLowerCase().includes("prose essence") || dist.questionTypeName?.toLowerCase().includes("prose_essence"))) ||
           (resolvedEssence && (dist.questionTypeName?.includes("সারমর্ম") || dist.questionTypeName?.toLowerCase().includes("essence"))) ||
           (resolvedPoem && (dist.questionTypeName?.includes("কবিতা") || dist.questionTypeName?.toLowerCase().includes("poem"))) ||
           (resolvedSummary && (dist.questionTypeName?.includes("সারাংশ") || dist.questionTypeName?.toLowerCase().includes("summary"))) ||
@@ -637,6 +872,8 @@ export async function getQuestionPaperById(
       application: resolvedApplication,
       summary: resolvedSummary,
       essence: resolvedEssence,
+      poemEssence: resolvedPoemEssence,
+      proseEssence: resolvedProseEssence,
       poem: resolvedPoem,
       newsReport: resolvedNewsReport,
       essay: resolvedEssay,
@@ -650,6 +887,17 @@ export async function getQuestionPaperById(
       shortComposition: resolvedShortComposition,
       descriptiveQuestion: resolvedDescriptiveQuestion,
       shortQuestion: resolvedShortQuestion,
+      makeQuestion: resolvedMakeQuestion,
+      wordMeaning: resolvedWordMeaning,
+      makeSentences: resolvedMakeSentences,
+      oppositeWord: resolvedOppositeWord,
+      juktoborno: resolvedJuktoborno,
+      ekKothayProkash: resolvedEkKothayProkash,
+      synonym: resolvedSynonym,
+      sadhuToCholito: resolvedSadhuToCholito,
+      podNirnoy: resolvedPodNirnoy,
+      verbTense: resolvedVerbTense,
+      formFillup: resolvedFormFillup,
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
   }

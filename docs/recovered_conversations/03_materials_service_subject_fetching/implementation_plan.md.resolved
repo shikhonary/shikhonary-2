@@ -1,0 +1,26 @@
+# Implementation Plan - Dynamic Subject/Chapter/Topic in Materials Service
+
+This plan outlines the steps to replace hardcoded subject and material data in [materials-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/materials-service.tsx) with dynamic data fetched from the database, mirroring the logic used in the `question-bank` view.
+
+## Proposed Changes
+
+### [api]
+
+#### [MODIFY] [services.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/services.ts)
+- Add `getMaterials` procedure to `serviceRouter`.
+- This procedure will fetch subjects, chapters, and topics, similar to `getMcqQuestionBank`.
+
+### [home]
+
+#### [MODIFY] [materials-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/materials-service.tsx)
+- Update tRPC call to use `trpc.home.service.getMaterials.useQuery()`.
+- (Previous changes still apply: replace hardcoded data, handle loading/empty states, etc.)
+
+## Verification Plan
+
+### Manual Verification
+1. Navigate to the Materials Service page in the browser.
+2. Verify that the "Concept Book" and "Marked Book" sections now display subjects and chapters (as materials) fetched from the database.
+3. Verify that the counts (e.g., "10 টি", "15 পৃষ্ঠা" - though pages will be placeholder for now) are consistent.
+4. Verify that the loading state is shown while data is being fetched.
+5. Verify that the "View All" button and other interactive elements still function as expected.

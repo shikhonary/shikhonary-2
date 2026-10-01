@@ -182,7 +182,7 @@ export const CSBlock = ({ item }: { item: any }) => {
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-2 break-inside-avoid">
       {/* Hover Controls */}
-      <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button 
           onClick={handleRemove}
           disabled={isRemoving}

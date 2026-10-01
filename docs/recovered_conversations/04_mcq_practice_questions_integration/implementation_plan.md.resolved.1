@@ -1,0 +1,38 @@
+# MCQ Practice Service Data Integration Phase 2
+
+The goal is to implement persistent exam-taking logic for MCQ practice sessions, matching the experience of public exams with server-synced answers, audio feedback, and confetti effects.
+
+## Proposed Changes
+
+### Core Logic
+
+#### [NEW] [use-practice-exam-attempt.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/hooks/use-practice-exam-attempt.ts)
+- Create a custom hook to manage practice session state.
+- Handle answer submissions via `trpc.home.demoExam.submitAnswer`.
+- Handle session completion via `trpc.home.demoExam.submitPractice`.
+- Track performance metrics (correct, wrong, streak, score).
+
+### Frontend Components
+
+#### [MODIFY] [mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)
+- Add `createPracticeSession` mutation.
+- When "Start Practice" is clicked, call the mutation and redirect to the practice view with the `attemptId`.
+- Toggle between configuration view and practice view if `attemptId` is present in URL.
+
+#### [MODIFY] [take-mcq-practice-view.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/take-mcq-practice-view.tsx)
+- Update to use `use-practice-exam-attempt` hook.
+- Implement server-synced answering.
+- Add audio feedback (correct/wrong) and confetti effects for streaks.
+
+## Verification Plan
+
+### Automated Tests
+- N/A
+
+### Manual Verification
+1. Navigate to MCQ practice config.
+2. Select subjects and start practice.
+3. Verify a persistent session is created in the DB.
+4. Answer questions and verify they are saved to the server (refresh and check).
+5. Complete the session and verify results.
+

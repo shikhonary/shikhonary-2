@@ -48,6 +48,7 @@ export const QUESTION_MODELS = [
   { name: "GenderChange", key: "genderChange" },
   { name: "WordMeaning", key: "wordMeaning" },
   { name: "MakeSentences", key: "makeSentences" },
+  { name: "FormFillup", key: "formFillup" },
 ] as const
 
 const DEFAULT_SOURCE = "গাইড বুক"

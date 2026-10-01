@@ -1,0 +1,31 @@
+# Implementation Plan - Fix Live Class Video Playback
+
+This plan addresses the issue where the embedded video does not play when the play button is triggered in the `live-class-service`. The root cause is a local component shadowing the intended component and missing interaction logic.
+
+## Proposed Changes
+
+### [Component] Live Class Service
+#### [MODIFY] [live-class-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/live-class-service.tsx)
+- Remove the "Recent Live Class" hero section.
+- Implement state `activeSubjectForVideo` to track which subject is currently showing its video player.
+- Inside `subjects.map`, add a conditional [LiveClassVideo](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx#10-120) component that appears above the horizontal video list when that subject is active.
+- Update the [Play](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx#13-16) button overlay on `Card` components to trigger setting the `activeSubjectForVideo`.
+- Remove the overall section click handler if it interferes with specific video selection.
+
+### [Component] Live Class Video
+#### [MODIFY] [live-class-video.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/components/live-class-video.tsx)
+- No changes needed if we continue to use subject-based URLs for now, but ensure it receives the correct `subject` prop.
+
+## Verification Plan
+
+### Manual Verification
+- **Test Case 1: Initial Load**
+  - Open the Live Class Service page.
+  - Verify that the main video section shows a placeholder/play button.
+- **Test Case 2: Play Button Interaction**
+  - Click the play button on the main video placeholder.
+  - Verify that the Facebook video iframe appears and starts playing automatically.
+- **Test Case 3: Subject Selection**
+  - Click on a different subject video card (e.g., Chemistry or Physics).
+  - Verify that the main video section updates to show the placeholder for that subject.
+  - Click the play button and verify it play the correct video (if mapped) or handles it gracefully.

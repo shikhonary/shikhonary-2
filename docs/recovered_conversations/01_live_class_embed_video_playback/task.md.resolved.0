@@ -1,0 +1,6 @@
+# Task: Fix Live Class Video Playback
+
+- [ ] Investigate `live-class-service.tsx` and `live-class-video.tsx` [/]
+- [ ] Identify why the play button doesn't trigger playback [ ]
+- [ ] Implement fix [ ]
+- [ ] Verify fix [ ]

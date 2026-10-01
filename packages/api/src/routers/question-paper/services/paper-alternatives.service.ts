@@ -48,6 +48,8 @@ export async function addAlternativeQuestion(
     APPLICATION: "applicationId",
     SUMMARY: "summaryId",
     ESSENCE: "essenceId",
+    POEM_ESSENCE: "poemEssenceId",
+    PROSE_ESSENCE: "proseEssenceId",
     POEM: "poemId",
     NEWS_REPORT: "newsReportId",
     ESSAY: "essayId",
@@ -61,6 +63,18 @@ export async function addAlternativeQuestion(
     SHORT_COMPOSITION: "shortCompositionId",
     DESCRIPTIVE_QUESTION: "descriptiveQuestionId",
     SHORT_QUESTION: "shortQuestionId",
+    MAKE_QUESTION: "makeQuestionId",
+    WORD_MEANING: "wordMeaningId",
+    MAKE_SENTENCES: "makeSentencesId",
+    OPPOSITE_WORD: "oppositeWordId",
+    JUKTOBORNO: "juktobornoId",
+    EK_KOTHAY_PROKASH: "ekKothayProkashId",
+    SYNONYM: "synonymId",
+    SADHU_TO_CHOLITO: "sadhuToCholitoId",
+    POD_NIRNOY: "podNirnoyId",
+    VERB_TENSE: "verbTenseId",
+    FORM_FILLUP: "formFillupId",
+    FORM_FILLING: "formFillupId",
   }
 
   const fkField = typeFieldMap[input.questionType]
@@ -93,6 +107,10 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).summary.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "ESSENCE") {
     altContent = await (db as any).essence.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "POEM_ESSENCE") {
+    altContent = await (db as any).poemEssence.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "PROSE_ESSENCE") {
+    altContent = await (db as any).proseEssence.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "POEM") {
     altContent = await (db as any).poem.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "NEWS_REPORT") {
@@ -119,6 +137,28 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).descriptiveQuestion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SHORT_QUESTION") {
     altContent = await (db as any).shortQuestion.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "MAKE_QUESTION") {
+    altContent = await (db as any).makeQuestion.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "WORD_MEANING") {
+    altContent = await (db as any).wordMeaning.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "MAKE_SENTENCES") {
+    altContent = await (db as any).makeSentences.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "OPPOSITE_WORD") {
+    altContent = await (db as any).oppositeWord.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "JUKTOBORNO") {
+    altContent = await (db as any).juktoborno.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "EK_KOTHAY_PROKASH") {
+    altContent = await (db as any).ekKothayProkash.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SYNONYM") {
+    altContent = await (db as any).synonym.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SADHU_TO_CHOLITO") {
+    altContent = await (db as any).sadhuToCholito.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "POD_NIRNOY") {
+    altContent = await (db as any).podNirnoy.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "VERB_TENSE") {
+    altContent = await (db as any).verbTense.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "FORM_FILLUP" || input.questionType === "FORM_FILLING") {
+    altContent = await (db as any).formFillup.findUnique({ where: { id: input.questionId } })
   }
   if (!altContent) throw notFound(input.questionType)
 
@@ -298,7 +338,8 @@ export async function swapAlternativeQuestion(
 
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
-    "letterId", "applicationId", "summaryId", "essenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId"
+    "letterId", "applicationId", "summaryId", "essenceId", "poemEssenceId", "proseEssenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId",
+    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId"
   ] as const
 
   const questionFields = [

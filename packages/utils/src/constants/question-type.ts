@@ -28,7 +28,9 @@ export const QUESTION_TYPES = {
   PUNCTUATION: "Punctuation and Capitalization",
   SHORT_COMPOSITION: "Short Composition",
   MAKE_SENTENCES: "Make Sentences",
+  OPPOSITE_WORD: "Opposite Word",
   JUKTOBORNO: "Juktoborno",
+  EK_KOTHAY_PROKASH: "Ek Kothay Prokash",
   WORD_MEANING: "Word Meaning",
   GENDER_CHANGE: "Gender Change",
   SYNONYM: "Synonym",
@@ -38,6 +40,8 @@ export const QUESTION_TYPES = {
   POD_NIRNOY: "Pod Nirnoy",
   VERB_TENSE: "Verb Tense",
   MAKE_QUESTION: "Make Question",
+  FORM_FILLUP: "Form Fillup",
+  FORM_FILLING: "Form Filling",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -68,7 +72,9 @@ export const QUESTION_TYPE_CODES = {
   PUNCTUATION: "PUNCTUATION",
   SHORT_COMPOSITION: "SHORT_COMPOSITION",
   MAKE_SENTENCES: "MAKE_SENTENCES",
+  OPPOSITE_WORD: "OPPOSITE_WORD",
   JUKTOBORNO: "JUKTOBORNO",
+  EK_KOTHAY_PROKASH: "EK_KOTHAY_PROKASH",
   WORD_MEANING: "WORD_MEANING",
   GENDER_CHANGE: "GENDER_CHANGE",
   SYNONYM: "SYNONYM",
@@ -78,6 +84,8 @@ export const QUESTION_TYPE_CODES = {
   POD_NIRNOY: "POD_NIRNOY",
   VERB_TENSE: "VERB_TENSE",
   MAKE_QUESTION: "MAKE_QUESTION",
+  FORM_FILLUP: "FORM_FILLUP",
+  FORM_FILLING: "FORM_FILLING",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -266,10 +274,24 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     defaultMark: 5,
     defaultPosition: 19,
   },
+  [QUESTION_TYPES.OPPOSITE_WORD]: {
+    nameEn: QUESTION_TYPES.OPPOSITE_WORD,
+    nameBn: "বিপরীত শব্দ",
+    code: QUESTION_TYPE_CODES.OPPOSITE_WORD,
+    defaultMark: 5,
+    defaultPosition: 20,
+  },
   [QUESTION_TYPES.JUKTOBORNO]: {
     nameEn: QUESTION_TYPES.JUKTOBORNO,
     nameBn: "যুক্তবর্ণ",
     code: QUESTION_TYPE_CODES.JUKTOBORNO,
+    defaultMark: 5,
+    defaultPosition: 20,
+  },
+  [QUESTION_TYPES.EK_KOTHAY_PROKASH]: {
+    nameEn: QUESTION_TYPES.EK_KOTHAY_PROKASH,
+    nameBn: "এক কথায় প্রকাশ",
+    code: QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH,
     defaultMark: 5,
     defaultPosition: 20,
   },
@@ -335,6 +357,20 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.MAKE_QUESTION,
     defaultMark: 5,
     defaultPosition: 29,
+  },
+  [QUESTION_TYPES.FORM_FILLUP]: {
+    nameEn: QUESTION_TYPES.FORM_FILLUP,
+    nameBn: "ফরম পূরণ",
+    code: QUESTION_TYPE_CODES.FORM_FILLUP,
+    defaultMark: 5,
+    defaultPosition: 30,
+  },
+  [QUESTION_TYPES.FORM_FILLING]: {
+    nameEn: QUESTION_TYPES.FORM_FILLING,
+    nameBn: "ফরম পূরণ",
+    code: QUESTION_TYPE_CODES.FORM_FILLING,
+    defaultMark: 5,
+    defaultPosition: 30,
   },
 } as const
 
@@ -530,6 +566,23 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     return QUESTION_TYPES.MAKE_SENTENCES
   }
   if (
+    lower === "opposite word" ||
+    lower === "opposite words" ||
+    lower === "opposite_word" ||
+    lower === "opposite_words" ||
+    lower === "antonym" ||
+    lower === "antonyms" ||
+    lower.includes("opposite word") ||
+    lower.includes("opposite words") ||
+    lower.includes("বিপরীত শব্দ") ||
+    lower.includes("বিপরীতার্থক শব্দ") ||
+    lower.includes("বিপরীত শব্দ লেখো") ||
+    lower.includes("বিপরীত শব্দ লিখ") ||
+    lower.includes("বিপরীত")
+  ) {
+    return QUESTION_TYPES.OPPOSITE_WORD
+  }
+  if (
     lower === "juktoborno" ||
     lower === "jukto borno" ||
     lower === "jukto_borno" ||
@@ -541,6 +594,21 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("যুক্তবর্ণ বিভাজন")
   ) {
     return QUESTION_TYPES.JUKTOBORNO
+  }
+  if (
+    lower === "ek kothay prokash" ||
+    lower === "ek kothai prokash" ||
+    lower === "ek_kothay_prokash" ||
+    lower === "ek_kothai_prokash" ||
+    lower === "one word substitution" ||
+    lower.includes("ek kothay") ||
+    lower.includes("ek kothai") ||
+    lower.includes("এক কথায় প্রকাশ") ||
+    lower.includes("এক কথায় প্রকাশ") ||
+    lower.includes("এক কথায়") ||
+    lower.includes("এক কথায়")
+  ) {
+    return QUESTION_TYPES.EK_KOTHAY_PROKASH
   }
   if (
     lower === "word meaning" ||
@@ -648,6 +716,20 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("প্রশ্নকরণ")
   ) {
     return QUESTION_TYPES.MAKE_QUESTION
+  }
+  if (
+    lower === "form fillup" ||
+    lower === "form fill up" ||
+    lower === "form filling" ||
+    lower === "form_fillup" ||
+    lower === "form_filling" ||
+    lower.includes("form fillup") ||
+    lower.includes("form fill up") ||
+    lower.includes("form filling") ||
+    lower.includes("ফরম পূরণ") ||
+    lower.includes("ফরমপুরণ")
+  ) {
+    return QUESTION_TYPES.FORM_FILLUP
   }
 
   return null

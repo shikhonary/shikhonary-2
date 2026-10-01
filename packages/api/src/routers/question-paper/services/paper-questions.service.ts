@@ -40,6 +40,8 @@ export async function addQuestionPaperQuestion(
     input.applicationId,
     input.summaryId,
     input.essenceId,
+    input.poemEssenceId,
+    input.proseEssenceId,
     input.poemId,
     input.essayId,
     input.newsReportId,
@@ -53,6 +55,17 @@ export async function addQuestionPaperQuestion(
     input.shortCompositionId,
     input.descriptiveQuestionId,
     input.shortQuestionId,
+    input.makeQuestionId,
+    input.wordMeaningId,
+    input.makeSentencesId,
+    input.oppositeWordId,
+    input.juktobornoId,
+    input.ekKothayProkashId,
+    input.synonymId,
+    input.sadhuToCholitoId,
+    input.podNirnoyId,
+    input.verbTenseId,
+    input.formFillupId,
   ].filter(Boolean)
 
   if (idsSet.length !== 1) {
@@ -128,6 +141,18 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("Essence")
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "Essence: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.poemEssenceId) {
+    const item = await (db as any).poemEssence.findUnique({ where: { id: input.poemEssenceId } })
+    if (!item) throw notFound("PoemEssence")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "PoemEssence: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.proseEssenceId) {
+    const item = await (db as any).proseEssence.findUnique({ where: { id: input.proseEssenceId } })
+    if (!item) throw notFound("ProseEssence")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "ProseEssence: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.poemId) {
     const item = await (db as any).poem.findUnique({ where: { id: input.poemId } })
@@ -207,6 +232,72 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "ShortQuestion: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.makeQuestionId) {
+    const item = await (db as any).makeQuestion.findUnique({ where: { id: input.makeQuestionId } })
+    if (!item) throw notFound("MakeQuestion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "MakeQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.wordMeaningId) {
+    const item = await (db as any).wordMeaning.findUnique({ where: { id: input.wordMeaningId } })
+    if (!item) throw notFound("WordMeaning")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "WordMeaning: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.juktobornoId) {
+    const item = await (db as any).juktoborno.findUnique({ where: { id: input.juktobornoId } })
+    if (!item) throw notFound("Juktoborno")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "Juktoborno: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.ekKothayProkashId) {
+    const item = await (db as any).ekKothayProkash.findUnique({ where: { id: input.ekKothayProkashId } })
+    if (!item) throw notFound("EkKothayProkash")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "EkKothayProkash: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.makeSentencesId) {
+    const item = await (db as any).makeSentences.findUnique({ where: { id: input.makeSentencesId } })
+    if (!item) throw notFound("MakeSentences")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "MakeSentences: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.oppositeWordId) {
+    const item = await (db as any).oppositeWord.findUnique({ where: { id: input.oppositeWordId } })
+    if (!item) throw notFound("OppositeWord")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "OppositeWord: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.synonymId) {
+    const item = await (db as any).synonym.findUnique({ where: { id: input.synonymId } })
+    if (!item) throw notFound("Synonym")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "Synonym: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.sadhuToCholitoId) {
+    const item = await (db as any).sadhuToCholito.findUnique({ where: { id: input.sadhuToCholitoId } })
+    if (!item) throw notFound("SadhuToCholito")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "SadhuToCholito: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.podNirnoyId) {
+    const item = await (db as any).podNirnoy.findUnique({ where: { id: input.podNirnoyId } })
+    if (!item) throw notFound("PodNirnoy")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "PodNirnoy: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.verbTenseId) {
+    const item = await (db as any).verbTense.findUnique({ where: { id: input.verbTenseId } })
+    if (!item) throw notFound("VerbTense")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "VerbTense: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.formFillupId) {
+    const item = await (db as any).formFillup.findUnique({ where: { id: input.formFillupId } })
+    if (!item) throw notFound("FormFillup")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "FormFillup: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
@@ -248,6 +339,8 @@ export async function addQuestionPaperQuestion(
       applicationId: input.applicationId,
       summaryId: input.summaryId,
       essenceId: input.essenceId,
+      poemEssenceId: input.poemEssenceId,
+      proseEssenceId: input.proseEssenceId,
       poemId: input.poemId,
       essayId: input.essayId,
       newsReportId: input.newsReportId,
@@ -261,6 +354,17 @@ export async function addQuestionPaperQuestion(
       shortCompositionId: input.shortCompositionId,
       descriptiveQuestionId: input.descriptiveQuestionId,
       shortQuestionId: input.shortQuestionId,
+      makeQuestionId: input.makeQuestionId,
+      wordMeaningId: input.wordMeaningId,
+      juktobornoId: input.juktobornoId,
+      ekKothayProkashId: input.ekKothayProkashId,
+      makeSentencesId: input.makeSentencesId,
+      oppositeWordId: input.oppositeWordId,
+      synonymId: input.synonymId,
+      sadhuToCholitoId: input.sadhuToCholitoId,
+      podNirnoyId: input.podNirnoyId,
+      verbTenseId: input.verbTenseId,
+      formFillupId: input.formFillupId,
       distributionId: input.distributionId,
       sectionId: finalSectionId,
       subSectionId: finalSubSectionId,
@@ -294,53 +398,54 @@ export async function removeQuestionPaperQuestion(
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
 
-  const where: any = { questionPaperId: input.questionPaperId }
-  if (input.questionType === "MCQ") {
-    where.mcqId = input.questionId
-  } else if (input.questionType === "CQ") {
-    where.cqId = input.questionId
-  } else if (input.questionType === "CS") {
-    where.csId = input.questionId
-  } else if (input.questionType === "SA") {
-    where.shortAnswerId = input.questionId
-  } else if (input.questionType === "PBQ") {
-    where.pbqId = input.questionId
-  } else if (input.questionType === "PARAGRAPH") {
-    where.paragraphId = input.questionId
-  } else if (input.questionType === "AMPLIFICATION") {
-    where.amplificationId = input.questionId
-  } else if (input.questionType === "LETTER") {
-    where.letterId = input.questionId
-  } else if (input.questionType === "APPLICATION") {
-    where.applicationId = input.questionId
-  } else if (input.questionType === "SUMMARY") {
-    where.summaryId = input.questionId
-  } else if (input.questionType === "ESSENCE") {
-    where.essenceId = input.questionId
-  } else if (input.questionType === "POEM") {
-    where.poemId = input.questionId
-  } else if (input.questionType === "ESSAY") {
-    where.essayId = input.questionId
-  } else if (input.questionType === "NEWS_REPORT") {
-    where.newsReportId = input.questionId
-  } else if (input.questionType === "PARTS_OF_SPEECH") {
-    where.partsOfSpeechId = input.questionId
-  } else if (input.questionType === "RIGHT_FORM_OF_VERBS") {
-    where.rightFormOfVerbId = input.questionId
-  } else if (input.questionType === "CHANGING_SENTENCES") {
-    where.changingSentenceId = input.questionId
-  } else if (input.questionType === "FILL_IN_THE_BLANKS_WITH_CLUES") {
-    where.fillInTheBlanksWithCluesId = input.questionId
-  } else if (input.questionType === "SUBSTITUTION_TABLE") {
-    where.substitutionTableId = input.questionId
-  } else if (input.questionType === "PUNCTUATION") {
-    where.punctuationId = input.questionId
-  } else if (input.questionType === "SHORT_COMPOSITION") {
-    where.shortCompositionId = input.questionId
-  } else if (input.questionType === "DESCRIPTIVE_QUESTION") {
-    where.descriptiveQuestionId = input.questionId
-  } else if (input.questionType === "SHORT_QUESTION") {
-    where.shortQuestionId = input.questionId
+  const typeFieldMap: Record<string, string> = {
+    MCQ: "mcqId",
+    CQ: "cqId",
+    CS: "csId",
+    SA: "shortAnswerId",
+    PBQ: "pbqId",
+    PARAGRAPH: "paragraphId",
+    AMPLIFICATION: "amplificationId",
+    LETTER: "letterId",
+    APPLICATION: "applicationId",
+    SUMMARY: "summaryId",
+    ESSENCE: "essenceId",
+    POEM_ESSENCE: "poemEssenceId",
+    PROSE_ESSENCE: "proseEssenceId",
+    POEM: "poemId",
+    ESSAY: "essayId",
+    NEWS_REPORT: "newsReportId",
+    PARTS_OF_SPEECH: "partsOfSpeechId",
+    RIGHT_FORM_OF_VERBS: "rightFormOfVerbId",
+    CHANGING_SENTENCES: "changingSentenceId",
+    FILL_IN_THE_BLANKS_WITH_CLUES: "fillInTheBlanksWithCluesId",
+    FILL_IN_THE_BLANKS_WITHOUT_CLUES: "fillInTheBlanksWithoutCluesId",
+    SUBSTITUTION_TABLE: "substitutionTableId",
+    PUNCTUATION: "punctuationId",
+    SHORT_COMPOSITION: "shortCompositionId",
+    DESCRIPTIVE_QUESTION: "descriptiveQuestionId",
+    SHORT_QUESTION: "shortQuestionId",
+    MAKE_QUESTION: "makeQuestionId",
+    WORD_MEANING: "wordMeaningId",
+    JUKTOBORNO: "juktobornoId",
+    EK_KOTHAY_PROKASH: "ekKothayProkashId",
+    MAKE_SENTENCES: "makeSentencesId",
+    OPPOSITE_WORD: "oppositeWordId",
+    SYNONYM: "synonymId",
+    SADHU_TO_CHOLITO: "sadhuToCholitoId",
+    POD_NIRNOY: "podNirnoyId",
+    VERB_TENSE: "verbTenseId",
+    FORM_FILLUP: "formFillupId",
+    FORM_FILLING: "formFillupId",
+  }
+
+  const field = typeFieldMap[input.questionType]
+  const where: any = {
+    questionPaperId: input.questionPaperId,
+    OR: [
+      { id: input.questionId },
+      ...(field ? [{ [field]: input.questionId }] : []),
+    ],
   }
 
   const existing = await tenantDb.questionPaperQuestion.findFirst({ where })
@@ -584,6 +689,32 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.poemEssenceIds && input.poemEssenceIds.length > 0) {
+    for (const poemEssenceId of input.poemEssenceIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        poemEssenceId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.proseEssenceIds && input.proseEssenceIds.length > 0) {
+    for (const proseEssenceId of input.proseEssenceIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        proseEssenceId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.poemIds && input.poemIds.length > 0) {
     for (const poemId of input.poemIds) {
       recordsToCreate.push({
@@ -753,6 +884,149 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.makeQuestionIds && input.makeQuestionIds.length > 0) {
+    for (const makeQuestionId of input.makeQuestionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        makeQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.wordMeaningIds && input.wordMeaningIds.length > 0) {
+    for (const wordMeaningId of input.wordMeaningIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        wordMeaningId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.juktobornoIds && input.juktobornoIds.length > 0) {
+    for (const juktobornoId of input.juktobornoIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        juktobornoId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.makeSentencesIds && input.makeSentencesIds.length > 0) {
+    for (const makeSentencesId of input.makeSentencesIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        makeSentencesId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.oppositeWordIds && input.oppositeWordIds.length > 0) {
+    for (const oppositeWordId of input.oppositeWordIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        oppositeWordId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.ekKothayProkashIds && input.ekKothayProkashIds.length > 0) {
+    for (const ekKothayProkashId of input.ekKothayProkashIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        ekKothayProkashId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.synonymIds && input.synonymIds.length > 0) {
+    for (const synonymId of input.synonymIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        synonymId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.sadhuToCholitoIds && input.sadhuToCholitoIds.length > 0) {
+    for (const sadhuToCholitoId of input.sadhuToCholitoIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        sadhuToCholitoId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.podNirnoyIds && input.podNirnoyIds.length > 0) {
+    for (const podNirnoyId of input.podNirnoyIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        podNirnoyId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.verbTenseIds && input.verbTenseIds.length > 0) {
+    for (const verbTenseId of input.verbTenseIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        verbTenseId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.formFillupIds && input.formFillupIds.length > 0) {
+    for (const formFillupId of input.formFillupIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        formFillupId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (recordsToCreate.length === 0) {
     return { success: true, count: 0 }
   }
@@ -805,6 +1079,10 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).summary.findUnique({ where: { id: record.summaryId } })) as any
       } else if (record.essenceId) {
         record.contentSnapshot = (await (db as any).essence.findUnique({ where: { id: record.essenceId } })) as any
+      } else if (record.poemEssenceId) {
+        record.contentSnapshot = (await (db as any).poemEssence.findUnique({ where: { id: record.poemEssenceId } })) as any
+      } else if (record.proseEssenceId) {
+        record.contentSnapshot = (await (db as any).proseEssence.findUnique({ where: { id: record.proseEssenceId } })) as any
       } else if (record.poemId) {
         record.contentSnapshot = (await (db as any).poem.findUnique({ where: { id: record.poemId } })) as any
       } else if (record.essayId) {
@@ -831,6 +1109,26 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).descriptiveQuestion.findUnique({ where: { id: record.descriptiveQuestionId } })) as any
       } else if (record.shortQuestionId) {
         record.contentSnapshot = (await db.shortQuestion.findUnique({ where: { id: record.shortQuestionId } })) as any
+      } else if (record.makeQuestionId) {
+        record.contentSnapshot = (await (db as any).makeQuestion.findUnique({ where: { id: record.makeQuestionId } })) as any
+      } else if (record.wordMeaningId) {
+        record.contentSnapshot = (await (db as any).wordMeaning.findUnique({ where: { id: record.wordMeaningId } })) as any
+      } else if (record.juktobornoId) {
+        record.contentSnapshot = (await (db as any).juktoborno.findUnique({ where: { id: record.juktobornoId } })) as any
+      } else if (record.ekKothayProkashId) {
+        record.contentSnapshot = (await (db as any).ekKothayProkash.findUnique({ where: { id: record.ekKothayProkashId } })) as any
+      } else if (record.makeSentencesId) {
+        record.contentSnapshot = (await (db as any).makeSentences.findUnique({ where: { id: record.makeSentencesId } })) as any
+      } else if (record.oppositeWordId) {
+        record.contentSnapshot = (await (db as any).oppositeWord.findUnique({ where: { id: record.oppositeWordId } })) as any
+      } else if (record.synonymId) {
+        record.contentSnapshot = (await (db as any).synonym.findUnique({ where: { id: record.synonymId } })) as any
+      } else if (record.sadhuToCholitoId) {
+        record.contentSnapshot = (await (db as any).sadhuToCholito.findUnique({ where: { id: record.sadhuToCholitoId } })) as any
+      } else if (record.podNirnoyId) {
+        record.contentSnapshot = (await (db as any).podNirnoy.findUnique({ where: { id: record.podNirnoyId } })) as any
+      } else if (record.verbTenseId) {
+        record.contentSnapshot = (await (db as any).verbTense.findUnique({ where: { id: record.verbTenseId } })) as any
       }
     }
 
@@ -857,6 +1155,10 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_summaryId: { questionPaperId: input.questionPaperId, summaryId: record.summaryId } }
     } else if (record.essenceId) {
       whereCondition = { questionPaperId_essenceId: { questionPaperId: input.questionPaperId, essenceId: record.essenceId } }
+    } else if (record.poemEssenceId) {
+      whereCondition = { questionPaperId_poemEssenceId: { questionPaperId: input.questionPaperId, poemEssenceId: record.poemEssenceId } }
+    } else if (record.proseEssenceId) {
+      whereCondition = { questionPaperId_proseEssenceId: { questionPaperId: input.questionPaperId, proseEssenceId: record.proseEssenceId } }
     } else if (record.poemId) {
       whereCondition = { questionPaperId_poemId: { questionPaperId: input.questionPaperId, poemId: record.poemId } }
     } else if (record.essayId) {
@@ -883,6 +1185,26 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_descriptiveQuestionId: { questionPaperId: input.questionPaperId, descriptiveQuestionId: record.descriptiveQuestionId } }
     } else if (record.shortQuestionId) {
       whereCondition = { questionPaperId_shortQuestionId: { questionPaperId: input.questionPaperId, shortQuestionId: record.shortQuestionId } }
+    } else if (record.makeQuestionId) {
+      whereCondition = { questionPaperId_makeQuestionId: { questionPaperId: input.questionPaperId, makeQuestionId: record.makeQuestionId } }
+    } else if (record.wordMeaningId) {
+      whereCondition = { questionPaperId_wordMeaningId: { questionPaperId: input.questionPaperId, wordMeaningId: record.wordMeaningId } }
+    } else if (record.juktobornoId) {
+      whereCondition = { questionPaperId_juktobornoId: { questionPaperId: input.questionPaperId, juktobornoId: record.juktobornoId } }
+    } else if (record.ekKothayProkashId) {
+      whereCondition = { questionPaperId_ekKothayProkashId: { questionPaperId: input.questionPaperId, ekKothayProkashId: record.ekKothayProkashId } }
+    } else if (record.makeSentencesId) {
+      whereCondition = { questionPaperId_makeSentencesId: { questionPaperId: input.questionPaperId, makeSentencesId: record.makeSentencesId } }
+    } else if (record.oppositeWordId) {
+      whereCondition = { questionPaperId_oppositeWordId: { questionPaperId: input.questionPaperId, oppositeWordId: record.oppositeWordId } }
+    } else if (record.synonymId) {
+      whereCondition = { questionPaperId_synonymId: { questionPaperId: input.questionPaperId, synonymId: record.synonymId } }
+    } else if (record.sadhuToCholitoId) {
+      whereCondition = { questionPaperId_sadhuToCholitoId: { questionPaperId: input.questionPaperId, sadhuToCholitoId: record.sadhuToCholitoId } }
+    } else if (record.podNirnoyId) {
+      whereCondition = { questionPaperId_podNirnoyId: { questionPaperId: input.questionPaperId, podNirnoyId: record.podNirnoyId } }
+    } else if (record.verbTenseId) {
+      whereCondition = { questionPaperId_verbTenseId: { questionPaperId: input.questionPaperId, verbTenseId: record.verbTenseId } }
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -930,6 +1252,8 @@ export async function bulkRemoveQuestions(
         { applicationId: { in: input.questionIds } },
         { summaryId: { in: input.questionIds } },
         { essenceId: { in: input.questionIds } },
+        { poemEssenceId: { in: input.questionIds } },
+        { proseEssenceId: { in: input.questionIds } },
         { poemId: { in: input.questionIds } },
         { essayId: { in: input.questionIds } },
         { newsReportId: { in: input.questionIds } },
@@ -943,6 +1267,16 @@ export async function bulkRemoveQuestions(
         { shortCompositionId: { in: input.questionIds } },
         { descriptiveQuestionId: { in: input.questionIds } },
         { shortQuestionId: { in: input.questionIds } },
+        { makeQuestionId: { in: input.questionIds } },
+        { wordMeaningId: { in: input.questionIds } },
+        { juktobornoId: { in: input.questionIds } },
+        { ekKothayProkashId: { in: input.questionIds } },
+        { makeSentencesId: { in: input.questionIds } },
+        { oppositeWordId: { in: input.questionIds } },
+        { synonymId: { in: input.questionIds } },
+        { sadhuToCholitoId: { in: input.questionIds } },
+        { podNirnoyId: { in: input.questionIds } },
+        { verbTenseId: { in: input.questionIds } },
       ],
     },
     select: { id: true, distributionId: true },

@@ -8,6 +8,9 @@ import { PBQBlock } from "../blocks/pbq-block";
 import { ShortAnswerBlock } from "../blocks/short-answer-block";
 import { ParagraphBlock } from "../blocks/paragraph-block";
 import { EssenceBlock } from "../blocks/essence-block";
+import { PoemEssenceBlock } from "../blocks/poem-essence-block";
+import { FormFillupBlock } from "../blocks/form-fillup-block";
+import { ProseEssenceBlock } from "../blocks/prose-essence-block";
 import { PoemBlock } from "../blocks/poem-block";
 import { SummaryBlock } from "../blocks/summary-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
@@ -15,10 +18,21 @@ import { LetterBlock } from "../blocks/letter-block";
 import { ApplicationBlock } from "../blocks/application-block";
 import { NewsReportBlock } from "../blocks/news-report-block";
 import { EssayBlock } from "../blocks/essay-block";
+import { WordMeaningBlock } from "../blocks/word-meaning-block";
+import { MakeSentenceBlock } from "../blocks/make-sentence-block";
+import { MakeQuestionBlock } from "../blocks/make-question-block";
+import { OppositeWordBlock } from "../blocks/opposite-word-block";
+import { JuktobornoBlock } from "../blocks/juktoborno-block";
+import { EkKothayProkashBlock } from "../blocks/ek-kothay-prokash-block";
+import { SynonymBlock } from "../blocks/synonym-block";
+import { SadhuToCholitoBlock } from "../blocks/sadhu-to-cholito-block";
+import { PodNirnoyBlock } from "../blocks/pod-nirnoy-block";
+import { VerbTenseBlock } from "../blocks/verb-tense-block";
 import { PartsOfSpeechBlock } from "../blocks/parts-of-speech-block";
 import { RightFormOfVerbBlock } from "../blocks/right-form-of-verb-block";
 import { ChangingSentenceBlock } from "../blocks/changing-sentence-block";
 import { FillInTheBlanksWithCluesBlock } from "../blocks/fill-in-the-blanks-with-clues-block";
+import { FillInTheBlanksWithoutCluesBlock } from "../blocks/fill-in-the-blanks-without-clues-block";
 import { SubstitutionTableBlock } from "../blocks/substitution-table-block";
 import { PunctuationBlock } from "../blocks/punctuation-block";
 import { ShortCompositionBlock } from "../blocks/short-composition-block";
@@ -302,6 +316,32 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <NewsReportBlock item={block.data.item} />;
     case "question-essay":
       return <EssayBlock item={block.data.item} />;
+    case "question-poem-essence":
+      return <PoemEssenceBlock item={block.data.item} />;
+    case "question-form-fillup":
+      return <FormFillupBlock item={block.data.item} />;
+    case "question-prose-essence":
+      return <ProseEssenceBlock item={block.data.item} />;
+    case "question-word-meaning":
+      return <WordMeaningBlock item={block.data.item} />;
+    case "question-make-sentence":
+      return <MakeSentenceBlock item={block.data.item} />;
+    case "question-make-question":
+      return <MakeQuestionBlock item={block.data.item} />;
+    case "question-opposite-word":
+      return <OppositeWordBlock item={block.data.item} />;
+    case "question-juktoborno":
+      return <JuktobornoBlock item={block.data.item} />;
+    case "question-ek-kothay-prokash":
+      return <EkKothayProkashBlock item={block.data.item} />;
+    case "question-synonym":
+      return <SynonymBlock item={block.data.item} />;
+    case "question-sadhu-to-cholito":
+      return <SadhuToCholitoBlock item={block.data.item} />;
+    case "question-pod-nirnoy":
+      return <PodNirnoyBlock item={block.data.item} />;
+    case "question-verb-tense":
+      return <VerbTenseBlock item={block.data.item} />;
     case "question-parts-of-speech":
       return <PartsOfSpeechBlock item={block.data.item} />;
     case "question-right-form-of-verb":
@@ -310,6 +350,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ChangingSentenceBlock item={block.data.item} />;
     case "question-fill-in-the-blanks-with-clues":
       return <FillInTheBlanksWithCluesBlock item={block.data.item} />;
+    case "question-fill-in-the-blanks-without-clues":
+      return <FillInTheBlanksWithoutCluesBlock item={block.data.item} />;
     case "question-substitution-table":
       return <SubstitutionTableBlock item={block.data.item} />;
     case "question-punctuation":

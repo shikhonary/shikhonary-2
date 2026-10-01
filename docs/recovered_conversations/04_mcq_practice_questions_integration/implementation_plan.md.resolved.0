@@ -1,0 +1,31 @@
+# MCQ Practice Service Data Integration
+
+The goal is to synchronize the MCQ practice session data fetching with the question-bank methodology, specifically by including topics and real question counts.
+
+## Proposed Changes
+
+### API Layer
+
+#### [MODIFY] [exam.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/exam.ts)
+- Update `getSubjectsWithChapters` query to include `topics` within chapters.
+- Include MCQ counts for each topic.
+- Ensure ordering by `position` instead of `name` where applicable, consistent with [services.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/services.ts).
+
+### Frontend Layer
+
+#### [MODIFY] [mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)
+- Use real data from the `getSubjectsWithChapters` tRPC query.
+- Remove the `subjectsData` mock constant.
+- Update `availableChapters`, `availableTopics`, and `totalQuestionsAvailable` to use the schema-defined fields.
+- Ensure selection logic (subjects, chapters, topics) works with database IDs.
+
+## Verification Plan
+
+### Automated Tests
+- N/A
+
+### Manual Verification
+1. Navigate to the MCQ practice page.
+2. Verify that subjects, chapters, and topics are loaded from the database.
+3. Select various items and check if "Total Questions Available" updates correctly.
+4. Start a practice session and verify questions are fetched based on selection.

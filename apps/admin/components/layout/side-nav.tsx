@@ -77,6 +77,7 @@ const navGroups: NavGroup[] = [
       { href: "/juktoborno", label: "Juktoborno", icon: HelpCircle },
       { href: "/opposite-words", label: "Opposite Words", icon: ArrowLeftRight },
       { href: "/word-meaning", label: "Word Meaning", icon: HelpCircle },
+      { href: "/form-filling", label: "Form Filling", icon: HelpCircle },
       { href: "/ek-kothay-prokash", label: "Ek Kothay Prokash", icon: HelpCircle },
       { href: "/sadhu-to-cholito", label: "Sadhu to Cholito", icon: ArrowLeftRight },
       { href: "/gender-change", label: "Gender Change", icon: HelpCircle },

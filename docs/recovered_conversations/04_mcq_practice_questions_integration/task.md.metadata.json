@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_TASK",
+  "summary": "Fixed answer marking bug in MCQ Practice Service.",
+  "updatedAt": "2026-01-23T10:03:17.801161200Z",
+  "version": "9"
+}

@@ -15,8 +15,8 @@ import {
 
 export interface FillInTheBlanksWithoutCluesItem {
   id: string
-  content?: string | null
-  options?: string[]
+  content: string
+  clue?: string
   reference: string[]
   difficulty: string
   popularityCount: number
@@ -197,7 +197,7 @@ export function FillInTheBlanksWithoutCluesTable({
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const rawContent = item.content || (item.options && item.options.length > 0 ? item.options[0] : "") || ""
+            const rawContent = item.content || ""
             const plainText = rawContent.replace(/<[^>]*>?/gm, "")
             const snippet = plainText.length > 80 ? plainText.substring(0, 80) + "..." : plainText
 
@@ -239,13 +239,6 @@ export function FillInTheBlanksWithoutCluesTable({
                           </span>
                         )}
 
-                        {/* Sentence Options Count Badge */}
-                        {Array.isArray(item.options) && item.options.length > 0 && (
-                          <span className="px-2.5 py-0.5 bg-violet-50 text-violet-700 rounded font-label-sm text-[11px] font-bold border border-violet-200">
-                            📋 {item.options.length} Sentences
-                          </span>
-                        )}
-
                         {/* Popularity Badge */}
                         <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
                           👁️ {item.popularityCount} Views
@@ -264,31 +257,20 @@ export function FillInTheBlanksWithoutCluesTable({
                         </span>
                       </div>
 
-                      {/* Content / Passage (if present) */}
+                      {/* Clue / Instructions (if present) */}
+                      {item.clue && item.clue.trim() && (
+                        <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-primary font-medium flex items-center gap-1.5">
+                          <span>💡</span>
+                          <span><strong className="font-semibold">Clue / Instructions:</strong> {item.clue}</span>
+                        </div>
+                      )}
+
+                      {/* Content / Question / Passage */}
                       {item.content && (
                         <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
                           <div className="whitespace-pre-wrap font-medium">
                             <RenderFormattedPassage text={item.content} />
                           </div>
-                        </div>
-                      )}
-
-                      {/* Sentence Options List (if present) */}
-                      {Array.isArray(item.options) && item.options.length > 0 && (
-                        <div className="space-y-2">
-                          {item.options.map((opt, optIdx) => (
-                            <div
-                              key={optIdx}
-                              className="flex items-start gap-2.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-3.5 py-2.5 text-sm"
-                            >
-                              <span className="font-mono text-xs font-bold text-outline shrink-0 mt-0.5">
-                                #{optIdx + 1}
-                              </span>
-                              <div className="font-medium text-on-surface flex-1">
-                                <RenderFormattedPassage text={opt} />
-                              </div>
-                            </div>
-                          ))}
                         </div>
                       )}
 

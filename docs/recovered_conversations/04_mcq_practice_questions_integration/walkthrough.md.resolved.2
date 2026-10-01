@@ -1,0 +1,78 @@
+# Walkthrough - MCQ Practice Service Data Integration
+
+I have integrated real data from the database into the MCQ practice service, enabling users to select subjects, chapters, and topics with accurate question counts.
+
+## Changes Made
+
+### API Layer
+- **[exam.ts](file:///c:/Users/User/Documents/monorepo-new/packages/api/src/routers/home/exam.ts)**:
+    - Updated `getSubjectsWithChapters` to include topics within each chapter.
+    - Added MCQ counts for each topic.
+    - Switched ordering to `position` for consistency with other services.
+
+### Frontend Layer
+- **[mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Removed `subjectsData` mock constant.
+    - Now consumes real data from `trpc.home.demoExam.getSubjectsWithChapters`.
+    - Updated selection logic (subjects, chapters, topics) to work with database-driven IDs.
+    - Enhanced hero section badges to display real counts for subjects, chapters, and total questions.
+    - Fixed TypeScript linting errors in map callbacks.
+
+## Phase 2: Exam Taking Logic
+
+I have implemented persistent, server-synced exam-taking logic that mirrors the premium experience of public exams.
+
+### Changes Made
+
+#### Core Logic
+- **[NEW] [use-practice-exam-attempt.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/hooks/use-practice-exam-attempt.ts)**:
+    - Created a custom hook to manage practice session state.
+    - Synced answers with the server in real-time.
+    - Provided performance metrics and answer states.
+
+#### UI & Experience
+- **[MODIFY] [mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Integrated `createPracticeSession` mutation to persist sessions before starting.
+    - Added conditional rendering for configuration and practice views.
+- **[MODIFY] [take-mcq-practice-view.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/take-mcq-practice-view.tsx)**:
+    - Refactored to use the new attempt hook.
+    - Added **Audio Feedback** for correct/incorrect answers.
+    - Added **Confetti Effects** for achieving streaks.
+- **[NEW] [use-audio-feedback.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/hooks/use-audio-feedback.ts)**:
+    - Added a hook for generating procedural audio feedback.
+
+## Phase 3: Result Logic
+
+I have implemented a comprehensive result logic for practice sessions, matching the depth and visual quality of public exam results.
+
+### Changes Made
+
+#### Frontend Logic & Navigation
+- **[MODIFY] [use-practice-exam-attempt.ts](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/hooks/use-practice-exam-attempt.ts)**:
+    - Updated [onSuccess](file:///c:/Users/User/Documents/monorepo-new/apps/student/modules/exam/hooks/use-public-exam-attempt.ts#88-102) callback for practice submission to automatically append `view=result` to the URL and redirect.
+- **[MODIFY] [mcq-practice-service.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/mcq-practice-service.tsx)**:
+    - Added logic to catch the `view=result` query parameter and render the new [PracticeResultView](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/practice-result-view.tsx#34-174).
+
+#### Result UI
+- **[NEW] [practice-result-view.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/modules/services/ui/views/practice-result-view.tsx)**:
+    - A high-fidelity results page featuring:
+        - **Performance Summary**: Score, accuracy, duration, and mistake tracking.
+        - **Interactive Review**: A categorized review section (All, Correct, Wrong, Skipped) with detailed question cards.
+        - **Rich Content**: Support for KaTeX math rendering, explanations, and context blocks.
+        - **Premium Design**: Gradient headers, animated status icons, and responsive layouts.
+
+## Verification Results
+
+### Automatic Redirection
+Upon clicking "Submit" and confirming the dialog, the app correctly transitions from the practice view to the results view.
+
+### Data Accuracy
+The results page correctly fetches and displays session stats, including the calculated score and accuracy percentage.
+
+### Detailed Review
+The review section allows for easy navigation through all questions, showing the user's choice vs. the correct answer with full explanations.
+
+## Conclusion
+
+The MCQ Practice Service is now fully integrated with the database, featuring persistent sessions, real-time sync, interactive feedback, and detailed performance analysis.
+

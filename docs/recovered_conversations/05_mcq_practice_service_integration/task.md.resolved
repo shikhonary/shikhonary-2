@@ -1,0 +1,34 @@
+# Refactor MCQ Practice Service - Task Checklist
+
+## Backend Changes
+- [x] Add `getPracticeMcqs` procedure to exam router
+- [ ] Test the new procedure returns correct MCQs based on filters
+
+## Frontend - MCQ Practice Service Page
+- [x] Remove session creation mutation
+- [x] Remove sessionId state management
+- [x] Update handleStartPractice to navigate with query params
+- [x] Update button to use new navigation approach
+
+## Frontend - Practice Page Route
+- [x] Move page from `[id]/page.tsx` to [page.tsx](file:///c:/Users/User/Documents/monorepo-new/apps/home/app/%28root%29/services/mcq-practice/page.tsx)
+- [x] Update to read query params instead of route params
+- [x] Parse and validate filter parameters
+- [x] Pass filters to view component
+
+## Frontend - Practice View Component
+- [x] Update props to accept filters instead of IDs
+- [x] Update to fetch MCQs using new tRPC procedure
+- [x] Remove dependencies on demoExamId and attemptId
+- [x] Keep client-side answer tracking
+- [x] Update navigation/routing logic
+
+## Frontend - Demo Exam Attempt Hook
+- [x] Removed (no longer needed - using local state in view component)
+
+## Cleanup
+- [x] Remove old dynamic route folder
+- [x] Remove unused hook file
+- [ ] Remove unused imports from mcq-practice-service
+- [ ] Fix TypeScript errors
+- [ ] Test the complete flow

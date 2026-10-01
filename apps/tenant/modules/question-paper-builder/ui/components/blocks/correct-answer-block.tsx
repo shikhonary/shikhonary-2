@@ -185,7 +185,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
          style={{ fontSize: settings.fontSize || 12, fontFamily: settings.fontFamily }}>
          
       {/* Hover Controls */}
-      <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button 
           onClick={() => setMcqOptionLayout(item.id, 1)}
           className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${columns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}

@@ -21,6 +21,8 @@ import {
   updateDistributionLabelSchema,
   getDistributionStatusesSchema,
   getAvailableQuestionsSchema,
+  getAvailableBoardYearsSchema,
+  getAvailableSourcesSchema,
   bulkAssignQuestionsSchema,
   bulkRemoveQuestionsSchema,
   updateQuestionPaperSettingsSchema,
@@ -53,6 +55,8 @@ import {
   getQuestionPaperHistory,
   getQuestionPaperDistributionStatuses,
   getAvailableQuestions,
+  getAvailableBoardYears,
+  getAvailableSources,
   bulkAssignQuestions,
   bulkRemoveQuestions,
   updateQuestionPaperSettings,
@@ -87,6 +91,18 @@ export const questionPaperRouter = createTRPCRouter({
     .input(getAvailableQuestionsSchema)
     .query(({ ctx, input }) =>
       getAvailableQuestions(ctx.db, ctx.tenantDb, input)
+    ),
+
+  getAvailableBoardYears: tenantMemberProcedure
+    .input(getAvailableBoardYearsSchema)
+    .query(({ ctx, input }) =>
+      getAvailableBoardYears(ctx.db, input)
+    ),
+
+  getAvailableSources: tenantMemberProcedure
+    .input(getAvailableSourcesSchema)
+    .query(({ ctx, input }) =>
+      getAvailableSources(ctx.db, input)
     ),
 
   // Mutations

@@ -7,7 +7,6 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
-import { EditableSectionLabel } from "./editable-section-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -94,10 +93,10 @@ const ApplicationEditableText = ({
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
-          fontWeight: mergedStyle.fontWeight,
+          fontWeight: mergedStyle.fontWeight || "bold",
         }}
       >
-        <RenderMath text={text} />
+        <RenderMath text={text} className="font-bold" />
       </div>
     </div>
   );
@@ -210,7 +209,7 @@ export const ApplicationBlock = ({ item }: { item: any }) => {
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,
-      fontWeight: settings.fontWeight || "normal"
+      fontWeight: settings.fontWeight || "bold"
     };
   };
 
@@ -236,15 +235,16 @@ export const ApplicationBlock = ({ item }: { item: any }) => {
 
   const isFirst = item.isFirstApplication !== undefined ? item.isFirstApplication : (item.orderIndex === 0);
   const masterNum = item.masterNumber || (item.orderIndex + 1);
+  const totalQuestions = item.totalQuestions || 1;
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
-  const titleText = data.title || data.name || "";
+  const titleText = data.title || data.name || data.question || "";
 
   return (
     <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
-      <div className="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button
           type="button"
           onClick={() => setShowAddAlternative(true)}
@@ -265,81 +265,89 @@ export const ApplicationBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      {isFirst && (
-        <div className="flex justify-between items-start w-full">
-          <div 
-            className="font-bold ml-[0px] flex items-baseline gap-2" 
-            style={{
-              fontSize: questionStyle.fontSize,
-              fontFamily: questionStyle.fontFamily,
-            }}
-          >
-            <span
-              className="font-bold shrink-0 min-w-[1.8em]"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            >
-              {toBengaliDigits(masterNum)}।
-            </span>
-            <EditableSectionLabel
-              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={rawLabel}
-              fallbackLabel="যেকোনো একটি বিষয়ে আবেদনপত্র লেখো:"
-              questionType="APPLICATION"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            />
+      {isFirst ? (
+        <div className="flex justify-between items-start gap-2 w-full">
+          <div className="flex gap-1 flex-1 relative flex-col">
+            <div className="flex gap-2 items-start w-full">
+              <span
+                className="font-bold shrink-0 min-w-[1.8em]"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                {toBengaliDigits(masterNum)}।
+              </span>
+              {totalQuestions > 1 && renderSubQuestionLabel(label)}
+              <div className="flex-1 w-full min-w-0">
+                <ApplicationEditableText 
+                  text={titleText}
+                  itemKey={`${item.id}-question`}
+                  defaultStyle={questionStyle}
+                  className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Attached Alternatives */}
+            {item.alternatives && item.alternatives.length > 0 && (
+              <AlternativeQuestionRenderer
+                paperId={paperId || ""}
+                parentQuestionId={item.id}
+                alternatives={item.alternatives}
+                settings={settings}
+                masterNumber={item.masterNumber || (item.orderIndex + 1)}
+                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+              />
+            )}
           </div>
-          <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
+
+          <div className="font-bold whitespace-nowrap text-right shrink-0 ml-2" style={{
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
             {toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
           </div>
         </div>
-      )}
-
-      <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex gap-1 flex-1 relative flex-col">
-          <div className="flex gap-2 items-start w-full">
-            <span
-              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-              aria-hidden="true"
-            >
-              {toBengaliDigits(masterNum)}।
-            </span>
-            {renderSubQuestionLabel(label)}
-            <div className="flex-1 w-full min-w-0">
-              <ApplicationEditableText 
-                text={titleText}
-                itemKey={`${item.id}-question`}
-                defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
-              />
+      ) : (
+        <div className="flex justify-between items-start gap-2 w-full">
+          <div className="flex gap-1 flex-1 relative flex-col">
+            <div className="flex gap-2 items-start w-full">
+              <span
+                className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+                aria-hidden="true"
+              >
+                {toBengaliDigits(masterNum)}।
+              </span>
+              {renderSubQuestionLabel(label)}
+              <div className="flex-1 w-full min-w-0">
+                <ApplicationEditableText 
+                  text={titleText}
+                  itemKey={`${item.id}-question`}
+                  defaultStyle={questionStyle}
+                  className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Attached Alternatives */}
-          {item.alternatives && item.alternatives.length > 0 && (
-            <AlternativeQuestionRenderer
-              paperId={paperId || ""}
-              parentQuestionId={item.id}
-              alternatives={item.alternatives}
-              settings={settings}
-              masterNumber={item.masterNumber || (item.orderIndex + 1)}
-              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
-            />
-          )}
+            {/* Attached Alternatives */}
+            {item.alternatives && item.alternatives.length > 0 && (
+              <AlternativeQuestionRenderer
+                paperId={paperId || ""}
+                parentQuestionId={item.id}
+                alternatives={item.alternatives}
+                settings={settings}
+                masterNumber={item.masterNumber || (item.orderIndex + 1)}
+                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <AddAlternativeModal
         open={showAddAlternative}
