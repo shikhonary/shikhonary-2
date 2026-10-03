@@ -104,6 +104,10 @@ model User {
   updatedSynonyms                    Synonym[]                     @relation("SynonymUpdater")
   createdFormFillups                 FormFillup[]                  @relation("FormFillupCreator")
   updatedFormFillups                 FormFillup[]                  @relation("FormFillupUpdater")
+  createdShuddhoAshuddhos            ShuddhoAshuddho[]             @relation("ShuddhoAshuddhoCreator")
+  updatedShuddhoAshuddhos            ShuddhoAshuddho[]             @relation("ShuddhoAshuddhoUpdater")
+  createdDanBamMilkorons             DanBamMilkoron[]              @relation("DanBamMilkoronCreator")
+  updatedDanBamMilkorons             DanBamMilkoron[]              @relation("DanBamMilkoronUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -310,6 +314,8 @@ model Tenant {
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
   formFillups                 FormFillup[]
+  shuddhoAshuddhos            ShuddhoAshuddho[]
+  danBamMilkorons             DanBamMilkoron[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -702,6 +708,8 @@ model AcademicSubject {
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
   formFillups                 FormFillup[]
+  shuddhoAshuddhos            ShuddhoAshuddho[]
+  danBamMilkorons             DanBamMilkoron[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -768,6 +776,8 @@ model AcademicChapter {
   sadhuToCholitos             SadhuToCholito[]
   punctuation                 Punctuation[]
   formFillups                 FormFillup[]
+  shuddhoAshuddhos            ShuddhoAshuddho[]
+  danBamMilkorons             DanBamMilkoron[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -836,6 +846,8 @@ model QuestionType {
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
   formFillups                 FormFillup[]
+  shuddhoAshuddhos            ShuddhoAshuddho[]
+  danBamMilkorons             DanBamMilkoron[]
 
   @@index([label])
   @@index([isActive])
@@ -2930,6 +2942,108 @@ model FormFillup {
   @@index([subjectId])
   @@index([difficulty])
   @@map("form_fillup")
+}
+
+model ShuddhoAshuddho {
+  id       String  @id @default(cuid())
+  sentence String
+  answer   String?
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("ShuddhoAshuddhoCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("ShuddhoAshuddhoUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("shuddho_ashuddho")
+}
+
+model DanBamMilkoron {
+  id          String   @id @default(cuid())
+  leftColumn  String[] @default([])
+  rightColumn String[] @default([])
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("DanBamMilkoronCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("DanBamMilkoronUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("dan_bam_milkoron")
 }
 
 model QuestionReport {

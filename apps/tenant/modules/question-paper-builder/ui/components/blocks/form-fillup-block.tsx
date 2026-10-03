@@ -296,7 +296,7 @@ export const FormFillupBlock = ({ item }: { item: any }) => {
     : ["প্রার্থীর স্বাক্ষর"];
 
   return (
-    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-2">
+    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-1">
       {/* Hover Controls */}
       <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button
@@ -320,144 +320,143 @@ export const FormFillupBlock = ({ item }: { item: any }) => {
       </div>
 
       <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex gap-2 flex-1 relative flex-col">
-          {/* 1. SCENARIO / QUESTION LABEL & NUMBERING */}
-          <div className="flex gap-2 items-start w-full">
-            {isFirst ? (
-              <span
-                className="font-bold shrink-0 min-w-[1.8em]"
-                style={{
-                  fontSize: questionStyle.fontSize,
-                  fontFamily: questionStyle.fontFamily,
-                }}
-              >
-                {toBengaliDigits(masterNum)}।
-              </span>
-            ) : (
-              <span
-                className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
-                style={{
-                  fontSize: questionStyle.fontSize,
-                  fontFamily: questionStyle.fontFamily,
-                }}
-                aria-hidden="true"
-              >
-                {toBengaliDigits(masterNum)}।
-              </span>
-            )}
-
-            <div className="flex-1 w-full min-w-0">
-              <FormFillupEditableText 
-                text={scenarioText}
-                itemKey={`${item.id}-scenario`}
-                defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
-              />
-            </div>
-
-            {marksPerQuestion !== undefined && marksPerQuestion !== null && (
-              <div
-                className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
-                style={{
-                  fontSize: questionStyle.fontSize,
-                  fontFamily: questionStyle.fontFamily,
-                }}
-              >
-                {attemptCount > 1 && !isFirst ? null : attemptCount > 1
-                  ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
-                  : toBengaliDigits(marksPerQuestion)}
-              </div>
-            )}
-          </div>
-
-          {/* 2. AUTHENTIC FORM BOX */}
-          <div className="w-full mt-2">
-            <div className="border-2 border-neutral-900 rounded-sm bg-white p-4 sm:p-6 shadow-xs space-y-4 text-neutral-900 font-solaiman relative">
-              {/* Photo Slot (Top Right Corner) */}
-              {data.hasPhoto && (
-                <div className="absolute right-4 sm:right-6 top-4 sm:top-6 w-16 h-20 sm:w-20 sm:h-24 border-2 border-neutral-900 rounded-xs flex items-center justify-center bg-white text-neutral-900 font-bold text-xs sm:text-sm select-none z-10">
-                  ছবি
-                </div>
-              )}
-
-              {/* Header Title & Institution */}
-              <div className={cn(
-                "text-center space-y-0.5 pb-1",
-                data.hasPhoto ? "pr-20 sm:pr-24 pl-2" : "px-2"
-              )}>
-                {data.institution && (
-                  <h3 className="text-sm sm:text-base font-bold tracking-tight text-neutral-900 leading-snug">
-                    {data.institution}
-                  </h3>
-                )}
-                {data.title && (
-                  <h4 className="text-xs sm:text-sm font-bold text-neutral-900">
-                    {data.title}
-                  </h4>
-                )}
-                {data.description && (
-                  <p className="text-[11px] sm:text-xs font-semibold text-neutral-700">
-                    {data.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Form Fields with Dotted Lines */}
-              <div className="space-y-2 sm:space-y-3 pt-1">
-                {fields.length > 0 ? (
-                  fields.map((field, fIdx) => (
-                    <div key={fIdx} className="flex items-baseline text-xs sm:text-sm leading-relaxed">
-                      {/* Label with serial and colon */}
-                      <div className="flex items-baseline shrink-0 gap-1.5 min-w-[120px] sm:min-w-[150px]">
-                        {field.sl && <span className="font-bold">{field.sl}</span>}
-                        <span className="font-bold">{field.label}</span>
-                        <span className="font-bold ml-auto mr-1.5">:</span>
-                      </div>
-
-                      {/* Dotted underline fill area */}
-                      <div className="flex-1 relative min-h-[1.2rem] flex items-baseline">
-                        <div className="w-full border-b-2 border-dotted border-neutral-800 translate-y-[-2px]" />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="py-2 text-xs text-neutral-500 italic text-center">
-                    (কোনো ফর্ম ফিল্ড নির্ধারিত নেই)
-                  </div>
-                )}
-              </div>
-
-              {/* Declaration Note */}
-              {data.declaration && (
-                <div className="pt-2 text-[11px] sm:text-xs text-neutral-900 leading-relaxed font-semibold">
-                  {data.declaration}
-                </div>
-              )}
-
-              {/* Signatures */}
-              <div className="pt-4 sm:pt-6 flex flex-wrap items-end justify-end gap-6 sm:gap-8">
-                {signatures.map((sig: string, sIdx: number) => (
-                  <div key={sIdx} className="text-center min-w-[110px] sm:min-w-[130px]">
-                    <div className="w-full border-b-2 border-neutral-900 mb-1" />
-                    <span className="text-[11px] sm:text-xs font-bold text-neutral-900">{sig}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Attached Alternatives */}
-          {item.alternatives && item.alternatives.length > 0 && (
-            <AlternativeQuestionRenderer
-              paperId={paperId || ""}
-              parentQuestionId={item.id}
-              alternatives={item.alternatives}
-              settings={settings}
-              masterNumber={item.masterNumber || (item.orderIndex + 1)}
-              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
-            />
+        <div className="flex gap-2 flex-1 relative items-start">
+          {/* 1. GLOBAL NUMBERING */}
+          {isFirst ? (
+            <span
+              className="font-bold shrink-0 min-w-[1.8em]"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+            >
+              {toBengaliDigits(masterNum)}।
+            </span>
+          ) : (
+            <span
+              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+              style={{
+                fontSize: questionStyle.fontSize,
+                fontFamily: questionStyle.fontFamily,
+              }}
+              aria-hidden="true"
+            >
+              {toBengaliDigits(masterNum)}।
+            </span>
           )}
+
+          <div className="flex-1 w-full min-w-0 flex flex-col gap-1">
+            {/* 2. SCENARIO / QUESTION LABEL */}
+            <FormFillupEditableText 
+              text={scenarioText}
+              itemKey={`${item.id}-scenario`}
+              defaultStyle={questionStyle}
+              className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+            />
+
+            {/* 3. AUTHENTIC FORM BOX (aligned with question label) */}
+            <div className="w-full mt-0.5">
+              <div className="border border-neutral-900 rounded-xs bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 space-y-1.5 text-neutral-900 font-solaiman text-[12px] leading-tight relative">
+                {/* Photo Slot (Top Right Corner) */}
+                {data.hasPhoto && (
+                  <div className="absolute right-2 top-2 w-10 h-12 border border-neutral-900 rounded-xs flex items-center justify-center bg-white text-neutral-900 font-bold text-[10px] select-none z-10">
+                    ছবি
+                  </div>
+                )}
+
+                {/* Header Title & Institution */}
+                <div className={cn(
+                  "text-center space-y-0 pb-0.5",
+                  data.hasPhoto ? "pr-14 pl-1" : "px-1"
+                )}>
+                  {data.institution && (
+                    <h3 className="text-[12px] font-bold tracking-tight text-neutral-900 leading-tight">
+                      {data.institution}
+                    </h3>
+                  )}
+                  {data.title && (
+                    <h4 className="text-[12px] font-bold text-neutral-900 leading-tight">
+                      {data.title}
+                    </h4>
+                  )}
+                  {data.description && (
+                    <p className="text-[11px] font-medium text-neutral-700 leading-tight">
+                      {data.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Form Fields with Dotted Lines */}
+                <div className="space-y-0.5 pt-0.5">
+                  {fields.length > 0 ? (
+                    fields.map((field, fIdx) => (
+                      <div key={fIdx} className="flex items-baseline text-[12px] leading-tight">
+                        {/* Label with serial and colon */}
+                        <div className="flex items-baseline shrink-0 gap-1 min-w-[100px] sm:min-w-[120px]">
+                          {field.sl && <span className="font-bold">{field.sl}</span>}
+                          <span className="font-bold">{field.label}</span>
+                          <span className="font-bold ml-auto mr-1">:</span>
+                        </div>
+
+                        {/* Dotted underline fill area */}
+                        <div className="flex-1 relative flex items-baseline">
+                          <div className="w-full border-b border-dotted border-neutral-800 translate-y-[-1px]" />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-1 text-[11px] text-neutral-500 italic text-center">
+                      (কোনো ফর্ম ফিল্ড নির্ধারিত নেই)
+                    </div>
+                  )}
+                </div>
+
+                {/* Declaration Note */}
+                {data.declaration && (
+                  <div className="pt-0.5 text-[11px] text-neutral-900 leading-tight font-medium">
+                    {data.declaration}
+                  </div>
+                )}
+
+                {/* Signatures */}
+                <div className="pt-1.5 sm:pt-2 flex flex-wrap items-end justify-end gap-4 sm:gap-6">
+                  {signatures.map((sig: string, sIdx: number) => (
+                    <div key={sIdx} className="text-center min-w-[80px] sm:min-w-[100px]">
+                      <div className="w-full border-b border-neutral-900 mb-0.5" />
+                      <span className="text-[11px] font-bold text-neutral-900">{sig}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Attached Alternatives */}
+            {item.alternatives && item.alternatives.length > 0 && (
+              <AlternativeQuestionRenderer
+                paperId={paperId || ""}
+                parentQuestionId={item.id}
+                alternatives={item.alternatives}
+                settings={settings}
+                masterNumber={item.masterNumber || (item.orderIndex + 1)}
+                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
+              />
+            )}
+          </div>
         </div>
+
+        {marksPerQuestion !== undefined && marksPerQuestion !== null && (
+          <div
+            className="font-bold whitespace-nowrap text-right shrink-0 ml-2"
+            style={{
+              fontSize: questionStyle.fontSize,
+              fontFamily: questionStyle.fontFamily,
+            }}
+          >
+            {attemptCount > 1 && !isFirst ? null : attemptCount > 1
+              ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+              : toBengaliDigits(marksPerQuestion)}
+          </div>
+        )}
       </div>
 
       <AddAlternativeModal

@@ -126,6 +126,18 @@ export const PageSetupCard: React.FC = () => {
 
       <div className="flex items-center justify-between pt-2 border-t">
         <div>
+          <Label htmlFor="two-pages-per-sheet" className="text-sm font-medium block">২ পৃষ্ঠা প্রতি শিট</Label>
+          <span className="text-[10px] text-muted-foreground">প্রতি শিটে পাশাপাশি ২টি পৃষ্ঠা (১+২, ৩+৪) বিন্যাস</span>
+        </div>
+        <Switch 
+          id="two-pages-per-sheet"
+          checked={settings.twoPagesPerSheet}
+          onCheckedChange={(c) => updateSettings({ twoPagesPerSheet: c })}
+        />
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t">
+        <div>
           <Label htmlFor="book-fold" className="text-sm font-medium block">বুক ফোল্ড লেআউট</Label>
           <span className="text-[10px] text-muted-foreground">folding-friendly বুকলেট প্রিন্ট পেইজ বিন্যাস</span>
         </div>

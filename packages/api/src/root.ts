@@ -66,6 +66,8 @@ import { proseEssenceRouter } from "./routers/prose-essence/prose-essence.router
 import { genderChangeRouter } from "./routers/gender-change/gender-change.router"
 import { synonymRouter } from "./routers/synonym/synonym.router"
 import { formFillupRouter } from "./routers/form-fillup/form-fillup.router"
+import { shuddhoAshuddhoRouter } from "./routers/shuddho-ashuddho/shuddho-ashuddho.router"
+import { danBamMilkoronRouter } from "./routers/dan-bam-milkoron/dan-bam-milkoron.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -128,6 +130,8 @@ export const appRouter = createTRPCRouter({
   proseEssence: proseEssenceRouter,
   formFillup: formFillupRouter,
   formFilling: formFillupRouter,
+  shuddhoAshuddho: shuddhoAshuddhoRouter,
+  danBamMilkoron: danBamMilkoronRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

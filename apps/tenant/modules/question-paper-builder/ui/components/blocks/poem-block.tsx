@@ -18,6 +18,15 @@ const toBengaliDigits = (num?: number | string | null): string => {
     .join("");
 };
 
+const formatPoemMarks = (marks: number | string | null | undefined): string => {
+  if (marks === null || marks === undefined || marks === "") return "";
+  const num = Number(marks);
+  if (!isNaN(num) && num > 2) {
+    return `${toBengaliDigits(1)}+${toBengaliDigits(1)}+${toBengaliDigits(num - 2)}`;
+  }
+  return toBengaliDigits(marks);
+};
+
 export const PoemBlock = ({ item }: { item: any }) => {
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
@@ -206,7 +215,7 @@ export const PoemBlock = ({ item }: { item: any }) => {
                   fontFamily: questionStyle.fontFamily,
                 }}
               >
-                {toBengaliDigits(marksPerQuestion)}
+                {formatPoemMarks(marksPerQuestion)}
               </span>
             )}
           </div>

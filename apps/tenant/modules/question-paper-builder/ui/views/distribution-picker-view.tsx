@@ -28,7 +28,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@workspace/ui/components/drawer";
-import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split, Shuffle } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionGrid } from "../components/distribution-picker/question-grid";
@@ -70,6 +70,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [selectedChapterId, setSelectedChapterId] = useState<string>("All");
   const [selectedBoard, setSelectedBoard] = useState<string>("All");
   const [selectedSource, setSelectedSource] = useState<string>("All");
+  const [selectedSort, setSelectedSort] = useState<"newest" | "oldest">("newest");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
 
@@ -227,6 +228,57 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const effectiveTargetCount = isAlternativeMode ? 1 : (urlLimit ?? distStatus.targetCount ?? 0);
   const maxSelectable = isAlternativeMode ? 1 : Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
 
+  const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
+    {
+      subjectId: distStatus?.subjectId || "",
+      questionTypeId: isAlternativeMode ? "" : (urlQuestionTypeIdParam || distStatus?.questionTypeId),
+      category,
+      search: search.trim() || undefined,
+      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+      board: selectedBoard !== "All" ? selectedBoard : undefined,
+      source: selectedSource !== "All" ? selectedSource : undefined,
+      sort: selectedSort,
+      excludePaperId: paperId,
+      page,
+      limit,
+    },
+    Boolean(distStatus?.subjectId)
+  );
+
+  const availableUnassigned = (availableData?.items || []).filter((q: any) => !q.isAssigned);
+
+  const handleRandomSelect = () => {
+    if (questionsLoading) return;
+
+    if (isAlternativeMode) {
+      if (availableUnassigned.length === 0) {
+        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * availableUnassigned.length);
+      setSelectedIds([availableUnassigned[randomIndex].id]);
+      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      return;
+    }
+
+    if (maxSelectable <= 0) {
+      toast.info("এই অংশের প্রশ্নের লক্ষ্য ইতিমধ্যে পূরণ হয়ে গেছে।");
+      return;
+    }
+
+    if (availableUnassigned.length === 0) {
+      toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+      return;
+    }
+
+    const shuffled = [...availableUnassigned].sort(() => 0.5 - Math.random());
+    const selectedCount = Math.min(maxSelectable, shuffled.length);
+    const pickedIds = shuffled.slice(0, selectedCount).map((q: any) => q.id);
+
+    setSelectedIds(pickedIds);
+    toast.success(`${toBengaliDigits(pickedIds.length)}টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!`);
+  };
+
   const qTypeNameEn = (distStatus.questionType?.nameEn || distStatus.questionTypeName || "").toLowerCase();
   const qTypeNameBn = (distStatus.questionType?.nameBn || distStatus.questionTypeNameBn || "").toLowerCase();
   const qTypeCode = (distStatus.questionType?.code || "").toLowerCase();
@@ -237,15 +289,17 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All");
   const hasActiveBoard = Boolean(selectedBoard && selectedBoard !== "All");
   const hasActiveSource = Boolean(selectedSource && selectedSource !== "All");
+  const hasActiveSort = Boolean(selectedSort && selectedSort !== "newest");
 
-  const hasAnyFilter = hasActiveQuery || hasActiveChapter || hasActiveBoard || hasActiveSource;
-  const activeFilterCount = (hasActiveChapter ? 1 : 0) + (hasActiveBoard ? 1 : 0) + (hasActiveSource ? 1 : 0);
+  const hasAnyFilter = hasActiveQuery || hasActiveChapter || hasActiveBoard || hasActiveSource || hasActiveSort;
+  const activeFilterCount = (hasActiveChapter ? 1 : 0) + (hasActiveBoard ? 1 : 0) + (hasActiveSource ? 1 : 0) + (hasActiveSort ? 1 : 0);
 
   const handleResetAll = () => {
     setSearch("");
     setSelectedChapterId("All");
     setSelectedBoard("All");
     setSelectedSource("All");
+    setSelectedSort("newest");
     setPage(1);
   };
 
@@ -340,6 +394,30 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           </Select>
         </div>
       )}
+
+      {/* Sort Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[160px] flex-1 md:flex-none"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            সর্ট
+          </label>
+        )}
+        <Select
+          value={selectedSort}
+          onValueChange={(val: "newest" | "oldest") => {
+            setSelectedSort(val ?? "newest");
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+            <SelectValue placeholder="সর্ট" />
+          </SelectTrigger>
+          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64 font-body">
+            <SelectItem value="newest">নতুন যুক্ত</SelectItem>
+            <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </>
   );
   const currentDistIndex = statuses?.findIndex((s: any) => s.distributionId === distributionId) ?? -1;
@@ -505,19 +583,35 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               )}
             </div>
           </div>
-          {!isAlternativeMode && nextDistStatus && (
+          <div className="flex items-center gap-2">
             <Button
+              type="button"
               variant="outline"
               size="sm"
-              asChild
-              className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+              onClick={handleRandomSelect}
+              disabled={questionsLoading || availableUnassigned.length === 0}
+              className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              title="প্রশ্নসমূহ থেকে দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করুন"
             >
-              <Link href={`/question-papers/${paperId}/distributions/${nextDistStatus.distributionId}/pick`}>
-                <span>পরবর্তী উপ-বিভাগ</span>
-                <ArrowLeft className="w-3.5 h-3.5 ml-1 rotate-180" />
-              </Link>
+              <Shuffle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">র‍্যান্ডম নির্বাচন</span>
+              <span className="sm:hidden">র‍্যান্ডম</span>
             </Button>
-          )}
+
+            {!isAlternativeMode && nextDistStatus && (
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+              >
+                <Link href={`/question-papers/${paperId}/distributions/${nextDistStatus.distributionId}/pick`}>
+                  <span>পরবর্তী উপ-বিভাগ</span>
+                  <ArrowLeft className="w-3.5 h-3.5 ml-1 rotate-180" />
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -719,6 +813,26 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     </button>
                   </Badge>
                 )}
+
+                {hasActiveSort && (
+                  <Badge
+                    variant="secondary"
+                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
+                  >
+                    <span>সর্ট: {selectedSort === "oldest" ? "পুরাতন যুক্ত" : "নতুন যুক্ত"}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSort("newest");
+                        setPage(1);
+                      }}
+                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
+                      title="Remove sort filter"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
               </div>
             </div>
           )}
@@ -732,6 +846,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             chapterId={selectedChapterId}
             board={selectedBoard}
             source={selectedSource}
+            sort={selectedSort}
             excludePaperId={paperId}
             selectedIds={selectedIds}
             page={page}

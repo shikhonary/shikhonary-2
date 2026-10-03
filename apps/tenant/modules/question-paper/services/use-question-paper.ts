@@ -234,6 +234,7 @@ export function useAvailableQuestions(
     page?: number
     limit?: number
     cursor?: string
+    sort?: "newest" | "oldest"
   },
   enabled = true
 ) {

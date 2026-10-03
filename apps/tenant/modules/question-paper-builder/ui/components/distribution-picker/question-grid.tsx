@@ -74,6 +74,7 @@ export interface QuestionGridProps {
   chapterId: string;
   board: string;
   source?: string;
+  sort?: "newest" | "oldest";
   excludePaperId: string;
   selectedIds: string[];
   onToggle: (id: string) => void;
@@ -91,6 +92,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   chapterId,
   board,
   source,
+  sort,
   excludePaperId,
   selectedIds,
   onToggle,
@@ -107,6 +109,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     chapterId: chapterId !== "All" ? chapterId : undefined,
     board: board !== "All" ? board : undefined,
     source: source && source !== "All" ? source : undefined,
+    sort,
     excludePaperId,
     page,
     limit,

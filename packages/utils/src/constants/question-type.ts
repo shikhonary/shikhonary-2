@@ -42,6 +42,8 @@ export const QUESTION_TYPES = {
   MAKE_QUESTION: "Make Question",
   FORM_FILLUP: "Form Fillup",
   FORM_FILLING: "Form Filling",
+  SHUDDHO_ASHUDDHO: "Shuddho Ashuddho",
+  DAN_BAM_MILKORON: "Dan Bam Milkoron",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -86,6 +88,8 @@ export const QUESTION_TYPE_CODES = {
   MAKE_QUESTION: "MAKE_QUESTION",
   FORM_FILLUP: "FORM_FILLUP",
   FORM_FILLING: "FORM_FILLING",
+  SHUDDHO_ASHUDDHO: "SHUDDHO_ASHUDDHO",
+  DAN_BAM_MILKORON: "DAN_BAM_MILKORON",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -371,6 +375,20 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.FORM_FILLING,
     defaultMark: 5,
     defaultPosition: 30,
+  },
+  [QUESTION_TYPES.SHUDDHO_ASHUDDHO]: {
+    nameEn: QUESTION_TYPES.SHUDDHO_ASHUDDHO,
+    nameBn: "শুদ্ধ অশুদ্ধ নির্ণয়",
+    code: QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO,
+    defaultMark: 5,
+    defaultPosition: 31,
+  },
+  [QUESTION_TYPES.DAN_BAM_MILKORON]: {
+    nameEn: QUESTION_TYPES.DAN_BAM_MILKORON,
+    nameBn: "ডান-বাম মিলকরণ",
+    code: QUESTION_TYPE_CODES.DAN_BAM_MILKORON,
+    defaultMark: 5,
+    defaultPosition: 32,
   },
 } as const
 
@@ -730,6 +748,35 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("ফরমপুরণ")
   ) {
     return QUESTION_TYPES.FORM_FILLUP
+  }
+
+  if (
+    lower === "shuddho ashuddho" ||
+    lower === "shuddho_ashuddho" ||
+    lower === "true false" ||
+    lower === "true_false" ||
+    lower.includes("shuddho ashuddho") ||
+    lower.includes("শুদ্ধ অশুদ্ধ") ||
+    lower.includes("শুদ্ধ-অশুদ্ধ") ||
+    lower.includes("শুদ্ধ অশুদ্ধ নির্ণয়") ||
+    lower.includes("সত্য মিথ্যা")
+  ) {
+    return QUESTION_TYPES.SHUDDHO_ASHUDDHO
+  }
+  if (
+    lower === "dan bam milkoron" ||
+    lower === "dan_bam_milkoron" ||
+    lower === "dan bam" ||
+    lower === "matching" ||
+    lower.includes("dan bam") ||
+    lower.includes("ডান-বাম মিলকরণ") ||
+    lower.includes("ডান বাম মিলকরণ") ||
+    lower.includes("ডান-বাম") ||
+    lower.includes("ডান বাম") ||
+    lower.includes("বাম-ডান") ||
+    lower.includes("মিলকরণ")
+  ) {
+    return QUESTION_TYPES.DAN_BAM_MILKORON
   }
 
   return null

@@ -565,6 +565,50 @@ export type {
   ImportFormFillingInput,
 } from "./routers/form-fillup/form-fillup.schema"
 
+export type {
+  ListShuddhoAshuddhoInput,
+  ShuddhoAshuddhoStatsInput,
+  GetShuddhoAshuddhoInput,
+  CreateShuddhoAshuddhoInput,
+  UpdateShuddhoAshuddhoInput,
+  DeleteShuddhoAshuddhoInput,
+  BulkDeleteShuddhoAshuddhoInput,
+  ImportShuddhoAshuddhoInput,
+} from "./routers/shuddho-ashuddho/shuddho-ashuddho.schema"
+
+export {
+  listShuddhoAshuddhoSchema,
+  shuddhoAshuddhoStatsSchema,
+  getShuddhoAshuddhoSchema,
+  createShuddhoAshuddhoSchema,
+  updateShuddhoAshuddhoSchema,
+  deleteShuddhoAshuddhoSchema,
+  bulkDeleteShuddhoAshuddhoSchema,
+  importShuddhoAshuddhoSchema,
+} from "./routers/shuddho-ashuddho/shuddho-ashuddho.schema"
+
+export type {
+  ListDanBamMilkoronInput,
+  DanBamMilkoronStatsInput,
+  GetDanBamMilkoronInput,
+  CreateDanBamMilkoronInput,
+  UpdateDanBamMilkoronInput,
+  DeleteDanBamMilkoronInput,
+  BulkDeleteDanBamMilkoronInput,
+  ImportDanBamMilkoronInput,
+} from "./routers/dan-bam-milkoron/dan-bam-milkoron.schema"
+
+export {
+  listDanBamMilkoronSchema,
+  danBamMilkoronStatsSchema,
+  getDanBamMilkoronSchema,
+  createDanBamMilkoronSchema,
+  updateDanBamMilkoronSchema,
+  deleteDanBamMilkoronSchema,
+  bulkDeleteDanBamMilkoronSchema,
+  importDanBamMilkoronSchema,
+} from "./routers/dan-bam-milkoron/dan-bam-milkoron.schema"
+
 export {
   listFillInTheBlanksWithoutCluesSchema,
   fillInTheBlanksWithoutCluesStatsSchema,

@@ -2275,7 +2275,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             className="shrink-0 flex flex-col items-center gap-3"
             data-page-index={pageIdx}
           >
-            {settings.bookFoldLayout ? (
+            {settings.twoPagesPerSheet ? (
+              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
+                শিট {Math.floor(pageIdx / 2) + 1} • পৃষ্ঠা {pageIdx + 1}
+              </div>
+            ) : settings.bookFoldLayout ? (
               <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
                 বুকলেট পৃষ্ঠা - {pageIdx + 1} (Booklet Page {pageIdx + 1})
               </div>

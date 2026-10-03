@@ -108,6 +108,7 @@ export interface PaperSettings {
   showColumnDivider: boolean;
   bookletMode: boolean;
   bookFoldLayout: boolean;
+  twoPagesPerSheet: boolean;
 
   headerTemplate: "classic" | "modern" | "minimal" | "left-aligned";
 

@@ -338,6 +338,7 @@ export const getAvailableQuestionsSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(20).optional(),
   cursor: z.string().optional(),
+  sort: z.enum(["newest", "oldest"]).optional(),
 })
 
 export type GetAvailableQuestionsInput = z.infer<typeof getAvailableQuestionsSchema>

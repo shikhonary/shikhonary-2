@@ -186,7 +186,7 @@ export function StepSubjectsDistribution({
     const distribution: WizardDistribution = {
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
-      questionTypeName: matched.nameEn || matched.nameBn,
+      questionTypeName: matched.nameBn || matched.nameEn,
       questionTypeNameBn: matched.nameBn || null,
       questionTypeLabel: (preset as any)?.customLabel || (preset as any)?.questionTypeLabel || (matched as any).label || matched.nameBn || matched.nameEn,
       marksPerQuestion: marksNum,

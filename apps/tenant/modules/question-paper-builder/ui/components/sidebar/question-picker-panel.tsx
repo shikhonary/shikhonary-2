@@ -5,7 +5,8 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { Search, Loader2, Plus, CheckCircle2, ArrowRight, ExternalLink } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
+import { Search, Loader2, Plus, CheckCircle2, ArrowRight, ExternalLink, Shuffle } from "lucide-react";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { 
   useQuestionPaperById, 
@@ -37,6 +38,7 @@ export const QuestionPickerPanel: React.FC = () => {
   
   const [selectedDistId, setSelectedDistId] = useState<string>("");
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
 
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
@@ -129,6 +131,10 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.MAKE_QUESTION;
   } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
     category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
+  } else if (normalized === QUESTION_TYPES.SHUDDHO_ASHUDDHO) {
+    category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
+  } else if (normalized === QUESTION_TYPES.DAN_BAM_MILKORON) {
+    category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
   } else if (normalized === QUESTION_TYPES.FORM_FILLUP || normalized === QUESTION_TYPES.FORM_FILLING) {
     category = QUESTION_TYPE_CODES.FORM_FILLUP;
   } else if (normalized === QUESTION_TYPES.MCQ) {
@@ -210,6 +216,7 @@ export const QuestionPickerPanel: React.FC = () => {
       questionTypeId: activeDist?.questionTypeId,
       category,
       search: search.trim() || undefined,
+      sort,
       excludePaperId: paperId || undefined,
       limit: 25,
     },
@@ -341,21 +348,44 @@ export const QuestionPickerPanel: React.FC = () => {
 
   const questions = availableData?.items || [];
 
+  const handleRandomQuickAssign = async () => {
+    const unassigned = questions.filter((q: any) => !q.isAssigned);
+    if (unassigned.length === 0) {
+      toast.error("যুক্ত করার মতো কোনো নতুন প্রশ্ন পাওয়া যায়নি।");
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * unassigned.length);
+    const randomQuestion = unassigned[randomIndex];
+    await handleQuickAssign(randomQuestion.id);
+  };
+
   return (
     <div className="flex flex-col h-full bg-background relative font-display">
       {/* Distribution selector & search bar */}
       <div className="p-3 border-b space-y-2 bg-card">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-on-surface">বণ্টন নির্বাচন করুন:</label>
-          {paperId && activeDistId && (
-            <Link
-              href={`/question-papers/${paperId}/distributions/${activeDistId}/pick`}
-              className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleRandomQuickAssign}
+              disabled={isAssigning || questionsLoading}
+              className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              title="দৈবচয়ন (Random) পদ্ধতিতে একটি প্রশ্ন যুক্ত করুন"
             >
-              <span>গ্রিড ভিউ</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
-          )}
+              <Shuffle className="w-3 h-3" />
+              <span>র‍্যান্ডম যোগ</span>
+            </button>
+            {paperId && activeDistId && (
+              <Link
+                href={`/question-papers/${paperId}/distributions/${activeDistId}/pick`}
+                className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>গ্রিড ভিউ</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+            )}
+          </div>
         </div>
 
         {statusesLoading ? (
@@ -414,15 +444,29 @@ export const QuestionPickerPanel: React.FC = () => {
           </div>
         )}
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-          <Input 
-            placeholder="প্রশ্ন খুঁজুন..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs font-body bg-card" 
-          />
+        {/* Search & Sort */}
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+            <Input 
+              placeholder="প্রশ্ন খুঁজুন..." 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 h-8 text-xs font-body bg-card" 
+            />
+          </div>
+          <Select
+            value={sort}
+            onValueChange={(val: "newest" | "oldest") => setSort(val ?? "newest")}
+          >
+            <SelectTrigger className="h-8 w-[100px] text-xs font-body bg-card border border-outline-variant px-2 shrink-0">
+              <SelectValue placeholder="সর্ট" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body text-xs">
+              <SelectItem value="newest">নতুন যুক্ত</SelectItem>
+              <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -575,6 +619,24 @@ export const QuestionPickerPanel: React.FC = () => {
                         {q.institution && (
                           <span className="text-[11px] text-muted-foreground font-semibold">
                             {q.institution}
+                          </span>
+                        )}
+                      </div>
+                    ) : category === "SHUDDHO_ASHUDDHO" ? (
+                      <div className="flex flex-col gap-0.5">
+                        <RenderMath text={q.sentence || ""} />
+                        {q.answer && (
+                          <span className="text-[11px] text-muted-foreground font-semibold">
+                            উত্তর: {q.answer}
+                          </span>
+                        )}
+                      </div>
+                    ) : category === "DAN_BAM_MILKORON" ? (
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-primary">ডান-বাম মিলকরণ ({q.leftColumn?.length || 0} সারি)</span>
+                        {Array.isArray(q.leftColumn) && q.leftColumn[0] && (
+                          <span className="text-[11px] text-muted-foreground line-clamp-1">
+                            {q.leftColumn[0]} ↔ {q.rightColumn?.[0] || ""}
                           </span>
                         )}
                       </div>

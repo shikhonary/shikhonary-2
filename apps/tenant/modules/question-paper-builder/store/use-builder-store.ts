@@ -61,6 +61,7 @@ const defaultSettings: PaperSettings = {
   showColumnDivider: false,
   bookletMode: false,
   bookFoldLayout: false,
+  twoPagesPerSheet: false,
   headerTemplate: "modern",
   optionStyle: "circle",
   fontFamily: "SolaimanLipi",
@@ -207,10 +208,18 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     return { items: reordered as PaperItem[], hasUnsavedChanges: true };
   }),
   
-  updateSettings: (updates) => set((state) => ({
-    settings: { ...state.settings, ...updates },
-    hasUnsavedChanges: true,
-  })),
+  updateSettings: (updates) => set((state) => {
+    const finalUpdates = { ...updates };
+    if (updates.twoPagesPerSheet) {
+      finalUpdates.bookFoldLayout = false;
+    } else if (updates.bookFoldLayout) {
+      finalUpdates.twoPagesPerSheet = false;
+    }
+    return {
+      settings: { ...state.settings, ...finalUpdates },
+      hasUnsavedChanges: true,
+    };
+  }),
   
   setZoom: (zoom) => set({ zoom }),
   setSelectedItemId: (id) => set({ selectedItemId: id }),

@@ -317,6 +317,22 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  SHUDDHO_ASHUDDHO: {
+    model: "shuddhoAshuddho",
+    searchFields: ["sentence", "answer", "source", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "shuddhoAshuddhoId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  DAN_BAM_MILKORON: {
+    model: "danBamMilkoron",
+    searchFields: ["leftColumn", "rightColumn", "source", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "danBamMilkoronId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
 }
 
 export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
@@ -358,6 +374,8 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.VERB_TENSE]: "VERB_TENSE",
   [QUESTION_TYPES.FORM_FILLUP]: "FORM_FILLUP",
   [QUESTION_TYPES.FORM_FILLING]: "FORM_FILLUP",
+  [QUESTION_TYPES.SHUDDHO_ASHUDDHO]: "SHUDDHO_ASHUDDHO",
+  [QUESTION_TYPES.DAN_BAM_MILKORON]: "DAN_BAM_MILKORON",
 }
 
 export async function getAvailableQuestions(
@@ -365,7 +383,9 @@ export async function getAvailableQuestions(
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
-  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor } = input
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor, sort } = input
+
+  const sortOrder: "asc" | "desc" = sort === "oldest" ? "asc" : "desc"
 
   // 1. Build exclusion set and resolve category in parallel
   const exclusionPromise = excludePaperId
@@ -546,7 +566,7 @@ export async function getAvailableQuestions(
     skip,
     take: resolvedLimit,
     include: config.includes,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: sortOrder },
   })
 
   // Fallback 1: retry without questionTypeId filter if no results
@@ -562,7 +582,7 @@ export async function getAvailableQuestions(
       skip,
       take: resolvedLimit,
       include: config.includes,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: sortOrder },
     })
   }
 
@@ -579,7 +599,7 @@ export async function getAvailableQuestions(
       skip,
       take: resolvedLimit,
       include: config.includes,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: sortOrder },
     })
   }
 

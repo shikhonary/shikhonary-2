@@ -26,6 +26,73 @@ async function waitForFonts(): Promise<void> {
   }
 }
 
+/** Resolves after the browser has painted a frame, keeping the loading UI animating. */
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) =>
+    requestAnimationFrame(() => setTimeout(resolve, 0))
+  );
+}
+
+/** Safe inset (mm) so printers' unprintable edges don't clip content. */
+const SAFE_INSET_MM = 6.5;
+
+/** Places a page image inside the box, scaled uniformly and centered with a safe inset. */
+function placePage(pdf: jsPDF, img: string, x: number, y: number, w: number, h: number) {
+  const scale = Math.min((w - 2 * SAFE_INSET_MM) / w, (h - 2 * SAFE_INSET_MM) / h);
+  const dw = w * scale;
+  const dh = h * scale;
+  pdf.addImage(img, "PNG", x + (w - dw) / 2, y + (h - dh) / 2, dw, dh, undefined, "SLOW");
+}
+
+/**
+ * Darkens mid-tones (anti-aliased text edges) so printed text isn't faint.
+ * White stays white; gamma > 1 pulls grey pixels towards black.
+ */
+function hardenImage(dataUrl: string, gamma = 1.8): Promise<string> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(dataUrl);
+        ctx.drawImage(image, 0, 0);
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const lut = new Uint8Array(256);
+        for (let i = 0; i < 256; i++) lut[i] = Math.round(255 * Math.pow(i / 255, gamma));
+        const px = data.data;
+        for (let i = 0; i < px.length; i += 4) {
+          px[i] = lut[px[i]!]!;
+          px[i + 1] = lut[px[i + 1]!]!;
+          px[i + 2] = lut[px[i + 2]!]!;
+        }
+        ctx.putImageData(data, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      } catch {
+        resolve(dataUrl);
+      }
+    };
+    image.onerror = () => resolve(dataUrl);
+    image.src = dataUrl;
+  });
+}
+
+/** Temporary style giving text slightly heavier, crisper strokes during capture. */
+function injectExportStyle(): HTMLStyleElement {
+  const style = document.createElement("style");
+  style.setAttribute("data-export-style", "true");
+  style.textContent = `
+    [data-page-content], [data-page-content] * {
+      text-rendering: geometricPrecision;
+      -webkit-text-stroke: 0.15px currentColor;
+    }
+  `;
+  document.head.appendChild(style);
+  return style;
+}
+
 /**
  * Filter function for html-to-image: excludes interactive-only elements
  * that shouldn't appear in the downloaded PDF.
@@ -54,15 +121,17 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
     const {
       settings,
       zoom: originalZoom,
-      setZoom,
       setIsExporting,
       setExportProgress,
     } = useBuilderStore.getState();
 
     setIsExporting(true);
     setExportProgress(null);
+    // Let the overlay mount and paint before any heavy work starts
+    await nextPaint();
 
     let originalDescriptor: PropertyDescriptor | undefined;
+    let exportStyleEl: HTMLStyleElement | null = null;
 
     try {
       // 0. Intercept CSSStyleSheet.prototype.cssRules to prevent SecurityError from cross-origin stylesheets
@@ -95,14 +164,12 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       // 1. Wait for fonts
       await waitForFonts();
 
-      // 2. Temporarily set zoom to 1 for true-size capture
-      setZoom(1);
-
-      // 3. Wait for reflow and ensure page nodes are mounted
+      // 2. Find the page nodes. Capture overrides the zoom transform on the clone,
+      //    so the live canvas is not re-rendered (that re-render caused the stall).
       let pageNodes: HTMLElement[] = [];
 
       for (let attempt = 0; attempt < 15; attempt++) {
-        await new Promise((resolve) => setTimeout(resolve, 150));
+        if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 150));
 
         // Strategy 1: Find by [data-page-content] attribute
         let found = Array.from(document.querySelectorAll<HTMLElement>("[data-page-content]"));
@@ -146,41 +213,57 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
 
       // 5. Determine PDF dimensions and sheet settings
       const isBookFold = settings.bookFoldLayout;
+      const isTwoPagesPerSheet = settings.twoPagesPerSheet;
+      const isSideBySide = isBookFold || isTwoPagesPerSheet;
       const dims = PAPER_DIMENSIONS[settings.paperSize] ?? PAPER_DIMENSIONS.A4!;
       const isLandscape = settings.paperOrientation === "landscape";
 
       const logicalWidth = isLandscape ? dims!.h : dims!.w;
       const logicalHeight = isLandscape ? dims!.w : dims!.h;
 
-      // For book fold, the sheet width is double the logical page width, and orientation is landscape
-      const pdfWidth = isBookFold ? logicalWidth * 2 : logicalWidth;
+      // For book fold or 2 pages per sheet, the sheet width is double the logical page width, and orientation is landscape
+      const pdfWidth = isSideBySide ? logicalWidth * 2 : logicalWidth;
       const pdfHeight = logicalHeight;
 
       // 6. Create jsPDF instance
       const pdf = new jsPDF({
-        orientation: isBookFold ? "landscape" : (isLandscape ? "landscape" : "portrait"),
+        orientation: isSideBySide ? "landscape" : (isLandscape ? "landscape" : "portrait"),
         unit: "mm",
         format: [pdfWidth, pdfHeight],
       });
 
       setExportProgress({ current: 0, total: pageNodes.length });
 
-      // 7. Capture each page as a PNG data URL
+      // 7. Capture each page as a PNG data URL (4x ≈ 384 DPI) with crisp, darkened text
       const pageImages: string[] = [];
+      exportStyleEl = injectExportStyle();
       for (let i = 0; i < pageNodes.length; i++) {
         const pageNode = pageNodes[i];
         if (!pageNode) continue;
 
-        setExportProgress({ current: i + 1, total: pageNodes.length });
+        // `current` = pages already completed; yield so the overlay repaints before heavy work
+        setExportProgress({ current: i, total: pageNodes.length });
+        await nextPaint();
 
-        // Capture as PNG with 3x pixel ratio for near-print quality (~288 DPI)
         let dataUrl: string;
+        // Overrides applied to the *cloned* page only, so the live builder never reflows:
+        // - transform none: capture true size regardless of the on-screen zoom
+        // - drop page margins (top/bottom always; left/right for multi-column).
+        //   The safe inset applied when placing the page still protects the printer edge.
+        const removeSideMargins = Number(settings.columns) > 1;
+        const cloneStyle: Record<string, string> = {
+          transform: "none",
+          paddingTop: "0px",
+          paddingBottom: "0px",
+          ...(removeSideMargins ? { paddingLeft: "0px", paddingRight: "0px" } : {}),
+        };
         try {
           dataUrl = await toPng(pageNode, {
-            pixelRatio: 3,
+            pixelRatio: 4,
             filter: exportFilter,
             cacheBust: true,
             backgroundColor: "#ffffff",
+            style: cloneStyle,
           });
         } catch {
           // Fallback: try with lower pixel ratio if memory issues
@@ -189,10 +272,17 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
             filter: exportFilter,
             cacheBust: true,
             backgroundColor: "#ffffff",
+            style: cloneStyle,
           });
         }
-        pageImages.push(dataUrl);
+
+        pageImages.push(await hardenImage(dataUrl));
+        setExportProgress({ current: i + 1, total: pageNodes.length });
+        await nextPaint();
+
       }
+      exportStyleEl.remove();
+      exportStyleEl = null;
 
       // 8. Compile captured pages into the PDF document
       if (isBookFold) {
@@ -218,10 +308,10 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
           }
           
           if (frontLeftImg) {
-            pdf.addImage(frontLeftImg, "PNG", 0, 0, logicalWidth, logicalHeight);
+            placePage(pdf, frontLeftImg, 0, 0, logicalWidth, logicalHeight);
           }
           if (frontRightImg) {
-            pdf.addImage(frontRightImg, "PNG", logicalWidth, 0, logicalWidth, logicalHeight);
+            placePage(pdf, frontRightImg, logicalWidth, 0, logicalWidth, logicalHeight);
           }
 
           // Back Side: Left = Second page, Right = Second to last page
@@ -233,10 +323,34 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
           pdf.addPage([pdfWidth, pdfHeight], "landscape");
           
           if (backLeftImg) {
-            pdf.addImage(backLeftImg, "PNG", 0, 0, logicalWidth, logicalHeight);
+            placePage(pdf, backLeftImg, 0, 0, logicalWidth, logicalHeight);
           }
           if (backRightImg) {
-            pdf.addImage(backRightImg, "PNG", logicalWidth, 0, logicalWidth, logicalHeight);
+            placePage(pdf, backRightImg, logicalWidth, 0, logicalWidth, logicalHeight);
+          }
+        }
+      } else if (isTwoPagesPerSheet) {
+        // Sequential 2 Pages per Sheet Layout: [1 | 2], [3 | 4], [5 | 6]...
+        const sheetCount = Math.ceil(pageImages.length / 2);
+        let addedFirst = false;
+
+        for (let i = 0; i < sheetCount; i++) {
+          const leftIdx = 2 * i;
+          const rightIdx = 2 * i + 1;
+          const leftImg = pageImages[leftIdx];
+          const rightImg = pageImages[rightIdx];
+
+          if (addedFirst) {
+            pdf.addPage([pdfWidth, pdfHeight], "landscape");
+          } else {
+            addedFirst = true;
+          }
+
+          if (leftImg) {
+            placePage(pdf, leftImg, 0, 0, logicalWidth, logicalHeight);
+          }
+          if (rightImg) {
+            placePage(pdf, rightImg, logicalWidth, 0, logicalWidth, logicalHeight);
           }
         }
       } else {
@@ -248,7 +362,7 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
           if (i > 0) {
             pdf.addPage([pdfWidth, pdfHeight], isLandscape ? "l" : "p");
           }
-          pdf.addImage(img, "PNG", 0, 0, pdfWidth, pdfHeight);
+          placePage(pdf, img, 0, 0, pdfWidth, pdfHeight);
         }
       }
 
@@ -263,6 +377,7 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       console.error("PDF download failed:", error);
       toast.error(error?.message || "পিডিএফ তৈরি করতে ব্যর্থ হয়েছে");
     } finally {
+      (exportStyleEl as HTMLStyleElement | null)?.remove();
       // Restore original CSSStyleSheet.prototype.cssRules
       if (typeof CSSStyleSheet !== "undefined" && originalDescriptor) {
         try {

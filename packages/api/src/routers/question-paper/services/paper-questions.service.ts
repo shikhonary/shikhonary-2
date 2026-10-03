@@ -1129,6 +1129,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).podNirnoy.findUnique({ where: { id: record.podNirnoyId } })) as any
       } else if (record.verbTenseId) {
         record.contentSnapshot = (await (db as any).verbTense.findUnique({ where: { id: record.verbTenseId } })) as any
+      } else if (record.formFillupId) {
+        record.contentSnapshot = (await (db as any).formFillup.findUnique({ where: { id: record.formFillupId } })) as any
       }
     }
 
@@ -1205,6 +1207,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_podNirnoyId: { questionPaperId: input.questionPaperId, podNirnoyId: record.podNirnoyId } }
     } else if (record.verbTenseId) {
       whereCondition = { questionPaperId_verbTenseId: { questionPaperId: input.questionPaperId, verbTenseId: record.verbTenseId } }
+    } else if (record.formFillupId) {
+      whereCondition = { questionPaperId_formFillupId: { questionPaperId: input.questionPaperId, formFillupId: record.formFillupId } }
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -1277,6 +1281,7 @@ export async function bulkRemoveQuestions(
         { sadhuToCholitoId: { in: input.questionIds } },
         { podNirnoyId: { in: input.questionIds } },
         { verbTenseId: { in: input.questionIds } },
+        { formFillupId: { in: input.questionIds } },
       ],
     },
     select: { id: true, distributionId: true },
