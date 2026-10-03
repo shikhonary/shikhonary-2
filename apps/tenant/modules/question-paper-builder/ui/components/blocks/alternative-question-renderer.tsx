@@ -19,6 +19,7 @@ import { RenderRightFormOfVerbContent } from "./right-form-of-verb-block";
 import { RenderChangingSentenceContent } from "./changing-sentence-block";
 import { RenderFillInTheBlanksContent, RenderCluesTable } from "./fill-in-the-blanks-with-clues-block";
 import { RenderSubstitutionTable } from "./substitution-table-block";
+import { RenderDanBamMilkoronTable } from "./dan-bam-milkoron-block";
 import { formatShortCompositionPrompt } from "./short-composition-block";
 
 const toBengaliDigits = (num?: number | string | null): string => {
@@ -178,6 +179,8 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const sadhuToCholito = alt.sadhuToCholito;
         const podNirnoy = alt.podNirnoy;
         const verbTense = alt.verbTense;
+        const shuddhoAshuddho = alt.shuddhoAshuddho;
+        const danBamMilkoron = alt.danBamMilkoron;
 
         return (
           <div key={alt.id} className="w-full flex flex-col group/alt relative">
@@ -1558,6 +1561,52 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.10.5 SHUDDHO ASHUDDHO BLOCK REPRESENTATION */}
+              {shuddhoAshuddho && (() => {
+                const text = shuddhoAshuddho.sentence || shuddhoAshuddho.question || shuddhoAshuddho.text || "";
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <div
+                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground leading-relaxed"
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        >
+                          <RenderMath text={text} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 6.10.6 DAN BAM MILKORON BLOCK REPRESENTATION */}
+              {danBamMilkoron && (() => {
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0 flex flex-col items-center">
+                        <RenderDanBamMilkoronTable
+                          leftColumn={danBamMilkoron.leftColumn || []}
+                          rightColumn={danBamMilkoron.rightColumn || []}
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 6.11 SYNONYM / OPPOSITE WORD / SADHU TO CHOLITO / VERB TENSE / MAKE SENTENCE / WORD MEANING REPRESENTATION */}
               {(synonym || oppositeWord || sadhuToCholito || verbTense || makeSentences || wordMeaning) && (() => {
                 const wordText = verbTense?.verb || sadhuToCholito?.sadhuText || sadhuToCholito?.word || synonym?.word || oppositeWord?.word || makeSentences?.word || wordMeaning?.word || "";
@@ -1583,7 +1632,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
               })()}
 
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
+              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !shuddhoAshuddho && !danBamMilkoron && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

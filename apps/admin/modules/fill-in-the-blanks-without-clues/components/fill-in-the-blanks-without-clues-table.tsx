@@ -16,7 +16,7 @@ import {
 export interface FillInTheBlanksWithoutCluesItem {
   id: string
   content: string
-  clue?: string
+  clue?: string | null
   reference: string[]
   difficulty: string
   popularityCount: number

@@ -38,6 +38,8 @@ import { PunctuationBlock } from "../blocks/punctuation-block";
 import { ShortCompositionBlock } from "../blocks/short-composition-block";
 import { DescriptiveQuestionBlock } from "../blocks/descriptive-question-block";
 import { ShortQuestionBlock } from "../blocks/short-question-block";
+import { ShuddhoAshuddhoBlock } from "../blocks/shuddho-ashuddho-block";
+import { DanBamMilkoronBlock } from "../blocks/dan-bam-milkoron-block";
 import { CorrectAnswerBlock } from "../blocks/correct-answer-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
@@ -362,6 +364,10 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <DescriptiveQuestionBlock item={block.data.item} />;
     case "question-short-question":
       return <ShortQuestionBlock item={block.data.item} />;
+    case "question-shuddho-ashuddho":
+      return <ShuddhoAshuddhoBlock item={block.data.item} />;
+    case "question-dan-bam-milkoron":
+      return <DanBamMilkoronBlock item={block.data.item} />;
     case "question-correct-answer":
       return <CorrectAnswerBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
     case "dist-action":

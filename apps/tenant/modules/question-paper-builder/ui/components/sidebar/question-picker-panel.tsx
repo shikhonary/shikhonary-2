@@ -203,6 +203,10 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.MAKE_QUESTION;
     } else if (lower.includes("descriptive question") || lower.includes("descriptive_question") || lower.includes("dq") || lower.includes("রচনামূলক প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
+    } else if (lower.includes("shuddho") || lower.includes("shudho") || lower.includes("ashuddho") || lower.includes("শুদ্ধ") || lower.includes("অশুদ্ধ")) {
+      category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
+    } else if (lower.includes("dan bam") || lower.includes("dan_bam") || lower.includes("বাম-ডান") || lower.includes("ডান-বাম") || lower.includes("মিলকরণ") || lower.includes("matching")) {
+      category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
@@ -326,6 +330,10 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, descriptiveQuestionIds: [questionId] });
       } else if (category === "SHORT_QUESTION") {
         await assignQuestion({ ...payloadBase, shortQuestionIds: [questionId] });
+      } else if (category === "SHUDDHO_ASHUDDHO") {
+        await assignQuestion({ ...payloadBase, shuddhoAshuddhoIds: [questionId] });
+      } else if (category === "DAN_BAM_MILKORON") {
+        await assignQuestion({ ...payloadBase, danBamMilkoronIds: [questionId] });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
         await assignQuestion({ ...payloadBase, rightFormOfVerbIds: [questionId] });
       } else if (category === "CHANGING_SENTENCES") {

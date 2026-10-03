@@ -77,6 +77,8 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.POD_NIRNOY, nameBn: "পদ নির্ণয়", nameEn: "Pod Nirnoy", desc: "বাক্য থেকে পদ নির্ণয় লিখন" },
   { code: QUESTION_TYPE_CODES.VERB_TENSE, nameBn: "ক্রিয়াপদের রূপ / কাল", nameEn: "Verb Tense", desc: "ক্রিয়াপদের বর্তমান, অতীত ও ভবিষ্যৎ রূপ বা কাল নির্ণয়" },
   { code: QUESTION_TYPE_CODES.FORM_FILLUP, nameBn: "ফরম পূরণ", nameEn: "Form Fillup", desc: "উদ্দীপক অনুযায়ী প্রাতিষ্ঠানিক বা ব্যক্তিগত ফরম পূরণ" },
+  { code: QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO, nameBn: "শুদ্ধ অশুদ্ধ নির্ণয়", nameEn: "Shuddho Ashuddho", desc: "প্রদত্ত বাক্যের শুদ্ধ বা অশুদ্ধ রূপ নির্ণয়" },
+  { code: QUESTION_TYPE_CODES.DAN_BAM_MILKORON, nameBn: "ডান-বাম মিলকরণ", nameEn: "Dan Bam Milkoron", desc: "বাম পাশের বাক্যাংশের সাথে ডান পাশের বাক্যাংশ মিলকরণ" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({

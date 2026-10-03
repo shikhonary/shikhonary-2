@@ -167,261 +167,241 @@ export function DanBamMilkoronTable({
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              id="select-all"
-              aria-label="Select all questions on this page"
               checked={allSelected}
               onChange={(e) => handleSelectAll(e.target.checked)}
-              className="size-4 rounded border-outline-variant text-primary focus:ring-primary/20 cursor-pointer"
+              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
             />
-            <label
-              htmlFor="select-all"
-              className="text-sm font-medium text-on-surface cursor-pointer select-none"
-            >
-              Select All on this page
-            </label>
-          </div>
-          {selectedIds.length > 0 && (
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              {selectedIds.length} selected
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
+              Select All ({items.length})
             </span>
+          </div>
+
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
+              <span className="font-label-sm text-xs font-semibold text-primary">
+                {selectedIds.length} items selected
+              </span>
+              <Button
+                type="button"
+                onClick={() => {
+                  onBulkDelete(selectedIds)
+                  setSelectedIds([])
+                }}
+                className="h-8 px-3 text-xs font-bold bg-error text-white hover:bg-error/90 rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete Selected</span>
+              </Button>
+            </div>
           )}
         </div>
 
-        {selectedIds.length > 0 && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => onBulkDelete(selectedIds)}
-            className="flex items-center gap-1.5 h-8 px-3 text-xs font-semibold rounded-lg shadow-xs cursor-pointer"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Delete Selected ({selectedIds.length})
-          </Button>
-        )}
+        <div className="text-xs text-outline font-medium">
+          Showing {displayStart}–{displayEnd} of {totalItems} items
+        </div>
       </div>
 
-      {/* Main Table */}
-      <div className="overflow-x-auto rounded-xl border border-outline-variant/30 bg-surface shadow-xs">
-        <table className="w-full border-collapse text-left">
-          <thead>
-            <tr className="border-b border-outline-variant/30 bg-surface-container-low">
-              <th className="w-12 px-4 py-3.5 text-center">
-                <input
-                  type="checkbox"
-                  aria-label="Select all"
-                  checked={allSelected}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="size-4 rounded border-outline-variant text-primary focus:ring-primary/20 cursor-pointer"
-                />
-              </th>
-              <th className="px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                বাম-ডান তথ্য (Columns)
-              </th>
-              <th className="px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                বিষয় ও অধ্যায়
-              </th>
-              <th className="px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                কঠিনতার স্তর
-              </th>
-              <th className="px-4 py-3.5 text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                রেফারেন্স
-              </th>
-              <th className="px-4 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                অ্যাকশন
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant/20">
-            {isLoading ? (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-on-surface-variant">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    <p className="text-sm font-medium">লোড হচ্ছে...</p>
-                  </div>
-                </td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-error">
-                  <p className="text-sm font-medium">তথ্য লোড করতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</p>
-                </td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-12 text-center text-on-surface-variant">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <ArrowRightLeft className="size-8 text-outline" />
-                    <p className="text-sm font-medium">কোনো ডান-বাম মিলকরণ তথ্য পাওয়া যায়নি</p>
-                    <p className="text-xs text-outline">নতুন প্রশ্ন তৈরি করুন অথবা JSON ইমপোর্ট করুন</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              items.map((item) => {
-                const isSelected = selectedIds.includes(item.id)
-                const snippet = item.leftColumn?.[0] || item.rightColumn?.[0] || "ডান-বাম মিলকরণ"
-                return (
-                  <tr
-                    key={item.id}
-                    className={cn(
-                      "transition-colors hover:bg-surface-container-low/50",
-                      isSelected && "bg-primary/5 hover:bg-primary/10"
-                    )}
-                  >
-                    <td className="px-4 py-3 text-center align-top">
-                      <input
-                        type="checkbox"
-                        aria-label={`Select item`}
-                        checked={isSelected}
-                        onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                        className="size-4 rounded border-outline-variant text-primary focus:ring-primary/20 cursor-pointer"
-                      />
-                    </td>
-                    <td className="px-4 py-3 align-top min-w-[340px]">
-                      <DanBamMilkoronGrid
-                        leftColumn={item.leftColumn}
-                        rightColumn={item.rightColumn}
-                      />
-                      {item.source && (
-                        <span className="text-[11px] text-outline mt-1 inline-block">
-                          উৎস: {item.source}
+      {/* Main List */}
+      {isLoading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-40 w-full animate-pulse rounded-xl bg-surface-container-low border border-outline-variant/30"
+            />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="rounded-xl border border-error/30 bg-error/5 p-8 text-center text-error">
+          <p className="font-bold text-base">Failed to load dan bam milkoron</p>
+          <p className="text-xs mt-1 text-on-surface-variant">
+            Please check your network connection or try refreshing the page.
+          </p>
+        </div>
+      ) : items.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-outline-variant/60 bg-surface-container-lowest p-12 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+            <ArrowRightLeft className="h-6 w-6" />
+          </div>
+          <h3 className="font-headline-sm text-lg font-bold text-on-surface">
+            No Dan Bam Milkoron Found
+          </h3>
+          <p className="mt-1 text-xs text-on-surface-variant max-w-md mx-auto">
+            Try adjusting your search criteria or create a new dan bam milkoron question.
+          </p>
+          <Button asChild className="mt-4 bg-primary text-white text-xs font-bold rounded-lg cursor-pointer">
+            <Link href="/dan-bam-milkoron/create">Create Dan Bam Milkoron</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {items.map((item, idx) => {
+            const isSelected = selectedIds.includes(item.id)
+            const itemSnippet = item.leftColumn?.[0] || item.rightColumn?.[0] || `ডান-বাম মিলকরণ #${(currentPage - 1) * itemsPerPage + idx + 1}`
+
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  "relative flex flex-col justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-5 transition-all hover:shadow-md",
+                  isSelected && "border-primary/50 bg-primary/5 shadow-xs"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => handleSelectOne(item.id, e.target.checked)}
+                    className="mt-1.5 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    {/* Header Badges */}
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="font-mono text-xs font-bold text-outline">
+                        #{(currentPage - 1) * itemsPerPage + idx + 1}
+                      </span>
+
+                      {/* Subject */}
+                      {item.subject && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                          {item.subject.nameEn}
+                          {item.subject.nameBn && ` (${item.subject.nameBn})`}
                         </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3 align-top text-xs">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-semibold text-on-surface">
-                          {item.subject?.nameEn || "N/A"}
-                          {item.subject?.nameBn && (
-                            <span className="text-on-surface-variant ml-1 font-normal">
-                              ({item.subject.nameBn})
-                            </span>
-                          )}
+
+                      {/* Chapter */}
+                      {item.academicChapter && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
+                          অধ্যায়: {item.academicChapter.nameEn}
                         </span>
-                        {item.academicChapter && (
-                          <span className="text-on-surface-variant">
-                            অধ্যায়: {item.academicChapter.nameEn}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 align-top">
+                      )}
+
+                      {/* Difficulty */}
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wider",
+                          "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border",
                           item.difficulty === "EASY"
-                            ? "bg-emerald-100 text-emerald-800"
+                            ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
                             : item.difficulty === "MEDIUM"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-rose-100 text-rose-800"
+                            ? "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                            : "bg-red-500/10 text-red-700 border-red-500/20"
                         )}
                       >
                         {item.difficulty}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 align-top text-xs text-on-surface-variant max-w-[200px]">
-                      {item.reference && item.reference.length > 0 ? (
+
+                      {/* References */}
+                      {item.reference && item.reference.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {item.reference.map((ref, idx) => (
+                          {item.reference.map((ref, rIdx) => (
                             <span
-                              key={idx}
-                              className="rounded bg-surface-container px-1.5 py-0.5 text-[10px] text-on-surface"
+                              key={rIdx}
+                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40"
                             >
                               {ref}
                             </span>
                           ))}
                         </div>
-                      ) : (
-                        <span className="text-outline italic">-</span>
                       )}
+
+                      {/* Source */}
+                      {item.source && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
+                          উৎস: {item.source}
+                        </span>
+                      )}
+
+                      {/* Session */}
                       {item.session && (
-                        <div className="text-[11px] text-outline mt-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
                           সেশন: {item.session}
-                        </div>
+                        </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-right align-top">
-                      <div className="flex items-center justify-end gap-1">
-                        <Link href={`/dan-bam-milkoron/${item.id}/edit`}>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
-                            title="Edit"
-                          >
-                            <Edit3 className="size-4" />
-                          </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onDelete(item.id, snippet)}
-                          className="size-8 text-error hover:text-error hover:bg-error/10 rounded-lg cursor-pointer"
-                          title="Delete"
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                    </div>
+
+                    {/* 2-Column Grid View */}
+                    <DanBamMilkoronGrid
+                      leftColumn={item.leftColumn}
+                      rightColumn={item.rightColumn}
+                    />
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 text-outline hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
+                      title="Edit Question"
+                    >
+                      <Link href={`/dan-bam-milkoron/${item.id}/edit`}>
+                        <Edit3 className="h-4 w-4" />
+                      </Link>
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(item.id, itemSnippet)}
+                      className="h-8 w-8 p-0 text-outline hover:text-error hover:bg-error/10 rounded-lg cursor-pointer"
+                      title="Delete Question"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Pagination Footer */}
-      {totalPages > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          <div className="flex items-center gap-2 text-xs text-on-surface-variant">
-            <span>
-              Showing <span className="font-semibold text-on-surface">{displayStart}</span> to{" "}
-              <span className="font-semibold text-on-surface">{displayEnd}</span> of{" "}
-              <span className="font-semibold text-on-surface">{totalItems}</span> items
-            </span>
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-outline-variant/30">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-outline font-medium">Rows per page:</span>
             {onLimitChange && (
-              <div className="flex items-center gap-1.5 ml-4">
-                <span>Rows:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val))}
-                >
-                  <SelectTrigger className="h-7 w-16 text-xs bg-white border-outline-variant">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select
+                value={String(itemsPerPage)}
+                onValueChange={(val) => onLimitChange(Number(val))}
+              >
+                <SelectTrigger className="h-8 w-[70px] text-xs bg-white border-outline-variant rounded-md">
+                  <SelectValue placeholder={String(itemsPerPage)} />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-outline-variant shadow-md">
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage <= 1}
-              className="h-8 px-2.5 text-xs border-outline-variant disabled:opacity-40 cursor-pointer"
+              className="h-8 px-3 text-xs font-bold border-outline-variant rounded-lg cursor-pointer disabled:opacity-50"
             >
               <ChevronLeft className="h-3.5 w-3.5 mr-1" />
               Previous
             </Button>
-            <span className="text-xs px-2 font-medium">
+
+            <span className="text-xs text-on-surface font-semibold px-2">
               Page {currentPage} of {totalPages}
             </span>
+
             <Button
               variant="outline"
               size="sm"
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage >= totalPages}
-              className="h-8 px-2.5 text-xs border-outline-variant disabled:opacity-40 cursor-pointer"
+              className="h-8 px-3 text-xs font-bold border-outline-variant rounded-lg cursor-pointer disabled:opacity-50"
             >
               Next
               <ChevronRight className="h-3.5 w-3.5 ml-1" />

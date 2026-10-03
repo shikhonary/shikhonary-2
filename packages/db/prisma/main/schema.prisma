@@ -2225,7 +2225,7 @@ model FillInTheBlanksWithClues {
 model FillInTheBlanksWithoutClues {
   id        String   @id @default(cuid())
   content   String
-  clue      String
+  clue      String?
   reference String[] @default([])
   source    String?
   session   String?

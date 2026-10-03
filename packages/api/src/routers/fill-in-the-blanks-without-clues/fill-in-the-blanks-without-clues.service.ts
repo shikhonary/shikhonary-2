@@ -162,7 +162,7 @@ export async function createFillInTheBlanksWithoutClues(
   const created = await db.fillInTheBlanksWithoutClues.create({
     data: {
       content: data.content.trim(),
-      clue: data.clue ? data.clue.trim() : "",
+      clue: data.clue && data.clue.trim() ? data.clue.trim() : null,
       reference: data.reference ?? [],
       source: data.source ? data.source.trim() : "গাইড বুক",
       session: data.session ? data.session.trim() : currentYear,
@@ -222,7 +222,7 @@ export async function updateFillInTheBlanksWithoutClues(
   }
 
   if (data.clue !== undefined) {
-    updateData.clue = data.clue ? data.clue.trim() : ""
+    updateData.clue = data.clue && data.clue.trim() ? data.clue.trim() : null
   }
 
   if (data.source !== undefined) {
@@ -300,7 +300,7 @@ export async function importFillInTheBlanksWithoutClues(
         const createdItem = await tx.fillInTheBlanksWithoutClues.create({
           data: {
             content: data.content.trim(),
-            clue: data.clue ? data.clue.trim() : "",
+            clue: data.clue && data.clue.trim() ? data.clue.trim() : null,
             reference: data.reference || [],
             source: itemSource,
             session: itemSession,

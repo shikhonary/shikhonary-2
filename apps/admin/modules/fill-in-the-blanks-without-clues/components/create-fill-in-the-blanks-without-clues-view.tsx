@@ -176,7 +176,7 @@ export function CreateFillInTheBlanksWithoutCluesView() {
         subjectId: data.subjectId,
         chapterId: data.chapterId || null,
         content: contentVal,
-        clue: data.clue ? data.clue.trim() : "",
+        clue: data.clue && data.clue.trim() ? data.clue.trim() : null,
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,

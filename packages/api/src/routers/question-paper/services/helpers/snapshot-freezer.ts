@@ -83,6 +83,10 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).verbTense.findUnique({ where: { id: pq.verbTenseId } })
     } else if (pq.formFillupId) {
       content = await (db as any).formFillup.findUnique({ where: { id: pq.formFillupId } })
+    } else if (pq.shuddhoAshuddhoId) {
+      content = await (db as any).shuddhoAshuddho.findUnique({ where: { id: pq.shuddhoAshuddhoId } })
+    } else if (pq.danBamMilkoronId) {
+      content = await (db as any).danBamMilkoron.findUnique({ where: { id: pq.danBamMilkoronId } })
     }
 
     if (content) {

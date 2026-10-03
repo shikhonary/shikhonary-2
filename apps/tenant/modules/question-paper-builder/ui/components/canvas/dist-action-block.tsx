@@ -144,6 +144,10 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.MAKE_QUESTION;
     } else if (lowerName.includes("descriptive question") || lowerName.includes("descriptive_question") || lowerName.includes("dq") || lowerName.includes("রচনামূলক প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
+    } else if (lowerName.includes("shuddho") || lowerName.includes("shudho") || lowerName.includes("ashuddho") || lowerName.includes("শুদ্ধ") || lowerName.includes("অশুদ্ধ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
+    } else if (lowerName.includes("dan bam") || lowerName.includes("dan_bam") || lowerName.includes("বাম-ডান") || lowerName.includes("ডান-বাম") || lowerName.includes("মিলকরণ") || lowerName.includes("matching")) {
+      resolvedCategory = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {

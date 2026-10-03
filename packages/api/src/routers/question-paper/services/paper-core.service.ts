@@ -180,6 +180,8 @@ export async function getQuestionPaperById(
   const podNirnoyIds = allPaperQuestions.map((q: any) => q.podNirnoyId).filter(Boolean) as string[]
   const verbTenseIds = allPaperQuestions.map((q: any) => q.verbTenseId).filter(Boolean) as string[]
   const formFillupIds = allPaperQuestions.map((q: any) => q.formFillupId).filter(Boolean) as string[]
+  const shuddhoAshuddhoIds = allPaperQuestions.map((q: any) => q.shuddhoAshuddhoId).filter(Boolean) as string[]
+  const danBamMilkoronIds = allPaperQuestions.map((q: any) => q.danBamMilkoronId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -224,6 +226,8 @@ export async function getQuestionPaperById(
     podNirnoys,
     verbTenses,
     formFillups,
+    shuddhoAshuddhos,
+    danBamMilkorons,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -562,6 +566,24 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    shuddhoAshuddhoIds.length > 0
+      ? (db as any).shuddhoAshuddho.findMany({
+        where: { id: { in: shuddhoAshuddhoIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    danBamMilkoronIds.length > 0
+      ? (db as any).danBamMilkoron.findMany({
+        where: { id: { in: danBamMilkoronIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     paper.classId ? db.academicClass.findUnique({ where: { id: paper.classId } }) : null,
     subjectIds.length > 0 ? db.academicSubject.findMany({ where: { id: { in: subjectIds } } }) : [],
     questionTypeIds.length > 0 ? db.questionType.findMany({ where: { id: { in: questionTypeIds } } }) : [],
@@ -604,6 +626,8 @@ export async function getQuestionPaperById(
   const podNirnoyMap = new Map((podNirnoys as any[]).map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const verbTenseMap = new Map((verbTenses as any[]).map((v: any) => [v.id, { ...v, chapter: v.academicChapter }]))
   const formFillupMap = new Map((formFillups as any[]).map((f: any) => [f.id, { ...f, chapter: f.academicChapter }]))
+  const shuddhoAshuddhoMap = new Map((shuddhoAshuddhos as any[]).map((s: any) => [s.id, { ...s, chapter: s.academicChapter }]))
+  const danBamMilkoronMap = new Map((danBamMilkorons as any[]).map((d: any) => [d.id, { ...d, chapter: d.academicChapter }]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -659,6 +683,8 @@ export async function getQuestionPaperById(
     let resolvedPodNirnoy = q.podNirnoyId ? podNirnoyMap.get(q.podNirnoyId) || null : null
     let resolvedVerbTense = q.verbTenseId ? verbTenseMap.get(q.verbTenseId) || null : null
     let resolvedFormFillup = q.formFillupId ? formFillupMap.get(q.formFillupId) || null : null
+    let resolvedShuddhoAshuddho = q.shuddhoAshuddhoId ? shuddhoAshuddhoMap.get(q.shuddhoAshuddhoId) || null : null
+    let resolvedDanBamMilkoron = q.danBamMilkoronId ? danBamMilkoronMap.get(q.danBamMilkoronId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -772,10 +798,18 @@ export async function getQuestionPaperById(
     if (!resolvedFormFillup && q.formFillupId && q.contentSnapshot) {
       resolvedFormFillup = q.contentSnapshot as any
     }
+    if (!resolvedShuddhoAshuddho && q.shuddhoAshuddhoId && q.contentSnapshot) {
+      resolvedShuddhoAshuddho = q.contentSnapshot as any
+    }
+    if (!resolvedDanBamMilkoron && q.danBamMilkoronId && q.contentSnapshot) {
+      resolvedDanBamMilkoron = q.contentSnapshot as any
+    }
 
     let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
 
     const actualQuestionTypeId =
+      (resolvedDanBamMilkoron as any)?.questionTypeId ||
+      (resolvedShuddhoAshuddho as any)?.questionTypeId ||
       (resolvedFormFillup as any)?.questionTypeId ||
       (resolvedVerbTense as any)?.questionTypeId ||
       (resolvedPodNirnoy as any)?.questionTypeId ||
@@ -815,6 +849,8 @@ export async function getQuestionPaperById(
       for (const dist of distMap.values()) {
         const matchesExact = dist.questionTypeId === actualQuestionTypeId
         const matchesCategory =
+          (resolvedDanBamMilkoron && (dist.questionTypeName?.includes("মিলকরণ") || dist.questionTypeName?.includes("বাম-ডান") || dist.questionTypeName?.includes("ডান-বাম") || dist.questionTypeName?.toLowerCase().includes("dan bam") || dist.questionTypeName?.toLowerCase().includes("dan_bam") || dist.questionTypeName?.toLowerCase().includes("matching"))) ||
+          (resolvedShuddhoAshuddho && (dist.questionTypeName?.includes("শুদ্ধ-অশুদ্ধ") || dist.questionTypeName?.includes("শুদ্ধ") || dist.questionTypeName?.toLowerCase().includes("shuddho") || dist.questionTypeName?.toLowerCase().includes("shuddho_ashuddho"))) ||
           (resolvedFormFillup && (dist.questionTypeName?.includes("ফরম পূরণ") || dist.questionTypeName?.includes("ফরমপুরণ") || dist.questionTypeName?.toLowerCase().includes("form fillup") || dist.questionTypeName?.toLowerCase().includes("form_fillup") || dist.questionTypeName?.toLowerCase().includes("form filling") || dist.questionTypeName?.toLowerCase().includes("form_filling"))) ||
           (resolvedVerbTense && (dist.questionTypeName?.includes("ক্রিয়াপদ") || dist.questionTypeName?.includes("ক্রিয়াপদ") || dist.questionTypeName?.includes("ক্রিয়ার কাল") || dist.questionTypeName?.includes("ক্রিয়ার কাল") || dist.questionTypeName?.toLowerCase().includes("verb tense") || dist.questionTypeName?.toLowerCase().includes("verb_tense"))) ||
           (resolvedPodNirnoy && (dist.questionTypeName?.includes("পদ নির্ণয়") || dist.questionTypeName?.includes("পদ নির্ণয়") || dist.questionTypeName?.toLowerCase().includes("pod nirnoy") || dist.questionTypeName?.toLowerCase().includes("pod_nirnoy"))) ||
@@ -898,6 +934,8 @@ export async function getQuestionPaperById(
       podNirnoy: resolvedPodNirnoy,
       verbTense: resolvedVerbTense,
       formFillup: resolvedFormFillup,
+      shuddhoAshuddho: resolvedShuddhoAshuddho,
+      danBamMilkoron: resolvedDanBamMilkoron,
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
   }

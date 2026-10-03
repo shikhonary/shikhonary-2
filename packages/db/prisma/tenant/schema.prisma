@@ -265,6 +265,8 @@ model QuestionPaperQuestion {
   synonymId                     String?
   verbTenseId                   String?
   formFillupId                  String?
+  shuddhoAshuddhoId             String?
+  danBamMilkoronId              String?
 
   // ── Alternative / OR Question Relationship ─────────────────
   // If null, this is the primary question slot.
@@ -341,6 +343,8 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, synonymId])
   @@unique([questionPaperId, verbTenseId])
   @@unique([questionPaperId, formFillupId])
+  @@unique([questionPaperId, shuddhoAshuddhoId])
+  @@unique([questionPaperId, danBamMilkoronId])
   @@index([parentQuestionId])
   @@index([questionPaperId])
   @@index([questionPaperId, parentQuestionId, orderIndex])
@@ -381,6 +385,8 @@ model QuestionPaperQuestion {
   @@index([synonymId])
   @@index([verbTenseId])
   @@index([formFillupId])
+  @@index([shuddhoAshuddhoId])
+  @@index([danBamMilkoronId])
   @@index([distributionId])
   @@index([sectionId])
   @@index([subSectionId])

@@ -75,6 +75,8 @@ export async function addAlternativeQuestion(
     VERB_TENSE: "verbTenseId",
     FORM_FILLUP: "formFillupId",
     FORM_FILLING: "formFillupId",
+    SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
+    DAN_BAM_MILKORON: "danBamMilkoronId",
   }
 
   const fkField = typeFieldMap[input.questionType]
@@ -159,6 +161,10 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).verbTense.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "FORM_FILLUP" || input.questionType === "FORM_FILLING") {
     altContent = await (db as any).formFillup.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SHUDDHO_ASHUDDHO") {
+    altContent = await (db as any).shuddhoAshuddho.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "DAN_BAM_MILKORON") {
+    altContent = await (db as any).danBamMilkoron.findUnique({ where: { id: input.questionId } })
   }
   if (!altContent) throw notFound(input.questionType)
 
@@ -339,7 +345,7 @@ export async function swapAlternativeQuestion(
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
     "letterId", "applicationId", "summaryId", "essenceId", "poemEssenceId", "proseEssenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId",
-    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId"
+    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId"
   ] as const
 
   const questionFields = [

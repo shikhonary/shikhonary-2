@@ -215,10 +215,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let changingSentenceIdx = 0;
         let fillInTheBlanksWithCluesIdx = 0;
         let fillInTheBlanksWithoutCluesIdx = 0;
+        let danBamMilkoronIdx = 0;
         let substitutionTableIdx = 0;
         let punctuationIdx = 0;
         let shortCompositionIdx = 0;
         let descriptiveQuestionIdx = 0;
+        let shuddhoAshuddhoIdx = 0;
         let shortQuestionIdx = 0;
         let makeQuestionIdx = 0;
         let pbqIdx = 0;
@@ -227,6 +229,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalPoemEssences = questions.filter((q: any) => q.poemEssence).length;
         const totalFormFillups = questions.filter((q: any) => q.formFillup).length;
+        const totalShuddhoAshuddhos = questions.filter((q: any) => q.shuddhoAshuddho).length;
         const totalProseEssences = questions.filter((q: any) => q.proseEssence).length;
         const totalPodNirnoys = questions.filter((q: any) => q.podNirnoy).length;
         const totalVerbTenses = questions.filter((q: any) => q.verbTense).length;
@@ -254,6 +257,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalChangingSentences = questions.filter((q: any) => q.changingSentence).length;
         const totalFillInTheBlanksWithClues = questions.filter((q: any) => q.fillInTheBlanksWithClues).length;
         const totalFillInTheBlanksWithoutClues = questions.filter((q: any) => q.fillInTheBlanksWithoutClues).length;
+        const totalDanBamMilkorons = questions.filter((q: any) => q.danBamMilkoron).length;
         const totalSubstitutionTables = questions.filter((q: any) => q.substitutionTable).length;
         const totalPunctuation = questions.filter((q: any) => q.punctuation).length;
         const totalShortCompositions = questions.filter((q: any) => q.shortComposition).length;
@@ -542,6 +546,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: descriptiveQuestionIdx === totalDescriptiveQuestions - 1 ? 4 : 0
             });
             descriptiveQuestionIdx++;
+          }
+          if (q.shuddhoAshuddho) {
+            if (shuddhoAshuddhoIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-shuddho-ashuddho",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "SHUDDHO_ASHUDDHO",
+                  data: q.shuddhoAshuddho,
+                  orderIndex: shuddhoAshuddhoIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstShuddhoAshuddho: shuddhoAshuddhoIdx === 0,
+                  totalQuestions: totalShuddhoAshuddhos,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "শুদ্ধ অশুদ্ধ নির্ণয়",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: shuddhoAshuddhoIdx === totalShuddhoAshuddhos - 1 ? 4 : 0
+            });
+            shuddhoAshuddhoIdx++;
           }
           if (q.shortQuestion) {
             if (shortQuestionIdx === 0) {
@@ -1550,6 +1589,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: fillInTheBlanksWithoutCluesIdx === totalFillInTheBlanksWithoutClues - 1 ? 4 : 0,
             });
             fillInTheBlanksWithoutCluesIdx++;
+          }
+          if (q.danBamMilkoron) {
+            if (danBamMilkoronIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-dan-bam-milkoron",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "DAN_BAM_MILKORON",
+                  data: q.danBamMilkoron,
+                  orderIndex: danBamMilkoronIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstDanBamMilkoron: danBamMilkoronIdx === 0,
+                  totalQuestions: totalDanBamMilkorons,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "বাম পাশের বাক্যাংশের সাথে ডান পাশের বাক্যাংশ মিল করে বাক্য লেখো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: danBamMilkoronIdx === totalDanBamMilkorons - 1 ? 4 : 0,
+            });
+            danBamMilkoronIdx++;
           }
           if (q.substitutionTable) {
             if (substitutionTableIdx === 0) {

@@ -42,6 +42,8 @@ import { PunctuationPickerCard } from "./punctuation-picker-card";
 import { ShortCompositionPickerCard } from "./short-composition-picker-card";
 import { DescriptiveQuestionPickerCard } from "./descriptive-question-picker-card";
 import { ShortQuestionPickerCard } from "./short-question-picker-card";
+import { ShuddhoAshuddhoPickerCard } from "./shuddho-ashuddho-picker-card";
+import { DanBamMilkoronPickerCard } from "./dan-bam-milkoron-picker-card";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "০";
@@ -165,6 +167,10 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <DescriptiveQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SHORT_QUESTION":
         return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SHUDDHO_ASHUDDHO":
+        return <ShuddhoAshuddhoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "DAN_BAM_MILKORON":
+        return <DanBamMilkoronPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "POEM":
         return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "MAKE_SENTENCES":

@@ -429,6 +429,8 @@ export async function getAvailableQuestions(
         podNirnoyId: true,
         verbTenseId: true,
         formFillupId: true,
+        shuddhoAshuddhoId: true,
+        danBamMilkoronId: true,
       },
     })
     : Promise.resolve([])
@@ -500,6 +502,8 @@ export async function getAvailableQuestions(
     effectiveCategory === "VERB_TENSE" ||
     effectiveCategory === "FORM_FILLUP" ||
     effectiveCategory === "FORM_FILLING" ||
+    effectiveCategory === "SHUDDHO_ASHUDDHO" ||
+    effectiveCategory === "DAN_BAM_MILKORON" ||
     effectiveCategory === "POEM_ESSENCE" ||
     effectiveCategory === "PROSE_ESSENCE" ||
     effectiveCategory === "SHORT_QUESTION" ||
@@ -657,7 +661,7 @@ export async function getAvailableBoardYears(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId
@@ -730,7 +734,7 @@ export async function getAvailableSources(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId

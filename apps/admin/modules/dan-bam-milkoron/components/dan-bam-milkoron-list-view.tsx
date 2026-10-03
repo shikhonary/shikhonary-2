@@ -28,29 +28,29 @@ export function DanBamMilkoronListView() {
     subjectId: params.subjectId === "All" ? undefined : params.subjectId,
   })
 
-  const { data: listData, isLoading, isError } = useDanBamMilkoronList({
+  const { data: statsData, isLoading: isStatsLoading } = useDanBamMilkoronStats({
+    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
+    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
+  })
+
+  const { data: listData, isLoading: isListLoading, isError } = useDanBamMilkoronList({
     page: params.page,
     limit: params.limit,
-    query: params.query,
+    query: params.query || undefined,
     subjectId: params.subjectId === "All" ? undefined : params.subjectId,
     chapterId: params.chapterId === "All" ? undefined : params.chapterId,
     difficulty: params.difficulty === "All" ? undefined : params.difficulty,
     sort: params.sort === "All" ? undefined : params.sort,
   })
 
-  const { data: statsData } = useDanBamMilkoronStats({
-    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
-    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
-  })
-
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <DanBamMilkoronListHeader />
 
       <DanBamMilkoronStatsCards
         totalCount={statsData?.totalCount}
         difficultyCounts={statsData?.difficultyCounts}
-        isLoading={isLoading}
+        isLoading={isStatsLoading}
       />
 
       <DanBamMilkoronFilters
@@ -73,16 +73,16 @@ export function DanBamMilkoronListView() {
 
       <DanBamMilkoronTable
         items={listData?.items ?? []}
-        isLoading={isLoading}
+        isLoading={isListLoading}
         isError={isError}
-        onDelete={(id, text) => openModal(id, text)}
-        onBulkDelete={(ids) => openBulkModal(ids)}
         currentPage={params.page}
         itemsPerPage={params.limit}
         totalItems={listData?.totalItems ?? 0}
         totalPages={listData?.totalPages ?? 1}
         onPageChange={(page) => setParams({ page })}
         onLimitChange={(limit) => setParams({ limit, page: 1 })}
+        onDelete={(id, text) => openModal(id, text)}
+        onBulkDelete={(ids) => openBulkModal(ids)}
       />
 
       <DeleteDanBamMilkoronModal />
