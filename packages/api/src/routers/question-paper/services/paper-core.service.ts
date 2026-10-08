@@ -11,6 +11,7 @@ import type {
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
   UpdateQuestionPaperSettingsInput,
+  PatchQuestionPaperSettingsInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
 import { syncMarkDistribution } from "./helpers/totals-calculator"
@@ -1590,4 +1591,64 @@ export async function updateQuestionPaperSettings(
   })
 
   return updated
+}
+
+export async function patchQuestionPaperSettings(
+  tenantDb: TenantPrismaClient,
+  input: PatchQuestionPaperSettingsInput,
+  actorId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.id },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+
+  const currentSettings = ((paper.settings as any) || {}) as Record<string, any>
+
+  // Handle mutual exclusivity rules identical to use-builder-store
+  const patchData: Record<string, any> = { ...input.patch }
+  if (patchData.twoPagesPerSheet) {
+    patchData.bookFoldLayout = false
+  } else if (patchData.bookFoldLayout) {
+    patchData.twoPagesPerSheet = false
+  }
+
+  // Deep merge nested objects
+  const mergedSettings: Record<string, any> = {
+    ...currentSettings,
+    ...patchData,
+  }
+
+  if (patchData.margins) {
+    mergedSettings.margins = {
+      ...(currentSettings.margins || { top: 20, bottom: 20, left: 20, right: 20 }),
+      ...patchData.margins,
+    }
+  }
+
+  if (patchData.omrSettings) {
+    mergedSettings.omrSettings = {
+      ...(currentSettings.omrSettings || { columns: 3, includeRollNumber: true }),
+      ...patchData.omrSettings,
+    }
+  }
+
+  const updated = await tenantDb.questionPaper.update({
+    where: { id: input.id },
+    data: {
+      settings: mergedSettings,
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.id,
+    action: "SETTINGS_UPDATED",
+    actorId,
+    changes: { patch: patchData, settings: mergedSettings },
+  })
+
+  return {
+    paper: updated,
+    patch: patchData,
+  }
 }

@@ -38,7 +38,7 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
-import { SHUDDHO_ASHUDDHO_SOURCE_OPTIONS, SHUDDHO_ASHUDDHO_ANSWER_OPTIONS } from "../constants"
+import { SHUDDHO_ASHUDDHO_SOURCE_OPTIONS } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -377,24 +377,44 @@ function EditableShuddhoAshuddhoCard({
 
           {/* Answer */}
           <div>
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
-              Answer (উত্তর)
-            </span>
-            <Select
-              value={item.answer || "শুদ্ধ"}
-              onValueChange={(val) => onChange({ ...item, answer: val })}
-            >
-              <SelectTrigger className="w-full bg-white font-solaiman font-bold h-10">
-                <SelectValue placeholder="Select Answer" />
-              </SelectTrigger>
-              <SelectContent className="bg-white font-solaiman">
-                {SHUDDHO_ASHUDDHO_ANSWER_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
+                Answer (উত্তর - ঐচ্ছিক)
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...item, answer: item.answer === "শুদ্ধ" ? "" : "শুদ্ধ" })}
+                  className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-colors border",
+                    item.answer === "শুদ্ধ"
+                      ? "bg-emerald-100 text-emerald-800 border-emerald-300 font-bold"
+                      : "bg-surface-container-low text-on-surface-variant hover:bg-emerald-50 border-outline-variant/60"
+                  )}
+                  title="Toggle শুদ্ধ"
+                >
+                  শুদ্ধ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...item, answer: item.answer === "অশুদ্ধ" ? "" : "অশুদ্ধ" })}
+                  className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-colors border",
+                    item.answer === "অশুদ্ধ"
+                      ? "bg-red-100 text-red-800 border-red-300 font-bold"
+                      : "bg-surface-container-low text-on-surface-variant hover:bg-red-50 border-outline-variant/60"
+                  )}
+                  title="Toggle অশুদ্ধ"
+                >
+                  অশুদ্ধ
+                </button>
+              </div>
+            </div>
+            <EditableField
+              value={item.answer || ""}
+              placeholder="e.g. শুদ্ধ / অশুদ্ধ / সঠিক বাক্য..."
+              onSave={(newVal) => onChange({ ...item, answer: newVal })}
+            />
           </div>
         </div>
 
@@ -561,7 +581,7 @@ export function ImportShuddhoAshuddhoView() {
           chapterId: chapterId || null,
           academicChapterId: chapterId || null,
           sentence: String(sentenceText).trim(),
-          answer: item.answer ? String(item.answer).trim() : "শুদ্ধ",
+          answer: item.answer ? String(item.answer).trim() : "",
           difficulty: item.difficulty || "MEDIUM",
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
@@ -664,7 +684,7 @@ export function ImportShuddhoAshuddhoView() {
   const handleAddNewSentenceCard = () => {
     const newSentence = {
       sentence: "নতুন বাক্য",
-      answer: "শুদ্ধ",
+      answer: "",
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -691,7 +711,7 @@ export function ImportShuddhoAshuddhoView() {
         chapterId: selectedChapterId || null,
         academicChapterId: selectedChapterId || null,
         sentence: item.sentence.trim(),
-        answer: item.answer ? item.answer.trim() : "শুদ্ধ",
+        answer: item.answer && item.answer.trim() ? item.answer.trim() : null,
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],

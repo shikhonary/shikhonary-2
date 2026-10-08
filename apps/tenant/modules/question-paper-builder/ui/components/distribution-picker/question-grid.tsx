@@ -84,6 +84,8 @@ export interface QuestionGridProps {
   limit?: number;
   onPageChange?: (page: number) => void;
   onLimitChange?: (limit: number) => void;
+  onlyBookmarked?: boolean;
+  bookmarkedIds?: string[];
 }
 
 export const QuestionGrid: React.FC<QuestionGridProps> = ({
@@ -102,6 +104,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   limit = 20,
   onPageChange,
   onLimitChange,
+  onlyBookmarked = false,
+  bookmarkedIds,
 }) => {
   const { data: result, isLoading } = useAvailableQuestions({
     subjectId,
@@ -117,13 +121,21 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     limit,
   });
 
-  const questions = result?.items || [];
-  const totalItems = result?.totalItems || 0;
-  const totalPages = result?.totalPages || 1;
+  const rawQuestions = result?.items || [];
+  const questions =
+    onlyBookmarked && bookmarkedIds
+      ? rawQuestions.filter((q: any) => bookmarkedIds.includes(q.id))
+      : rawQuestions;
+
+  const totalItems = onlyBookmarked ? questions.length : result?.totalItems || 0;
+  const totalPages = onlyBookmarked
+    ? Math.max(1, Math.ceil(totalItems / limit))
+    : result?.totalPages || 1;
   const currentPage = result?.page || page;
   const currentLimit = result?.limit || limit;
   const displayStart = totalItems === 0 ? 0 : (currentPage - 1) * currentLimit + 1;
   const displayEnd = Math.min(totalItems, currentPage * currentLimit);
+
 
   if (isLoading) {
     return (

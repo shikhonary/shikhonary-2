@@ -278,7 +278,16 @@ const EmptyBlock = () => {
 };
 
 export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
-  switch (block.type) {
+  const highlightedItemIds = useBuilderStore((state) => state.highlightedItemIds);
+  const isHighlighted = Boolean(
+    (block.id && highlightedItemIds?.includes(block.id)) ||
+    (block.data?.item?.id && highlightedItemIds?.includes(block.data.item.id)) ||
+    (block.data?.item?.questionId && highlightedItemIds?.includes(block.data.item.questionId)) ||
+    (block.data?.distributionId && highlightedItemIds?.includes(block.data.distributionId))
+  );
+
+  const renderContent = () => {
+    switch (block.type) {
     case "header-full":
     case "header-column":
       return <HeaderBlock />;
@@ -376,5 +385,19 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <EmptyBlock />;
     default:
       return null;
+    }
+  };
+
+  const content = renderContent();
+  if (!content) return null;
+
+  if (isHighlighted) {
+    return (
+      <div className="relative rounded-md ring-2 ring-primary/80 bg-primary/10 transition-all duration-500 animate-pulse">
+        {content}
+      </div>
+    );
   }
+
+  return content;
 };

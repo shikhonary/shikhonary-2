@@ -35,6 +35,11 @@ interface BuilderState {
   restoreSubSection: (subSectionId: string) => void;
   
   updateSettings: (updates: Partial<PaperSettings>) => void;
+  applyRemoteSettings: (updates: Partial<PaperSettings>) => void;
+  requestRehydrate: () => void;
+  rehydrateCounter: number;
+  highlightedItemIds: string[];
+  flashHighlightItem: (idOrIds: string | string[]) => void;
   
   setZoom: (zoom: number | "auto") => void;
   setSelectedItemId: (id: string | null) => void;
@@ -220,7 +225,36 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       hasUnsavedChanges: true,
     };
   }),
+
+  applyRemoteSettings: (updates) => set((state) => {
+    const finalUpdates = { ...updates };
+    if (updates.twoPagesPerSheet) {
+      finalUpdates.bookFoldLayout = false;
+    } else if (updates.bookFoldLayout) {
+      finalUpdates.twoPagesPerSheet = false;
+    }
+    return {
+      settings: { ...state.settings, ...finalUpdates },
+      hasUnsavedChanges: false,
+    };
+  }),
+
+  rehydrateCounter: 0,
+  requestRehydrate: () => set((state) => ({ rehydrateCounter: state.rehydrateCounter + 1 })),
   
+  highlightedItemIds: [],
+  flashHighlightItem: (idOrIds) => {
+    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+    set((state) => ({
+      highlightedItemIds: Array.from(new Set([...state.highlightedItemIds, ...ids])),
+    }));
+    setTimeout(() => {
+      set((state) => ({
+        highlightedItemIds: state.highlightedItemIds.filter((id) => !ids.includes(id)),
+      }));
+    }, 3500);
+  },
+
   setZoom: (zoom) => set({ zoom }),
   setSelectedItemId: (id) => set({ selectedItemId: id }),
   setIsExporting: (isExporting) => set({ isExporting }),

@@ -28,10 +28,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@workspace/ui/components/drawer";
-import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split, Shuffle } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split, Shuffle, Bookmark } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionGrid } from "../components/distribution-picker/question-grid";
+import { useBookmarkedQuestionsStore } from "@/modules/question-bank/store/use-bookmarked-questions-store";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -73,6 +74,9 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [selectedSort, setSelectedSort] = useState<"newest" | "oldest">("newest");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
+  const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+
+  const bookmarks = useBookmarkedQuestionsStore((s) => s.bookmarks);
 
   const { mutateAsync: bulkAssign, isPending: isAssigning } = useBulkAssignQuestions();
   const { mutateAsync: addAlternative, isPending: isAddingAlternative } = useAddAlternativeQuestion();
@@ -80,6 +84,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const distStatus =
     statuses?.find((s: any) => s.distributionId === distributionId) ||
     (isAlternativeMode && statuses && statuses.length > 0 ? statuses[0] : null);
+
+  const bookmarkedIds = React.useMemo(() => {
+    return Object.values(bookmarks)
+      .filter((b) => b.subjectId === distStatus?.subjectId)
+      .map((b) => b.id);
+  }, [bookmarks, distStatus?.subjectId]);
 
   const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
   const distCode = distStatus?.questionType?.code;
@@ -728,6 +738,30 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               </DrawerContent>
             </Drawer>
 
+            {/* Bookmarked Filter Pill */}
+            <button
+              type="button"
+              onClick={() => {
+                setOnlyBookmarked(!onlyBookmarked);
+                setPage(1);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold font-body transition-colors cursor-pointer shrink-0 ${
+                onlyBookmarked
+                  ? "bg-rose-600 text-white shadow-xs"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-outline-variant/40"
+              }`}
+              title="বুকমার্ককৃত প্রশ্ন ফিল্টার"
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarked ? "fill-white text-white" : "fill-rose-500 text-rose-500"}`} />
+              <span>বুকমার্ককৃত</span>
+              <span
+                className="font-solaiman font-semibold"
+                style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+              >
+                ({toBengaliDigits(bookmarkedIds.length)})
+              </span>
+            </button>
+
             {/* Desktop Filters (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 shrink-0">
               {renderSelectFilters(false)}
@@ -861,6 +895,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             limit={limit}
             onPageChange={setPage}
             onLimitChange={setLimit}
+            onlyBookmarked={onlyBookmarked}
+            bookmarkedIds={bookmarkedIds}
             onToggle={(id) => {
               setSelectedIds(prev => {
                 if (prev.includes(id)) {

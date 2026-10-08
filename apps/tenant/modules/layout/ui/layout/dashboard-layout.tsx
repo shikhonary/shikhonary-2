@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DashboardSidebar } from "./dashboard-sidebar";
 import DashboardHeader from "./dashboard-header";
 
+import { AssistantProvider, SpeedDialAssistant } from "@/modules/ai-assistant";
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
@@ -27,25 +29,28 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   }, []);
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex font-sans">
-      {/* Side Navigation (Desktop & Tablet) */}
-      <DashboardSidebar
-        collapsed={isCollapsed}
-        onToggle={() => setIsCollapsed((prev) => !prev)}
-      />
+    <AssistantProvider>
+      <div className="bg-background text-on-background min-h-screen flex font-sans w-full min-w-0 overflow-x-hidden">
+        {/* Side Navigation (Desktop & Tablet) */}
+        <DashboardSidebar
+          collapsed={isCollapsed}
+          onToggle={() => setIsCollapsed((prev) => !prev)}
+        />
 
-      {/* Main Content Wrapper */}
-      <div
-        className={`flex flex-1 flex-col min-h-screen transition-all duration-300 ${
-          isCollapsed ? "md:ml-20" : "md:ml-64"
-        }`}
-      >
-        {/* Top Navigation (Sticky Header) */}
-        <DashboardHeader />
+        {/* Main Content Wrapper */}
+        <div
+          className={`flex flex-1 flex-col min-h-screen transition-all duration-300 w-full min-w-0 max-w-full ${
+            isCollapsed ? "md:ml-20" : "md:ml-64"
+          }`}
+        >
+          {/* Top Navigation (Sticky Header) */}
+          <DashboardHeader />
 
-        {/* Main Workspace Canvas */}
-        <main className="flex-grow p-4 sm:p-6">{children}</main>
+          {/* Main Workspace Canvas */}
+          <main className="flex-grow p-4 sm:p-6 w-full min-w-0 max-w-full">{children}</main>
+        </div>
       </div>
-    </div>
+      <SpeedDialAssistant />
+    </AssistantProvider>
   );
 };

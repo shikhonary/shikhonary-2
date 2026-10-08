@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Settings,
   FileText,
+  BookOpen,
   Coins,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
@@ -63,6 +64,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       groupLabel: "Main",
       items: [
         { href: "/", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+        { href: "/question-bank", label: "প্রশ্ন ব্যাংক", icon: BookOpen },
         { href: "/question-papers", label: "প্রশ্নপত্র", icon: FileText },
       ],
     },

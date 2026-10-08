@@ -6,9 +6,10 @@ import { BuilderSidebar } from "../components/sidebar/builder-sidebar";
 import { BuilderCanvas } from "../components/canvas/builder-canvas";
 import { FloatingFormatToolbar } from "../components/toolbar/floating-format-toolbar";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Loader2, Save, Copy, Download } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Copy, Download, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
+import { useAssistant } from "@/modules/ai-assistant";
 import {
   useQuestionPaperById,
   useUpdateQuestionPaperSettings,
@@ -66,16 +67,18 @@ function AutoSaveManager({ paperId }: { paperId: string }) {
 
 export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
   const { tenant } = useTenant();
-  const { hydratePaper, saveStatus, markSaved, settings } = useBuilderStore();
+  const { hydratePaper, saveStatus, markSaved, settings, rehydrateCounter } = useBuilderStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const lastRehydratedCounter = useRef(-1);
 
   const { data: paperQuery, isLoading, error } = useQuestionPaperById(paperId);
   const { mutateAsync: updateSettingsMutation, isPending: isManualSaving } = useUpdateQuestionPaperSettings();
   const { downloadAsPdf, isDownloading } = useDownloadPaper({ paperTitle: paperQuery?.title });
 
   useEffect(() => {
-    if (paperQuery && !isHydrated) {
+    if (paperQuery && (!isHydrated || lastRehydratedCounter.current !== rehydrateCounter)) {
+      lastRehydratedCounter.current = rehydrateCounter;
       hydratePaper(
         paperId,
         (paperQuery.settings || {}) as any,
@@ -84,7 +87,9 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
       );
       setIsHydrated(true);
     }
-  }, [paperQuery, isHydrated, hydratePaper, paperId, tenant]);
+  }, [paperQuery, isHydrated, rehydrateCounter, hydratePaper, paperId, tenant]);
+
+  const { toggleOpen: toggleAssistant, isOpen: isAssistantOpen } = useAssistant();
 
   const handleManualSave = async () => {
     useBuilderStore.setState({ saveStatus: "saving" });
@@ -149,6 +154,15 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button
+            variant={isAssistantOpen ? "secondary" : "outline"}
+            size="sm"
+            onClick={toggleAssistant}
+            className="cursor-pointer gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>AI সহকারী</span>
+          </Button>
           <Button variant="secondary" size="sm" onClick={() => setShowGenerateModal(true)} className="cursor-pointer gap-1.5">
             <Copy className="w-3.5 h-3.5" />
             <span>সেট তৈরি</span>

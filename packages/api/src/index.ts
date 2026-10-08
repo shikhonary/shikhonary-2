@@ -91,7 +91,16 @@ export type {
   BulkAssignQuestionsInput,
   BulkRemoveQuestionsInput,
   UpdateQuestionPaperSettingsInput,
+  PatchQuestionPaperSettingsInput,
   GeneratePaperSetsInput,
+  AutoFillDistributionInput,
+  ReplaceQuestionInput,
+} from "./routers/question-paper/question-paper.schema"
+
+export {
+  patchQuestionPaperSettingsSchema,
+  autoFillDistributionSchema,
+  replaceQuestionSchema,
 } from "./routers/question-paper/question-paper.schema"
 
 // ── Academic Setup Exports ───────────────────────────────────
@@ -619,6 +628,22 @@ export {
   bulkDeleteFillInTheBlanksWithoutCluesSchema,
   importFillInTheBlanksWithoutCluesSchema,
 } from "./routers/fill-in-the-blanks-without-clues/fill-in-the-blanks-without-clues.schema"
+
+export {
+  listQuestionBankSchema,
+  getQuestionDetailsSchema,
+  getQuestionBankStatsSchema,
+  getFilterOptionsSchema,
+} from "./routers/question-bank/question-bank.schema"
+
+export type {
+  ListQuestionBankInput,
+  GetQuestionDetailsInput,
+  GetQuestionBankStatsInput,
+  GetFilterOptionsInput,
+  GetClassDetailsInput,
+} from "./routers/question-bank/question-bank.schema"
+export { getClassDetailsSchema } from "./routers/question-bank/question-bank.schema"
 
 
 

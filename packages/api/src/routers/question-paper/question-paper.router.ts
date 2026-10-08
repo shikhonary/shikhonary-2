@@ -26,11 +26,14 @@ import {
   bulkAssignQuestionsSchema,
   bulkRemoveQuestionsSchema,
   updateQuestionPaperSettingsSchema,
+  patchQuestionPaperSettingsSchema,
   generatePaperSetsSchema,
   addAlternativeQuestionSchema,
   removeAlternativeQuestionSchema,
   swapAlternativeQuestionSchema,
   updateAlternativeQuestionSchema,
+  autoFillDistributionSchema,
+  replaceQuestionSchema,
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
@@ -60,11 +63,14 @@ import {
   bulkAssignQuestions,
   bulkRemoveQuestions,
   updateQuestionPaperSettings,
+  patchQuestionPaperSettings,
   generatePaperSets,
   addAlternativeQuestion,
   removeAlternativeQuestion,
   swapAlternativeQuestion,
   updateAlternativeQuestion,
+  autoFillDistribution,
+  replaceQuestion,
 } from "./question-paper.service"
 
 export const questionPaperRouter = createTRPCRouter({
@@ -128,6 +134,12 @@ export const questionPaperRouter = createTRPCRouter({
     .input(updateQuestionPaperSettingsSchema)
     .mutation(({ ctx, input }) =>
       updateQuestionPaperSettings(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  patchSettings: tenantMemberProcedure
+    .input(patchQuestionPaperSettingsSchema)
+    .mutation(({ ctx, input }) =>
+      patchQuestionPaperSettings(ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   delete: tenantMemberProcedure
@@ -254,6 +266,18 @@ export const questionPaperRouter = createTRPCRouter({
     .input(updateDistributionLabelSchema)
     .mutation(({ ctx, input }) =>
       updateDistributionLabel(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  autoFillDistribution: tenantMemberProcedure
+    .input(autoFillDistributionSchema)
+    .mutation(({ ctx, input }) =>
+      autoFillDistribution(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
+    ),
+
+  replaceQuestion: tenantMemberProcedure
+    .input(replaceQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      replaceQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
     ),
 })
 

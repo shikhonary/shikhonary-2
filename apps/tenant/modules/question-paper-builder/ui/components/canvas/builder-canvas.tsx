@@ -2138,7 +2138,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       }
     });
     setMeasuredHeights(newHeights);
-  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles]);
+  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles, settings.columns]);
 
   const pages = useMemo(() => {
     if (!blocks || blocks.length === 0) return [];
@@ -2272,7 +2272,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               
               <div 
                 className="flex h-full"
-                style={{ gap: "40px" }}
+                style={{ gap: settings.columns === 2 ? "1in" : "40px" }}
               >
                 {page.columns.map((col, colIdx) => (
                   <div 
@@ -2280,8 +2280,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                     className="flex-1 flex flex-col"
                     style={{ 
                       borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
-                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "20px" : "0",
-                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "-20px" : "0",
+                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? (settings.columns === 2 ? "0.5in" : "20px") : "0",
+                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? (settings.columns === 2 ? "-0.5in" : "-20px") : "0",
                     }}
                   >
                     {col.map((b, bIdx) => {
@@ -2330,7 +2330,13 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       >
         <div id="page-content-measurer" style={{ height: `${canvasMinHeight}mm` }} className="w-full"></div>
         {/* We need the column width for accurate text wrapping measurements */}
-        <div style={{ width: settings.columns > 1 ? `calc((100% - 40px) / ${settings.columns})` : '100%' }}>
+        <div style={{ 
+          width: settings.columns === 2 
+            ? 'calc((100% - 1in) / 2)' 
+            : settings.columns > 2 
+              ? `calc((100% - ${(settings.columns - 1) * 40}px) / ${settings.columns})` 
+              : '100%' 
+        }}>
           {blocks.map((b, idx) => {
             return (
               <div key={`measure-${b.id}-${idx}`} id={`measure-block-${b.id}`} className="w-full">
@@ -2429,7 +2435,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
                   <div style={{ 
                     columnCount: settings.columns, 
-                    columnGap: '40px',
+                    columnGap: settings.columns === 2 ? '1in' : '40px',
                     columnRule: settings.showColumnDivider ? '1px solid #e2e8f0' : 'none'
                   }}>
                     {blocks.filter(b => b.type !== "header-full").map((b, idx) => {

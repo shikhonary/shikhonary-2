@@ -275,6 +275,16 @@ export function useUpdateQuestionPaperSettings() {
   })
 }
 
+export function usePatchQuestionPaperSettings() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.patchSettings.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
 export function useGeneratePaperSets() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -319,6 +329,26 @@ export function useUpdateAlternativeQuestion() {
   const queryClient = useQueryClient()
   return useMutation({
     ...trpc.questionPaper.updateAlternative.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useAutoFillDistribution() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.autoFillDistribution.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useReplaceQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.replaceQuestion.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
     },

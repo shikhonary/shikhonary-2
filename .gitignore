@@ -47,3 +47,6 @@ packages/db/generated/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local agent configs
+.agents/

@@ -418,12 +418,99 @@ export const bulkRemoveQuestionsSchema = z.object({
 
 export type BulkRemoveQuestionsInput = z.infer<typeof bulkRemoveQuestionsSchema>
 
+export const autoFillDistributionSchema = z.object({
+  questionPaperId: z.string().min(1),
+  distributionId: z.string().min(1),
+  count: z.number().int().positive().optional(),
+  chapterId: z.string().optional(),
+  difficulty: z.string().optional(),
+  board: z.string().optional(),
+  source: z.string().optional(),
+})
+
+export type AutoFillDistributionInput = z.infer<typeof autoFillDistributionSchema>
+
+export const replaceQuestionSchema = z.object({
+  questionPaperId: z.string().min(1),
+  questionPaperQuestionId: z.string().min(1),
+  chapterId: z.string().optional(),
+  difficulty: z.string().optional(),
+})
+
+export type ReplaceQuestionInput = z.infer<typeof replaceQuestionSchema>
+
 export const updateQuestionPaperSettingsSchema = z.object({
   id: z.string().min(1),
   settings: z.record(z.any()),
 })
 
 export type UpdateQuestionPaperSettingsInput = z.infer<typeof updateQuestionPaperSettingsSchema>
+
+export const patchQuestionPaperSettingsSchema = z.object({
+  id: z.string().min(1),
+  patch: z
+    .object({
+      paperSize: z.enum(["A4", "Letter", "Legal", "A5"]).optional(),
+      paperOrientation: z.enum(["portrait", "landscape"]).optional(),
+      margins: z
+        .object({
+          top: z.number().optional(),
+          bottom: z.number().optional(),
+          left: z.number().optional(),
+          right: z.number().optional(),
+        })
+        .optional(),
+      columns: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+      showColumnDivider: z.boolean().optional(),
+      bookletMode: z.boolean().optional(),
+      bookFoldLayout: z.boolean().optional(),
+      twoPagesPerSheet: z.boolean().optional(),
+      headerTemplate: z.enum(["classic", "modern", "minimal", "left-aligned"]).optional(),
+      optionStyle: z.enum(["parentheses", "dot", "circle", "round"]).optional(),
+      fontFamily: z.string().optional(),
+      fontSize: z.number().optional(),
+      fontWeight: z.enum(["normal", "medium", "semibold", "bold"]).optional(),
+      lineHeight: z.number().optional(),
+      textAlign: z.enum(["left", "center", "right", "justify"]).optional(),
+      showLogo: z.boolean().optional(),
+      logoUrl: z.string().optional(),
+      showAddress: z.boolean().optional(),
+      address: z.string().optional(),
+      showWatermark: z.boolean().optional(),
+      watermark: z.string().optional(),
+      showClassName: z.boolean().optional(),
+      showSubjectName: z.boolean().optional(),
+      showChapterName: z.boolean().optional(),
+      showSetCode: z.boolean().optional(),
+      showExamName: z.boolean().optional(),
+      showTime: z.boolean().optional(),
+      showTotalMarks: z.boolean().optional(),
+      showInstructions: z.boolean().optional(),
+      showNoMarkingNote: z.boolean().optional(),
+      showReference: z.boolean().optional(),
+      institutionName: z.string().optional(),
+      className: z.string().optional(),
+      subjectName: z.string().optional(),
+      chapterName: z.string().optional(),
+      setCode: z.string().optional(),
+      examName: z.string().optional(),
+      time: z.string().optional(),
+      totalMarks: z.union([z.string(), z.number()]).optional(),
+      instructions: z.string().optional(),
+      showOMRSheet: z.boolean().optional(),
+      omrSettings: z
+        .object({
+          columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+          includeRollNumber: z.boolean().optional(),
+        })
+        .optional(),
+      dismissedSectionIds: z.array(z.string()).optional(),
+      dismissedSubSectionIds: z.array(z.string()).optional(),
+    })
+    .passthrough(),
+})
+
+export type PatchQuestionPaperSettingsInput = z.infer<typeof patchQuestionPaperSettingsSchema>
 
 export const generatePaperSetsSchema = z.object({
   sourcePaperId: z.string().min(1),
@@ -433,4 +520,5 @@ export const generatePaperSetsSchema = z.object({
 })
 
 export type GeneratePaperSetsInput = z.infer<typeof generatePaperSetsSchema>
+
 

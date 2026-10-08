@@ -5,11 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Users,
-  Coins,
-  Calculator,
-  MapPin,
-  CalendarDays,
+  BookOpen,
+  FileText,
   Settings,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
@@ -21,19 +18,14 @@ const mobileNavItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "করদাতা",
-    url: "/tax-payers",
-    icon: Users,
+    title: "প্রশ্ন ব্যাংক",
+    url: "/question-bank",
+    icon: BookOpen,
   },
   {
-    title: "কর আদায়",
-    url: "/tax-collection",
-    icon: Coins,
-  },
-  {
-    title: "কর জেনারেট",
-    url: "/generate-tax-payment",
-    icon: Calculator,
+    title: "প্রশ্নপত্র",
+    url: "/question-papers",
+    icon: FileText,
   },
   {
     title: "প্রোফাইল",

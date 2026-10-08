@@ -71,7 +71,7 @@ export function DashboardHeader() {
   const unionDisplayName = tenant.nameBn || tenant.name;
 
   return (
-    <header className="w-full h-14 sticky top-0 bg-surface border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
+    <header className="w-full min-w-0 h-14 sticky top-0 bg-surface border-b border-outline-variant flex justify-between items-center px-4 sm:px-6 z-40">
       
       {/* Left Side: Mobile Drawer trigger */}
       <div className="flex items-center">
@@ -151,27 +151,6 @@ export function DashboardHeader() {
             </div>
           </SheetContent>
         </Sheet>
-
-        {/* Desktop display of Tenant Name on the left (TopNav) */}
-        <div className="hidden md:flex items-center gap-2">
-          {tenant.logo && (
-            <img
-              src={tenant.logo}
-              alt={unionDisplayName}
-              className="w-6 h-6 rounded-full object-cover border border-primary/20 shrink-0"
-            />
-          )}
-          <span className="font-bold text-sm text-foreground">
-            {unionDisplayName}
-          </span>
-        </div>
-      </div>
-
-      {/* Center display (for mobile only/optional spacer) */}
-      <div className="md:hidden flex items-center gap-2">
-        <span className="font-bold text-xs text-foreground truncate max-w-[150px]">
-          {unionDisplayName}
-        </span>
       </div>
 
       {/* Right Side Actions */}
