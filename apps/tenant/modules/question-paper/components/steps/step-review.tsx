@@ -40,29 +40,29 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
   const grandTotal = data.subjects.reduce((sum, s) => sum + getSubjectTotal(s), 0)
 
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
-      <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
-        <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+    <Card className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-0 shadow-xs ring-0">
+      <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-6 flex flex-row items-center gap-3 sm:gap-4">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100 dark:border-primary/20 text-indigo-600 dark:text-primary shrink-0">
           <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
         <div className="flex-1">
-          <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
-            পর্যালোচনা
+          <CardTitle className="font-headline text-base sm:text-lg font-bold text-foreground normal-case tracking-normal">
+            চূড়ান্ত পর্যালোচনা
           </CardTitle>
-          <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5 font-body">
-            সবকিছু যাচাই করুন এবং প্রশ্নপত্র তৈরি করুন
+          <p className="text-xs text-muted-foreground mt-0.5 font-body">
+            সকল তথ্য ও নম্বর বণ্টন যাচাই করে প্রশ্নপত্র তৈরি সম্পন্ন করুন
           </p>
         </div>
         {grandTotal > 0 && (
-          <Badge className="bg-primary text-white px-3 py-1.5 text-sm font-bold rounded-lg shrink-0">
+          <Badge className="bg-indigo-600 text-white px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl shrink-0 font-solaiman shadow-xs">
             মোট: {grandTotal} নম্বর
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="p-4 sm:p-8 space-y-6">
+      <CardContent className="p-5 sm:p-6 space-y-6 font-body">
         {/* Basic Info */}
         <ReviewSection
-          icon={<FileText className="h-4 w-4" />}
+          icon={<FileText className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
           title="প্রাথমিক তথ্য"
           onEdit={() => onGoToStep(0)}
         >
@@ -70,14 +70,12 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
             <ReviewField label="পরীক্ষার নাম" value={data.examName} />
             <ReviewField label="শ্রেণী" value={data.className} />
             <ReviewField label="পরীক্ষার সময়" value={formatDurationBn(data.timeInMinutes)} />
-            <ReviewField label="টেমপ্লেট" value={data.isTemplate ? "হ্যাঁ" : "না"} />
           </div>
         </ReviewSection>
 
-        {/* Sections */}
         {/* Subjects & Distribution */}
         <ReviewSection
-          icon={<BookOpen className="h-4 w-4" />}
+          icon={<BookOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
           title={`বিষয় ও নম্বর বণ্টন (${data.subjects.length} বিষয়)`}
           onEdit={() => onGoToStep(1)}
         >
@@ -85,37 +83,68 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
             {data.subjects.map((subject) => {
               const subTotal = getSubjectTotal(subject)
               return (
-                <div key={subject.tempId} className="space-y-2">
+                <div key={subject.tempId} className="space-y-2 p-3.5 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.02]">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-on-surface font-display">{subject.subjectName}</span>
-                    <Badge className="bg-primary/10 text-primary px-2 py-0.5 text-xs font-bold rounded-md">
+                    <span className="text-sm font-bold text-foreground font-headline">{subject.subjectName}</span>
+                    <Badge className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 px-2 py-0.5 text-xs font-bold rounded-md font-solaiman">
                       {subTotal} নম্বর
                     </Badge>
                   </div>
                   {subject.distributions.length > 0 && (
-                    <div className="overflow-x-auto ml-2">
-                      <table className="w-full text-xs font-body">
-                        <thead>
-                          <tr className="border-b border-outline-variant/40">
-                            <th className="text-left py-1.5 px-2 text-[10px] font-medium text-outline uppercase">ধরণ</th>
-                            <th className="text-center py-1.5 px-2 text-[10px] font-medium text-outline uppercase">নম্বর/প্রশ্ন</th>
-                            <th className="text-center py-1.5 px-2 text-[10px] font-medium text-outline uppercase">প্রশ্ন সংখ্যা</th>
-                            <th className="text-center py-1.5 px-2 text-[10px] font-medium text-outline uppercase">চেষ্টা</th>
-                            <th className="text-center py-1.5 px-2 text-[10px] font-medium text-outline uppercase">মোট</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {subject.distributions.map((d) => (
-                            <tr key={d.tempId} className="border-b border-outline-variant/20 last:border-0">
-                              <td className="py-1.5 px-2 text-on-surface">{d.questionTypeNameBn || d.questionTypeName}</td>
-                              <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.marksPerQuestion}</td>
-                              <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionCount}</td>
-                              <td className="py-1.5 px-2 text-center text-on-surface-variant">{d.questionsToAttempt ?? "সব"}</td>
-                              <td className="py-1.5 px-2 text-center font-bold text-primary">{d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount)}</td>
+                    <div className="mt-2">
+                      {/* Mobile Cards View (sm:hidden) */}
+                      <div className="space-y-2 sm:hidden">
+                        {subject.distributions.map((d) => (
+                          <div
+                            key={d.tempId}
+                            className="p-3 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-2xs space-y-2"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <p className="text-xs font-bold text-foreground font-headline">
+                                  {d.questionTypeNameBn || d.questionTypeName}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5 font-body">
+                                  প্রতি প্রশ্নে: <span className="font-semibold text-foreground font-solaiman">{d.marksPerQuestion}</span> নম্বর
+                                </p>
+                              </div>
+                              <span className="font-bold text-xs text-indigo-600 dark:text-indigo-400 font-solaiman bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-md border border-indigo-200/50 dark:border-indigo-800/40">
+                                মোট: {d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 text-[11px] text-muted-foreground pt-1.5 border-t border-slate-100 dark:border-white/[0.04] font-body">
+                              <span>প্রশ্ন সংখ্যা: <strong className="text-foreground font-solaiman">{d.questionCount}</strong></span>
+                              <span>চেষ্টা: <strong className="text-foreground font-solaiman">{d.questionsToAttempt ?? "সব"}</strong></span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Desktop Table View (hidden sm:block) */}
+                      <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-card">
+                        <table className="w-full text-xs font-body">
+                          <thead>
+                            <tr className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] text-muted-foreground">
+                              <th className="text-left py-2 px-2.5 text-[11px] font-bold font-headline uppercase">ধরণ</th>
+                              <th className="text-center py-2 px-2.5 text-[11px] font-bold font-headline uppercase">নম্বর/প্রশ্ন</th>
+                              <th className="text-center py-2 px-2.5 text-[11px] font-bold font-headline uppercase">প্রশ্ন সংখ্যা</th>
+                              <th className="text-center py-2 px-2.5 text-[11px] font-bold font-headline uppercase">চেষ্টা</th>
+                              <th className="text-center py-2 px-2.5 text-[11px] font-bold font-headline uppercase">মোট</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                            {subject.distributions.map((d) => (
+                              <tr key={d.tempId} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02]">
+                                <td className="py-2 px-2.5 font-semibold text-foreground">{d.questionTypeNameBn || d.questionTypeName}</td>
+                                <td className="py-2 px-2.5 text-center text-muted-foreground font-solaiman">{d.marksPerQuestion}</td>
+                                <td className="py-2 px-2.5 text-center text-muted-foreground font-solaiman">{d.questionCount}</td>
+                                <td className="py-2 px-2.5 text-center text-muted-foreground font-solaiman">{d.questionsToAttempt ?? "সব"}</td>
+                                <td className="py-2 px-2.5 text-center font-bold text-indigo-600 dark:text-indigo-400 font-solaiman">{d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -124,12 +153,10 @@ export function StepReview({ data, onGoToStep }: StepReviewProps) {
           </div>
         </ReviewSection>
 
-
-
         {/* Grand Total */}
-        <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-primary/5 p-5 font-display">
-          <span className="text-base font-bold text-primary">সর্বমোট নম্বর</span>
-          <span className="text-3xl font-extrabold text-primary">{grandTotal}</span>
+        <div className="flex items-center justify-between rounded-2xl border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 p-5 font-headline shadow-2xs">
+          <span className="text-base font-bold text-foreground">সর্বমোট নম্বর</span>
+          <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-solaiman">{grandTotal}</span>
         </div>
       </CardContent>
     </Card>
@@ -150,17 +177,17 @@ function ReviewSection({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-lg border border-outline-variant/40 p-4 space-y-3">
+    <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-5 space-y-3.5 bg-card shadow-2xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-primary">{icon}</span>
-          <span className="text-xs font-bold uppercase tracking-wider text-on-surface font-display">{title}</span>
+          <span>{icon}</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-foreground font-headline">{title}</span>
         </div>
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           onClick={onEdit}
-          className="h-7 rounded-lg px-3 py-1 font-bold text-xs cursor-pointer text-primary bg-primary/10 hover:bg-primary/20 hover:text-primary transition-colors border-0"
+          className="h-8 rounded-xl px-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/60 bg-indigo-50/50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors cursor-pointer"
         >
           এডিট
         </Button>
@@ -173,8 +200,8 @@ function ReviewSection({
 function ReviewField({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-0.5">
-      <p className="text-[10px] text-outline uppercase tracking-wider font-display">{label}</p>
-      <p className="text-sm text-on-surface font-body">{value || "—"}</p>
+      <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-headline font-semibold">{label}</p>
+      <p className="text-sm font-semibold text-foreground font-body">{value || "—"}</p>
     </div>
   )
 }

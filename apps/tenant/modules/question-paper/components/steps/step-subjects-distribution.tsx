@@ -240,53 +240,53 @@ export function StepSubjectsDistribution({
   }
 
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
-      <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
-        <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+    <Card className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-0 shadow-xs ring-0">
+      <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-6 flex flex-row items-center gap-3 sm:gap-4">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100 dark:border-primary/20 text-indigo-600 dark:text-primary shrink-0">
           <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
         <div className="flex-1">
-          <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
+          <CardTitle className="font-headline text-base sm:text-lg font-bold text-foreground normal-case tracking-normal">
             বিষয় ও নম্বর বণ্টন
           </CardTitle>
-          <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5 font-body">
+          <p className="text-xs text-muted-foreground mt-0.5 font-body">
             বিষয় যোগ করুন এবং প্রতিটি বিষয়ে প্রশ্নের ধরণ অনুযায়ী নম্বর বণ্টন নির্ধারণ করুন
           </p>
         </div>
         {grandTotal > 0 && (
-          <Badge className="bg-primary text-white px-3 py-1 text-sm font-bold rounded-lg shrink-0">
-            মোট: {grandTotal}
+          <Badge className="bg-indigo-600 text-white px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl shrink-0 font-solaiman shadow-xs">
+            মোট: {grandTotal} নম্বর
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="p-4 sm:p-8 space-y-6">
-        <div className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-on-surface font-body">
-          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-          <p className="text-xs leading-relaxed">
+      <CardContent className="p-5 sm:p-6 space-y-6 font-body">
+        <div className="flex items-start gap-2.5 rounded-xl border border-indigo-200/60 dark:border-indigo-800/40 bg-indigo-50/50 dark:bg-indigo-950/20 p-3.5 text-foreground font-body">
+          <Info className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
+          <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-300">
             এই ধাপে পরীক্ষার জন্য এক বা একাধিক বিষয় যোগ করতে পারবেন। বিষয় যোগ করার পর তার কার্ডটি উন্মুক্ত করে নির্দিষ্ট প্রশ্নের ধরণ সিলেক্ট করলে পূর্বনির্ধারিত নম্বর ও সংখ্যা ফর্মে বসে যাবে।
           </p>
         </div>
 
         {/* Subject error */}
         {errors.subjects && (
-          <p className="text-xs text-error font-body">{errors.subjects}</p>
+          <p className="text-xs text-rose-600 dark:text-rose-400 font-body">{errors.subjects}</p>
         )}
 
         {/* Add Subject */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <Select value={selectedSubjectId} onValueChange={setSelectedSubjectId}>
-              <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 h-auto justify-between">
+              <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] py-2.5 px-4 font-body text-xs sm:text-sm transition-all focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 h-11 justify-between">
                 <SelectValue placeholder={data.classId ? "বিষয় নির্বাচন করুন" : "প্রথমে শ্রেণী নির্বাচন করুন"} />
               </SelectTrigger>
-              <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body">
+              <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
                 {availableSubjects.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.nameBn || s.nameEn}
                   </SelectItem>
                 ))}
                 {availableSubjects.length === 0 && data.classId && (
-                  <div className="px-3 py-2 text-xs text-outline font-body">
+                  <div className="px-3 py-2 text-xs text-muted-foreground font-body">
                     এই শ্রেণীর জন্য আর কোনো বিষয় নেই
                   </div>
                 )}
@@ -297,10 +297,10 @@ export function StepSubjectsDistribution({
             type="button"
             onClick={handleAddSubject}
             disabled={!selectedSubjectId}
-            className="flex items-center gap-2 rounded-lg bg-primary-container px-5 py-2.5 font-bold text-on-primary-container text-sm transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal font-display shrink-0"
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm px-5 h-11 transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs font-headline shrink-0"
           >
             <Plus className="h-4 w-4" />
-            <span>বিষয় যোগ</span>
+            <span>বিষয় যোগ করুন</span>
           </Button>
         </div>
 
@@ -316,7 +316,7 @@ export function StepSubjectsDistribution({
 
         {/* Subject Cards */}
         {data.subjects.length > 0 && (
-          <div className="space-y-4 border-t border-outline-variant/40 pt-6">
+          <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
             {data.subjects.map((subject, sIdx) => {
               const subjectTotal = getSubjectTotal(subject)
               const isExpanded = expandedSubject === subject.tempId
@@ -325,7 +325,7 @@ export function StepSubjectsDistribution({
               return (
                 <div
                   key={subject.tempId}
-                  className="rounded-xl border border-outline-variant/60 bg-surface-container-lowest overflow-hidden"
+                  className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card overflow-hidden shadow-2xs"
                 >
                   {/* Subject header */}
                   <button
@@ -334,98 +334,139 @@ export function StepSubjectsDistribution({
                       setExpandedSubject(isExpanded ? null : subject.tempId)
                       resetDistForm()
                     }}
-                    className="w-full flex items-center gap-3 p-4 hover:bg-surface-container-low transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
                   >
-                    <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">
+                    <span className="flex size-8 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary text-xs font-bold shrink-0 font-solaiman">
                       {sIdx + 1}
                     </span>
-                    <span className="flex-1 text-left font-bold text-sm text-on-surface font-display">
+                    <span className="flex-1 text-left font-bold text-sm text-foreground font-headline">
                       {subject.subjectName}
                     </span>
                     {subject.distributions.length > 0 && (
-                      <Badge className="bg-primary/10 text-primary px-2 py-0.5 text-xs font-bold rounded-md">
+                      <Badge className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 px-2.5 py-0.5 text-xs font-bold rounded-lg font-solaiman">
                         {subjectTotal} নম্বর
                       </Badge>
                     )}
-                    <span className="text-outline">
+                    <span className="text-muted-foreground">
                       {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </span>
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-outline-variant/40 p-4 space-y-4">
+                    <div className="border-t border-slate-200/80 dark:border-white/[0.08] p-4 sm:p-5 space-y-4 bg-slate-50/30 dark:bg-white/[0.01]">
                       {/* Distribution error */}
                       {distError && (
-                        <p className="text-xs text-error font-body">{distError}</p>
+                        <p className="text-xs text-rose-600 dark:text-rose-400 font-body">{distError}</p>
                       )}
 
-                      {/* Distributions table */}
+                      {/* Distributions list - Responsive Card list on mobile & Table on sm+ */}
                       {subject.distributions.length > 0 && (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm font-body">
-                            <thead>
-                              <tr className="border-b border-outline-variant/40">
-                                <th className="text-left py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider">ধরণ</th>
-                                <th className="text-center py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider">নম্বর/প্রশ্ন</th>
-                                <th className="text-center py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider">প্রশ্ন সংখ্যা</th>
-                                <th className="text-center py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider">চেষ্টা</th>
-                                <th className="text-center py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider">মোট</th>
-                                <th className="text-center py-2 px-2 text-[11px] font-medium text-outline uppercase tracking-wider w-10"></th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {subject.distributions.map((dist) => (
-                                <tr key={dist.tempId} className="border-b border-outline-variant/20 last:border-0">
-                                  <td className="py-2 px-2 font-medium text-on-surface">{dist.questionTypeNameBn || dist.questionTypeName}</td>
-                                  <td className="py-2 px-2 text-center text-on-surface-variant">{dist.marksPerQuestion}</td>
-                                  <td className="py-2 px-2 text-center text-on-surface-variant">{dist.questionCount}</td>
-                                  <td className="py-2 px-2 text-center text-on-surface-variant">
-                                    {dist.questionsToAttempt ?? "সব"}
-                                  </td>
-                                  <td className="py-2 px-2 text-center font-bold text-primary">
-                                    {dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}
-                                  </td>
-                                  <td className="py-2 px-2 text-center">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      onClick={() => handleRemoveDistribution(subject.tempId, dist.tempId)}
-                                      className="h-7 w-7 rounded-md p-0 hover:bg-error-container text-error cursor-pointer"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </td>
+                        <div>
+                          {/* Mobile Cards (sm:hidden) */}
+                          <div className="space-y-2 sm:hidden">
+                            {subject.distributions.map((dist) => (
+                              <div
+                                key={dist.tempId}
+                                className="p-3 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-2xs space-y-2"
+                              >
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <p className="text-xs font-bold text-foreground font-headline">
+                                      {dist.questionTypeNameBn || dist.questionTypeName}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                                      প্রতি প্রশ্নে: <span className="font-semibold text-foreground font-solaiman">{dist.marksPerQuestion}</span> নম্বর
+                                    </p>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => handleRemoveDistribution(subject.tempId, dist.tempId)}
+                                    className="h-7 w-7 rounded-lg p-0 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 cursor-pointer shrink-0"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-100 dark:border-white/[0.04]">
+                                  <div className="flex items-center gap-3 text-muted-foreground font-body">
+                                    <span>সংখ্যা: <strong className="text-foreground font-solaiman">{dist.questionCount}</strong></span>
+                                    <span>চেষ্টা: <strong className="text-foreground font-solaiman">{dist.questionsToAttempt ?? "সব"}</strong></span>
+                                  </div>
+                                  <span className="font-bold text-xs text-indigo-600 dark:text-indigo-400 font-solaiman">
+                                    মোট: {dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Desktop Table (hidden sm:block) */}
+                          <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-card">
+                            <table className="w-full text-xs font-body">
+                              <thead>
+                                <tr className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] text-muted-foreground">
+                                  <th className="text-left py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">ধরণ</th>
+                                  <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">নম্বর/প্রশ্ন</th>
+                                  <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">প্রশ্ন সংখ্যা</th>
+                                  <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">চেষ্টা</th>
+                                  <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">মোট</th>
+                                  <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider w-10"></th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                                {subject.distributions.map((dist) => (
+                                  <tr key={dist.tempId} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                                    <td className="py-2.5 px-3 font-semibold text-foreground">{dist.questionTypeNameBn || dist.questionTypeName}</td>
+                                    <td className="py-2.5 px-3 text-center text-muted-foreground font-solaiman">{dist.marksPerQuestion}</td>
+                                    <td className="py-2.5 px-3 text-center text-muted-foreground font-solaiman">{dist.questionCount}</td>
+                                    <td className="py-2.5 px-3 text-center text-muted-foreground font-solaiman">
+                                      {dist.questionsToAttempt ?? "সব"}
+                                    </td>
+                                    <td className="py-2.5 px-3 text-center font-bold text-indigo-600 dark:text-indigo-400 font-solaiman">
+                                      {dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}
+                                    </td>
+                                    <td className="py-2.5 px-3 text-center">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() => handleRemoveDistribution(subject.tempId, dist.tempId)}
+                                        className="h-7 w-7 rounded-lg p-0 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 cursor-pointer"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       )}
 
                       {/* Add distribution form */}
-                      <div className="rounded-lg border border-dashed border-outline-variant/60 p-4 space-y-3 bg-surface-container-low/30">
+                      <div className="rounded-xl border border-dashed border-indigo-200 dark:border-indigo-800/50 p-3.5 sm:p-4 space-y-3 bg-indigo-50/30 dark:bg-indigo-950/10">
                         <div className="flex items-center gap-2">
-                          <p className="text-[11px] font-bold text-outline uppercase tracking-wider font-display">নম্বর বণ্টন যোগ করুন</p>
+                          <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 font-headline">নতুন প্রশ্নের ধরণ ও নম্বর বণ্টন যোগ করুন</p>
                           {isDetailLoading && (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary shrink-0" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600 shrink-0" />
                           )}
                         </div>
 
                         {showAutoFillToast && (
-                          <div className="flex items-center gap-1.5 text-primary text-[11px] font-body animate-in fade-in duration-300">
+                          <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 text-xs font-body animate-in fade-in duration-300">
                             <Sparkles className="h-3.5 w-3.5 shrink-0" />
                             <span>নম্বর ও প্রশ্ন সংখ্যা স্বয়ংক্রিয়ভাবে পূরণ হয়েছে!</span>
                           </div>
                         )}
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="col-span-2 sm:col-span-1">
-                            <label className="text-[10px] text-outline font-body mb-1 block">প্রশ্নের ধরণ *</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                          <div className="sm:col-span-1">
+                            <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">প্রশ্নের ধরণ *</label>
                             <Select value={distForm.questionTypeId} onValueChange={handleQuestionTypeChange}>
-                              <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-xs h-auto justify-between">
-                                <SelectValue placeholder="ধরণ" />
+                              <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card py-2 px-3 font-body text-xs h-10 justify-between">
+                                <SelectValue placeholder="ধরণ নির্বাচন করুন" />
                               </SelectTrigger>
-                              <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body">
+                              <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
                                 {filteredQuestionTypes.map((t) => (
                                   <SelectItem key={t.id} value={t.id}>
                                     {t.nameBn || t.nameEn}
@@ -434,46 +475,48 @@ export function StepSubjectsDistribution({
                               </SelectContent>
                             </Select>
                           </div>
-                          <div>
-                            <label className="text-[10px] text-outline font-body mb-1 block">নম্বর/প্রশ্ন *</label>
-                            <Input
-                              type="number"
-                              value={distForm.marksPerQuestion}
-                              onChange={(e) => setDistForm((p) => ({ ...p, marksPerQuestion: e.target.value }))}
-                              placeholder="1"
-                              min={0.5}
-                              step={0.5}
-                              className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body text-xs text-on-surface bg-white focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] text-outline font-body mb-1 block">প্রশ্ন সংখ্যা *</label>
-                            <Input
-                              type="number"
-                              value={distForm.questionCount}
-                              onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
-                              onBlur={handleQuestionCountBlur}
-                              placeholder="10"
-                              min={0}
-                              className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body text-xs text-on-surface bg-white focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] text-outline font-body mb-1 block">চেষ্টা (ঐচ্ছিক)</label>
-                            <Input
-                              type="number"
-                              value={distForm.questionsToAttempt}
-                              onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
-                              onBlur={handleQuestionsToAttemptBlur}
-                              placeholder="সব"
-                              min={1}
-                              className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body text-xs text-on-surface bg-white focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                            />
+                          <div className="grid grid-cols-3 gap-2 sm:contents">
+                            <div>
+                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">নম্বর/প্রশ্ন *</label>
+                              <Input
+                                type="number"
+                                value={distForm.marksPerQuestion}
+                                onChange={(e) => setDistForm((p) => ({ ...p, marksPerQuestion: e.target.value }))}
+                                placeholder="১"
+                                min={0.5}
+                                step={0.5}
+                                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">প্রশ্ন সংখ্যা *</label>
+                              <Input
+                                type="number"
+                                value={distForm.questionCount}
+                                onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
+                                onBlur={handleQuestionCountBlur}
+                                placeholder="১০"
+                                min={0}
+                                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">চেষ্টা (ঐচ্ছিক)</label>
+                              <Input
+                                type="number"
+                                value={distForm.questionsToAttempt}
+                                onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
+                                onBlur={handleQuestionsToAttemptBlur}
+                                placeholder="সব"
+                                min={1}
+                                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
+                              />
+                            </div>
                           </div>
                         </div>
 
                         {distForm.questionsToAttempt !== "" && (parseInt(distForm.questionCount, 10) || 0) < (parseInt(distForm.questionsToAttempt, 10) || 0) && (
-                          <p className="text-[11px] text-error font-body font-medium animate-in fade-in duration-200">
+                          <p className="text-xs text-rose-600 dark:text-rose-400 font-body font-medium animate-in fade-in duration-200">
                             ⚠️ চেষ্টার সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।
                           </p>
                         )}
@@ -490,29 +533,29 @@ export function StepSubjectsDistribution({
                               type="button"
                               onClick={() => handleAddDistribution(subject.tempId)}
                               disabled={isFormInvalid}
-                              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal font-display ${
+                              className={`flex items-center gap-1.5 rounded-xl px-4 h-9 font-bold text-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer font-headline ${
                                 isFormInvalid
-                                  ? "bg-primary-container/40 text-on-primary-container/60"
-                                  : "bg-primary-container text-on-primary-container hover:bg-primary hover:text-white"
+                                  ? "bg-slate-200 dark:bg-white/10 text-muted-foreground"
+                                  : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
                               }`}
                             >
                               <Calculator className="h-3.5 w-3.5" />
-                              <span>যোগ করুন</span>
+                              <span>নম্বর বণ্টন যোগ করুন</span>
                             </Button>
                           )
                         })()}
                       </div>
 
                       {/* Subject actions */}
-                      <div className="flex justify-end pt-2">
+                      <div className="flex justify-end pt-1">
                         <Button
                           type="button"
                           variant="ghost"
                           onClick={() => handleRemoveSubject(subject.tempId)}
-                          className="flex items-center gap-1.5 text-error hover:bg-error-container text-xs rounded-lg px-3 py-1.5 cursor-pointer h-auto font-display"
+                          className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs rounded-xl px-3 py-1.5 cursor-pointer h-auto font-headline font-semibold"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          <span>বিষয় সরান</span>
+                          <span>বিষয় ডিলিট করুন</span>
                         </Button>
                       </div>
                     </div>
@@ -525,9 +568,9 @@ export function StepSubjectsDistribution({
 
         {/* Grand Total */}
         {data.subjects.length > 0 && (
-          <div className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-4 font-display">
-            <span className="text-sm font-bold text-primary">সর্বমোট নম্বর</span>
-            <span className="text-2xl font-extrabold text-primary">{grandTotal}</span>
+          <div className="flex items-center justify-between rounded-2xl border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 p-5 font-headline shadow-2xs">
+            <span className="text-sm font-bold text-foreground">সর্বমোট নম্বর</span>
+            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-solaiman">{grandTotal}</span>
           </div>
         )}
       </CardContent>

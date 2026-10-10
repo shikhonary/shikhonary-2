@@ -8,15 +8,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="flex flex-col gap-5 lg:gap-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">ড্যাশবোর্ড</h1>
-        <p className="text-muted-foreground text-sm">
-          শিখনারী এডুকেশনাল পোর্টালে আপনাকে স্বাগতম।
-        </p>
-      </div>
-
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-200">
       <DashboardOverview />
     </div>
   );

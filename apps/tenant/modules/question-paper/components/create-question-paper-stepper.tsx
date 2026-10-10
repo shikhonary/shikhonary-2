@@ -197,44 +197,48 @@ export function CreateQuestionPaperStepper() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Step Indicator */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center p-4 sm:p-5 rounded-2xl bg-card border border-slate-200/80 dark:border-white/[0.08] shadow-xs">
         {WIZARD_STEPS.map((step, index) => {
           const isCompleted = index < currentStep
           const isActive = index === currentStep
-          const isPending = index > currentStep
 
           return (
             <Fragment key={step.id}>
               {index > 0 && (
                 <div
-                  className={`h-0.5 w-6 sm:w-12 transition-colors ${
-                    isCompleted ? "bg-primary" : "bg-outline-variant/40"
+                  className={`h-0.5 w-8 sm:w-16 mx-2 transition-colors ${
+                    isCompleted ? "bg-indigo-600" : "bg-slate-200 dark:bg-white/10"
                   }`}
                 />
               )}
               <button
                 type="button"
                 onClick={() => goToStep(index)}
-                className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                className="flex items-center gap-2 cursor-pointer group select-none"
               >
                 <div
-                  className={`flex items-center justify-center rounded-full text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
                     isCompleted
-                      ? "size-8 sm:size-10 bg-primary text-white"
+                      ? "size-8 sm:size-9 bg-emerald-600 text-white shadow-xs"
                       : isActive
-                        ? "size-8 sm:size-10 bg-primary text-white ring-4 ring-primary/20"
-                        : "size-8 sm:size-10 border-2 border-outline-variant text-outline"
+                        ? "size-8 sm:size-9 bg-indigo-600 text-white ring-4 ring-indigo-500/20 shadow-xs"
+                        : "size-8 sm:size-9 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] text-muted-foreground group-hover:border-slate-300"
                   }`}
                 >
                   {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
                 </div>
-                <span
-                  className={`text-[9px] sm:text-[11px] font-medium hidden sm:block transition-colors ${
-                    isCompleted || isActive ? "text-primary" : "text-outline"
-                  }`}
-                >
-                  {step.label}
-                </span>
+                <div className="hidden sm:flex flex-col text-left">
+                  <span
+                    className={`text-xs font-bold font-headline transition-colors ${
+                      isActive ? "text-indigo-600 dark:text-indigo-400" : isCompleted ? "text-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    ধাপ {index + 1}
+                  </span>
+                </div>
               </button>
             </Fragment>
           )
@@ -267,8 +271,8 @@ export function CreateQuestionPaperStepper() {
         )}
       </div>
 
-      {/* Navigation */}
-      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 font-display">
+      {/* Navigation Action Buttons */}
+      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-2 font-headline">
         <div>
           {currentStep > 0 && (
             <Button
@@ -276,37 +280,37 @@ export function CreateQuestionPaperStepper() {
               variant="outline"
               onClick={handlePrev}
               disabled={isSubmitting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg border border-outline px-6 py-2.5 font-bold text-primary transition-all active:scale-95 hover:bg-surface-container-low cursor-pointer h-auto normal-case tracking-normal disabled:opacity-50 text-sm"
+              className="w-full sm:w-auto h-11 px-5 rounded-xl border border-slate-200 dark:border-white/[0.08] font-bold text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all cursor-pointer text-xs sm:text-sm"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 mr-1.5" />
               <span>পূর্ববর্তী ধাপ</span>
             </Button>
           )}
         </div>
-        <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-3">
+        <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
           {isLastStep ? (
             <Button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal text-sm"
+              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
             >
               {isSubmitting ? (
-                <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                <Loader2 className="h-4.5 w-4.5 animate-spin mr-2" />
               ) : (
-                <FileText className="h-4.5 w-4.5" />
+                <FileText className="h-4.5 w-4.5 mr-2" />
               )}
-              <span>{isSubmitting ? "তৈরি করা হচ্ছে..." : "প্রশ্নপত্র তৈরি করুন"}</span>
+              <span>{isSubmitting ? "তৈরি করা হচ্ছে..." : "প্রশ্নপত্র তৈরি সম্পন্ন করুন"}</span>
             </Button>
           ) : (
             <Button
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal text-sm"
+              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
             >
               <span>পরবর্তী ধাপ</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
           )}
         </div>

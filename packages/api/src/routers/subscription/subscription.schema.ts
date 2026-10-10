@@ -74,3 +74,12 @@ export type CancelSubscriptionInput = z.infer<typeof cancelSubscriptionSchema>
 export const deleteSubscriptionSchema = idSchema
 
 export type DeleteSubscriptionInput = z.infer<typeof deleteSubscriptionSchema>
+
+export const requestPlanChangeSchema = z.object({
+  planId: z.string().min(1),
+  billingCycle: z.enum(["MONTHLY", "YEARLY"]).default("YEARLY"),
+  reason: z.string().optional(),
+})
+
+export type RequestPlanChangeInput = z.infer<typeof requestPlanChangeSchema>
+

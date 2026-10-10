@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function CreateQuestionPaperPage() {
   return (
-    <div className="flex flex-col gap-5 lg:gap-6 max-w-6xl mx-auto">
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-200">
       <CreateQuestionPaperView />
     </div>
   )

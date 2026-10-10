@@ -51,7 +51,10 @@ export type {
   ChangeSubscriptionPlanInput,
   CancelSubscriptionInput,
   DeleteSubscriptionInput,
+  RequestPlanChangeInput,
 } from "./routers/subscription/subscription.schema"
+
+export { requestPlanChangeSchema } from "./routers/subscription/subscription.schema"
 
 export type {
   ListSubscriptionPlansInput,

@@ -14,7 +14,7 @@ export default async function QuestionPaperBuilderPage({ params }: PageProps) {
   const { id } = await params
 
   return (
-    <div className="w-full h-full min-h-screen">
+    <div className="w-full h-full min-h-0 overflow-hidden">
       <QuestionPaperBuilderView paperId={id} />
     </div>
   )

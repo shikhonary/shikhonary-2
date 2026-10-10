@@ -8,6 +8,7 @@ interface BuilderState {
   
   // UI State
   zoom: number | "auto";
+  effectiveZoom: number;
   selectedItemId: string | null;
   calculatedBlocks: PaperBlock[];
   isExporting: boolean;
@@ -42,6 +43,7 @@ interface BuilderState {
   flashHighlightItem: (idOrIds: string | string[]) => void;
   
   setZoom: (zoom: number | "auto") => void;
+  setEffectiveZoom: (effectiveZoom: number) => void;
   setSelectedItemId: (id: string | null) => void;
   setIsExporting: (isExporting: boolean) => void;
   setExportProgress: (progress: { current: number; total: number } | null) => void;
@@ -114,6 +116,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   settings: defaultSettings,
   
   zoom: "auto",
+  effectiveZoom: 1,
   selectedItemId: null,
   calculatedBlocks: [],
   isExporting: false,
@@ -256,6 +259,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   },
 
   setZoom: (zoom) => set({ zoom }),
+  setEffectiveZoom: (effectiveZoom) => set({ effectiveZoom }),
   setSelectedItemId: (id) => set({ selectedItemId: id }),
   setIsExporting: (isExporting) => set({ isExporting }),
   setExportProgress: (exportProgress) => set({ exportProgress }),

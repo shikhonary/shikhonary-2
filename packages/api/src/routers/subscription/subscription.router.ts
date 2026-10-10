@@ -1,4 +1,4 @@
-import { createTRPCRouter, superAdminProcedure } from "../../trpc"
+import { createTRPCRouter, superAdminProcedure, tenantMemberProcedure } from "../../trpc"
 import {
   cancelSubscriptionSchema,
   changeSubscriptionPlanSchema,
@@ -7,6 +7,7 @@ import {
   getSubscriptionByTenantSchema,
   getSubscriptionSchema,
   listSubscriptionsSchema,
+  requestPlanChangeSchema,
   updateSubscriptionSchema,
 } from "./subscription.schema"
 import {
@@ -17,11 +18,35 @@ import {
   getSubscriptionById,
   getSubscriptionByTenantId,
   getSubscriptionStats,
+  getTenantInvoices,
+  getTenantSubscriptionDetails,
   listSubscriptions,
+  tenantChangeSubscriptionPlan,
   updateSubscription,
 } from "./subscription.service"
+import { listSubscriptionPlans } from "../subscription-plan/subscription-plan.service"
 
 export const subscriptionRouter = createTRPCRouter({
+  // ── Tenant Member Procedures ──
+  getMySubscription: tenantMemberProcedure.query(({ ctx }) =>
+    getTenantSubscriptionDetails(ctx.db, ctx.tenant.id, ctx.tenantDb)
+  ),
+
+  listAvailablePlans: tenantMemberProcedure.query(({ ctx }) =>
+    listSubscriptionPlans(ctx.db, { isActive: true, limit: 20 })
+  ),
+
+  getMyInvoices: tenantMemberProcedure.query(({ ctx }) =>
+    getTenantInvoices(ctx.db, ctx.tenant.id)
+  ),
+
+  requestPlanChange: tenantMemberProcedure
+    .input(requestPlanChangeSchema)
+    .mutation(({ ctx, input }) =>
+      tenantChangeSubscriptionPlan(ctx.db, ctx.tenant.id, ctx.session.user.id, input)
+    ),
+
+  // ── Super Admin Procedures ──
   list: superAdminProcedure
     .input(listSubscriptionsSchema)
     .query(({ ctx, input }) => listSubscriptions(ctx.db, input)),
@@ -57,3 +82,4 @@ export const subscriptionRouter = createTRPCRouter({
     .input(deleteSubscriptionSchema)
     .mutation(({ ctx, input }) => deleteSubscription(ctx.db, input)),
 })
+

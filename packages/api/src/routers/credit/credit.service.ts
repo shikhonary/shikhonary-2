@@ -1,6 +1,10 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { notFound } from "../../utils/errors"
-import type { EstimatePaperCostInput, ListCreditTransactionsInput } from "./credit.schema"
+import type {
+  CreditPackItem,
+  EstimatePaperCostInput,
+  ListCreditTransactionsInput,
+} from "./credit.schema"
 
 export async function getTenantCreditBalance(db: PrismaClient, tenantId: string) {
   const tenant = await db.tenant.findUnique({
@@ -127,4 +131,110 @@ export async function estimatePaperCost(
     totalCredits,
     breakdown,
   }
+}
+
+export async function listCreditPacks(db?: PrismaClient): Promise<CreditPackItem[]> {
+  if (db && (db as any).creditPack) {
+    try {
+      const dbPacks = await (db as any).creditPack.findMany({
+        where: { isActive: true },
+        orderBy: { position: "asc" },
+      })
+      if (dbPacks.length > 0) {
+        return dbPacks.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          displayName: p.displayName,
+          description: p.description,
+          credits: p.credits,
+          bonusCredits: p.bonusCredits,
+          totalCredits: p.credits + p.bonusCredits,
+          priceBDT: p.priceBDT,
+          isPopular: p.isPopular,
+          badge: p.bonusCredits > 0 ? `+${p.bonusCredits} বোনাস` : undefined,
+        }))
+      }
+    } catch {
+      // Fallback to static definitions
+    }
+  }
+
+  const { DEFAULT_CREDIT_PACKS } = await import("./credit.schema")
+  return DEFAULT_CREDIT_PACKS
+}
+
+export async function purchaseCreditPack(
+  db: PrismaClient,
+  tenantId: string,
+  input: { packId: string; paymentMethod?: string; paymentReference?: string }
+) {
+  const packs = await listCreditPacks(db)
+  const pack = packs.find((p: CreditPackItem) => p.id === input.packId || p.name === input.packId)
+  if (!pack) {
+    throw notFound("Credit pack")
+  }
+
+  const tenant = await db.tenant.findUnique({
+    where: { id: tenantId },
+    select: { id: true, name: true, creditBalance: true },
+  })
+  if (!tenant) throw notFound("Tenant")
+
+  const totalCreditsToAdd = pack.totalCredits
+  const newBalance = tenant.creditBalance + totalCreditsToAdd
+
+  return db.$transaction(async (tx) => {
+    // 1. Update Tenant balance
+    await tx.tenant.update({
+      where: { id: tenantId },
+      data: { creditBalance: newBalance },
+    })
+
+    // 2. Create Credit Transaction
+    const txRecord = await tx.creditTransaction.create({
+      data: {
+        tenantId,
+        type: "PURCHASE",
+        amount: totalCreditsToAdd,
+        balance: newBalance,
+        description: `${pack.displayName} (${totalCreditsToAdd} ক্রেডিট) ক্রয় সফল হয়েছে`,
+        metadata: {
+          packId: pack.id,
+          packName: pack.name,
+          baseCredits: pack.credits,
+          bonusCredits: pack.bonusCredits,
+          priceBDT: pack.priceBDT,
+          paymentMethod: input.paymentMethod || "BKASH",
+          paymentReference: input.paymentReference || null,
+        },
+      },
+    })
+
+    // 3. Create Invoice Record
+    const now = new Date()
+    const invoiceNumber = `INV-CR-${Date.now().toString().slice(-6)}`
+    await tx.invoice.create({
+      data: {
+        tenantId,
+        invoiceNumber,
+        amount: pack.priceBDT,
+        currency: "BDT",
+        status: "PAID",
+        periodStart: now,
+        periodEnd: now,
+        paidAt: now,
+        paymentMethod: input.paymentMethod || "BKASH",
+        paymentReference: input.paymentReference || null,
+        description: `ক্রেডিট টপ-আপ: ${pack.displayName} (${totalCreditsToAdd} ক্রেডিট)`,
+      },
+    })
+
+    return {
+      success: true,
+      pack,
+      creditsAdded: totalCreditsToAdd,
+      newBalance,
+      transactionId: txRecord.id,
+    }
+  })
 }

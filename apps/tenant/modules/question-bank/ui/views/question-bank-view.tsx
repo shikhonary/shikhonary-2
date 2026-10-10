@@ -63,7 +63,7 @@ export const QuestionBankView: React.FC = () => {
       </div>
 
       {/* ── Mobile View (hidden on desktop) ────────────────────────── */}
-      <div className="md:hidden w-full min-w-0">
+      <div className="md:hidden -m-4 sm:-m-6">
         <MobileClassesList
           classes={filteredClasses}
           isLoading={isLoading}

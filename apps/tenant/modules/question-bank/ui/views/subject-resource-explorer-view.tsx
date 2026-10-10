@@ -249,7 +249,7 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
       </div>
 
       {/* ── Mobile View (Hidden on desktop) ────────────────────────── */}
-      <div className="md:hidden w-full min-w-0">
+      <div className="md:hidden -m-4 sm:-m-6">
         <MobileSubjectExplorer
           classId={classId}
           subjectId={subjectId}

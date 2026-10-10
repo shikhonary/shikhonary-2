@@ -111,7 +111,7 @@ export const ClassDetailView: React.FC<ClassDetailViewProps> = ({ classId }) => 
       </div>
 
       {/* ── Mobile View (hidden on desktop) ────────────────────────── */}
-      <div className="md:hidden w-full min-w-0">
+      <div className="md:hidden -m-4 sm:-m-6">
         <MobileClassDetail
           classNameBn={classNameBn}
           classNameEn={classNameEn}

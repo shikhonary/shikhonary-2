@@ -8,6 +8,7 @@ import { QuestionPaperPageHeader } from "./question-paper-page-header"
 import { QuestionPaperStatsCards } from "./question-paper-stats-cards"
 import { QuestionPaperFilterBar } from "./question-paper-filter-bar"
 import { QuestionPaperDataTable, type QuestionPaperItem } from "./question-paper-data-table"
+import { QuestionPaperPagination } from "./question-paper-pagination"
 import { useQuestionPaperSearchParams } from "../hooks/use-question-paper-search-params"
 import { DeleteQuestionPaperModal } from "./delete-question-paper-modal"
 import { DuplicateQuestionPaperModal } from "./duplicate-question-paper-modal"
@@ -17,7 +18,7 @@ import { useQuery } from "@tanstack/react-query"
 export function QuestionPaperManagementView() {
   const router = useRouter()
   const [
-    { search: searchQuery, classId: selectedClassId, status: selectedStatus, sort: selectedSort, page: currentPage, limit },
+    { search: searchQuery, classId: selectedClassId, status: selectedStatus, sort: selectedSort, viewMode, page: currentPage, limit },
     setSearchParams,
   ] = useQuestionPaperSearchParams()
 
@@ -59,7 +60,7 @@ export function QuestionPaperManagementView() {
   const averageMarks = allPapers.length > 0 ? Math.round(allPapers.reduce((sum, p) => sum + p.total, 0) / allPapers.length) : 0
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6 sm:space-y-8">
       {/* Header */}
       <QuestionPaperPageHeader />
 
@@ -82,24 +83,33 @@ export function QuestionPaperManagementView() {
         onStatusChange={(status) => setSearchParams({ status, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
+        viewMode={viewMode}
+        onViewModeChange={(mode) => setSearchParams({ viewMode: mode })}
         classes={classes}
       />
 
-      {/* Data Table */}
+      {/* Data Table / Card Grid */}
       <QuestionPaperDataTable
         items={pagedItems}
         isLoading={isLoading}
         isError={isError}
+        viewMode={viewMode}
         onEdit={(item) => router.push(`/question-papers/${item.id}/edit`)}
         onDuplicate={(id, title) => openDuplicateModal(id, title)}
         onDelete={(id, title) => openDeleteModal(id, title)}
-        currentPage={currentPage}
-        itemsPerPage={limit}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        onPageChange={(page) => setSearchParams({ page })}
-        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
+
+      {/* Pagination - Separated and styled like Subject Details View */}
+      {!isLoading && !isError && totalItems > 0 && (
+        <QuestionPaperPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          limit={limit}
+          onPageChange={(page) => setSearchParams({ page })}
+          onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+        />
+      )}
 
       {/* Modals */}
       <DeleteQuestionPaperModal />

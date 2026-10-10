@@ -3,6 +3,8 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { BlockRenderer } from "./block-renderer";
 import { OMRBlock } from "../blocks/omr-block";
 import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
+import { LayoutList, FileText, ZoomIn, Eye, Sparkles } from "lucide-react";
+import { cn } from "@workspace/ui/lib/utils";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
@@ -44,6 +46,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
   const [measuredHeights, setMeasuredHeights] = useState<Record<string, number>>({});
   const [pageContentHeight, setPageContentHeight] = useState<number>(0);
   const [autoZoom, setAutoZoom] = useState(1);
+  const [mobileViewMode, setMobileViewMode] = useState<"flow" | "sheet">("flow");
+  const [is100PercentZoom, setIs100PercentZoom] = useState(false);
+  const [pinchZoom, setPinchZoom] = useState<number | null>(null);
+
+  const initialPinchDistRef = useRef<number | null>(null);
+  const initialPinchZoomRef = useRef<number>(1);
   const measureContainerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,15 +69,18 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     const updateZoom = () => {
       if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
+      if (!width) return;
       // 1mm = 3.779527559px
       const canvasPx = canvasWidth * 3.78; 
-      const padding = 64; // 32px padding on each side (p-8)
-      let calculatedZoom = (width - padding - 4) / canvasPx; // Subtract 4px safety margin for rounding errors
+      // Responsive padding matching container (p-3 sm:p-6 md:p-8)
+      const padding = width >= 768 ? 64 : width >= 640 ? 48 : 24;
+      const availableWidth = Math.max(100, width - padding - 4); // 4px buffer for subpixel/border rounding
+      let calculatedZoom = availableWidth / canvasPx;
       
-      // Don't scale up past 100% on huge screens
+      // Don't scale up past 100% on huge screens in auto mode
       if (calculatedZoom > 1) calculatedZoom = 1;
-      // Don't scale down past 30% to keep it readable
-      if (calculatedZoom < 0.3) calculatedZoom = 0.3;
+      // Allow full down-scaling on mobile so it always fits 100%
+      if (calculatedZoom < 0.1) calculatedZoom = 0.1;
       
       setAutoZoom(calculatedZoom);
     };
@@ -79,10 +90,104 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
     const observer = new ResizeObserver(updateZoom);
     observer.observe(parent);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
     return () => observer.disconnect();
-  }, [zoom, canvasWidth]);
+  }, [zoom, canvasWidth, mobileViewMode]);
 
-  const zoomFactor = zoom === "auto" ? autoZoom : zoom;
+  const effectiveZoom = pinchZoom !== null ? pinchZoom : is100PercentZoom ? 1 : (zoom === "auto" ? autoZoom : zoom);
+  const zoomFactor = effectiveZoom;
+
+  const setEffectiveZoom = useBuilderStore((state) => state.setEffectiveZoom);
+  useEffect(() => {
+    setEffectiveZoom(effectiveZoom);
+  }, [effectiveZoom, setEffectiveZoom]);
+
+  // ── 2-Finger Touch Pinch-to-Zoom Gesture Listener on Print Sheet ──
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        if (touch1 && touch2) {
+          const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+          initialPinchDistRef.current = dist;
+          initialPinchZoomRef.current = effectiveZoom;
+        }
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && initialPinchDistRef.current) {
+        if (e.cancelable) e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        if (touch1 && touch2) {
+          const currentDist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+          const scale = currentDist / initialPinchDistRef.current;
+          const calculated = Math.min(2.5, Math.max(0.3, initialPinchZoomRef.current * scale));
+          setPinchZoom(calculated);
+        }
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        initialPinchDistRef.current = null;
+      }
+    };
+
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
+    container.addEventListener("touchend", onTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", onTouchEnd, { passive: true });
+
+    return () => {
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
+      container.removeEventListener("touchend", onTouchEnd);
+      container.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [effectiveZoom]);
+
+  // ── Ctrl + Mouse Wheel Zoom Listener (Preserves multi-page vertical scroll & focal anchor) ──
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // ONLY intercept when Ctrl or Meta key is held.
+      // When scrolling normally without Ctrl, regular multi-page vertical scrolling works 100% uninterrupted!
+      if (!e.ctrlKey && !e.metaKey) return;
+
+      e.preventDefault();
+
+      const currentScrollTop = container.scrollTop;
+      const currentScrollHeight = container.scrollHeight;
+      const scrollRatio = currentScrollHeight > 0 ? currentScrollTop / currentScrollHeight : 0;
+
+      const { zoom, setZoom } = useBuilderStore.getState();
+      const currentZoom = typeof zoom === "number" ? zoom : autoZoom;
+
+      const delta = e.deltaY < 0 ? 0.08 : -0.08;
+      const newZoom = Math.min(2.5, Math.max(0.3, +(currentZoom + delta).toFixed(2)));
+
+      setZoom(newZoom);
+
+      requestAnimationFrame(() => {
+        if (container) {
+          container.scrollTop = scrollRatio * container.scrollHeight;
+        }
+      });
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+    return () => container.removeEventListener("wheel", onWheel);
+  }, [autoZoom]);
 
   const blocks = useMemo(() => {
     // 1. If this paper has pre-generated blocks (e.g. Generated Sets), render them immediately!
@@ -2222,7 +2327,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     return (
       <div 
         key={`page-renderer-${seqIndex}`}
-        className="bg-white shadow-xl relative shrink-0 border border-slate-200/80"
+        className="bg-white relative shrink-0"
         data-page-content="true"
         data-page-seq-index={seqIndex}
         style={{
@@ -2312,8 +2417,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
   if (!paperQuery) return null;
 
   return (
-    <div ref={containerRef} id="print-container" className="w-full h-full overflow-auto p-8 pb-24 flex flex-col items-center gap-12 print:p-0 print:gap-0 print:block print:overflow-visible bg-slate-100 print:bg-white">
-      
+    <div
+      ref={containerRef}
+      id="print-container"
+      className="w-full h-full overflow-auto p-3 sm:p-6 md:p-8 pb-32 flex flex-col gap-6 sm:gap-12 print:p-0 print:gap-0 print:block print:overflow-visible bg-slate-100/80 dark:bg-zinc-950/60 print:bg-white relative"
+    >
       {/* Invisible Measurement Container */}
       <div 
         ref={measureContainerRef} 
@@ -2347,39 +2455,142 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         </div>
       </div>
 
-      {/* WYSIWYG Editor Layout (Hidden in Print) */}
-      <div className="flex flex-col items-center gap-12 print:hidden">
+      {/* ── Mobile Smart Flow Editor Mode (< xl only when mobileViewMode === "flow") ── */}
+      <div
+        className={cn(
+          "w-full max-w-2xl mx-auto flex flex-col gap-3.5 print:hidden",
+          mobileViewMode === "flow" ? "flex xl:hidden" : "hidden"
+        )}
+      >
+        {/* Header Block Summary in Flow View */}
+        {blocks
+          .filter((b) => b.type === "header-full" || b.type === "header-column")
+          .map((b) => (
+            <div
+              key={`flow-header-${b.id}`}
+              className="bg-card rounded-2xl border border-border p-4 sm:p-5 shadow-xs"
+            >
+              <BlockRenderer block={b} />
+            </div>
+          ))}
+
+        {/* Question, Subject & Section Blocks */}
+        {blocks
+          .filter((b) => b.type !== "header-full" && b.type !== "header-column")
+          .map((b, idx) => (
+            <div
+              key={`flow-block-${b.id}-${idx}`}
+              className="w-full bg-card rounded-2xl border border-border/80 shadow-xs p-3.5 sm:p-5 transition-all"
+            >
+              <BlockRenderer block={b} />
+            </div>
+          ))}
+
+        {/* OMR Sheet Block in Flow View */}
+        {settings.showOMRSheet && (
+          <div className="w-full bg-card rounded-2xl border border-border/80 shadow-xs p-3.5 sm:p-5">
+            <OMRBlock />
+          </div>
+        )}
+      </div>
+
+      {/* ── WYSIWYG Print Sheet Layout (Desktop or Mobile when mobileViewMode === "sheet") ── */}
+      <div
+        className={cn(
+          "w-max min-w-full mx-auto flex flex-col items-center gap-8 sm:gap-12 print:hidden",
+          mobileViewMode === "sheet" ? "flex" : "hidden xl:flex"
+        )}
+      >
         {pages.map((page, pageIdx) => (
           <div
             key={`page-wrapper-${pageIdx}`}
-            className="shrink-0 flex flex-col items-center gap-3"
+            className="shrink-0 flex flex-col items-center gap-3 w-max"
             data-page-index={pageIdx}
           >
             {settings.twoPagesPerSheet ? (
-              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
+              <div className="text-xs font-semibold text-muted-foreground bg-card shadow-xs border border-border px-3 py-1 rounded-xl select-none">
                 শিট {Math.floor(pageIdx / 2) + 1} • পৃষ্ঠা {pageIdx + 1}
               </div>
             ) : settings.bookFoldLayout ? (
-              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
-                বুকলেট পৃষ্ঠা - {pageIdx + 1} (Booklet Page {pageIdx + 1})
+              <div className="text-xs font-semibold text-muted-foreground bg-card shadow-xs border border-border px-3 py-1 rounded-xl select-none">
+                বুকলেট পৃষ্ঠা - {pageIdx + 1}
               </div>
             ) : (
-              <div className="text-xs font-semibold text-muted-foreground bg-white/80 shadow-sm border px-3 py-1 rounded-md select-none">
-                পৃষ্ঠা - {pageIdx + 1} (Page {pageIdx + 1})
+              <div className="text-xs font-semibold text-muted-foreground bg-card shadow-xs border border-border px-3 py-1 rounded-xl select-none">
+                পৃষ্ঠা - {pageIdx + 1}
               </div>
             )}
             <div
+              className="bg-white shadow-xl relative shrink-0 border border-slate-200/80 overflow-hidden"
               style={{
                 width: `${canvasWidth * 3.78 * zoomFactor}px`,
                 height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
                 position: "relative",
-                overflow: "visible",
               }}
             >
               {renderPage(page, pageIdx)}
             </div>
           </div>
         ))}
+      </div>
+
+      {/* ── Mobile Floating Canvas Switcher Dock (< xl) ── */}
+      <div className="xl:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 max-w-[calc(100vw-20px)] sm:max-w-lg w-max flex items-center flex-nowrap whitespace-nowrap gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full bg-card/95 backdrop-blur-2xl border border-border shadow-xl select-none">
+        <button
+          type="button"
+          onClick={() => setMobileViewMode("flow")}
+          className={cn(
+            "h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-full text-[11px] sm:text-xs font-headline font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap",
+            mobileViewMode === "flow"
+              ? "bg-indigo-600 text-white shadow-xs"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+          )}
+        >
+          <LayoutList className="w-3.5 h-3.5 shrink-0" />
+          <span>স্মার্ট এডিটর</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileViewMode("sheet")}
+          className={cn(
+            "h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-full text-[11px] sm:text-xs font-headline font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap",
+            mobileViewMode === "sheet"
+              ? "bg-indigo-600 text-white shadow-xs"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+          )}
+        >
+          <FileText className="w-3.5 h-3.5 shrink-0" />
+          <span>প্রিন্ট শিট ({toBengaliDigits(pages.length)})</span>
+        </button>
+
+        {mobileViewMode === "sheet" && (
+          <button
+            type="button"
+            onClick={() => {
+              if (pinchZoom !== null || is100PercentZoom || zoom !== "auto") {
+                setPinchZoom(null);
+                setIs100PercentZoom(false);
+                useBuilderStore.getState().setZoom("auto");
+              } else {
+                setPinchZoom(null);
+                setIs100PercentZoom(true);
+                useBuilderStore.getState().setZoom(1.0);
+              }
+            }}
+            className="h-8 sm:h-9 px-2.5 sm:px-3 rounded-full text-[11px] sm:text-xs font-headline font-bold bg-muted hover:bg-muted/80 text-foreground border border-border/60 transition-all flex items-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
+            title="জুম মোড পরিবর্তন বা রিসেট করুন"
+          >
+            <ZoomIn className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span>
+              {pinchZoom !== null
+                ? `${toBengaliDigits(Math.round(pinchZoom * 100))}%`
+                : (is100PercentZoom || zoom === 1.0)
+                ? "১০০%"
+                : "ফিট"}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Native Browser Print Layout (Hidden in UI) */}

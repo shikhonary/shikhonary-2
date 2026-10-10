@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
@@ -17,28 +18,42 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu"
-import { MoreVertical, Pen, Trash, Clock, Copy, CheckCircle, AlertTriangle, Sparkles } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+import {
+  MoreVertical,
+  Pen,
+  Trash,
+  Clock,
+  Copy,
+  CheckCircle,
+  AlertTriangle,
+  Sparkles,
+  FileQuestion,
+  Plus,
+} from "lucide-react"
+import { QuestionPaperCardGrid } from "./question-paper-card-grid"
+import type { QuestionPaperViewMode } from "../hooks/use-question-paper-search-params"
+
+const toBengaliDigits = (num?: number | string | null): string => {
+  if (num === null || num === undefined || num === "") return "০"
+  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+  return num
+    .toString()
+    .split("")
+    .map((char) => (/\d/.test(char) ? bengaliDigits[parseInt(char)] : char))
+    .join("")
+}
 
 export function formatDurationBn(minutes: number): string {
   if (!minutes) return "০ মিনিট"
   const hours = Math.floor(minutes / 60)
   const mins = minutes % 60
 
-  const toBnNums = (num: number): string => {
-    const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
-    return String(num)
-      .split("")
-      .map((digit) => bnDigits[parseInt(digit, 10)] || digit)
-      .join("")
-  }
-
   if (hours > 0 && mins > 0) {
-    return `${toBnNums(hours)} ঘণ্টা ${toBnNums(mins)} মিনিট`
+    return `${toBengaliDigits(hours)} ঘণ্টা ${toBengaliDigits(mins)} মিনিট`
   } else if (hours > 0) {
-    return `${toBnNums(hours)} ঘণ্টা`
+    return `${toBengaliDigits(hours)} ঘণ্টা`
   } else {
-    return `${toBnNums(mins)} মিনিট`
+    return `${toBengaliDigits(mins)} মিনিট`
   }
 }
 
@@ -60,378 +75,302 @@ interface QuestionPaperDataTableProps {
   items: QuestionPaperItem[]
   isLoading: boolean
   isError: boolean
+  viewMode?: QuestionPaperViewMode
   onEdit?: (item: QuestionPaperItem) => void
   onDuplicate: (id: string, title: string) => void
   onDelete: (id: string, title: string) => void
-  currentPage: number
-  itemsPerPage: number
-  totalItems: number
-  totalPages: number
-  onPageChange: (page: number) => void
-  onLimitChange?: (limit: number) => void
 }
 
 export function QuestionPaperDataTable({
   items,
   isLoading,
   isError,
+  viewMode = "table",
   onEdit,
   onDuplicate,
   onDelete,
-  currentPage,
-  itemsPerPage,
-  totalItems,
-  totalPages,
-  onPageChange,
-  onLimitChange,
 }: QuestionPaperDataTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
-
   const getStatusBadge = (status: string) => {
     if (status === "Published") {
       return (
-        <div className="flex items-center gap-1.5 text-emerald-600 font-display">
-          <CheckCircle className="h-4 w-4 shrink-0" />
-          <span className="text-xs font-semibold uppercase">প্রকাশিত</span>
-        </div>
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40 font-headline">
+          <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>পাবলিশড</span>
+        </span>
       )
     }
     return (
-      <div className="flex items-center gap-1.5 text-amber-600 font-display">
-        <AlertTriangle className="h-4 w-4 shrink-0" />
-        <span className="text-xs font-semibold uppercase">খসড়া (Draft)</span>
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40 font-headline">
+        <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+        <span>ড্রাফট</span>
+      </span>
+    )
+  }
+
+  // If in Grid view mode on desktop
+  if (viewMode === "grid") {
+    if (isLoading) {
+      return (
+        <QuestionPaperCardGrid
+          items={[]}
+          isLoading={true}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+        />
+      )
+    }
+
+    if (isError) {
+      return (
+        <div className="p-12 text-center text-red-500 font-headline bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs">
+          <AlertTriangle className="h-10 w-10 mx-auto text-red-400 mb-3" />
+          <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করতে ব্যর্থ হয়েছে।</p>
+          <p className="text-xs text-muted-foreground mt-1">অনুগ্রহ করে পুনরায় পেজটি রিফ্রেশ করুন বা পরে চেষ্টা করুন।</p>
+        </div>
+      )
+    }
+
+    return (
+      <QuestionPaperCardGrid
+        items={items}
+        isLoading={false}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <>
+        {/* Mobile View Skeleton: Card Grid */}
+        <div className="md:hidden">
+          <QuestionPaperCardGrid
+            items={[]}
+            isLoading={true}
+            onDuplicate={onDuplicate}
+            onDelete={onDelete}
+          />
+        </div>
+
+        {/* Desktop View Skeleton: Table with Matching Question Bank Style */}
+        <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs">
+          <div className="bg-slate-50/70 dark:bg-card/70 border-b border-slate-200/80 dark:border-white/[0.06] px-6 py-3.5 flex items-center justify-between">
+            <div className="h-4 w-32 bg-slate-200/80 dark:bg-white/10 rounded animate-pulse" />
+            <div className="h-4 w-20 bg-slate-200/60 dark:bg-white/[0.06] rounded animate-pulse" />
+          </div>
+          <div className="divide-y divide-slate-100 dark:divide-white/[0.04] p-2">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-6 px-4 py-4 animate-pulse">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100 dark:border-primary/20 shrink-0" />
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="h-4 w-48 bg-slate-200/80 dark:bg-white/10 rounded" />
+                    <div className="h-3 w-32 bg-slate-100 dark:bg-white/[0.06] rounded" />
+                  </div>
+                </div>
+                <div className="h-6 w-20 bg-indigo-50 dark:bg-indigo-950/40 rounded-lg border border-indigo-100 dark:border-indigo-800/30 shrink-0" />
+                <div className="h-4 w-28 bg-slate-100 dark:bg-white/[0.06] rounded shrink-0 hidden lg:block" />
+                <div className="h-6 w-20 bg-slate-100 dark:bg-white/[0.06] rounded-full shrink-0" />
+                <div className="h-4 w-24 bg-slate-100 dark:bg-white/[0.06] rounded shrink-0 hidden xl:block" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="h-8 w-24 bg-indigo-100/70 dark:bg-primary/20 rounded-xl" />
+                  <div className="h-8 w-8 bg-slate-100 dark:bg-white/[0.06] rounded-xl" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs p-12 text-center text-red-500 font-headline">
+        <AlertTriangle className="h-10 w-10 mx-auto text-red-400 mb-3" />
+        <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করতে ব্যর্থ হয়েছে।</p>
+        <p className="text-xs text-muted-foreground mt-1">অনুগ্রহ করে পুনরায় পেজটি রিফ্রেশ করুন বা পরে চেষ্টা করুন।</p>
+      </div>
+    )
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs py-16 px-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 mx-auto flex items-center justify-center mb-4 border border-indigo-100 dark:border-indigo-800/40">
+          <FileQuestion className="w-8 h-8" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+          কোনো প্রশ্নপত্র পাওয়া যায়নি
+        </h3>
+        <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
+          নতুন একটি প্রশ্নপত্র তৈরি করে বা কোনো পূর্ববর্তী টেমপ্লেট ডুপ্লিকেট করে শুরু করতে পারেন।
+        </p>
+        <div className="mt-6">
+          <Button asChild className="rounded-xl bg-primary text-primary-foreground font-bold h-10 px-5 gap-2 shadow-xs hover:shadow-md transition-all font-headline">
+            <Link href="/question-papers/create">
+              <Plus className="w-4 h-4" />
+              <span>নতুন প্রশ্নপত্র তৈরি করুন</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-xs">
-      {isLoading ? (
-        <div className="p-12 text-center text-on-surface-variant font-display">
-          <span className="animate-spin inline-block mr-2">⏳</span>
-          लोड হচ্ছে...
-        </div>
-      ) : isError ? (
-        <div className="p-8 text-center text-red-500 font-display">
-          <p className="font-medium">প্রশ্নপত্র তালিকা লোড করতে ব্যর্থ হয়েছে।</p>
-        </div>
-      ) : items.length === 0 ? (
-        <div className="p-8 sm:p-12 text-center font-display">
-          <h3 className="mt-4 text-lg font-bold text-on-surface">
-            কোনো প্রশ্নপত্র পাওয়া যায়নি
-          </h3>
-          <p className="mt-1 text-sm text-on-surface-variant max-w-sm mx-auto font-body">
-            নতুন একটি প্রশ্নপত্র তৈরি করে বা কোনো পূর্ববর্তী টেমপ্লেট ডুপ্লিকেট করে শুরু করুন।
-          </p>
-          <div className="mt-6">
-            <Button asChild className="rounded-lg bg-primary text-white font-bold h-auto py-2.5 px-6">
-              <Link href="/question-papers/create">
-                নতুন প্রশ্নপত্র তৈরি করুন
-              </Link>
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div>
-          {/* Mobile View */}
-          <div className="grid grid-cols-1 gap-3 p-3 sm:p-4 md:hidden font-body">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-sm font-extrabold text-on-surface truncate">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-outline mt-0.5 truncate">{item.examName}</p>
-                    <div className="flex gap-2 items-center mt-2 flex-wrap">
-                      <Badge variant="outline" className="text-[10px] font-bold border-primary/20 bg-primary/5 px-2 py-0.5 rounded-full text-primary font-display h-auto">
-                        {item.className}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] font-bold border-outline/20 bg-muted/5 px-2 py-0.5 rounded-full text-outline font-display h-auto">
-                        পূর্ণমান: {item.total}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] font-bold border-outline/20 bg-muted/5 px-2 py-0.5 rounded-full text-outline font-display h-auto">
-                        সময়: {formatDurationBn(item.timeInMinutes)}
-                      </Badge>
-                      {item.isTemplate && (
-                        <Badge variant="outline" className="text-[10px] font-bold border-teal-500/20 bg-teal-500/5 px-2 py-0.5 rounded-full text-teal-600 font-display h-auto">
-                          টেমপ্লেট
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-8 w-8 shrink-0 animate-none transition-none"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px] font-display">
-                      <DropdownMenuItem
-                        asChild
-                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10"
-                      >
-                        <Link href={`/question-papers/${item.id}/builder`}>
-                          <Sparkles className="h-3.5 w-3.5" />
-                          <span>বিল্ডার ওপেন করুন</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        asChild
-                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                      >
-                        <Link href={`/question-papers/${item.id}/edit`}>
-                          <Pen className="h-3.5 w-3.5" />
-                          <span>সম্পাদনা করুন</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onDuplicate(item.id, item.title)}
-                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                        <span>ডুপ্লিকেট করুন</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => onDelete(item.id, item.title)}
-                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
-                      >
-                        <Trash className="h-3.5 w-3.5" />
-                        <span>মুছে ফেলুন</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                <div className="flex items-center justify-between pt-1">
-                  {getStatusBadge(item.status)}
-                  <div className="flex items-center gap-1.5 text-[11px] text-outline">
-                    <Clock className="h-3.5 w-3.5 shrink-0" />
-                    <span>
-                      {new Date(item.createdAt).toLocaleDateString("bn-BD", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+    <>
+      {/* Mobile View - Direct Card Grid Without Any Outer Box Wrapper */}
+          <div className="md:hidden">
+            <QuestionPaperCardGrid
+              items={items}
+              isLoading={false}
+              onEdit={onEdit}
+              onDuplicate={onDuplicate}
+              onDelete={onDelete}
+            />
           </div>
 
-          {/* Desktop Table View */}
-          <div className="hidden md:block font-display">
+          {/* Desktop Table View - Contained in rounded-2xl Card */}
+          <div className="hidden md:block overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs">
             <Table className="w-full text-left">
-              <TableHeader className="bg-surface-container-low border-b border-outline-variant">
-                <TableRow className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-low">
-                  <TableHead className="px-6 py-4 font-semibold tracking-wider text-outline uppercase h-auto">
-                    প্রশ্নপত্র বিবরণ
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-semibold tracking-wider text-outline uppercase h-auto">
-                    শ্রেণী
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-semibold tracking-wider text-outline uppercase h-auto">
-                    পূর্ণমান / সময়
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-semibold tracking-wider text-outline uppercase h-auto">
-                    স্ট্যাটাস
-                  </TableHead>
-                  <TableHead className="px-6 py-4 font-semibold tracking-wider text-outline uppercase h-auto">
-                    তৈরির তারিখ
-                  </TableHead>
-                  <TableHead className="px-6 py-4 text-right font-semibold tracking-wider text-outline uppercase h-auto">
-                    কার্যক্রম
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="divide-y divide-outline-variant/30 font-body">
-                {items.map((item) => (
-                  <TableRow
-                    key={item.id}
-                    className="hover:bg-surface-container-low transition-all duration-200 ease-in-out group border-b border-outline-variant/30"
-                  >
-                    <TableCell className="py-4 px-6">
-                      <div>
-                        <p className="text-sm font-bold text-on-surface">
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-outline">{item.examName}</p>
-                      </div>
-                    </TableCell>
+              <TableHeader className="bg-slate-50/70 dark:bg-card/70 border-b border-slate-200/80 dark:border-white/[0.06]">
+                  <TableRow className="border-b border-slate-200/80 dark:border-white/[0.06] hover:bg-transparent">
+                    <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      প্রশ্নপত্র বিবরণ
+                    </TableHead>
+                    <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      শ্রেণি
+                    </TableHead>
+                    <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      পূর্ণমান / সময়
+                    </TableHead>
+                    <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      স্ট্যাটাস
+                    </TableHead>
+                    <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      তৈরির তারিখ
+                    </TableHead>
+                    <TableHead className="px-6 py-3.5 text-right font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
+                      কার্যক্রম
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
+                  {items.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className="hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors border-b border-slate-100 dark:border-white/[0.04] group"
+                    >
+                      <TableCell className="py-4 px-6">
+                        <div className="space-y-0.5">
+                          <p className="text-sm font-bold text-foreground font-headline">
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground font-body">{item.examName}</p>
+                        </div>
+                      </TableCell>
 
-                    <TableCell className="py-4 px-6">
-                      <Badge variant="outline" className="rounded-full px-2.5 py-0.5 border border-primary/20 bg-primary/5 text-primary text-xs font-bold">
-                        {item.className}
-                      </Badge>
-                    </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <Badge variant="outline" className="rounded-lg px-2.5 py-0.5 border border-indigo-200 dark:border-indigo-800/40 bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold font-headline">
+                          {item.className}
+                        </Badge>
+                      </TableCell>
 
-                    <TableCell className="py-4 px-6">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-on-surface font-bold">
-                          পূর্ণমান: {item.total}
+                      <TableCell className="py-4 px-6 font-body">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-foreground font-bold font-solaiman">
+                            পূর্ণমান: {toBengaliDigits(item.total)}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            সময়: {formatDurationBn(item.timeInMinutes)}
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="py-4 px-6">
+                        {getStatusBadge(item.status)}
+                      </TableCell>
+
+                      <TableCell className="py-4 px-6">
+                        <span className="text-xs text-muted-foreground font-body">
+                          {new Date(item.createdAt).toLocaleDateString("bn-BD", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </span>
-                        <span className="text-[10px] text-outline">
-                          সময়: {formatDurationBn(item.timeInMinutes)}
-                        </span>
-                      </div>
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell className="py-4 px-6">
-                      {getStatusBadge(item.status)}
-                    </TableCell>
-
-                    <TableCell className="py-4 px-6">
-                      <span className="text-xs text-on-surface">
-                        {new Date(item.createdAt).toLocaleDateString("bn-BD", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="rounded-lg h-8 gap-1.5 border-primary/30 text-primary hover:bg-primary/10 font-bold text-xs cursor-pointer"
-                        >
-                          <Link href={`/question-papers/${item.id}/builder`}>
-                            <Sparkles className="h-3.5 w-3.5" />
-                            <span>বিল্ডার</span>
-                          </Link>
-                        </Button>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high cursor-pointer h-auto w-auto"
-                            >
-                              <MoreVertical />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="bg-white border border-outline-variant shadow-md rounded-xl p-1.5 min-w-[140px] font-display">
-                            <DropdownMenuItem
-                              asChild
-                              className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10"
-                            >
-                              <Link href={`/question-papers/${item.id}/builder`}>
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span>বিল্ডার ওপেন করুন</span>
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              asChild
-                              className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
-                            >
-                              <Link href={`/question-papers/${item.id}/edit`}>
-                                <Pen className="h-3.5 w-3.5" />
-                                <span>সম্পাদনা করুন</span>
-                              </Link>
-                            </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => onDuplicate(item.id, item.title)}
-                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-on-surface hover:bg-surface-container-high"
+                      <TableCell className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            asChild
+                            className="rounded-xl h-8 gap-1.5 border-primary/30 text-primary hover:bg-primary/10 font-bold text-xs cursor-pointer font-headline"
                           >
-                            <Copy className="h-3.5 w-3.5" />
-                            <span>ডুপ্লিকেট করুন</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => onDelete(item.id, item.title)}
-                            className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-error hover:bg-error-container/20"
-                          >
-                            <Trash className="h-3.5 w-3.5" />
-                            <span>মুছে ফেলুন</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                            <Link href={`/question-papers/${item.id}/builder`}>
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span>বিল্ডার</span>
+                            </Link>
+                          </Button>
 
-          {/* Table Footer / Pagination */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant bg-surface-container-low px-4 sm:px-6 py-4 font-display">
-            <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-              <p className="text-xs sm:text-sm text-on-surface-variant">
-                মোট <span className="font-bold">{totalItems}</span> টি প্রশ্নপত্রের মধ্যে <span className="font-bold">{displayStart}-{displayEnd}</span> দেখানো হচ্ছে
-              </p>
-              {onLimitChange && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-outline font-medium">প্রতি পাতায়:</span>
-                  <Select
-                    value={String(itemsPerPage)}
-                    onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                  >
-                    <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 text-xs w-auto gap-1">
-                      <SelectValue placeholder="Per Page" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                      <SelectItem value="5">৫</SelectItem>
-                      <SelectItem value="10">১০</SelectItem>
-                      <SelectItem value="20">২০</SelectItem>
-                      <SelectItem value="50">৫০</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={currentPage === 1}
-                onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-                className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30 shrink-0"
-              >
-                <span>⬅️</span>
-              </Button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <Button
-                  key={pageNum}
-                  variant={currentPage === pageNum ? "default" : "ghost"}
-                  onClick={() => onPageChange(pageNum)}
-                  className={`size-8 sm:size-10 rounded-lg text-xs sm:text-sm transition-colors shrink-0 ${currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary hover:text-white"
-                    : "hover:bg-surface-container-high text-on-surface"
-                    }`}
-                >
-                  {pageNum}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="icon"
-                disabled={currentPage === totalPages}
-                onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-                className="size-8 sm:size-10 rounded-lg border border-outline-variant transition-colors hover:bg-surface-container-high disabled:opacity-30 shrink-0"
-              >
-                <span>➡️</span>
-              </Button>
-            </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer h-8 w-8"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl p-1.5 min-w-[150px] font-headline">
+                              <DropdownMenuItem
+                                asChild
+                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10"
+                              >
+                                <Link href={`/question-papers/${item.id}/builder`}>
+                                  <Sparkles className="h-3.5 w-3.5" />
+                                  <span>বিল্ডার ওপেন করুন</span>
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                asChild
+                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                              >
+                                <Link href={`/question-papers/${item.id}/edit`}>
+                                  <Pen className="h-3.5 w-3.5" />
+                                  <span>সম্পাদনা করুন</span>
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => onDuplicate(item.id, item.title)}
+                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                                <span>ডুপ্লিকেট করুন</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => onDelete(item.id, item.title)}
+                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                              >
+                                <Trash className="h-3.5 w-3.5" />
+                                <span>মুছে ফেলুন</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
           </div>
-        </div>
-      )}
-    </div>
+        </>
   )
 }

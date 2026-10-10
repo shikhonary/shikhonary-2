@@ -19,16 +19,31 @@ import { toast } from "@workspace/ui/components/sonner";
 import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@workspace/ui/components/drawer";
-import { ArrowLeft, Loader2, Save, Search, CheckCircle2, SlidersHorizontal, RotateCcw, X, Split, Shuffle, Bookmark } from "lucide-react";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@workspace/ui/components/sheet";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Loader2,
+  Save,
+  Search,
+  CheckCircle2,
+  SlidersHorizontal,
+  RotateCcw,
+  X,
+  Split,
+  Shuffle,
+  Bookmark,
+  BookOpen,
+  Tag,
+  FileText,
+  ArrowUpDown,
+  Check,
+} from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionGrid } from "../components/distribution-picker/question-grid";
@@ -75,6 +90,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState<boolean>(false);
 
   const bookmarks = useBookmarkedQuestionsStore((s) => s.bookmarks);
 
@@ -319,16 +335,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
   const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
 
-  const renderSelectFilters = (isMobile = false) => (
+  const renderSelectFilters = () => (
     <>
       {/* Chapter Filter */}
       {isChapterApplicable && (
-        <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
-          {isMobile && (
-            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-              অধ্যায়
-            </label>
-          )}
+        <div className="min-w-[150px]">
           <Select
             value={selectedChapterId}
             onValueChange={(val) => {
@@ -336,13 +347,19 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               setPage(1);
             }}
           >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+            <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
               <SelectValue placeholder="সকল অধ্যায়" />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
               <SelectItem value="All">সকল অধ্যায়</SelectItem>
-              {chapters.map((ch: any) => (
+              {chapters.map((ch: any, idx: number) => (
                 <SelectItem key={ch.id} value={ch.id}>
+                  <span
+                    className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
+                    style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+                  >
+                    {toBengaliDigits(idx + 1)}.
+                  </span>{" "}
                   {ch.nameBn || ch.nameEn}
                 </SelectItem>
               ))}
@@ -352,12 +369,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       )}
 
       {/* Reference Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            রেফারেন্স
-          </label>
-        )}
+      <div className="min-w-[150px]">
         <Select
           value={selectedBoard}
           onValueChange={(val) => {
@@ -365,10 +377,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
             <SelectValue placeholder="সকল রেফারেন্স" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
             <SelectItem value="All">সকল রেফারেন্স</SelectItem>
             {boardYears.map((item: any) => (
               <SelectItem key={item.rawRef} value={item.rawRef}>
@@ -381,12 +393,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
       {/* Source Filter */}
       {sources.length > 0 && (
-        <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
-          {isMobile && (
-            <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-              উৎস
-            </label>
-          )}
+        <div className="min-w-[150px]">
           <Select
             value={selectedSource}
             onValueChange={(val) => {
@@ -394,10 +401,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               setPage(1);
             }}
           >
-            <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
+            <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
               <SelectValue placeholder="সকল উৎস" />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
               <SelectItem value="All">সকল উৎস</SelectItem>
               {sources.map((item: any) => (
                 <SelectItem key={item.rawSource} value={item.rawSource}>
@@ -410,12 +417,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       )}
 
       {/* Sort Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[160px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            সর্ট
-          </label>
-        )}
+      <div className="min-w-[130px]">
         <Select
           value={selectedSort}
           onValueChange={(val: "newest" | "oldest") => {
@@ -423,10 +425,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2 px-3 font-body text-sm justify-between h-10">
-            <SelectValue placeholder="সর্ট" />
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
+            <SelectValue placeholder="সাজানো" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64 font-body">
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
             <SelectItem value="newest">নতুন যুক্ত</SelectItem>
             <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
           </SelectContent>
@@ -574,64 +576,600 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   };
 
   return (
-    <div className="flex flex-col h-screen bg-muted/20 font-display">
+    <div className="flex flex-col w-full h-full min-h-0 max-h-full overflow-hidden bg-background font-display select-none">
       {/* Header */}
-      <header className="border-b bg-card shrink-0 z-10 shadow-xs">
-        <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-muted/80 w-8 h-8">
-              <Link href={`/question-papers/${paperId}/builder`}>
-                <ArrowLeft className="w-4 h-4 text-primary" />
+      <header className="h-16 border-b border-border bg-card shrink-0 z-40 shadow-xs">
+        <div className="max-w-6xl mx-auto w-full h-full px-3 sm:px-6 flex items-center justify-between gap-2">
+          {/* Left Side: Back button & Title & Target Status */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
+            >
+              <Link href={`/question-papers/${paperId}/builder`} title="বিল্ডারে ফিরে যান">
+                <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="hidden sm:inline">বিল্ডারে ফিরুন</span>
+                <span className="inline sm:hidden text-[11px]">ফিরে যান</span>
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <h1 className="font-bold text-base text-primary font-headline">
+
+            <div className="flex flex-col justify-center min-w-0">
+              <h1
+                className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[240px] md:max-w-[340px] lg:max-w-lg leading-tight"
+                title={
+                  isAlternativeMode
+                    ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
+                    : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                }
+              >
                 {isAlternativeMode
                   ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
-                  : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
+                  : `${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
               </h1>
-              {isAlternativeMode ? (
-                <span className="text-xs text-primary bg-primary/10 px-2.5 py-0.5 rounded-full font-bold">
-                  ১টি প্রশ্ন নির্বাচন করুন
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground font-body bg-muted px-2.5 py-0.5 rounded-full font-medium">
-                  টার্গেট: {toBengaliDigits(effectiveTargetCount)}টি • যোগ হয়েছে: {toBengaliDigits(subSectionQuestionsCount)}টি
-                </span>
-              )}
+
+              {/* Target and Progress Sub-line */}
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {isAssigning || isAddingAlternative ? (
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground flex items-center gap-1 font-body">
+                    <Loader2 className="w-2.5 h-2.5 animate-spin text-indigo-600 dark:text-indigo-400" />
+                    <span>যুক্ত করা হচ্ছে...</span>
+                  </span>
+                ) : isAlternativeMode ? (
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.2 rounded-md font-headline">
+                    ১টি বিকল্প প্রশ্ন নির্বাচন করুন
+                  </span>
+                ) : (
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground font-body flex items-center gap-1">
+                    <span>টার্গেট: <strong className="text-foreground font-headline">{toBengaliDigits(effectiveTargetCount)}টি</strong></span>
+                    <span>•</span>
+                    <span>যুক্ত: <strong className="text-indigo-600 dark:text-indigo-400 font-headline">{toBengaliDigits(subSectionQuestionsCount)}টি</strong></span>
+                    {selectedIds.length > 0 && (
+                      <>
+                        <span>•</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-headline font-semibold">
+                          +{toBengaliDigits(selectedIds.length)}টি নির্বাচিত
+                        </span>
+                      </>
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Random Select Button */}
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleRandomSelect}
               disabled={questionsLoading || availableUnassigned.length === 0}
-              className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-1.5 shadow-2xs"
+              className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer flex items-center gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95 disabled:opacity-50"
               title="প্রশ্নসমূহ থেকে দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করুন"
             >
-              <Shuffle className="w-3.5 h-3.5" />
+              <Shuffle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span className="hidden sm:inline">র‍্যান্ডম নির্বাচন</span>
-              <span className="sm:hidden">র‍্যান্ডম</span>
+              <span className="sm:hidden text-[11px]">র‍্যান্ডম</span>
             </Button>
 
+            {/* Next Sub-Section Button (if not alternative mode and next exists) */}
             {!isAlternativeMode && nextDistStatus && (
               <Button
                 variant="outline"
                 size="sm"
                 asChild
-                className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+                className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer flex items-center gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95"
               >
                 <Link href={`/question-papers/${paperId}/distributions/${nextDistStatus.distributionId}/pick`}>
-                  <span>পরবর্তী উপ-বিভাগ</span>
-                  <ArrowLeft className="w-3.5 h-3.5 ml-1 rotate-180" />
+                  <span className="hidden md:inline">পরবর্তী উপ-বিভাগ</span>
+                  <span className="md:hidden text-[11px]">পরবর্তী</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-0.5 text-muted-foreground" />
                 </Link>
               </Button>
             )}
           </div>
         </div>
       </header>
+
+      {/* Sub-Header Filter Bar directly attached under Header with ZERO gap */}
+      <div className="bg-card border-b border-border shrink-0 z-30 shadow-2xs px-3 sm:px-6 py-2.5 sm:py-3">
+        <div className="max-w-6xl mx-auto w-full flex flex-col gap-2.5">
+          {/* Primary Filter Row */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Search Input Filter */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="প্রশ্ন বা বিষয় দিয়ে অনুসন্ধান করুন..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full pl-9 pr-9 h-10 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500/50 transition-all font-body"
+              />
+              {hasActiveQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setPage(1);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                  title="অনুসন্ধান মুছুন"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Bookmarked Filter Pill */}
+            <button
+              type="button"
+              onClick={() => {
+                setOnlyBookmarked(!onlyBookmarked);
+                setPage(1);
+              }}
+              className={`h-10 px-3 sm:px-3.5 rounded-xl border inline-flex items-center gap-1.5 text-xs font-bold font-headline transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs ${
+                onlyBookmarked
+                  ? "bg-rose-600 text-white border-rose-600 shadow-xs"
+                  : "bg-card border-slate-200 dark:border-white/[0.08] text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+              }`}
+              title="বুকমার্ককৃত প্রশ্ন ফিল্টার"
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarked ? "fill-white text-white" : "fill-rose-500 text-rose-500"}`} />
+              <span className="hidden sm:inline">বুকমার্ককৃত</span>
+              <span className="text-[11px] font-semibold">({toBengaliDigits(bookmarkedIds.length)})</span>
+            </button>
+
+            {/* Mobile Filter Sheet Trigger Button & Content */}
+            <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className={`md:hidden h-10 px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold font-body transition-all shrink-0 cursor-pointer active:scale-95 ${
+                    activeFilterCount > 0
+                      ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
+                      : "bg-card border-border/60 text-foreground hover:bg-muted/60 shadow-2xs"
+                  }`}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>ফিল্টার</span>
+                  {activeFilterCount > 0 && (
+                    <span className="w-4.5 h-4.5 rounded-full bg-white text-indigo-700 text-[10px] font-bold flex items-center justify-center ml-0.5">
+                      {toBengaliDigits(activeFilterCount)}
+                    </span>
+                  )}
+                </button>
+              </SheetTrigger>
+
+              <SheetContent
+                side="bottom"
+                className="rounded-t-3xl max-h-[88vh] flex flex-col p-0 border-t border-border/50 bg-card text-foreground shadow-2xl focus:outline-hidden overflow-hidden"
+              >
+                {/* Grab Handle */}
+                <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 mx-auto mt-3 mb-1 shrink-0" />
+
+                {/* Sheet Header */}
+                <SheetHeader className="px-4 py-3 border-b border-border/40 text-left shrink-0">
+                  <SheetTitle className="text-base font-bold font-headline flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <SlidersHorizontal className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span>ফিল্টারসমূহ</span>
+                          {activeFilterCount > 0 && (
+                            <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">
+                              {toBengaliDigits(activeFilterCount)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] font-normal text-muted-foreground font-body leading-none mt-0.5">
+                          {activeFilterCount > 0
+                            ? `${toBengaliDigits(activeFilterCount)}টি ফিল্টার সক্রিয় রয়েছে`
+                            : "পছন্দমতো ফিল্টার নির্বাচন করুন"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {activeFilterCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleResetAll}
+                        className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-body cursor-pointer transition-all active:scale-95"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>সব মুছুন</span>
+                      </button>
+                    )}
+                  </SheetTitle>
+                </SheetHeader>
+
+                {/* Sheet Body */}
+                <div className="flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3.5 font-body text-xs">
+                  {/* Active Filter Chips Strip inside Drawer */}
+                  {activeFilterCount > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-border/40">
+                      <span className="text-[10px] font-semibold text-muted-foreground">সক্রিয়:</span>
+                      {hasActiveChapter && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
+                          <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedChapterId("All"); setPage(1); }}
+                            className="hover:opacity-75 cursor-pointer ml-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      )}
+                      {hasActiveBoard && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
+                          <span>রেফারেন্স: {selectedBoard}</span>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedBoard("All"); setPage(1); }}
+                            className="hover:opacity-75 cursor-pointer ml-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      )}
+                      {hasActiveSource && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
+                          <span>উৎস: {selectedSource}</span>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSource("All"); setPage(1); }}
+                            className="hover:opacity-75 cursor-pointer ml-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      )}
+                      {hasActiveSort && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
+                          <span>সাজানো: {selectedSort === "newest" ? "নতুন যুক্ত" : "পুরাতন যুক্ত"}</span>
+                          <button
+                            type="button"
+                            onClick={() => { setSelectedSort("newest"); setPage(1); }}
+                            className="hover:opacity-75 cursor-pointer ml-0.5"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Chapter Filter in Sheet */}
+                  {isChapterApplicable && chapters.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-foreground flex items-center gap-2">
+                          <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>অধ্যায় নির্বাচন</span>
+                        </label>
+                        {hasActiveChapter && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
+                            সক্রিয়
+                          </span>
+                        )}
+                      </div>
+                      <Select
+                        value={selectedChapterId}
+                        onValueChange={(val) => {
+                          setSelectedChapterId(val ?? "All");
+                          setPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
+                          <div className="flex items-center gap-2 truncate pl-1">
+                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <SelectValue placeholder="সকল অধ্যায়" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64 font-body">
+                          <SelectItem value="All">সকল অধ্যায়</SelectItem>
+                          {chapters.map((ch: any, idx: number) => (
+                            <SelectItem key={ch.id} value={ch.id}>
+                              <span
+                                className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
+                                style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+                              >
+                                {toBengaliDigits(idx + 1)}.
+                              </span>{" "}
+                              {ch.nameBn || ch.nameEn}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Reference / Board in Sheet */}
+                  {boardYears.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-foreground flex items-center gap-2">
+                          <Tag className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>রেফারেন্স / বোর্ড</span>
+                        </label>
+                        {hasActiveBoard && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
+                            সক্রিয়
+                          </span>
+                        )}
+                      </div>
+                      <Select
+                        value={selectedBoard}
+                        onValueChange={(val) => {
+                          setSelectedBoard(val ?? "All");
+                          setPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
+                          <div className="flex items-center gap-2 truncate pl-1">
+                            <Tag className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <SelectValue placeholder="সকল রেফারেন্স" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64 font-body">
+                          <SelectItem value="All">সকল রেফারেন্স</SelectItem>
+                          {boardYears.map((item: any) => (
+                            <SelectItem key={item.rawRef} value={item.rawRef}>
+                              🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Source in Sheet */}
+                  {sources.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-bold text-foreground flex items-center gap-2">
+                          <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>উৎস</span>
+                        </label>
+                        {hasActiveSource && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
+                            সক্রিয়
+                          </span>
+                        )}
+                      </div>
+                      <Select
+                        value={selectedSource}
+                        onValueChange={(val) => {
+                          setSelectedSource(val ?? "All");
+                          setPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
+                          <div className="flex items-center gap-2 truncate pl-1">
+                            <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <SelectValue placeholder="সকল উৎস" />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64 font-body">
+                          <SelectItem value="All">সকল উৎস</SelectItem>
+                          {sources.map((item: any) => (
+                            <SelectItem key={item.rawSource} value={item.rawSource}>
+                              📚 {item.rawSource} ({toBengaliDigits(item.count)})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Sort Order in Sheet */}
+                  <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-foreground flex items-center gap-2">
+                        <ArrowUpDown className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>ক্রমবিন্যাস</span>
+                      </label>
+                      {hasActiveSort && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
+                          সক্রিয়
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedSort("newest"); setPage(1); }}
+                        className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                          selectedSort === "newest"
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
+                        }`}
+                      >
+                        নতুন যুক্ত আগে
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedSort("oldest"); setPage(1); }}
+                        className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                          selectedSort === "oldest"
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
+                        }`}
+                      >
+                        পুরাতন যুক্ত আগে
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sticky Action Footer */}
+                <div className="px-3.5 py-3 bg-background/95 backdrop-blur-md border-t border-border/50 flex items-center gap-2.5 shrink-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleResetAll}
+                    disabled={activeFilterCount === 0}
+                    className="h-11 px-4 rounded-xl font-bold flex items-center gap-1.5 border-border text-foreground shrink-0 disabled:opacity-40 cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>রিসেট</span>
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={() => setMobileFilterOpen(false)}
+                    className="flex-1 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-transform cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>ফলাফল দেখুন</span>
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {/* Desktop Filters (Hidden on Mobile) */}
+            <div className="hidden md:flex items-center gap-2.5 shrink-0">
+              {renderSelectFilters()}
+            </div>
+          </div>
+
+          {/* Active Filter Badges & Reset Row */}
+          {hasAnyFilter && (
+            <div className="flex flex-col gap-2 rounded-xl bg-slate-50/70 dark:bg-muted/30 border border-slate-200/60 dark:border-white/[0.04] p-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span className="font-semibold text-slate-500 dark:text-muted-foreground text-[11px] sm:text-xs font-headline">
+                  সক্রিয় ফিল্টারসমূহ:
+                </span>
+
+                {/* Search Query Badge */}
+                {hasActiveQuery && (
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal max-w-[220px] truncate font-body"
+                  >
+                    <span className="truncate">অনুসন্ধান: &quot;{search}&quot;</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearch("");
+                        setPage(1);
+                      }}
+                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title="অনুসন্ধান ফিল্টার বাদ দিন"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+
+                {/* Chapter Filter Badge */}
+                {hasActiveChapter && (
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
+                  >
+                    <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedChapterId("All");
+                        setPage(1);
+                      }}
+                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title="অধ্যায় ফিল্টার বাদ দিন"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+
+                {/* Reference Filter Badge */}
+                {hasActiveBoard && (
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
+                  >
+                    <span>রেফারেন্স: {selectedBoard}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedBoard("All");
+                        setPage(1);
+                      }}
+                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title="রেফারেন্স ফিল্টার বাদ দিন"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+
+                {/* Source Filter Badge */}
+                {hasActiveSource && (
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
+                  >
+                    <span>উৎস: {selectedSource}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSource("All");
+                        setPage(1);
+                      }}
+                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title="উৎস ফিল্টার বাদ দিন"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+
+                {/* Sort Filter Badge */}
+                {hasActiveSort && (
+                  <Badge
+                    variant="secondary"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
+                  >
+                    <span>সাজানো: {selectedSort === "oldest" ? "পুরাতন যুক্ত" : "নতুন যুক্ত"}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSort("newest");
+                        setPage(1);
+                      }}
+                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                      title="ক্রম পরিবর্তন বাদ দিন"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                )}
+              </div>
+
+              {/* Reset All Button */}
+              <button
+                type="button"
+                onClick={handleResetAll}
+                className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer self-end sm:self-auto shrink-0 font-body"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>সব ফিল্টার মুছুন</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto p-4 sm:p-6">
@@ -671,213 +1209,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             </div>
           )}
 
-          {/* Primary Filter Toolbar */}
-          <div className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-card p-3 sm:p-4 shadow-sm">
-            {/* Search Input Filter */}
-            <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="প্রশ্ন বা বিষয় দিয়ে খুঁজুন..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                className="pl-9 bg-muted/50 font-body text-sm rounded-lg border border-outline-variant py-2.5 outline-hidden focus:ring-2 focus:ring-primary/10 h-10"
-              />
-            </div>
 
-            {/* Mobile Filter Drawer Button (Visible ONLY on mobile) */}
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="md:hidden flex items-center gap-2 h-10 px-3.5 bg-white border-outline-variant/40 text-sm font-medium shrink-0 rounded-lg cursor-pointer"
-                  type="button"
-                >
-                  <span>ফিল্টার</span>
-                  {activeFilterCount > 0 && (
-                    <span className="flex size-5 items-center justify-center rounded-full bg-primary text-white text-[11px] font-bold">
-                      {activeFilterCount}
-                    </span>
-                  )}
-                </Button>
-              </DrawerTrigger>
-
-              <DrawerContent className="p-6 space-y-5 bg-white border-t border-outline-variant/40 max-h-[90vh] overflow-y-auto font-display">
-                <DrawerHeader className="p-0 text-left">
-                  <DrawerTitle className="text-base font-bold text-on-surface flex items-center gap-2">
-                    <SlidersHorizontal className="h-5 w-5 text-primary" />
-                    ফিল্টার প্রশ্নসমূহ
-                  </DrawerTitle>
-                  <DrawerDescription className="text-xs text-muted-foreground">
-                    অধ্যায় ও বোর্ড অনুযায়ী ফিল্টার করুন
-                  </DrawerDescription>
-                </DrawerHeader>
-
-                <div className="space-y-4 pt-2">
-                  {renderSelectFilters(true)}
-                </div>
-
-                <DrawerFooter className="p-0 pt-4 flex-row gap-2">
-                  {hasAnyFilter && (
-                    <Button
-                      variant="outline"
-                      onClick={handleResetAll}
-                      className="flex-1 border-outline-variant text-on-surface text-xs font-bold h-10 rounded-lg"
-                    >
-                      রিসেট
-                    </Button>
-                  )}
-                  <DrawerClose asChild>
-                    <Button className="flex-1 bg-primary text-white text-xs font-bold h-10 rounded-lg">
-                      প্রয়োগ করুন
-                    </Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
-
-            {/* Bookmarked Filter Pill */}
-            <button
-              type="button"
-              onClick={() => {
-                setOnlyBookmarked(!onlyBookmarked);
-                setPage(1);
-              }}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold font-body transition-colors cursor-pointer shrink-0 ${
-                onlyBookmarked
-                  ? "bg-rose-600 text-white shadow-xs"
-                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground border border-outline-variant/40"
-              }`}
-              title="বুকমার্ককৃত প্রশ্ন ফিল্টার"
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarked ? "fill-white text-white" : "fill-rose-500 text-rose-500"}`} />
-              <span>বুকমার্ককৃত</span>
-              <span
-                className="font-solaiman font-semibold"
-                style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
-              >
-                ({toBengaliDigits(bookmarkedIds.length)})
-              </span>
-            </button>
-
-            {/* Desktop Filters (Hidden on Mobile) */}
-            <div className="hidden md:flex items-center gap-3 shrink-0">
-              {renderSelectFilters(false)}
-            </div>
-          </div>
-
-          {/* Active Filters Badges */}
-          {hasAnyFilter && (
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-card border border-outline-variant/40 rounded-xl p-2.5 px-4 text-xs font-body shadow-xs">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <span className="text-muted-foreground font-semibold text-[11px] uppercase tracking-wider mr-1">
-                  সক্রিয় ফিল্টার:
-                </span>
-
-                {hasActiveQuery && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
-                  >
-                    <span>খোঁজ: "{search}"</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearch("");
-                        setPage(1);
-                      }}
-                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove search query"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-
-                {hasActiveChapter && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
-                  >
-                    <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedChapterId("All");
-                        setPage(1);
-                      }}
-                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove chapter filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-
-                {hasActiveBoard && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
-                  >
-                    <span>রেফারেন্স: {selectedBoard}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedBoard("All");
-                        setPage(1);
-                      }}
-                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove reference filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-
-                {hasActiveSource && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
-                  >
-                    <span>উৎস: {selectedSource}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSource("All");
-                        setPage(1);
-                      }}
-                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove source filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-
-                {hasActiveSort && (
-                  <Badge
-                    variant="secondary"
-                    className="gap-1.5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 transition-colors font-medium text-[11px] sm:text-xs"
-                  >
-                    <span>সর্ট: {selectedSort === "oldest" ? "পুরাতন যুক্ত" : "নতুন যুক্ত"}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSort("newest");
-                        setPage(1);
-                      }}
-                      className="hover:text-primary/70 cursor-pointer focus:outline-hidden"
-                      title="Remove sort filter"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Question Grid */}
           <QuestionGrid
@@ -923,10 +1255,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
       {/* Floating Action Bar */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card border border-primary/30 shadow-2xl rounded-xl md:rounded-full p-2 md:px-6 md:py-3 flex flex-col md:flex-row items-center gap-1.5 md:gap-6 z-50 animate-in slide-in-from-bottom-8">
-          <div className="text-xs md:text-sm font-bold text-on-surface flex items-center justify-between w-full md:w-auto px-1 md:px-0">
+        <div className="fixed bottom-4 left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl md:rounded-full p-2.5 md:px-6 md:py-2.5 flex flex-col md:flex-row items-center gap-2 md:gap-5 z-50 animate-in slide-in-from-bottom-5 select-none">
+          <div className="text-xs md:text-sm font-bold text-foreground flex items-center justify-between w-full md:w-auto px-1 md:px-0">
             <span>
-              <span className="text-primary font-bold">{toBengaliDigits(selectedIds.length)}টি</span> নির্বাচিত
+              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> প্রশ্ন নির্বাচিত
             </span>
             <span className="text-muted-foreground md:ml-2 font-normal text-[11px] md:text-xs">
               (প্রয়োজন: {toBengaliDigits(maxSelectable)}টি)
@@ -936,7 +1268,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 variant="outline"
-                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 border-border text-muted-foreground hover:bg-muted font-medium cursor-pointer text-xs md:text-sm py-2 px-4"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
                 asChild
               >
                 <Link href={`/question-papers/${paperId}/builder`}>
@@ -944,7 +1276,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 </Link>
               </Button>
               <Button
-                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-5 shrink-0 shadow-md"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
                 disabled={isAddingAlternative}
                 onClick={handleSaveAlternative}
               >
@@ -955,7 +1287,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           ) : (
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
-                className="w-full md:w-auto rounded-lg md:rounded-full h-auto md:h-10 bg-primary text-white font-bold cursor-pointer gap-2 text-xs md:text-sm py-2.5 md:py-2 px-4 shrink-0"
+                className="w-full md:w-auto rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
                 disabled={isAssigning}
                 onClick={() => handleSaveAndContinue(false)}
               >

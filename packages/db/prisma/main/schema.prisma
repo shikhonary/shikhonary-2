@@ -472,6 +472,27 @@ model CreditTransaction {
   @@map("credit_transaction")
 }
 
+model CreditPack {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  displayName  String
+  description  String?
+  credits      Int
+  bonusCredits Int      @default(0)
+  priceBDT     Int
+  isPopular    Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  position     Int      @default(0)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([position])
+  @@map("credit_pack")
+}
+
+
 model SubscriptionHistory {
   id             String   @id @default(cuid())
   subscriptionId String
