@@ -1,6 +1,13 @@
-export const OPPOSITE_WORD_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import {
+  QUESTION_SOURCE_OPTIONS,
+  type QuestionSource,
+  DEFAULT_SOURCE,
+  DEFAULT_QUESTION_SOURCE,
+} from "@workspace/utils"
 
-export type OppositeWordSource = (typeof OPPOSITE_WORD_SOURCE_OPTIONS)[number]["value"]
+export const OPPOSITE_WORD_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type OppositeWordSource = QuestionSource
+export const DEFAULT_OPPOSITE_WORD_SOURCE = DEFAULT_QUESTION_SOURCE
+export { DEFAULT_SOURCE }
+
+

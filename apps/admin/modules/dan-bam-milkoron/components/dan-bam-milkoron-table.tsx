@@ -6,7 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2, ArrowRightLeft } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Edit3, Trash2, ArrowRightLeft, MoreHorizontal } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -123,6 +123,22 @@ export function DanBamMilkoronGrid({
   )
 }
 
+function getPaginationItems(currentPage: number, totalPages: number): (number | "ellipsis-start" | "ellipsis-end")[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, "ellipsis-end", totalPages]
+  }
+
+  if (currentPage >= totalPages - 3) {
+    return [1, "ellipsis-start", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+  }
+
+  return [1, "ellipsis-start", currentPage - 1, currentPage, currentPage + 1, "ellipsis-end", totalPages]
+}
+
 export function DanBamMilkoronTable({
   items,
   isLoading,
@@ -201,155 +217,172 @@ export function DanBamMilkoronTable({
         </div>
       </div>
 
-      {/* Main List */}
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-40 w-full animate-pulse rounded-xl bg-surface-container-low border border-outline-variant/30"
-            />
-          ))}
-        </div>
-      ) : isError ? (
-        <div className="rounded-xl border border-error/30 bg-error/5 p-8 text-center text-error">
-          <p className="font-bold text-base">Failed to load dan bam milkoron</p>
-          <p className="text-xs mt-1 text-on-surface-variant">
-            Please check your network connection or try refreshing the page.
-          </p>
-        </div>
-      ) : items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-outline-variant/60 bg-surface-container-lowest p-12 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
-            <ArrowRightLeft className="h-6 w-6" />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <span className="animate-spin text-primary text-sm font-bold">
+              Loading...
+            </span>
+            <span className="font-body-md text-sm font-medium">Loading Dan Bam Milkoron...</span>
           </div>
-          <h3 className="font-headline-sm text-lg font-bold text-on-surface">
-            No Dan Bam Milkoron Found
-          </h3>
-          <p className="mt-1 text-xs text-on-surface-variant max-w-md mx-auto">
-            Try adjusting your search criteria or create a new dan bam milkoron question.
-          </p>
-          <Button asChild className="mt-4 bg-primary text-white text-xs font-bold rounded-lg cursor-pointer">
-            <Link href="/dan-bam-milkoron/create">Create Dan Bam Milkoron</Link>
-          </Button>
         </div>
-      ) : (
-        <div className="space-y-4">
+      )}
+
+      {/* Error State */}
+      {isError && !isLoading && (
+        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <span className="text-xl font-bold">⚠️ Error</span>
+            <span className="font-body-md text-sm font-medium">
+              Error loading dan bam milkoron. Please try refreshing.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !isError && items.length === 0 && (
+        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
+              <ArrowRightLeft className="h-6 w-6" />
+            </div>
+            <p className="font-headline-md text-xl font-bold text-on-surface">
+              No Dan Bam Milkoron Found
+            </p>
+            <p className="font-body-md text-sm text-outline max-w-md">
+              Try adjusting filters or create a new dan bam milkoron to the bank.
+            </p>
+            <Button asChild className="mt-2 bg-primary text-white text-xs font-bold rounded-lg cursor-pointer">
+              <Link href="/dan-bam-milkoron/create">Create Dan Bam Milkoron</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+      {/* CARD VIEW LAYOUT */}
+      {!isLoading && !isError && items.length > 0 && (
+        <div className="grid grid-cols-1 gap-6">
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
-            const itemSnippet = item.leftColumn?.[0] || item.rightColumn?.[0] || `ডান-বাম মিলকরণ #${(currentPage - 1) * itemsPerPage + idx + 1}`
+            const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+            const itemSnippet = item.leftColumn?.[0] || item.rightColumn?.[0] || `ডান-বাম মিলকরণ #${globalIndex}`
 
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "relative flex flex-col justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-5 transition-all hover:shadow-md",
-                  isSelected && "border-primary/50 bg-primary/5 shadow-xs"
+                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
+                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
                 )}
               >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                    className="mt-1.5 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
-                  />
-
-                  <div className="flex-1 min-w-0">
-                    {/* Header Badges */}
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="font-mono text-xs font-bold text-outline">
-                        #{(currentPage - 1) * itemsPerPage + idx + 1}
-                      </span>
-
-                      {/* Subject */}
-                      {item.subject && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
-                          {item.subject.nameEn}
-                          {item.subject.nameBn && ` (${item.subject.nameBn})`}
-                        </span>
-                      )}
-
-                      {/* Chapter */}
-                      {item.academicChapter && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
-                          অধ্যায়: {item.academicChapter.nameEn}
-                        </span>
-                      )}
-
-                      {/* Difficulty */}
-                      <span
-                        className={cn(
-                          "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border",
-                          item.difficulty === "EASY"
-                            ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
-                            : item.difficulty === "MEDIUM"
-                            ? "bg-amber-500/10 text-amber-700 border-amber-500/20"
-                            : "bg-red-500/10 text-red-700 border-red-500/20"
-                        )}
-                      >
-                        {item.difficulty}
-                      </span>
-
-                      {/* References */}
-                      {item.reference && item.reference.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {item.reference.map((ref, rIdx) => (
-                            <span
-                              key={rIdx}
-                              className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40"
-                            >
-                              {ref}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Source */}
-                      {item.source && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
-                          উৎস: {item.source}
-                        </span>
-                      )}
-
-                      {/* Session */}
-                      {item.session && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
-                          সেশন: {item.session}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* 2-Column Grid View */}
-                    <DanBamMilkoronGrid
-                      leftColumn={item.leftColumn}
-                      rightColumn={item.rightColumn}
+                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                  {/* Selection Checkbox & Main Info */}
+                  <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => handleSelectOne(item.id, e.target.checked)}
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
                     />
+
+                    <div className="flex-1 space-y-4 min-w-0">
+                      {/* Badges Row */}
+                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
+                        {/* Global Index Badge */}
+                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
+                          #{globalIndex}
+                        </span>
+
+                        {/* Subject Badge */}
+                        {item.subject && (
+                          <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
+                            {item.subject.nameBn || item.subject.nameEn}
+                          </span>
+                        )}
+
+                        {/* Chapter Badge */}
+                        {item.academicChapter && (
+                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
+                            {item.academicChapter.nameBn || item.academicChapter.nameEn}
+                          </span>
+                        )}
+
+                        {/* Popularity Badge */}
+                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
+                          👁️ {item.popularityCount} Views
+                        </span>
+
+                        {/* Difficulty Badge */}
+                        <span
+                          className={cn(
+                            "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
+                            item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
+                            item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
+                          )}
+                        >
+                          {item.difficulty}
+                        </span>
+                      </div>
+
+                      {/* 2-Column Grid Box */}
+                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
+                        <DanBamMilkoronGrid
+                          leftColumn={item.leftColumn}
+                          rightColumn={item.rightColumn}
+                        />
+                      </div>
+
+                      {/* Reference Tags & ID Footer */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {(item.source || item.session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+                            </span>
+                          )}
+                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
+                            item.reference.map((ref, rIdx) => (
+                              <span
+                                key={rIdx}
+                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
+                              >
+                                🏷️ {ref}
+                              </span>
+                            ))
+                          ) : (
+                            !(item.source || item.session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
+                          )}
+                        </div>
+
+                        <span className="text-[11px] font-mono text-outline/60">
+                          ID: {item.id}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-outline hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
+                  {/* Actions Column */}
+                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
+                    <Link
+                      href={`/dan-bam-milkoron/${item.id}/edit`}
+                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
                       title="Edit Question"
                     >
-                      <Link href={`/dan-bam-milkoron/${item.id}/edit`}>
-                        <Edit3 className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                      <Edit3 className="size-5 mx-auto" />
+                    </Link>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
+                    <button
+                      type="button"
                       onClick={() => onDelete(item.id, itemSnippet)}
-                      className="h-8 w-8 p-0 text-outline hover:text-error hover:bg-error/10 rounded-lg cursor-pointer"
+                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
                       title="Delete Question"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Trash2 className="size-5 mx-auto" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -359,52 +392,119 @@ export function DanBamMilkoronTable({
       )}
 
       {/* Pagination Footer */}
-      {totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-outline-variant/30">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-outline font-medium">Rows per page:</span>
+      {!isLoading && !isError && totalItems > 0 && (
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-2xl p-4 shadow-xs">
+          {/* Left: Summary & Rows Per Page */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
+            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant text-center sm:text-left">
+              Showing <span className="font-bold text-on-surface">{displayStart}-{displayEnd}</span> of{" "}
+              <span className="font-bold text-on-surface">{totalItems}</span> items
+            </p>
             {onLimitChange && (
-              <Select
-                value={String(itemsPerPage)}
-                onValueChange={(val) => onLimitChange(Number(val))}
-              >
-                <SelectTrigger className="h-8 w-[70px] text-xs bg-white border-outline-variant rounded-md">
-                  <SelectValue placeholder={String(itemsPerPage)} />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-outline-variant shadow-md">
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-outline font-medium">Rows per page:</span>
+                <Select
+                  value={String(itemsPerPage)}
+                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
+                >
+                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
+                    <SelectValue placeholder="Per Page" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
+                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
+                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
+                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
+                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Right: Responsive Page Navigation */}
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center w-full lg:w-auto">
+            {/* First Page Button */}
             <Button
               variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage - 1)}
+              size="icon"
               disabled={currentPage <= 1}
-              className="h-8 px-3 text-xs font-bold border-outline-variant rounded-lg cursor-pointer disabled:opacity-50"
+              onClick={() => onPageChange(1)}
+              title="First page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              <ChevronLeft className="h-3.5 w-3.5 mr-1" />
-              Previous
+              <ChevronsLeft className="size-4" />
             </Button>
 
-            <span className="text-xs text-on-surface font-semibold px-2">
-              Page {currentPage} of {totalPages}
-            </span>
-
+            {/* Previous Page Button */}
             <Button
               variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="h-8 px-3 text-xs font-bold border-outline-variant rounded-lg cursor-pointer disabled:opacity-50"
+              size="icon"
+              disabled={currentPage <= 1}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+              title="Previous page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              Next
-              <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              <ChevronLeft className="size-4" />
+            </Button>
+
+            {/* Numbered Page Buttons & Ellipses */}
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              {getPaginationItems(currentPage, totalPages).map((pItem, i) => {
+                if (pItem === "ellipsis-start" || pItem === "ellipsis-end") {
+                  return (
+                    <span
+                      key={`${pItem}-${i}`}
+                      className="flex size-8 sm:size-9 items-center justify-center text-xs text-muted-foreground select-none"
+                    >
+                      <MoreHorizontal className="size-4" />
+                    </span>
+                  )
+                }
+
+                const pageNum = pItem as number
+                const isCurrent = currentPage === pageNum
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={isCurrent ? "default" : "outline"}
+                    size="icon"
+                    onClick={() => onPageChange(pageNum)}
+                    className={cn(
+                      "size-8 sm:size-9 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                      isCurrent
+                        ? "bg-primary font-bold text-white hover:bg-primary shadow-xs"
+                        : "border-outline-variant/60 bg-white hover:bg-surface-container-high text-on-surface hover:text-primary"
+                    )}
+                  >
+                    {pageNum}
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Next Page Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+              title="Next page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronRight className="size-4" />
+            </Button>
+
+            {/* Last Page Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(totalPages)}
+              title="Last page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronsRight className="size-4" />
             </Button>
           </div>
         </div>

@@ -1,11 +1,11 @@
-export const ESSAY_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-  { value: "এনসিটিবি টেক্সটবুক", label: "এনসিটিবি টেক্সটবুক" },
-  { value: "বোর্ড প্রশ্ন", label: "বোর্ড প্রশ্ন" },
-  { value: "মডেল টেস্ট", label: "মডেল টেস্ট" },
-  { value: "শ্রেণি পরীক্ষা", label: "শ্রেণি পরীক্ষা" },
-  { value: "অন্যান্য", label: "অন্যান্য" },
-] as const
+import {
+  QUESTION_SOURCE_OPTIONS,
+  type QuestionSource,
+  DEFAULT_SOURCE,
+  DEFAULT_QUESTION_SOURCE,
+} from "@workspace/utils"
 
-export type EssaySource = (typeof ESSAY_SOURCE_OPTIONS)[number]["value"]
+export const ESSAY_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type EssaySource = QuestionSource
+export const DEFAULT_ESSAY_SOURCE = DEFAULT_QUESTION_SOURCE
+export { DEFAULT_SOURCE }

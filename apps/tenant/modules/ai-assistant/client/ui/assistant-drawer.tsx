@@ -44,7 +44,7 @@ export const AssistantDrawer: React.FC = () => {
             </div>
             <div>
               <SheetTitle className="text-sm font-semibold flex items-center gap-2">
-                শিখনারী এআই সহকারী
+                শিখনারী AI সহকারী
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
                   Llama 3.3
                 </Badge>
@@ -76,7 +76,7 @@ export const AssistantDrawer: React.FC = () => {
               <div className="w-12 h-12 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
                 <Bot className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-sm">স্বাগতম! আমি আপনার এআই সহকারী</h3>
+              <h3 className="font-semibold text-sm">স্বাগতম! আমি আপনার AI সহকারী</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 আমি যেকোনো শ্রেণির জন্য নতুন প্রশ্নপত্র তৈরি, মানবণ্টন ও বিষয় নির্ধারণ করতে পারি।
                 প্রশ্নপত্র তৈরির সাথে সাথে সরাসরি বিল্ডার ক্যানভাসে আপনাকে নিয়ে যাওয়া হবে।

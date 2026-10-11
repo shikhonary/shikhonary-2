@@ -31,6 +31,13 @@
     "update:poem-board-book-source": "npx -y tsx scripts/update-poem-board-book-source.ts",
     "update:question-source-session": "npx -y tsx scripts/update-question-source-session.ts",
     "update:today-word-meaning-source": "npx -y tsx scripts/update-today-word-meaning-source.ts",
+    "seed:class3-dan-bam-milkoron": "npx -y tsx scripts/seed-class3-dan-bam-milkoron.ts",
+    "seed:class3-punctuation": "npx -y tsx scripts/seed-class3-punctuation.ts",
+    "seed:class3-opposite-words": "npx -y tsx scripts/seed-class3-opposite-words.ts",
+    "seed:class3-synonyms": "npx -y tsx scripts/seed-class3-synonyms.ts",
+    "seed:class3-ek-kothay-prokash": "npx -y tsx scripts/seed-class3-ek-kothay-prokash.ts",
+    "seed:class3-paragraph": "npx -y tsx scripts/seed-class3-paragraph.ts",
+    "seed:class3-essay": "npx -y tsx scripts/seed-class3-essay.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -26,7 +26,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { JUKTOBORNO_SOURCE_OPTIONS } from "../constants"
+import { JUKTOBORNO_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createJuktobornoFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -62,6 +62,8 @@ export function CreateJuktobornoView() {
       juktoborno: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
     },
   })
 

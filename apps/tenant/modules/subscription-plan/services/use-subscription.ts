@@ -76,3 +76,11 @@ export function usePurchaseCreditPack() {
     })
   )
 }
+
+export function useQuestionTypePricing() {
+  return useQuery(trpc.credit.getPricing.queryOptions())
+}
+
+export function useEstimatePaperCost() {
+  return useMutation(trpc.credit.estimateCost.mutationOptions())
+}

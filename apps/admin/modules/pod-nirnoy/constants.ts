@@ -1,8 +1,5 @@
-export const POD_NIRNOY_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "পাঠ্যবই", label: "পাঠ্যবই" },
-  { value: "বোর্ড প্রশ্ন", label: "বোর্ড প্রশ্ন" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import { QUESTION_SOURCE_OPTIONS, type QuestionSource } from "@workspace/utils"
 
-export type PodNirnoySource = (typeof POD_NIRNOY_SOURCE_OPTIONS)[number]["value"]
+export const POD_NIRNOY_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type PodNirnoySource = QuestionSource
+

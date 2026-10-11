@@ -1,7 +1,12 @@
-export const DAN_BAM_MILKORON_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বোর্ড বই", label: "বোর্ড বই" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import {
+  QUESTION_SOURCE_OPTIONS,
+  type QuestionSource,
+  DEFAULT_SOURCE,
+  DEFAULT_QUESTION_SOURCE,
+} from "@workspace/utils"
 
-export type DanBamMilkoronSource = (typeof DAN_BAM_MILKORON_SOURCE_OPTIONS)[number]["value"]
+export const DAN_BAM_MILKORON_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type DanBamMilkoronSource = QuestionSource
+export const DEFAULT_DAN_BAM_MILKORON_SOURCE = DEFAULT_QUESTION_SOURCE
+export { DEFAULT_SOURCE }
+

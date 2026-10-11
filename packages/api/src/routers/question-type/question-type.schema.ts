@@ -47,3 +47,14 @@ export type UpdateQuestionTypeInput = z.infer<typeof updateQuestionTypeSchema>
 export const deleteQuestionTypeSchema = idSchema
 
 export type DeleteQuestionTypeInput = z.infer<typeof deleteQuestionTypeSchema>
+
+export const batchUpdateCreditCostsSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string().min(1),
+      creditCost: z.number().int().min(0, "Credit cost must be at least 0"),
+    })
+  ).min(1, "At least one item must be updated"),
+})
+
+export type BatchUpdateCreditCostsInput = z.infer<typeof batchUpdateCreditCostsSchema>

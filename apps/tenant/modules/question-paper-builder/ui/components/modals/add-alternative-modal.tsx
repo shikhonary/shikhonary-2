@@ -13,7 +13,7 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
-import { Split, ArrowRight, BookOpen, Layers, Loader2 } from "lucide-react";
+import { Split, ArrowRight, BookOpen, Layers, Loader2, Check, Search } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
@@ -24,7 +24,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
   return num
     .toString()
     .split("")
-    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
+    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit, 10)] || digit : digit))
     .join("");
 };
 
@@ -153,9 +153,22 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
 
   const [selectedCategory, setSelectedCategory] = useState<QuestionTypeCode>(primaryQuestionType);
   const [orLabel, setOrLabel] = useState("অথবা");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredOptions = useMemo(() => {
+    if (!searchQuery.trim()) return availableOptions;
+    const query = searchQuery.toLowerCase().trim();
+    return availableOptions.filter(
+      (opt) =>
+        opt.nameBn.toLowerCase().includes(query) ||
+        opt.nameEn.toLowerCase().includes(query) ||
+        opt.desc.toLowerCase().includes(query)
+    );
+  }, [availableOptions, searchQuery]);
 
   useEffect(() => {
     if (open) {
+      setSearchQuery("");
       if (availableOptions.some((opt) => opt.code === primaryQuestionType)) {
         setSelectedCategory(primaryQuestionType);
       } else if (availableOptions.length > 0) {
@@ -186,133 +199,177 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
     router.push(`/question-papers/${paperId}/distributions/${distId}/pick?${params.toString()}`);
   };
 
+  const primaryCategoryName =
+    CATEGORY_OPTIONS.find((c) => c.code === primaryQuestionType)?.nameBn || primaryQuestionType;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-6 font-display">
-        <DialogHeader className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <Split className="w-4 h-4" />
+      <DialogContent className="font-display sm:max-w-lg p-0 overflow-hidden bg-card border-border shadow-xl">
+        {/* Themed Header with Tinted Indigo Accent */}
+        <DialogHeader className="p-4 sm:p-6 pb-3 border-b border-border/60 bg-indigo-500/5 text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/20 shadow-2xs">
+              <Split className="w-5 h-5" />
             </div>
-            <DialogTitle className="text-lg font-bold">
-              বিকল্প (অথবা) প্রশ্নের ধরন নির্বাচন
-            </DialogTitle>
+            <div>
+              <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
+                বিকল্প (অথবা) প্রশ্নের ধরন নির্বাচন
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
+                {masterNumber ? `${toBengaliDigits(masterNumber)} নং প্রশ্নের জন্য ` : ""}
+                বিকল্প হিসেবে কোন ধরনের প্রশ্ন নির্বাচন করতে চান তা নির্ধারণ করুন
+              </DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-            {masterNumber ? `${toBengaliDigits(masterNumber)} নং প্রশ্নের জন্য ` : ""}
-            বিকল্প হিসেবে কোন ধরনের প্রশ্ন নির্বাচন করতে চান তা নির্ধারণ করুন।
-          </DialogDescription>
         </DialogHeader>
 
-        {/* Primary Question Info Pill */}
-        <div className="bg-muted/40 border rounded-lg p-3 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-muted-foreground" />
-            <span className="font-semibold text-foreground">
-              মূল প্রশ্ন: {masterNumber ? `${toBengaliDigits(masterNumber)}। ` : ""}
-              {CATEGORY_OPTIONS.find((c) => c.code === primaryQuestionType)?.nameBn || primaryQuestionType}
-            </span>
+        {/* Content Body */}
+        <div className="p-4 sm:p-6 space-y-4 font-body text-xs sm:text-sm max-h-[75vh] overflow-y-auto">
+          {/* Primary Question Info Banner */}
+          <div className="p-3.5 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/30">
+                <BookOpen className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[11px] text-muted-foreground font-medium block">মূল প্রশ্ন:</span>
+                <span className="font-bold text-foreground font-headline truncate block mt-0.5">
+                  {masterNumber ? `${toBengaliDigits(masterNumber)}। ` : ""}
+                  {primaryCategoryName}
+                </span>
+              </div>
+            </div>
+            {primaryMarks !== undefined && primaryMarks !== null && (
+              <Badge
+                variant="outline"
+                className="font-bold text-xs border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 shrink-0 font-headline"
+              >
+                মান: {toBengaliDigits(primaryMarks)}
+              </Badge>
+            )}
           </div>
-          {primaryMarks !== undefined && primaryMarks !== null && (
-            <Badge variant="outline" className="font-bold text-xs bg-background">
-              মান: {toBengaliDigits(primaryMarks)}
-            </Badge>
-          )}
-        </div>
 
-        <div className="space-y-4 my-2">
           {/* Question Type Selection */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-primary" />
-                বিকল্প প্রশ্নের ধরন (Question Type):
+              <label className="text-xs font-bold font-headline text-foreground flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>বিকল্প প্রশ্নের ধরন (Question Type):</span>
               </label>
               {isSubjectLoading && (
-                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-body">
+                  <Loader2 className="w-3 h-3 animate-spin text-indigo-600 dark:text-indigo-400" />
                   <span>লোড হচ্ছে...</span>
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-1 gap-2 max-h-56 overflow-y-auto pr-1">
-              {availableOptions.map((opt) => {
-                const isSelected = selectedCategory === opt.code;
-                return (
-                  <button
-                    key={opt.code}
-                    type="button"
-                    onClick={() => setSelectedCategory(opt.code)}
-                    className={`flex items-start justify-between p-2.5 rounded-lg border text-left transition-all ${
-                      isSelected
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-border hover:bg-muted/30"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-xs font-bold text-foreground">
-                        {opt.nameBn}
+
+            {/* Quick Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="প্রশ্নের ধরন খুঁজুন (যেমন: চিঠি, দরখাস্ত, অনুচ্ছেদ)..."
+                className="h-8.5 pl-8 text-xs rounded-xl bg-background border-border/80 font-body placeholder:text-muted-foreground/70"
+              />
+            </div>
+
+            {/* Types List Grid */}
+            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+              {filteredOptions.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground text-xs font-body">
+                  কোনো প্রশ্নের ধরন পাওয়া যায়নি।
+                </div>
+              ) : (
+                filteredOptions.map((opt) => {
+                  const isSelected = selectedCategory === opt.code;
+                  return (
+                    <button
+                      key={opt.code}
+                      type="button"
+                      onClick={() => setSelectedCategory(opt.code)}
+                      className={`w-full p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs active:scale-99 ${
+                        isSelected
+                          ? "border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/40 text-foreground ring-2 ring-indigo-500/30 shadow-xs"
+                          : "border-border/80 bg-background hover:bg-muted/40 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs sm:text-sm font-bold font-headline text-foreground truncate">
+                            {opt.nameBn}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            ({opt.nameEn})
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5 font-body">
+                          {opt.desc}
+                        </p>
                       </div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {opt.desc}
-                      </div>
-                    </div>
-                    {isSelected && (
-                      <Badge className="text-[10px] py-0 px-1.5 bg-primary text-primary-foreground">
-                        নির্বাচিত
-                      </Badge>
-                    )}
-                  </button>
-                );
-              })}
+
+                      {isSelected ? (
+                        <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                      ) : (
+                        <div className="w-5 h-5 rounded-full border border-border/80 shrink-0" />
+                      )}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 
           {/* Connector Label */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">
+          <div className="p-3.5 rounded-xl border border-border/80 bg-muted/20 space-y-2 shadow-2xs">
+            <label className="text-xs font-bold font-headline text-foreground block">
               সংযোগকারী লেবেল (Connector Label):
             </label>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
               <Input
                 value={orLabel}
                 onChange={(e) => setOrLabel(e.target.value)}
                 placeholder="অথবা"
-                className="h-8 text-xs font-bold w-32 text-center"
+                className="h-8.5 text-xs font-bold font-headline w-full sm:w-28 text-center bg-background rounded-xl border-border/80"
               />
-              <div className="flex gap-1">
+              <div className="flex gap-1.5 flex-wrap">
                 {["অথবা", "বা", "OR"].map((l) => (
-                  <Button
+                  <button
                     key={l}
                     type="button"
-                    variant={orLabel === l ? "secondary" : "outline"}
-                    size="sm"
-                    className="h-8 text-xs px-2.5 font-bold"
                     onClick={() => setOrLabel(l)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold font-headline transition-all cursor-pointer border ${
+                      orLabel === l
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
+                        : "bg-background border-border/80 hover:bg-muted/50 text-foreground"
+                    }`}
                   >
                     {l}
-                  </Button>
+                  </button>
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0 mt-3 pt-3 border-t">
+        {/* Modal Footer */}
+        <DialogFooter className="p-4 sm:p-5 pt-3 border-t border-border bg-card flex flex-col sm:flex-row items-center justify-end gap-2">
           <Button
             type="button"
-            variant="ghost"
-            size="sm"
+            variant="outline"
             onClick={() => onOpenChange(false)}
-            className="text-xs"
+            className="w-full sm:w-auto h-9 px-4 text-xs font-bold font-headline rounded-xl cursor-pointer"
           >
             বাতিল
           </Button>
+
           <Button
             type="button"
-            size="sm"
             onClick={handleProceedToPicker}
-            className="text-xs font-bold gap-1.5"
+            className="w-full sm:w-auto h-9 px-4.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold font-headline text-xs cursor-pointer gap-2 shadow-xs transition-all active:scale-95 disabled:opacity-50"
           >
             <span>গ্রিড ভিউতে প্রশ্ন নির্বাচন করুন</span>
             <ArrowRight className="w-3.5 h-3.5" />

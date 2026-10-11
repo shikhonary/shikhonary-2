@@ -1,0 +1,7389 @@
+[
+  {
+    "chapter": "আমাদের কথা",
+    "questions": [
+      {
+        "question": "আজ কীসের প্রথম দিন?",
+        "answer": "",
+        "options": [
+          "মেলা",
+          "হাট",
+          "স্কুল",
+          "ছুটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নতুন ক্লাসে উঠে রাজুদের কেমন লাগছিল?",
+        "answer": "",
+        "options": [
+          "ভয়",
+          "চিন্তিত",
+          "ভালো",
+          "খারাপ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজু কোন শ্রেণিতে পড়ে?",
+        "answer": "",
+        "options": [
+          "চতুর্থ",
+          "তৃতীয়",
+          "পঞ্চম",
+          "দ্বিতীয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর সাথে কে আছে?",
+        "answer": "",
+        "options": [
+          "বাবা",
+          "মা",
+          "ভাই",
+          "বন্ধুরা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে রাজুর বন্ধু?",
+        "answer": "",
+        "options": [
+          "মীনা",
+          "তিথি",
+          "মিমি",
+          "নিপু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে রাজুর বন্ধু নয়?",
+        "answer": "",
+        "options": [
+          "তিথি",
+          "মিতু",
+          "ঝিমিত",
+          "হিমু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর হাতে কোন বই?",
+        "answer": "",
+        "options": [
+          "গণিত",
+          "বাংলা",
+          "ইংরেজি",
+          "বিজ্ঞান"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুরা বই পড়বে আর কী করবে?",
+        "answer": "",
+        "options": [
+          "খেলা",
+          "গান",
+          "মজা",
+          "নাচ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বন্ধুদের জন্য কে চকলেট এনেছে?",
+        "answer": "",
+        "options": [
+          "তিথি",
+          "রাজু",
+          "মিতু",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে চকলেট খাবে?",
+        "answer": "",
+        "options": [
+          "তিথি",
+          "মিতু",
+          "ঝিমিত",
+          "উপরের সবাই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তিথিকে কে ধন্যবাদ জানালো?",
+        "answer": "",
+        "options": [
+          "মিতু",
+          "ঝিমিত",
+          "রাজু",
+          "কেউ নয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বন্ধুদের কথাবার্তায় কে কথা বলেনি?",
+        "answer": "",
+        "options": [
+          "রাজু",
+          "তিথি",
+          "মিতু",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আমাদের পরিবার ও আমাদের প্রতিবেশী",
+    "questions": [
+      {
+        "question": "রাজু কোন শ্রেণিতে পড়ে?",
+        "answer": "",
+        "options": [
+          "তৃতীয়",
+          "চতুর্থ",
+          "পঞ্চম",
+          "অষ্টম"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর কয়জন বোন?",
+        "answer": "",
+        "options": [
+          "এ",
+          "ক",
+          "দুই",
+          "তিন",
+          "চার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর বোনের নাম কী?",
+        "answer": "",
+        "options": [
+          "মিতু",
+          "তিথি",
+          "তুলি",
+          "মিলি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজু কার সাথে স্কুলে যায়?",
+        "answer": "",
+        "options": [
+          "মা",
+          "বাবা",
+          "ভাই",
+          "বোন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তুলি কোন শ্রেণিতে পড়ে?",
+        "answer": "",
+        "options": [
+          "তৃতীয়",
+          "চতুর্থ",
+          "পঞ্চম",
+          "ষষ্ঠ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর বাবা একজন—",
+        "answer": "",
+        "options": [
+          "শ্রমি",
+          "ক",
+          "কৃষক",
+          "মিস্ত্রি",
+          "দিনমজুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর মায়ের কীসের খামার আছে?",
+        "answer": "",
+        "options": [
+          "গরুর",
+          "ছাগলের",
+          "ভেড়ার",
+          "হাঁস-মুরগির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজুর প্রতিবেশী কে?",
+        "answer": "",
+        "options": [
+          "মিতু",
+          "সেতু",
+          "তিথি",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমাদের আশেপাশে যাঁরা থাকেন, তাঁরা আমাদের—",
+        "answer": "",
+        "options": [
+          "আত্মীয়",
+          "অনাত্মীয়",
+          "প্রতিবেশী",
+          "কেউ না"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুরা কয় বোন?",
+        "answer": "",
+        "options": [
+          "এ",
+          "ক",
+          "দুই",
+          "তিন",
+          "চার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর বড়ো বোন কোথায় পড়েন?",
+        "answer": "",
+        "options": [
+          "কলেজে",
+          "হাইস্কুলে",
+          "ভার্সিটিতে",
+          "মাদরাসায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর বড়ো বোন রাজুদের কী করেন?",
+        "answer": "",
+        "options": [
+          "শাসন",
+          "সম্মান",
+          "আদর",
+          "বকাঝকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর বাবার কীসের দোকান আছে?",
+        "answer": "",
+        "options": [
+          "কাপড়ের",
+          "জুতার",
+          "বইয়ের",
+          "খাবারের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর বাবার দোকানের নাম কী?",
+        "answer": "",
+        "options": [
+          "সোনালি লাইব্রেরি",
+          "রূপালি লাইব্রেরি",
+          "পুবালি লাইব্রেরি",
+          "দক্ষিণা লাইব্রেরি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর মা কোথায় কাজ করেন?",
+        "answer": "",
+        "options": [
+          "হাসপাতালে",
+          "বইয়ের দোকানে",
+          "স্কুলে",
+          "অন্যের বাড়িতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিতুর মায়ের পেশা কী?",
+        "answer": "",
+        "options": [
+          "ডাক্তার",
+          "নার্স",
+          "স্কুল শিক্ষ",
+          "ক",
+          "গৃহিণী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ময়লার বাক্স",
+    "questions": [
+      {
+        "question": "দোকানদারের নাম কী?",
+        "answer": "",
+        "options": [
+          "হাসিব",
+          "সাগর",
+          "হারুন",
+          "রুবেল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "দোকানদার প্রথমে কী বিক্রি করেছিল?",
+        "answer": "",
+        "options": [
+          "চানাচুর",
+          "বিস্কুট",
+          "মুড়ি",
+          "কলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কলার খোসায়—",
+        "answer": "",
+        "options": [
+          "পরিবেশ দূষিত হতে পারে",
+          "কেউ আছাড় খেতে পারে",
+          "ময়লা হতে পারে",
+          "দুর্গন্ধ হতে পারে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হারুন মামা, আমাকে এক প্যাকেট ............ দাও।",
+        "answer": "",
+        "options": [
+          "বিস্কুট",
+          "চানাচুর",
+          "মুড়ি",
+          "লবণ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সবাই কোথায় ময়লা ফেলছে?",
+        "answer": "",
+        "options": [
+          "ঘরের সামনে",
+          "যেখানে-সেখানে",
+          "নির্দিষ্ট স্থানে",
+          "রাস্তার ওপর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রেবা দোকানদারকে কী নামে ডেকেছিল?",
+        "answer": "",
+        "options": [
+          "হারু মামা",
+          "হারুন চাচা",
+          "হারুন কাকা",
+          "হারুন মামা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রেবা দোকানদারের কাছে কী চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "কলা",
+          "বিস্কুট",
+          "বাক্সো",
+          "চানাচুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রেবা কয়টি বাক্সো চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "একটি",
+          "দুইটি",
+          "তিনটি",
+          "চারটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রেবা কীসের বাক্সো চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "প্লাস্টিকের",
+          "টিনের",
+          "স্টিলের",
+          "কাগজের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রেবা বাক্সো ছাড়া আর কী চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "চকোলেট",
+          "বিস্কুট",
+          "কলম",
+          "কিছুই না"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ময়লা বাক্সে ফেলার বুদ্ধি কার?",
+        "answer": "",
+        "options": [
+          "রেবার",
+          "দোকানদারের",
+          "নানার",
+          "কারও না"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কলার খোসা খায়—",
+        "answer": "",
+        "options": [
+          "ছাগল",
+          "মুরগি",
+          "মানুষ",
+          "হাঁস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আবার পড়ি কারচিহ্ন",
+    "questions": [
+      {
+        "question": "( ৃ) ঋ-কার যুক্ত শব্দ কোনটি?",
+        "answer": "",
+        "options": [
+          "কামার",
+          "কুমার",
+          "কৃষ",
+          "ক",
+          "কুপ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ভোর' শব্দটিতে কোন কার আছে?",
+        "answer": "",
+        "options": [
+          "া",
+          "ু",
+          "(",
+          "ে  \t(",
+          "ে া"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন শব্দটিতেৈ -কার নেই?",
+        "answer": "",
+        "options": [
+          "তৈরি",
+          "প্রমাণ",
+          "শৈবাল",
+          "কৈলাস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'মোরগ ডাকছে'— বাক্যটিতেে া-কার যুক্ত বর্ণ কোনটি?",
+        "answer": "",
+        "options": [
+          "ছ",
+          "গ",
+          "ম",
+          "ড"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন শব্দে ু-কার আছে?",
+        "answer": "",
+        "options": [
+          "মোর",
+          "তার",
+          "দূর",
+          "সুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঔ-কার কোনটি?",
+        "answer": "",
+        "options": [
+          "(",
+          "ে  \t(",
+          "ে া",
+          "(",
+          "ৈ  \t(",
+          "ে ৗ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন শব্দটিতেে -কার নেই?",
+        "answer": "",
+        "options": [
+          "বেশ",
+          "শেষ",
+          "মাসি",
+          "কেশ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'নৌকা চলে'— বাক্যেে ৗ-কার যুক্ত শব্দ কোনটি?",
+        "answer": "",
+        "options": [
+          "চলে",
+          "নৌকা",
+          "বাক্য",
+          "শব্দ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আবার পড়ি ফলাচিহ্ন",
+    "questions": [
+      {
+        "question": "নিচের কোনটি ব-ফলা?",
+        "answer": "",
+        "options": [
+          "ণ",
+          "্ব",
+          "্য",
+          "্র"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ম-ফলা ব্যবহৃত হয়েছে নিচের কোনটিতে?",
+        "answer": "",
+        "options": [
+          "স্মরণ",
+          "মগ্ন",
+          "লগ্ন",
+          "বজ্র"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "‘্য’— এটি কোন ফলা?",
+        "answer": "",
+        "options": [
+          "ব-ফলা",
+          "য-ফলা",
+          "ম-ফলা",
+          "র-ফলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "য-ফলা যুক্ত শব্দ কোনটি?",
+        "answer": "",
+        "options": [
+          "বিশ্ব",
+          "পদ্ম",
+          "ধন্যবাদ",
+          "গ্রহ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন ফলাটি বর্ণের পাশে যুক্ত করতে হয়?",
+        "answer": "",
+        "options": [
+          "ব-ফলা",
+          "ম-ফলা",
+          "য-ফলা",
+          "র-ফলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "দেখে বুঝে কাজ করি",
+    "questions": [
+      {
+        "question": "চিহ্নটি দিয়ে কী বোঝায়?",
+        "answer": "",
+        "options": [
+          "সামনে হাসপাতাল",
+          "থামুন",
+          "সামনে রেলক্রসিং",
+          "পথচারী পারাপার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "চিহ্নটি দিয়ে কী বোঝায়?",
+        "answer": "",
+        "options": [
+          "রিকশা চলাচল নিষেধ",
+          "সাইকেল চলাচল নিষেধ",
+          "রিকশা চলবে",
+          "রিকশা আছে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সংকেতটি কীসের?",
+        "answer": "",
+        "options": [
+          "সামনে টয়লেট",
+          "থামুন",
+          "সামনে রেলক্রসিং",
+          "পথচারী পারাপার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সংকেতটি দ্বারা কী বোঝায়?",
+        "answer": "",
+        "options": [
+          "সামনে হাসপাতাল",
+          "থামুন",
+          "রিকশা চলবে",
+          "সামনে রেলক্রসিং"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ছবিটি দিয়ে কী বোঝায়?",
+        "answer": "",
+        "options": [
+          "এখানে ময়লা ফেলি",
+          "খ",
+          "টয়লেট ব্যবহার করি",
+          "হাত ধুই",
+          "সামনে হাসপাতাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ঘাসফড়িং আর পিঁপড়ার গল্প",
+    "questions": [
+      {
+        "question": "ঘাসফড়িং কোথায় খেলা করছিল?",
+        "answer": "",
+        "options": [
+          "ঘাসের উপর",
+          "গাছের উপর",
+          "ফুলের উপর",
+          "বাড়ির ছাদে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিঁপড়া রোদের মধ্যে কী টেনে নিয়ে যাচ্ছে?",
+        "answer": "",
+        "options": [
+          "খড়",
+          "ঘাস",
+          "বোঝা",
+          "মাটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিঁপড়া শীঘ্রই কোন কাল এসে যাওয়ার কথা বলে?",
+        "answer": "",
+        "options": [
+          "শরৎ",
+          "শীত",
+          "বসন্ত",
+          "গ্রীষ্ম"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিঁপড়া কোন কাল থাকতেই খাবার সঞ্চয় করে?",
+        "answer": "",
+        "options": [
+          "শীতকাল",
+          "বর্ষাকাল",
+          "বসন্তকাল",
+          "গরমকাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শীতকাল এসে গেলে পিঁপড়া কী করতে পারবে না?",
+        "answer": "",
+        "options": [
+          "খেতে পারবে না",
+          "ঘর থেকে বের হতে পারবে না",
+          "খেলতে পারবে না",
+          "গান গাইতে পারবে না"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং পিঁপড়াকে কী ভাবে?",
+        "answer": "",
+        "options": [
+          "বুদ্ধিমান",
+          "চালাক",
+          "বোকা",
+          "রাগী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কখন সূর্যের তাপ কমে যায়?",
+        "answer": "",
+        "options": [
+          "গ্রীষ্মকালে",
+          "শীতকালে",
+          "শরৎকালে",
+          "হেমন্তকালে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং কখন খাবার খুঁজে পায় না?",
+        "answer": "",
+        "options": [
+          "শীতকালে",
+          "গ্রীষ্মকালে",
+          "বসন্তকালে",
+          "হেমন্তকালে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং পিঁপড়ার কাছে কী চায়?",
+        "answer": "",
+        "options": [
+          "খেলনা",
+          "শীতবস্ত্র",
+          "ভালোবাসা",
+          "খাবার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে সময়ের কাজ সময়ে করেছে?",
+        "answer": "",
+        "options": [
+          "পিঁপড়ার বন্ধু",
+          "ঘাসফড়িং",
+          "পিঁপড়া",
+          "গুবরে পোকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ভাদ্র ও আশ্বিন মাস মিলে কোন কাল?",
+        "answer": "",
+        "options": [
+          "শীতকাল",
+          "শরৎকাল",
+          "গ্রীষ্মকাল",
+          "বসন্তকাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'সঞ্চয়' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "কুয়াশা",
+          "কাজ",
+          "সূর্য",
+          "জমা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং আর পিঁপড়ার গল্পে কোন বিষয়ের উপর গুরুত্ব দেওয়া হয়েছে?",
+        "answer": "",
+        "options": [
+          "সময়ের কাজ সময়ে করা",
+          "খেলা করা",
+          "নাচ করা",
+          "বোঝা টানা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিঁপড়া গরমকালে কী করেছে?",
+        "answer": "",
+        "options": [
+          "খেলা করেছে",
+          "নাচ করেছে",
+          "খাবার সঞ্চয় করেছে",
+          "গান করেছে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং শীতকালে কী খুঁজে পায় না?",
+        "answer": "",
+        "options": [
+          "সময়",
+          "খাবার",
+          "খেলার সাথি",
+          "কাজ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং কেন গরমকালে খাবার সঞ্চয় করেনি?",
+        "answer": "",
+        "options": [
+          "কারণ সে বুদ্ধিমান",
+          "কারণ সে চালাক",
+          "কারণ সে বোকা",
+          "কারণ সে চঞ্চল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "চারপাশে রোদ ঝলমল করছে কোন সময়?",
+        "answer": "",
+        "options": [
+          "সকালে",
+          "দুপুরে",
+          "বিকেলে",
+          "সন্ধ্যায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসফড়িং কেন তিড়িং বিড়িং করে খেলা করছিল?",
+        "answer": "",
+        "options": [
+          "ক্লান্ত হয়ে",
+          "রাগে",
+          "খুশিতে",
+          "দুঃখে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'পিঁপড়া রোদের মধ্যে একটা বোঝা টেনে নিয়ে যাচ্ছে'- এর দ্বারা পিঁপড়ার কোন বৈশিষ্ট্যটি ফুটে উঠেছে?",
+        "answer": "",
+        "options": [
+          "অলস",
+          "কর্মঠ",
+          "বোকা",
+          "দুর্বল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'পিঁপড়া বলল, না ভাই, আমার অনেক কাজ।' এখানে পিঁপড়া কেন কাজ করছে?",
+        "answer": "",
+        "options": [
+          "ভবিষ্যতের সঞ্চয়ের জন্য",
+          "তার কাজ করতে ভালো লাগে এজন্য",
+          "ঘাসফড়িং খেলা করছে এজন্য",
+          "বসে থাকলে ঘুম পায় এজন্য"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আমি হব",
+    "questions": [
+      {
+        "question": "'আমি হব' কবিতার রচয়িতা কে?",
+        "answer": "",
+        "options": [
+          "জসিমউদ্‌দীন",
+          "কাজী নজরুল ইসলাম",
+          "আল মাহমুদ",
+          "রবীন্দ্রনাথ ঠাকুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে পাখি হতে চায়?",
+        "answer": "",
+        "options": [
+          "দিদা",
+          "খুকি",
+          "খোকা",
+          "মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকা কোন বেলার পাখি হতে চায়?",
+        "answer": "",
+        "options": [
+          "সন্ধ্যা",
+          "বিকাল",
+          "দুপুর",
+          "সকাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কুসুম-বাগে খোকা কী করে উঠবে?",
+        "answer": "",
+        "options": [
+          "কেঁদে",
+          "নেচে",
+          "ডেকে",
+          "গেয়ে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকা কার জাগার আগে জেগে উঠবে?",
+        "answer": "",
+        "options": [
+          "বাবা",
+          "কাকা",
+          "সূর্য",
+          "মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সূর্যকে খোকা কী বলে ডাকে?",
+        "answer": "",
+        "options": [
+          "সুয্যি দাদা",
+          "সুয্যি মামা",
+          "সুয্যি ভাই",
+          "সুয্যি বুড়ো"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকার ওপর কে রেগে উঠবে?",
+        "answer": "",
+        "options": [
+          "বোন",
+          "বাবা",
+          "ভাই",
+          "মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকা কাকে 'আলসে মেয়ে' বলবে?",
+        "answer": "",
+        "options": [
+          "ছোটো বোনকে",
+          "মাকে",
+          "দাদিকে",
+          "বড়ো বোনকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকা কাকে ঘুমিয়ে থাকার জন্য বলবে?",
+        "answer": "",
+        "options": [
+          "বাবাকে",
+          "ছোটো ভাইকে",
+          "ছোটো বোনকে",
+          "মাকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীভাবে রাত পোহাবে?",
+        "answer": "",
+        "options": [
+          "স্কুলে যাওয়ার সময় হলে",
+          "বাবা কাজে গেলে",
+          "খোকা ঘুম থেকে জাগলে",
+          "মা ডেকে তুললে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আলসে' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "ফুলবাগান",
+          "অলস",
+          "বোকা",
+          "চালাক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকা কার ওঠার আগে উঠবে বলে বোঝানো হয়েছে?",
+        "answer": "",
+        "options": [
+          "সুয্যি মামার",
+          "পাখির",
+          "মায়ের",
+          "বাবার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি কী হলে উন্নতি করা যায় না বলে বুঝিয়েছেন?",
+        "answer": "",
+        "options": [
+          "রা",
+          "গ",
+          "অলস",
+          "বেলা",
+          "সকাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি 'আমি হব' কবিতাটিতে কোন বিষয়ের উপর গুরুত্ব দিয়েছেন?",
+        "answer": "",
+        "options": [
+          "সময়নিষ্ঠার",
+          "অলস হওয়ার",
+          "পরিশ্রমের",
+          "রা",
+          "হওয়ার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ব্যাঙের সাজা",
+    "questions": [
+      {
+        "question": "প্রশ্ন বোঝায় এমন বাক্যের শেষে বসে—",
+        "answer": "",
+        "options": [
+          ",",
+          "।",
+          "?",
+          "—"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিঁপড়া পিলপিল করে গেল—",
+        "answer": "",
+        "options": [
+          "শহরের কাছে",
+          "মাটির গর্তে",
+          "কাঁঠাল গাছের তলায়",
+          "রাজার দরবারে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "লেজ থেকে রক্ত ঝরছে—",
+        "answer": "",
+        "options": [
+          "হরিণের",
+          "সাপের",
+          "বুলবুলির",
+          "মুরগির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ব্যাঙ বেড়াতে গিয়েছিল —",
+        "answer": "",
+        "options": [
+          "মুরগির বাড়িতে",
+          "গর্তে",
+          "গ্রামে",
+          "শহরে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোথায় খুব অশান্তি শুরু হলো?",
+        "answer": "",
+        "options": [
+          "বনে",
+          "শহরে",
+          "রাজদরবারে",
+          "গ্রামে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মুরগি কার বাসা ভেঙেছে?",
+        "answer": "",
+        "options": [
+          "সাপের",
+          "পিঁপড়ার",
+          "ব্যাঙের",
+          "পাখির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে মুরগির ডিম ভেঙে ফেলেছে?",
+        "answer": "",
+        "options": [
+          "সাপ",
+          "ব্যাঙ",
+          "সারস",
+          "বুলবুলি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কার চোখে ভয়?",
+        "answer": "",
+        "options": [
+          "সাপের",
+          "হরিণের",
+          "ব্যাঙের",
+          "সারসের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হরিণ কীসের দ্বারা সাপকে আঘাত করেছে?",
+        "answer": "",
+        "options": [
+          "খুর",
+          "নখ",
+          "দাঁত",
+          "লেজ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে ডানা ঝাপটেছিল?",
+        "answer": "",
+        "options": [
+          "বুলবুলি",
+          "চড়ুই",
+          "মুরগি",
+          "সারস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে সারসের মুখে ঢুকে পড়েছিল?",
+        "answer": "",
+        "options": [
+          "বুলবুলি",
+          "চড়ুই",
+          "পিঁপড়া",
+          "সাপ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কার মুখে বুলবুলি ঝড়ের কথা শুনেছিল?",
+        "answer": "",
+        "options": [
+          "ব্যাঙের",
+          "চড়ুইয়ের",
+          "মুরগির",
+          "হরিণের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ব্যাঙকে কীভাবে রাজদরবারে আনা হলো?",
+        "answer": "",
+        "options": [
+          "চ্যাংদোলা করে",
+          "টেনে হিঁচড়ে",
+          "বেঁধে",
+          "কোনোটিই নয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ব্যাঙ কোথায় লুকিয়েছিল?",
+        "answer": "",
+        "options": [
+          "গাছের উপরে",
+          "গাছের নিচে",
+          "নদীতে",
+          "বনে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীসের জন্য ব্যাঙের শাস্তি হবে?",
+        "answer": "",
+        "options": [
+          "গুজব রটিয়ে বলে",
+          "মুরগির ডিম ভাঙায়",
+          "পিঁপড়ার বাসা ভাঙায়",
+          "সাপ আঘাত পাওয়ায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন গাছের তলায় ব্যাঙকে নিয়ে যাওয়া হলো?",
+        "answer": "",
+        "options": [
+          "আম",
+          "কাঁঠাল",
+          "জাম",
+          "পেয়ারা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'গুজব' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "ছড়ানো",
+          "মিথ্যা তথ্য",
+          "সত্য তথ্য",
+          "সৈনিক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজার সিপাইরা ব্যাঙটাকে কোথায় নিয়ে গেল?",
+        "answer": "",
+        "options": [
+          "বকুল তলায়",
+          "আম তলায়",
+          "কাঁঠাল গাছের তলায়",
+          "রাজসভায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বনের শান্তি নষ্ট করার মূলে কে ছিল?",
+        "answer": "",
+        "options": [
+          "পিঁপড়া",
+          "রাজা",
+          "ব্যাঙ",
+          "বুলবুলি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ব্যাঙের সাজা' গল্পে সিপাইরা বুলবুলিকে নিয়ে এলো কেন?",
+        "answer": "",
+        "options": [
+          "রাজার আদেশে",
+          "বুলবুলির ইচ্ছায়",
+          "সারসের অভিযোগে",
+          "ব্যাঙের কথায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাঁচার জন্য বুলবুলি সারসের মুখে ঢুকেছিল কেন?",
+        "answer": "",
+        "options": [
+          "সারসকে কষ্ট দিতে",
+          "সাহস দেখিয়ে",
+          "নিজে ভয় পেয়ে",
+          "ব্যাঙের উপকার করতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ব্যাঙের সাজা' গল্পে মিথ্যে ভয় দেখানো বলতে কী বোঝানো হয়েছে?",
+        "answer": "",
+        "options": [
+          "গুজব ছড়ানো",
+          "সতর্",
+          "করা",
+          "হুমকি দেওয়া",
+          "ক্ষমতা জাহির করা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আনন্দের দিন",
+    "questions": [
+      {
+        "question": "কী বাজতেই আপা ক্লাসে এলেন?",
+        "answer": "",
+        "options": [
+          "ঘণ্টা",
+          "সাইরেন",
+          "বাঁশি",
+          "হর্ন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ক্লাসের সবাই হৈ হৈ করে উঠল কেন?",
+        "answer": "",
+        "options": [
+          "রা",
+          "করে",
+          "আনন্দে",
+          "বিরক্ত হয়ে",
+          "আপা চলে যাওয়ায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে জাদুঘরে যাওয়ার কথা বলল?",
+        "answer": "",
+        "options": [
+          "রাজু",
+          "তপু",
+          "তুলি",
+          "আপা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজু কোথায় যাওয়ার কথা বলল?",
+        "answer": "",
+        "options": [
+          "পার্কে",
+          "শিশুপার্কে",
+          "জাদুঘরে",
+          "কেল্লায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে সবার মধ্যে দায়িত্ব ভাগ করে দিলেন?",
+        "answer": "",
+        "options": [
+          "রাজু",
+          "তপু",
+          "তুলি",
+          "আপা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আপা সবার মধ্যে কী ভাগ করে দিলেন?",
+        "answer": "",
+        "options": [
+          "দায়িত্ব",
+          "খাবার",
+          "নোটবু",
+          "ক",
+          "কলম"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কয়টার মধ্যে সবাই চলে আসবে?",
+        "answer": "",
+        "options": [
+          "আটটা",
+          "নয়টা",
+          "দশটা",
+          "এগারোটা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী পরে আসতে হবে?",
+        "answer": "",
+        "options": [
+          "স্কুলের পোশা",
+          "ক",
+          "শার্ট",
+          "ফ্র",
+          "ক",
+          "গেঞ্জি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিচের কোন জিনিসটি আপা সাথে নিতে বললেন?",
+        "answer": "",
+        "options": [
+          "জামাকাপড়",
+          "খাবার",
+          "বই-খাতা",
+          "নোটবুক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবে সবাই স্কুল মাঠে জড়ো হলেন?",
+        "answer": "",
+        "options": [
+          "শনিবার",
+          "রবিবার",
+          "সোমবার",
+          "মঙ্গলবার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সবার নাম লিখে রাখতে কাকে বলা হলো?",
+        "answer": "",
+        "options": [
+          "মিলিকে",
+          "তুলিকে",
+          "রাজুকে",
+          "মিতুকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে কে গান গেয়ে শোনাল?",
+        "answer": "",
+        "options": [
+          "আপা ও রাজু",
+          "রাজু ও তুলি",
+          "মিতু ও তুলি",
+          "রাজু ও মিতু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "জাদুঘরে কী থাকে?",
+        "answer": "",
+        "options": [
+          "প্রাণী",
+          "জাদুকর",
+          "পুরাতন অস্ত্র-মুদ্রা",
+          "পুরাতন গাড়ি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "লালবাগ কেল্লা কোথায় অবস্থিত?",
+        "answer": "",
+        "options": [
+          "ঢাকায়",
+          "কুমিল্লায়",
+          "রাজশাহীতে",
+          "চট্টগ্রামে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ক্লাসে শিক্ষার পাশাপাশি শিশুদের প্রয়োজন—",
+        "answer": "",
+        "options": [
+          "শাসন",
+          "আনন্দ",
+          "শরীর চর্চা",
+          "কোনোটি নয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "বালুচরে একদিন",
+    "questions": [
+      {
+        "question": "তিথির গ্রামের নাম—",
+        "answer": "",
+        "options": [
+          "মধুপুর",
+          "অচিনপুর",
+          "শফিপুর",
+          "নাজিরপুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নদীর চরে পাখিদের মেলা বসার কথা বললেন—",
+        "answer": "",
+        "options": [
+          "গণেশ কাকা",
+          "হামিদ চাচা",
+          "নাদের চাচা",
+          "মধু কাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মাটি দিয়ে শখের হাঁড়ি বানান—",
+        "answer": "",
+        "options": [
+          "নাদের চাচা",
+          "হামিদ চাচা",
+          "মধু কাকা",
+          "গণেশ কাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নলখাগড়ার ঝোপে চুপচাপ বসে আছে—",
+        "answer": "",
+        "options": [
+          "মাছরাঙা",
+          "গাঙচিল",
+          "শালি",
+          "ক",
+          "সাদা বক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "যে ঘটনাটি আগের—",
+        "answer": "",
+        "options": [
+          "পাখিরা আকাশে উড়ছে।",
+          "তোমাকে গল্প শোনাব।",
+          "কে যেন এগিয়ে আসছে।",
+          "তিনি দাওয়াত দিয়েছিলেন।"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তিথির গ্রামের নাম কী?",
+        "answer": "",
+        "options": [
+          "দুর্গাপুর",
+          "পিরোজপুর",
+          "অচিনপুর",
+          "গৌরিপুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীসের ছুটিতে তিথিরা বেড়াতে এসেছে?",
+        "answer": "",
+        "options": [
+          "ঈদের",
+          "গ্রীষ্মের",
+          "শীতের",
+          "পূজার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তিথি মন ভরে কী দেখে?",
+        "answer": "",
+        "options": [
+          "কার্টুন",
+          "সিনেমা",
+          "খেলা",
+          "প্রকৃতি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নদীর চরে কীসের মেলা বসে?",
+        "answer": "",
+        "options": [
+          "পাখিদের",
+          "মাছের",
+          "পোকার",
+          "ঝিনুকের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নাদের চাচার পেশা কী?",
+        "answer": "",
+        "options": [
+          "কামার",
+          "মাঝি",
+          "কুমার",
+          "জেলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খপ করে মাছ ধরে কে?",
+        "answer": "",
+        "options": [
+          "ব",
+          "ক",
+          "ডাহুক",
+          "পানকৌড়ি",
+          "কাক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গণেশ কাকা কী নিয়ে হাজির হয়েছিলেন?",
+        "answer": "",
+        "options": [
+          "মিঠাই",
+          "শখের হাঁড়ি",
+          "নৌকা",
+          "মাছ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নৌকায় বসে তিথি কী দেখতে পায়নি?",
+        "answer": "",
+        "options": [
+          "বটতলা",
+          "স্কুল",
+          "মাঠ",
+          "মন্দির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "স্কুলে শিক্ষকতা করেন কে?",
+        "answer": "",
+        "options": [
+          "নাদের চাচা",
+          "মধু কাকা",
+          "হামিদ চাচা",
+          "গণেশ কাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নলখাগড়ার ঝোপে বসেছিল কোন পাখি?",
+        "answer": "",
+        "options": [
+          "ব",
+          "ক",
+          "মাছরাঙা",
+          "গাঙচিল",
+          "শালিক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নাদের চাচার ঝুড়িতে কী মাছ ছিল না?",
+        "answer": "",
+        "options": [
+          "রুই",
+          "পাবদা",
+          "পুঁটি",
+          "বোয়াল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গণেশ কাকার সাথে কে আরেকটি বৈঠা চালাচ্ছিলেন?",
+        "answer": "",
+        "options": [
+          "তিথির বাবা",
+          "হামিদ চাচা",
+          "নাদের চাচা",
+          "মধু কাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'চর' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "বৃষ্টি",
+          "নদীতে তৈরি হওয়া বালুময় ভূমি",
+          "মিনার",
+          "নলের মতো লম্বা ঘাস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাখিদের মেলা কোথায় বসে?",
+        "answer": "",
+        "options": [
+          "মাঝনদীতে",
+          "নদীর চরে",
+          "নলখাগড়ার ঝোপে",
+          "সুপারি গাছের সারির মধ্যে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাখিদের মাছ ধরার গল্প কে বলছিলেন?",
+        "answer": "",
+        "options": [
+          "নাদের চাচা",
+          "বাবা",
+          "গণেশ কাকা",
+          "মধু কাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আমাদের গ্রাম",
+    "questions": [
+      {
+        "question": "কবি গ্রামকে তুলনা করেছেন—",
+        "answer": "",
+        "options": [
+          "মায়ের সাথে",
+          "বাবার সাথে",
+          "বোনের সাথে",
+          "ভাইয়ের সাথে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কখনো করব না—",
+        "answer": "",
+        "options": [
+          "খেলাধুলা ও পড়াশোনা",
+          "শ্রদ্ধা ও সম্মান",
+          "হিংসা ও মারামারি",
+          "আদর ও স্নেহ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সোনার রবি ওঠে—",
+        "answer": "",
+        "options": [
+          "পূর্ব দিকে",
+          "পশ্চিম দিকে",
+          "উত্তর দিকে",
+          "দক্ষিণ দিকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গ্রামটি কেমন?",
+        "answer": "",
+        "options": [
+          "বড়ো",
+          "মাঝারি",
+          "ছোটো",
+          "অনে",
+          "বড়ো"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "একসাথে কী করি?",
+        "answer": "",
+        "options": [
+          "মারামারি করি",
+          "পাঠশালায় যাই",
+          "গোসলে যাই",
+          "নদীতে ঘুরতে যাই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ছোটো গ্রামটিকে কবি কীসের সাথে তুলনা করেছেন?",
+        "answer": "",
+        "options": [
+          "মায়ের সাথে",
+          "বাবার সাথে",
+          "বোনের সাথে",
+          "দাদির সাথে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সূর্য কোন দিকে ওঠে?",
+        "answer": "",
+        "options": [
+          "পশ্চিম",
+          "পূর্ব",
+          "উত্তর",
+          "দক্ষিণ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ছোটো গ্রাম কীভাবে প্রাণ বাঁচিয়ে রেখেছে?",
+        "answer": "",
+        "options": [
+          "পানি দিয়ে",
+          "আগুন দিয়ে",
+          "বায়ু দিয়ে",
+          "রক্ত দিয়ে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মাঠভরা কী?",
+        "answer": "",
+        "options": [
+          "গম",
+          "ভুট্টা",
+          "আলু",
+          "ধান"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আমাদের গ্রাম' কবিতায় কোন গাছের উল্লেখ আছে?",
+        "answer": "",
+        "options": [
+          "কাঁঠাল",
+          "জাম",
+          "বরই",
+          "কলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমগাছ জামগাছ বাঁশঝাড় কেমন করে থাকে?",
+        "answer": "",
+        "options": [
+          "আত্মীয়ের মতো",
+          "শত্রুর মতো",
+          "বন্ধুর মতো",
+          "ভাইয়ের মতো"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আমাদের গ্রাম' কবিতায় জলভরা কী?",
+        "answer": "",
+        "options": [
+          "পুকুর",
+          "দিঘি",
+          "নদী",
+          "সমুদ্র"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীসের কিরণ লেগে দিঘির জল ঝিকিমিকি করে?",
+        "answer": "",
+        "options": [
+          "তারার",
+          "সূর্যের",
+          "চাঁদের",
+          "লাইটের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ডরি' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "সেখানে",
+          "কখনো",
+          "ভয় পাই",
+          "বায়ু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গাঁয়ের ঘরগুলো কেমন?",
+        "answer": "",
+        "options": [
+          "বড়ো বড়ো",
+          "কাছে কাছে",
+          "ছোটো ছোটো",
+          "দূরে দূরে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'থাকি সেথা সবে মিলে নাহি কেহ পর'— দ্বারা কবি কী বোঝাতে চেয়েছেন?",
+        "answer": "",
+        "options": [
+          "সবাই হিংসা ও মারামারি করেন",
+          "সবাই মিলেমিশে থাকেন",
+          "সবাই আলাদা আলাদা থাকেন",
+          "সবাই বড়োদের শ্রদ্ধা করেন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "নদীর দেশ",
+    "questions": [
+      {
+        "question": "ছোটো নদী-",
+        "answer": "",
+        "options": [
+          "পদ্মা",
+          "মেঘনা",
+          "ধানতারা",
+          "যমুনা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হিমালয় পর্বতে জন্ম-",
+        "answer": "",
+        "options": [
+          "পদ্মা নদীর",
+          "কর্ণফুলী নদীর",
+          "যমুনা নদীর",
+          "আত্রাই নদীর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলাদেশ ও মায়ানমারকে ভাগ করেছে-",
+        "answer": "",
+        "options": [
+          "কর্ণফুলী",
+          "নাফ",
+          "পিয়াইন",
+          "বুড়িগঙ্গা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "প্রতিবেশী দেশকে দেখার শখ-",
+        "answer": "",
+        "options": [
+          "আত্রাই নদীর",
+          "যমুনা নদীর",
+          "হালদা নদীর",
+          "ধলেশ্বরী নদীর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বর্ণগুলো সাজিয়ে লিখলেও শব্দ হবে না-",
+        "answer": "",
+        "options": [
+          "লড়িয়া",
+          "ঘ",
+          "লমাহিয",
+          "বাডুঘাই",
+          "নডফল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলাদেশে কী জালের মতো জড়িয়ে আছে?",
+        "answer": "",
+        "options": [
+          "পুকুর",
+          "সাগর",
+          "নদী",
+          "পাহাড়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ব্রহ্মপুত্র নদীর জন্ম কোন পর্বতে?",
+        "answer": "",
+        "options": [
+          "আন্দিস",
+          "হিমালয়",
+          "কারাকোরাম",
+          "লুসাই পাহাড়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন নদীর ইলিশ বিখ্যাত?",
+        "answer": "",
+        "options": [
+          "মুহুরি",
+          "ফেনী",
+          "মেঘনা",
+          "পদ্মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘড়িয়াল দেখতে কীসের মতো?",
+        "answer": "",
+        "options": [
+          "কুমিরের",
+          "বানরের",
+          "গিরগিটির",
+          "মুরগির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মেঘনায় একসময় অনেক কী দেখা যেত?",
+        "answer": "",
+        "options": [
+          "হাঙর",
+          "ডলফিন",
+          "জলহস্তী",
+          "তিমি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন নদী ভারতে গিয়ে আবার বাংলাদেশে ফিরে এসেছে?",
+        "answer": "",
+        "options": [
+          "নাফ",
+          "যমুনা",
+          "আত্রাই",
+          "সুরমা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মেঘনা নদী কোথায় গিয়ে মিশেছে?",
+        "answer": "",
+        "options": [
+          "লোহিতসাগরে",
+          "বঙ্গোপসাগরে",
+          "নীলনদে",
+          "ভারতসাগরে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলাদেশ ও মায়ানমারকে ভাগ করেছে কোন নদী?",
+        "answer": "",
+        "options": [
+          "নাফ",
+          "যমুনা",
+          "মেঘনা",
+          "বুড়িগঙ্গা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কর্ণফুলী নদী কোন পাহাড়ে জন্ম নিয়েছে?",
+        "answer": "",
+        "options": [
+          "তাজিংডং",
+          "লুসাই",
+          "হিমালয়",
+          "গারো"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ডিম ছাড়ার জন্য মা-মাছ কোন নদীতে আসে?",
+        "answer": "",
+        "options": [
+          "হালদা",
+          "যমুনা",
+          "সুরমা",
+          "মেঘনা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সাপের মতো পেঁচানো নদীটির নাম কী?",
+        "answer": "",
+        "options": [
+          "পিয়াইন",
+          "কর্ণফুলী",
+          "মেঘনা",
+          "সোমেশ্বরী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পিয়াইন নদী পাহাড়ি ঢলের সময় ছোটো-বড়ো কী নিয়ে আসে?",
+        "answer": "",
+        "options": [
+          "বালু",
+          "মাছ",
+          "পাথর",
+          "কাঁকড়া"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন নদীর পানি ময়লায় কালো হয়ে গেছে?",
+        "answer": "",
+        "options": [
+          "বুড়িগঙ্গা",
+          "ফেনী",
+          "ধরলা",
+          "পদ্মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "উজানে কী দেওয়ার ফলে নদী মরে যাচ্ছে?",
+        "answer": "",
+        "options": [
+          "বালু",
+          "বাঁধ",
+          "মাটি",
+          "পাথর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলাদেশের অন্যতম বড়ো নদী কোনটি?",
+        "answer": "",
+        "options": [
+          "আগুনমুখা",
+          "ধানসিঁড়ি",
+          "দুধকুমার",
+          "পদ্মা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলাদেশ কীসের দেশ বলে বুঝিয়েছেন লেখক?",
+        "answer": "",
+        "options": [
+          "মসজিদের",
+          "নদীর",
+          "মাছের",
+          "পাখির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ধানসিঁড়ি' নামটি কীসের সাথে মিলিয়ে রাখা হয়েছে?",
+        "answer": "",
+        "options": [
+          "চালের",
+          "ধানের",
+          "পাটের",
+          "তুলার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'উজান' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "প্রতিকূল দি",
+          "ক",
+          "পানির প্রবাহ",
+          "স্রোতের প্রবাহ",
+          "খরস্রোতা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নদীর পানি দূষিত হয়ে পড়ছে কেন?",
+        "answer": "",
+        "options": [
+          "স্রোত বেশি হওয়ার কারণে",
+          "পলিথিন, ময়লা-আবর্জনা ফেলার জন্য",
+          "উজানে বাঁধ দেওয়ার কারণে",
+          "মাছ চাষের কারণে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নদী মরে যাচ্ছে কেন?",
+        "answer": "",
+        "options": [
+          "উজানে বাঁধের কারণে",
+          "নোংরা করার কারণে",
+          "পাহাড়ি ঢলের কারণে",
+          "স্রোতের কারণে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "হার-জিতের গল্প",
+    "questions": [
+      {
+        "question": "ক্র্যাচে ভর দিয়ে এগিয়ে এলো—",
+        "answer": "",
+        "options": [
+          "জাফর",
+          "রাশেদ",
+          "রাজু",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাশেদ যে যে খেলায় নাম দিয়েছিল—",
+        "answer": "",
+        "options": [
+          "অঙ্",
+          "দৌড় ও দীর্",
+          "লাফ",
+          "দীর্",
+          "লাফ ও মোর",
+          "লড়াই",
+          "মোর",
+          "লড়াই ও দৌড়",
+          "অঙ্",
+          "দৌড় ও মোর",
+          "লড়াই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মাইকে খেলার ধারাবর্ণনা করছেন—",
+        "answer": "",
+        "options": [
+          "রাশেদ স্যার",
+          "জাফর স্যার",
+          "নোমান স্যার",
+          "হেড স্যার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হেড স্যার বিজয়ীদের হাতে তুলে দিলেন—",
+        "answer": "",
+        "options": [
+          "ক্রেস্ট",
+          "মেডেল",
+          "মালা",
+          "বই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মোরগ লড়াইয়ে অংশ নিয়েছিল—",
+        "answer": "",
+        "options": [
+          "সাত জন",
+          "আট জন",
+          "পাঁচ জন",
+          "নয় জন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নোমান স্যার কাকে দরজায় দাঁড়িয়ে থাকতে দেখেন?",
+        "answer": "",
+        "options": [
+          "রাশেদকে",
+          "ঝিমিতকে",
+          "রাজুকে",
+          "রবিকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নোমান স্যার রাশেদকে কয়টি প্রশ্ন করেছিলেন?",
+        "answer": "",
+        "options": [
+          "একটি",
+          "দুটি",
+          "তিনটি",
+          "চারটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে অত্যন্ত মেধাবী?",
+        "answer": "",
+        "options": [
+          "অপু",
+          "তপু",
+          "ঝিমিত",
+          "রাশেদ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী দিয়ে মাঠ সাজানো হয়?",
+        "answer": "",
+        "options": [
+          "ফুল",
+          "রঙিন কাগজ",
+          "পাতা",
+          "কাপড়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাশেদ কীসে ভর দিয়ে দাঁড়িয়ে ছিল?",
+        "answer": "",
+        "options": [
+          "লাঠিতে",
+          "হাতে",
+          "বাঁশে",
+          "ক্র্যাচে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "অঙ্ক খেলায় রাশেদকে ৯৫ থেকে কত বিয়োগ করতে হয়?",
+        "answer": "",
+        "options": [
+          "৬৭",
+          "৭০",
+          "৭৫",
+          "২৮"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মোরগ লড়াইয়ে রাশেদ প্রথমে কী করে না?",
+        "answer": "",
+        "options": [
+          "খেলে না",
+          "যায় না",
+          "আক্রমণ করে না",
+          "নিজেকে রক্ষা করে না"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কত জন মোরগ লড়াইয়ে অংশ নেয়?",
+        "answer": "",
+        "options": [
+          "পাঁচ জন",
+          "তিন জন",
+          "আট জন",
+          "ছয় জন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মোরগ লড়াই খেলতে গিয়ে রাজু কীসের উপর পড়ে যায়?",
+        "answer": "",
+        "options": [
+          "বালির",
+          "মাদুরের",
+          "ম্যাটের",
+          "ঘাসের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মাইকে খেলার ধারাবর্ণনা দেন কে?",
+        "answer": "",
+        "options": [
+          "হেড স্যার",
+          "নোমান স্যার",
+          "রাশেদ",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ভারসাম্য রাখতে না পেরে পড়ে যায় কে?",
+        "answer": "",
+        "options": [
+          "ঝিমিত",
+          "রাশেদ",
+          "রাজু",
+          "মনির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে বিজয়ীদের গলায় মেডেল পরিয়ে দিলেন?",
+        "answer": "",
+        "options": [
+          "নোমান স্যার",
+          "শিক্ষা অফিসার",
+          "হেড স্যার",
+          "রাশেদ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পুরস্কার হিসেবে কী দেওয়া হয়?",
+        "answer": "",
+        "options": [
+          "কলম",
+          "বই",
+          "খেলনা",
+          "ঘড়ি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী বড়ো কথা নয়?",
+        "answer": "",
+        "options": [
+          "হার-জিত",
+          "হার",
+          "জিত",
+          "খেলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আক্রমণ' শব্দের দ্বারা কী বোঝানো হয়েছে?",
+        "answer": "",
+        "options": [
+          "উৎসাহ দেওয়া",
+          "আঘাত করা",
+          "লাফ দেওয়া",
+          "জয়ী হওয়া"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "হাসি",
+    "questions": [
+      {
+        "question": "খোকন কেমন দাঁতে হাসে?",
+        "answer": "",
+        "options": [
+          "ময়লা",
+          "পরিষ্কার",
+          "ফোকলা",
+          "ভাঙা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোথায় শাপলা হাসে?",
+        "answer": "",
+        "options": [
+          "কাজল বিলে",
+          "নদীতে",
+          "পুকুরে",
+          "সমুদ্রে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খলসে মাছের হাসি দেখে কে হাসেন?",
+        "answer": "",
+        "options": [
+          "ময়না",
+          "টিয়া",
+          "রাজহাঁস",
+          "পাতিহাঁস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "টিয়ে কেমন ঠোঁটে হাসে?",
+        "answer": "",
+        "options": [
+          "সাদা",
+          "কালো",
+          "রাঙা",
+          "নীল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কার হাসি দেখলে পিলে চমকে যায়?",
+        "answer": "",
+        "options": [
+          "ইলিশ মাছের",
+          "বোয়াল মাছের",
+          "খলসে মাছের",
+          "রুই মাছের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঘাসের রং কী?",
+        "answer": "",
+        "options": [
+          "লাল",
+          "নীল",
+          "কালো",
+          "সবুজ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খোকনের সাথে কে হাসে?",
+        "answer": "",
+        "options": [
+          "সূর্য",
+          "নদী",
+          "চাঁদ",
+          "পাহাড়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কার মুখে হাসি ফোটে?",
+        "answer": "",
+        "options": [
+          "ফিঙের",
+          "দোয়েলের",
+          "ময়নার",
+          "শ্যামার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কার হাসি দেখে পাতিহাঁস হাসেন?",
+        "answer": "",
+        "options": [
+          "ময়নার",
+          "প্যাঁচার",
+          "দোয়েলের",
+          "খলসে মাছের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "যারা গোমড়া মুখে চায় তাদের দেখে কার হাসি পায়?",
+        "answer": "",
+        "options": [
+          "প্যাঁচার",
+          "টিয়ার",
+          "মাছের",
+          "ময়নার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'খবর' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "সংবাদ",
+          "লাল",
+          "গম্ভীর",
+          "দাঁতহীন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ফোকলা দাঁতে কে হাসে?",
+        "answer": "",
+        "options": [
+          "টিয়ে",
+          "দোয়েল",
+          "খোকন",
+          "বোয়াল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'বিল' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "স্রোতহীন বড়ো জলাশয়",
+          "স্রোতহীন ছোটো জলাশয়",
+          "অল্প পানির নদী",
+          "চর পড়া বিশাল ভূমি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবিতাটিতে কী করতে উৎসাহ দেওয়া হয়েছে?",
+        "answer": "",
+        "options": [
+          "হাসতে",
+          "কাঁদতে",
+          "খেলতে",
+          "পড়তে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আমাদের উৎসব",
+    "questions": [
+      {
+        "question": "উৎসব পালন করা হয় কীসের সাথে?",
+        "answer": "",
+        "options": [
+          "দুঃখের",
+          "জাঁকজমকের",
+          "কান্নার",
+          "মন খারাপের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নববর্ষ বছরের কোন দিন পালন করা হয়?",
+        "answer": "",
+        "options": [
+          "চতুর্থ",
+          "দ্বিতীয়",
+          "প্রথম",
+          "শেষ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলা বছরের প্রথম মাস কোনটি?",
+        "answer": "",
+        "options": [
+          "কার্তি",
+          "ক",
+          "শ্রাবণ",
+          "ফাল্গুন",
+          "বৈশাখ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন উৎসবকে নববর্ষ বলা হয়?",
+        "answer": "",
+        "options": [
+          "ঈদ",
+          "বাংলা বছরের প্রথম দিন",
+          "পূজা",
+          "বুদ্ধ পূর্ণিমা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন উৎসবে শোভাযাত্রা হয়?",
+        "answer": "",
+        "options": [
+          "বড়োদিন",
+          "পূজা",
+          "নববর্ষ",
+          "বুদ্ধ পূর্ণিমা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ধর্মীয় উৎসব নয় কোনটি?",
+        "answer": "",
+        "options": [
+          "নববর্ষ",
+          "বুদ্ধ পূর্ণিমা",
+          "পূজা",
+          "বড়োদিন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বৈসাবি উৎসব কোথায় হয়?",
+        "answer": "",
+        "options": [
+          "সমুদ্র তীরে",
+          "সুন্দরবনে",
+          "সিলেটে",
+          "পার্বত্য অঞ্চলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হিন্দুদের সবচেয়ে বড়ো উৎসব কোনটি?",
+        "answer": "",
+        "options": [
+          "শ্যামাপূজা",
+          "লক্ষ্মীপূজা",
+          "দুর্গাপূজা",
+          "কালীপূজা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বড়োদিন পালন করা হয় কত তারিখ?",
+        "answer": "",
+        "options": [
+          "২৩ ডিসেম্বর",
+          "২৪ ডিসেম্বর",
+          "২৫ ডিসেম্বর",
+          "২৬ ডিসেম্বর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ক্রিসমাস ট্রি কোন উৎসবের গাছ?",
+        "answer": "",
+        "options": [
+          "বৈসাবি",
+          "বড়োদিন",
+          "বুদ্ধ পূর্ণিমা",
+          "লক্ষ্মীপূজা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সান্তা ক্লজ কোন উৎসবে উপহার নিয়ে আসে?",
+        "answer": "",
+        "options": [
+          "নববর্ষ",
+          "ঈদ-উল ফিতর",
+          "বড়োদিন",
+          "দুর্গাপূজা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বুদ্ধ পূর্ণিমা কোন মাসে উদযাপিত হয়?",
+        "answer": "",
+        "options": [
+          "আষাঢ়",
+          "ভাদ্র",
+          "পৌষ",
+          "বৈশাখ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মুসলমানদের প্রধান উৎসব কী?",
+        "answer": "",
+        "options": [
+          "ঈদ-উল ফিতর ও ঈদ-উল আজহা",
+          "বৈসাবি",
+          "দুর্গাপূজা",
+          "বুদ্ধ পূর্ণিমা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ঈদ-উল আজহা কী ধরনের উৎসব?",
+        "answer": "",
+        "options": [
+          "পারিবারি",
+          "উৎসব",
+          "ধর্মীয় উৎসব",
+          "সামাজি",
+          "উৎসব",
+          "আঞ্চলি",
+          "উৎসব"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নাড়ু, লাড্ডু, সন্দেশ তৈরি করা হয় কোন উৎসবে?",
+        "answer": "",
+        "options": [
+          "দুর্গাপূজায়",
+          "লক্ষ্মীপূজায়",
+          "বুদ্ধ পূর্ণিমায়",
+          "বড়োদিনে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "‘কোলাকুলি’ করার রীতি রয়েছে কোন উৎসবে?",
+        "answer": "",
+        "options": [
+          "বড়োদিন",
+          "ঈদে",
+          "পূজায়",
+          "বৈসাবিতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাংলা বছরের প্রথম দিন কী?",
+        "answer": "",
+        "options": [
+          "ঈদ",
+          "পূজা",
+          "১লা বৈশা",
+          "খ",
+          "বড়োদিন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নববর্ষে গ্রামে ও শহরে কী বসে?",
+        "answer": "",
+        "options": [
+          "মেলা",
+          "হাট",
+          "বাজার",
+          "উৎসব"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শোভাযাত্রা বের হয় কোন উৎসবে?",
+        "answer": "",
+        "options": [
+          "বুদ্ধ পূর্ণিমা",
+          "নববর্ষ",
+          "দুর্গাপূজা",
+          "জন্মদিন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "‘পার্বত্য’ শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "পাহাড়ি",
+          "সমতলি",
+          "বন্ধুর",
+          "উপজাতি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "রাষ্ট্রভাষা বাংলা চাই",
+    "questions": [
+      {
+        "question": "আমাদেরকে কারা শাসন করত?",
+        "answer": "",
+        "options": [
+          "ভারতীয়রা",
+          "পাকিস্তানিরা",
+          "ইংরেজরা",
+          "ডাচরা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাকিস্তানিরা কোন ভাষাকে রাষ্ট্রভাষা করতে চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "বাংলা",
+          "ইংরেজি",
+          "উর্দু",
+          "হিন্দি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "১৯৫২ সালের ২১শে ফেব্রুয়ারিতে ছাত্র-ছাত্রীরা কোথায় জড়ো হয়েছিল?",
+        "answer": "",
+        "options": [
+          "ঢাকা বিশ্ববিদ্যালয়ে",
+          "ঢাকা কলেজে",
+          "রাজশাহী বিশ্ববিদ্যালয়ে",
+          "জগন্নাথ বিশ্ববিদ্যালয়ে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ছাত্র-ছাত্রীরা পোস্টারে কী লিখেছিল?",
+        "answer": "",
+        "options": [
+          "আমাদের দাবি মানতে হবে",
+          "উর্দু ভাষা মানি না",
+          "বাংলা ভাষা হবে রাষ্ট্রভাষা",
+          "রাষ্ট্রভাষা বাংলা চাই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিছিলে প্রথম দলটি কাদের ছিল?",
+        "answer": "",
+        "options": [
+          "কৃষকদের",
+          "ছাত্রদের",
+          "ছাত্রীদের",
+          "পুলিশের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সরকারের নির্দেশে কারা মিছিলে গুলি চালায়?",
+        "answer": "",
+        "options": [
+          "পুলিশ",
+          "ছাত্র",
+          "ছাত্রী",
+          "মিলিটারি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজপথ লাল হওয়ার কারণ কী?",
+        "answer": "",
+        "options": [
+          "পানি",
+          "ঝড়",
+          "শীত",
+          "রক্ত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "এদের মধ্যে কে ভাষা শহিদ নয়?",
+        "answer": "",
+        "options": [
+          "রফি",
+          "ক",
+          "মজিদ",
+          "শফি",
+          "ক",
+          "জব্বার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কারা কোনো বাধা মানল না?",
+        "answer": "",
+        "options": [
+          "শিক্ষার্থীরা",
+          "কৃষকেরা",
+          "পুলিশরা",
+          "মিলিটারিরা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সারা দেশের মানুষ ক্ষোভে ফেটে পড়ার কারণ কী?",
+        "answer": "",
+        "options": [
+          "শিক্ষার্থীদের সাথে ভালো ব্যবহার করা",
+          "শিক্ষার্থীদের বাধা দেওয়া",
+          "শিক্ষার্থীদের ওপর গুলি চালানো",
+          "শিক্ষার্থীদের কিছু না বলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাঙালিরা কোন ভাষাকে রাষ্ট্রভাষা করতে চেয়েছিল?",
+        "answer": "",
+        "options": [
+          "বাংলা",
+          "উর্দু",
+          "হিন্দি",
+          "ইংরেজি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমাদের শহিদ দিবস কবে?",
+        "answer": "",
+        "options": [
+          "১৬ ডিসেম্বর",
+          "২৬ মার্চ",
+          "২১শে ফেব্রুয়ারি",
+          "১০ ডিসেম্বর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আক্রমণ' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "বড়ো রাস্তা",
+          "একসাথে",
+          "শাসন",
+          "হামলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ক্ষোভ' শব্দটির অর্থ কী?",
+        "answer": "",
+        "options": [
+          "অসন্তোষ",
+          "দেশ পরিচালনা",
+          "একসাথে",
+          "মিছিল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শহিদ দিবসকে আর কী হিসেবে পালন করা হয়?",
+        "answer": "",
+        "options": [
+          "ভাষা দিবস",
+          "বিজয় দিবস",
+          "আন্তর্জাতি",
+          "মাতৃভাষা দিবস",
+          "স্বাধীনতা দিবস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'তারা উর্দুকে রাষ্ট্রভাষা করতে চাইল'— তারা বলতে কাদেরকে বোঝানো হয়েছে?",
+        "answer": "",
+        "options": [
+          "ভারতীয়দের",
+          "পাকিস্তানিদের",
+          "মারাঠিদের",
+          "বাংলাদেশিদের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাঙালির ন্যায্য দাবি—",
+        "answer": "",
+        "options": [
+          "রাষ্ট্রভাষা হিন্দি চাই",
+          "রাষ্ট্রভাষা উর্দু চাই",
+          "রাষ্ট্রভাষা বাংলা চাই",
+          "রাষ্ট্রভাষা ইংরেজি চাই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাকিস্তানের বেশির ভাগ মানুষ কোন ভাষায় কথা বলত?",
+        "answer": "",
+        "options": [
+          "বাংলা",
+          "হিন্দি",
+          "উর্দু",
+          "পর্তুগিজ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাকিস্তান সরকার বাঙালির দাবি মেনে নেয় কেন?",
+        "answer": "",
+        "options": [
+          "বাঙালি ভীরু বলে",
+          "পাকিস্তান ভীরু বলে",
+          "বাঙালি সাহসী বলে",
+          "বাঙালি প্রতিবাদী বলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "উর্দুর পাশাপাশি কোন ভাষাকে রাষ্ট্রভাষা করা হয়?",
+        "answer": "",
+        "options": [
+          "গুজরাটি",
+          "ইংরেজি",
+          "হিন্দি",
+          "বাংলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আজিকার শিশু",
+    "questions": [
+      {
+        "question": "'আজিকার শিশু' কবিতাটির লেখক কে?",
+        "answer": "",
+        "options": [
+          "সুফিয়া কামাল",
+          "কাজী নজরুল ইসলাম",
+          "কুসুম কুমারী দাশ",
+          "রবীন্দ্রনাথ ঠাকুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবির যুগে কবি কী নিয়ে খেলা করেছেন?",
+        "answer": "",
+        "options": [
+          "বই",
+          "জাহাজ",
+          "গেম",
+          "পুতুল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পুতুল খেলার বয়সে আমরা কী করি?",
+        "answer": "",
+        "options": [
+          "লেখাপড়া",
+          "নাচ-গান",
+          "ঘুমিয়ে থাকি",
+          "গল্প করি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গগন জুড়ে আমরা কী চালাই?",
+        "answer": "",
+        "options": [
+          "কলের পুতুল",
+          "ঘুড়ি",
+          "কলের জাহাজ",
+          "কোনোটিই নয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমাদের কীসের খবর জানা রয়েছে?",
+        "answer": "",
+        "options": [
+          "উত্তর মেরুর",
+          "দক্ষিণ মেরুর",
+          "উত্তর-দক্ষিণ মেরুর",
+          "পশ্চিম মেরুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবিরা কীসের গল্প শুনেছেন?",
+        "answer": "",
+        "options": [
+          "জিন, পরি, দেও, দানা",
+          "বিজ্ঞানের",
+          "ইতিহাসের",
+          "ভূত-প্রেত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমাদের ঘরে কীসের অভাব হবে না?",
+        "answer": "",
+        "options": [
+          "অর্থের",
+          "জ্ঞানের",
+          "আলোর",
+          "খাবারের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি কী এনে অন্ধকার দূর করার কথা বলেছেন?",
+        "answer": "",
+        "options": [
+          "আলো",
+          "ঘুড়ি",
+          "ফুল",
+          "পাখি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাখি ডাকা রাঙা ভোর কে আনবে?",
+        "answer": "",
+        "options": [
+          "কবি",
+          "আমরা",
+          "শিশুরা",
+          "যুগ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "জগৎ কীভাবে মধুময় হবে?",
+        "answer": "",
+        "options": [
+          "প্রাণের মিলনে",
+          "শিক্ষার আলোয়",
+          "প্রাণের ডাকে",
+          "পাখির ডাকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি কোথায় ঘুড়ি উড়িয়েছে?",
+        "answer": "",
+        "options": [
+          "বাগানে",
+          "ছাদে",
+          "আকাশ তলে",
+          "নদীর পাড়ে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'গগন' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "পানি",
+          "মাটি",
+          "আকাশ",
+          "বাতাস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'সব তোমাদের জানা' বলতে কবি কী বুঝিয়েছেন?",
+        "answer": "",
+        "options": [
+          "দেশ সম্পর্কে জ্ঞান",
+          "বিশ্ব সম্পর্কে জ্ঞান",
+          "রাষ্ট্র সম্পর্কে জ্ঞান",
+          "নদী সম্পর্কে জ্ঞান"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'আজিকার শিশু' কবিতায় কবি কী বোঝাতে চেয়েছেন?",
+        "answer": "",
+        "options": [
+          "যুগের পার্থক্য",
+          "দেশের পার্থক্য",
+          "জিন ও পরির পার্থক্য",
+          "আকাশ ও মাটির পার্থক্য"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ঢাকাই মসলিন",
+    "questions": [
+      {
+        "question": "কোথায় দারুণ খবর ছাপা হয়েছে?",
+        "answer": "",
+        "options": [
+          "টিভিতে",
+          "পত্রিকায়",
+          "রেডিওতে",
+          "পোস্টারে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন অঞ্চলের মসলিন বিশ্ববিখ্যাত?",
+        "answer": "",
+        "options": [
+          "কুমিল্লা",
+          "বুড়িগঙ্গা",
+          "ঢাকা",
+          "রূপগঞ্জ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মিহি সুতায় কী বোনা হতো?",
+        "answer": "",
+        "options": [
+          "জামদানি",
+          "মসলিন",
+          "খাদি",
+          "টাঙ্গাইল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিন শাড়ি কীসের ভিতর দিয়ে গলানো যেত?",
+        "answer": "",
+        "options": [
+          "হার",
+          "গয়না",
+          "আংটি",
+          "বাক্স"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিন কেমন কাপড়?",
+        "answer": "",
+        "options": [
+          "স্বচ্ছ ও সূক্ষ্ম",
+          "ভারী ও মোটা",
+          "মিহি ও শক্ত",
+          "অমসৃণ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিন কাপড়ের সুতা কী তুলা থেকে তৈরি হয়?",
+        "answer": "",
+        "options": [
+          "কার্পাস",
+          "শিমুল",
+          "ফুটি",
+          "দেশি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীভাবে সুতা বানানো হতো?",
+        "answer": "",
+        "options": [
+          "চরকা কেটে",
+          "মেশিনে",
+          "হাতে তৈরি করে",
+          "কেটে কেটে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কারা সুতা বোনে?",
+        "answer": "",
+        "options": [
+          "জেলে",
+          "তাঁতি",
+          "কৃষ",
+          "ক",
+          "কুমার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিনের জন্য বিখ্যাত অঞ্চল কোনটি?",
+        "answer": "",
+        "options": [
+          "সোনারগাঁ",
+          "রূপপুর",
+          "নারায়ণগঞ্জ",
+          "গাজীপুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন নদীর পানি মসলিন তৈরির উপযোগী?",
+        "answer": "",
+        "options": [
+          "বুড়িগঙ্গা",
+          "শীতলক্ষ্যা",
+          "পদ্মা",
+          "ব্রহ্মপুত্র"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিন হারিয়ে যায় কেন?",
+        "answer": "",
+        "options": [
+          "প্রতিযোগিতামূল",
+          "বাজার",
+          "লোকজনের অরুচি",
+          "উপকরণের অভাবে",
+          "সবকটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিচের কোনটি আমাদের ঐতিহ্য?",
+        "answer": "",
+        "options": [
+          "মসলিন",
+          "নদী",
+          "পদ্মা সেতু",
+          "ঢাকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মসলিন তৈরির উপযোগী—",
+        "answer": "",
+        "options": [
+          "শীতলক্ষ্যা নদীর পানি ও বাতাস",
+          "বুড়িগঙ্গার পানি",
+          "মেঘনা নদীর ঘাট",
+          "রেশম পোকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "হজরত আবু বকর (রা)",
+    "questions": [
+      {
+        "question": "তপ্ত বালুর পাশ দিয়ে হেঁটে চলেছেন—",
+        "answer": "",
+        "options": [
+          "হজরত মুহাম্মদ",
+          "গ",
+          "হজরত আবু বকর (রা)",
+          "হজরত ওমর (রা)",
+          "হজরত বেলাল (রা)"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ক্রীতদাস' অর্থ—",
+        "answer": "",
+        "options": [
+          "কেনা গোলাম",
+          "মনিব",
+          "মুয়াজ্জিন",
+          "খলিফা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মরু প্রান্তরটি কোথায়?",
+        "answer": "",
+        "options": [
+          "মক্কায়",
+          "মদিনায়",
+          "ঢাকায়",
+          "আরবে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রোদে বালু কেমন হয়েছিল?",
+        "answer": "",
+        "options": [
+          "ঠান্ডা",
+          "তপ্ত",
+          "গরম",
+          "শীতল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বালুর উপর কে হেঁটে যাচ্ছিলেন?",
+        "answer": "",
+        "options": [
+          "হজরত আবু বকর (রা)",
+          "হজরত মুহাম্মদ",
+          "হজরত বেলাল (রা)",
+          "হজরত আয়েশা (রা)"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মুহাম্মদ (স)-কে হত্যার ঘোষণা দেয় কে?",
+        "answer": "",
+        "options": [
+          "মুশরিকরা",
+          "মুনাফিকরা",
+          "কাফেররা",
+          "ইহুদিরা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মুহাম্মদ (স.) মক্কা থেকে কোথায় হিজরত করেন?",
+        "answer": "",
+        "options": [
+          "জেদ্দায়",
+          "মদিনায়",
+          "কাবুলে",
+          "কাবা ঘরে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আবু বকর (রা)-এর কাছে মৃত্যুর পূর্বে কী ছিল?",
+        "answer": "",
+        "options": [
+          "গোরু",
+          "ছাগল",
+          "উট",
+          "ভেড়া"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আবু বকর (রা) দাসের প্রতি কেমন ছিলেন?",
+        "answer": "",
+        "options": [
+          "নিষ্ঠুর",
+          "মানবিক",
+          "যত্নশীল",
+          "অমানবিক"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ইসলামের প্রথম মুয়াজ্জিনের নাম কী?",
+        "answer": "",
+        "options": [
+          "হজরত ওমর (রা)",
+          "হজরত উসমান (রা)",
+          "হজরত ইয়াকুব (রা)",
+          "হজরত বেলাল (রা)"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "খলিফা হলো—",
+        "answer": "",
+        "options": [
+          "মুসলিম জাহানের রাজা",
+          "আল্লাহর প্রেরিত রসুল",
+          "মুসলিম জাহানের শাস",
+          "ক",
+          "ফেরেশতা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "\"কোমল হৃদয় ও সুন্দর চরিত্র\"— কার সম্পর্কে বলা হয়েছে?",
+        "answer": "",
+        "options": [
+          "মুহাম্মদ",
+          "গ",
+          "আবু বকর (রা)",
+          "আয়েশা (রা)",
+          "বেলাল (রা)"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ক্রীতদাসকে মুক্ত করে দেওয়ার মধ্য দিয়ে আবু বকর (রা)-এর কোন দিকটি প্রকাশিত হয়?",
+        "answer": "",
+        "options": [
+          "উদারতা",
+          "হিংস্রতা",
+          "মানবিকতা",
+          "সততা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মনিবের আচরণ কেমন ছিল?",
+        "answer": "",
+        "options": [
+          "নিষ্ঠুর",
+          "উদার",
+          "মানবি",
+          "ক",
+          "কঠোর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ইসলামের প্রথম খলিফা ছিলেন—",
+        "answer": "",
+        "options": [
+          "হজরত উমর (রা.)",
+          "হজরত আবু বকর (রা)",
+          "হজরত আলী (রা.)",
+          "হজরত উসমান (রা.)"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আমার পণ",
+    "questions": [
+      {
+        "question": "সকালে উঠে আমি কীভাবে বলি?",
+        "answer": "",
+        "options": [
+          "জোরে জোরে",
+          "চিৎকার করে",
+          "কেঁদে কেঁদে",
+          "মনে মনে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কখন আমি মনে মনে বলি?",
+        "answer": "",
+        "options": [
+          "সন্ধ্যায়",
+          "দুপুরে",
+          "সকালে",
+          "রাতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গুরুজনে কী করেন?",
+        "answer": "",
+        "options": [
+          "মিনতি",
+          "আদেশ",
+          "অনুরোধ",
+          "অনুনয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "ভাইবোন সকলেরে যেন—",
+        "answer": "",
+        "options": [
+          "ঘৃণা করি",
+          "অত্যাচার করি",
+          "ভালোবাসি",
+          "নির্যাতন করি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন ছেলেদের সাথে মিশে খেলা করব?",
+        "answer": "",
+        "options": [
+          "দুষ্টু",
+          "ভালো",
+          "ফাজিল",
+          "অলস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন সময় যেন হেলা না করি?",
+        "answer": "",
+        "options": [
+          "ঘুমের",
+          "ঘোরার",
+          "গল্পের",
+          "পাঠের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কারো দুখে কী হওয়া উচিত নয়?",
+        "answer": "",
+        "options": [
+          "সুখী",
+          "দুঃখী",
+          "বিষণ্ন",
+          "উদাসীন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সাবধানে যেন কী সামলিয়ে থাকি?",
+        "answer": "",
+        "options": [
+          "হাসি",
+          "আনন্দ",
+          "খুশি",
+          "লোভ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কিছুতে কাহারে যেন নাহি দিই—",
+        "answer": "",
+        "options": [
+          "টাকা",
+          "খাবার",
+          "ফাঁকি",
+          "গুরুত্ব"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কারো সাথে কী করা উচিত না?",
+        "answer": "",
+        "options": [
+          "খেলাধুলা",
+          "ঝগড়া",
+          "পড়াশোনা",
+          "আনন্দ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গুরুজনের আদেশ যেন পালন করি—",
+        "answer": "",
+        "options": [
+          "গোমড়ামুখে",
+          "কেঁদে কেঁদে",
+          "রা",
+          "করে",
+          "ভালো মনে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কখন যেন আমি ভালো হয়ে চলি?",
+        "answer": "",
+        "options": [
+          "সকালে",
+          "রাতে",
+          "সারাদিন",
+          "দুপুরে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি পাঠের সময় কী করতে নিষেধ করেছেন?",
+        "answer": "",
+        "options": [
+          "গল্প",
+          "রাগ",
+          "অবহেলা",
+          "মারামারি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গুরুজনের আদেশ মানতে হবে কারণ—",
+        "answer": "",
+        "options": [
+          "গুরুজন সঠি",
+          "পথ দেখান",
+          "গুরুজন জীবনকে উন্নত করে",
+          "গুরুজন ভালো খাবার দেয়",
+          "গুরুজন টাকা দেয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাড়ার সকলের সাথে সম্পর্ক কেমন হওয়া দরকার?",
+        "answer": "",
+        "options": [
+          "ঝগড়ার",
+          "মারামারির",
+          "সহানুভূতির",
+          "রাগারাগির"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন কাজগুলো কবি ভালো মতো করতে বলেছেন?",
+        "answer": "",
+        "options": [
+          "বাবার দেওয়া কাজ",
+          "শিক্ষকের দেওয়া কাজ",
+          "মায়ের দেওয়া কাজ",
+          "গুরুজনের দেওয়া কাজ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "মানব জয়ের গল্প",
+    "questions": [
+      {
+        "question": "নিকোলাসের গ্রামের নাম কী?",
+        "answer": "",
+        "options": [
+          "সিরিয়া",
+          "তুরস্ক",
+          "পাতারা",
+          "সিয়ারা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিকোলাস মানে কী?",
+        "answer": "",
+        "options": [
+          "মানব-জয়",
+          "বিশ্বজয়",
+          "গরিব-দুঃখী",
+          "বিজয়ী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে অল্প বয়সে পিতামাতাকে হারান?",
+        "answer": "",
+        "options": [
+          "নিকোলাস",
+          "রাশেদ",
+          "তিথি",
+          "রবীন্দ্রনাথ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিকোলাস কী হিসেবে বেড়ে ওঠেন?",
+        "answer": "",
+        "options": [
+          "গরিব",
+          "এতিম",
+          "ধনী",
+          "সুখী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বড়ো হয়ে নিকোলাস কী হিসেবে পরিচিতি লাভ করেন?",
+        "answer": "",
+        "options": [
+          "নির্দয়",
+          "অভাবী",
+          "দয়ালু",
+          "সুখী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিকোলাস মানুষের মাঝে কী বিলিয়ে দেন?",
+        "answer": "",
+        "options": [
+          "সম্পত্তি",
+          "খাবার",
+          "পোশা",
+          "ক",
+          "খেলনা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিকোলাস কাদের সন্ধান করতেন?",
+        "answer": "",
+        "options": [
+          "পিতামাতা",
+          "গরিব-দুঃখী",
+          "পশু-পাখি",
+          "শিশু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শিশুদের কে উপহার দিতে পছন্দ করতেন?",
+        "answer": "",
+        "options": [
+          "রবীন্দ্রনাথ",
+          "নিকোলাসের বাবা",
+          "রাজা",
+          "নিকোলাস"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নিকোলাসের কোন গুণ সারা দুনিয়ায় ছড়িয়ে পড়ে?",
+        "answer": "",
+        "options": [
+          "দানশীলতা",
+          "কঠোরতা",
+          "নিষ্ঠুরতা",
+          "হিংসা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "অল্প বয়সেই নিকোলাস কী হারান?",
+        "answer": "",
+        "options": [
+          "সম্পদ",
+          "পিতামাতা",
+          "জ্ঞান",
+          "ভাইবোন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'নিকোলাস ডে' কবে পালিত হয়?",
+        "answer": "",
+        "options": [
+          "৭ই ডিসেম্বর",
+          "৬ই ডিসেম্বর",
+          "৫ই ডিসেম্বর",
+          "২৫শে ডিসেম্বর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'নিকোলাস ডে' তে কাদের জন্য নানা আয়োজন করা হয়?",
+        "answer": "",
+        "options": [
+          "বড়োদের",
+          "শিশুদের",
+          "গরিবদের",
+          "অসহায়দের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'রীতি' শব্দের অর্থ কী?",
+        "answer": "",
+        "options": [
+          "নিয়ম",
+          "প্রচলিত ধারা",
+          "প্রচলিত নিয়ম",
+          "প্রচলিত ধারণা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'পাতারা' গ্রাম কোন দেশে অবস্থিত?",
+        "answer": "",
+        "options": [
+          "তুরস্",
+          "ক",
+          "সিরিয়া",
+          "ফিলিস্তিন",
+          "রাশিয়া"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সমুদ্রপাড়ে জন্মগ্রহণ করা শিশুটির নাম কী?",
+        "answer": "",
+        "options": [
+          "রবীন্দ্রনাথ",
+          "কাজী নজরুল ইসলাম",
+          "নিকোলাস",
+          "কুসুমকুমারী দাশ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "তালগাছ",
+    "questions": [
+      {
+        "question": "তালগাছ উঁকি মারে—",
+        "answer": "",
+        "options": [
+          "আকাশে",
+          "বাতাসে",
+          "জানালায়",
+          "দরজায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছের মনের ইচ্ছা—",
+        "answer": "",
+        "options": [
+          "সব গাছের চেয়ে উঁচুতে উঠবে",
+          "কালো মে",
+          "ফুঁড়ে উড়ে যাবে",
+          "আকাশে উঁকি মেরে দেখবে",
+          "এ",
+          "পায়ে দাঁড়িয়ে থাকবে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বাতাস হলে তালগাছের—",
+        "answer": "",
+        "options": [
+          "পাতা কাঁপা থেমে যায়",
+          "মনের ইচ্ছা থেমে যায়",
+          "থরথর করে পাতা কাঁপে",
+          "থরথর করে পা কাঁপে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে এক পায়ে দাঁড়িয়ে?",
+        "answer": "",
+        "options": [
+          "বট গাছ",
+          "কলা গাছ",
+          "আম গাছ",
+          "তাল গাছ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছ কোথায় উঁকি মারে?",
+        "answer": "",
+        "options": [
+          "আকাশে",
+          "পাশের বাড়িতে",
+          "জানালায়",
+          "কোনোটিই নয়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হাওয়া নেমে গেলে কী হয়?",
+        "answer": "",
+        "options": [
+          "বৃষ্টি আসে",
+          "মে",
+          "জমে যায়",
+          "পাতা-কাঁপা থেমে যায়",
+          "মা যে হয় মাটি তার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মাটি তার কী হয়?",
+        "answer": "",
+        "options": [
+          "বোন",
+          "খালা",
+          "মা",
+          "চাচি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছের মন কখন ফেরে?",
+        "answer": "",
+        "options": [
+          "মায়ের কথা মনে হলে",
+          "দিন শেষ হলে",
+          "হাওয়া নেমে গেলে",
+          "বেড়ানো শেষ হলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মানুষ কীসের জোরে বেঁচে থাকে?",
+        "answer": "",
+        "options": [
+          "শক্তির",
+          "সাহসের",
+          "স্বপ্নের",
+          "অর্থের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সামর্থ্য না থাকলেও কী থাকতে হয়?",
+        "answer": "",
+        "options": [
+          "ইচ্ছা",
+          "অনিচ্ছা",
+          "বিনয়",
+          "শিষ্টাচার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছ কীসের আক্ষেপ করে?",
+        "answer": "",
+        "options": [
+          "ফলের",
+          "ফুলের",
+          "শেকড়ের",
+          "পাখার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছের পাতা কেমন?",
+        "answer": "",
+        "options": [
+          "লম্বা লম্বা",
+          "গোল গোল",
+          "সরু সরু",
+          "ফাঁকা-ফাঁকা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছের পাতা কেমন করে কাঁপে?",
+        "answer": "",
+        "options": [
+          "মর্মর",
+          "বনবন",
+          "থরথর",
+          "ঝনঝন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছের পৃথিবীর কোন জিনিসটি আবার ভালো লাগে?",
+        "answer": "",
+        "options": [
+          "বন",
+          "কোণটি",
+          "বাতাস",
+          "সাগর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "তালগাছ কবিতাটি লিখেছেন-",
+        "answer": "",
+        "options": [
+          "রবীন্দ্রনাথ ঠাকুর",
+          "কাজী নজরুল ইসলাম",
+          "সুফিয়া কামাল",
+          "রোকনুজ্জামান"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "রবীন্দ্রনাথ ঠাকুরের ছেলেবেলা",
+    "questions": [
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুর কে ছিলেন?",
+        "answer": "",
+        "options": [
+          "ব্যবসায়ী",
+          "ব্যাংকার",
+          "কবি",
+          "রাজনীতিবিদ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথের ছোটোবেলা কেমন ছিল?",
+        "answer": "",
+        "options": [
+          "মজার",
+          "বিষাদ",
+          "দুঃখে ভরা",
+          "একাকীতে ভরা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ কানা পালোয়ানের কাছে কী শিখতেন?",
+        "answer": "",
+        "options": [
+          "ফুটবল",
+          "হকি",
+          "ক্রিকেট",
+          "কুস্তি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুরের স্বাস্থ্য ভালো ছিল কেন?",
+        "answer": "",
+        "options": [
+          "ঘুরতেন বলে",
+          "ব্যায়াম করতেন বলে",
+          "মায়ের কথা শুনতেন বলে",
+          "লেখালেখি করতেন বলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুর জ্বর হলে খুশি হতেন কেন?",
+        "answer": "",
+        "options": [
+          "বেড়াতে যাবেন না বলে",
+          "স্কুলে যাবেন না বলে",
+          "পড়তে হবে না বলে",
+          "কুস্তি করতে হবে না বলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "জ্বর হওয়ার জন্য রবীন্দ্রনাথ কী করতেন?",
+        "answer": "",
+        "options": [
+          "ব্যায়াম করতেন",
+          "কুস্তি করতেন",
+          "আইসক্রিম খেতেন",
+          "বৃষ্টিতে ভিজতেন"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সন্ধ্যাবেলায় রবীন্দ্রনাথের মা কাদের সাথে গল্প করতেন?",
+        "answer": "",
+        "options": [
+          "বাড়ির মেয়েদের সাথে",
+          "চাকরদের সাথে",
+          "প্রতিবেশীদের সাথে",
+          "ছেলেমেয়েদের সাথে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ বাড়ির মেয়েদের কী পড়ে শোনাতেন?",
+        "answer": "",
+        "options": [
+          "মহাভারত",
+          "পুঁথি",
+          "মঙ্গলকাব্য",
+          "কবিতা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন বিষয় পড়তে রবীন্দ্রনাথ ঠাকুরের ভালো লাগত?",
+        "answer": "",
+        "options": [
+          "সাহিত্য",
+          "দর্শন",
+          "কবিতা",
+          "বিজ্ঞান"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুরের বিজ্ঞান শিক্ষকের নাম কী?",
+        "answer": "",
+        "options": [
+          "কানা পালোয়ান",
+          "সতীনাথ",
+          "সতীনাথ দত্ত",
+          "মহেন্দ্রনাথ দত্ত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী করতে রবীন্দ্রনাথের খুব ভালো লাগত?",
+        "answer": "",
+        "options": [
+          "ঘুরতে",
+          "গল্প করতে",
+          "দাবা খেলতে",
+          "কাহিনি বলতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ কত সালে নোবেল পুরস্কার পান?",
+        "answer": "",
+        "options": [
+          "১৯১০ সাল",
+          "১৯১১ সাল",
+          "১৯১২ সাল",
+          "১৯১৩ সাল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুর কীসের জন্য নোবেল পেয়েছেন?",
+        "answer": "",
+        "options": [
+          "গানের জন্য",
+          "কবিতার জন্য",
+          "গল্পের জন্য",
+          "উপন্যাসের জন্য"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কত সালে রবীন্দ্রনাথ ঠাকুর জন্মগ্রহণ করেন?",
+        "answer": "",
+        "options": [
+          "১৮৬১",
+          "১৯৬১",
+          "১৮৪১",
+          "১৯৪১"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবীন্দ্রনাথ ঠাকুর কত তারিখে মৃত্যুবরণ করেন?",
+        "answer": "",
+        "options": [
+          "২০শে শ্রাবণ",
+          "২১শে শ্রাবণ",
+          "২২শে শ্রাবণ",
+          "২৩শে শ্রাবণ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "আদর্শ ছেলে",
+    "questions": [
+      {
+        "question": "আদর্শ ছেলে কবিতাটির মূলভাব কী?",
+        "answer": "",
+        "options": [
+          "শপথে বলীয়ান হওয়ার গুরুত্ব",
+          "দেশসেবার গুরুত্ব",
+          "আদর্শ মানুষ হওয়ার গুরুত্ব",
+          "মানবসেবার গুরুত্ব"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "দেশের জন্য কী রকম ছেলে/শিশু চাই?",
+        "answer": "",
+        "options": [
+          "কাজে নয় কথায় বড়ো",
+          "কথায় নয় কাজে বড়ো",
+          "কথা বেশি কাজ কম",
+          "কথা কম কাজ কম"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী হওয়ার পণ করতে হবে?",
+        "answer": "",
+        "options": [
+          "পাখি",
+          "ফুল",
+          "গাছ",
+          "মানুষ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বিপদ কাছে আসলে কী করতে হবে?",
+        "answer": "",
+        "options": [
+          "পালিয়ে যেতে হবে",
+          "বানান করতে হবে",
+          "আগুয়ান হতে হবে",
+          "পিছিয়ে যেতে হবে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে পিছে পড়ে থাকে না?",
+        "answer": "",
+        "options": [
+          "যার সৌন্দর্য রয়েছে",
+          "যার চেতনা রয়েছে",
+          "যার টাকা রয়েছে",
+          "যার ভালো পোশা",
+          "রয়েছে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীসে ভরা মন?",
+        "answer": "",
+        "options": [
+          "ঘৃণায়",
+          "রাগে",
+          "তেজে",
+          "জেদে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন প্রাণে পণ করবে?",
+        "answer": "",
+        "options": [
+          "সাদা",
+          "কালো",
+          "দুঃখী",
+          "আনন্দিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সবাই 'মানুষ' হলে দেশের—",
+        "answer": "",
+        "options": [
+          "অমঙ্গল",
+          "কল্যাণ",
+          "বিপদ",
+          "ঝুঁকি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "'ক্ত' যুক্তবর্ণটি নিচের কোন শব্দে আছে?",
+        "answer": "",
+        "options": [
+          "স্বাধীন",
+          "বৃষ্টি",
+          "শক্তি",
+          "শব্দ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমাদের কী পণ করা উচিত?",
+        "answer": "",
+        "options": [
+          "স্কুলে প্রথম হওয়ার",
+          "মানুষ হওয়ার",
+          "প্রতিদিন খেলতে যাওয়ার",
+          "মোবাইলে আসক্ত হওয়ার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কবি কোন ধরনের ছেলে/শিশু প্রত্যাশা করেন?",
+        "answer": "",
+        "options": [
+          "রাগী",
+          "জেদি",
+          "গোমড়ামুখো",
+          "সাহসী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কেমন ছেলে কেউ চায় না?",
+        "answer": "",
+        "options": [
+          "কথায় কথায় যার চোখে জল আসে",
+          "কথায় কথায় যার মুখে হাসি ফোটে",
+          "যে সবসময় ছোটাছুটি করে",
+          "যে সবসময় গোমড়া মুখে থাকে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "হাসি মুখে কোন পণ করতে হবে?",
+        "answer": "",
+        "options": [
+          "বড়ো হওয়ার",
+          "ধনী হওয়ার",
+          "মানুষ হওয়ার",
+          "শিক্ষিত হওয়ার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বিশ্বমাঝারে কার কাজ রয়েছে?",
+        "answer": "",
+        "options": [
+          "শুধু কৃষকের শিশুর",
+          "শুধু রাজার কুমারের",
+          "শুধু গৃহস্থের ছেলের",
+          "সবার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "দেশের কল্যাণ হবে কীভাবে?",
+        "answer": "",
+        "options": [
+          "ছেলেরা শিক্ষিত হলে",
+          "ছেলেরা মানুষ হলে",
+          "ছেলেরা ধার্মি",
+          "হলে",
+          "ছেলেরা কর্মঠ হলে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "মুক্তিযুদ্ধে রাজারবাগ",
+    "questions": [
+      {
+        "question": "মুক্তিযুদ্ধ জাদুঘর কোথায়?",
+        "answer": "",
+        "options": [
+          "শাহবা",
+          "গ",
+          "লালবাগ",
+          "রাজারবা",
+          "গ",
+          "মতিঝিল"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রিতা কার কাছে জাদুঘরের কথা শুনেছিল?",
+        "answer": "",
+        "options": [
+          "বড়ো মামা",
+          "ছোটো মামা",
+          "মেজো মামা",
+          "সেজো মামা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কত সালে পুলিশেরা বীরত্বের পরিচয় দিয়েছিল?",
+        "answer": "",
+        "options": [
+          "১৯৫২",
+          "১৯৪৭",
+          "১৯৭২",
+          "১৯৭১"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রিতা ও রবিন কখন রাজারবাগে গেল?",
+        "answer": "",
+        "options": [
+          "সকালবেলা",
+          "দুপুরবেলা",
+          "বিকালবেলা",
+          "সন্ধ্যাবেলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মামা দুজনকে কয়টি বই কিনে দিলেন?",
+        "answer": "",
+        "options": [
+          "একটি",
+          "দুটি",
+          "তিনটি",
+          "চারটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রবিন অনেকক্ষণ দাঁড়িয়ে আগের দিনের কী দেখল?",
+        "answer": "",
+        "options": [
+          "বন্দু",
+          "ক",
+          "রাইফেল",
+          "মেশিনগান",
+          "গোলাবারুদ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কোন তারিখে পাকিস্তান মিলিটারি রাজারবাগে আক্রমণ করেছিল?",
+        "answer": "",
+        "options": [
+          "২৩শে মার্চ",
+          "২৪শে মার্চ",
+          "২৫শে মার্চ",
+          "২৬শে মার্চ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কী বাজিয়ে পুলিশকে সতর্ক করা হয়েছিল?",
+        "answer": "",
+        "options": [
+          "বাঁশি",
+          "পাগলা ঘণ্টা",
+          "হারমোনিয়াম",
+          "তবলা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাকিস্তান সেনাবাহিনীর কাছে কী ছিল?",
+        "answer": "",
+        "options": [
+          "কামান",
+          "ফুল",
+          "মেশিনগান",
+          "চিঠি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সেই রাতে (২৫শে মার্চ) অনেক পুলিশ কী হন?",
+        "answer": "",
+        "options": [
+          "গাজি",
+          "বিসিএস ক্যাডার",
+          "শহিদ",
+          "ব্যাংকার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শহিদদের কথা ভেবে কাদের গর্ব হয়?",
+        "answer": "",
+        "options": [
+          "মামা ও মামির",
+          "বাবা ও মায়ের",
+          "চাচা ও চাচির",
+          "রিতা ও রবিনের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বীর যোদ্ধাদের আত্মত্যাগে আমরা কী পেয়েছি?",
+        "answer": "",
+        "options": [
+          "ভুটান",
+          "নেপাল",
+          "স্বাধীন বাংলাদেশ",
+          "মায়ানমার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সিঁড়ি দিয়ে নিচে নামলেই কোনটি দেখা যায়?",
+        "answer": "",
+        "options": [
+          "মূল জাদুঘর",
+          "লাইব্রেরি",
+          "দোকান",
+          "প্রশিক্ষণ কেন্দ্র"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মামা বিশেষভাবে কয়টি জিনিস দেখালেন?",
+        "answer": "",
+        "options": [
+          "একটি",
+          "দুটি",
+          "তিনটি",
+          "চারটি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাকিস্তানি মিলিটারি রাজারবাগে আক্রমণ চালিয়েছিল কেন?",
+        "answer": "",
+        "options": [
+          "পুলিশের সাথে দেখা করতে",
+          "পুলিশের সাথে সন্ধি করতে",
+          "পুলিশ হত্যা করতে",
+          "পুলিশের কাজে বাধা দিতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পাগলা ঘণ্টা বলতে কী বোঝায়?",
+        "answer": "",
+        "options": [
+          "সতর্",
+          "করার ঘণ্টা",
+          "বিরক্ত করার ঘণ্টা",
+          "সাধারণ ঘণ্টা",
+          "মূল্যবান ঘণ্টা"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "দেশের জন্য পুলিশরা কীভাবে লড়াই করে?",
+        "answer": "",
+        "options": [
+          "ভয়ে ভয়ে",
+          "অসীম সাহসে",
+          "শত্রুর সাথে মিলে",
+          "অনীহা করে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "পুলিশের পাশাপাশি মুক্তিযুদ্ধে কারা অংশ নেয়?",
+        "answer": "",
+        "options": [
+          "চাকরিজীবী",
+          "কৃষিজীবী",
+          "মৎস্যজীবী",
+          "নানা পেশার মানুষ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "আমরা কীভাবে স্বাধীন বাংলাদেশ পেয়েছি?",
+        "answer": "",
+        "options": [
+          "পুলিশদের আত্মত্যাগে",
+          "মুক্তিযোদ্ধাদের আত্মত্যাগে",
+          "নেতাদের আত্মত্যাগে",
+          "ছাত্রদের আত্মত্যাগে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "নিজের মতো লিখি",
+    "questions": [
+      {
+        "question": "কোথায় হাজার তারা আছে?",
+        "answer": "",
+        "options": [
+          "মেঘে",
+          "আকাশে",
+          "নদীতে",
+          "পানিতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "চাঁদের আলো কী করে?",
+        "answer": "",
+        "options": [
+          "হাসে",
+          "কাঁদে",
+          "খায়",
+          "গান গায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "শিশির কণা কোথায় গড়িয়ে পড়ে?",
+        "answer": "",
+        "options": [
+          "মাটিতে",
+          "চাদরে",
+          "ঘাসে",
+          "পাতায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "মেঘ কোথায় গিয়েছে?",
+        "answer": "",
+        "options": [
+          "আকাশে",
+          "দূরে",
+          "আড়ালে",
+          "কাছে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গাছের ছায়ায় কীসের নাচন?",
+        "answer": "",
+        "options": [
+          "পাখির",
+          "রোদের",
+          "মেঘের",
+          "পাতার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে গান গাইছে?",
+        "answer": "",
+        "options": [
+          "পাখি",
+          "পাতা",
+          "শিশির",
+          "নদী"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কীভাবে বৃষ্টি এলো?",
+        "answer": "",
+        "options": [
+          "কলকলিয়ে",
+          "ঝিরঝিরিয়ে",
+          "ঝমঝমিয়ে",
+          "টলটলিয়ে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে মিউ মিউ শব্দ করে?",
+        "answer": "",
+        "options": [
+          "বিড়াল",
+          "কুকুর",
+          "ঘোড়া",
+          "হাতি"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বিড়ালটি কী খেলো?",
+        "answer": "",
+        "options": [
+          "মাছ",
+          "মাংস",
+          "ডিম",
+          "দুধ"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বিড়ালছানাটি কোথায় ছিল?",
+        "answer": "",
+        "options": [
+          "মাঠে",
+          "ঘরে",
+          "স্কুলে",
+          "বিছানায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "প্রতিযোগিতার নাম লিখি",
+    "questions": [
+      {
+        "question": "কোথায় সাংস্কৃতিক প্রতিযোগিতা অনুষ্ঠিত হবে?",
+        "answer": "",
+        "options": [
+          "মাঠে",
+          "বাজারে",
+          "স্কুলে",
+          "বাড়িতে"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "প্রতিযোগিতায় অংশ নেওয়ার কথা বলেছেন কে?",
+        "answer": "",
+        "options": [
+          "নোমান স্যার",
+          "মিতু",
+          "রাজু",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সাংস্কৃতিক প্রতিযোগিতায় কী কী হয় তা জানতে চাইলেন কে?",
+        "answer": "",
+        "options": [
+          "ঝিমিত",
+          "নোমান স্যার",
+          "মিতু",
+          "রাজু"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "সাংস্কৃতিক প্রতিযোগিতায় গান হওয়ার কথা বলেছে কে?",
+        "answer": "",
+        "options": [
+          "নোমান স্যার",
+          "রাজু",
+          "মিতু",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গল্প বলতে কার ভালো লাগে?",
+        "answer": "",
+        "options": [
+          "রাজুর",
+          "নোমান স্যারের",
+          "মিতুর",
+          "ঝিমিতের"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "রাজু কীসের প্রতিযোগিতার কথা বলেছিল?",
+        "answer": "",
+        "options": [
+          "গানের",
+          "নাচের",
+          "ছবি আঁকার",
+          "গল্প বলার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গল্প বলার প্রতিযোগিতা হয় কোথায়?",
+        "answer": "",
+        "options": [
+          "স্কুলে",
+          "কলেজে",
+          "গ্রাম্যমেলায়",
+          "বৈশাখী মেলায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "কে গল্প বলায় অংশ নিতে চায়?",
+        "answer": "",
+        "options": [
+          "রাজু",
+          "ঝিমিত",
+          "মিতু",
+          "নোমান স্যার"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "গল্প বলতে কার ভালো লাগে?",
+        "answer": "",
+        "options": [
+          "ঝিমিতের",
+          "নোমান স্যারের",
+          "রাজুর",
+          "মিতুর"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নোমান স্যার কোথায় নিজের ভালো লাগার কথা লিখতে বলেছেন?",
+        "answer": "",
+        "options": [
+          "বোর্ডে",
+          "চার্টে",
+          "ছকে",
+          "খাতায়"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "বোর্ডে ছক আঁকলেন কে?",
+        "answer": "",
+        "options": [
+          "রাজু",
+          "মিতু",
+          "নোমান স্যার",
+          "ঝিমিত"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "question": "নোমান স্যার কী পড়ে শোনালেন?",
+        "answer": "",
+        "options": [
+          "চিঠি",
+          "বিজ্ঞপ্তি",
+          "খবর",
+          "বই"
+        ],
+        "statements": [],
+        "type": "SINGLE",
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  }
+]

@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
-import { PUNCTUATION_SOURCE_OPTIONS } from "../constants"
+import { PUNCTUATION_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editPunctuationFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -84,8 +84,8 @@ export function EditPunctuationView({ id: propId }: { id?: string } = {}) {
         classId,
         subjectId: p.subjectId || "",
         content: p.rawText || p.content || "",
-        source: p.source || "",
-        session: p.session || "",
+        source: p.source || DEFAULT_SOURCE,
+        session: p.session || new Date().getFullYear().toString(),
         referenceText: Array.isArray(p.reference) ? p.reference.join(", ") : "",
         difficulty: (p.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         popularityCount: String(p.popularityCount || 0),

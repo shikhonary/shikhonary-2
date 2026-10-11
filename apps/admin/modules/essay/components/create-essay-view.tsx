@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
-import { ESSAY_SOURCE_OPTIONS } from "../constants"
+import { ESSAY_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createEssayFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -58,8 +58,8 @@ export function CreateEssayView() {
       classId: "",
       subjectId: "",
       title: "",
-      source: "",
-      session: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",

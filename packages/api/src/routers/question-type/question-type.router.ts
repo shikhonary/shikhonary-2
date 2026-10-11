@@ -5,6 +5,7 @@ import {
   getQuestionTypeSchema,
   listQuestionTypesSchema,
   updateQuestionTypeSchema,
+  batchUpdateCreditCostsSchema,
 } from "./question-type.schema"
 import {
   createQuestionType,
@@ -13,6 +14,7 @@ import {
   listQuestionTypes,
   updateQuestionType,
   toggleQuestionTypeStatus,
+  batchUpdateCreditCosts,
 } from "./question-type.service"
 
 export const questionTypeRouter = createTRPCRouter({
@@ -31,6 +33,10 @@ export const questionTypeRouter = createTRPCRouter({
   update: superAdminProcedure
     .input(updateQuestionTypeSchema)
     .mutation(({ ctx, input }) => updateQuestionType(ctx.db, input)),
+
+  batchUpdateCreditCosts: superAdminProcedure
+    .input(batchUpdateCreditCostsSchema)
+    .mutation(({ ctx, input }) => batchUpdateCreditCosts(ctx.db, input)),
 
   toggleStatus: superAdminProcedure
     .input(getQuestionTypeSchema)

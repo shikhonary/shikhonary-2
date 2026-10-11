@@ -1,9 +1,6 @@
-export const FILL_IN_THE_BLANKS_WITHOUT_CLUES_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import { QUESTION_SOURCE_OPTIONS, type QuestionSource } from "@workspace/utils"
 
-export type FillInTheBlanksWithoutCluesSource =
-  (typeof FILL_IN_THE_BLANKS_WITHOUT_CLUES_SOURCE_OPTIONS)[number]["value"]
+export const FILL_IN_THE_BLANKS_WITHOUT_CLUES_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type FillInTheBlanksWithoutCluesSource = QuestionSource
+export const DEFAULT_SOURCE = "সহায়ক সংকলন"
 
-export const DEFAULT_SOURCE = "গাইড বুক"

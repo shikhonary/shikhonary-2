@@ -91,7 +91,7 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                 >
                   <div className="flex items-start justify-between gap-2">
                     <Link
-                      href={`/question-papers/${paper.id}`}
+                      href={`/question-papers/${paper.id}/builder`}
                       className="text-xs font-bold text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-headline line-clamp-1 block flex-1"
                     >
                       {paper.title || paper.examName}
@@ -135,8 +135,8 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                       size="sm"
                       className="h-7 rounded-xl px-3 text-[11px] font-bold text-foreground border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/[0.05] cursor-pointer font-headline"
                     >
-                      <Link href={`/question-papers/${paper.id}`} className="flex items-center gap-1">
-                        <span>বিস্তারিত</span>
+                      <Link href={`/question-papers/${paper.id}/builder`} className="flex items-center gap-1">
+                        <span>বিল্ডার</span>
                         <ChevronRight className="h-3 w-3" />
                       </Link>
                     </Button>
@@ -169,7 +169,7 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                     >
                       <td className="py-3.5 px-4 font-headline">
                         <Link
-                          href={`/question-papers/${paper.id}`}
+                          href={`/question-papers/${paper.id}/builder`}
                           className="font-bold text-foreground hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-xs sm:text-sm line-clamp-1"
                         >
                           {paper.title || paper.examName}
@@ -218,8 +218,8 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                           size="sm"
                           className="h-8 rounded-xl px-3 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 font-headline cursor-pointer"
                         >
-                          <Link href={`/question-papers/${paper.id}`} className="flex items-center gap-1">
-                            <span>ভিউ ও এডিট</span>
+                          <Link href={`/question-papers/${paper.id}/builder`} className="flex items-center gap-1">
+                            <span>বিল্ডারে যান</span>
                             <ChevronRight className="h-3.5 w-3.5" />
                           </Link>
                         </Button>

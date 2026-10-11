@@ -26,7 +26,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Plus, Trash2, ArrowRightLeft } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { DAN_BAM_MILKORON_SOURCE_OPTIONS } from "../constants"
+import { DAN_BAM_MILKORON_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 import { DanBamMilkoronGrid } from "./dan-bam-milkoron-table"
 
 const createDanBamMilkoronFormSchema = z.object({
@@ -73,7 +73,7 @@ export function CreateDanBamMilkoronView() {
       chapterId: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "গাইড বুক",
+      source: DEFAULT_SOURCE,
       session: new Date().getFullYear().toString(),
       popularityCount: "0",
     },

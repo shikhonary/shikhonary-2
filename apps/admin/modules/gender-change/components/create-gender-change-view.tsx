@@ -26,6 +26,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { GENDER_CHANGE_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createGenderChangeFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -35,6 +36,8 @@ const createGenderChangeFormSchema = z.object({
   genderWord: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
 })
 
 type CreateGenderChangeFormData = z.infer<typeof createGenderChangeFormSchema>
@@ -61,6 +64,8 @@ export function CreateGenderChangeView() {
       genderWord: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
     },
   })
 
@@ -96,6 +101,8 @@ export function CreateGenderChangeView() {
         genderWord: data.genderWord?.trim() || null,
         difficulty: data.difficulty,
         reference: referenceArray,
+        source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
       })
 
       toast.success("Gender Change entry created successfully.")
@@ -307,6 +314,39 @@ export function CreateGenderChangeView() {
                 <Input
                   {...register("referenceText")}
                   placeholder="e.g. ঢাকা বোর্ড ২০২৪, সমাপনী পরীক্ষা"
+                  className="bg-white"
+                />
+              </div>
+
+              {/* Source */}
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-on-surface">Source (উৎস)</Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Select Source" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                        {GENDER_CHANGE_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session */}
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-on-surface">Session / Year (Optional)</Label>
+                <Input
+                  {...register("session")}
+                  placeholder="e.g. 2026, 2025-26..."
                   className="bg-white"
                 />
               </div>

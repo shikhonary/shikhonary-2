@@ -204,3 +204,17 @@ export async function toggleQuestionTypeStatus(
     data: { isActive: !existing.isActive },
   })
 }
+
+export async function batchUpdateCreditCosts(
+  db: PrismaClient,
+  input: { items: { id: string; creditCost: number }[] }
+) {
+  return db.$transaction(
+    input.items.map((item) =>
+      db.questionType.update({
+        where: { id: item.id },
+        data: { creditCost: item.creditCost },
+      })
+    )
+  )
+}

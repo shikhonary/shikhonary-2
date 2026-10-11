@@ -27,7 +27,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { EK_KOTHAY_PROKASH_SOURCE_OPTIONS } from "../constants"
+import { EK_KOTHAY_PROKASH_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createEkKothayProkashFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -38,6 +38,7 @@ const createEkKothayProkashFormSchema = z.object({
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
   source: z.string().optional(),
+  session: z.string().optional(),
 })
 
 type CreateEkKothayProkashFormData = z.infer<typeof createEkKothayProkashFormSchema>
@@ -64,7 +65,8 @@ export function CreateEkKothayProkashView() {
       oneWord: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "গাইড বুক",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
     },
   })
 
@@ -101,6 +103,7 @@ export function CreateEkKothayProkashView() {
         difficulty: data.difficulty,
         reference: referenceArray,
         source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
       })
 
       toast.success("Ek Kothay Prokash entry created successfully.")
@@ -318,18 +321,18 @@ export function CreateEkKothayProkashView() {
 
             {/* Source */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Source</Label>
+              <Label className="text-xs font-bold text-on-surface">Source (উৎস)</Label>
               <Controller
                 name="source"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full bg-white">
                       <SelectValue placeholder="Select Source" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
                       {EK_KOTHAY_PROKASH_SOURCE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
+                        <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
                           {opt.label}
                         </SelectItem>
                       ))}
@@ -339,9 +342,19 @@ export function CreateEkKothayProkashView() {
               />
             </div>
 
+            {/* Session */}
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-on-surface">Session / Year (Optional)</Label>
+              <Input
+                {...register("session")}
+                placeholder="e.g. 2026, 2025-26..."
+                className="bg-white"
+              />
+            </div>
+
             {/* Reference */}
             <div className="space-y-2 md:col-span-3">
-              <Label className="text-xs font-bold text-on-surface">References (comma separated)</Label>
+              <Label className="text-xs font-bold text-on-surface">Board Reference (Comma-separated)</Label>
               <Input
                 {...register("referenceText")}
                 placeholder="e.g. ঢাকা বোর্ড ২০২৪, রাজশাহী বোর্ড ২০২৩"

@@ -248,7 +248,26 @@ export const QUESTION_DIFFICULTY_OPTIONS = [
 ] as const
 
 // ---------------------------------------------------------------------------
+// Question Bank Source Options
+// ---------------------------------------------------------------------------
+
+export const QUESTION_SOURCE_OPTIONS = [
+  { value: "গাইড বুক", label: "গাইড বুক" },
+  { value: "বোর্ড প্রশ্ন", label: "বোর্ড প্রশ্ন" },
+  { value: "শীর্ষস্থানীয় স্কুল", label: "শীর্ষস্থানীয় স্কুল" },
+  { value: "সহায়ক সংকলন", label: "সহায়ক সংকলন" },
+  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
+  { value: "মডেল টেস্ট", label: "মডেল টেস্ট" },
+  { value: "অন্যান্য", label: "অন্যান্য" },
+] as const
+
+export type QuestionSource = (typeof QUESTION_SOURCE_OPTIONS)[number]["value"]
+export const DEFAULT_QUESTION_SOURCE = "সহায়ক সংকলন"
+export const DEFAULT_SOURCE = "সহায়ক সংকলন"
+
+// ---------------------------------------------------------------------------
 // Question Types & Bilingual Mappings
 // ---------------------------------------------------------------------------
 
 export * from "./question-type"
+

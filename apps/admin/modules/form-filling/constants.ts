@@ -1,6 +1,5 @@
-export const FORM_FILLING_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import { QUESTION_SOURCE_OPTIONS, type QuestionSource } from "@workspace/utils"
 
-export type FormFillingSource = (typeof FORM_FILLING_SOURCE_OPTIONS)[number]["value"]
+export const FORM_FILLING_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type FormFillingSource = QuestionSource
+

@@ -12,7 +12,9 @@ export type ParagraphSortOption = (typeof paragraphSortOptions)[number]
 
 export const paragraphSearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
+  chapterId: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<ParagraphSortOption>(Array.from(paragraphSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),

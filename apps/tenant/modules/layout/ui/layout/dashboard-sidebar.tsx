@@ -19,6 +19,7 @@ import {
   ScanLine,
   Globe,
   Share2,
+  Calculator,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import { authClient } from "@workspace/auth/client";
@@ -91,6 +92,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       groupLabel: "বিলিং ও রিওয়ার্ডস",
       items: [
         { href: "/subscription", label: "সাবস্ক্রিপশন ও প্ল্যান", icon: Sparkles },
+        { href: "/resource-pricing", label: "রিসোর্স মূল্যতালিকা", icon: Calculator },
         { href: "/refer", label: "রেফার ও রিওয়ার্ডস", icon: Share2 },
       ],
     },
@@ -156,7 +158,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           {navGroups.map((group, groupIdx) => (
             <div key={groupIdx} className="flex flex-col gap-1">
               {!collapsed && (
-                <span className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 block mt-1 first:mt-0 font-solaiman">
+                <span className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/70 block mt-1 first:mt-0 font-solaiman leading-relaxed">
                   {group.groupLabel}
                 </span>
               )}
@@ -179,11 +181,11 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                     }`} />
                     {!collapsed && (
                       <div className="flex items-center justify-between flex-1 min-w-0">
-                        <span className="text-sm tracking-tight truncate font-solaiman">
+                        <span className="text-[13.5px] leading-relaxed truncate font-solaiman py-0.5 tracking-normal">
                           {item.label}
                         </span>
                         {item.badge && (
-                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold leading-none ${
+                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold leading-normal ${
                             active
                               ? "bg-white/20 text-white"
                               : "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60"
@@ -237,10 +239,10 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 <div className="w-6 h-6 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-600">
                   <Coins className="h-3.5 w-3.5 shrink-0 group-hover:rotate-12 transition-transform" />
                 </div>
-                <span className="font-solaiman">ক্রেডিট ব্যালেন্স</span>
+                <span className="font-solaiman leading-relaxed">ক্রেডিট ব্যালেন্স</span>
               </div>
               <span
-                className="font-extrabold text-amber-900 dark:text-amber-300 bg-card px-2 py-0.5 rounded-lg border border-amber-500/30 font-solaiman text-xs"
+                className="font-extrabold text-amber-900 dark:text-amber-300 bg-card px-2 py-0.5 rounded-lg border border-amber-500/30 font-solaiman text-xs leading-relaxed"
                 style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
               >
                 {creditData?.creditBalance ?? 0}

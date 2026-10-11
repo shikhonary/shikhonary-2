@@ -111,7 +111,7 @@ export const SpeedDialAssistant: React.FC = () => {
             <div>
               <div className="flex items-center gap-1.5">
                 <h2 className="font-bold text-sm text-foreground leading-tight">
-                  শিখনারী এআই সহকারী
+                  শিখনারী AI সহকারী
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-primary/10 text-primary border border-primary/20">
                   স্মার্ট ক্রিয়েটর
@@ -254,7 +254,7 @@ export const SpeedDialAssistant: React.FC = () => {
             </span>
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              এআই সংযুক্ত
+              AI সংযুক্ত
             </span>
           </div>
         </div>
@@ -273,8 +273,8 @@ export const SpeedDialAssistant: React.FC = () => {
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
             : "opacity-0 scale-75 translate-y-2 pointer-events-none select-none"
         )}
-        title="শিখনারী এআই সহকারী (Ctrl + K)"
-        aria-label="শিখনারী এআই সহকারী"
+        title="শিখনারী AI সহকারী (Ctrl + K)"
+        aria-label="শিখনারী AI সহকারী"
       >
         <Sparkles className="w-6 h-6 animate-pulse" />
       </button>

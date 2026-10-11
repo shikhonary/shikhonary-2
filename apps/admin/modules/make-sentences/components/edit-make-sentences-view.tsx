@@ -27,7 +27,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { MAKE_SENTENCES_SOURCE_OPTIONS } from "../constants"
+import { MAKE_SENTENCES_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editMakeSentencesFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -69,8 +69,8 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
       word: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "গাইড বুক",
-      session: new Date().getFullYear().toString(),
+      source: "",
+      session: "",
     },
   })
 
@@ -98,7 +98,7 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
         word: item.word,
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: (item as any).source || "গাইড বুক",
+        source: (item as any).source || DEFAULT_SOURCE,
         session: (item as any).session || new Date().getFullYear().toString(),
       })
     }
@@ -358,7 +358,7 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
                   name="source"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value || "গাইড বুক"} onValueChange={field.onChange}>
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full bg-white">
                         <SelectValue placeholder="Select Source" />
                       </SelectTrigger>

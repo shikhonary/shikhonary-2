@@ -26,7 +26,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { MAKE_SENTENCES_SOURCE_OPTIONS } from "../constants"
+import { MAKE_SENTENCES_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createMakeSentencesFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -62,7 +62,7 @@ export function CreateMakeSentencesView() {
       word: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "গাইড বুক",
+      source: DEFAULT_SOURCE,
       session: new Date().getFullYear().toString(),
     },
   })
@@ -310,7 +310,7 @@ export function CreateMakeSentencesView() {
                   name="source"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value || "গাইড বুক"} onValueChange={field.onChange}>
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full bg-white">
                         <SelectValue placeholder="Select Source" />
                       </SelectTrigger>

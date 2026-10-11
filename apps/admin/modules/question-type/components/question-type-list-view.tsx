@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useState } from "react"
 import { useQuestionTypesList, useToggleQuestionTypeStatus } from "../services/use-question-type"
 import { useDeleteQuestionTypeModalStore } from "../store/use-delete-question-type-modal-store"
 import { QuestionTypeListHeader } from "./question-type-list-header"
@@ -7,9 +8,11 @@ import { QuestionTypeFilters } from "./question-type-filters"
 import { QuestionTypeTable } from "./question-type-table"
 import { DeleteQuestionTypeModal } from "./delete-question-type-modal"
 import { QuestionTypePagination } from "./question-type-pagination"
+import { BatchCreditPricingModal } from "./batch-credit-pricing-modal"
 import { useQuestionTypeSearchParams } from "../hooks/use-question-type-search-params"
 
 export function QuestionTypeListView() {
+  const [isBatchPricingOpen, setIsBatchPricingOpen] = useState(false)
   const [{ query: searchQuery, sort: selectedSort, page: currentPage, limit }, setSearchParams] =
     useQuestionTypeSearchParams()
 
@@ -29,7 +32,7 @@ export function QuestionTypeListView() {
   return (
     <div className="w-full">
       {/* Header */}
-      <QuestionTypeListHeader />
+      <QuestionTypeListHeader onOpenBatchPricing={() => setIsBatchPricingOpen(true)} />
 
       {/* Filters & Action Bar */}
       <QuestionTypeFilters
@@ -59,6 +62,13 @@ export function QuestionTypeListView() {
 
       {/* Delete Confirmation Modal */}
       <DeleteQuestionTypeModal />
+
+      {/* Batch Credit Pricing Modal */}
+      <BatchCreditPricingModal
+        open={isBatchPricingOpen}
+        onOpenChange={setIsBatchPricingOpen}
+      />
     </div>
   )
 }
+

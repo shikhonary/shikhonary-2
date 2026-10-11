@@ -27,7 +27,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { OPPOSITE_WORD_SOURCE_OPTIONS } from "../constants"
+import { OPPOSITE_WORD_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editOppositeWordFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -73,8 +73,8 @@ export function EditOppositeWordView({ id }: EditOppositeWordViewProps) {
       oppositeWordsText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "",
-      session: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
     },
   })
 
@@ -103,7 +103,7 @@ export function EditOppositeWordView({ id }: EditOppositeWordViewProps) {
         oppositeWordsText: Array.isArray(item.oppositeWords) ? item.oppositeWords.join(", ") : "",
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: (item as any).source || "গাইড বুক",
+        source: (item as any).source || DEFAULT_SOURCE,
         session: (item as any).session || new Date().getFullYear().toString(),
       })
     }
@@ -395,7 +395,7 @@ export function EditOppositeWordView({ id }: EditOppositeWordViewProps) {
                   name="source"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value || "গাইড বুক"} onValueChange={field.onChange}>
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full bg-white">
                         <SelectValue placeholder="Select Source" />
                       </SelectTrigger>

@@ -27,7 +27,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Plus, Trash2, ArrowRightLeft, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { DAN_BAM_MILKORON_SOURCE_OPTIONS } from "../constants"
+import { DAN_BAM_MILKORON_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 import { DanBamMilkoronGrid } from "./dan-bam-milkoron-table"
 
 const editDanBamMilkoronFormSchema = z.object({
@@ -104,8 +104,8 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
         chapterId: item.academicChapterId || "",
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: item.source || "",
-        session: item.session || "",
+        source: item.source || DEFAULT_SOURCE,
+        session: item.session || new Date().getFullYear().toString(),
         popularityCount: String(item.popularityCount || 0),
       })
 

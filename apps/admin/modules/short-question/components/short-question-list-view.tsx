@@ -22,15 +22,15 @@ export function ShortQuestionListView() {
   // Queries
   const { data: classes = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection({
-    academicClassId: params.subjectId !== "All" ? undefined : undefined,
+    academicClassId: params.classId === "All" ? undefined : params.classId,
   })
   const { data: chapters = [] } = useChaptersForSelection({
-    subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
+    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
   })
 
   const { data: statsData, isLoading: isStatsLoading } = useShortQuestionStats({
-    subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
-    chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
+    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
+    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
   })
 
   const {
@@ -39,10 +39,10 @@ export function ShortQuestionListView() {
     isError,
   } = useShortQuestionsList({
     query: params.query || undefined,
-    subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
-    chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
-    difficulty: params.difficulty !== "All" ? params.difficulty : undefined,
-    sort: params.sort !== "All" ? params.sort : "newest",
+    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
+    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
+    difficulty: params.difficulty === "All" ? undefined : params.difficulty,
+    sort: params.sort === "All" ? undefined : params.sort,
     page: params.page,
     limit: params.limit,
   })
@@ -60,8 +60,8 @@ export function ShortQuestionListView() {
       <ShortQuestionFilters
         searchQuery={params.query}
         onSearchChange={(query) => setParams({ query, page: 1 })}
-        selectedAcademicClassId={"All"}
-        onAcademicClassChange={() => {}}
+        selectedAcademicClassId={params.classId}
+        onAcademicClassChange={(clsId) => setParams({ classId: clsId, subjectId: "All", chapterId: "All", page: 1 })}
         academicClasses={classes}
         selectedSubjectId={params.subjectId}
         onSubjectChange={(subjectId) => setParams({ subjectId, chapterId: "All", page: 1 })}

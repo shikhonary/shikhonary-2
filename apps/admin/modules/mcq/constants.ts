@@ -1,8 +1,6 @@
-export const MCQ_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import { QUESTION_SOURCE_OPTIONS, type QuestionSource, DEFAULT_SOURCE } from "@workspace/utils"
 
-export type McqSource = (typeof MCQ_SOURCE_OPTIONS)[number]["value"]
+export const MCQ_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type McqSource = QuestionSource
+export { DEFAULT_SOURCE }
 
-export const DEFAULT_SOURCE = "গাইড বুক"

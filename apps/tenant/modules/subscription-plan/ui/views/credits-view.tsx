@@ -15,6 +15,7 @@ import {
   History,
   BadgePercent,
   CheckCircle2,
+  Calculator,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -87,14 +88,26 @@ export const CreditsView: React.FC = () => {
                 </div>
               </div>
 
-              <Button
-                size="lg"
-                onClick={() => handleOpenRechargeWithPack()}
-                className="w-full bg-white hover:bg-white/90 text-amber-900 font-bold rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-              >
-                <Zap className="w-4 h-4 fill-amber-700 text-amber-700" />
-                <span>তাৎক্ষণিক রিচার্জ</span>
-              </Button>
+              <div className="w-full flex flex-col gap-2">
+                <Button
+                  size="lg"
+                  onClick={() => handleOpenRechargeWithPack()}
+                  className="w-full bg-white hover:bg-white/90 text-amber-900 font-bold rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Zap className="w-4 h-4 fill-amber-700 text-amber-700" />
+                  <span>তাৎক্ষণিক রিচার্জ</span>
+                </Button>
+                <Link href="/resource-pricing" className="w-full">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs rounded-xl"
+                  >
+                    <Calculator className="w-3.5 h-3.5 mr-1 text-amber-200" />
+                    <span>রিসোর্স ও প্রশ্ন টাইপ মূল্যতালিকা</span>
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>

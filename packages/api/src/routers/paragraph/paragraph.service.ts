@@ -34,7 +34,7 @@ async function resolveParagraphQuestionTypeId(db: any) {
 }
 
 export async function listParagraphs(db: PrismaClient, input: ListParagraphsInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -44,6 +44,8 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.academicChapterId = chapterId
   if (difficulty) where.difficulty = difficulty
+  if (source) where.source = source
+  if (session) where.session = session
 
   if (query) {
     where.OR = [
@@ -149,6 +151,8 @@ export async function createParagraph(db: PrismaClient, input: CreateParagraphIn
     data: {
       name: data.name,
       reference: data.reference ?? [],
+      source: data.source ?? null,
+      session: data.session ?? null,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -181,6 +185,8 @@ export async function updateParagraph(db: PrismaClient, input: UpdateParagraphIn
     data: {
       name: data.name,
       reference: data.reference,
+      source: data.source !== undefined ? data.source : undefined,
+      session: data.session !== undefined ? data.session : undefined,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount,
       subjectId: data.subjectId,
@@ -231,6 +237,8 @@ export async function importParagraphs(db: PrismaClient, input: ImportParagraphs
           data: {
             name: data.name,
             reference: data.reference || [],
+            source: data.source ?? null,
+            session: data.session ?? null,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

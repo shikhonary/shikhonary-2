@@ -1,6 +1,12 @@
-export const SHORT_QUESTION_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import {
+  QUESTION_SOURCE_OPTIONS,
+  type QuestionSource,
+  DEFAULT_SOURCE,
+  DEFAULT_QUESTION_SOURCE,
+} from "@workspace/utils"
 
-export type ShortQuestionSource = (typeof SHORT_QUESTION_SOURCE_OPTIONS)[number]["value"]
+export const SHORT_QUESTION_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type ShortQuestionSource = QuestionSource
+export const DEFAULT_SHORT_QUESTION_SOURCE = DEFAULT_QUESTION_SOURCE
+export { DEFAULT_SOURCE }
+

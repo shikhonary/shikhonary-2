@@ -82,6 +82,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showIncompleteModal, setShowIncompleteModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publishActionType, setPublishActionType] = useState<"download" | "generate-sets">("download");
   const [isSettingsSheetOpen, setIsSettingsSheetOpen] = useState(false);
   const [isAiSheetOpen, setIsAiSheetOpen] = useState(false);
   const lastRehydratedCounter = useRef(-1);
@@ -99,31 +100,78 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
     );
   }, [distributionStatuses]);
 
-  const handleDownloadClick = () => {
+  const handleDownloadClick = async () => {
     if (incompleteDistributions.length > 0) {
       setShowIncompleteModal(true);
       return;
     }
 
     if (paperQuery?.status !== "Published") {
+      setPublishActionType("download");
       setShowPublishModal(true);
       return;
+    }
+
+    // Save paper settings before download
+    try {
+      await updateSettingsMutation({ id: paperId, settings });
+      markSaved();
+    } catch (e) {
+      console.error(e);
     }
 
     downloadAsPdf();
   };
 
-  const handleConfirmPublishAndDownload = async () => {
+  const handleGenerateSetsClick = async () => {
+    if (incompleteDistributions.length > 0) {
+      setShowIncompleteModal(true);
+      return;
+    }
+
+    if (paperQuery?.status !== "Published") {
+      setPublishActionType("generate-sets");
+      setShowPublishModal(true);
+      return;
+    }
+
+    // Save paper settings before generating sets
     try {
+      await updateSettingsMutation({ id: paperId, settings });
+      markSaved();
+    } catch (e) {
+      console.error(e);
+    }
+
+    setShowGenerateModal(true);
+  };
+
+  const handleConfirmPublish = async () => {
+    try {
+      // 1. Save paper settings
+      await updateSettingsMutation({
+        id: paperId,
+        settings,
+      });
+      markSaved();
+
+      // 2. Publish paper
       await updatePaperMutation({
         id: paperId,
         status: "Published",
       });
+
       setShowPublishModal(false);
-      toast.success("প্রশ্নপত্র সফলভাবে প্রকাশিত হয়েছে");
-      downloadAsPdf();
+
+      if (publishActionType === "generate-sets") {
+        toast.success("প্রশ্নপত্র সফলভাবে সংরক্ষিত ও প্রকাশিত হয়েছে");
+        setShowGenerateModal(true);
+      } else {
+        toast.success("প্রশ্নপত্র সফলভাবে সংরক্ষিত ও প্রকাশিত হয়েছে");
+        downloadAsPdf();
+      }
     } catch (err: any) {
-      toast.error(err?.message || "প্রশ্নপত্রের স্ট্যাটাস পরিবর্তন করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "প্রশ্নপত্রের তথ্য সংরক্ষণ ও স্ট্যাটাস পরিবর্তন করতে ব্যর্থ হয়েছে");
     }
   };
 
@@ -269,7 +317,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowGenerateModal(true)}
+            onClick={handleGenerateSetsClick}
             className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer gap-1.5 font-headline shrink-0"
             title="সেট তৈরি করুন"
           >
@@ -338,7 +386,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
               className="flex-1 h-8.5 px-3 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 font-headline font-bold text-xs flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer shadow-2xs"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>এআই সহকারী</span>
+              <span>AI সহকারী</span>
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </button>
           </SheetTrigger>
@@ -373,8 +421,9 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         open={showPublishModal}
         onOpenChange={setShowPublishModal}
         paperTitle={paperQuery.title}
-        onConfirm={handleConfirmPublishAndDownload}
-        isLoading={isPublishing}
+        actionType={publishActionType}
+        onConfirm={handleConfirmPublish}
+        isLoading={isPublishing || isManualSaving}
       />
       <ExportOverlay />
     </div>

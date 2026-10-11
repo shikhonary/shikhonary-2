@@ -648,6 +648,18 @@ export type {
 } from "./routers/question-bank/question-bank.schema"
 export { getClassDetailsSchema } from "./routers/question-bank/question-bank.schema"
 
+export * from "./routers/credit/credit.schema"
+export {
+  listQuestions,
+  getQuestionStats,
+  getQuestionDetails,
+  getFilterOptions,
+  getClassesWithStats,
+  getClassDetails,
+  getSubjectDetails,
+} from "./routers/question-bank/question-bank.service"
+export type { NormalizedQuestionItem } from "./routers/question-bank/question-bank.service"
+
 
 
 

@@ -16,6 +16,7 @@ import {
   Settings,
   X,
   ChevronRight,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -67,6 +68,13 @@ const MORE_SPEED_DIAL_ITEMS = [
     title: "ক্রেডিট ও রিচার্জ",
     subtitle: "এআই প্রশ্ন তৈরির ক্রেডিট ওয়ালেট ও টপ-আপ",
     iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  },
+  {
+    href: "/resource-pricing",
+    icon: Calculator,
+    title: "রিসোর্স মূল্যতালিকা",
+    subtitle: "প্রশ্ন টাইপ অনুযায়ী ক্রেডিট খরচ ও হিসাব",
+    iconBg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
   },
   {
     href: "/refer",

@@ -28,7 +28,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { WORD_MEANING_SOURCE_OPTIONS } from "../constants"
+import { WORD_MEANING_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editWordMeaningFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -101,7 +101,7 @@ export function EditWordMeaningView({ id }: EditWordMeaningViewProps) {
         meaning: item.meaning || "",
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: (item as any).source || "গাইড বুক",
+        source: (item as any).source || DEFAULT_SOURCE,
         session: (item as any).session || new Date().getFullYear().toString(),
       })
     }
@@ -373,7 +373,7 @@ export function EditWordMeaningView({ id }: EditWordMeaningViewProps) {
                   name="source"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value || "গাইড বুক"} onValueChange={field.onChange}>
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full bg-white">
                         <SelectValue placeholder="Select Source" />
                       </SelectTrigger>

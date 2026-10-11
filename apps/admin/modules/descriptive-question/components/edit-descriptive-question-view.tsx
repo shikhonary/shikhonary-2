@@ -28,6 +28,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { DESCRIPTIVE_QUESTION_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editDescriptiveQuestionFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -37,6 +38,8 @@ const editDescriptiveQuestionFormSchema = z.object({
   answer: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
 })
 
 type EditDescriptiveQuestionFormData = z.infer<typeof editDescriptiveQuestionFormSchema>
@@ -67,6 +70,8 @@ export function EditDescriptiveQuestionView({ descriptiveQuestionId }: { descrip
       answer: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
+      source: "",
+      session: "",
     },
   })
 
@@ -81,6 +86,8 @@ export function EditDescriptiveQuestionView({ descriptiveQuestionId }: { descrip
         answer: item.answer || "",
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: item.reference ? item.reference.join(", ") : "",
+        source: item.source || DEFAULT_SOURCE,
+        session: item.session || new Date().getFullYear().toString(),
       })
     }
   }, [item, reset])
@@ -117,6 +124,8 @@ export function EditDescriptiveQuestionView({ descriptiveQuestionId }: { descrip
         answer: data.answer?.trim() || null,
         difficulty: data.difficulty,
         reference: referenceArray,
+        source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
       })
 
       toast.success("Descriptive Question updated successfully.")
@@ -342,6 +351,39 @@ export function EditDescriptiveQuestionView({ descriptiveQuestionId }: { descrip
                 <Input
                   {...register("referenceText")}
                   placeholder="e.g. ঢাকা বোর্ড ২০২৪, রাজশাহী বোর্ড ২০২৩"
+                  className="bg-white"
+                />
+              </div>
+
+              {/* Source */}
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-on-surface">Source (উৎস)</Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full bg-white">
+                        <SelectValue placeholder="Select Source" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                        {DESCRIPTIVE_QUESTION_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session */}
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-on-surface">Session / Year (Optional)</Label>
+                <Input
+                  {...register("session")}
+                  placeholder="e.g. 2026, 2025-26..."
                   className="bg-white"
                 />
               </div>

@@ -33,12 +33,13 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
-import { ESSAY_SOURCE_OPTIONS } from "../constants"
+import { ESSAY_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
     "title": "দৈনন্দিন জীবনে বিজ্ঞান ও আধুনিক প্রযুক্তি—মানব সভ্যতায় বিজ্ঞানের অবদান ও ভবিষ্যৎ সম্ভাবনা বিষয়ে একটি নাতিদীর্ঘ প্রবন্ধ রচনা করো।",
-    "source": "গাইড বুক",
+    "source": "${DEFAULT_SOURCE}",
+    "session": "2024",
     "reference": ["Dhaka Board 2024", "Rajshahi Board 2023"],
     "difficulty": "MEDIUM",
     "popularityCount": 15
@@ -383,7 +384,7 @@ function EditableEssayCard({
               Source (উৎস)
             </span>
             <Select
-              value={item.source || "গাইড বুক"}
+              value={item.source || DEFAULT_SOURCE}
               onValueChange={(val) => onChange({ ...item, source: val })}
             >
               <SelectTrigger className="w-full bg-white h-9 text-xs">
@@ -423,7 +424,7 @@ export function ImportEssayView() {
   const [jsonText, setJsonText] = useState<string>("")
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
-  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -496,7 +497,8 @@ export function ImportEssayView() {
         return
       }
 
-      const currentDefaultSource = overrideSource || selectedSource || "গাইড বুক"
+      const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
+      const currentDefaultSession = new Date().getFullYear().toString()
       const validated: any[] = []
       const errors: string[] = []
 
@@ -516,6 +518,7 @@ export function ImportEssayView() {
           subjectId,
           title: String(title || "").trim(),
           source: item.source ? String(item.source).trim() : currentDefaultSource,
+          session: item.session ? String(item.session).trim() : currentDefaultSession,
           difficulty: item.difficulty || "MEDIUM",
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
@@ -607,7 +610,8 @@ export function ImportEssayView() {
   const handleAddNewQuestionCard = () => {
     const newEssay = {
       title: "New Essay Prompt / Topic...",
-      source: selectedSource || "গাইড বুক",
+      source: selectedSource || DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -631,7 +635,8 @@ export function ImportEssayView() {
       const payload = parsedItems.map((item) => ({
         subjectId: selectedSubjectId,
         title: item.title.trim(),
-        source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
+        source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
+        session: item.session ? String(item.session).trim() : new Date().getFullYear().toString(),
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],

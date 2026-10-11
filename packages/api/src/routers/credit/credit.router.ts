@@ -38,7 +38,7 @@ export const creditRouter = createTRPCRouter({
 
   estimateCost: tenantMemberProcedure
     .input(estimatePaperCostSchema)
-    .query(({ ctx, input }) =>
+    .mutation(({ ctx, input }) =>
       estimatePaperCost(ctx.db, input)
     ),
 })

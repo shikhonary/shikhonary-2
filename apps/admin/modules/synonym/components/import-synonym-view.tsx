@@ -38,7 +38,7 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
-import { SYNONYM_SOURCE_OPTIONS } from "../constants"
+import { SYNONYM_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -46,6 +46,7 @@ const sampleJsonTemplate = `[
     "synonymWord": "সাগর",
     "synonyms": ["সাগর", "জলধি", "সিন্ধু"],
     "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
+    "source": "সহায়ক সংকলন",
     "difficulty": "EASY",
     "popularityCount": 12
   },
@@ -54,6 +55,7 @@ const sampleJsonTemplate = `[
     "synonymWord": "রবি",
     "synonyms": ["রবি", "ভানু", "দিবাকর"],
     "reference": ["চট্টগ্রাম বোর্ড ২০২২"],
+    "source": "সহায়ক সংকলন",
     "difficulty": "MEDIUM",
     "popularityCount": 8
   }
@@ -424,7 +426,7 @@ function EditableSynonymCard({
               Source (উৎস)
             </span>
             <Select
-              value={item.source || "গাইড বুক"}
+              value={item.source || DEFAULT_SOURCE}
               onValueChange={(val) => onChange({ ...item, source: val })}
             >
               <SelectTrigger className="w-full bg-white h-9 text-xs">
@@ -465,7 +467,7 @@ export function ImportSynonymView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
-  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -542,7 +544,7 @@ export function ImportSynonymView() {
         return
       }
 
-      const currentDefaultSource = overrideSource || selectedSource || "গাইড বুক"
+      const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
       const validated: any[] = []
       const errors: string[] = []
 
@@ -684,7 +686,7 @@ export function ImportSynonymView() {
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
-      source: selectedSource || "গাইড বুক",
+      source: selectedSource || DEFAULT_SOURCE,
     }
     const next = [...parsedItems, newWord]
     syncParsedItemsToText(next)
@@ -715,7 +717,7 @@ export function ImportSynonymView() {
           difficulty: item.difficulty as any,
           popularityCount: Number(item.popularityCount) || 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
-          source: item.source ? String(item.source).trim() : (selectedSource || "গাইড বুক"),
+          source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
         }
       })
 
@@ -878,7 +880,7 @@ export function ImportSynonymView() {
               </Label>
               <Select
                 value={selectedSource}
-                onValueChange={(val) => handleSourceChange(val ?? "গাইড বুক")}
+                onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
               >
                 <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
                   <SelectValue placeholder="Select Source..." />

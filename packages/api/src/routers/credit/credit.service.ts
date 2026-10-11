@@ -93,6 +93,8 @@ export async function getQuestionTypePricing(db: PrismaClient) {
       mark: true,
       creditCost: true,
       position: true,
+      descriptionEn: true,
+      descriptionBn: true,
     },
     orderBy: { position: "asc" },
   })

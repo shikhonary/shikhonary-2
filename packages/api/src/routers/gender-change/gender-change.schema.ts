@@ -29,6 +29,8 @@ export const createGenderChangeSchema = z.object({
   word: z.string().min(1, "Word text is required"),
   genderWord: z.string().optional().nullable(),
   reference: z.array(z.string()).optional().default([]),
+  source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),

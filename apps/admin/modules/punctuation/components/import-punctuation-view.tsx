@@ -37,7 +37,7 @@ import {
   UploadIcon,
 } from "lucide-react"
 
-import { PUNCTUATION_SOURCE_OPTIONS } from "../constants"
+import { PUNCTUATION_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -401,7 +401,7 @@ export function ImportPunctuationView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
-  const [selectedSource, setSelectedSource] = useState<string>("গাইড বুক")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [jsonText, setJsonText] = useState("")
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)

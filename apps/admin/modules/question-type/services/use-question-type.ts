@@ -79,3 +79,20 @@ export function useToggleQuestionTypeStatus() {
     onError: (err: any) => toast.error(err.message || "Failed to update status"),
   })
 }
+
+/**
+ * Hook to batch update credit costs of question types.
+ */
+export function useBatchUpdateCreditCosts() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.questionType.batchUpdateCreditCosts.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionType.pathFilter())
+      toast.success("Resource credit pricing updated successfully.")
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to update credit pricing"),
+  })
+}
+

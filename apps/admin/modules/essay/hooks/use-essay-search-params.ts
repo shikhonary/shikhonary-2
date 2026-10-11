@@ -12,6 +12,7 @@ export type EssaySortOption = (typeof essaySortOptions)[number]
 
 export const essaySearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<EssaySortOption>(Array.from(essaySortOptions)).withDefault("All"),

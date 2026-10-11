@@ -1,6 +1,12 @@
-export const EK_KOTHAY_PROKASH_SOURCE_OPTIONS = [
-  { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },
-] as const
+import {
+  QUESTION_SOURCE_OPTIONS,
+  type QuestionSource,
+  DEFAULT_SOURCE,
+  DEFAULT_QUESTION_SOURCE,
+} from "@workspace/utils"
 
-export type EkKothayProkashSource = (typeof EK_KOTHAY_PROKASH_SOURCE_OPTIONS)[number]["value"]
+export const EK_KOTHAY_PROKASH_SOURCE_OPTIONS = QUESTION_SOURCE_OPTIONS
+export type EkKothayProkashSource = QuestionSource
+export const DEFAULT_EK_KOTHAY_PROKASH_SOURCE = DEFAULT_QUESTION_SOURCE
+export { DEFAULT_SOURCE }
+

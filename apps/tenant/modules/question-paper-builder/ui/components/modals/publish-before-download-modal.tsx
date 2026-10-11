@@ -10,12 +10,13 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
-import { AlertTriangle, Download, Loader2, Lock, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Copy, Download, Loader2, Lock, ShieldAlert } from "lucide-react";
 
 interface PublishBeforeDownloadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   paperTitle?: string;
+  actionType?: "download" | "generate-sets";
   onConfirm: () => void;
   isLoading?: boolean;
 }
@@ -24,9 +25,12 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
   open,
   onOpenChange,
   paperTitle,
+  actionType = "download",
   onConfirm,
   isLoading = false,
 }) => {
+  const isGenerateSets = actionType === "generate-sets";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="font-display sm:max-w-md p-0 overflow-hidden bg-card border-border">
@@ -38,10 +42,12 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
             </div>
             <div>
               <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
-                প্রশ্নপত্র প্রকাশ ও ডাউনলোড
+                {isGenerateSets ? "প্রশ্নপত্র প্রকাশ ও সেট তৈরি" : "প্রশ্নপত্র প্রকাশ ও ডাউনলোড"}
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
-                ডাউনলোড করার পূর্বে স্ট্যাটাস পরিবর্তনের সতর্কতা
+                {isGenerateSets
+                  ? "সেট তৈরি করার পূর্বে স্ট্যাটাস পরিবর্তনের সতর্কতা"
+                  : "ডাউনলোড করার পূর্বে স্ট্যাটাস পরিবর্তনের সতর্কতা"}
               </DialogDescription>
             </div>
           </div>
@@ -65,7 +71,9 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
               <span>গুরুত্বপূর্ণ নোটিশ</span>
             </div>
             <p className="text-xs leading-relaxed opacity-90">
-              প্রশ্নপত্রটি ডাউনলোড সম্পন্ন করলে এর স্ট্যাটাস স্বয়ংক্রিয়ভাবে <strong>'পাবলিশড (Published)'</strong> হিসেবে সংরক্ষিত হবে।
+              {isGenerateSets
+                ? "প্রশ্নপত্রের একাধিক সেট তৈরি করতে এর স্ট্যাটাস স্বয়ংক্রিয়ভাবে 'পাবলিশড (Published)' হিসেবে সংরক্ষিত হবে।"
+                : "প্রশ্নপত্রটি ডাউনলোড সম্পন্ন করলে এর স্ট্যাটাস স্বয়ংক্রিয়ভাবে 'পাবলিশড (Published)' হিসেবে সংরক্ষিত হবে।"}
             </p>
             <div className="flex items-start gap-1.5 pt-1 text-[11px] text-amber-700 dark:text-amber-300/90 font-medium">
               <Lock className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -92,10 +100,14 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
           >
             {isLoading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : isGenerateSets ? (
+              <Copy className="w-3.5 h-3.5" />
             ) : (
               <Download className="w-3.5 h-3.5" />
             )}
-            <span>প্রকাশ ও ডাউনলোড করুন</span>
+            <span>
+              {isGenerateSets ? "প্রকাশ ও সেট তৈরি করুন" : "প্রকাশ ও ডাউনলোড করুন"}
+            </span>
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -72,7 +72,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <h2 className="font-headline font-bold text-sm text-foreground truncate">
-                এআই সহকারী
+                AI সহকারী
               </h2>
               <span className="px-1.5 py-0.2 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/40">
                 সক্রিয়
@@ -218,7 +218,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
           </span>
           <span className="flex items-center gap-1">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            এআই সংযুক্ত
+            AI সংযুক্ত
           </span>
         </div>
       </div>

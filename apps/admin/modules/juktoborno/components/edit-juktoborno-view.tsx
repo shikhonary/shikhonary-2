@@ -27,7 +27,7 @@ import {
 } from "@workspace/ui/components/select"
 import { ChevronRightIcon, Loader2 } from "lucide-react"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { JUKTOBORNO_SOURCE_OPTIONS } from "../constants"
+import { JUKTOBORNO_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const editJuktobornoFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -96,8 +96,8 @@ export function EditJuktobornoView({ id }: EditJuktobornoViewProps) {
         subjectId: item.subjectId,
         chapterId: item.academicChapterId || "",
         juktoborno: item.juktoborno,
-        source: (item as any).source || "",
-        session: (item as any).session || "",
+        source: (item as any).source || DEFAULT_SOURCE,
+        session: (item as any).session || new Date().getFullYear().toString(),
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
       })

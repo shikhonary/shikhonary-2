@@ -16,7 +16,49 @@ export async function generatePaperSets(
 
   const generatedPapers: Array<{ id: string; title: string; setCode: string }> = []
 
-  for (const setCode of input.setCodes) {
+  const cleanBaseTitle = source.title.replace(/\s*\(সেট\s*[^)]+\)$/, "").trim()
+
+  const firstSetCode = input.setCodes[0] || "ক"
+  const firstSetTitle = `${cleanBaseTitle} (সেট ${firstSetCode})`
+
+  // 1. Update the original paper to become the first set (Set A / Set ক) and publish it
+  const updatedOriginalSettings = {
+    ...((source.settings as any) || {}),
+    setCode: firstSetCode,
+    showSetCode: true,
+  }
+
+  await tenantDb.questionPaper.update({
+    where: { id: source.id },
+    data: {
+      title: firstSetTitle,
+      status: "Published",
+      settings: updatedOriginalSettings,
+    },
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: source.id,
+    action: "UPDATED",
+    actorId,
+    changes: {
+      title: firstSetTitle,
+      status: "Published",
+      setCode: firstSetCode,
+      isOriginalSet: true,
+    },
+  })
+
+  generatedPapers.push({
+    id: source.id,
+    title: firstSetTitle,
+    setCode: firstSetCode,
+  })
+
+  // 2. Only generate the remaining sets (e.g. if 2 sets: only 1 new set for "খ", not 2 new sets)
+  const remainingSetCodes = input.setCodes.slice(1)
+
+  for (const setCode of remainingSetCodes) {
     const newSettings = {
       ...((source.settings as any) || {}),
       setCode,
@@ -25,7 +67,7 @@ export async function generatePaperSets(
 
     const createdPaper = await tenantDb.questionPaper.create({
       data: {
-        title: `${source.title} (সেট ${setCode})`,
+        title: `${cleanBaseTitle} (সেট ${setCode})`,
         examName: source.examName,
         description: source.description,
         classId: source.classId,
@@ -33,7 +75,7 @@ export async function generatePaperSets(
         settings: newSettings,
         instructions: source.instructions ?? [],
         isTemplate: false,
-        status: "Draft",
+        status: "Published",
         total: source.total,
         timeInMinutes: source.timeInMinutes,
         createdBy: actorId,

@@ -12,6 +12,7 @@ export type ShortQuestionSortOption = (typeof shortQuestionSortOptions)[number]
 
 export const shortQuestionSearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),

@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { PARAGRAPH_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createParagraphFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -30,6 +31,8 @@ const createParagraphFormSchema = z.object({
   chapterId: z.string().optional(),
   name: z.string().min(1, "Paragraph text/passage is required"),
   referenceText: z.string().optional(),
+  source: z.string().optional(),
+  session: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
     message: "Popularity count must be a number",
@@ -60,6 +63,8 @@ export function CreateParagraphView() {
       chapterId: "",
       name: "",
       referenceText: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",
     },
@@ -94,6 +99,8 @@ export function CreateParagraphView() {
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
+        source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
       })
 
       toast.success("Paragraph created successfully.")
@@ -346,6 +353,53 @@ export function CreateParagraphView() {
                 {errors.popularityCount && (
                   <p className="text-xs text-error">{errors.popularityCount.message}</p>
                 )}
+              </div>
+            </div>
+
+            {/* Source & Session */}
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              {/* Source */}
+              <div className="space-y-2">
+                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                  Source (উৎস)
+                </Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      disabled={isSubmitting}
+                      value={field.value || DEFAULT_SOURCE}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 focus-visible:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
+                        <SelectValue placeholder="Select Source" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg">
+                        {PARAGRAPH_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session */}
+              <div className="space-y-2">
+                <Label htmlFor="session" className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                  Session / Year (Optional)
+                </Label>
+                <Input
+                  id="session"
+                  type="text"
+                  disabled={isSubmitting}
+                  placeholder="e.g. 2026, 2025-26..."
+                  {...register("session")}
+                  className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm text-on-surface outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50 h-auto focus-visible:ring-primary/20 focus-visible:outline-hidden"
+                />
               </div>
             </div>
 

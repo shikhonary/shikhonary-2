@@ -20,6 +20,7 @@ import {
   SlidersHorizontal,
   ArrowUpDown,
   BookOpen,
+  Bookmark,
   Layers,
   GraduationCap,
 } from "lucide-react"
@@ -28,6 +29,13 @@ interface SubjectOption {
   id: string
   nameEn: string
   nameBn?: string
+}
+
+interface ChapterOption {
+  id: string
+  nameEn: string
+  nameBn?: string
+  subjectId: string
 }
 
 interface AcademicClassOption {
@@ -45,6 +53,9 @@ interface ParagraphFiltersProps {
   selectedSubjectId: string
   onSubjectChange: (value: string) => void
   subjects?: SubjectOption[]
+  selectedChapterId: string
+  onChapterChange: (value: string) => void
+  chapters?: ChapterOption[]
   selectedDifficulty: string
   onDifficultyChange: (value: string) => void
   selectedSort: string
@@ -60,25 +71,35 @@ export function ParagraphFilters({
   selectedSubjectId,
   onSubjectChange,
   subjects = [],
+  selectedChapterId,
+  onChapterChange,
+  chapters = [],
   selectedDifficulty,
   onDifficultyChange,
   selectedSort,
   onSortChange,
 }: ParagraphFiltersProps) {
+  const filteredChapters = selectedSubjectId !== "All"
+    ? chapters.filter((c) => c.subjectId === selectedSubjectId)
+    : chapters
+
   const hasActiveQuery = Boolean(searchQuery && searchQuery.trim() !== "")
   const hasActiveSubject = Boolean(selectedSubjectId && selectedSubjectId !== "All")
+  const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All")
   const hasActiveDifficulty = Boolean(selectedDifficulty && selectedDifficulty !== "All")
   const hasActiveSort = Boolean(selectedSort && selectedSort !== "All")
 
   const hasAnyFilter =
     hasActiveQuery ||
     hasActiveSubject ||
+    hasActiveChapter ||
     hasActiveDifficulty ||
     hasActiveSort ||
     selectedAcademicClassId !== "All"
 
   const activeFilterCount =
     (hasActiveSubject ? 1 : 0) +
+    (hasActiveChapter ? 1 : 0) +
     (hasActiveDifficulty ? 1 : 0) +
     (hasActiveSort ? 1 : 0)
 
@@ -86,6 +107,7 @@ export function ParagraphFilters({
     onSearchChange("")
     onAcademicClassChange("All")
     onSubjectChange("All")
+    onChapterChange("All")
     onDifficultyChange("All")
     onSortChange("All")
   }
@@ -122,6 +144,7 @@ export function ParagraphFilters({
           onValueChange={(val) => {
             onAcademicClassChange(val ?? "All")
             onSubjectChange("All")
+            onChapterChange("All")
           }}
         >
           <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
@@ -150,6 +173,7 @@ export function ParagraphFilters({
           value={selectedSubjectId}
           onValueChange={(val) => {
             onSubjectChange(val ?? "All")
+            onChapterChange("All")
           }}
           disabled={selectedAcademicClassId === "All"}
         >
@@ -161,6 +185,33 @@ export function ParagraphFilters({
             {subjects.map((sub) => (
               <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
                 {sub.nameEn}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Chapter Filter */}
+      <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
+        {isMobile && (
+          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+            <Bookmark className="h-3.5 w-3.5 text-primary" />
+            Chapter
+          </label>
+        )}
+        <Select
+          value={selectedChapterId}
+          onValueChange={(val) => onChapterChange(val ?? "All")}
+          disabled={selectedSubjectId === "All"}
+        >
+          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+            <SelectValue placeholder={selectedSubjectId === "All" ? "Select Subject First" : "All Chapters"} />
+          </SelectTrigger>
+          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+            <SelectItem value="All" className="text-neutral-900">All Chapters</SelectItem>
+            {filteredChapters.map((ch) => (
+              <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
+                {ch.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
@@ -332,9 +383,28 @@ export function ParagraphFilters({
                   type="button"
                   onClick={() => {
                     onSubjectChange("All")
+                    onChapterChange("All")
                   }}
                   className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
                   title="Remove subject filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+
+            {/* Chapter Badge */}
+            {hasActiveChapter && (
+              <Badge
+                variant="secondary"
+                className="inline-flex items-center gap-1 rounded-md border border-outline-variant/40 bg-surface-container-high px-2 py-1 text-[11px] sm:text-xs font-medium text-on-surface hover:bg-surface-container-highest cursor-default normal-case tracking-normal shrink-0"
+              >
+                <span>Chapter: {chapters.find(c => c.id === selectedChapterId)?.nameEn || selectedChapterId}</span>
+                <button
+                  type="button"
+                  onClick={() => onChapterChange("All")}
+                  className="rounded-full p-0.5 hover:bg-outline-variant/30 transition-colors cursor-pointer shrink-0"
+                  title="Remove chapter filter"
                 >
                   <X className="h-3 w-3" />
                 </button>

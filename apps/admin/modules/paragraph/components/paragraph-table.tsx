@@ -6,7 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Edit3, Trash2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -15,12 +15,30 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 
+function getPaginationItems(currentPage: number, totalPages: number): (number | "ellipsis-start" | "ellipsis-end")[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, "ellipsis-end", totalPages]
+  }
+
+  if (currentPage >= totalPages - 3) {
+    return [1, "ellipsis-start", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+  }
+
+  return [1, "ellipsis-start", currentPage - 1, currentPage, currentPage + 1, "ellipsis-end", totalPages]
+}
+
 export interface ParagraphItem {
   id: string
   name: string
   reference: string[]
   difficulty: string
   popularityCount: number
+  source?: string | null
+  session?: string | null
   createdAt: Date | string
   updatedAt: Date | string
   subject: {
@@ -237,6 +255,11 @@ export function ParagraphTable({
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {((item as any).source || (item as any).session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -247,7 +270,9 @@ export function ParagraphTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !((item as any).source || (item as any).session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 
@@ -284,7 +309,7 @@ export function ParagraphTable({
         </div>
       )}
 
-      {/* Pagination Footer (Matches CQ Pagination exactly) */}
+      {/* Pagination Footer */}
       {!isLoading && !isError && totalItems > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
           <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
@@ -313,37 +338,88 @@ export function ParagraphTable({
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* First Page Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage <= 1}
+              onClick={() => onPageChange(1)}
+              title="First page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronsLeft className="size-4" />
+            </Button>
+
+            {/* Previous Page Button */}
             <Button
               variant="outline"
               size="icon"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
+              title="Previous page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="size-4" />
             </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? "default" : "ghost"}
-                onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary"
-                    : "hover:bg-surface-container-high text-on-surface"
-                }`}
-              >
-                {pageNum}
-              </Button>
-            ))}
+
+            {/* Numbered Page Buttons & Ellipses */}
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              {getPaginationItems(currentPage, totalPages).map((pItem, i) => {
+                if (pItem === "ellipsis-start" || pItem === "ellipsis-end") {
+                  return (
+                    <span
+                      key={`${pItem}-${i}`}
+                      className="flex size-8 sm:size-9 items-center justify-center text-xs text-muted-foreground select-none"
+                    >
+                      <MoreHorizontal className="size-4" />
+                    </span>
+                  )
+                }
+
+                const pageNum = pItem as number
+                const isCurrent = currentPage === pageNum
+
+                return (
+                  <Button
+                    key={pageNum}
+                    variant={isCurrent ? "default" : "outline"}
+                    size="icon"
+                    onClick={() => onPageChange(pageNum)}
+                    className={cn(
+                      "size-8 sm:size-9 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                      isCurrent
+                        ? "bg-primary font-bold text-white hover:bg-primary shadow-xs"
+                        : "border-outline-variant/60 bg-white hover:bg-surface-container-high text-on-surface hover:text-primary"
+                    )}
+                  >
+                    {pageNum}
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Next Page Button */}
             <Button
               variant="outline"
               size="icon"
               disabled={currentPage >= totalPages}
               onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
+              title="Next page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="size-4" />
+            </Button>
+
+            {/* Last Page Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(totalPages)}
+              title="Last page"
+              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
+            >
+              <ChevronsRight className="size-4" />
             </Button>
           </div>
         </div>
