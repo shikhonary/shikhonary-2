@@ -461,6 +461,17 @@ export type {
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
+  ListGrammarQuestionInput,
+  GrammarQuestionStatsInput,
+  GetGrammarQuestionInput,
+  CreateGrammarQuestionInput,
+  UpdateGrammarQuestionInput,
+  DeleteGrammarQuestionInput,
+  BulkDeleteGrammarQuestionInput,
+  ImportGrammarQuestionInput,
+} from "./routers/grammar-question/grammar-question.schema"
+
+export type {
   ListEkKothayProkashInput,
   EkKothayProkashStatsInput,
   GetEkKothayProkashInput,
@@ -620,6 +631,17 @@ export {
   bulkDeleteDanBamMilkoronSchema,
   importDanBamMilkoronSchema,
 } from "./routers/dan-bam-milkoron/dan-bam-milkoron.schema"
+
+export {
+  listGrammarQuestionSchema,
+  grammarQuestionStatsSchema,
+  getGrammarQuestionSchema,
+  createGrammarQuestionSchema,
+  updateGrammarQuestionSchema,
+  deleteGrammarQuestionSchema,
+  bulkDeleteGrammarQuestionSchema,
+  importGrammarQuestionSchema,
+} from "./routers/grammar-question/grammar-question.schema"
 
 export {
   listFillInTheBlanksWithoutCluesSchema,

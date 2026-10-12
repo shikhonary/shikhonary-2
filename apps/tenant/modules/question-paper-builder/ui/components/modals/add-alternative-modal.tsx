@@ -66,6 +66,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.SHORT_COMPOSITION, nameBn: "Short Composition", nameEn: "Short Composition", desc: "সংক্ষিপ্ত রচনা বা কম্পোজিশন লিখন" },
   { code: QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION, nameBn: "রচনামূলক প্রশ্ন", nameEn: "Descriptive Question", desc: "রচনামূলক বা বিস্তারিত উত্তরদানের প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SHORT_QUESTION, nameBn: "সংক্ষিপ্ত প্রশ্ন", nameEn: "Short Question", desc: "সরাসরি সংক্ষেপে উত্তরদানের প্রশ্ন" },
+  { code: QUESTION_TYPE_CODES.GRAMMAR_QUESTION, nameBn: "ব্যাকরণ প্রশ্ন", nameEn: "Grammar Question", desc: "ব্যাকরণ বিষয়ক সংক্ষিপ্ত বা সুনির্দিষ্ট প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.MAKE_QUESTION, nameBn: "Make Question / প্রশ্ন তৈরি", nameEn: "Make Question", desc: "নির্দেশনা অনুযায়ী প্রশ্ন তৈরিকরণ (WH Questions)" },
   { code: QUESTION_TYPE_CODES.WORD_MEANING, nameBn: "শব্দার্থ", nameEn: "Word Meaning", desc: "শব্দের অর্থ লিখন" },
   { code: QUESTION_TYPE_CODES.MAKE_SENTENCES, nameBn: "বাক্য রচনা / বাক্য তৈরি", nameEn: "Make Sentences", desc: "প্রদত্ত শব্দ দিয়ে বাক্য রচনা" },

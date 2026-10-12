@@ -87,6 +87,8 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).shuddhoAshuddho.findUnique({ where: { id: pq.shuddhoAshuddhoId } })
     } else if (pq.danBamMilkoronId) {
       content = await (db as any).danBamMilkoron.findUnique({ where: { id: pq.danBamMilkoronId } })
+    } else if (pq.grammarQuestionId) {
+      content = await (db as any).grammarQuestion.findUnique({ where: { id: pq.grammarQuestionId } })
     }
 
     if (content) {

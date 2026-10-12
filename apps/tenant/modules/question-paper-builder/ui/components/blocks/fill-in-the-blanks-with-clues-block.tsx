@@ -259,6 +259,11 @@ export const FillInTheBlanksWithCluesBlock = ({ item }: { item: any }) => {
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
+  // Content or Options check: either passage content and/or discrete sentence options
+  const hasPassageContent = Boolean(data.content && typeof data.content === "string" && data.content.trim());
+  const optionsList: string[] = Array.isArray(data.options) ? data.options : [];
+  const hasOptionsList = optionsList.length > 0;
+
   return (
     <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${item.isFirstFillInTheBlanksWithClues ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
@@ -342,14 +347,40 @@ export const FillInTheBlanksWithCluesBlock = ({ item }: { item: any }) => {
               {/* Clues Box Table */}
               <RenderCluesTable clues={data.clues} style={questionStyle} />
 
-              {/* Passage with blanks */}
+              {/* Passage with blanks OR discrete options */}
               <div className="w-full">
-                <FillInTheBlanksEditableText 
-                  text={data.content || ""}
-                  itemKey={`${item.id}-question`}
-                  defaultStyle={questionStyle}
-                  className="m-0 w-full whitespace-pre-wrap leading-relaxed"
-                />
+                {hasPassageContent && (
+                  <FillInTheBlanksEditableText 
+                    text={data.content || ""}
+                    itemKey={`${item.id}-question`}
+                    defaultStyle={questionStyle}
+                    className="m-0 w-full whitespace-pre-wrap leading-relaxed"
+                  />
+                )}
+
+                {hasOptionsList && (
+                  <div className={`space-y-1 ${hasPassageContent ? "mt-2" : ""}`}>
+                    {optionsList.map((opt: string, optIdx: number) => {
+                      const match = opt.match(/^\s*\(?([a-zA-Z0-9]+)\)[\s.:-]*(.*)$/);
+                      const optLabel: string = match?.[1] || subLabels[optIdx] || String(optIdx + 1);
+                      const optText: string = (match?.[2] !== undefined ? match[2] : opt) || "";
+
+                      return (
+                        <div key={optIdx} className="flex gap-2 items-start w-full">
+                          {renderSubQuestionLabel(optLabel)}
+                          <div className="flex-1 min-w-0">
+                            <FillInTheBlanksEditableText 
+                              text={optText}
+                              itemKey={`${item.id}-option-${optIdx}`}
+                              defaultStyle={questionStyle}
+                              className="m-0 w-full leading-relaxed"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>

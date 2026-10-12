@@ -24,9 +24,12 @@ export const getFillInTheBlanksWithCluesSchema = idSchema
 export type GetFillInTheBlanksWithCluesInput = z.infer<typeof getFillInTheBlanksWithCluesSchema>
 
 export const createFillInTheBlanksWithCluesSchema = z.object({
-  content: z.string().min(1, "Content is required"),
+  content: z.string().optional().nullable(),
+  options: z.array(z.string()).optional().default([]),
   clues: z.array(z.string()).default([]),
   reference: z.array(z.string()).optional().default([]),
+  source: z.string().optional().nullable(),
+  session: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),

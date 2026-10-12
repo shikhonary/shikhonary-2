@@ -15,11 +15,14 @@ import {
 
 export interface FillInTheBlanksWithCluesItem {
   id: string
-  content: string
+  content?: string | null
+  options?: string[]
   clues: string[]
   reference: string[]
   difficulty: string
   popularityCount: number
+  source?: string | null
+  session?: string | null
   createdAt: Date | string
   updatedAt: Date | string
   subject: {
@@ -236,7 +239,8 @@ export function FillInTheBlanksWithCluesTable({
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const plainText = item.content.replace(/<[^>]*>?/gm, "")
+            const rawText = item.content || (item.options?.length ? item.options.join(" ") : "") || ""
+            const plainText = rawText.replace(/<[^>]*>?/gm, "")
             const snippet = plainText.length > 80 ? plainText.substring(0, 80) + "..." : plainText
 
             return (
@@ -293,6 +297,20 @@ export function FillInTheBlanksWithCluesTable({
                         >
                           {item.difficulty}
                         </span>
+
+                        {/* Source Badge */}
+                        {item.source && (
+                          <span className="px-2.5 py-0.5 bg-purple-50 text-purple-700 rounded font-label-sm text-[11px] font-bold border border-purple-200">
+                            📌 {item.source}
+                          </span>
+                        )}
+
+                        {/* Session Badge */}
+                        {item.session && (
+                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-[11px] font-semibold">
+                            📅 {item.session}
+                          </span>
+                        )}
                       </div>
 
                       {/* CLUES BOX PREVIEW (Table/Grid Style with 5 items per row) */}
@@ -301,11 +319,32 @@ export function FillInTheBlanksWithCluesTable({
                       )}
 
                       {/* Content / Passage */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
-                        <div className="whitespace-pre-wrap font-medium">
-                          <RenderFormattedPassage text={item.content} />
+                      {item.content && (
+                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
+                          <div className="whitespace-pre-wrap font-medium">
+                            <RenderFormattedPassage text={item.content} />
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {/* Options / Sentences */}
+                      {Array.isArray(item.options) && item.options.length > 0 && (
+                        <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed space-y-2">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-secondary mb-1">
+                            Sentences / Options ({item.options.length}):
+                          </p>
+                          <div className="space-y-1.5">
+                            {item.options.map((opt, oIdx) => (
+                              <div key={oIdx} className="font-medium text-sm flex gap-2">
+                                <span className="font-bold text-primary shrink-0">({String.fromCharCode(97 + oIdx)})</span>
+                                <div className="flex-1">
+                                  <RenderFormattedPassage text={opt} />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">

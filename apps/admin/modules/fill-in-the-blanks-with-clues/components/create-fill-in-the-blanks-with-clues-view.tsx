@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
@@ -18,7 +18,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { HelpCircle, Sparkles, BoxSelect, Plus, X } from "lucide-react"
+import { HelpCircle, Sparkles, BoxSelect, Plus, X, Trash2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -27,31 +27,48 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { FILL_IN_THE_BLANKS_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createFillInTheBlanksWithCluesFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
   subjectId: z.string().min(1, "Please select a subject"),
   chapterId: z.string().optional(),
-  content: z.string().min(1, "Question passage text is required"),
+  content: z.string().optional(),
+  options: z.array(z.object({ value: z.string() })).optional().default([]),
   cluesText: z.string().optional(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
     message: "Popularity count must be a number",
   }),
+  source: z.string().optional(),
+  session: z.string().optional(),
 })
 
 type CreateFillInTheBlanksWithCluesFormData = z.infer<typeof createFillInTheBlanksWithCluesFormSchema>
 
 /**
- * Preview renderer for passage with highlighted blanks
+ * Preview renderer for passage or options with highlighted blanks
  */
-function ContentPreview({ text, clues }: { text: string; clues: string[] }) {
-  if (!text.trim() && clues.length === 0) {
-    return <span className="text-outline italic text-xs">Fill in clues and passage above to preview formatted question...</span>
+function ContentPreview({
+  text,
+  clues,
+  options,
+}: {
+  text?: string
+  clues: string[]
+  options?: { value: string }[]
+}) {
+  const hasOptions = options && options.length > 0 && options.some((o) => o.value.trim().length > 0)
+  if (!text?.trim() && clues.length === 0 && !hasOptions) {
+    return (
+      <span className="text-outline italic text-xs">
+        Fill in clues, passage, or sentence options above to preview formatted question...
+      </span>
+    )
   }
 
-  const parts = text.split(/(\([a-z]\)\s*_{2,})/gi)
+  const parts = (text || "").split(/(\([a-z]\)\s*_{2,})/gi)
 
   return (
     <div className="space-y-3">
@@ -63,7 +80,10 @@ function ContentPreview({ text, clues }: { text: string; clues: string[] }) {
           </p>
           <div className="flex flex-wrap gap-1.5">
             {clues.map((c, i) => (
-              <span key={i} className="px-2.5 py-0.5 rounded bg-white text-xs font-semibold text-on-surface border border-outline-variant shadow-2xs">
+              <span
+                key={i}
+                className="px-2.5 py-0.5 rounded bg-white text-xs font-semibold text-on-surface border border-outline-variant shadow-2xs"
+              >
                 {c}
               </span>
             ))}
@@ -72,7 +92,7 @@ function ContentPreview({ text, clues }: { text: string; clues: string[] }) {
       )}
 
       {/* Text preview */}
-      {text.trim() && (
+      {text?.trim() ? (
         <div className="leading-relaxed text-sm text-on-surface">
           {parts.map((part, index) => {
             if (/^\([a-z]\)\s*_{2,}/i.test(part)) {
@@ -87,6 +107,40 @@ function ContentPreview({ text, clues }: { text: string; clues: string[] }) {
             }
             return <span key={index}>{part}</span>
           })}
+        </div>
+      ) : null}
+
+      {/* Options preview */}
+      {hasOptions && (
+        <div className="space-y-1.5 border-t border-outline-variant/30 pt-2">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-secondary">
+            Sentence Options:
+          </p>
+          {options
+            ?.filter((o) => o.value.trim().length > 0)
+            .map((opt, oIdx) => {
+              const optParts = opt.value.split(/(\([a-z]\)\s*_{2,})/gi)
+              return (
+                <div key={oIdx} className="leading-relaxed text-sm text-on-surface flex gap-2">
+                  <span className="font-bold text-primary shrink-0">#{oIdx + 1}</span>
+                  <div className="flex-1">
+                    {optParts.map((part, index) => {
+                      if (/^\([a-z]\)\s*_{2,}/i.test(part)) {
+                        return (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-1.5 py-0.5 mx-0.5 rounded font-mono font-bold text-primary bg-primary/10 border border-primary/20"
+                          >
+                            {part}
+                          </span>
+                        )
+                      }
+                      return <span key={index}>{part}</span>
+                    })}
+                  </div>
+                </div>
+              )
+            })}
         </div>
       )}
     </div>
@@ -116,11 +170,19 @@ export function CreateFillInTheBlanksWithCluesView() {
       subjectId: "",
       chapterId: "",
       content: "",
+      options: [],
       cluesText: "",
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
     },
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "options",
   })
 
   const selectedClassId = watch("classId")
@@ -132,6 +194,7 @@ export function CreateFillInTheBlanksWithCluesView() {
     selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
   )
   const contentValue = watch("content")
+  const watchedOptions = watch("options")
 
   const isSubmitting = createMutation.isPending || isFormSubmitting
 
@@ -175,6 +238,19 @@ export function CreateFillInTheBlanksWithCluesView() {
     setErrorMessage(null)
 
     try {
+      const optionsList = (data.options || [])
+        .map((opt) => opt.value.trim())
+        .filter(Boolean)
+
+      const contentVal = data.content?.trim() || null
+
+      if (!contentVal && optionsList.length === 0) {
+        const err = "Please provide either passage content or at least one sentence option."
+        setErrorMessage(err)
+        toast.error(err)
+        return
+      }
+
       const cluesArray = cluesList.length > 0
         ? cluesList
         : data.cluesText
@@ -191,11 +267,14 @@ export function CreateFillInTheBlanksWithCluesView() {
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
         chapterId: data.chapterId || null,
-        content: data.content.trim(),
+        content: contentVal,
+        options: optionsList,
         clues: cluesArray,
         difficulty: data.difficulty,
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
+        source: data.source || DEFAULT_SOURCE,
+        session: data.session || null,
       })
 
       toast.success("Fill in the Blanks with Clues question created successfully.")
@@ -425,7 +504,7 @@ export function CreateFillInTheBlanksWithCluesView() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="content-textarea" className="font-label-lg text-sm font-bold text-on-surface">
-                  Passage Content with Blanks <span className="text-error">*</span>
+                  Passage Content with Blanks <span className="text-xs font-normal text-outline">(Optional if options provided)</span>
                 </Label>
                 <Button
                   type="button"
@@ -442,7 +521,7 @@ export function CreateFillInTheBlanksWithCluesView() {
 
               <Textarea
                 id="content-textarea"
-                rows={6}
+                rows={5}
                 placeholder="e.g. Complete the following text with suitable words from the box:\n\nStudents should be (a) _________ to their teachers. They should (b) _________ hard and live (c) _________..."
                 className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10"
                 {...register("content")}
@@ -453,14 +532,79 @@ export function CreateFillInTheBlanksWithCluesView() {
               {errors.content && (
                 <p className="font-body-sm text-xs text-error">{errors.content.message}</p>
               )}
+            </div>
 
-              {/* Live Preview Box */}
-              <div className="mt-3 rounded-lg border border-outline-variant/40 bg-surface-container-low p-3.5 space-y-1">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-outline">
-                  Live Formatted Preview:
-                </p>
-                <ContentPreview text={contentValue} clues={cluesList} />
+            {/* Sentence Options (Item-based) */}
+            <div className="space-y-3 rounded-xl border border-secondary/20 bg-secondary-container/10 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="font-label-lg text-sm font-bold text-on-surface">
+                    Sentence / Option Items <span className="text-xs font-normal text-outline">(Optional if passage provided)</span>
+                  </Label>
+                  <p className="text-[11px] text-outline">
+                    Add discrete sentences with gap markers like <code className="bg-muted px-1 rounded">(a) _________</code>.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => append({ value: "" })}
+                  className="h-8 gap-1.5 text-xs font-semibold bg-white border-secondary/30 text-secondary hover:bg-secondary/10 cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Sentence
+                </Button>
               </div>
+
+              <div className="space-y-2.5">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-outline w-6 text-center shrink-0">
+                      #{index + 1}
+                    </span>
+                    <Input
+                      placeholder={`e.g. (${String.fromCharCode(97 + index)}) It is very cold in (a) _________.`}
+                      className="bg-white font-body-sm text-xs flex-1"
+                      {...register(`options.${index}.value` as const)}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="h-8 w-8 text-outline hover:text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+
+                {fields.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-outline-variant/40 p-4 text-center bg-white/50">
+                    <p className="text-xs text-outline italic">
+                      No discrete sentence options added. The question will rely on the passage content above.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      onClick={() => append({ value: "" })}
+                      className="text-xs mt-1 text-primary cursor-pointer"
+                    >
+                      + Add sentence option
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Live Preview Box */}
+            <div className="rounded-lg border border-outline-variant/40 bg-surface-container-low p-3.5 space-y-1">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-outline">
+                Live Formatted Preview:
+              </p>
+              <ContentPreview text={contentValue} clues={cluesList} options={watchedOptions} />
             </div>
 
             {/* Difficulty & Popularity */}
@@ -516,6 +660,47 @@ export function CreateFillInTheBlanksWithCluesView() {
                 className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
                 {...register("referenceText")}
               />
+            </div>
+
+            {/* Source & Session */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Source */}
+              <div className="space-y-2">
+                <Label className="font-label-lg text-sm font-bold text-on-surface">
+                  Source (উৎস)
+                </Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
+                        <SelectValue placeholder="Select Source" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                        {FILL_IN_THE_BLANKS_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              {/* Session */}
+              <div className="space-y-2">
+                <Label htmlFor="session" className="font-label-lg text-sm font-bold text-on-surface">
+                  Session / Year <span className="text-xs font-normal text-outline">(Optional)</span>
+                </Label>
+                <Input
+                  id="session"
+                  placeholder="e.g. 2026, 2025-26..."
+                  className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
+                  {...register("session")}
+                />
+              </div>
             </div>
 
             {/* Action Buttons */}

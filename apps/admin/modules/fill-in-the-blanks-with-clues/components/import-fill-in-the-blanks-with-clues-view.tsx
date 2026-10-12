@@ -37,13 +37,28 @@ import {
   UploadIcon,
   BoxSelect,
 } from "lucide-react"
+import { FILL_IN_THE_BLANKS_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
     "clues": ["diligently", "happily", "honest", "wood", "forest", "help", "river", "reward"],
     "content": "A poor woodcutter lived in a village. He was very (a) _________ and worked (b) _________ in the (c) _________ every day. One day, his axe fell into a deep (d) _________. He cried for (e) _________.",
     "reference": ["Board 2024", "Dhaka Board"],
+    "source": "গাইড বুক",
     "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "clues": ["at", "in", "on", "with", "for", "to"],
+    "options": [
+      "(a) He is good (a) _________ English.",
+      "(b) She went (b) _________ school.",
+      "(c) Water boils (c) _________ 100 degrees.",
+      "(d) We should be kind (d) _________ animals."
+    ],
+    "reference": ["Rajshahi Board 2023"],
+    "source": "মডেল টেস্ট",
+    "difficulty": "EASY",
     "popularityCount": 0
   }
 ]`
@@ -400,12 +415,24 @@ function EditableCard({
 
         {/* Content / Passage */}
         <EditableField
-          label="Passage Content with Blanks (a) _________"
+          label="Passage Content with Blanks (Optional if options provided)"
           value={item.content || item.name || ""}
           multiline
           renderFormatted
           placeholder="Enter passage with (a) _________ gap markers..."
           onSave={(newVal) => onChange({ ...item, content: newVal })}
+        />
+
+        {/* Sentence Options */}
+        <EditableField
+          label="Sentence Options (One per line - Optional if passage provided)"
+          value={Array.isArray(item.options) ? item.options.join("\n") : ""}
+          multiline
+          placeholder={"e.g.\n(a) First sentence with _________\n(b) Second sentence with _________"}
+          onSave={(newVal) => {
+            const arr = newVal.split("\n").map((s) => s.trim()).filter(Boolean)
+            onChange({ ...item, options: arr })
+          }}
         />
 
         {/* References & Popularity */}
@@ -428,6 +455,42 @@ function EditableCard({
             }
           />
         </div>
+
+        {/* Source & Auto-assigned Session */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3 items-center">
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || DEFAULT_SOURCE}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {FILL_IN_THE_BLANKS_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{new Date().getFullYear()}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
+        </div>
       </div>
     </Card>
   )
@@ -441,6 +504,7 @@ export function ImportFillInTheBlanksWithCluesView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -463,7 +527,7 @@ export function ImportFillInTheBlanksWithCluesView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
       }
     }
     reader.readAsText(file)
@@ -473,7 +537,8 @@ export function ImportFillInTheBlanksWithCluesView() {
     text: string,
     overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string
+    overrideChapterId: string,
+    overrideSource?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -516,6 +581,7 @@ export function ImportFillInTheBlanksWithCluesView() {
         return
       }
 
+      const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
       const validated: any[] = []
       const errors: string[] = []
 
@@ -524,9 +590,10 @@ export function ImportFillInTheBlanksWithCluesView() {
         const subjectId = item.subjectId || overrideSubjectId
         const chapterId = item.chapterId || overrideChapterId
         const contentText = item.content || item.name
+        const optionsList = Array.isArray(item.options) ? item.options.filter(Boolean) : []
 
-        if (!contentText || typeof contentText !== "string" || !contentText.trim()) {
-          errors.push(`Item #${itemNum}: Missing or invalid 'content' passage text.`)
+        if ((!contentText || typeof contentText !== "string" || !contentText.trim()) && optionsList.length === 0) {
+          errors.push(`Item #${itemNum}: Missing both 'content' passage and 'options' list.`)
         }
         if (!subjectId) {
           errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
@@ -541,7 +608,8 @@ export function ImportFillInTheBlanksWithCluesView() {
         validated.push({
           subjectId,
           chapterId: chapterId || null,
-          content: String(contentText || "").trim(),
+          content: contentText ? String(contentText).trim() : null,
+          options: optionsList,
           clues,
           difficulty: item.difficulty || "MEDIUM",
           popularityCount:
@@ -553,6 +621,7 @@ export function ImportFillInTheBlanksWithCluesView() {
             : typeof item.reference === "string" && item.reference.trim()
             ? [item.reference.trim()]
             : [],
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
         })
       })
 
@@ -575,7 +644,7 @@ export function ImportFillInTheBlanksWithCluesView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -588,7 +657,7 @@ export function ImportFillInTheBlanksWithCluesView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -597,7 +666,7 @@ export function ImportFillInTheBlanksWithCluesView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource)
     }
   }
 
@@ -606,7 +675,7 @@ export function ImportFillInTheBlanksWithCluesView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
     }
   }
 
@@ -614,7 +683,18 @@ export function ImportFillInTheBlanksWithCluesView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
+    }
+  }
+
+  const handleSourceChange = (val: string) => {
+    setSelectedSource(val)
+    if (parsedItems.length > 0) {
+      const next = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || val,
+      }))
+      syncParsedItemsToText(next)
     }
   }
 
@@ -649,6 +729,7 @@ export function ImportFillInTheBlanksWithCluesView() {
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
+      source: selectedSource || DEFAULT_SOURCE,
     }
     const next = [...parsedItems, newItem]
     syncParsedItemsToText(next)
@@ -669,11 +750,13 @@ export function ImportFillInTheBlanksWithCluesView() {
       const payload = parsedItems.map((item) => ({
         subjectId: selectedSubjectId,
         chapterId: selectedChapterId || null,
-        content: item.content.trim(),
+        content: item.content?.trim() || null,
+        options: Array.isArray(item.options) ? item.options.filter(Boolean) : [],
         clues: Array.isArray(item.clues) ? item.clues : [],
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
+        source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
       }))
 
       const res = await importMutation.mutateAsync({ items: payload })
@@ -755,7 +838,8 @@ export function ImportFillInTheBlanksWithCluesView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Academic Class, Subject, Chapter & Source dropdowns */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -825,6 +909,28 @@ export function ImportFillInTheBlanksWithCluesView() {
                   {chapters.map((ch) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {FILL_IN_THE_BLANKS_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -44,6 +44,7 @@ export const QUESTION_TYPES = {
   FORM_FILLING: "Form Filling",
   SHUDDHO_ASHUDDHO: "Shuddho Ashuddho",
   DAN_BAM_MILKORON: "Dan Bam Milkoron",
+  GRAMMAR_QUESTION: "Grammar Question",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -90,6 +91,7 @@ export const QUESTION_TYPE_CODES = {
   FORM_FILLING: "FORM_FILLING",
   SHUDDHO_ASHUDDHO: "SHUDDHO_ASHUDDHO",
   DAN_BAM_MILKORON: "DAN_BAM_MILKORON",
+  GRAMMAR_QUESTION: "GRAMMAR_QUESTION",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -389,6 +391,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.DAN_BAM_MILKORON,
     defaultMark: 5,
     defaultPosition: 32,
+  },
+  [QUESTION_TYPES.GRAMMAR_QUESTION]: {
+    nameEn: QUESTION_TYPES.GRAMMAR_QUESTION,
+    nameBn: "ব্যাকরণ প্রশ্ন",
+    code: QUESTION_TYPE_CODES.GRAMMAR_QUESTION,
+    defaultMark: 5,
+    defaultPosition: 33,
   },
 } as const
 
@@ -777,6 +786,17 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("মিলকরণ")
   ) {
     return QUESTION_TYPES.DAN_BAM_MILKORON
+  }
+  if (
+    lower === "grammar question" ||
+    lower === "grammar questions" ||
+    lower === "grammar_question" ||
+    lower === "grammar" ||
+    lower.includes("grammar question") ||
+    lower.includes("ব্যাকরণ প্রশ্ন") ||
+    lower.includes("ব্যাকরণ")
+  ) {
+    return QUESTION_TYPES.GRAMMAR_QUESTION
   }
 
   return null

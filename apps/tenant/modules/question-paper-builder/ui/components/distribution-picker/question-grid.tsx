@@ -19,6 +19,7 @@ import { SummaryPickerCard } from "./summary-picker-card";
 import { AmplificationPickerCard } from "./amplification-picker-card";
 import { LetterPickerCard } from "./letter-picker-card";
 import { ApplicationPickerCard } from "./application-picker-card";
+import { GrammarQuestionPickerCard } from "./grammar-question-picker-card";
 import { NewsReportPickerCard } from "./news-report-picker-card";
 import { EssayPickerCard } from "./essay-picker-card";
 import { WordMeaningPickerCard } from "./word-meaning-picker-card";
@@ -230,6 +231,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "APPLICATION":
         return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "GRAMMAR_QUESTION":
+        return <GrammarQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "NEWS_REPORT":
         return <NewsReportPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "ESSAY":

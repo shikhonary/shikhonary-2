@@ -36,6 +36,7 @@ import { SummaryPickerCard } from "@/modules/question-paper-builder/ui/component
 import { AmplificationPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/amplification-picker-card"
 import { LetterPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/letter-picker-card"
 import { ApplicationPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/application-picker-card"
+import { GrammarQuestionPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/grammar-question-picker-card"
 import { NewsReportPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/news-report-picker-card"
 import { EssayPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/essay-picker-card"
 import { WordMeaningPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/word-meaning-picker-card"
@@ -240,6 +241,8 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
         return <LetterPickerCard {...cardProps} />
       case "APPLICATION":
         return <ApplicationPickerCard {...cardProps} />
+      case "GRAMMAR_QUESTION":
+        return <GrammarQuestionPickerCard {...cardProps} />
       case "NEWS_REPORT":
         return <NewsReportPickerCard {...cardProps} />
       case "ESSAY":

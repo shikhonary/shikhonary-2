@@ -327,10 +327,12 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let descriptiveQuestionIdx = 0;
         let shuddhoAshuddhoIdx = 0;
         let shortQuestionIdx = 0;
+        let grammarQuestionIdx = 0;
         let makeQuestionIdx = 0;
         let pbqIdx = 0;
         let mcqIdx = 0;
         const totalMcqs = questions.filter((q: any) => q.mcq).length;
+        const totalGrammarQuestions = questions.filter((q: any) => q.grammarQuestion).length;
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalPoemEssences = questions.filter((q: any) => q.poemEssence).length;
         const totalFormFillups = questions.filter((q: any) => q.formFillup).length;
@@ -1834,6 +1836,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: shortCompositionIdx === totalShortCompositions - 1 ? 4 : 0,
             });
             shortCompositionIdx++;
+          }
+          if (q.grammarQuestion) {
+            if (grammarQuestionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-grammar-question",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "GRAMMAR_QUESTION",
+                  data: q.grammarQuestion,
+                  orderIndex: grammarQuestionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstGrammarQuestion: grammarQuestionIdx === 0,
+                  totalQuestions: totalGrammarQuestions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "ব্যাকরণ প্রশ্ন",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: grammarQuestionIdx === totalGrammarQuestions - 1 ? 4 : 0,
+            });
+            grammarQuestionIdx++;
           }
         });
 

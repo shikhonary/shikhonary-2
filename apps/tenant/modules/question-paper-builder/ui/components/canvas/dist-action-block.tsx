@@ -150,6 +150,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("grammar question") || lowerName.includes("grammar_question") || lowerName.includes("ব্যাকরণ প্রশ্ন") || lowerName.includes("ব্যাকরণ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
       resolvedCategory = QUESTION_TYPE_CODES.SA;
     } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {

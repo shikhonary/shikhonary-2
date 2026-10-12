@@ -58,6 +58,7 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "VERB_TENSE" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত") || l.includes("সাধু") || l.includes("চলিত"))) return true;
   if (questionType === "MAKE_QUESTION" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "CORRECT_ANSWER" && (l === "correct_answer" || l === "correct answer" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "GRAMMAR_QUESTION" && (l === "grammar_question" || l === "grammar question" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   return false;
 };
 

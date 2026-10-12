@@ -68,6 +68,7 @@ export async function addQuestionPaperQuestion(
     input.formFillupId,
     input.shuddhoAshuddhoId,
     input.danBamMilkoronId,
+    input.grammarQuestionId,
   ].filter(Boolean)
 
   if (idsSet.length !== 1) {
@@ -312,6 +313,12 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "DanBamMilkoron: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.grammarQuestionId) {
+    const item = await (db as any).grammarQuestion.findUnique({ where: { id: input.grammarQuestionId } })
+    if (!item) throw notFound("GrammarQuestion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "GrammarQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
@@ -381,6 +388,7 @@ export async function addQuestionPaperQuestion(
       formFillupId: input.formFillupId,
       shuddhoAshuddhoId: input.shuddhoAshuddhoId,
       danBamMilkoronId: input.danBamMilkoronId,
+      grammarQuestionId: input.grammarQuestionId,
       distributionId: input.distributionId,
       sectionId: finalSectionId,
       subSectionId: finalSubSectionId,
@@ -455,6 +463,7 @@ export async function removeQuestionPaperQuestion(
     FORM_FILLING: "formFillupId",
     SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
     DAN_BAM_MILKORON: "danBamMilkoronId",
+    GRAMMAR_QUESTION: "grammarQuestionId",
   }
 
   const field = typeFieldMap[input.questionType]
@@ -1071,6 +1080,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.grammarQuestionIds && input.grammarQuestionIds.length > 0) {
+    for (const grammarQuestionId of input.grammarQuestionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        grammarQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (recordsToCreate.length === 0) {
     return { success: true, count: 0 }
   }
@@ -1179,6 +1201,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).shuddhoAshuddho.findUnique({ where: { id: record.shuddhoAshuddhoId } })) as any
       } else if (record.danBamMilkoronId) {
         record.contentSnapshot = (await (db as any).danBamMilkoron.findUnique({ where: { id: record.danBamMilkoronId } })) as any
+      } else if (record.grammarQuestionId) {
+        record.contentSnapshot = (await (db as any).grammarQuestion.findUnique({ where: { id: record.grammarQuestionId } })) as any
       }
     }
 
@@ -1261,6 +1285,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_shuddhoAshuddhoId: { questionPaperId: input.questionPaperId, shuddhoAshuddhoId: record.shuddhoAshuddhoId } }
     } else if (record.danBamMilkoronId) {
       whereCondition = { questionPaperId_danBamMilkoronId: { questionPaperId: input.questionPaperId, danBamMilkoronId: record.danBamMilkoronId } }
+    } else if (record.grammarQuestionId) {
+      whereCondition = { questionPaperId_grammarQuestionId: { questionPaperId: input.questionPaperId, grammarQuestionId: record.grammarQuestionId } }
     }
 
     await tenantDb.questionPaperQuestion.upsert({
@@ -1336,6 +1362,7 @@ export async function bulkRemoveQuestions(
         { formFillupId: { in: input.questionIds } },
         { shuddhoAshuddhoId: { in: input.questionIds } },
         { danBamMilkoronId: { in: input.questionIds } },
+        { grammarQuestionId: { in: input.questionIds } },
       ],
     },
     select: { id: true, distributionId: true },

@@ -52,6 +52,7 @@ export async function listFillInTheBlanksWithClues(db: PrismaClient, input: List
   if (query) {
     where.OR = [
       { content: { contains: query, mode: "insensitive" } },
+      { options: { has: query } },
       { reference: { has: query } },
       { clues: { has: query } },
     ]
@@ -148,13 +149,24 @@ export async function getFillInTheBlanksWithCluesById(db: PrismaClient, input: G
 
 export async function createFillInTheBlanksWithClues(db: PrismaClient, input: CreateFillInTheBlanksWithCluesInput) {
   const data = input
+
+  if (!data.content?.trim() && (!data.options || data.options.length === 0)) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Either passage content or at least one option must be provided",
+    })
+  }
+
   const resolvedQuestionTypeId = await resolveFillInTheBlanksWithCluesQuestionTypeId(db)
 
   const created = await db.fillInTheBlanksWithClues.create({
     data: {
-      content: data.content,
+      content: data.content ?? null,
+      options: data.options ?? [],
       clues: data.clues ?? [],
       reference: data.reference ?? [],
+      source: data.source ?? null,
+      session: data.session ?? null,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -193,8 +205,11 @@ export async function updateFillInTheBlanksWithClues(db: PrismaClient, input: Up
     where: { id },
     data: {
       content: data.content !== undefined ? data.content : undefined,
+      options: data.options !== undefined ? data.options : undefined,
       clues: data.clues !== undefined ? data.clues : undefined,
       reference: data.reference !== undefined ? data.reference : undefined,
+      source: data.source !== undefined ? data.source : undefined,
+      session: data.session !== undefined ? data.session : undefined,
       difficulty: data.difficulty !== undefined ? data.difficulty : undefined,
       popularityCount: data.popularityCount !== undefined ? data.popularityCount : undefined,
       subjectId: data.subjectId !== undefined ? data.subjectId : undefined,
@@ -253,9 +268,12 @@ export async function importFillInTheBlanksWithClues(db: PrismaClient, input: Im
 
         const createdItem = await tx.fillInTheBlanksWithClues.create({
           data: {
-            content: data.content,
+            content: data.content ?? null,
+            options: data.options ?? [],
             clues: data.clues || [],
             reference: data.reference || [],
+            source: data.source ?? null,
+            session: data.session ?? String(new Date().getFullYear()),
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,

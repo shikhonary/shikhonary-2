@@ -246,6 +246,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   formFillupId: z.string().optional().nullable(),
   shuddhoAshuddhoId: z.string().optional().nullable(),
   danBamMilkoronId: z.string().optional().nullable(),
+  grammarQuestionId: z.string().optional().nullable(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -407,6 +408,7 @@ export const bulkAssignQuestionsSchema = z.object({
   formFillupIds: z.array(z.string()).optional(),
   shuddhoAshuddhoIds: z.array(z.string()).optional(),
   danBamMilkoronIds: z.array(z.string()).optional(),
+  grammarQuestionIds: z.array(z.string()).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>

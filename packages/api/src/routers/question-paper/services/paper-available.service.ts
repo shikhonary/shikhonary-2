@@ -333,6 +333,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  GRAMMAR_QUESTION: {
+    model: "grammarQuestion",
+    searchFields: ["question", "answer", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "grammarQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
 }
 
 export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
@@ -376,6 +384,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.FORM_FILLING]: "FORM_FILLUP",
   [QUESTION_TYPES.SHUDDHO_ASHUDDHO]: "SHUDDHO_ASHUDDHO",
   [QUESTION_TYPES.DAN_BAM_MILKORON]: "DAN_BAM_MILKORON",
+  [QUESTION_TYPES.GRAMMAR_QUESTION]: "GRAMMAR_QUESTION",
 }
 
 export async function getAvailableQuestions(
@@ -431,6 +440,7 @@ export async function getAvailableQuestions(
         formFillupId: true,
         shuddhoAshuddhoId: true,
         danBamMilkoronId: true,
+        grammarQuestionId: true,
       },
     })
     : Promise.resolve([])

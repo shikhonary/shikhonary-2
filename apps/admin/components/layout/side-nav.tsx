@@ -72,6 +72,7 @@ const navGroups: NavGroup[] = [
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/descriptive-questions", label: "Descriptive Questions", icon: HelpCircle },
       { href: "/short-questions", label: "Short Questions", icon: HelpCircle },
+      { href: "/grammar-questions", label: "Grammar Questions", icon: HelpCircle },
       { href: "/make-sentences", label: "Make Sentences", icon: HelpCircle },
       { href: "/make-questions", label: "Make Questions", icon: HelpCircle },
       { href: "/juktoborno", label: "Juktoborno", icon: HelpCircle },

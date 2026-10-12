@@ -135,6 +135,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
   } else if (normalized === QUESTION_TYPES.DAN_BAM_MILKORON) {
     category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
+  } else if (normalized === QUESTION_TYPES.GRAMMAR_QUESTION) {
+    category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
   } else if (normalized === QUESTION_TYPES.FORM_FILLUP || normalized === QUESTION_TYPES.FORM_FILLING) {
     category = QUESTION_TYPE_CODES.FORM_FILLUP;
   } else if (normalized === QUESTION_TYPES.MCQ) {
@@ -209,6 +211,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lower.includes("grammar question") || lower.includes("grammar_question") || lower.includes("ব্যাকরণ প্রশ্ন") || lower.includes("ব্যাকরণ")) {
+      category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
       category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
     }
@@ -334,6 +338,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, shuddhoAshuddhoIds: [questionId] });
       } else if (category === "DAN_BAM_MILKORON") {
         await assignQuestion({ ...payloadBase, danBamMilkoronIds: [questionId] });
+      } else if (category === "GRAMMAR_QUESTION") {
+        await assignQuestion({ ...payloadBase, grammarQuestionIds: [questionId] });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
         await assignQuestion({ ...payloadBase, rightFormOfVerbIds: [questionId] });
       } else if (category === "CHANGING_SENTENCES") {

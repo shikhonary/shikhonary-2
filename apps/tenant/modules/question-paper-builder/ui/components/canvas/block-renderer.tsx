@@ -16,6 +16,7 @@ import { SummaryBlock } from "../blocks/summary-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
 import { LetterBlock } from "../blocks/letter-block";
 import { ApplicationBlock } from "../blocks/application-block";
+import { GrammarQuestionBlock } from "../blocks/grammar-question-block";
 import { NewsReportBlock } from "../blocks/news-report-block";
 import { EssayBlock } from "../blocks/essay-block";
 import { WordMeaningBlock } from "../blocks/word-meaning-block";
@@ -377,6 +378,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ShuddhoAshuddhoBlock item={block.data.item} />;
     case "question-dan-bam-milkoron":
       return <DanBamMilkoronBlock item={block.data.item} />;
+    case "question-grammar-question":
+      return <GrammarQuestionBlock item={block.data.item} />;
     case "question-correct-answer":
       return <CorrectAnswerBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
     case "dist-action":

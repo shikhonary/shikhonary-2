@@ -54,6 +54,7 @@ const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   FORM_FILLING: "formFillupIds",
   SHUDDHO_ASHUDDHO: "shuddhoAshuddhoIds",
   DAN_BAM_MILKORON: "danBamMilkoronIds",
+  GRAMMAR_QUESTION: "grammarQuestionIds",
 };
 
 const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
@@ -97,6 +98,7 @@ const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
   FORM_FILLING: "formFillupId",
   SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
   DAN_BAM_MILKORON: "danBamMilkoronId",
+  GRAMMAR_QUESTION: "grammarQuestionId",
 };
 
 /**

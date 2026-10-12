@@ -188,6 +188,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("grammar question") || lowerName.includes("grammar_question") || lowerName.includes("ব্যাকরণ প্রশ্ন") || lowerName.includes("ব্যাকরণ")) {
+      category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
       category = QUESTION_TYPE_CODES.SA;
     } else if (lowerName.includes("essence") || lowerName.includes("সারমর্ম")) {
@@ -532,6 +534,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, shuddhoAshuddhoIds: selectedIds });
       } else if (category === "DAN_BAM_MILKORON") {
         await bulkAssign({ ...payloadBase, danBamMilkoronIds: selectedIds });
+      } else if (category === "GRAMMAR_QUESTION") {
+        await bulkAssign({ ...payloadBase, grammarQuestionIds: selectedIds });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
         await bulkAssign({ ...payloadBase, rightFormOfVerbIds: selectedIds });
       } else if (category === "CHANGING_SENTENCES") {

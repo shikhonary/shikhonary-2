@@ -32,10 +32,22 @@ export const FillInTheBlanksWithCluesPickerCard: React.FC<FillInTheBlanksWithClu
           </div>
         )}
 
-        {/* Formatted Passage Preview */}
-        <div className="text-sm font-medium text-on-surface leading-relaxed whitespace-pre-wrap">
-          <RenderFillInTheBlanksContent text={q.content || ""} />
-        </div>
+        {/* Formatted Passage / Options Preview */}
+        {q.content ? (
+          <div className="text-sm font-medium text-on-surface leading-relaxed whitespace-pre-wrap">
+            <RenderFillInTheBlanksContent text={q.content} />
+          </div>
+        ) : null}
+
+        {Array.isArray(q.options) && q.options.length > 0 && (
+          <div className="space-y-1">
+            {q.options.map((opt: string, idx: number) => (
+              <div key={idx} className="text-sm font-medium text-on-surface leading-relaxed">
+                <RenderFillInTheBlanksContent text={opt} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </PickerCardWrapper>
   );
