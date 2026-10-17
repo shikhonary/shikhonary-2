@@ -43,12 +43,17 @@ export const FillInTheBlanksWithoutCluesPickerCard: React.FC<FillInTheBlanksWith
       <div className="flex flex-col gap-2 font-body">
         {/* Formatted Content Preview */}
         <div className="text-sm font-medium text-on-surface leading-relaxed whitespace-pre-wrap py-0.5">
-          <RenderFillInTheBlanksContent text={q.content || ""} />
+          <RenderFillInTheBlanksContent text={q.content || ""} isMath={q.isMath} />
         </div>
 
         {/* Reference Tags & Source Footer */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
           <div className="flex flex-wrap items-center gap-1.5">
+            {q.isMath && (
+              <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-[11px] font-bold border border-purple-200">
+                ∑ Math
+              </span>
+            )}
             {(q.source || q.session) && (
               <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
                 📚 {q.source || "N/A"}

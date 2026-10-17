@@ -21,13 +21,14 @@ export interface CqItem {
   id: string
   questionA: string
   questionB: string
-  questionC: string
+  questionC?: string | null
   questionD?: string | null
   context?: string | null
   reference: string[]
   difficulty: string
   year?: number | null
   source?: string | null
+  session?: string | null
   marks?: any
   isActive: boolean
   attachments?: QuestionAttachmentItemData[]
@@ -231,7 +232,7 @@ export function CqTable({
             const marksB = item.marks?.b ?? 2
             const marksC = item.marks?.c ?? 3
             const marksD = item.marks?.d ?? 4
-            const totalCqMarks = Number(marksA) + Number(marksB) + Number(marksC) + Number(item.questionD ? marksD : 0)
+            const totalCqMarks = Number(marksA) + Number(marksB) + Number(item.questionC ? marksC : 0) + Number(item.questionD ? marksD : 0)
 
             return (
               <div
@@ -358,23 +359,25 @@ export function CqTable({
                           </p>
                         </div>
 
-                        {/* Question C */}
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
-                              গ
-                            </span>
-                            <span className="text-xs text-outline font-semibold">
-                              Application [{marksC} marks]
-                            </span>
+                        {/* Question C (Optional) */}
+                        {item.questionC && (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container">
+                                গ
+                              </span>
+                              <span className="text-xs text-outline font-semibold">
+                                Application [{marksC} marks]
+                              </span>
+                            </div>
+                            <p className={cn(
+                              "text-sm text-on-surface pl-7 font-medium",
+                              /[\u0980-\u09FF]/.test(item.questionC) && "font-solaiman text-[15px]"
+                            )}>
+                              <RenderMath text={item.questionC} isMath={true} />
+                            </p>
                           </div>
-                          <p className={cn(
-                            "text-sm text-on-surface pl-7 font-medium",
-                            /[\u0980-\u09FF]/.test(item.questionC) && "font-solaiman text-[15px]"
-                          )}>
-                            <RenderMath text={item.questionC} isMath={true} />
-                          </p>
-                        </div>
+                        )}
 
                         {/* Question D (Optional) */}
                         {item.questionD && (
@@ -504,6 +507,11 @@ export function CqTable({
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {((item as any).source || (item as any).session) && (
+                            <span className="px-2 py-0.5 bg-secondary-container/40 text-on-secondary-container rounded text-[11px] font-medium border border-secondary-container">
+                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -514,7 +522,9 @@ export function CqTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !((item as any).source || (item as any).session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 

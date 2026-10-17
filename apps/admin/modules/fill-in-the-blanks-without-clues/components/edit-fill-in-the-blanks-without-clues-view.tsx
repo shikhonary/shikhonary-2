@@ -19,6 +19,8 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
+import { Switch } from "@workspace/ui/components/switch"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import { HelpCircle, Sparkles } from "lucide-react"
 import {
   Select,
@@ -42,6 +44,7 @@ const editFillInTheBlanksWithoutCluesFormSchema = z.object({
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  isMath: z.boolean(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
     message: "Popularity count must be a number",
@@ -50,7 +53,7 @@ const editFillInTheBlanksWithoutCluesFormSchema = z.object({
 
 type EditFillInTheBlanksWithoutCluesFormData = z.infer<typeof editFillInTheBlanksWithoutCluesFormSchema>
 
-function ContentPreview({ text, clue }: { text: string; clue?: string }) {
+function ContentPreview({ text, clue, isMath = false }: { text: string; clue?: string; isMath?: boolean }) {
   if (!text.trim() && !clue?.trim()) {
     return <span className="text-outline italic text-xs">Type question content above to preview formatted question...</span>
   }
@@ -61,7 +64,8 @@ function ContentPreview({ text, clue }: { text: string; clue?: string }) {
     <div className="space-y-3">
       {clue && clue.trim() && (
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-primary font-medium">
-          💡 <span className="font-bold">Clue / Instructions:</span> {clue.trim()}
+          💡 <span className="font-bold">Clue / Instructions:</span>{" "}
+          <RenderMath text={clue.trim()} isMath={isMath} />
         </div>
       )}
 
@@ -79,7 +83,7 @@ function ContentPreview({ text, clue }: { text: string; clue?: string }) {
                 </span>
               )
             }
-            return <span key={index}>{part}</span>
+            return <RenderMath key={index} text={part} isMath={isMath} />
           })}
         </div>
       )}
@@ -116,6 +120,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
       referenceText: "",
       source: DEFAULT_SOURCE,
       session: new Date().getFullYear().toString(),
+      isMath: false,
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",
     },
@@ -135,6 +140,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
         referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
         source: (item as any).source || DEFAULT_SOURCE,
         session: (item as any).session || new Date().getFullYear().toString(),
+        isMath: Boolean((item as any).isMath),
         difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
         popularityCount: String(item.popularityCount ?? 0),
       })
@@ -151,6 +157,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
   )
   const contentValue = watch("content") || ""
   const clueValue = watch("clue") || ""
+  const isMathValue = watch("isMath") || false
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -204,6 +211,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
         reference: referenceArray,
         source: data.source ? data.source.trim() : null,
         session: data.session ? data.session.trim() : new Date().getFullYear().toString(),
+        isMath: data.isMath,
       })
 
       toast.success("Fill in the Blanks without Clues question updated successfully.")
@@ -443,7 +451,7 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
                 <p className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
                   Formatted Preview
                 </p>
-                <ContentPreview text={contentValue} clue={clueValue} />
+                <ContentPreview text={contentValue} clue={clueValue} isMath={isMathValue} />
               </div>
             )}
 
@@ -546,6 +554,30 @@ export function EditFillInTheBlanksWithoutCluesView({ id: propId }: { id?: strin
                   className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto"
                 />
               </div>
+            </div>
+
+            {/* Math / LaTeX Formula Toggle Card */}
+            <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
+              <div>
+                <Label className="block font-headline text-sm font-bold text-on-surface">
+                  Math / LaTeX Formula
+                </Label>
+                <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
+                  Enable LaTeX rendering for math formulas in question content and clues.
+                </span>
+              </div>
+              <Controller
+                name="isMath"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSubmitting}
+                    className="cursor-pointer"
+                  />
+                )}
+              />
             </div>
 
             {/* Action Buttons */}

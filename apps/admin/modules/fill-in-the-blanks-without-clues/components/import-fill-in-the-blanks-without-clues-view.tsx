@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import { cn } from "@workspace/ui/lib/utils"
 import {
   PlusIcon,
@@ -47,6 +48,7 @@ const sampleJsonTemplate = `[
     "clue": "Fill in the gaps using suitable words.",
     "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
     "source": "গাইড বুক",
+    "isMath": false,
     "difficulty": "MEDIUM",
     "popularityCount": 0
   },
@@ -55,6 +57,7 @@ const sampleJsonTemplate = `[
     "clue": "Use appropriate prepositions or articles where necessary.",
     "reference": ["চট্টগ্রাম বোর্ড ২০২২"],
     "source": "বৃত্তি সহায়িকা",
+    "isMath": false,
     "difficulty": "EASY",
     "popularityCount": 0
   }
@@ -139,7 +142,7 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   }
 }
 
-function RenderFormattedPassage({ text }: { text: string }) {
+function RenderFormattedPassage({ text, isMath = false }: { text: string; isMath?: boolean }) {
   if (!text) return null
   const parts = text.split(/(\([a-z]\)\s*_{2,})/gi)
   return (
@@ -155,7 +158,7 @@ function RenderFormattedPassage({ text }: { text: string }) {
             </span>
           )
         }
-        return <span key={index}>{part}</span>
+        return <RenderMath key={index} text={part} isMath={isMath} />
       })}
     </span>
   )
@@ -171,6 +174,7 @@ interface EditableFieldProps {
   textClassName?: string
   badge?: React.ReactNode
   renderFormatted?: boolean
+  isMath?: boolean
 }
 
 function EditableField({
@@ -183,6 +187,7 @@ function EditableField({
   textClassName = "",
   badge,
   renderFormatted = false,
+  isMath = false,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value || "")
@@ -267,7 +272,9 @@ function EditableField({
           <div className="flex items-start justify-between gap-2">
             <span className="flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed">
               {renderFormatted ? (
-                <RenderFormattedPassage text={value || placeholder} />
+                <RenderFormattedPassage text={value || placeholder} isMath={isMath} />
+              ) : isMath ? (
+                <RenderMath text={value || placeholder} isMath={isMath} />
               ) : (
                 value || placeholder
               )}
@@ -349,6 +356,21 @@ function EditableCard({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Math Toggle */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => onChange({ ...item, isMath: !item.isMath })}
+            variant={item.isMath ? "outline" : "ghost"}
+            className={cn(
+              "h-8 px-2 text-xs font-semibold cursor-pointer rounded-lg",
+              item.isMath ? "border-primary text-primary bg-primary/5" : "text-muted-foreground"
+            )}
+            title="Toggle Math / LaTeX Formula Rendering"
+          >
+            {item.isMath ? "∑ Math On" : "Text Only"}
+          </Button>
+
           <Button
             type="button"
             variant="ghost"
@@ -380,6 +402,7 @@ function EditableCard({
           placeholder="Enter question or passage content with (a) _________ ..."
           multiline
           renderFormatted
+          isMath={item.isMath}
           onSave={(val) => onChange({ ...item, content: val || "" })}
         />
 
@@ -388,6 +411,7 @@ function EditableCard({
           label="Clue / Instructions (Optional)"
           value={item.clue || ""}
           placeholder="e.g. Fill in the blanks with suitable words..."
+          isMath={item.isMath}
           onSave={(val) => onChange({ ...item, clue: val || "" })}
         />
 
@@ -577,6 +601,7 @@ export function ImportFillInTheBlanksWithoutCluesView() {
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
           source: item.source ? String(item.source).trim() : currentDefaultSource,
+          isMath: item.isMath !== undefined ? Boolean(item.isMath) : false,
         })
       })
 
@@ -679,6 +704,7 @@ export function ImportFillInTheBlanksWithoutCluesView() {
       popularityCount: 0,
       reference: [],
       source: selectedSource || DEFAULT_SOURCE,
+      isMath: false,
     }
     const next = [...parsedItems, newItem]
     syncParsedItemsToText(next)
@@ -712,6 +738,7 @@ export function ImportFillInTheBlanksWithoutCluesView() {
         reference: Array.isArray(item.reference) ? item.reference : [],
         source: item.source ? String(item.source).trim() : selectedSource,
         session: currentYear,
+        isMath: Boolean(item.isMath),
       }))
 
       const res = await importMutation.mutateAsync({

@@ -1,0 +1,3105 @@
+[
+  {
+    "chapter": "সংখ্যা",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "১ম শার্টের দামে কয়টি শত আছে?",
+        "questionB": "সংখ্যা কার্ডের মাধ্যমে ২য় শার্টের দাম প্রকাশ করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: দুইটি শার্টের দাম ৩৮৯০ টাকা ও ৩৬৪৪ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কার্ডগুলো বড় হতে ছোট ক্রমানুসারে সাজাও।",
+        "questionB": "কার্ডগুলো গণনা করে প্রাপ্ত সংখ্যাটি অঙ্কে ও কথায় লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক:\n[১০০০০] [১০০০] [১০০০] [১০] [১]\n[১০০০০] [১০০] [১০০০] [১০] [১০০০]\n[১] [১০০] [১] [১] [১০০০০]\n[১০] [১০] [১০০] [১০] [১০০]\n[১০০] [১০] [১০০] [১] [১]\n[১০০০] [১০০০০] [১০০০]\n[১] [১০০০০] [১০০০]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ছবিটি যে সংখ্যা নির্দেশ করে তা লেখো।",
+        "questionB": "ছবির সংখ্যাটি হতে ৪ বেশি সংখ্যাটির অঙ্কগুলোর স্থানীয় মান নির্ণয় করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "১০০ এর ব্লক ৩টি, ১০ এর বার ৮টি এবং ১ এর ব্লক ৯টি সংবলিত চিত্র",
+            "content": "[১০০ এর ব্লক ৩টি, ১০ এর বার ৮টি এবং ১ এর ব্লক ৯টি সংবলিত চিত্র]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "দ্বিতীয় শহরের জনসংখ্যাকে কথায় লেখো।",
+        "questionB": "প্রথম শহরের জনসংখ্যার অঙ্কগুলোর স্থানীয় মান নির্ণয় করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: বাংলাদেশের দুইটি শহরের জনসংখ্যা যথাক্রমে ১৩৬৮২৫ ও ২৮৬০৩২ জন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "দ্বিতীয় সংখ্যাটি কথায় লেখো।",
+        "questionB": "প্রদত্ত সংখ্যাগুলোকে প্রতীকের সাহায্যে ছোটো থেকে বড়ো ও বড়ো থেকে ছোটো ক্রমে লেখো।",
+        "questionC": "তৃতীয় সংখ্যাটির দশক, শতক ও হাজার স্থানীয় অঙ্কগুলোর স্থানীয় মান নির্ণয় করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: ৯০২৫, ১০১০১০, ৯৮০৫, ৩৫০৯ চারটি সংখ্যা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সংখ্যা দুইটির মধ্যে কোন সংখ্যাটি বড়ো তা নির্ণয় করে প্রতীকের সাহায্যে দেখাও।",
+        "questionB": "প্রথম সংখ্যাটির অঙ্কগুলোর স্থানীয় মান নির্ণয় করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: আব্দুল্লাহ তার বাবার ডায়েরিতে ১৭৩৯০৪ ও ১৪৫৭৩২ সংখ্যা দুইটি দেখতে পেলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৭ জন লোক বেশি হলে, মোট লোক সংখ্যার ক্রমবাচক সংখ্যা এবং তার সংক্ষিপ্ত রূপটি লেখো।",
+        "questionB": "বর্ণনাসহ আমের সংখ্যাগুলো প্রতীক ব্যবহার করে ছোটো থেকে বড়ো ক্রমে সাজাও।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: চারটি আম বাগান থেকে যথাক্রমে ৩৩৫১৬, ৯৭৩২, ৫৬৭২১ ও ৫৪২১৫টি আম ১২ জন লোকের কাছে বিক্রি করা হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "শফিক সাহেব যদি একই প্যাটার্নে স্বর্ণ বিক্রি করেন তবে ঐ সপ্তাহের ৬ষ্ঠ দিন তিনি কত গ্রাম স্বর্ণ বিক্রি করবেন?",
+        "questionB": "ঐ ৪ দিনে বিক্রি হওয়া স্বর্ণের মূল্যকে কথায় লেখো এবং সংখ্যাটিতে ৫ এর স্থানীয় মান দুটির পার্থক্য নির্ণয় করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: শফিক সাহেব তার স্বর্ণের দোকান থেকে সপ্তাহের প্রথম ৪ দিন যথাক্রমে ৪৫ গ্রাম, ৪৯ গ্রাম, ৫৩ গ্রাম ও ৫৭ গ্রাম স্বর্ণ বিক্রি করলেন। সপ্তাহ শেষে হিসাব করে দেখলেন ঐ ৪ দিনে তার মোট ৮৯৫-২৫ টাকার স্বর্ণ বিক্রি হয়েছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্যাটার্নটির নিয়ম ব্যাখ্যা করো।",
+        "questionB": "‘ক’ ও ‘খ’ এর মান নির্ণয় করো।",
+        "questionC": "নতুন একটি প্যাটার্ন গঠন করো যার নিয়ম ‘− ৩’ এবং ১ম সংখ্যাটি প্রদত্ত প্যাটার্নের ১ম সংখ্যা।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: ৯৪, ১০০, ১০৬, ১১২, ‘ক’, ‘খ’ একটি প্যাটার্ন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "এমন একটি প্যাটার্ন তৈরি করো যার নিয়ম হবে −৪ এবং প্যাটার্নের ১ম সংখ্যাটি হবে প্রদত্ত প্যাটার্নের চতুর্থ সংখ্যা।",
+        "questionB": "প্যাটার্নটির নিয়ম খুঁজে বের করো এবং খালিঘর পূরণ করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: ২২, ৩১, ——, ৪৯, ৫৮, ——, ——।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "তিনি মোট কত টাকার চাল বিক্রি করেছেন?",
+        "questionB": "তার কাছে মোট কত বস্তা চাল ছিল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: এক দোকানি ১ম মাসে ১২৩৯ বস্তা চাল ৫৮৪৬৮ টাকায়, ২য় মাসে ১৫৮৭ বস্তা চাল ৭৪৮৮৯ টাকায় এবং ৩য় মাসে ২০৬০ বস্তা চাল ৯৮৯৬৭ টাকায় বিক্রি করেন। তাঁর কাছে এখন আর ৯৮৭ বস্তা চাল অবশিষ্ট আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "গ্রামটিতে পরবর্তী বছর আরো ৭১২ জন শিশু জন্মগ্রহণ করলে মোট শিশুর সংখ্যা কত হবে?",
+        "questionB": "গ্রামে মহিলার সংখ্যা কত জন?",
+        "questionC": "গ্রামে মোট জনসংখ্যা কত জন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি গ্রামে ১৩২৪৮ জন পুরুষ এবং ২১৮৭ জন শিশু আছে। মহিলার সংখ্যা শিশুর সংখ্যা হতে ৮৫৪৬ জন বেশি।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তিনি দ্বিতীয় সপ্তাহে কত টাকা লাভ করেন?",
+        "questionB": "তিনি তিন সপ্তাহে মোট কত টাকা লাভ করেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একজন দোকানদার তার দোকান থেকে প্রথম সপ্তাহে ৩৪৫৭ টাকা লাভ করেন। প্রথম সপ্তাহের চেয়ে দ্বিতীয় সপ্তাহে ১৯২৮ টাকা বেশি এবং তৃতীয় সপ্তাহে ৯৭৭ টাকা বেশি লাভ করেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তিনি পুকুরে মোট কতটি মাছের পোনা ছেড়েছেন?",
+        "questionB": "মোট গাছের চারা ও মোট মাছের পোনার মধ্যে কোনটির সংখ্যা বেশি?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি পুকুরের চারপাশের পাড়ে জাফর সাহেব নার্সারি করেছেন। নার্সারিতে ৮৭৫টি বেলি, ৯৬৯টি গোলাপ ও ১৩২৭টি জবা ফুলের চারা গাছ আছে। এছাড়াও তিনি পুকুরে ২৮৬৯টি রুই ও ১৬৮৬টি কৈ মাছের পোনা ছেড়েছেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কোন মাসে সবচেয়ে বেশি টাকার ফুল বিক্রয় হয়েছে?",
+        "questionB": "জুন ও জুলাই মাসে মোট কত টাকার ফুল বিক্রি হয়েছে?",
+        "questionC": "শেষ ৩ মাসে মোট কত টাকার ফুল বিক্রি হয়েছে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "table",
+            "caption": null,
+            "content": null,
+            "url": null,
+            "table": {
+              "headers": [
+                "মাস",
+                "বিক্রয় (টাকা)"
+              ],
+              "rows": [
+                [
+                  "জুন",
+                  "৭৫২৬"
+                ],
+                [
+                  "জুলাই",
+                  "১০৪8৫"
+                ],
+                [
+                  "আগস্ট",
+                  "১১৭৬৩"
+                ],
+                [
+                  "সেপ্টেম্বর",
+                  "৮৬৪৯"
+                ],
+                [
+                  "অক্টোবর",
+                  "১৩২৫২"
+                ]
+              ]
+            },
+            "bottomContent": "উপরের ছকটি একটি ফুলের দোকানের বিক্রয় তালিকা।",
+            "tableBorder": true,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৪র্থ দিন কত জন দর্শনার্থী এসেছিল?",
+        "questionB": "২য় ও ৪র্থ দিন মোট কতজন দর্শনার্থী এসেছিল?",
+        "questionC": "১ম তিন দিনে মোট কত জন দর্শনার্থী এসেছিল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি জাদুঘরে সপ্তাহের ১ম দিন ১৮৮২ জন, ২য় দিন ২৬৮৮ জন এবং ৩য় দিন ১৫৬৪ জন দর্শনার্থী এসেছিল। ৪র্থ দিন ৩য় দিন অপেক্ষা ৩৬ জন বেশি দর্শনার্থী এসেছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম দুইটি গাছ থেকে মোট কতটি লিচু পাড়া হয়েছিল?",
+        "questionB": "ঐ তিনটি গাছে আরও ৫৮৫টি লিচু অবশিষ্ট থাকলে গাছগুলোতে মোট কতটি লিচু হয়েছিল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: নাফিসদের ফল বাগানের ৩টি লিচু গাছ থেকে যথাক্রমে ৫৩৮টি, ৭০৬টি ও ৮৯৫টি লিচু পাড়া হয়েছিল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রাহুল কোন মাসে সবচেয়ে বেশি টাকার বই কিনেছে?",
+        "questionB": "সে ৩ মাসে মোট কত পৃষ্ঠা বই পড়েছে?",
+        "questionC": "সে চার মাসে কত টাকার বই কিনল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রাহুল লাইব্রেরি থেকে প্রথম মাসে ১৩৪৮ টাকা, দ্বিতীয় মাসে ১০৮৫ টাকা, তৃতীয় মাসে ১৮৪৮ টাকা এবং চতুর্থ মাসে ১৭০০ টাকার বই কিনল। সে ৩ মাসে যথাক্রমে ৩৮৪ পৃষ্ঠা, ২৭০ পৃষ্ঠা ও ৫০৮ পৃষ্ঠার তিনটি বই পড়ে শেষ করে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম ও চতুর্থ দিন সে মোট কত মিটার দৌড়ায়?",
+        "questionB": "৫ম দিন ২০৯ মিটার দৌড়ালে শেষ ৪ দিনে মোট কত মিটার দৌড়াবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: সাজিদ বার্ষিক ক্রীড়া প্রতিযোগিতার জন্য ১ম দিন ৮২ মিটার, ২য় দিন ১০৭ মিটার, ৩য় দিন ১৬৫ মিটার এবং ৪র্থ দিন ১২৭ মিটার দৌড়ায়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১ম তিন দিনে কতটি ডিম বিক্রি করেছিলেন?",
+        "questionB": "ডিম বিক্রেতার নিকট মোট কতটি ডিম ছিলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একজন ডিম বিক্রেতা ১ম দিনে ৩৩৪টি, ২য় দিনে ৩২৫টি, ৩য় দিনে ৩৬৮টি ও ৪র্থ দিনে ৪০৬টি ডিম বিক্রি করলেন। তার কাছে আরও ৪৭৮টি ডিম অবশিষ্ট থাকলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "উদ্দীপকের তিন প্রজাতির মোট গাছের সংখ্যা কত?",
+        "questionB": "বনে অন্য প্রজাতির আরো ৭০৭৭টি গাছ থাকলে মোট গাছের সংখ্যা কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি বনে অর্জুন গাছ ১৩২৪০টি, বটগাছ ২২৭৮৪টি এবং ১৩২৯৫টি কড়ই গাছ আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "বিয়োগ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "তিনি সাইকেল অপেক্ষা কত টাকা বেশি দিয়ে টিভি কিনেছিলেন?",
+        "questionB": "এখন ট্রেনে কতজন যাত্রী অবশিষ্ট আছেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: সালাম সাহেব ৫২৩২০ টাকা দিয়ে একটি টিভি এবং ২৮১৮০ টাকা দিয়ে একটি সাইকেল কিনে ৩২৫০ জন যাত্রীবাহী একটি ট্রেনে উঠলেন। পরের স্টেশনে ১২৮৮ জন যাত্রী নেমে গেলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "জামাল সাহেব কাকে কত টাকা বেশি দিলেন?",
+        "questionB": "নার্সারিতে কোন ফুলের গাছ কতটি কম আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: জামাল সাহেব তার কন্যা টিকলীকে ২৬৮৯ টাকা এবং পুত্র আব্দুল্লাহকে ৪৭৫৬ টাকা দিলেন। আব্দুল্লাহ টাকা পেয়ে ফুল কেনার জন্য একটি নার্সারিতে গিয়ে দেখল যে, সেখানে ৯৩৭টি জবা ফুল গাছ ও ৫৬৫টি গাঁদা ফুল গাছ আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "এক মাস পর মাসিক আয় কত বৃদ্ধি পেল?",
+        "questionB": "বেতন বৃদ্ধির পূর্বে মাসিক সঞ্চয় কত ছিল?",
+        "questionC": "বেতন বৃদ্ধির পর তার মাসিক ব্যয় ৭১০০ টাকা হলে প্রতি মাসে পূর্বের তুলনায় কত টাকা বেশি জমাতে পারবেন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: মাসুদ সাহেবের মাসিক আয় ৯৭৮০ টাকা এবং মাসিক ব্যয় ৬৯৭৫ টাকা। অবশিষ্ট টাকা তিনি ব্যাংকে জমা রাখেন। এক মাস পর তাঁর বেতন ১২০৮০ টাকা হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "জামিলের মাসিক সঞ্চয় কত টাকা?",
+        "questionB": "কার সঞ্চয়ের পরিমাণ বেশি?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "table",
+            "caption": null,
+            "content": null,
+            "url": null,
+            "table": {
+              "headers": [
+                "ব্যক্তির নাম",
+                "আয়",
+                "ব্যয়"
+              ],
+              "rows": [
+                [
+                  "জামিল",
+                  "৫০,৬৩০",
+                  "৩৫,৮৭৬"
+                ],
+                [
+                  "কালাম",
+                  "৬৫,০১০",
+                  "৫২,০০৯"
+                ]
+              ]
+            },
+            "bottomContent": "জামিল এবং কালামের মাসিক আয়-ব্যয়ের পরিমাণ দেওয়া হলো।",
+            "tableBorder": true,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ঐ বিদ্যালয়ে ছাত্রের সংখ্যা কত জন?",
+        "questionB": "ঐ বিদ্যালয় হতে ৫৪ জন ছাত্রী চলে গেলে ছাত্রসংখ্যা অপেক্ষা ছাত্রীসংখ্যা কত বেশি থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি বিদ্যালয়ে ১৫৮২ জন ছাত্র-ছাত্রী আছে। ছাত্রীর সংখ্যা ৮৯৪ জন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১ম দিনের দর্শক সংখ্যা নির্ণয় করো।",
+        "questionB": "১ম দিন অপেক্ষা ২য় দিনে কতজন দর্শক বেশি ছিল?",
+        "questionC": "২য় দিন কতজন পুরুষ দর্শক উপস্থিত ছিল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: স্টেডিয়ামে খেলা দেখতে প্রথমদিন ৩৮৩২ জন এসেছিল যাদের ৭৫৪ জন স্টেডিয়ামে প্রবেশ করতে পারে নাই। ২য় দিন খেলার দর্শক ছিল ৪৩৪০ জন যার মাঝে ২৪৭৮ জন নারী ছিল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কর্মচারীদের বেতন দেওয়ার পর কোম্পানির অবশিষ্ট বাৎসরিক টাকার পরিমাণ কত?",
+        "questionB": "কোম্পানির লাভ কত টাকা?",
+        "questionC": "কর্মচারীদের বেতন বাবদ খরচ অন্যান্য ব্যয় বাবদ খরচ অপেক্ষা কত বেশি?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি কোম্পানি বছরে ৮০০০০০ টাকা আয় করে এবং কর্মচারীদের বেতন বাবদ ২৫৬৭০০ টাকা ও অন্যান্য ব্যয়ে ৯৫৮৫০ টাকা খরচ করে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বাসা ভাড়া ও রক্ষণাবেক্ষণ বাদে অন্যান্য খরচ কত?",
+        "questionB": "জেসমিন বেগম মাসে কত টাকা জমা রাখেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: জেসমিন বেগম মাসে ৩৪২৫০ টাকা আয় করেন এবং ২৯৭৪৫ টাকা ব্যয় করেন। তাঁর বাসা ভাড়া ও রক্ষণাবেক্ষণ বাবদ ১৬৮৮৭ টাকা খরচ করতে হয়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "শুধুমাত্র মাছ কেনার পর তার কাছে কত টাকা থাকবে?",
+        "questionB": "বাজার করার পর তার কাছে কত টাকা থাকবে?",
+        "questionC": "করিম সাহেব মাংস অপেক্ষা কত টাকার বেশি মাছ কিনেছেন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: করিম সাহেব ৩৫০০ টাকা নিয়ে বাজারে গেলেন। তিনি ১৬২৫ টাকার মাছ ও ৯৮৮ টাকার মাংস কিনলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "দ্বিতীয় দিন তিনি কত টাকার বই বেশি বিক্রি করেন?",
+        "questionB": "তার কাছে কত টাকা অবশিষ্ট রইল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: জাহেদ চৌধুরী বইমেলায় প্রথম দিন ২৮৫৫ টাকার এবং দ্বিতীয় দিন ৮৩২০ টাকার বই বিক্রি করলেন। দ্বিতীয় দিনের বই বিক্রির টাকা থেকে তিনি ১৮৩২ টাকার বাজার করলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "খামারে বর্তমানে কতটি হাঁসের বাচ্চা আছে?",
+        "questionB": "অবশিষ্ট হাঁসের বাচ্চাগুলো থেকে ২০টি বাচ্চা মারা গেলে, ঐ খামারে বর্তমানে পূর্বের তুলনায় কতটি হাঁসের বাচ্চা কম আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি হাঁসের খামারে ৯৫০টি হাঁসের বাচ্চা ছিল। এর থেকে ৫৩২টি হাঁসের বাচ্চা বিক্রি করা হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ছোটো সংখ্যাটি নির্ণয় করো।",
+        "questionB": "১০০০০ হতে সংখ্যাদ্বয়ের যোগফল বিয়োগ করো।",
+        "questionC": "বড়ো সংখ্যাটি অপেক্ষা ১৭৪৮৯ কত বেশি?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: দুইটি সংখ্যার যোগফল ৮৭৯৩। এদের মধ্যে বড়ো সংখ্যাটি ৬৯৯৫।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ ও বিয়োগের সম্পর্ক",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "দুইটি স্কুলের মোট ছাত্র-ছাত্রীর সংখ্যা নির্ণয় করো।",
+        "questionB": "স্কুল দুইটির ছাত্র-ছাত্রীর সংখ্যার পার্থক্য কতজন হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি স্কুলে ১৫৫৪ জন ছাত্র-ছাত্রী আছে। একই শহরের অপর একটি স্কুলে ছাত্র-ছাত্রীর সংখ্যা ৯৫০ জন। ১ম স্কুল হতে ৭৯ জন ছাত্র এবং ৩১ জন ছাত্রী ২য় স্কুলে চলে গেল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রান্তের কাছে মোট কত টাকা অবশিষ্ট রইল?",
+        "questionB": "শার্ট, প্যান্ট ও লুঙ্গিতে যথাক্রমে ৩৭০ টাকা, ২৯৫ টাকা ও ১৮৫ টাকা ছাড় পেলে তার কাছে মোট কত টাকা অবশিষ্ট থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: প্রান্ত ৫০০০ টাকা নিয়ে মার্কেটে গেল। সে ২৩২০ টাকার শার্ট, ১৬৮৫ টাকার প্যান্ট এবং ৭৪০ টাকার লুঙ্গি কিনলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "জামীর কত টাকা আছে?",
+        "questionB": "তিন জনের মোট কত টাকা আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: জামী অপেক্ষা রুমীর ৫৯০ টাকা বেশি আছে। অনি অপেক্ষা জামীর ২৫০ টাকা কম আছে। অনির কাছে ৯৯০ টাকা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম স্টেশন ত্যাগ করার পর যাত্রী সংখ্যা কত হলো?",
+        "questionB": "দ্বিতীয় স্টেশন ত্যাগ করার পর ট্রেনটিতে যাত্রী সংখ্যা কত হলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি ট্রেনে ২৬২৫ জন যাত্রী যাত্রা শুরু করলো। প্রথম স্টেশনে ৬৯১ জন যাত্রী নেমে গেল। ট্রেনটি দ্বিতীয় স্টেশনে পৌঁছানোর পর ৫৮৩ জন যাত্রী নেমে গেলো এবং ৭৬৭ জন নতুন যাত্রী উঠলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বন্যার্তদের মধ্যে মোট কত প্যাকেট খাদ্য সামগ্রী বিতরণ করা হলো?",
+        "questionB": "অসহায় পরিবারগুলো মোট কত প্যাকেট খাদ্য সামগ্রী পেয়েছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: বন্যার্তদের সাহায্যের জন্য মোট ২২৪১ প্যাকেট চাল, ডাল ও লবণ ক্রয় করা হলো। বন্যার্তদের মধ্যে ৩৭৭ প্যাকেট চাল, ৩৯৯ প্যাকেট ডাল এবং ১৩৯৮ প্যাকেট লবণ বিতরণ করা হলো। অবশিষ্ট খাদ্য সামগ্রী কয়েকটি অসহায় পরিবারের মধ্যে বিতরণ করা হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বন্যায় পুকুর থেকে কতগুলো মাছ বের হয়ে গেলো?",
+        "questionB": "পুকুরে কতটি মাছ অবশিষ্ট রইলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি পুকুরে মোট ৭৯২২টি রুই, কাতলা, মৃগেল, গ্রাস কার্প ও তেলাপিয়া মাছ ছিল। বন্যায় পুকুর থেকে ৭৯৭টি রুই মাছ, ৯২১টি কাতলা মাছ, ১২৫৩টি মৃগেল মাছ এবং ১৮৬৯টি তেলাপিয়া মাছ বের হয়ে গেলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "চালের চেয়ে মাছের দাম কত টাকা বেশি?",
+        "questionB": "মাছ ও সবজির দামের পার্থক্য কত?",
+        "questionC": "বাজার করার পর তার কাছে আর কত টাকা রইল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রহিমা বেগম ৭২৭৫ টাকা নিয়ে বাজারে গেলেন। তিনি ৮১৫ টাকার চাল, ২৬১৫ টাকার মাছ ও ১৮৪৭ টাকার সবজি কিনলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "দুইজনের কাছে মোট কত টাকা আছে?",
+        "questionB": "হিয়ার চেয়ে রেজার কত টাকা বেশি আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রেজার কাছে ৫৩৪৮ টাকা আছে। হিয়ার কাছে ৩৬৮৫ টাকা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম দুই শিফটে মোট কতজন শ্রমিক কাজ করে?",
+        "questionB": "তৃতীয় শিফটে কতজন শ্রমিক কাজ করে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি কারখানায় ৩৫,৬৭৫ জন শ্রমিক কাজ করে। প্রথম শিফটে ১০,৭৫০ জন শ্রমিক, দ্বিতীয় শিফটে ১২,৬৫০ জন শ্রমিক এবং অবশিষ্ট শ্রমিক তৃতীয় শিফটে কাজ করে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "গোলাপ থেকে জবার চারার সংখ্যা কত বেশি?",
+        "questionB": "ঐ নার্সারিতে মোট কতগুলো চারা গাছ আছে?",
+        "questionC": "১২৮টি গোলাপ ও ২২৯টি গাঁদা ফুলের চারা বিক্রি হলে নার্সারিটিতে মোট কতটি গোলাপ ও গাঁদা ফুলের চারা গাছ অবশিষ্ট থাকবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি নার্সারিতে ৬২০টি গোলাপ, ৮৩২টি জবা ও ১২৮৮টি গাঁদা ফুলের চারা গাছ আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বিদ্যালয় তহবিল অপেক্ষা সরকারি অনুদান কত টাকা বেশি?",
+        "questionB": "প্রতিযোগিতার জন্য মোট কত টাকা সংগ্রহ করা হলো?",
+        "questionC": "প্রতিযোগিতার জন্য কত টাকা ছাত্রীদের বেতন থেকে পরিশোধ করতে হবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: বার্ষিক ক্রীড়া প্রতিযোগিতার জন্য ২৪০০০ টাকার প্রয়োজন। সরকারি অনুদান হিসেবে ৯৮০০ টাকা এবং বিদ্যালয়ের তহবিল থেকে ৮৫০০ টাকা সংগ্রহ করা হলো। অবশিষ্ট টাকা ছাত্রীদের বেতন থেকে পরিশোধ করতে হবে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রেজিস্ট্রেশন এবং মেরামত বাবদ মোট কত টাকা খরচ হলো?",
+        "questionB": "তার কত টাকা লাভ হলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রাহুল ৬৮৫০০ টাকা দিয়ে একটি স্কুটার ক্রয় করলেন। স্কুটারটির রেজিস্ট্রেশন বাবদ ৭০৮০ টাকা ও মেরামত বাবদ ৯৫০ টাকা খরচ হলো। এরপর তিনি স্কুটারটি ১০২০০০ টাকায় বিক্রয় করলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সংখ্যা দুইটির সমষ্টি কত?",
+        "questionB": "ছোটো সংখ্যাটি হতে কত বিয়োগ করলে বিয়োগফল চার অঙ্কের ক্ষুদ্রতম সংখ্যা থেকে ৪৮ কম হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: দুটি সংখ্যার বিয়োগফল ৫১২। ছোটো সংখ্যাটি ১৫২৭।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কন্যার বয়স কত বছর পর ২৫ বছর হবে?",
+        "questionB": "মাতার বর্তমান বয়স কন্যার বর্তমান বয়স অপেক্ষা কত বেশি তা নির্ণয় করে প্রাপ্ত সংখ্যাটির দশক স্থানীয় অঙ্কের স্থানীয় মান লেখো।",
+        "questionC": "৯ বছর পূর্বে মাতা ও কন্যার বয়সের সমষ্টি কত ছিল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: মাতার বর্তমান বয়স ৩৯ বছর ও কন্যার বর্তমান বয়স ১২ বছর।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "গুণ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "সবগুলো বইয়ের মোট মূল্য কত?",
+        "questionB": "সবগুলো বইয়ের মোট পৃষ্ঠা সংখ্যা কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: স্কুলের রচনা প্রতিযোগিতার পুরস্কার হিসেবে দেওয়ার জন্য একজন শিক্ষক ১৪৫ টাকা মূল্যের ১৫টি বই ক্রয় করলেন। প্রতি বইয়ে পৃষ্ঠার সংখ্যা ২৩৬।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সুমির কাছে কত টাকা আছে?",
+        "questionB": "সিঁথির কাছে কত টাকা আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রুমির টাকার ১৫ গুণ টাকা সুমির কাছে আছে এবং রুমির টাকার ২৫ গুণ সিঁথির কাছে আছে। রুমির কাছে ১৩৫ টাকা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৩০ বস্তা চালের দাম কত?",
+        "questionB": "৫ কুইন্টাল চাল কিনতে কত টাকা লাগবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: এক বস্তায় ৭০ কেজি চাল আছে। প্রতি কেজি চালের দাম ৮৫ টাকা। [১ কুইন্টাল = ১০০ কেজি]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সিলেট পৌঁছাতে ৮ ঘণ্টা সময় লাগলে ঢাকা হতে সিলেটের দূরত্ব কত?",
+        "questionB": "জনপ্রতি ভাড়া যাত্রী সংখ্যার ১৫ গুণ হলে, বাসটিতে মোট কত টাকা ভাড়া উঠেছিল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: অনিক বাসে করে ঢাকা থেকে সিলেট যান। বাসটি প্রতি ঘণ্টায় ৩২ কিলোমিটার যায়। বাসটিতে ৩৫ জন যাত্রী আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১ হালি ইলিশের দাম কত?",
+        "questionB": "এরূপ ২ ডজন ইলিশ কিনতে কত টাকা লাগবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: নেহার বাবা পহেলা বৈশাখ উপলক্ষে কিছু ইলিশ মাছ কিনেন। একটি ইলিশ মাছের দাম ১১০০ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রিফাত প্রতি ঘণ্টায় কত মিটার গাড়ি চালান? [১ কিমি = ১০০০ মিটার]",
+        "questionB": "রিফাতের তেল বাবদ মোট কত টাকা খরচ হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রিফাত ঘণ্টায় ৪২ কিমি বেগে ৯ ঘণ্টা গাড়ি চালান। প্রতি কিমি গাড়ি চালাতে তেল বাবদ খরচ হয় ১৮ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "শ্রেণিতে মোট শিক্ষার্থী সংখ্যা কত?",
+        "questionB": "প্রত্যেক শিক্ষার্থীকে ১২টি করে চকোলেট দেওয়া হলে, মোট কতটি চকোলেট প্রয়োজন হবে?",
+        "questionC": "যদি প্রতি বেঞ্চে ৫ জন শিক্ষার্থী বসতে পারত তাহলে ঐ শ্রেণির শিক্ষার্থী সংখ্যা কত হতো?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি শ্রেণিতে ২৮টি বেঞ্চ আছে। শ্রেণির সকল শিক্ষার্থী উপস্থিত থাকলে প্রতি বেঞ্চে ৪ জন শিক্ষার্থীর বসতে হয়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রেজা সাহেবের বাসা হতে মাওয়ার দূরত্ব কত?",
+        "questionB": "রেজা সাহেব মোট কতটি ইলিশ কিনেছেন?",
+        "questionC": "ইলিশ কিনতে তার মোট কত টাকা খরচ হয়েছে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রেজা সাহেব গাড়ি চালিয়ে ঘণ্টায় ৫৪ কি. মি. যান। তিনি তার বাসার সামনে থেকে ৩ ঘণ্টা গাড়ি চালিয়ে মাওয়া ঘাটে গিয়ে ৮ হালি ইলিশ কিনলেন। প্রতিটি ইলিশের দাম ৪৮০ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "একটি ফুলের তোড়ার দাম ৭০ টাকা হলে, ৬ টি ফুলের তোড়ার দাম কত?",
+        "questionB": "এরকম ৯টি তোড়ায় কয়টি ফুল থাকবে?",
+        "questionC": "১টি ফুলের দাম ২৫ টাকা হলে, ১৫টি ফুলের তোড়ার দাম কত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: বর্ণালী ১২টি ফুলের একটি তোড়া কিনলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তিনি কতটি কলা কিনেছেন?",
+        "questionB": "১৩ হালি কলার দাম কত টাকা?",
+        "questionC": "তার মোট কত টাকা খরচ হয়েছে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: তানভীর হালি প্রতি ২১ টাকা দরে ৮ ডজন কলা ক্রয় করেন। [১ ডজন = ৩ হালি / ১ হালি = ১/৩ ডজন]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সে কত টাকার ইলিশ কিনল?",
+        "questionB": "রুই মাছ কেনার পরে কত টাকা অবশিষ্ট ছিল?",
+        "questionC": "সয়াবিন তেল ও ইলিশের মোট দাম কত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রাহুল ৩০০০ টাকা নিয়ে বাজারে গেল। সে ২২৫ টাকা দামের ৩টি রুই মাছ, ৩৬০ টাকা দামের ৪টি ইলিশ এবং প্রতি লিটার ১০০ টাকা দরে ৫ লিটার সয়াবিন তেল কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "নাফিস কত টাকার আনারস এবং কত টাকার বিস্কুট কিনেছে?",
+        "questionB": "নাফিস মোট কত টাকার বাজার করেছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: নাফিস বাজারে গিয়ে ৩০ টাকা দরে ৬টি আনারস, ২৭ টাকা দরে ৯ প্যাকেট বিস্কুট ও ৪৫ টাকা দরে ২৬টি খাতা কিনেছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "আলমারিতে মোট কতগুলো বই আছে?",
+        "questionB": "বইগুলোতে মোট কতগুলো পৃষ্ঠা আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি আলমারিতে ১৮টি তাক আছে। প্রতিটি তাকে ১৭ পৃষ্ঠার ২৪টি করে বই আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "ভাগ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "শিক্ষার্থীদের বসার জন্য কয়টি বেঞ্চের প্রয়োজন?",
+        "questionB": "প্রতি দলে ৫ জন শিক্ষার্থী নিয়ে দল গঠন করা হলে, কয়টি দল হবে এবং কত জন শিক্ষার্থী কোনো দলে থাকবে না?",
+        "questionC": "শিক্ষার্থী সংখ্যা ৮ জন কমে গেলে কয়টি বেঞ্চের প্রয়োজন হবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি ক্লাসে ৭২ জন শিক্ষার্থী আছে। প্রতি বেঞ্চে ৪ জন করে শিক্ষার্থী বসতে পারে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তন্বী একদিনে বইটির ৩ পৃষ্ঠা পড়লে তার বইটি পড়ে শেষ করতে কতদিন লাগবে?",
+        "questionB": "তন্বী বই না কিনে তার মোট টাকা ৫ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে কত টাকা করে পেত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: তন্বী ৬৫ টাকা দিয়ে ৭৮ পৃষ্ঠার একটি বই কিনলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১ ডজন ডিমের দাম কত?",
+        "questionB": "৪ কেজি আদার দাম কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি দোকানে ৭ ডজন ডিমের দাম ৭৩৫ টাকা ও ৬ কেজি আদার দাম ৯৬০ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রত্যেকে কয়টি করে পেয়ারা পাবে?",
+        "questionB": "লোকসংখ্যা দ্বিগুণ হলে প্রত্যেকে কত টাকার পেয়ারা পাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: ৪৮টি পেয়ারা ৬ জনের মধ্যে সমানভাবে বিতরণ করা হলো। একটি পেয়ারার দাম ১৪ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রতি প্যাকেটে কয়টি করে বিস্কুট আছে?",
+        "questionB": "পেয়ারাগুলো ৬ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে কয়টি করে পেয়ারা পাবে?",
+        "questionC": "বিস্কুটগুলোকে ৪ জন বন্ধুর মধ্যে সমান ভাগে ভাগ করে দিলে প্রত্যেকে কয়টি করে বিস্কুট পাবে এবং কয়টি বিস্কুট অবশিষ্ট থাকবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: নেহা দোকান থেকে ৭টি প্যাকেটের মোট ৬৩টি বিস্কুট এবং ৭৮টি পেয়ারা কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কতজন বন্ধুকে সে পেন্সিল দিতে পারবে এবং কয়টি পেন্সিল অবশিষ্ট থাকবে?",
+        "questionB": "৩ জন বন্ধুকে পেন্সিলগুলো সমানভাবে ভাগ করে দিলে কোনো পেন্সিল অবশিষ্ট থাকবে কি?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: রিয়ার কাছে ৮৭টি পেন্সিল আছে। সে তার বন্ধুদের ৬টি করে পেন্সিল দিতে চায়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রত্যেক দলে ৫ জন শিক্ষার্থী নিয়ে মোট কতটি দল গঠন করা যাবে?",
+        "questionB": "৩৮০টি বই ঐ শ্রেণির অর্ধেক শিক্ষার্থীর মধ্যে সমান ভাগে ভাগ করে দিলে প্রত্যেকে কয়টি করে বই পাবে এবং কতটি বই অবশিষ্ট থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: একটি শ্রেণিতে ৬০ জন শিক্ষার্থী আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সে মোট কয়টি কলম কিনতে পারবে?",
+        "questionB": "মালিহা পাশের দোকান থেকে কলম কিনলে কয়টি কলম কিনতে পারত?",
+        "questionC": "প্রতিটি পেন্সিলের দাম ১০ টাকা হলে সে কতটি পেন্সিল কিনতে পারত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: মালিহার কাছে ৩৬০ টাকা আছে। সে এই টাকা দিয়ে কিছু কলম কিনল। প্রতিটি কলমের দাম ৮ টাকা। কিন্তু পাশের দোকানে একই কলমের দাম ৬ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সোমা এক দিনে বইটির কত পৃষ্ঠা পড়ে?",
+        "questionB": "সোমা ব্যাংকটিতে প্রতিদিন কত টাকা জমা করে?",
+        "questionC": "যদি সোমা ৫ দিনে সমপরিমাণ টাকা জমাতে চায় তাহলে তাকে প্রতিদিন কত টাকা করে জমাতে হবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: সোমা ৮ দিনে একটি বইয়ের ১৯২ পৃষ্ঠা পড়ে এবং তার মাটির ব্যাংকে ৬৮০ টাকা জমা করে। সে প্রতিদিন সমপরিমাণ পৃষ্ঠা পড়ে এবং প্রতিদিন একই পরিমাণ টাকা জমা করে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কতটি মার্বেল অবশিষ্ট থাকবে?",
+        "questionB": "মার্বেলের সংখ্যা ৫৪০টি বাড়ানো হলে প্রত্যেকে কতটি করে মার্বেল পাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: ৪১২টি মার্বেল ৮ জন বালকের মাঝে সমানভাবে ভাগ করে দেওয়া হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মোট কতটি খুঁটি বসানো যাবে?",
+        "questionB": "মোট কতটি ল্যাম্পপোস্ট বসানো হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "একটি রাস্তার চিত্র যেখানে সমান দূরত্বের ব্লক ও দাগ নির্দেশ করা আছে",
+            "content": "[একটি রাস্তার চিত্র যেখানে সমান দূরত্বের ব্লক ও দাগ নির্দেশ করা আছে]",
+            "url": null,
+            "table": null,
+            "bottomContent": "একটি রাস্তায় চিত্রের মতো ৯৬৮টি ব্লক রয়েছে। প্রথম স্থানটি খালি রেখে প্রতি ৪টি ব্লক পরপর একটি করে খুঁটি বসানো হবে এবং ৮টি ব্লক পর পর ল্যাম্পপোস্ট বসানো হবে।",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ভাজ্যটি ৯ দ্বারা নিঃশেষে বিভাজ্য কি-না তা নির্ণয় করো।",
+        "questionB": "ভাজ্য থেকে কত বিয়োগ করলে তা ৭ দ্বারা নিঃশেষে বিভাজ্য হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "উদ্দীপক: কোনো ভাগ অঙ্কে ভাজ্য ৯২৩।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "গুণ ও ভাগের সম্পর্ক",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "গুণফলটি নির্ণয় করো।",
+        "questionB": "গুণফলটি কতটি ২৫ এর সমান হবে?",
+        "questionC": "গুণফলটিকে ৪৫ দ্বারা ভাগ করলে কত অবশিষ্ট থাকবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "৫টি ৭ কে ৭টি ৫ দ্বারা গুণ করা হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৫টি ডিমের দাম কত?",
+        "questionB": "১৭টি কলার দাম কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "ফারহান ১৬৮ টাকা দিয়ে ১২টি ডিম এবং ১১২ টাকা দিয়ে ৮টি কলা কিনলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "আপেলগুলো ১৬ জনের মধ্যে ভাগ করে দিলে প্রত্যেকে কতটি করে আপেল পাবে?",
+        "questionB": "কমলাগুলো কতজনের মধ্যে ভাগ করে দিলে প্রত্যেকে ১৮টি করে কমলা পাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "৮টি ঝুড়ির প্রত্যেকটিতে ৮২টি করে আপেল এবং ৫৪টি করে কমলা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রেবেকার ১টি খেলনার মূল্য কত?",
+        "questionB": "নাফিসের ১৭টি খেলনার মূল্য কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "নাফিসের ৭টি খেলনার মূল্য ৬৬৫ টাকা এবং রেবেকার ৪টি খেলনার মূল্য ৮৬০ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "একটি জ্যামিতি বক্স কেনার জন্য কয়টি ২ টাকার নোট প্রয়োজন?",
+        "questionB": "৫টি জ্যামিতি বক্সের মোট দাম কত?",
+        "questionC": "২৪ জন শিক্ষার্থীর প্রত্যেকে কত টাকা করে দিলে ৯টি জ্যামিতি বক্স কেনা যাবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি জ্যামিতি বক্সের দাম ১২৮ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সমপরিমাণ টাকা ১০ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে কত টাকা করে পেত?",
+        "questionB": "প্রত্যেকে কত টাকা পাবে এবং কত টাকা অবশিষ্ট থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "২০০ টাকার ৮টি নোট ১৩ জনের মধ্যে সমানভাবে ভাগ করে দেওয়া হলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৩০ জনের মাঝে বাক্সের চকলেটগুলো সমান ভাগে ভাগ করে দিলে প্রত্যেকে কয়টি করে চকলেট পাবে?",
+        "questionB": "প্রতি প্যাকেটে ২৫টি করে চকলেট থাকলে অনুরূপ কতগুলো বাক্সে মোট ২৪০০টি চকলেট থাকবে?",
+        "questionC": "বাক্সটিতে আরও ১৩টি চকলেটের প্যাকেট রাখা হলে, মোট চকলেটের সংখ্যা কত হবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি বাক্সে ৬টি চকলেটের প্যাকেট আছে এবং প্রতি প্যাকেটে ৪৫টি করে চকলেট আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রতিটি খাতার মূল্য কত?",
+        "questionB": "প্রত্যেকের চাঁদার পরিমাণ ১০ টাকা এবং খাতার মূল্য ১ টাকা করে বৃদ্ধি করলে মোট কতগুলো খাতা কেনা যাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "২৮ জন বন্ধুর প্রত্যেকে ৬২ টাকা করে চাঁদা তুলে নিজেদের জন্য মোট ৫৬টি খাতা কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "অতিথিদের প্রত্যেককে ২০ টাকা মূল্যের একটি করে ফুল উপহার দেওয়া হলে মোট কত টাকার ফুল কিনতে হবে?",
+        "questionB": "রবিন পরবর্তীতে আরো ৮টি কলম কিনলে তাকে অতিরিক্ত কত টাকা খরচ করতে হবে?",
+        "questionC": "ছাত্রদের খাতা উপহার দেয়ার জন্য প্রত্যেক অতিথি কত টাকা করে দিয়েছেন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রবিনদের বিদ্যালয়ের একটি অনুষ্ঠানে ১৫ জন অতিথির প্রত্যেককে একটি করে কলম দেওয়া হবে। রবিন ২৪০ টাকা খরচ করে ১৫টি কলম আনল। আবার, অতিথিগণ ৩৬ জন ছাত্রের প্রত্যেককে ৩০ টাকা দামের একটি করে খাতা উপহার দিবেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রত্যেকে কত টাকা পাবে?",
+        "questionB": "মিরাজ কতটি ১০০ টাকার নোট নিয়েছিল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মিরাজ ১০০০ টাকার ৪টি নোট ভাঙিয়ে দোকানদারের কাছ থেকে ১৫টি ২০০ টাকার নোট এবং কতগুলো ১০০ টাকার নোট নিল। সে ২০০ টাকার নোটগুলোর সমপরিমাণ মূল্যের টাকা ৪০ জনের মাঝে ভাগ করে দেয়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মোট চাঁদার পরিমাণ কত টাকা?",
+        "questionB": "যদি মোট চাঁদার সমপরিমাণ টাকা ১৬টি অসহায় পরিবারের মধ্যে সমানভাগে ভাগ করে দেওয়া হয় তবে প্রত্যেক পরিবার কত টাকা করে পাবে এবং কত টাকা অবশিষ্ট থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি শ্রেণিতে ৭৫ জন শিক্ষার্থী আছে। প্রত্যেকে শিক্ষার্থী সংখ্যার চেয়ে ৩০ টাকা করে বেশি চাঁদা দিল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ছাত্রাবাসে শিক্ষার্থী সংখ্যা কতজন?",
+        "questionB": "প্রত্যেক শিক্ষার্থী কত গ্রাম করে চাল পেল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ছাত্রাবাসের প্রত্যেক শিক্ষার্থী ৪০ টাকা করে চাঁদা দিল। মোট চাঁদার পরিমাণ ৩৬০০ টাকা এবং এর সাথে শিক্ষকদের দেওয়া ৯০০ টাকা যুক্ত করে মোট টাকা দিয়ে শিক্ষার্থীদের জন্য ৫০ টাকা কেজি দরে চাল কেনা হল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "স্ত্রী কতটুকু জমি পাবে?",
+        "questionB": "মেয়েটি কত কাঠা জমি পাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সিরাজ সাহেব মৃত্যুর সময় ৩২০ কাঠা জমি তাঁর স্ত্রী, দুই ছেলে এবং এক মেয়ের জন্য রেখে গেলেন। প্রত্যেক ছেলে, মেয়ের দ্বিগুণ পরিমাণ এবং স্ত্রী মোট জমির ১৬ ভাগের ৩ ভাগ পাবে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ফিঁজা বাসে কতটুকু পথ অতিক্রম করল?",
+        "questionB": "ফিঁজার রিকশায় অতিক্রান্ত পথের পরিমাণ কত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "ফিঁজা তার ১৪৪ কিলোমিটারের ভ্রমণে মোট পথের ৯ ভাগের ৭ ভাগ বাসে, ৮ ভাগের ১ ভাগ গাড়িতে ও অবশিষ্ট পথ রিকশায় অতিক্রম করল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "নেহার ছোটো ভাই কতটুকু ফিতা পেল?",
+        "questionB": "সম্পূর্ণ ফিতাটির দাম কত?",
+        "questionC": "সম্পূর্ণ ফিতাটিকে সমান ১১টি টুকরায় ভাগ করা হলে কত মিটার ফিতা অবশিষ্ট থাকবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "নেহা ১৩৫ মিটার লম্বা ফিতার ১৫ ভাগের ৮ ভাগ তার ছোট ভাইকে দিল। আবার, ফিতাটির প্রতি ৫ মিটারের দাম ৮ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ, বিয়োগ, গুণ ও ভাগসংক্রান্ত সমস্যা",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "১ম ও ২য় ঝুড়িতে কতটি করে কলা রয়েছে?",
+        "questionB": "দুইটি ঝুড়িতে মোট কত টাকার কলা রয়েছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ঝুড়িতে ৯ হালি ১ জোড়া কলা আছে। অপর ঝুড়িতে ১২ হালি ১ জোড়া কলা আছে এবং প্রতিটি কলার দাম ৯ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রতিটি বইয়ের দাম কত?",
+        "questionB": "৯টি পেন্সিল ও ৭টি খাতা কিনে দোকানদারকে ১০০০ টাকা দিলে দোকানদার কত টাকা ফেরত দিবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "দুইটি বই ও তিনটি পেন্সিলের দাম ১৮৪ টাকা। একটি পেন্সিল ও একটি খাতার দাম যথাক্রমে ১৮ টাকা ও ৪৫ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মার্চ মাসে তিনি কত টাকা খরচ করেছিলেন?",
+        "questionB": "এপ্রিল মাসে তিনি ১৮৯১৫ টাকা খরচ করলে ঐ মাসে কত টাকা জমা করেছিলেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মাসুদ সাহেবের দৈনিক বেতন ৮৭২ টাকা। মার্চ মাসে তিনি ২৯২০ টাকা জমা করেছিলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সুকুমার দৈনিক কত টাকার ডিম বিক্রি করে?",
+        "questionB": "সুকুমার এক সপ্তাহে কত টাকা ব্যাংকে জমা রাখে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সুকুমার প্রতিদিন প্রতিটি ডিম ১০ টাকা দরে ৮ ডজন ডিম বিক্রি করে এবং তা থেকে ২৩০ টাকা খরচ করে বাকি টাকা ব্যাংকে জমা রাখে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "৩য় শ্রেণির শিক্ষার্থীদের দান করা টাকা কতটি ১০০ টাকার নোটের সমান হবে?",
+        "questionB": "৩য় শ্রেণিতে শিক্ষার্থী সংখ্যা ৫০ জন হলে প্রত্যেকে কত টাকা করে দিয়েছিলো?",
+        "questionC": "মোট টাকা ২০ জন ক্ষতিগ্রস্ত মানুষের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে কত টাকা পাবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "বন্যায় ক্ষতিগ্রস্ত মানুষকে সাহায্য করার জন্য ৩য় শ্রেণির শিক্ষার্থীরা ২৫০০ টাকা ও ৪র্থ শ্রেণির শিক্ষার্থীরা ৩০০০ টাকা দিলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মিরাজুল সঞ্চয় হিসাবে কত টাকা রেখেছিল?",
+        "questionB": "ঐ মাসে ৪ বার ডিম কিনলে মাস শেষে মিরাজুলের নিকট কত টাকা অবশিষ্ট থাকবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "গত মাসে মিরাজুলের কাছে ১৫০০ টাকা ছিল। সে টাকাগুলোকে ৫ ভাগ করে ২ ভাগ সঞ্চয় হিসাবে রেখে দিল। অবশিষ্ট টাকা দিয়ে সে প্রতিবার ১৭টি করে ডিম কিনল। প্রতিটি ডিমের দাম ৮ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "গাণিতিক বাক্যের আলোকে একটি গল্প লেখো।",
+        "questionB": "নাসির সাহেবের উত্তর ২১ হলে তা সঠিক হবে কিনা যাচাই করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "নাসির সাহেব তাঁর ছেলেকে নিচের গাণিতিক বাক্য লিখে সমাধান করতে বললেন। তাঁর পুত্র আবার একটি পাজল লিখে তাঁকে সমাধান করতে বলল।\nগাণিতিক বাক্য: ১৮০০ – (৫০ + ৪০) × ১০\nপাজল:\n[একটি বর্গাকৃতির পাজল যার কর্ণ ও কেন্দ্রগামী রেখা দ্বারা ৮টি ত্রিভুজাকার ভাগে বিভক্ত। সংখ্যাগুলো ঘড়ির কাঁটার দিকে ক্রমানুসারে সাজানো: ৮, ৫, ?, ২৯, ২০, ১১, ৭, ১১]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মিনা প্রতি মাসে কত টাকা বৃত্তি পায়?",
+        "questionB": "মিনা বছরে কত টাকা জমা করে?",
+        "questionC": "মিনা ৮ মাসে মোট কত টাকা জমা করে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মিনা বছরে ৩০০০ টাকা বৃত্তি পায়। সে বৃত্তির টাকা থেকে প্রতিমাসে ১১৫ টাকা খরচ করে এবং বাকি টাকা মাটির ব্যাংকে জমা রাখে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১ম ঝুড়িতে কত টাকার আম আছে?",
+        "questionB": "প্রত্যেকে কত গ্রাম আম পেল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ঝুড়িতে ৫৬টি আম আছে। অন্য একটি ঝুড়িতে ৫২টি আম আছে। দুইটি ঝুড়ির আম একত্র করে ১২ জনের মধ্যে সমানভাবে ভাগ করে দেওয়া হলো। প্রতিটি আমের মূল্য ১৫ টাকা ও ওজন ১৫০ গ্রাম।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১টি চেয়ার ও ১টি টেবিলের মোট দাম কত?",
+        "questionB": "১৫টি চেয়ারের দাম কত?",
+        "questionC": "১৫টি চেয়ার ও ৩০টি টেবিলের দাম কত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি চেয়ারের দাম ৪৫২ টাকা ও একটি টেবিলের দাম ৯৭৫ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "১২টি পেন্সিলের দাম কত?",
+        "questionB": "রুমি মোট কত টাকা খরচ করল?",
+        "questionC": "দোকানদার রুমিকে কত টাকা ফেরত দিবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রুমি ১৫ টাকা দরে ৫টি পেন্সিল এবং ১২০ টাকা দরে ৩টি ছবি আঁকার খাতা কিনে দোকানদারকে ৫০০ টাকা দিলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "পিতা ও পুত্রের ওজনের পার্থক্য কত?",
+        "questionB": "১২ বছর পর কন্যা ও পিতার বয়স কত হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "পিতার বয়স কন্যার বয়সের ৪ গুণ। আবার পিতার ওজন কন্যার ওজনের দ্বিগুণের থেকে ১৩ কেজি কম। কন্যার ৬ বছর পূর্বে বয়স ছিল ৫ বছর। পুত্রের ওজন ৫৬ কেজি এবং কন্যার ওজন ৪৫ কেজি।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "আকাশ জসিমকে ৪ ভাগ কলম দিয়ে দিলে তার কাছে আর কতটি কলম অবশিষ্ট থাকবে?",
+        "questionB": "৬ ভাগ পেন্সিল শিহাবকে দিলে শিহাব কতগুলো পেন্সিল পাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "আকাশের কাছে ৬৫টি কলম ও ৪২টি পেন্সিল ছিল। সে কলমগুলোকে সমান ১৩ ভাগে ভাগ করল। আবার পেন্সিলগুলো হতে ৯টি নিজের জন্য রেখে বাকিগুলো সমান ১১ ভাগে ভাগ করল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "২য় ঝুড়ির কলাগুলো ১৩ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে কতটি কলা পাবে?",
+        "questionB": "১ম ঝুড়ির কলাগুলো থেকে ১৮টি নিয়ে বাকিগুলো ১২ জনের মধ্যে ভাগ করে দিলে প্রত্যেকে কতটি কলা পাবে?",
+        "questionC": "উভয় ঝুড়ির কলাগুলো একত্র করে ২৪ জনকে সমানভাবে ভাগ করে দিলে প্রত্যেকে কয়টি কলা পাবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ঝুড়িতে ১২৬টি এবং অন্য একটি ঝুড়িতে ২৩৪টি কলা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "ভগ্নাংশ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "বাদশাহ মিয়া প্রতি মাসে কিসে বেশি খরচ করেন?",
+        "questionB": "তিনি মোট আয়ের কত অংশ ব্যাংকে জমা রাখেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "বাদশাহ মিয়া তার মাসিক আয়ের $\\frac{১}{৪}$ অংশ বাসা ভাড়া, $\\frac{২}{৩}$ অংশ অন্যান্য খরচ এবং বাকী অংশ ব্যাংকে জমা রাখেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কে বেশি ও কত বেশি অংশ রং করেছে?",
+        "questionB": "তানজীম যদি সম্পূর্ণ ফিতাটি রং করত তাহলে সে সাদিকের থেকে কত বেশি অংশ রং করত?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "৯টি সমান ভাগে বিভক্ত দুটি ফিতার চিত্র; তানজীম ৫টি ভাগ এবং সাদিক ৭টি ভাগ রং করেছে",
+            "content": "[চিত্র: ৯টি সমান ভাগে বিভক্ত দুটি ফিতার চিত্র; তানজীম ৫টি ভাগ এবং সাদিক ৭টি ভাগ রং করেছে]",
+            "url": null,
+            "table": null,
+            "bottomContent": "তানজীম ও সাদিক বাজার থেকে একই মাপের দুইটি ফিতা কিনে বিভিন্ন অংশে বিভক্ত করে চিত্রের ন্যায় রং করলো।",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ফিতাটির লাল অংশ অপেক্ষা সবুজ অংশ এবং সবুজ অংশ অপেক্ষা হলুদ অংশ কতটুকু কম রয়েছে?",
+        "questionB": "ফিতাটির সবুজ অংশ অপেক্ষা লাল ও হলুদ অংশ একত্রে কতটুকু বেশি আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ফিতার $\\frac{৫}{১১}$ অংশ লাল, $\\frac{৪}{১১}$ অংশ সবুজ ও $\\frac{২}{১১}$ অংশ হলুদ রং করা হয়েছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রিনা বাসে ও রিকশায় মোট কতটুকু অংশ যায়?",
+        "questionB": "রিনা কত অংশ পায়ে হেঁটে যায়?",
+        "questionC": "রিনা কোন উপায়ে সবচেয়ে বেশি অংশ যায়?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রিনা স্কুলে যাওয়ার সময় $\\frac{৪}{৭}$ অংশ পথ বাসে, $\\frac{২}{৭}$ অংশ পথ রিকশায় এবং বাকি অংশ পায়ে হেঁটে যায়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম ভগ্নাংশের একটি সমতুল ভগ্নাংশ লেখো।",
+        "questionB": "ভগ্নাংশ দুইটি তুলনা করো।",
+        "questionC": "ভগ্নাংশদ্বয়ের সমষ্টি ও পার্থক্য নির্ণয় করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ভগ্নাংশের লব ৮ এবং হর ১১। অপর একটি ভগ্নাংশের হর ১১ ও লব ২।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কে বেশি পিজ্জা পেলো?",
+        "questionB": "তারা মোট কত অংশ পিজ্জা পেলো?",
+        "questionC": "তারা খাওয়ার পর পিজ্জা আর কতটুকু অংশ বাকি রইল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মিরা একটি পিজ্জার ৮ ভাগের ৩ ভাগ এবং সাদিযা ৮ ভাগের ৪ ভাগ পেল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "চিত্রের রং করা ও খালি অংশের তুলনা করো।",
+        "questionB": "চিত্রের খালি ও রং করা অংশের সমষ্টি ও বিয়োগফল নির্ণয় করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "১ মিটার দৈর্ঘ্যের একটি ফিতাকে সমান ১০ ভাগে ভাগ করা হয়েছে, যার মধ্যে ৩টি ভাগ রং করা এবং ৭টি ভাগ খালি",
+            "content": "[চিত্র: ১ মিটার দৈর্ঘ্যের একটি ফিতাকে সমান ১০ ভাগে ভাগ করা হয়েছে, যার মধ্যে ৩টি ভাগ রং করা এবং ৭টি ভাগ খালি]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "২নং স্থানের ভগ্নাংশটি লেখো।",
+        "questionB": "৩নং স্থান হতে ৪নং স্থানের দূরত্ব নির্ণয় করো।",
+        "questionC": "১নং ও ৪নং স্থানের দূরত্বের সমষ্টি নির্ণয় করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "০ থেকে ১ মিটারের একটি সংখ্যারেখাকে সমান ৯ ভাগে ভাগ করা হয়েছে এবং ক্রমানুসারে ১, ২, ৩, ৪ ও ৫ চিহ্নিত ফাঁকা বক্স দেওয়া আছে",
+            "content": "[চিত্র: ০ থেকে ১ মিটারের একটি সংখ্যারেখাকে সমান ৯ ভাগে ভাগ করা হয়েছে এবং ক্রমানুসারে ১, ২, ৩, ৪ ও ৫ চিহ্নিত ফাঁকা বক্স দেওয়া আছে]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "চিত্রের রং করা ও খালি অংশের পরিমাণ লেখো।",
+        "questionB": "বড় ও ছোটো অংশটি লেখো।",
+        "questionC": "বড় অংশ থেকে ছোট অংশের বিয়োগ করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "৮টি সমান ভাগে বিভক্ত একটি বৃত্ত, যার ৩টি ভাগ রং করা এবং ৫টি ভাগ খালি",
+            "content": "[চিত্র: ৮টি সমান ভাগে বিভক্ত একটি বৃত্ত, যার ৩টি ভাগ রং করা এবং ৫টি ভাগ খালি]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তার সম্পত্তির কত অংশ অবশিষ্ট রইল?",
+        "questionB": "কোন সন্তান বেশি সম্পত্তি পেলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "নাফিস সাহেব তার প্রথম ও দ্বিতীয় সন্তানকে যথাক্রমে $\\frac{৫}{১৮}$ অংশ এবং $\\frac{২}{১৮}$ অংশ সম্পত্তি দান করলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম ও দ্বিতীয় ভগ্নাংশটি সমতুল কিনা ব্যাখ্যা করো।",
+        "questionB": "দ্বিতীয় ভগ্নাংশটির ২টি সমতুল ভগ্নাংশ লেখো।",
+        "questionC": "ভগ্নাংশদ্বয়কে যোগ ও বিয়োগ করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি ভগ্নাংশের লব ১৫ এবং হর ২৮। অপর একটি ভগ্নাংশের হর ২৮ ও লব ৯।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মুন্নীর কাছে কত লিটার পানি রইল?",
+        "questionB": "রাকিবের বোতলে পানির পরিমাণ কত হলো?",
+        "questionC": "মুন্নী রাকিবকে পানি দেওয়ার আগে তাদের দুইজনের নিকট মোট কত লিটার পানি ছিল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রাকিবের বোতলে $\\frac{৩}{৮}$ লিটার পানি এবং মুন্নীর বোতলে $\\frac{৫}{৮}$ লিটার পানি ছিল। মুন্নী রাকিবকে $\\frac{১}{৮}$ লিটার পানি দিয়ে দিলো।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কোন ভগ্নাংশটি ছোটো?",
+        "questionB": "ভগ্নাংশ দুইটির বিয়োগফল কত?",
+        "questionC": "ভগ্নাংশ দুইটির বিয়োগফলের সাথে $\\frac{১১}{১৩}$ যোগ করলে যোগফল কত হবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "$\\frac{৬}{১০}$ এবং $\\frac{৮}{১০}$ দুইটি ভগ্নাংশ।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "পানিতে ও কাদায় বাঁশটির মোট কত অংশ আছে?",
+        "questionB": "বাঁশটির কত অংশ উপরে আছে?",
+        "questionC": "উপরে অপেক্ষা পানিতে বাঁশটির কত অংশ বেশি আছে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি বাঁশের $\\frac{৩}{৭}$ অংশ পানিতে, $\\frac{২}{৭}$ অংশ কাদায় এবং বাকি অংশ উপরে আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রাবেয়া ও রিফকি একত্রে জমির কত অংশ পেল?",
+        "questionB": "কে বেশি অংশ জমি পেল এবং কত অংশ জমি বেশি পেল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রাবেয়া একটি জমির $\\frac{৩}{৫}$ অংশ এবং রিফকি $\\frac{২}{৫}$ অংশ পেল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রাইসার কাছে রুমার চেয়ে কতটুকু ফিতা কম বা বেশি আছে?",
+        "questionB": "রাইসা ও রুমার কাছে মোট কত মিটার ফিতা আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রাইসার কাছে $\\frac{৪}{৮}$ মিটার এবং রুমার কাছে $\\frac{২}{৮}$ মিটার ফিতা আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "তাদের কাছে মোট কত লিটার পানি আছে?",
+        "questionB": "মিনার কাছে লিজার চেয়ে কত লিটার পানি কম বা বেশি আছে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মিনার কাছে $\\frac{৭}{১০}$ লিটার এবং লিজার কাছে $\\frac{২}{১০}$ লিটার পানি আছে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "বাংলাদেশি মুদ্রা",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "লজেন্স বাবদ তারা মোট কত টাকা খরচ করল?",
+        "questionB": "লজেন্স কেনার পর কার কাছে কত টাকা বেশি থাকল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রাজীবের কাছে ৬টি ১০০ টাকার নোট ও ৩টি ২৫ পয়সার কয়েন রয়েছে। অপর দিকে নাফিসের কাছে ২টি ২০০ টাকার নোট, ২টি ৫০ টাকার নোট ও ৫টি ১০ পয়সার কয়েন রয়েছে। দুইজনের পয়সা একত্র করে তারা লজেন্স কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মাছ কেনার পর তার কাছে কত টাকা অবশিষ্ট ছিল?",
+        "questionB": "সে কত টাকা ব্যাংকে রেখেছিল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "অপুর কাছে ৮৫ টাকা ৫০ পয়সা ছিল। তার মা তাকে আরও ৫টি ২০ টাকার নোট দিল। সে বাজারে গিয়ে ১২০ টাকার মাছ কিনল। অবশিষ্ট টাকা থেকে ২৭২৫ পয়সা সে তার মাটির ব্যাংকে রাখল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সুজনের বাবা তাকে আরও ২৫ টাকা ৭৫ পয়সা দিলে সুজনের মোট কত টাকা হতো?",
+        "questionB": "মুনিয়ার কাছে কত টাকা অবশিষ্ট রইল?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সুজনের কাছে ৭৮ টাকা ৫০ পয়সা ছিল। তার মা তাকে ১৫ টাকা ৭৫ পয়সা দিলেন। সুজনের বোন মুনিয়া ৫০ টাকার ৬টি নোট নিয়ে বাজারে গেল। সে ৬৮ টাকা ৩০ পয়সা দিয়ে ২টি খাতা এবং ৪৮ টাকা ৪০ পয়সা দিয়ে ৬টি কলম কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ফাহিমের নিকট মোট কত টাকা হলো?",
+        "questionB": "ফাহিমের নিকট কত টাকা অবশিষ্ট থাকবে?",
+        "questionC": "জ্যামিতি বক্সের দাম স্কেল থেকে কত টাকা বেশি?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "ফাহিমের নিকট ৫৪ টাকা ৪০ পয়সা ছিল। তার মা তাকে ৮৮ টাকা ৬০ পয়সা দিলেন। ফাহিম ৭০ টাকা ২৫ পয়সার জ্যামিতি বক্স এবং ৪৫ টাকা ৬৫ পয়সা দামের স্কেল কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "দোকানদার রুহিকে মোট কত টাকা ফেরত দিলেন?",
+        "questionB": "রুহি দোকানদারকে কত টাকা দিয়েছিল?",
+        "questionC": "প্রতিটি পেনসিলের দাম কত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রুহি ৪টি পেনসিল কিনতে গিয়ে দোকানদারকে ২টি ২০ টাকার ও ১টি ৫০ টাকার নোট দিল। দোকানদার তাকে ৪টি কয়েন ফেরত দিলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রাহাত খাতা কিনতে কত টাকা খরচ করল?",
+        "questionB": "সে কলম কিনতে কত টাকা খরচ করল?",
+        "questionC": "রাহাত দোকানদারকে ২০০ টাকার একটি নোট দিলে দোকানদার তাকে কত টাকা ফেরত দেবেন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রাহাত ৪টি খাতা ও ৪টি কলম কিনল। প্রতিটি খাতার মূল্য ১৭ টাকা ও প্রতিটি কলমের মূল্য ১৫ টাকা।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বক্স ১ এর নোট ও কয়েন মিলে মোট কত টাকা হয়?",
+        "questionB": "বক্স ২ এর টাকা দিয়ে প্রতিটি ৫ টাকা দরের কয়টি পেনসিল কেনা যাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "বক্স ১: ৪টি ৫০ পয়সার কয়েন, ১টি ২০ টাকার নোট, ১টি ৫০ টাকার নোট এবং ৫টি ১০০ টাকার নোট; বক্স ২: ৪টি ৫ টাকার কয়েন, ২টি ১০ টাকার নোট এবং ৩টি ৫০ টাকার নোট",
+            "content": "[চিত্র:\nবক্স ১: ৪টি ৫০ পয়সার কয়েন, ১টি ২০ টাকার নোট, ১টি ৫০ টাকার নোট এবং ৫টি ১০০ টাকার নোট\nবক্স ২: ৪টি ৫ টাকার কয়েন, ২টি ১০ টাকার নোট এবং ৩টি ৫০ টাকার নোট]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বেলাল মোট কত টাকার জিনিস ক্রয় করলো?",
+        "questionB": "বেলালের নিকট কত টাকা অবশিষ্ট রইলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "বেলাল ১টি ১০০০ টাকার নোট, ২টি ৫০০ টাকার নোট, ৪টি ১০০ টাকার নোট ও ২টি ৫০ টাকার নোট নিয়ে মার্কেটে গেল। সে ১১২০ টাকা ৩০ পয়সার খেলনা, ৩৬০ টাকা ৭৫ পয়সার শার্ট ও ৭৭০ টাকা ৮৫ পয়সা মূল্যের প্যান্ট কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কলমের মূল্যকে পয়সায় প্রকাশ করো।",
+        "questionB": "দুইটি খাতার মূল্যের সাথে ৪টি ১০ টাকার ও ৫টি ৫ টাকার নোট যোগ করো।",
+        "questionC": "দোকানদার রতনকে কত টাকা ফেরত দিবে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "দুইটি খাতার মূল্য ৮৫ টাকা এবং একটি কলমের মূল্য ৫০ টাকা ৭৫ পয়সা। রতন দুইটি খাতা এবং একটি কলম কিনে দোকানদারকে একটি ৫০০ টাকার নোট দিল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "শান্তর মোট টাকাকে ৫০০ টাকা ও ১০০ টাকার নোটের মাধ্যমে প্রকাশ করো।",
+        "questionB": "পেঁয়াজের মূল্য, আলুর মূল্যের চেয়ে কত বেশি?",
+        "questionC": "শান্তর কাছে কত টাকা অবশিষ্ট রইল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "শান্ত ৮০০ টাকা নিয়ে বাজারে গেল। সে ৩৪২ টাকা ৭৫ পয়সার মাছ, ৮১ টাকা ৭০ পয়সার আলু ও ১১০ টাকা ৮৮ পয়সার পেঁয়াজ কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "পানির বোতলের দাম কত পয়সা?",
+        "questionB": "ফাহাদ বাংলাদেশে প্রচলিত ধাতব মুদ্রা ও নোট ব্যবহার করে কতভাবে টিকিট কাটতে পারে? ৬টি উপায় দেখাও।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "ফাহাদ বাংলাদেশ বনাম নেপালের ফুটবল খেলা দেখতে স্টেডিয়ামে গেল। টিকিট কাটতে গিয়ে সে জানতে পারল প্রতিটি টিকিটের মূল্য ৫০ টাকা। টিকিট কেটে ভেতরে ঢুকে সে ১৫ টাকা ২৫ পয়সা দিয়ে একটি পানির বোতল কিনল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বিয়োজ্যের টাকার পরিমাণটিকে পয়সায় প্রকাশ করে প্রাপ্ত সংখ্যার শতক স্থানীয় অঙ্কটি নির্ণয় করো।",
+        "questionB": "গাণিতিক বাক্যটি দিয়ে একটি গল্প তৈরি করে সমাধান করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "৩৫০ টাকা ৫২ পয়সা – ১৭৩ টাকা ৮৫ পয়সা = [ ]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": "পরিমাপ",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "বাস ও সিএনজি ভ্রমণের পর আর কত কিমি পথ বাকি থাকে?",
+        "questionB": "লোকটি পায়ে হেঁটে কত মিটার পথ ভ্রমণ করেন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "ঢাকা থেকে কুয়াকাটার দূরত্ব ৩২০ কিমি। একজন লোক ঢাকা থেকে বাসে ২৬২ কিমি, সিএনজিতে ৫৫ কিমি, রিকশায় ৬ কিমি ১৭০ মিটার ও বাকি পথ পায়ে হেঁটে কুয়াকাটা পৌঁছান।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ছবি হতে কাঠি দুইটির দৈর্ঘ্যের সমষ্টি নির্ণয় করো।",
+        "questionB": "কাঠিদ্বয়ের দৈর্ঘ্যের পার্থক্য নির্ণয় করো।",
+        "questionC": "স্কেলটি অপেক্ষা কাঠি দুইটির প্রত্যেকটি কত ছোট?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "১০ সেন্টিমিটারের একটি স্কেলের উপরে দুটি কাঠি; ১ম কাঠিটি ০ থেকে ৩ সেমি ৮ মিমি পর্যন্ত এবং ২য় কাঠিটি ৬ সেমি থেকে ৯ সেমি ২ মিমি পর্যন্ত বিস্তৃত",
+            "content": "[চিত্র: ১০ সেন্টিমিটারের একটি স্কেলের উপরে দুটি কাঠি; ১ম কাঠিটি ০ থেকে ৩ সেমি ৮ মিমি পর্যন্ত এবং ২য় কাঠিটি ৬ সেমি থেকে ৯ সেমি ২ মিমি পর্যন্ত বিস্তৃত]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বাসা হতে বিদ্যালয়ের দূরত্বকে মিটারে প্রকাশ করো।",
+        "questionB": "দেয়ালের দৈর্ঘ্য ও উচ্চতার সমষ্টিকে সেমি ও মিমি এ প্রকাশ করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "আব্দুল্লাহর বাসা হতে বিদ্যালয়ের দূরত্ব ৩ কিলোমিটার। তার শ্রেণিকক্ষের দেয়ালের দৈর্ঘ্য ৮ মিটার ৫০ সেমি এবং উচ্চতা ২ মিটার ৪৭০ মিলিমিটার।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সে মোট কত ওজনের জিনিস কিনে?",
+        "questionB": "তাঁর মোট কত মিটার পথ হাঁটতে হলো?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সাগর বাসা হতে ২ কিলোমিটার ১৬০ মিটার পথ হেঁটে বাজারে গিয়ে ১ কেজি ২৫০ গ্রাম সবজি, ২ কেজি ৭৩০ গ্রাম মাছ ও ১ কেজি ৬৬৫ গ্রাম ডাল কিনল। এ সময় সে ১ কিলোমিটার ২৪০ মিটার পথ হাঁটাহাঁটি করল। বাজার থেকে পুনরায় একই পথে সে হেঁটে বাসায় ফেরে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "গাজরের ওজনকে গ্রামে প্রকাশ করো।",
+        "questionB": "গাজর ওজন করতে কমপক্ষে কয়টি আদর্শ বাটখারা প্রয়োজন?",
+        "questionC": "এরূপ ৭ ব্যাগ গাজরের মোট ওজন কত?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "এক ব্যাগ গাজরের ওজন ৬ কেজি ৬৫০ গ্রাম।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "‘খ’ প্রান্তে কমপক্ষে কতটি আদর্শ বাটখারা থাকতে পারে?",
+        "questionB": "দাঁড়িপাল্লাটির দুই পাশ সমান করতে চাইলে ‘খ’ প্রান্তে অতিরিক্ত মোট কত গ্রামের সমপরিমাণ বাটখারা বসাতে হবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "একটি দাঁড়িপাল্লার ‘ক’ প্রান্তে ৩ কেজি ৩১০ গ্রাম চাল এবং ‘খ’ প্রান্তে ১ কেজি ৮৭৫ গ্রামের বাটখারা বসানো আছে",
+            "content": "[চিত্র: একটি দাঁড়িপাল্লার ‘ক’ প্রান্তে ৩ কেজি ৩১০ গ্রাম চাল এবং ‘খ’ প্রান্তে ১ কেজি ৮৭৫ গ্রামের বাটখারা বসানো আছে]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রতি ভাগের দৈর্ঘ্য কত সেন্টিমিটার?",
+        "questionB": "দণ্ডটির প্রতি ভাগের ওজন পরিমাপে কমপক্ষে কয়টি আদর্শ বাটখারা প্রয়োজন?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সামির কাছে ৬ মিটার লম্বা ও ৭০৫ গ্রাম ওজনের একটি সুষম দণ্ড আছে। সে দণ্ডটি সমান ৩ ভাগে ভাগ করল।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রতিদিন বাসে যাতায়াতের দূরত্বকে মিটারে প্রকাশ করো।",
+        "questionB": "গরুর মাংসের ওজন আটার ওজন থেকে কত বেশি?",
+        "questionC": "৪ সপ্তাহে রিয়াজ সাহেব মোট কত কিমি বাসে যাতায়াত করেন?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রিয়াজ সাহেব প্রতিদিন বাসে ১২ কিমি যাতায়াত করেন। বাসায় যাওয়ার পথে একদিন তিনি ১ কেজি ৫৫০ গ্রাম আটা ও ২ কেজি ৫০ গ্রাম গরুর মাংস কিনলেন।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "কত সেকেন্ড বৃষ্টি হয়েছিল?",
+        "questionB": "দুপুর ২ : ৩০ এ বৃষ্টি শুরু হলে বৃষ্টি কখন থেমে গিয়েছিল?",
+        "questionC": "স্কুল ছুটি হওয়ার সাথে সাথে বৃষ্টি শুরু হলে তামিমের স্কুল কখন ছুটি হয়েছিল?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "বিদ্যালয় থেকে বাড়ি যেতে তামিমের ৫৫ মিনিট সময় লাগে। ৪০ মিনিট বৃষ্টি হওয়ায় তার বিদ্যালয় থেকে রওনা দিতে দেরী হয়। বৃষ্টি থামামাত্রই রওনা দিয়ে সে বিকাল ৪ : ৩৫ এ বাড়ি পৌঁছায়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বিমানটি কখন দুবাই পৌঁছে?",
+        "questionB": "বিমানটি কখন কানাডায় পৌঁছাবে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি বিমান কানাডার উদ্দেশ্যে সকাল ৮:৩০ টায় রওনা হয়ে ৩ ঘণ্টা ৪৫ মিনিট পর দুবাই পৌঁছে এবং ৪৫ মিনিট বিরতি নেয়। দুবাই থেকে কানাডা যেতে ৬ ঘণ্টা সময় লাগে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "রিতার বাসায় পৌঁছানোর প্রয়োজনীয় সময়কে সেকেন্ডে প্রকাশ করো।",
+        "questionB": "সে কয়টার সময় বাসায় পৌঁছায়?",
+        "questionC": "বিদ্যালয় ছুটি হওয়ার কত মিনিট পর রিতা পড়তে বসে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "রিতার বিদ্যালয় ৩ : ২৫ টায় ছুটি হয়। তার বাসায় পৌঁছাতে ৪০ মিনিট সময় লাগে। এরপর সে সন্ধ্যা ৬ : ৩০ টায় পড়তে বসে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বৃষ্টি যতক্ষণ পড়ে তা ২ ঘণ্টা থেকে কত মিনিট কম?",
+        "questionB": "যদি বৃষ্টি শেষ হওয়ার ১ ঘণ্টা ১০ মিনিট পর পুনরায় বৃষ্টি শুরু হয় তাহলে কয়টা থেকে বৃষ্টি পড়বে?",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "সকালে বৃষ্টি শুরু হয় ৭:১০ টায় এবং শেষ হয় ৭:৫৫ টায়।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "মনির কত সেকেন্ড টিভি দেখে?",
+        "questionB": "মনির কত সময় ঘরের বাইরে ছিল?",
+        "questionC": "মনির কয়টা পর্যন্ত টিভি দেখে?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "মনির ১:৩০ থেকে ২:২০ পর্যন্ত ঘরের বাইরে ছিল। এরপর এসে ৫০ মিনিট টিভি দেখে।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
+  }
+]

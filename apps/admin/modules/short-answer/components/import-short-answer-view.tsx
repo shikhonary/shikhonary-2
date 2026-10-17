@@ -39,14 +39,17 @@ import {
   FileCodeIcon,
   UploadIcon,
 } from "lucide-react"
+import { SHORT_ANSWER_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
     "question": "একটি ভেক্টরের মান শূন্য হলে তাকে কী বলে?",
     "answer": "যে ভেক্টরের মান শূন্য তাকে শূন্য ভেক্টর বা নাল ভেক্টর (Null Vector) বলে।",
+    "options": [],
+    "isMath": false,
     "difficulty": "EASY",
-    "year": 2024,
-    "source": "Dhaka Board",
+    "source": "গাইড বুক",
+    "session": "2026",
     "reference": ["Physics Ch1"],
     "attachments": [
       {
@@ -304,6 +307,24 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
             </Badge>
           </button>
 
+          {/* Math Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => onChange({ ...item, isMath: !item.isMath })}
+            title="Click to toggle Math formula rendering"
+            className="cursor-pointer"
+          >
+            <Badge
+              variant={item.isMath ? "outline" : "ghost"}
+              className={cn(
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
+                item.isMath ? "border-primary text-primary bg-primary/5" : "text-muted-foreground"
+              )}
+            >
+              {item.isMath ? "∑ Math On" : "Text Only"}
+            </Badge>
+          </button>
+
           {/* Visibility */}
           <button type="button" onClick={handleToggleActive} className="cursor-pointer">
             <Badge
@@ -350,7 +371,7 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
             <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
               Attachments ({item.attachments.length})
             </span>
-            <QuestionAttachments attachments={item.attachments} isMath={true} />
+            <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
           </div>
         )}
 
@@ -359,8 +380,21 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
           label="Question Text *"
           value={item.question || ""}
           multiline
+          isMath={item.isMath}
           placeholder="Enter question text..."
           onSave={(newVal) => onChange({ ...item, question: newVal })}
+        />
+
+        {/* Options (Optional) */}
+        <EditableField
+          label="Answer Options (Optional, Comma-separated)"
+          value={Array.isArray(item.options) ? item.options.join(", ") : ""}
+          isMath={item.isMath}
+          placeholder="e.g. Option A, Option B, Option C, Option D"
+          onSave={(newVal) => {
+            const arr = newVal ? newVal.split(",").map((s: string) => s.trim()).filter(Boolean) : []
+            onChange({ ...item, options: arr })
+          }}
         />
 
         {/* Answer Text */}
@@ -368,30 +402,52 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
           label="Model Answer (Optional)"
           value={item.answer || ""}
           multiline
+          isMath={item.isMath}
           placeholder="Enter answer guidelines..."
           onSave={(newVal) => onChange({ ...item, answer: newVal || undefined })}
         />
 
-        {/* Year, Source, References */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3">
+        {/* References, Source & Session */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3 items-center">
           <EditableField
             label="References (Comma-separated)"
             value={Array.isArray(item.reference) ? item.reference.join(", ") : ""}
-            placeholder="e.g. Physics Ch1,panjeree 2024..."
+            placeholder="e.g. Physics Ch1, Panjeree 2024..."
             onSave={handleSaveReferences}
           />
-          <EditableField
-            label="Source / Board"
-            value={item.source || ""}
-            placeholder="e.g. Jessore Board..."
-            onSave={(newVal) => onChange({ ...item, source: newVal || undefined })}
-          />
-          <EditableField
-            label="Exam Year"
-            value={item.year ? String(item.year) : ""}
-            placeholder="e.g. 2024..."
-            onSave={(newVal) => onChange({ ...item, year: newVal && !isNaN(Number(newVal)) ? Number(newVal) : undefined })}
-          />
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || DEFAULT_SOURCE}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {SHORT_ANSWER_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{item.session || (item.year ? String(item.year) : new Date().getFullYear())}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
@@ -406,6 +462,7 @@ export function ImportShortAnswerView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -419,6 +476,17 @@ export function ImportShortAnswerView() {
     subjectId: selectedSubjectId,
   })
 
+  const handleSourceChange = (sourceVal: string) => {
+    setSelectedSource(sourceVal)
+    if (parsedItems.length > 0) {
+      const updated = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || sourceVal,
+      }))
+      syncParsedItemsToText(updated)
+    }
+  }
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -428,7 +496,7 @@ export function ImportShortAnswerView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
       }
     }
     reader.readAsText(file)
@@ -438,7 +506,8 @@ export function ImportShortAnswerView() {
     text: string,
     overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string
+    overrideChapterId: string,
+    overrideSource?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -516,14 +585,26 @@ export function ImportShortAnswerView() {
             position: att.position !== undefined && att.position !== null ? Number(att.position) : aIdx,
           }))
 
+        const optionsList = Array.isArray(item.options)
+          ? item.options.map((o: any) => String(o).trim()).filter(Boolean)
+          : typeof item.options === "string"
+          ? item.options.split(",").map((s: string) => s.trim()).filter(Boolean)
+          : []
+
+        const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
+        const currentYear = new Date().getFullYear().toString()
+
         validated.push({
           subjectId,
           chapterId,
           question: String(item.question || "").trim(),
           answer: item.answer ? String(item.answer).trim() : null,
+          options: optionsList,
+          isMath: item.isMath !== undefined ? Boolean(item.isMath) : false,
           difficulty: item.difficulty || "MEDIUM",
           year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
-          source: item.source?.trim() || null,
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
+          session: item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear),
           reference: Array.isArray(item.reference) ? item.reference : [],
           isActive: item.isActive !== false,
           attachments: mappedAttachments,
@@ -544,7 +625,7 @@ export function ImportShortAnswerView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
     toast.success("JSON syntax repaired!")
   }
 
@@ -557,7 +638,7 @@ export function ImportShortAnswerView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -566,7 +647,7 @@ export function ImportShortAnswerView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource)
     }
   }
 
@@ -575,7 +656,7 @@ export function ImportShortAnswerView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
     }
   }
 
@@ -583,7 +664,7 @@ export function ImportShortAnswerView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
     }
   }
 
@@ -615,7 +696,11 @@ export function ImportShortAnswerView() {
       {
         question: "নতুন প্রশ্ন...",
         answer: "",
+        options: [],
+        isMath: false,
         difficulty: "MEDIUM",
+        source: selectedSource || DEFAULT_SOURCE,
+        session: new Date().getFullYear().toString(),
         isActive: true,
         reference: [],
       },
@@ -635,15 +720,19 @@ export function ImportShortAnswerView() {
     }
 
     try {
+      const currentYear = new Date().getFullYear().toString()
       const payload = parsedItems.map((item) => ({
         classId: selectedAcademicClassId,
         subjectId: selectedSubjectId,
         chapterId: selectedChapterId,
         question: item.question.trim(),
         answer: item.answer?.trim() || null,
+        options: Array.isArray(item.options) ? item.options : [],
+        isMath: Boolean(item.isMath),
         difficulty: item.difficulty as any,
         year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
-        source: item.source?.trim() || null,
+        source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
+        session: item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear),
         reference: Array.isArray(item.reference) ? item.reference : [],
         isActive: item.isActive !== false,
         attachments: Array.isArray(item.attachments) ? item.attachments : [],
@@ -729,7 +818,7 @@ export function ImportShortAnswerView() {
         </CardHeader>
         <CardContent className="p-6 space-y-6">
           {/* Taxonomy Grid */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -792,6 +881,28 @@ export function ImportShortAnswerView() {
                   {chapters.map((ch) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {SHORT_ANSWER_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

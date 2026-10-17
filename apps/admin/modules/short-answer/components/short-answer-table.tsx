@@ -22,9 +22,12 @@ export interface ShortAnswerItem {
   id: string
   question: string
   answer?: string | null
+  options?: string[]
+  isMath?: boolean
   difficulty: string
   year?: number | null
   source?: string | null
+  session?: string | null
   reference: string[]
   isActive: boolean
   attachments?: QuestionAttachmentItemData[]
@@ -237,6 +240,14 @@ export function ShortAnswerTable({
                           </span>
                         )}
 
+                        {/* Math Badge */}
+                        {item.isMath && (
+                          <div className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded font-label-sm text-[11px] font-bold border border-amber-200">
+                            <span className="material-symbols-outlined text-[14px]">functions</span>
+                            <span>Math</span>
+                          </div>
+                        )}
+
                         {/* Difficulty Badge */}
                         <span className={cn(
                           "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
@@ -265,7 +276,7 @@ export function ShortAnswerTable({
                       {/* Attachments Section (Images, Tables, Context Texts) */}
                       {Array.isArray(item.attachments) && item.attachments.length > 0 && (
                         <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
-                          <QuestionAttachments attachments={item.attachments} isMath={true} />
+                          <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
                         </div>
                       )}
 
@@ -278,9 +289,26 @@ export function ShortAnswerTable({
                           "text-sm text-on-surface pl-2 font-medium",
                           /[\u0980-\u09FF]/.test(item.question) && "font-solaiman text-[15px]"
                         )}>
-                          <RenderMath text={item.question} isMath={true} />
+                          <RenderMath text={item.question} isMath={item.isMath} />
                         </p>
                       </div>
+
+                      {/* Options (If Present) */}
+                      {Array.isArray(item.options) && item.options.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4 py-1 bg-surface-container-low/20 rounded-xl p-3 border border-outline-variant/30">
+                          {item.options.map((opt, oIdx) => {
+                            const labels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"]
+                            return (
+                              <div key={oIdx} className="flex items-start gap-2 text-xs text-on-surface-variant font-medium">
+                                <span className="font-bold text-primary shrink-0">{labels[oIdx] || `(${oIdx + 1})`}</span>
+                                <div>
+                                  <RenderMath text={opt} isMath={item.isMath} />
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
 
                       {/* Optional Year/Source badges */}
                       {(item.source || item.year) && (
@@ -329,7 +357,7 @@ export function ShortAnswerTable({
                                 "text-sm leading-relaxed",
                                 /[\u0980-\u09FF]/.test(item.answer) && "font-solaiman text-[14px]"
                               )}>
-                                <RenderMath text={item.answer} isMath={true} />
+                                <RenderMath text={item.answer} isMath={item.isMath} />
                               </p>
                             </div>
                           ) : (
@@ -341,6 +369,11 @@ export function ShortAnswerTable({
                       {/* Reference Tags & ID Footer */}
                       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
                         <div className="flex flex-wrap items-center gap-1.5">
+                          {((item as any).source || (item as any).session) && (
+                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
+                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
+                            </span>
+                          )}
                           {Array.isArray(item.reference) && item.reference.length > 0 ? (
                             item.reference.map((ref, rIdx) => (
                               <span
@@ -351,7 +384,9 @@ export function ShortAnswerTable({
                               </span>
                             ))
                           ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            !((item as any).source || (item as any).session) && (
+                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
+                            )
                           )}
                         </div>
 

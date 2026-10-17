@@ -56,7 +56,7 @@ const sampleJsonTemplate = `[
     "answer": "What class does she read in?",
     "clue": "What class",
     "reference": ["চট্টগ্রাম বোর্ড ২০২৩"],
-    "source": "বোর্ড প্রশ্ন",
+    "source": "বোর্ড বই",
     "difficulty": "EASY",
     "popularityCount": 5
   }

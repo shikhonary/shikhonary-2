@@ -19,17 +19,33 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
   if (input.chapterId) where.chapterId = input.chapterId
   if (input.difficulty) where.difficulty = input.difficulty
 
-  if (input.board) {
+  if (input.source && input.year !== undefined) {
+    const boardRef = [input.source, input.year].filter(Boolean).join("-")
+    where.OR = [
+      { AND: [{ source: input.source }, { session: String(input.year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else {
+    if (input.source) where.source = input.source
+    if (input.session) where.session = input.session
+    if (input.year !== undefined) {
+      where.reference = { has: String(input.year) }
+    }
+  }
+
+  if (input.board && !input.source) {
     where.reference = { has: input.board }
   }
 
   if (input.query) {
-    where.OR = [
+    const queryConditions: any[] = [
       { questionA: { contains: input.query, mode: "insensitive" } },
       { questionB: { contains: input.query, mode: "insensitive" } },
       { questionC: { contains: input.query, mode: "insensitive" } },
       { questionD: { contains: input.query, mode: "insensitive" } },
       { context: { contains: input.query, mode: "insensitive" } },
+      { source: { contains: input.query, mode: "insensitive" } },
+      { session: { contains: input.query, mode: "insensitive" } },
       { reference: { has: input.query } },
       {
         answer: {
@@ -37,6 +53,16 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
         },
       },
     ]
+    if (where.OR) {
+      where.AND = [
+        ...(where.AND || []),
+        { OR: where.OR },
+        { OR: queryConditions },
+      ]
+      delete where.OR
+    } else {
+      where.OR = queryConditions
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -190,15 +216,13 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
   }
 
   // Create standard 10-mark distribution if not specified
-  const marksDistribution = data.marks || { a: 1, b: 2, c: 3, d: data.questionD ? 4 : 0 }
+  const marksDistribution = data.marks || { a: 1, b: 2, c: data.questionC ? 3 : 0, d: data.questionD ? 4 : 0 }
 
   const refList = Array.isArray(data.reference) ? [...data.reference] : []
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef && !refList.includes(legacyRef)) {
-      refList.push(legacyRef)
-    }
-  }
+
+  const currentYear = new Date().getFullYear().toString()
+  const resolvedSource = data.source ? data.source.trim() : "সহায়ক সংকলন"
+  const resolvedSession = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
 
   const createdCq = await db.cq.create({
     data: {
@@ -206,10 +230,12 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
       chapterId: data.chapterId,
       questionA: data.questionA,
       questionB: data.questionB,
-      questionC: data.questionC,
+      questionC: data.questionC || null,
       questionD: data.questionD || null,
       context: data.context || null,
       reference: refList,
+      source: resolvedSource,
+      session: resolvedSession,
       difficulty: data.difficulty,
       marks: marksDistribution,
       questionTypeId: resolvedQuestionTypeId || undefined,
@@ -316,23 +342,15 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
     }
   }
 
-  // Create standard marks distribution if questionD changes
+  // Create standard marks distribution if questionD or questionC changes
   let marksDistribution = data.marks
-  if (!marksDistribution && (data.questionD !== undefined)) {
-    marksDistribution = { a: 1, b: 2, c: 3, d: data.questionD ? 4 : 0 }
+  if (!marksDistribution && (data.questionD !== undefined || data.questionC !== undefined)) {
+    marksDistribution = { a: 1, b: 2, c: data.questionC ? 3 : 0, d: data.questionD ? 4 : 0 }
   }
 
-  let resolvedReference = data.reference
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef) {
-      const currentRefs = Array.isArray(data.reference) ? [...data.reference] : []
-      if (!currentRefs.includes(legacyRef)) {
-        currentRefs.push(legacyRef)
-      }
-      resolvedReference = currentRefs
-    }
-  }
+  const resolvedReference = data.reference !== undefined
+    ? (Array.isArray(data.reference) ? data.reference : [])
+    : undefined
 
   return db.cq.update({
     where: { id },
@@ -341,10 +359,14 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
       chapterId: data.chapterId,
       questionA: data.questionA,
       questionB: data.questionB,
-      questionC: data.questionC,
+      questionC: data.questionC !== undefined ? (data.questionC || null) : undefined,
       questionD: data.questionD !== undefined ? (data.questionD || null) : undefined,
       context: data.context !== undefined ? (data.context || null) : undefined,
       reference: resolvedReference,
+      source: data.source !== undefined ? (data.source?.trim() || null) : undefined,
+      session: data.session !== undefined
+        ? (data.session?.trim() || null)
+        : (data.year !== undefined ? String(data.year) : undefined),
       difficulty: data.difficulty,
       marks: marksDistribution !== undefined ? marksDistribution : undefined,
       questionTypeId: resolvedQuestionTypeId || undefined,
@@ -481,15 +503,13 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
           }
         }
 
-        const marksDistribution = data.marks || { a: 1, b: 2, c: 3, d: data.questionD ? 4 : 0 }
+        const marksDistribution = data.marks || { a: 1, b: 2, c: data.questionC ? 3 : 0, d: data.questionD ? 4 : 0 }
 
         const refList = Array.isArray(data.reference) ? [...data.reference] : []
-        if (data.source || data.year) {
-          const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-          if (legacyRef && !refList.includes(legacyRef)) {
-            refList.push(legacyRef)
-          }
-        }
+
+        const currentYear = new Date().getFullYear().toString()
+        const resolvedSource = data.source ? data.source.trim() : "সহায়ক সংকলন"
+        const resolvedSession = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
 
         const createdCq = await tx.cq.create({
           data: {
@@ -497,10 +517,12 @@ export async function importCqs(db: PrismaClient, input: ImportCqsInput) {
             chapterId: data.chapterId,
             questionA: data.questionA,
             questionB: data.questionB,
-            questionC: data.questionC,
+            questionC: data.questionC || null,
             questionD: data.questionD || null,
             context: data.context || null,
             reference: refList,
+            source: resolvedSource,
+            session: resolvedSession,
             difficulty: data.difficulty ?? "MEDIUM",
             marks: marksDistribution,
             questionTypeId: resolvedQuestionTypeId || undefined,
@@ -600,19 +622,27 @@ export async function getBoardYears(
 ) {
   const where: any = {
     subjectId: input.subjectId,
-    NOT: { reference: { equals: [] } },
+    OR: [
+      { NOT: { reference: { equals: [] } } },
+      { AND: [{ source: { not: null } }, { session: { not: null } }] },
+    ],
   }
   if (input.chapterId) where.chapterId = input.chapterId
 
   const questions = await db.cq.findMany({
     where,
-    select: { reference: true },
+    select: { reference: true, source: true, session: true },
   })
 
   const countMap = new Map<string, number>()
   for (const q of questions) {
+    if (q.source && q.session) {
+      const key = `${q.source}-${q.session}`
+      countMap.set(key, (countMap.get(key) || 0) + 1)
+    }
     for (const ref of q.reference || []) {
       if (!ref) continue
+      if (q.source && q.session && ref === `${q.source}-${q.session}`) continue
       countMap.set(ref, (countMap.get(ref) || 0) + 1)
     }
   }

@@ -1088,7 +1088,20 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               lineHeight: questionStyle.lineHeight,
                             }}
                           >
-                            <RenderMath text={sa.question || ""} />
+                            <RenderMath text={sa.question || ""} isMath={sa.isMath} />
+                            {Array.isArray(sa.options) && sa.options.length > 0 && (
+                              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1 font-normal">
+                                {sa.options.map((opt: string, i: number) => {
+                                  const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];
+                                  return (
+                                    <div key={i} className="flex gap-1.5 items-start text-xs">
+                                      <span className="shrink-0 font-medium">{optLabels[i] || `(${i + 1})`}</span>
+                                      <RenderMath text={opt} isMath={sa.isMath} />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1362,7 +1375,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               lineHeight: questionStyle.lineHeight,
                             }}
                           >
-                            <RenderFillInTheBlanksContent text={fillInTheBlanksWithoutClues.content || ""} />
+                            <RenderFillInTheBlanksContent 
+                              text={fillInTheBlanksWithoutClues.content || ""} 
+                              isMath={Boolean(alt.contentSnapshot?.isMath ?? fillInTheBlanksWithoutClues.isMath)}
+                            />
                           </div>
                         </div>
                       </div>

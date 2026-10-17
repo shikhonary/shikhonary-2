@@ -74,7 +74,7 @@ export function RenderCluesTable({
 /**
  * Highlights sequential blank indicators e.g. (a) _________, (b) ..., with RenderMath support
  */
-export function RenderFillInTheBlanksContent({ text, className = "" }: { text?: string; className?: string }) {
+export function RenderFillInTheBlanksContent({ text, className = "", isMath = false }: { text?: string; className?: string; isMath?: boolean }) {
   if (!text) return null;
 
   // Split by gap patterns like (a) ________ or (a) _______
@@ -89,11 +89,11 @@ export function RenderFillInTheBlanksContent({ text, className = "" }: { text?: 
               key={index}
               className="font-bold inline-block mx-0.5 tracking-tight"
             >
-              <RenderMath text={part} />
+              <RenderMath text={part} isMath={isMath} />
             </span>
           );
         }
-        return <RenderMath key={index} text={part} />;
+        return <RenderMath key={index} text={part} isMath={isMath} />;
       })}
     </span>
   );
@@ -103,12 +103,14 @@ const FillInTheBlanksEditableText = ({
   text, 
   itemKey, 
   defaultStyle,
-  className = ""
+  className = "",
+  isMath = false,
 }: { 
   text: string, 
   itemKey: string, 
   defaultStyle: any,
-  className?: string
+  className?: string,
+  isMath?: boolean,
 }) => {
   const [isActive, setIsActive] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -177,7 +179,7 @@ const FillInTheBlanksEditableText = ({
           fontWeight: mergedStyle.fontWeight,
         }}
       >
-        <RenderFillInTheBlanksContent text={text} />
+        <RenderFillInTheBlanksContent text={text} isMath={isMath} />
       </div>
     </div>
   );

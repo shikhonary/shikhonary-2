@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
@@ -27,8 +27,9 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { cn } from "@workspace/ui/lib/utils"
-import { ChevronRightIcon } from "lucide-react"
+import { ChevronRightIcon, Plus, Trash2 } from "lucide-react"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { SHORT_ANSWER_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createShortAnswerFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -36,10 +37,12 @@ const createShortAnswerFormSchema = z.object({
   chapterId: z.string().min(1, "Please select a chapter"),
   question: z.string().min(1, "Question text is required"),
   answer: z.string().optional(),
+  options: z.array(z.object({ value: z.string() })),
+  isMath: z.boolean(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
-  year: z.string().optional(),
   source: z.string().optional(),
+  session: z.string().optional(),
   isActive: z.boolean(),
 })
 
@@ -65,12 +68,19 @@ export function CreateShortAnswerView() {
       chapterId: "",
       question: "",
       answer: "",
+      options: [],
+      isMath: false,
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      year: "",
-      source: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       isActive: true,
     },
+  })
+
+  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
+    control,
+    name: "options",
   })
 
   // Watch selectors for cascading lists
@@ -98,17 +108,21 @@ export function CreateShortAnswerView() {
             .filter((r) => r.length > 0)
         : []
 
-      const parsedYear = data.year && !isNaN(Number(data.year)) ? Number(data.year) : null
+      const optionsArray = (data.options || [])
+        .map((o) => o.value.trim())
+        .filter((o) => o.length > 0)
 
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
         chapterId: data.chapterId,
         question: data.question.trim(),
         answer: data.answer?.trim() || null,
+        options: optionsArray,
+        isMath: data.isMath,
         difficulty: data.difficulty,
         reference: referenceArray,
-        year: parsedYear,
         source: data.source?.trim() || null,
+        session: data.session?.trim() || null,
         isActive: data.isActive,
         attachments: [],
       })
@@ -323,6 +337,57 @@ export function CreateShortAnswerView() {
               )}
             </div>
 
+            {/* Answer Options (Optional) */}
+            <div className="space-y-3 border-t border-outline-variant/30 pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                    Answer Options (Optional)
+                  </Label>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    Add choices/options if this question provides multiple choices.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendOption({ value: "" })}
+                  className="text-xs flex items-center gap-1 h-8 cursor-pointer"
+                >
+                  <Plus className="size-3.5" />
+                  <span>Add Option</span>
+                </Button>
+              </div>
+
+              {optionFields.length > 0 && (
+                <div className="space-y-2.5">
+                  {optionFields.map((field, index) => (
+                    <div key={field.id} className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-primary w-7 text-center shrink-0">
+                        {["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"][index] || `(${index + 1})`}
+                      </span>
+                      <Input
+                        disabled={isSubmitting}
+                        placeholder={`Option ${index + 1}...`}
+                        {...register(`options.${index}.value` as const)}
+                        className="flex-1 h-10 rounded-lg border border-outline-variant text-sm bg-white"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeOption(index)}
+                        className="text-destructive hover:bg-destructive/10 h-8 w-8 p-0 cursor-pointer shrink-0"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Difficulty, Source, Year & References Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-outline-variant/30 pt-6">
               {/* Difficulty */}
@@ -372,60 +437,106 @@ export function CreateShortAnswerView() {
                 />
               </div>
 
-              {/* Exam Source */}
+              {/* Source */}
               <div className="space-y-2">
                 <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Exam Source / Board
+                  Source (উৎস)
                 </Label>
-                <Input
-                  disabled={isSubmitting}
-                  type="text"
-                  placeholder="e.g. Dhaka Board, Cadet College Exam"
-                  {...register("source")}
-                  className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm text-on-surface h-10"
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      disabled={isSubmitting}
+                      value={field.value || DEFAULT_SOURCE}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface h-10 justify-between focus-visible:outline-hidden cursor-pointer text-sm">
+                        <SelectValue placeholder="Select Source..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+                        {SHORT_ANSWER_SOURCE_OPTIONS.map((opt) => (
+                          <SelectItem
+                            key={opt.value}
+                            value={opt.value}
+                            className="text-neutral-900 text-xs"
+                          >
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </div>
 
-              {/* Year */}
+              {/* Session */}
               <div className="space-y-2">
                 <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Exam Year
+                  Session / Year (Optional)
                 </Label>
                 <Input
                   disabled={isSubmitting}
                   type="text"
-                  placeholder="e.g. 2024"
-                  {...register("year")}
+                  placeholder="e.g. 2026, 2025-26..."
+                  {...register("session")}
                   className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm text-on-surface h-10"
                 />
-                {errors.year && (
-                  <p className="text-xs text-error">{errors.year.message}</p>
+                {errors.session && (
+                  <p className="text-xs text-error">{errors.session.message}</p>
                 )}
               </div>
             </div>
 
-            {/* Active Visibility Toggler */}
-            <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
-              <div>
-                <Label className="block font-headline text-sm font-bold text-on-surface">
-                  Publish to Question Bank
-                </Label>
-                <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
-                  If active, this question will immediately be searchable and usable in tests.
-                </span>
+            {/* Settings Grid (Math & Active) */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Math / LaTeX Formula */}
+              <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
+                <div>
+                  <Label className="block font-headline text-sm font-bold text-on-surface">
+                    Math / LaTeX Formula
+                  </Label>
+                  <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
+                    Enable LaTeX rendering for math formulas in question/options.
+                  </span>
+                </div>
+                <Controller
+                  name="isMath"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
+                      className="cursor-pointer"
+                    />
+                  )}
+                />
               </div>
-              <Controller
-                name="isActive"
-                control={control}
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isSubmitting}
-                    className="cursor-pointer"
-                  />
-                )}
-              />
+
+              {/* Active Visibility Toggler */}
+              <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
+                <div>
+                  <Label className="block font-headline text-sm font-bold text-on-surface">
+                    Publish to Question Bank
+                  </Label>
+                  <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
+                    If active, this question will immediately be searchable and usable in tests.
+                  </span>
+                </div>
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
+                      className="cursor-pointer"
+                    />
+                  )}
+                />
+              </div>
             </div>
 
             {/* Actions Form Footer */}

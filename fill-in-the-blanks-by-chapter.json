@@ -1,0 +1,3202 @@
+[
+  {
+    "chapter": "সংখ্যা",
+    "questions": [
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সংখ্যাটি ৩ হাজার ৫ শতক ০ দশক ৫ একক",
+        "clue": "৩৫০৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সংখ্যাটি ৭ হাজার ১ শতক ৪ দশক ও ৫ একক",
+        "clue": "৭১৪৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সংখ্যাটি ২ হাজার ২ দশক ও ৭ একক",
+        "clue": "২০২৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সংখ্যাটি ৫ হাজার ৬ একক",
+        "clue": "৫০০৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৩৭৫ সংখ্যাটি হচ্ছে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হাজার $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ শতক $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ দশক $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ একক",
+        "clue": "৪, ৩, ৭, ৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫৪০০৯ সংখ্যাটি হচ্ছে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ অযুত $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হাজার $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ শতক $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ দশক $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ একক",
+        "clue": "৫, ৪, ০, ০, ৯",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ",
+    "questions": [
+      {
+        "content": "৩ অঙ্কের দুইটি সংখ্যার যোগফল সর্বোচ্চ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ অঙ্কের হতে পারে।",
+        "clue": "৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫০০০ + ৫০০ + ৫০ + ৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৫৫৫৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৭০০০ + ২৭০০ + ২৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "২৯৭২৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩৮ + ৬৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "১০৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩৯৭ + ৪২৮ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৮২৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০১৬ + ১১৮৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "২২০৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২০২৫ + ৭২০ + ৬৮ + ৩০৫৯ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৫৮৭২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২২২৬ + ৩৩৯৭ + ১০০১ + ২৫১০ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৯১৩৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩২৪১ + ৬৮৭ + ৬৮ + ৯ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৪০০৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৩ + ৮০ + ৫৬৯ + ৬০৭৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৬৭৬৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৪৬ + ৯০০ + ১২০৭ + ১৮৪ + ৩৯৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৩৪৩৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬ + ৭৮ + ৮৯৬ + ৫০৮৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৬০৬৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৯০০ + ১৬০০ + ৩০০ + ২৪০০ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৭২০০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৮৯৭ + ৬৫৯ + ৮৫ + ৯ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৩৬৫০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫২৭৭ + ৩৯২৫ + ৪১২৭ + ৩৭৭৬ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৭১০৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮ দশক ৩ একক + ২ শতক ৪ দশক ১ একক = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৩২৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪ শতক ৫ দশক ৮ একক এবং ৩ শতক ১ দশক ২ এককের যোগফল ——।",
+        "clue": "৭৭০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\begin{array}{r@{\\quad}l} ৪ ৮ ৯ \\\\ +\\; ৯ [\\;] ৫ \\\\ \\hline ১৪৫৪ \\end{array}$",
+        "clue": "৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ − ৬৮ = ১৭; খালিঘরের সংখ্যাটি কত?",
+        "clue": "৮৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৬ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ৮৪ খালি ঘরে কত হবে?",
+        "clue": "৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ − ৬৪৬০ = ৩৫৪০",
+        "clue": "১০০০০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪ অঙ্কের বৃহত্তম সংখ্যা ও ৫ অঙ্কের বৃহত্তম সংখ্যার যোগফল ——।",
+        "clue": "১০৯৯৯৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২য় অঙ্কের বৃহত্তম সংখ্যা হতে —— বেশি সংখ্যাটি হল ৩টি অঙ্কের ক্ষুদ্রতম সংখ্যা।",
+        "clue": "১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পিতার বয়স ৫৮ বছর ও মাতার বয়স ৪৮ বছর হলে তাদের বয়সের সমষ্টি —— বছর।",
+        "clue": "১০৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩টি খেলনার মূল্য যথাক্রমে ৩৪০ টাকা, ২৫০ টাকা ও ৪৪০ টাকা। খেলনাগুলোর মোট মূল্য —— টাকা।",
+        "clue": "১০৩০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ফলের দোকান হতে ২৮টি আপেল, ৬টি কমলা এবং ১৯টি আম কেনা হলে মোট —— টি ফল কেনা হয়।",
+        "clue": "৫৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নেহার কাছে ১৫টি এবং নুহা’শের কাছে ৩১টি ক্যান্ডি আছে। নুহা’শ নেহাকে ৮টি ক্যান্ডি দিলে নেহার কাছে —— টি ক্যান্ডি থাকবে।",
+        "clue": "২৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নবী সাহেব ৫৫০ টাকার বই ১৮০ টাকা বেশি দাম দিয়ে কিনেন। তাঁকে বই কেনার জন্য মোট —— টাকা খরচ করতে হয়।",
+        "clue": "৭৩০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি লাইব্রেরিতে ৫টি সারিতে ১৫০টি বই, ২টি সারিতে ১২৫টি বই এবং অপর ১টি সারিতে ৭৫টি বই থাকলে লাইব্রেরিতে মোট —— টি বই আছে।",
+        "clue": "৩৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি খামারে ২৫টি গরু, ৩০টি মহিষ, ৪০টি ছাগল ও ৫৫টি ভেড়া থাকলে খামারটিতে মোট ——টি গবাদি পশু আছে।",
+        "clue": "১৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "বিয়োগ",
+    "questions": [
+      {
+        "content": "বিয়োজন – বিয়োগফল = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "বিয়োজ্য",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পরপর দুইটি ক্রমিক সংখ্যার পার্থক্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পরপর দুইটি বিজোড় সংখ্যার পার্থক্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইটি সমান সংখ্যার পার্থক্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "শূন্য",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বিয়োজনের থেকে বিয়োজ্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "ছোট",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বিয়োজ্য ও বিয়োজন একই সংখ্যা হলে বিয়োগফল $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হবে।",
+        "clue": "শূন্য",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪২২৭ – ২৯২০ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৩০৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮০৩ – ৬৬৭ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১১৩৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬০০০ – ৩০৫৬ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "২৯৪৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪২৯ – ২৭$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ১৫৭",
+        "clue": "২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৮৯ – ১৪$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ৫৪৬",
+        "clue": "৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৭৯ – $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ১৩৪",
+        "clue": "৪৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ – ১৩২৬ = ১৮১০",
+        "clue": "৩১৩৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭০০১ থেকে ৩৫২৯, $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ কম।",
+        "clue": "৩৪৭২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৯৭৩ থেকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বিয়োগ করলে বিয়োগফল ২৮৯৮ হবে।",
+        "clue": "৭৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭২৫৪ হতে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বিয়োগ করলে বিয়োগফল ৬৯৫৪ হবে।",
+        "clue": "৩০০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইটি সংখ্যার যোগফল ৭৯৪২; একটি সংখ্যা ৩৬১৫ হলে অপর সংখ্যাটি $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৪৩২৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইটি সংখ্যার যোগফল ৯১৩৫ এবং একটি সংখ্যা ৪৩৬৩ হলে অপর সংখ্যাটি $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৪৭৭২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "অভি ১৬০০ টাকা হতে ৫৩৫ টাকা খরচ করলে তার কাছে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা অবশিষ্ট থাকবে।",
+        "clue": "১০৬৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বিদ্যালয়ে ৮৭৫ জন শিক্ষার্থী ছিল। $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ জন শিক্ষার্থী চলে গেলে অবশিষ্ট শিক্ষার্থীর সংখ্যা ৮৬৮ জন হবে।",
+        "clue": "৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বিদ্যালয়ের শিক্ষার্থীসংখ্যা ১৬২৮ জন। এদের মধ্যে ছাত্রীসংখ্যা ৮৩৬ জন হলে, ছাত্রসংখ্যা $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ জন।",
+        "clue": "৭৯২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "রিমির কাছে ৯৮৭ টাকা এবং উর্মির কাছে ৩২৪ টাকা আছে। দুইজনের টাকার পার্থক্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৬৬৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "আবুল ও বাবুলের কাছে যথাক্রমে ৩৫০ ও ৪৩০ টাকা থাকলে বাবুলের কাছে আবুলের চেয়ে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা বেশি আছে।",
+        "clue": "৮০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বিয়োজ্য ১০২৬ এবং বিয়োগফল $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হলে বিয়োজন ১০২৭।",
+        "clue": "১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ল্যাপটপ ও একটি মোবাইলের মূল্য একত্রে ৪২২৬৯ টাকা। ল্যাপটপটির দাম ৩৫৩২৫ টাকা হলে, মোবাইলের দাম $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৬৯৪৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পিতার বয়স ৩৫ বছর ও পুত্রের বয়স ১০ বছর। ১০ বছর পর তাদের বয়সের পার্থক্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বছর হবে।",
+        "clue": "২৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ ও বিয়োগের সম্পর্ক",
+    "questions": [
+      {
+        "content": "যোগ ও $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বিপরীত প্রক্রিয়া।",
+        "clue": "বিয়োগ",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইটি সমান সংখ্যার বিয়োগফল সর্বদা $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "শূন্য",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "শূন্যের সাথে যেকোনো সংখ্যা যোগ করলে যোগফল সংখ্যাটির $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হয়।",
+        "clue": "সমান",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "কোনো সংখ্যা হতে শূন্য বিয়োগ করলে বিয়োগফল $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সমান হয়।",
+        "clue": "বিয়োজনের/সংখ্যাটির",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইটি ক্রমিক সংখ্যার বিয়োগফল সর্বদা $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বিয়োজ্য + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = বিয়োজন",
+        "clue": "বিয়োগফল",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "যে সংখ্যাটি হতে অপর সংখ্যা বিয়োগ করা হয়, ঐ সংখ্যাটিকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বলে।",
+        "clue": "বিয়োজন",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বিয়োগফল এবং $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ উভয় অপেক্ষা বিয়োজন বৃহত্তর।",
+        "clue": "বিয়োজ্য",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮৭ – ৬৫ = ২২; এখানে, বিয়োজ্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৬৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬৪ + ৩২ – ৫৮ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৩৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ – ২৩ = ১২",
+        "clue": "৩৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৯৬ – $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ১০৫",
+        "clue": "৯১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ + ৩৯ = ৭৪",
+        "clue": "৩৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯৭৩ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ২০২৩",
+        "clue": "১০৪৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ – ১৪৩২ = ১১০৪।",
+        "clue": "২৫৩৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫ অঙ্কের ক্ষুদ্রতম সংখ্যা – $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ = ৮৭৬৫",
+        "clue": "১২৩৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৭৮৯ – ২৪৩৬ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৫৩৫৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫৪৬৫ + ৪৭৬১ + ৩৮৬২ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৪০৮৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭০২ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ + ১৩৪৮ + ২৩৫৮ = ৫৪৯৭",
+        "clue": "১০৮৯",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হতে ১৯ বিয়োগ করলে বিয়োগফল ৬৫ হয়।",
+        "clue": "৮৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৪৬৮ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$০৮ + ১৬৭৩ = ৬০৪৯",
+        "clue": "১৯",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৯৭২ – ১৩২২ + ৪২৯ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১০৭৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পুকুরে ৭৬টি পুঁটি মাছ এবং ৯৭টি তেলাপিয়া মাছ আছে। জাল দিয়ে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি মাছ উঠালে পুকুরে মোট ৬৫টি মাছ থাকবে।",
+        "clue": "১০৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সবুজের ওজন ৪৫ কেজি। সাকিবের ওজন সবুজের চেয়ে ৮ কেজি কম এবং তামিমের ওজন সাকিবের চেয়ে ১৫ কেজি বেশি হলে তিনজনের মোট ওজন $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ কেজি।",
+        "clue": "১৩৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "শিকদারের অ্যাকাউন্টে ৫০,০০০ টাকা ছিল। সে কিছু টাকা খরচ করার পর অ্যাকাউন্টে ২৩,৮০০ টাকা থাকলে, সে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা খরচ করেছিল।",
+        "clue": "২৬২০০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "টিনা ৬৭৫ টাকার বই এবং ১২০ টাকার পেন্সিল বক্স ক্রয় করে দোকানদারকে ১০০০ টাকা দিলে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা ফেরত পাবে।",
+        "clue": "২০৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বেঙ্গল লাইব্রেরিতে ১২৩৪টি বই আছে। $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি বই অর্ডার করায় বইয়ের সংখ্যা বৃদ্ধি পেয়ে ৪১৭৮টি হলো।",
+        "clue": "৩৭৪৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ট্রাক একটি গুদামে ৩৫০ বস্তা মালামাল সরবরাহ করায় গুদামঘরে মোট ৭৩৫ বস্তা মালামাল হলো। শুরুতে গুদামঘরে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বস্তা মালামাল ছিল।",
+        "clue": "৩৮৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "জাকির সাহেবের কাছে ৬৫০টি আম ছিল। তিনি ২৬৯টি আম বিক্রি করলে তার নিকট $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি আম অবশিষ্ট থাকবে।",
+        "clue": "৩৮১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নিলয়ের কাছে ৭২টি চকলেট আছে। সে রবিনকে ১৩টি, সুজনকে ৭টি ও রিয়াকে ১০টি চকলেট দিল। এখন তার নিকট $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি চকলেট রয়েছে।",
+        "clue": "৪২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "গুণ",
+    "questions": [
+      {
+        "content": "গুণের ক্ষেত্রে গুণ্য ও গুণক স্থান বিনিময় করলেও $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ একই থাকে।",
+        "clue": "গুণফল",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৩৯ × ১০ = ১৩৯০, এখানে গুণ্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "১৩৯",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ ১ করে বৃদ্ধি পেলে গুণফল গুণ্যের সমান করে বৃদ্ধি পায়।",
+        "clue": "গুণক",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০৪ × ৮ এর গুণফল ১০৪ × ৭ এর গুণফলের চেয়ে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বেশি।",
+        "clue": "১০৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ × ৭ = ১৮ × ৪ + ১৮ × $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৫ × ৮ = ১৫ × ৭ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৩ × ৯ = ১৩ × ৮ + $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬২৮ × ০ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুই অঙ্কের বৃহত্তম জোড় সংখ্যার ১০ গুণ সমান $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৯৮০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৬ × ৯ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "২৩৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২২ × ২৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৫৫০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯৯ × ১৪ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১৩৮৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮৮ কে ১৯ দিয়ে গুণ করলে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হয়।",
+        "clue": "১৬৭২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭১৫ কে ৫ দ্বারা গুণ করলে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হয়।",
+        "clue": "৩৫৭৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২১৮ × ৪৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৯৮১০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১, ২, ৩ অঙ্কগুলো নিয়ে গঠিত বৃহত্তম সংখ্যার ১১ গুণ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৩৫৩১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ × ৬ = ৯ × $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "১২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১টি চতুর্ভুজের ৪টি বাহু থাকলে, ৪৫টি চতুর্ভুজের $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি বাহু আছে।",
+        "clue": "১৮০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ হালিতে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি ডিম হয়।",
+        "clue": "৭২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "প্রতিটি কলমের দাম ১৩ টাকা হলে, ৭টি কলমের দাম $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৯১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "এক পক্ষে ১৫ দিন হলে, ১৫ পক্ষে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ দিন।",
+        "clue": "২২৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ কেজি গমের দাম ৬০ টাকা হলে, ৮২ কেজি গমের দাম $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৪৯২০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ কেজি আমের মূল্য ১৭০ টাকা হলে, ৬ কেজি আমের মূল্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "১০২০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বইয়ের মূল্য ৪০৮ টাকা হলে, এরূপ ১৪টি বইয়ের মূল্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৫৭১২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "তামান্না প্রতি মাসে ৪৩০ টাকা সঞ্চয় করলে বছর শেষে তার সঞ্চয়ের পরিমাণ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা।",
+        "clue": "৫১৬০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ভাগ",
+    "questions": [
+      {
+        "content": "ভাগ প্রক্রিয়ার শেষে যে সংখ্যা অবশিষ্ট থাকে তাকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বলে।",
+        "clue": "ভাগশেষ",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ভাগের অবশিষ্ট ভাজক থেকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হবে।",
+        "clue": "ছোটো",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯৩ ÷ ৩ = ৩১, এখানে ভাজ্য $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৯৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৮ থেকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ বিয়োগ করা যায় ৭ বার।",
+        "clue": "৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ভাজ্য ৭৭ ও ভাজক ১১ হলে, ভাগফল $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৭",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮৬ ÷ ২ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "৪৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১২৫ ÷ ৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$",
+        "clue": "২৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬৯ ÷ ৮ = ভাগফল $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$, ভাগশেষ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "৮, ৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬৯৪ কে ৩ দ্বারা ভাগ করলে ভাগশেষ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ভাজ্য ২০৬ ও ভাজক ৪ হলে, ভাগশেষ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$।",
+        "clue": "২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "$\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ ÷ ৯ = ৯।",
+        "clue": "৮১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬০ ÷ ৫ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ – ২।",
+        "clue": "১৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫৮ = $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ × ৭ + ২।",
+        "clue": "৮",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮৫ = ৩ × $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ + ২।",
+        "clue": "৬১",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৫টি কলা $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ জনকে সমানভাবে ভাগ করে দিলে প্রত্যেকে ৫টি করে কলা পাবে।",
+        "clue": "৯",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬৬ টাকা ৩ জনের মধ্যে ভাগ করে দিলে প্রত্যেকে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টাকা পাবে।",
+        "clue": "২২",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "পিতার বয়স পুত্রের বয়সের চারগুণ হলে, পুত্রের বয়স পিতার বয়সের $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ ভাগের ১ ভাগ।",
+        "clue": "৪",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৬টি লিচু ১০ জনের মধ্যে ভাগ করলে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি লিচু অবশিষ্ট থাকে।",
+        "clue": "৬",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি পেন্সিলের দাম ৮ টাকা হলে, ১২০ টাকায় $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি পেন্সিল পাওয়া যাবে।",
+        "clue": "১৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪টিতে ১ হালি হলে, ১৬০টিতে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ হালি হবে।",
+        "clue": "৪০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ট্রেন ৯ ঘণ্টায় ৭৪৭ কি.মি. যায়। ট্রেনটি প্রতি ঘণ্টায় $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ কি.মি. যায়।",
+        "clue": "৮৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি প্যাকেটে ৯টি কমলা রাখা যায় এরূপ $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি প্যাকেটে ২৭০টি কমলা রাখা সম্ভব।",
+        "clue": "৩০",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৫০ জন ব্যক্তি থেকে ৭ জন করে দল গঠন হলে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ জন কোনো দলে থাকবে না।",
+        "clue": "৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩৮ দিনে $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ সপ্তাহ ৩ দিন।",
+        "clue": "৫",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮ টাকা দরে ১২ টি চকলেট কিনে দোকানদারকে ২০০ টাকার নোট দিলে দোকানদার $\\boxed{\\phantom{\\rule{0.3cm}{0.2cm}}}$ টি চকলেটের দাম ফেরত দিবে।",
+        "clue": "১৩",
+        "options": [],
+        "isMath": true,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "গুণ ও ভাগের সম্পর্ক",
+    "questions": [
+      {
+        "content": "গুণ এবং ভাগ পরস্পর _____ প্রক্রিয়া।",
+        "clue": "বিপরীত",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "গুণফল ÷ গুণক = _____",
+        "clue": "গুণ্য",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একই সংখ্যা বারবার সহজে যোগ করা যায় _____ মাধ্যমে।",
+        "clue": "গুণের",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ × ৩ ÷ _____ = ৬",
+        "clue": "৯",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "গুণ্য ১০৫, গুণক ১৭ হলে গুণফল _____",
+        "clue": "১৭৮৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ভাজ্য ১৪৪, ভাগফল ৮ হলে ভাজক _____",
+        "clue": "১৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৮ ÷ ৮ × ৭ = _____",
+        "clue": "৪২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৪ × ১২ ÷ ৬ = _____",
+        "clue": "৪৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩২ × ১৫ ÷ ৫ = _____",
+        "clue": "৯৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭২ ÷ ৮ × ১০ = _____",
+        "clue": "৯০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪১ × ৮ ÷ ২ = _____",
+        "clue": "১৬৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৮ × ৮ ÷ ৪ = _____",
+        "clue": "৫৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "০ ÷ ১১ × ৫ = _____",
+        "clue": "০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৪ × ১৫ ÷ ৩ = _____",
+        "clue": "২২০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৪ ÷ ৪ × ৭ = _____",
+        "clue": "৭৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫১ ÷ ৩ × ৫ = _____",
+        "clue": "৮৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭২ থেকে ৮ যতবার বিয়োগ করা যায়, ১০ এর সাথে ঠিক ততবার ১৪ যোগ করলে সংখ্যাটি _____ হবে।",
+        "clue": "১৩৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "শিকদারের কাছে ৮৫টি রং পেন্সিল ছিল। সে পেন্সিলগুলোকে সমান ৫ ভাগে ভাগ করল এবং কাজলকে ৩ ভাগ দিল। কাজল _____টি পেন্সিল পেল।",
+        "clue": "৫১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৩টি ঝুড়ির প্রতিটিতে ১৫টি করে পেয়ারা আছে। পেয়ারাগুলো ৫ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে _____টি করে পেয়ারা পাবে।",
+        "clue": "৩৯",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "প্রতি প্যাকেটে ৪৫টি চকলেট থাকে এরূপ ৮টি চকলেটের প্যাকেট কিনে ২০ জনের মধ্যে সমানভাবে ভাগ করে দিলে প্রত্যেকে _____টি করে চকলেট পাবে।",
+        "clue": "১৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____টি কলমের মূল্য ৬০ টাকা হলে ২৫টি কলমের মূল্য ১৫০ টাকা হবে।",
+        "clue": "১০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬টি ২০ টাকার নোট _____টি ২ টাকার মুদ্রার সমান।",
+        "clue": "৬০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫টি বইয়ের দাম ১৮টি খাতার দামের সমান হলে ২৫টি বইয়ের দাম _____টি খাতার দামের সমান হবে।",
+        "clue": "৯০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ১৫০ মিটার লম্বা ফিতার ৫ ভাগের ২ ভাগ হিরাকে দিলে, সে _____ মিটার ফিতা পাবে।",
+        "clue": "৬০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মায়ের বয়স মেয়ের বয়সের ৩ গুণ। মায়ের বয়স ৭৫ বছর হলে, মেয়ের বয়স _____ বছর।",
+        "clue": "২৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "আকাশ দুই দিনে ৮ ঘণ্টা পড়ে। জুলাই মাসে সে _____ ঘণ্টা পড়ে।",
+        "clue": "১২৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১২৯ ফুটের তিন ভাগের দুই ভাগ _____ ফুট।",
+        "clue": "৮৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫টি কলার দাম ৭২ টাকা হলে, ৪টি কলার দাম _____ টাকা।",
+        "clue": "৪৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মিতা বছরে ৩৩০০ টাকা বৃত্তি পায়। তবে সে ৮ মাসে _____ টাকা বৃত্তি পায়।",
+        "clue": "২২০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "এক ডজন ডিমের দাম ১৪৪ টাকা হলে, ৭টি ডিমের দাম _____ টাকা।",
+        "clue": "৮৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "যোগ, বিয়োগ, গুণ ও ভাগসংক্রান্ত সমস্যা",
+    "questions": [
+      {
+        "content": "নিঃশেষে বিভাজ্যের ক্ষেত্রে ভাজ্য, ভাজকের সমান হলে ভাগফল সর্বদা _____ হবে।",
+        "clue": "১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ × ভাগফল + ভাগশেষ = ভাজ্য।",
+        "clue": "ভাজক",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "(২১২ + ১৪৫) × ১৫ - _____ = ৫৩০০।",
+        "clue": "৫৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮ × ৯ = ৮ × ১০ - _____",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯ × ৫ = ৫ × ৫ + _____",
+        "clue": "২০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭ × ৪ = ৭ × _____ + ৭ × ২",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫ × ৪ = ৫ × ৩ + _____",
+        "clue": "৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১১২ ÷ ১৪ × _____ + ৮ = ৮০।",
+        "clue": "৯",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ × ৯ ÷ ৬ = _____",
+        "clue": "২৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "(৪১৬ - ২৯০) ÷ ১৪ = _____",
+        "clue": "৯",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ × ২৫ ÷ ১৫ = ৫",
+        "clue": "৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৪ ও ২৫ এর গুণফল থেকে _____ বিয়োগ করলে বিয়োগফল ২৩৮ হয়।",
+        "clue": "৯২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৮ ও ১৫ এর গুণফলের সাথে _____ যোগ করলে যোগফল ৩৬০ হয়।",
+        "clue": "৯০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৪ এর ৩ গুণ হবে _____ এর ৬ গুণের সমান।",
+        "clue": "১২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৫০ এর ৯ ভাগের ৩ ভাগ _____",
+        "clue": "১৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২১ এর ৮ গুণের সাথে _____ যোগ করলে ১৯৮ হবে।",
+        "clue": "৩০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি সংখ্যা ২৪ এর ৮ গুণ থেকে ১২ কম। সংখ্যাটি _____",
+        "clue": "১৮০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "এক ডজন কলা ও ৭টি আপেলের মূল্য ২৪২ টাকা। একটি কলার দাম ১২ টাকা হলে, একটি আপেলের দাম _____ টাকা।",
+        "clue": "১৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২০০ টাকার ৫ ভাগের _____ ভাগ = ১৬০ টাকা।",
+        "clue": "৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০০ টাকার ৩টি নোট, ৫০ টাকার ৫টি নোট এবং ২০ টাকার _____টি নোট মিলে ৯৭০ টাকা হয়।",
+        "clue": "৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মায়ের বয়স কন্যার বয়সের ৪ গুণ। তাদের মোট বয়স ৬০ বছর হলে, কন্যার বয়স _____ বছর।",
+        "clue": "১২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "চারটি চকলেটের দাম ৬ টাকা হলে ৩২টি চকলেটের দাম _____ টাকা।",
+        "clue": "৪৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "এক হালি ডিমের মূল্য _____ টাকা হলে, এক ডজন ডিমের মূল্য ৯৬ টাকা।",
+        "clue": "৩২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৩৭টি আম থেকে ৩২টি সরিয়ে ৭ জনের মধ্যে ভাগ করে দিলে প্রত্যেকে _____টি আম পাবে।",
+        "clue": "১৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ২৫০ মিটার লম্বা ফিতার ৫ ভাগের ২ ভাগ মিতুকে দিলে, সে _____ মিটার ফিতা পাবে।",
+        "clue": "১০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি খাতা ও দুইটি কলমের মূল্য একত্রে ৮২ টাকা। একটি খাতার মূল্য ৪৬ টাকা হলে, একটি কলমের মূল্য _____ টাকা।",
+        "clue": "১৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "তন্বীর ওজন ৫২ কেজি। রাফির ওজন তন্বীর চেয়ে ১৬ কেজি বেশি হলে রাফির ওজনের অর্ধেক _____ কেজি।",
+        "clue": "৩৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি কলমের মূল্য ৮ টাকা এবং একটি বইয়ের মূল্য ৫৬০ টাকা হলে, একটি বইয়ের মূল্যে _____টি কলম পাওয়া যাবে।",
+        "clue": "৭০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৫টি কলা থেকে ৭টি সরিয়ে ৪ জনের মধ্যে ভাগ করে দিলে প্রত্যেকে _____টি কলা পাবে।",
+        "clue": "১৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নেহা ২৮ টি চকলেট ৬ জনের মধ্যে ভাগ করে দিলে তার কাছে _____টি চকলেট অবশিষ্ট থাকবে।",
+        "clue": "৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "ভগ্নাংশ",
+    "questions": [
+      {
+        "content": "১২/১৫ ভগ্নাংশটিতে লব _____",
+        "clue": "১২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৪/২৫ এর হরের মান _____",
+        "clue": "২৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "লব ৫ ও হর ১৩ হলে ভগ্নাংশটি _____",
+        "clue": "৫/১৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬ টাকা ১৯ টাকার _____ অংশ।",
+        "clue": "৬/১৯",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ মিটার দৈর্ঘ্যের দুই পঞ্চমাংশ = _____ মিটার।",
+        "clue": "২/৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "কোনো ভগ্নাংশের লব ও হরকে একই সংখ্যা দ্বারা গুণ করলে _____ ভগ্নাংশ পাওয়া যায়।",
+        "clue": "সমতুল",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সমহরবিশিষ্ট ভগ্নাংশে যার লব বড়ো সেটি _____ ভগ্নাংশ।",
+        "clue": "বড়ো",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____/৮ মিটার হচ্ছে ১ মিটারের সমতুল্য।",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____/৫২ = ৪/১৩",
+        "clue": "১৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০/৩৫ = ২/_____",
+        "clue": "৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫/৭ অংশ ও ৩/৭ অংশের মধ্যে _____ অংশটি বড়।",
+        "clue": "৫/৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "খালিঘরে প্রতীক বসাও: ৮/৯ _____ ৬/৯",
+        "clue": ">",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৬/১০ _____ ১; খালিঘরে প্রতীক বসাও।",
+        "clue": "<",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮/২৫ + ৬/২৫ = _____",
+        "clue": "১৪/২৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০/২১ + ১১/২১ = _____",
+        "clue": "১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫/১৭ + ৮/১৭ = _____",
+        "clue": "১৩/১৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩/৪ + _____ = ১",
+        "clue": "১/৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩/৭ + _____/৭ = ৯/৭",
+        "clue": "৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ - ৫/৭ = ২/৭",
+        "clue": "১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ মিটারকে সমান ৩ টুকরা করলে এর ২টি টুকরাকে ১ মিটারের _____ অংশ বলা হয়।",
+        "clue": "২/৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুইজন শ্রমিক একটি কাঠের যথাক্রমে ২/৫ ও ৩/৫ অংশ কাটল। দুই জন একত্রে _____ অংশ কাটল।",
+        "clue": "৪/৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯/১৩ - _____ = ৩/১৩",
+        "clue": "৬/১৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ - ৪/৮ = _____",
+        "clue": "৪/৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ + ৯/১৩ = ১১/১৩",
+        "clue": "২/১৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮/১৫ - _____/১৫ = ৬/১৫",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি গ্লাসের এক চতুর্থাংশ পানি দ্বারা ভর্তি থাকলে _____ অংশ খালি আছে।",
+        "clue": "৩/৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সায়েম একটি কেকের ৩/১৮ অংশ খেল। এখন কেকের অবশিষ্ট আছে _____ অংশ।",
+        "clue": "১৫/১৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "বাংলাদেশি মুদ্রা",
+    "questions": [
+      {
+        "content": "বাংলাদেশে প্রচলিত কাগজের টাকার নোট _____ টি।",
+        "clue": "১০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "শহীদ মিনারের ছবি আছে _____ টাকার নোটে।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২ টাকার বিনিময়ে _____ টি ১০ পয়সার মুদ্রা পাওয়া সম্ভব।",
+        "clue": "২০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২০ টাকার ৩৫টি নোট সমান _____ টাকা।",
+        "clue": "৭০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫০ টাকার ৪৫টি নোট সমান _____ টাকা।",
+        "clue": "২২৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০০ টাকার _____ টি নোট সমান ৮০০ টাকা।",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২০ টাকার _____ টি নোট সমান ৭০০ টাকা।",
+        "clue": "৩৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০০০ টাকার _____ টি নোট সমান ২৫০০০ টাকা।",
+        "clue": "২৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ পয়সায় ২ টাকা ৩০ পয়সা।",
+        "clue": "২৩০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪টি ৫ টাকা ও ৩টি _____ টাকার নোট সমান ২৬ টাকা।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫০ টাকার _____ টি ও ১০০ টাকার ৩টি নোট সমান ৫০০ টাকা।",
+        "clue": "৪",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫০০ টাকার ১৩টি নোট সমান _____ টাকা।",
+        "clue": "৬৫০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩টি ২০ টাকা ও ১৪টি _____ টাকার নোট সমান ২০০ টাকা।",
+        "clue": "১০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭২ টাকা ৬০ পয়সা ও ২৫ টাকা ৪০ পয়সা সমান _____ টাকা।",
+        "clue": "৯৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৫ পয়সার ৪টি, ৫০ পয়সার ৬টি ও ৬টি _____ পয়সার মুদ্রা সমান ৪ টাকা ৬০ পয়সা।",
+        "clue": "১০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৪১ টাকা ২৪ পয়সা, ১৮৬ টাকা ৫৭ পয়সা থেকে _____ টাকা _____ পয়সা বেশি।",
+        "clue": "৫৪, ৬৭",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩০টি ২০ টাকার নোট = _____ টি ১০০ টাকার নোট।",
+        "clue": "৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৭৬ টাকা ৭৫ পয়সা + ৪১ টাকা ৫০ পয়সা = _____ টাকা ২৫ পয়সা।",
+        "clue": "১১৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮টি ৫০ পয়সার মুদ্রা = ২টি _____ টাকার নোট।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫ টাকার ১৬টি কলমের মূল্য পরিশোধ করতে ১০ টাকার _____ টি নোট লাগবে।",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১০০০ টাকা, ৬৮৬ টাকা ৭৫ পয়সা অপেক্ষা ৩১৩ টাকা _____ পয়সা বেশি।",
+        "clue": "২৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৮টি ২০ টাকার নোট এবং _____ টি ৫০ টাকার নোট ৩১০ টাকার সমান।",
+        "clue": "৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫০০ টাকার ৬টি নোট এবং ১০টি _____ টাকার নোটে ১৩০০০ টাকা হবে।",
+        "clue": "১০০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "দুই টাকার ১টি নোট, ১০ পয়সার ৩টি মুদ্রা ও _____ টি ৫ পয়সার মুদ্রায় ২ টাকা ৮০ পয়সা হবে।",
+        "clue": "১০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৫ টাকা ৬৫ পয়সা + ২৪ টাকা ৪৭ পয়সা সমান _____ টাকা ১২ পয়সা।",
+        "clue": "৭০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১২৭ টাকা থেকে _____ টাকা ৫০ পয়সা বিয়োগ করলে ৫৪ টাকা ৫০ পয়সা থাকবে।",
+        "clue": "৭২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নিয়াজের কাছে ১৫ টাকা ছিল। সে তার ভাইকে _____ টাকা ৭৫ পয়সা দিলে তার থাকবে ৮ টাকা ২৫ পয়সা।",
+        "clue": "৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১টি আমের দাম ২২ টাকা ২৫ পয়সা হলে ১৬টি আমের জন্য _____ টাকা খরচ করতে হবে।",
+        "clue": "৩৫৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "নাবিল ৭৫ পয়সার ৬টি লজেন্স কিনে দোকানদারকে ৫ টাকা দিলে _____ পয়সা ফেরত পাবে।",
+        "clue": "৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "রিফাত ১৫ টাকা ২৫ পয়সার একটি পেন্সিল, ২৭ টাকা ৭৫ পয়সার দুইটি স্কেল কিনলে মোট _____ টাকা _____ পয়সা খরচ হবে।",
+        "clue": "৭০, ৭৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "পরিমাপ",
+    "questions": [
+      {
+        "content": "মিলিমিটার, মিটার, সেন্টিমিটার, কিলোমিটার এদের মধ্যে সবচেয়ে বড় _____।",
+        "clue": "কিলোমিটার",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৫ মিটার = _____ মিলিমিটার।",
+        "clue": "৫০০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৩ মিটার _____ সেমি = ১৩০৮ সেমি।",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩ মিটার ৩০ সেন্টিমিটার = _____ সেন্টিমিটার।",
+        "clue": "৩৩০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ কিলোমিটার = ৬০০০০ মিটার।",
+        "clue": "৬০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১১ কিলোমিটার = _____ মিলিমিটার।",
+        "clue": "১১০০০০০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১৫ সেন্টিমিটার = _____ মিলিমিটার।",
+        "clue": "১৫০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩ মিটার ৫০০ সেন্টিমিটার + ১ মিটার ৬০০ সেন্টিমিটার = _____।",
+        "clue": "৫ মিটার ১০০ সেন্টিমিটার",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সবচেয়ে ছোট বাটখারা _____।",
+        "clue": "৫ গ্রাম",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "বাটখারা দিয়ে _____ পরিমাপ করা হয়।",
+        "clue": "ওজন",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ কিলোগ্রামের ৫টি বাটখারায় _____ গ্রাম।",
+        "clue": "৫০০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৭ কিলোগ্রামের ১/৯ অংশ = _____ গ্রাম।",
+        "clue": "৩০০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "১ কেজি ৩৪০ গ্রাম মাপতে কমপক্ষে _____টি বাটখারা প্রয়োজন।",
+        "clue": "৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৫০ গ্রামের ২টি, ৫০ গ্রামের ৩টি, ৫০০ গ্রামের ৪টি বাটখারা মিলে মোট _____ ওজন হয়।",
+        "clue": "২ কেজি ৬৫০ গ্রাম",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ৪৩ কেজি ওজনের বস্তু অপর একটি ৩৮ কেজি ওজনের বস্তু অপেক্ষা _____ কেজি ভারী।",
+        "clue": "৫",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪ কেজি ১৫০ গ্রাম চাল, ২ কেজি _____ গ্রাম ময়দা থেকে ১ কেজি ৩৫০ গ্রাম বেশি।",
+        "clue": "৮০০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মাহবুব ৭৮০ গ্রাম চিনি ও ৫৮০ গ্রাম বিস্কুট কিনল। সে মোট _____ কেজি _____ গ্রাম জিনিস কিনল।",
+        "clue": "১, ৩৬০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ডিজিটাল ঘড়িতে সবচেয়ে ডান পাশের দুটি সংখ্যা _____ নির্দেশ করে।",
+        "clue": "মিনিট",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "এক অর্ধদিবসে _____ ঘণ্টা।",
+        "clue": "১২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ঘড়ির সবচেয়ে বড় কাঁটা _____ নির্দেশ করে।",
+        "clue": "সেকেন্ড",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ঘণ্টার কাঁটা মিনিটের কাঁটার তুলনায় _____।",
+        "clue": "ছোট",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ঘড়ির ঘণ্টার কাঁটা ১১ এর ঘরে আসে দৈনিক _____ বার।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৩৬০ সেকেন্ডে _____ মিনিট।",
+        "clue": "৬",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "২৭ মিনিট = _____ সেকেন্ড।",
+        "clue": "১৬২০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "গণিত ক্লাস ১০:৪০ টায় শুরু হয়ে ১১:২০ টায় শেষ হলে ক্লাসের সময়কাল _____ মিনিট।",
+        "clue": "৪০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সকাল ৯:৩০ থেকে দুপুর ৩:২৫ টা পর্যন্ত সময়ের পার্থক্য _____।",
+        "clue": "৫ ঘণ্টা ৫৫ মিনিট",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  },
+  {
+    "chapter": "জ্যামিতি",
+    "questions": [
+      {
+        "content": "দুইটি বিন্দু দিয়ে _____ টি রেখা আঁকা যায়।",
+        "clue": "১",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ কেবল অবস্থান রয়েছে।",
+        "clue": "বিন্দুর",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি লুডুর ছক্কার শীর্ষবিন্দু _____ টি।",
+        "clue": "৮",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ইটের সকল তল _____।",
+        "clue": "সমতল",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "কাগজের পার্শ্ব একটি _____।",
+        "clue": "রেখা",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ঘনবস্তুর যেকোনো পৃষ্ঠকে _____ বলে।",
+        "clue": "তল",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "রুবিক্স কিউবের তলগুলো _____।",
+        "clue": "সমতল",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ঘনকের প্রতিটি পার্শ্ব _____।",
+        "clue": "সমতল",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মার্বেল একটি _____ আকৃতির বস্তু।",
+        "clue": "গোলক",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বিন্দুকে কেন্দ্র করে তার চারদিকে সমদূরত্বে যে বক্ররেখা আঁকা হয়, তাকে _____ বলে।",
+        "clue": "বৃত্ত",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি পেয়ারাকে দ্বিখণ্ডিত করলে _____ টি সমতল পাওয়া যায়।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "কেন্দ্র থেকে বৃত্তের পরিধি পর্যন্ত দূরত্বকে _____ বলে।",
+        "clue": "ব্যাসার্ধ",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ বাক্সটির তল _____ টি।",
+        "clue": "৬টি",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "আয়তের কর্ণদ্বয়ের ছেদবিন্দুতে _____ টি কোণ উৎপন্ন হয়।",
+        "clue": "৪টি",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "তিন সমকোণের মান _____ ডিগ্রি।",
+        "clue": "২৭০°",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি ত্রিভুজের ৩টি বাহু ও _____ টি কোণ থাকে।",
+        "clue": "৩",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪টি সমকোণ একত্রে মিলে _____ টি সরলকোণ তৈরি হয়।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৯০° এর সমান কোণকে _____ বলে।",
+        "clue": "সমকোণ",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "সূক্ষ্মকোণ, সমকোণ ও স্থূলকোণের মধ্যে _____ ক্ষুদ্রতম।",
+        "clue": "সূক্ষ্মকোণ",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "৪৬° কোণটি একটি _____।",
+        "clue": "সূক্ষ্মকোণ",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ সরলকোণ ৩৬০° ডিগ্রির সমান।",
+        "clue": "দুই",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বর্গে _____ টি সরলকোণ থাকে।",
+        "clue": "০",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি _____ আঁকতে সর্বনিম্ন ৪টি বিন্দুর প্রয়োজন।",
+        "clue": "চতুর্ভুজ",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "_____ এর বিপরীত বাহুগুলো সমান।",
+        "clue": "আয়ত",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "একটি বর্গের দুইটি বিপরীত কৌণিক বিন্দু যোগ করলে _____ টি ত্রিভুজ উৎপন্ন হয়।",
+        "clue": "২",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "ঘনকের তলের আকৃতি _____।",
+        "clue": "বর্গাকার",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "মৌমাছির চাকে খুব চমৎকার জ্যামিতিক আকৃতির _____ আছে।",
+        "clue": "প্যাটার্ন",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "☆☆□□○○△ _____ ◇◇",
+        "clue": "△",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      },
+      {
+        "content": "△□□△△□□□△△△ _____",
+        "clue": "□□□□",
+        "options": [],
+        "isMath": false,
+        "reference": [],
+        "questionUrl": null,
+        "difficulty": "MEDIUM",
+        "attachments": []
+      }
+    ]
+  }
+]

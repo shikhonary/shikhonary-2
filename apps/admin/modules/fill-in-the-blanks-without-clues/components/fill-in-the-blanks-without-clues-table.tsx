@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import { cn } from "@workspace/ui/lib/utils"
 import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
 import {
@@ -22,6 +23,7 @@ export interface FillInTheBlanksWithoutCluesItem {
   popularityCount: number
   source?: string | null
   session?: string | null
+  isMath?: boolean
   createdAt: Date | string
   updatedAt: Date | string
   subject: {
@@ -51,9 +53,9 @@ interface FillInTheBlanksWithoutCluesTableProps {
 }
 
 /**
- * Highlights sequential blank indicators e.g. (a) ________, (b) ..., or underlines
+ * Highlights sequential blank indicators e.g. (a) ________, (b) ..., with RenderMath support
  */
-function RenderFormattedPassage({ text }: { text: string }) {
+function RenderFormattedPassage({ text, isMath = false }: { text: string; isMath?: boolean }) {
   if (!text) return null
 
   // Format gaps with special highlighting
@@ -72,7 +74,7 @@ function RenderFormattedPassage({ text }: { text: string }) {
             </span>
           )
         }
-        return <span key={index}>{part}</span>
+        return <RenderMath key={index} text={part} isMath={isMath} />
       })}
     </span>
   )
@@ -255,13 +257,23 @@ export function FillInTheBlanksWithoutCluesTable({
                         >
                           {item.difficulty}
                         </span>
+
+                        {/* Math Badge */}
+                        {item.isMath && (
+                          <span className="px-2.5 py-0.5 bg-purple-50 text-purple-700 rounded font-label-sm text-[11px] font-bold border border-purple-200">
+                            ∑ Math
+                          </span>
+                        )}
                       </div>
 
                       {/* Clue / Instructions (if present) */}
                       {item.clue && item.clue.trim() && (
                         <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs text-primary font-medium flex items-center gap-1.5">
                           <span>💡</span>
-                          <span><strong className="font-semibold">Clue / Instructions:</strong> {item.clue}</span>
+                          <span>
+                            <strong className="font-semibold">Clue / Instructions:</strong>{" "}
+                            <RenderMath text={item.clue} isMath={item.isMath} />
+                          </span>
                         </div>
                       )}
 
@@ -269,7 +281,7 @@ export function FillInTheBlanksWithoutCluesTable({
                       {item.content && (
                         <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
                           <div className="whitespace-pre-wrap font-medium">
-                            <RenderFormattedPassage text={item.content} />
+                            <RenderFormattedPassage text={item.content} isMath={item.isMath} />
                           </div>
                         </div>
                       )}

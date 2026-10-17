@@ -536,6 +536,11 @@ export const QuestionPickerPanel: React.FC = () => {
                           {q.difficulty === "EASY" ? "সহজ" : q.difficulty === "MEDIUM" ? "মধ্যম" : q.difficulty === "HARD" ? "কঠিন" : q.difficulty}
                         </span>
                       )}
+                      {q.isMath && (
+                        <span className="px-1.5 py-0 rounded text-[9px] font-bold border border-amber-200 bg-amber-50 text-amber-700 tracking-wide">
+                          ∑ Math
+                        </span>
+                      )}
                     </div>
                     {isAssigned ? (
                       <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
@@ -664,12 +669,25 @@ export const QuestionPickerPanel: React.FC = () => {
                         ) : null}
                       </div>
                     ) : (
-                      <RenderMath text={q.question || ""} />
+                      <RenderMath text={q.question || ""} isMath={q.isMath} />
+                    )}
+                    {Array.isArray(q.options) && q.options.length > 0 && (
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1.5 text-xs text-on-surface-variant font-medium">
+                        {q.options.map((opt: string, i: number) => {
+                          const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];
+                          return (
+                            <div key={i} className="flex gap-1 items-start">
+                              <span className="font-bold text-primary shrink-0">{optLabels[i] || `(${i + 1})`}</span>
+                              <RenderMath text={opt} isMath={q.isMath} />
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
 
                   {/* Attachments */}
-                  <QuestionAttachments attachments={q.attachments} compact />
+                  <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
 
 
                   {/* References & Source */}

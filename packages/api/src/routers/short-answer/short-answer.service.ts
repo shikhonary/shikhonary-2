@@ -13,7 +13,7 @@ import {
 } from "./short-answer.schema"
 
 export async function listShortAnswers(db: PrismaClient, input: ListShortAnswersInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, source, year, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, year, isMath, sort } = input
   const skip = (page - 1) * limit
 
   const where: any = {}
@@ -21,19 +21,40 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
-  if (source || year !== undefined) {
+  if (typeof isMath === "boolean") where.isMath = isMath
+
+  if (source && year !== undefined) {
     const boardRef = [source, year].filter(Boolean).join("-")
-    if (boardRef) {
-      where.reference = { has: boardRef }
+    where.OR = [
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else {
+    if (source) where.source = source
+    if (session) where.session = session
+    if (year !== undefined) {
+      where.reference = { has: String(year) }
     }
   }
 
   if (query) {
-    where.OR = [
+    const queryConditions: any[] = [
       { question: { contains: query, mode: "insensitive" } },
       { answer: { contains: query, mode: "insensitive" } },
+      { source: { contains: query, mode: "insensitive" } },
+      { session: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
     ]
+    if (where.OR) {
+      where.AND = [
+        ...(where.AND || []),
+        { OR: where.OR },
+        { OR: queryConditions },
+      ]
+      delete where.OR
+    } else {
+      where.OR = queryConditions
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -168,12 +189,10 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
   }
 
   const refList = Array.isArray(data.reference) ? [...data.reference] : []
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef && !refList.includes(legacyRef)) {
-      refList.push(legacyRef)
-    }
-  }
+
+  const currentYear = new Date().getFullYear().toString()
+  const resolvedSource = data.source ? data.source.trim() : "সহায়ক সংকলন"
+  const resolvedSession = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
 
   return db.shortAnswer.create({
     data: {
@@ -181,8 +200,12 @@ export async function createShortAnswer(db: PrismaClient, input: CreateShortAnsw
       chapterId: data.chapterId,
       question: data.question,
       answer: data.answer || null,
+      options: data.options || [],
+      isMath: data.isMath ?? false,
       difficulty: data.difficulty,
       reference: refList,
+      source: resolvedSource,
+      session: resolvedSession,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
       attachments: allAttachments.length > 0
@@ -242,29 +265,35 @@ export async function updateShortAnswer(db: PrismaClient, input: UpdateShortAnsw
     }
   }
 
-  let resolvedReference = data.reference
-  if (data.source || data.year) {
-    const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-    if (legacyRef) {
-      const currentRefs = Array.isArray(data.reference) ? [...data.reference] : []
-      if (!currentRefs.includes(legacyRef)) {
-        currentRefs.push(legacyRef)
-      }
-      resolvedReference = currentRefs
-    }
+  const resolvedReference = data.reference !== undefined
+    ? (Array.isArray(data.reference) ? data.reference : [])
+    : undefined
+
+  const currentYear = new Date().getFullYear().toString()
+  const updateData: any = {
+    subjectId: data.subjectId,
+    chapterId: data.chapterId,
+    question: data.question,
+    answer: data.answer,
+    options: data.options || [],
+    isMath: data.isMath ?? false,
+    difficulty: data.difficulty,
+    reference: resolvedReference,
+    questionTypeId: resolvedQuestionTypeId || undefined,
+    isActive: data.isActive,
+  }
+
+  if (data.source !== undefined) {
+    updateData.source = data.source ? data.source.trim() : null
+  }
+  if (data.session !== undefined) {
+    updateData.session = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
   }
 
   return db.shortAnswer.update({
     where: { id },
     data: {
-      subjectId: data.subjectId,
-      chapterId: data.chapterId,
-      question: data.question,
-      answer: data.answer,
-      difficulty: data.difficulty,
-      reference: resolvedReference,
-      questionTypeId: resolvedQuestionTypeId || undefined,
-      isActive: data.isActive,
+      ...updateData,
       attachments: allAttachments.length > 0
         ? {
           deleteMany: {},
@@ -348,7 +377,10 @@ export async function getShortAnswerBoardYears(
   input: { subjectId?: string; chapterId?: string }
 ) {
   const where: any = {
-    NOT: { reference: { equals: [] } },
+    OR: [
+      { NOT: { reference: { equals: [] } } },
+      { AND: [{ source: { not: null } }, { session: { not: null } }] },
+    ],
   }
 
   if (input.subjectId) where.subjectId = input.subjectId
@@ -356,13 +388,18 @@ export async function getShortAnswerBoardYears(
 
   const questions = await db.shortAnswer.findMany({
     where,
-    select: { reference: true },
+    select: { reference: true, source: true, session: true },
   })
 
   const countMap = new Map<string, number>()
   for (const q of questions) {
+    if (q.source && q.session) {
+      const key = `${q.source}-${q.session}`
+      countMap.set(key, (countMap.get(key) || 0) + 1)
+    }
     for (const ref of q.reference || []) {
       if (!ref) continue
+      if (q.source && q.session && ref === `${q.source}-${q.session}`) continue
       countMap.set(ref, (countMap.get(ref) || 0) + 1)
     }
   }
@@ -437,12 +474,10 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
         }
 
         const refList = Array.isArray(data.reference) ? [...data.reference] : []
-        if (data.source || data.year) {
-          const legacyRef = [data.source, data.year].filter(Boolean).join("-")
-          if (legacyRef && !refList.includes(legacyRef)) {
-            refList.push(legacyRef)
-          }
-        }
+
+        const currentYear = new Date().getFullYear().toString()
+        const resolvedSource = data.source ? data.source.trim() : "সহায়ক সংকলন"
+        const resolvedSession = data.session ? data.session.trim() : (data.year ? String(data.year) : currentYear)
 
         const createdSa = await tx.shortAnswer.create({
           data: {
@@ -450,8 +485,12 @@ export async function importShortAnswers(db: PrismaClient, input: ImportShortAns
             chapterId: data.chapterId,
             question: data.question,
             answer: data.answer || null,
+            options: data.options || [],
+            isMath: data.isMath ?? false,
             difficulty: data.difficulty ?? "MEDIUM",
             reference: refList,
+            source: resolvedSource,
+            session: resolvedSession,
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
             attachments: allAttachments.length > 0

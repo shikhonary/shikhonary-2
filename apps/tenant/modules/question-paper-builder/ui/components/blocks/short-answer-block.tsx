@@ -9,12 +9,14 @@ const ShortAnswerEditableText = ({
   text, 
   itemKey, 
   defaultStyle,
-  className = ""
+  className = "",
+  isMath = false,
 }: { 
   text: string, 
   itemKey: string, 
   defaultStyle: any,
-  className?: string
+  className?: string,
+  isMath?: boolean,
 }) => {
   const [isActive, setIsActive] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -83,7 +85,7 @@ const ShortAnswerEditableText = ({
           fontWeight: mergedStyle.fontWeight,
         }}
       >
-        <RenderMath text={text} />
+        <RenderMath text={text} isMath={isMath} />
       </div>
     </div>
   );
@@ -182,8 +184,22 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
               itemKey={`${item.id}-question`}
               defaultStyle={questionStyle}
               className="m-0 w-full whitespace-pre-wrap"
+              isMath={data.isMath}
             />
-            <QuestionAttachments attachments={data.attachments} />
+            {Array.isArray(data.options) && data.options.length > 0 && (
+              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1">
+                {data.options.map((opt: string, i: number) => {
+                  const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];
+                  return (
+                    <div key={i} className="flex gap-1.5 items-start text-xs">
+                      <span className="shrink-0 font-medium">{optLabels[i] || `(${i + 1})`}</span>
+                      <RenderMath text={opt} isMath={data.isMath} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <QuestionAttachments attachments={data.attachments} isMath={data.isMath} />
           </div>
           {marksPerQuestion !== undefined && marksPerQuestion !== null && Number(marksPerQuestion) > 0 && (
             <span

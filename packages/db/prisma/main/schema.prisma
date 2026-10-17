@@ -108,6 +108,8 @@ model User {
   updatedShuddhoAshuddhos            ShuddhoAshuddho[]             @relation("ShuddhoAshuddhoUpdater")
   createdDanBamMilkorons             DanBamMilkoron[]              @relation("DanBamMilkoronCreator")
   updatedDanBamMilkorons             DanBamMilkoron[]              @relation("DanBamMilkoronUpdater")
+  createdMathQuestions               MathQuestion[]                @relation("MathQuestionCreator")
+  updatedMathQuestions               MathQuestion[]                @relation("MathQuestionUpdater")
   createdGrammarQuestions            GrammarQuestion[]             @relation("GrammarQuestionCreator")
   updatedGrammarQuestions            GrammarQuestion[]             @relation("GrammarQuestionUpdater")
 
@@ -318,6 +320,7 @@ model Tenant {
   formFillups                 FormFillup[]
   shuddhoAshuddhos            ShuddhoAshuddho[]
   danBamMilkorons             DanBamMilkoron[]
+  mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
 
   @@index([isActive])
@@ -734,6 +737,7 @@ model AcademicSubject {
   formFillups                 FormFillup[]
   shuddhoAshuddhos            ShuddhoAshuddho[]
   danBamMilkorons             DanBamMilkoron[]
+  mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
 
   @@index([isActive])
@@ -803,6 +807,7 @@ model AcademicChapter {
   formFillups                 FormFillup[]
   shuddhoAshuddhos            ShuddhoAshuddho[]
   danBamMilkorons             DanBamMilkoron[]
+  mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
 
   @@unique([subjectId, position])
@@ -874,6 +879,7 @@ model QuestionType {
   formFillups                 FormFillup[]
   shuddhoAshuddhos            ShuddhoAshuddho[]
   danBamMilkorons             DanBamMilkoron[]
+  mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
 
   @@index([label])
@@ -1012,7 +1018,7 @@ model Cq {
   id        String   @id @default(cuid())
   questionA String
   questionB String
-  questionC String
+  questionC String?
   questionD String?
   context   String?
   reference String[] @default([])
@@ -1181,6 +1187,8 @@ model ShortAnswer {
   id        String   @id @default(cuid())
   question  String
   answer    String?
+  options   String[] @default([])
+  isMath    Boolean  @default(false)
   reference String[] @default([])
   source    String?
   session   String?
@@ -1225,6 +1233,7 @@ model ShortAnswer {
   @@index([tenantId, isGlobal])
   @@index([questionTypeId])
   @@index([deletedAt])
+  @@index([isMath])
   @@index([subjectId, chapterId])
   @@index([chapterId])
   @@index([subjectId])
@@ -2257,6 +2266,7 @@ model FillInTheBlanksWithoutClues {
   reference String[] @default([])
   source    String?
   session   String?
+  isMath    Boolean  @default(false)
 
   difficulty      String @default("MEDIUM")
   popularityCount Int    @default(0)
@@ -2294,6 +2304,7 @@ model FillInTheBlanksWithoutClues {
   @@index([tenantId, isGlobal])
   @@index([questionTypeId])
   @@index([deletedAt])
+  @@index([isMath])
   @@index([academicChapterId])
   @@index([subjectId])
   @@index([difficulty])
@@ -3072,6 +3083,59 @@ model DanBamMilkoron {
   @@index([subjectId])
   @@index([difficulty])
   @@map("dan_bam_milkoron")
+}
+
+model MathQuestion {
+  id       String  @id @default(cuid())
+  question String
+  answer   String?
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("MathQuestionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("MathQuestionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("math_question")
 }
 
 model GrammarQuestion {

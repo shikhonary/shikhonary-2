@@ -40,6 +40,7 @@ import {
   GraduationCap
 } from "lucide-react"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { CQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -49,8 +50,9 @@ const sampleJsonTemplate = `[
     "questionC": "বস্তুটির ত্বরণ নির্ণয় কর।",
     "questionD": "বস্তুটির বেগ দ্বিগুণ করতে কত বল লাগবে গাণিতিক বিশ্লেষণ দাও।",
     "difficulty": "MEDIUM",
+    "source": "সহায়ক সংকলন",
+    "session": "2024",
     "year": 2024,
-    "source": "Physics Board",
     "reference": ["Board 2024"],
     "attachments": [
       {
@@ -443,10 +445,10 @@ function EditableCqCard({
             onSave={(newVal) => onChange({ ...item, questionB: newVal })}
           />
           <EditableField
-            label="গ. Question C (Application)"
-            value={item.questionC}
-            placeholder="Question C stem..."
-            onSave={(newVal) => onChange({ ...item, questionC: newVal })}
+            label="গ. Question C (Application) (Optional)"
+            value={item.questionC || ""}
+            placeholder="Question C stem (optional)..."
+            onSave={(newVal) => onChange({ ...item, questionC: newVal || undefined })}
           />
           <EditableField
             label="ঘ. Question D (Higher Ability)"
@@ -494,26 +496,47 @@ function EditableCqCard({
           />
         </div>
 
-        {/* References, Source, Year */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3">
+        {/* References, Source & Session */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3 items-center">
           <EditableField
             label="References (Comma-separated)"
             value={referenceString}
             placeholder="e.g. Board 2024..."
             onSave={handleSaveReferences}
           />
-          <EditableField
-            label="Source / Board"
-            value={item.source || ""}
-            placeholder="e.g. Dhaka Board..."
-            onSave={(newVal) => onChange({ ...item, source: newVal || undefined })}
-          />
-          <EditableField
-            label="Year"
-            value={item.year ? String(item.year) : ""}
-            placeholder="e.g. 2024..."
-            onSave={(newVal) => onChange({ ...item, year: newVal && !isNaN(Number(newVal)) ? Number(newVal) : undefined })}
-          />
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Source (উৎস)
+            </span>
+            <Select
+              value={item.source || DEFAULT_SOURCE}
+              onValueChange={(val) => onChange({ ...item, source: val })}
+            >
+              <SelectTrigger className="w-full bg-white h-9 text-xs">
+                <SelectValue placeholder="Select Source..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+                {CQ_SOURCE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+              Session (শিক্ষাবর্ষ)
+            </span>
+            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
+              <span>{item.session || (item.year ? String(item.year) : new Date().getFullYear())}</span>
+              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+                Auto Current Year
+              </Badge>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
@@ -528,6 +551,7 @@ export function ImportCqView() {
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
@@ -544,6 +568,17 @@ export function ImportCqView() {
   const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
   const questionTypes = questionTypesData?.questionTypes ?? []
 
+  const handleSourceChange = (sourceVal: string) => {
+    setSelectedSource(sourceVal)
+    if (parsedItems.length > 0) {
+      const updated = parsedItems.map((item) => ({
+        ...item,
+        source: item.source || sourceVal,
+      }))
+      syncParsedItemsToText(updated)
+    }
+  }
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -553,7 +588,7 @@ export function ImportCqView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
       }
     }
     reader.readAsText(file)
@@ -563,7 +598,8 @@ export function ImportCqView() {
     text: string,
     overrideClassId: string,
     overrideSubjectId: string,
-    overrideChapterId: string
+    overrideChapterId: string,
+    overrideSource?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -607,6 +643,8 @@ export function ImportCqView() {
         return
       }
 
+      const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
+      const currentYear = new Date().getFullYear().toString()
       const validated: any[] = []
       const errors: string[] = []
 
@@ -621,8 +659,8 @@ export function ImportCqView() {
         if (!item.questionB || typeof item.questionB !== "string") {
           errors.push(`Item #${itemNum}: Missing or invalid 'questionB' stem.`)
         }
-        if (!item.questionC || typeof item.questionC !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'questionC' stem.`)
+        if (item.questionC && typeof item.questionC !== "string") {
+          errors.push(`Item #${itemNum}: Invalid 'questionC' stem.`)
         }
         if (!subjectId) {
           errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
@@ -656,11 +694,12 @@ export function ImportCqView() {
           context: item.context?.trim() || null,
           questionA: String(item.questionA || "").trim(),
           questionB: String(item.questionB || "").trim(),
-          questionC: String(item.questionC || "").trim(),
+          questionC: item.questionC ? String(item.questionC).trim() : null,
           questionD: item.questionD?.trim() || null,
           difficulty: item.difficulty || "MEDIUM",
           year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
-          source: item.source?.trim() || null,
+          source: item.source ? String(item.source).trim() : currentDefaultSource,
+          session: item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear),
           reference: Array.isArray(item.reference) ? item.reference : [],
           isActive: item.isActive !== false,
           attachments: mappedAttachments,
@@ -688,7 +727,7 @@ export function ImportCqView() {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
     toast.success("Attempted JSON syntax repair & formatting!")
   }
 
@@ -701,7 +740,7 @@ export function ImportCqView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId)
+    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -710,7 +749,7 @@ export function ImportCqView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "")
+      validateAndParseJson(jsonText, value, "", "", selectedSource)
     }
   }
 
@@ -719,7 +758,7 @@ export function ImportCqView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "")
+      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
     }
   }
 
@@ -727,7 +766,7 @@ export function ImportCqView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value)
+      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
     }
   }
 
@@ -756,6 +795,7 @@ export function ImportCqView() {
   }
 
   const handleAddNewQuestionCard = () => {
+    const currentYear = new Date().getFullYear().toString()
     const newCq = {
       context: "উদ্দীপক...",
       questionA: "ক. নতুন প্রশ্ন",
@@ -763,6 +803,8 @@ export function ImportCqView() {
       questionC: "গ. নতুন প্রশ্ন",
       questionD: "ঘ. নতুন প্রশ্ন",
       difficulty: "MEDIUM",
+      source: selectedSource || DEFAULT_SOURCE,
+      session: currentYear,
       isActive: true,
       reference: [],
       answer: {
@@ -789,13 +831,19 @@ export function ImportCqView() {
     }
 
     try {
+      const currentYear = new Date().getFullYear().toString()
       const payload = parsedItems.map((item) => {
         const marksObj = {
           a: item.marks?.a || 1,
           b: item.marks?.b || 2,
-          c: item.marks?.c || 3,
+          c: item.questionC ? (item.marks?.c || 3) : 0,
           d: item.questionD ? (item.marks?.d || 4) : 0,
         }
+
+        const sessionVal = item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear)
+        const parsedYear = item.year !== undefined && item.year !== null
+          ? Number(item.year)
+          : (!isNaN(Number(sessionVal)) ? Number(sessionVal) : null)
 
         return {
           classId: selectedAcademicClassId,
@@ -804,11 +852,12 @@ export function ImportCqView() {
           context: item.context?.trim() || null,
           questionA: item.questionA.trim(),
           questionB: item.questionB.trim(),
-          questionC: item.questionC.trim(),
+          questionC: item.questionC?.trim() || null,
           questionD: item.questionD?.trim() || null,
           difficulty: item.difficulty as any,
-          year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
-          source: item.source?.trim() || null,
+          year: parsedYear,
+          source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
+          session: sessionVal,
           reference: Array.isArray(item.reference) ? item.reference : [],
           isActive: item.isActive !== false,
           marks: marksObj,
@@ -902,8 +951,8 @@ export function ImportCqView() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject & Chapter 3-Column Dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Academic Class, Subject, Chapter & Source Dropdowns */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
               <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
@@ -972,6 +1021,28 @@ export function ImportCqView() {
                   {chapters.map((ch) => (
                     <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
                       {ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source Select */}
+            <div className="space-y-2">
+              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
+                Source (উৎস) *
+              </Label>
+              <Select
+                value={selectedSource}
+                onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
+              >
+                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
+                  <SelectValue placeholder="Select Source..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                  {CQ_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

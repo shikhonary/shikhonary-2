@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { CQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const createCqFormSchema = z.object({
   classId: z.string().min(1, "Please select an academic class"),
@@ -31,7 +32,7 @@ const createCqFormSchema = z.object({
   context: z.string().optional(),
   questionA: z.string().min(1, "Question A text is required"),
   questionB: z.string().min(1, "Question B text is required"),
-  questionC: z.string().min(1, "Question C text is required"),
+  questionC: z.string().optional(),
   questionD: z.string().optional(),
   answerA: z.string().optional(),
   answerB: z.string().optional(),
@@ -42,6 +43,7 @@ const createCqFormSchema = z.object({
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   year: z.string().optional(),
   source: z.string().optional(),
+  session: z.string().optional(),
   questionTypeId: z.string().optional(),
   isActive: z.boolean(),
   marksA: z.string(),
@@ -87,7 +89,8 @@ export function CreateCqView() {
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       year: "",
-      source: "",
+      source: DEFAULT_SOURCE,
+      session: String(new Date().getFullYear()),
       questionTypeId: "",
       isActive: true,
       marksA: "1",
@@ -119,12 +122,16 @@ export function CreateCqView() {
             .filter((r) => r.length > 0)
         : []
 
-      const parsedYear = data.year && !isNaN(Number(data.year)) ? Number(data.year) : null
+      const parsedYear = data.year && !isNaN(Number(data.year))
+        ? Number(data.year)
+        : data.session && !isNaN(Number(data.session))
+        ? Number(data.session)
+        : null
 
       const marksObj = {
         a: Number(data.marksA) || 1,
         b: Number(data.marksB) || 2,
-        c: Number(data.marksC) || 3,
+        c: data.questionC ? (Number(data.marksC) || 3) : 0,
         d: data.questionD ? (Number(data.marksD) || 4) : 0,
       }
 
@@ -134,11 +141,12 @@ export function CreateCqView() {
         context: data.context?.trim() || null,
         questionA: data.questionA.trim(),
         questionB: data.questionB.trim(),
-        questionC: data.questionC.trim(),
+        questionC: data.questionC?.trim() || null,
         questionD: data.questionD?.trim() || null,
         difficulty: data.difficulty,
         year: parsedYear,
-        source: data.source?.trim() || null,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: data.session?.trim() || null,
         reference: referenceArray,
         questionTypeId: data.questionTypeId || null,
         isActive: data.isActive,
@@ -411,7 +419,7 @@ export function CreateCqView() {
                 {/* Question C */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
                   <div className="md:col-span-3 space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface">গ. Application Question Stem (C) *</Label>
+                    <Label className="font-bold text-xs text-on-surface">গ. Application Question Stem (C) (Optional)</Label>
                     <Input
                       type="text"
                       disabled={isSubmitting}
@@ -598,29 +606,51 @@ export function CreateCqView() {
                 {/* Source */}
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Source / Board (Optional)
+                    Source (উৎস)
                   </Label>
-                  <Input
-                    type="text"
-                    disabled={isSubmitting}
-                    placeholder="e.g. Dhaka Board, Rajshahi Board"
-                    {...register("source")}
-                    className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={isSubmitting}
+                        value={field.value || DEFAULT_SOURCE}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface h-10 justify-between focus-visible:outline-hidden cursor-pointer text-sm">
+                          <SelectValue placeholder="Select Source..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
+                          {CQ_SOURCE_OPTIONS.map((opt) => (
+                            <SelectItem
+                              key={opt.value}
+                              value={opt.value}
+                              className="text-neutral-900 text-xs"
+                            >
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                 </div>
 
-                {/* Year */}
+                {/* Session */}
                 <div className="space-y-2">
                   <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Exam Year (Optional)
+                    Session / Year (Optional)
                   </Label>
                   <Input
-                    type="number"
                     disabled={isSubmitting}
-                    placeholder="e.g. 2024"
-                    {...register("year")}
-                    className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
+                    type="text"
+                    placeholder="e.g. 2026, 2025-26..."
+                    {...register("session")}
+                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm text-on-surface h-10"
                   />
+                  {errors.session && (
+                    <p className="text-xs text-error">{errors.session.message}</p>
+                  )}
                 </div>
 
                 {/* References */}

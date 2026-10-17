@@ -22,12 +22,14 @@ const FillInTheBlanksWithoutCluesEditableText = ({
   text, 
   itemKey, 
   defaultStyle,
-  className = ""
+  className = "",
+  isMath = false,
 }: { 
   text: string, 
   itemKey: string, 
   defaultStyle: any,
-  className?: string
+  className?: string,
+  isMath?: boolean,
 }) => {
   const [isActive, setIsActive] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ const FillInTheBlanksWithoutCluesEditableText = ({
           fontWeight: mergedStyle.fontWeight,
         }}
       >
-        <RenderFillInTheBlanksContent text={text} />
+        <RenderFillInTheBlanksContent text={text} isMath={isMath} />
       </div>
     </div>
   );
@@ -317,6 +319,7 @@ export const FillInTheBlanksWithoutCluesBlock = ({ item }: { item: any }) => {
             <div className="flex-1 w-full min-w-0">
               <FillInTheBlanksWithoutCluesEditableText 
                 text={data.content || ""}
+                isMath={data.isMath}
                 itemKey={`${item.id}-question`}
                 defaultStyle={questionStyle}
                 className="m-0 w-full whitespace-pre-wrap leading-relaxed"

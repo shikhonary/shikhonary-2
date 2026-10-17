@@ -370,7 +370,7 @@ export function EditPunctuationView({ id: propId }: { id?: string } = {}) {
                   render={({ field }) => (
                     <Select value={field.value || ""} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-                        <SelectValue placeholder="উৎস নির্বাচন করুন (যেমন: গাইড বুক, বোর্ড প্রশ্ন)" />
+                        <SelectValue placeholder="উৎস নির্বাচন করুন (যেমন: গাইড বুক, বোর্ড বই)" />
                       </SelectTrigger>
                       <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-60">
                         {PUNCTUATION_SOURCE_OPTIONS.map((opt) => (

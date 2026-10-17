@@ -253,7 +253,7 @@ export const QUESTION_DIFFICULTY_OPTIONS = [
 
 export const QUESTION_SOURCE_OPTIONS = [
   { value: "গাইড বুক", label: "গাইড বুক" },
-  { value: "বোর্ড প্রশ্ন", label: "বোর্ড প্রশ্ন" },
+  { value: "বোর্ড বই", label: "বোর্ড বই" },
   { value: "শীর্ষস্থানীয় স্কুল", label: "শীর্ষস্থানীয় স্কুল" },
   { value: "সহায়ক সংকলন", label: "সহায়ক সংকলন" },
   { value: "বৃত্তি সহায়িকা", label: "বৃত্তি সহায়িকা" },

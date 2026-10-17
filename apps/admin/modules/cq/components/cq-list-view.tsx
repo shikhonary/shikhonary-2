@@ -43,6 +43,21 @@ export function CqListView() {
   const openDeleteModal = useDeleteCqModalStore((state) => state.openModal)
   const openBulkDeleteModal = useDeleteCqModalStore((state) => state.openBulkModal)
 
+  // Parse filters
+  let boardSource: string | undefined = undefined
+  let boardYear: number | undefined = undefined
+  if (selectedBoard && selectedBoard !== "All") {
+    const parts = selectedBoard.split("-")
+    const yearPart = parts[parts.length - 1]
+    const sourcePart = parts.slice(0, parts.length - 1).join("-")
+    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
+      boardSource = sourcePart
+      boardYear = Number(yearPart)
+    } else {
+      boardSource = selectedBoard
+    }
+  }
+
   // Query CQs list with search & filters
   const { data: cqsData, isLoading, isError } = useCqsList({
     limit,
@@ -51,6 +66,8 @@ export function CqListView() {
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
+    source: boardSource,
+    year: boardYear,
     difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
     sort: selectedSort,
   })

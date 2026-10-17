@@ -35,7 +35,7 @@ const editFillInTheBlanksWithCluesFormSchema = z.object({
   subjectId: z.string().min(1, "Please select a subject"),
   chapterId: z.string().optional(),
   content: z.string().optional(),
-  options: z.array(z.object({ value: z.string() })).optional().default([]),
+  options: z.array(z.object({ value: z.string() })),
   cluesText: z.string().optional(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
@@ -220,7 +220,7 @@ export function EditFillInTheBlanksWithCluesView({ id: propId }: { id?: string }
   const { data: chapters = [] } = useChaptersForSelection(
     selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
   )
-  const contentValue = watch("content")
+  const contentValue = watch("content") || ""
   const watchedOptions = watch("options")
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting

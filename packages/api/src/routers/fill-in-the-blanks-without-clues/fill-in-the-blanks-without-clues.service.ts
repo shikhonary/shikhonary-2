@@ -38,7 +38,7 @@ async function resolveFillInTheBlanksWithoutCluesQuestionTypeId(db: any) {
 }
 
 export async function listFillInTheBlanksWithoutClues(db: PrismaClient, input: ListFillInTheBlanksWithoutCluesInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
+  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, isMath, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -51,6 +51,7 @@ export async function listFillInTheBlanksWithoutClues(db: PrismaClient, input: L
   if (difficulty) where.difficulty = difficulty
   if (source) where.source = source
   if (session) where.session = session
+  if (typeof isMath === "boolean") where.isMath = isMath
 
   if (query) {
     where.OR = [
@@ -166,6 +167,7 @@ export async function createFillInTheBlanksWithoutClues(
       reference: data.reference ?? [],
       source: data.source ? data.source.trim() : "গাইড বুক",
       session: data.session ? data.session.trim() : currentYear,
+      isMath: data.isMath ?? false,
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
@@ -231,6 +233,10 @@ export async function updateFillInTheBlanksWithoutClues(
 
   if (data.session !== undefined) {
     updateData.session = data.session ? data.session.trim() : currentYear
+  }
+
+  if (data.isMath !== undefined) {
+    updateData.isMath = data.isMath
   }
 
   const updated = await db.fillInTheBlanksWithoutClues.update({
@@ -304,6 +310,7 @@ export async function importFillInTheBlanksWithoutClues(
             reference: data.reference || [],
             source: itemSource,
             session: itemSession,
+            isMath: data.isMath ?? false,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
