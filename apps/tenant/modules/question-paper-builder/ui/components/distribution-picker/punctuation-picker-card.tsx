@@ -4,6 +4,8 @@ import React from "react";
 import { RenderPunctuationContent } from "../blocks/punctuation-block";
 import { PickerCardWrapper } from "./picker-card-wrapper";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { isResourceEnglish } from "@workspace/utils";
+import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
 
 interface PunctuationPickerCardProps {
   question: any;
@@ -26,15 +28,20 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
-  const chapterName =
-    q.academicChapter?.nameBn ||
-    q.academicChapter?.nameEn ||
-    q.chapter?.nameBn ||
-    q.chapter?.nameEn;
-
   const mainText = q.rawText || q.content || q.prompt || "";
   const promptText = q.prompt && q.prompt !== q.rawText && q.prompt !== q.content ? q.prompt : "";
   const answerText = q.answerText || q.answer || "";
+
+  const isEnglish = isResourceEnglish({
+    subjectName: q.academicSubject?.nameEn || q.subject?.nameEn || q.academicSubject?.nameBn || q.subject?.nameBn,
+    content: mainText,
+  });
+
+  const rawChapterName = isEnglish
+    ? (q.academicChapter?.nameEn || q.chapter?.nameEn || q.academicChapter?.nameBn || q.chapter?.nameBn)
+    : (q.academicChapter?.nameBn || q.academicChapter?.nameEn || q.chapter?.nameBn || q.chapter?.nameEn);
+
+  const chapterName = rawChapterName && isEnglish ? translateTag(rawChapterName) : rawChapterName;
 
   return (
     <PickerCardWrapper
@@ -44,6 +51,8 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={q.difficulty}
+      typeLabel={isEnglish ? "Punctuation" : "বিরাম চিহ্ন"}
+      language={isEnglish ? "en" : "bn"}
     >
       <div className="flex flex-col gap-2.5 font-body">
         {/* Optional Prompt header if present */}
@@ -71,8 +80,8 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
           <div className="flex flex-wrap items-center gap-1.5">
             {(q.source || q.session) && (
               <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
+                📚 {isEnglish ? translateTag(q.source || "Textbook") : (q.source || "N/A")}
+                {q.session ? ` (${isEnglish ? toEnglishDigits(q.session) : toBengaliDigits(q.session)})` : ""}
               </span>
             )}
             {Array.isArray(q.reference) && q.reference.length > 0 ? (
@@ -81,13 +90,13 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
                   key={rIdx}
                   className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
                 >
-                  🏷️ {ref}
+                  🏷️ {isEnglish ? translateTag(ref) : ref}
                 </span>
               ))
             ) : (
               !(q.source || q.session) && (
                 <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
+                  {isEnglish ? "No reference tags" : "কোনো রেফারেন্স ট্যাগ নেই"}
                 </span>
               )
             )}

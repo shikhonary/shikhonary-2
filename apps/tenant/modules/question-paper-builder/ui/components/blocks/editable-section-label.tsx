@@ -21,6 +21,7 @@ interface EditableSectionLabelProps {
   questionType?: string;
   questionCount?: number | null;
   questionsToAttempt?: number | null;
+  hideTrailingColon?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -56,9 +57,15 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "SADHU_TO_CHOLITO" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত"))) return true;
   if (questionType === "POD_NIRNOY" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত") || l.includes("সাধু") || l.includes("চলিত"))) return true;
   if (questionType === "VERB_TENSE" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত") || l.includes("সাধু") || l.includes("চলিত"))) return true;
+  if (questionType === "NUMBER_IN_WORDS" && (l.includes("কথায়") || l.includes("কথায়") || l.includes("সংখ্যা") || l.includes("শব্দার্থ") || l.includes("অনুচ্ছেদ"))) return true;
   if (questionType === "MAKE_QUESTION" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "CORRECT_ANSWER" && (l === "correct_answer" || l === "correct answer" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (questionType === "MATH_QUESTION" && (l === "math_question" || l === "math question" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "GRAMMAR_QUESTION" && (l === "grammar_question" || l === "grammar question" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
+  if (
+    (questionType === "SEEN_COMPREHENSION_1" || questionType === "SEEN_COMPREHENSION_2" || questionType === "SEEN_COMPREHENSION") &&
+    (l.includes("seen comprehension") || l.includes("সীন কম্প্রিহেনশন") || l.includes("seen_comprehension") || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম"))
+  ) return true;
   return false;
 };
 
@@ -69,6 +76,7 @@ export const EditableSectionLabel = ({
   questionType,
   questionCount,
   questionsToAttempt,
+  hideTrailingColon = false,
   className = "",
   style = {},
 }: EditableSectionLabelProps) => {
@@ -77,7 +85,20 @@ export const EditableSectionLabel = ({
 
   // Resolve active label text
   const cleanInitial = initialLabel && initialLabel.trim() !== "" ? initialLabel.trim() : null;
-  const effectiveLabel = cleanInitial && !isMismatchedLabel(cleanInitial, questionType) ? cleanInitial : fallbackLabel;
+  const isLanguageMismatch = cleanInitial ? (
+    (!/[\u0980-\u09FF]/.test(fallbackLabel) && (
+      cleanInitial.includes("বিরাম চিহ্ন") || 
+      cleanInitial.includes("যতিচিহ্ন") || 
+      cleanInitial.includes("কথায় লেখ") || 
+      cleanInitial.includes("কথায় লেখ")
+    )) ||
+    (/[\u0980-\u09FF]/.test(fallbackLabel) && (
+      cleanInitial.toLowerCase().includes("punctuation") || 
+      cleanInitial.toLowerCase().includes("capitalization")
+    ))
+  ) : false;
+
+  const effectiveLabel = cleanInitial && !isMismatchedLabel(cleanInitial, questionType) && !isLanguageMismatch ? cleanInitial : fallbackLabel;
 
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(effectiveLabel);
@@ -138,12 +159,20 @@ export const EditableSectionLabel = ({
     questionsToAttempt > 0 &&
     questionCount > questionsToAttempt;
 
-  const attemptSuffix = hasAttemptDiff && !value.includes("যেকোনো")
-    ? ` (যেকোনো ${toBengaliDigits(questionsToAttempt)}টি)`
+  const isEnglishQuestion = !/[\u0980-\u09FF]/.test(value);
+
+  const attemptSuffix = hasAttemptDiff && !value.includes("যেকোনো") && !value.toLowerCase().includes("any")
+    ? isEnglishQuestion
+      ? ` (any ${questionsToAttempt})`
+      : ` (যেকোনো ${toBengaliDigits(questionsToAttempt)}টি)`
     : "";
 
   const baseLabel = value.replace(/[:।]$/, "").trim();
-  const trailingChar = value.endsWith("।") ? "।" : ":";
+  const isSeenComp =
+    questionType === "SEEN_COMPREHENSION_1" ||
+    questionType === "SEEN_COMPREHENSION_2" ||
+    questionType === "SEEN_COMPREHENSION";
+  const trailingChar = hideTrailingColon || isSeenComp ? "" : value.endsWith("।") ? "।" : ":";
   const formattedDisplay = `${baseLabel}${trailingChar}${attemptSuffix}`;
 
   if (isEditing) {

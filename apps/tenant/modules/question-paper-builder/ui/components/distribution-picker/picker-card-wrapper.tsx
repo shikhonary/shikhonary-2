@@ -14,6 +14,7 @@ interface PickerCardWrapperProps {
   chapterName?: string | null;
   typeLabel?: string | null;
   difficulty?: string | null;
+  language?: "bn" | "en";
   extraBadges?: React.ReactNode;
   footerLeft?: React.ReactNode;
   footerRight?: React.ReactNode;
@@ -34,11 +35,13 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   chapterName,
   typeLabel,
   difficulty,
+  language = "bn",
   extraBadges,
   footerLeft,
   footerRight,
   children,
 }) => {
+  const isEn = language === "en";
   return (
     <article
       onClick={() => {
@@ -103,7 +106,9 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
                   difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800/40"
                 )}
               >
-                {DIFFICULTY_BN_MAP[difficulty.toUpperCase()] || difficulty}
+                {isEn
+                  ? (difficulty ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase() : "")
+                  : (DIFFICULTY_BN_MAP[difficulty.toUpperCase()] || difficulty)}
               </span>
             )}
             {extraBadges}
@@ -114,7 +119,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
             {isAssigned ? (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300/70 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs font-headline">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="hidden sm:inline">যুক্ত</span>
+                <span className="hidden sm:inline">{isEn ? "Added" : "যুক্ত"}</span>
               </div>
             ) : (
               <div
@@ -146,16 +151,16 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
           ) : isAssigned ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40 font-headline">
               <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              <span>যুক্ত রয়েছে</span>
+              <span>{isEn ? "Already added" : "যুক্ত রয়েছে"}</span>
             </span>
           ) : isSelected ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800/40 font-headline">
               <Check className="h-3.5 w-3.5 shrink-0" />
-              <span>নির্বাচিত</span>
+              <span>{isEn ? "Selected" : "নির্বাচিত"}</span>
             </span>
           ) : (
             <span className="text-slate-400 dark:text-muted-foreground font-medium text-xs font-body">
-              প্রশ্ন নির্বাচন
+              {isEn ? "Select question" : "প্রশ্ন নির্বাচন"}
             </span>
           )}
         </div>
@@ -166,7 +171,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
             footerRight
           ) : isAssigned ? (
             <span className="text-xs font-medium text-muted-foreground italic font-body">
-              প্রশ্নপত্রে বিদ্যমান
+              {isEn ? "Already in paper" : "প্রশ্নপত্রে বিদ্যমান"}
             </span>
           ) : isSelected ? (
             <Button
@@ -176,7 +181,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
               className="h-8 px-3 rounded-lg text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 gap-1.5 transition-all cursor-pointer font-headline active:scale-95"
             >
               <X className="w-3.5 h-3.5" />
-              <span>বাছাই বাতিল</span>
+              <span>{isEn ? "Deselect" : "বাছাই বাতিল"}</span>
             </Button>
           ) : (
             <Button
@@ -186,7 +191,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
               className="h-8 px-3 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 hover:text-primary gap-1.5 group-hover:translate-x-0.5 transition-all cursor-pointer font-headline active:scale-95"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>বাছাই করুন</span>
+              <span>{isEn ? "Select" : "বাছাই করুন"}</span>
               <ArrowRight className="w-3 h-3" />
             </Button>
           )}

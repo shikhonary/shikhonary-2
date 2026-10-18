@@ -71,6 +71,8 @@ import { synonymRouter } from "./routers/synonym/synonym.router"
 import { formFillupRouter } from "./routers/form-fillup/form-fillup.router"
 import { shuddhoAshuddhoRouter } from "./routers/shuddho-ashuddho/shuddho-ashuddho.router"
 import { danBamMilkoronRouter } from "./routers/dan-bam-milkoron/dan-bam-milkoron.router"
+import { seenComprehensionRouter } from "./routers/seen-comprehension/seen-comprehension.router"
+import { numberInWordsRouter } from "./routers/number-in-words/number-in-words.router"
 
 export const appRouter = createTRPCRouter({
   health: healthRouter,
@@ -138,6 +140,9 @@ export const appRouter = createTRPCRouter({
   formFilling: formFillupRouter,
   shuddhoAshuddho: shuddhoAshuddhoRouter,
   danBamMilkoron: danBamMilkoronRouter,
+  seenComprehension: seenComprehensionRouter,
+  numberInWords: numberInWordsRouter,
+  numbersInWord: numberInWordsRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

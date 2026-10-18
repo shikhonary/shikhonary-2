@@ -42,6 +42,7 @@ const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   SHORT_QUESTION: "shortQuestionIds",
   MAKE_QUESTION: "makeQuestionIds",
   WORD_MEANING: "wordMeaningIds",
+  NUMBER_IN_WORDS: "numberInWordsIds",
   JUKTOBORNO: "juktobornoIds",
   EK_KOTHAY_PROKASH: "ekKothayProkashIds",
   MAKE_SENTENCES: "makeSentencesIds",
@@ -54,7 +55,10 @@ const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   FORM_FILLING: "formFillupIds",
   SHUDDHO_ASHUDDHO: "shuddhoAshuddhoIds",
   DAN_BAM_MILKORON: "danBamMilkoronIds",
+  MATH_QUESTION: "mathQuestionIds",
   GRAMMAR_QUESTION: "grammarQuestionIds",
+  SEEN_COMPREHENSION_1: "seenComprehensionIds",
+  SEEN_COMPREHENSION_2: "seenComprehensionIds",
 };
 
 const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
@@ -86,6 +90,7 @@ const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
   SHORT_QUESTION: "shortQuestionId",
   MAKE_QUESTION: "makeQuestionId",
   WORD_MEANING: "wordMeaningId",
+  NUMBER_IN_WORDS: "numberInWordsId",
   JUKTOBORNO: "juktobornoId",
   EK_KOTHAY_PROKASH: "ekKothayProkashId",
   MAKE_SENTENCES: "makeSentencesId",
@@ -98,7 +103,10 @@ const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
   FORM_FILLING: "formFillupId",
   SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
   DAN_BAM_MILKORON: "danBamMilkoronId",
+  MATH_QUESTION: "mathQuestionId",
   GRAMMAR_QUESTION: "grammarQuestionId",
+  SEEN_COMPREHENSION_1: "seenComprehensionId",
+  SEEN_COMPREHENSION_2: "seenComprehensionId",
 };
 
 /**

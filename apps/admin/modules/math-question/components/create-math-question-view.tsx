@@ -18,6 +18,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
+import { Switch } from "@workspace/ui/components/switch"
 import {
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ const createMathQuestionFormSchema = z.object({
   chapterId: z.string().min(1, "Please select a chapter"),
   question: z.string().min(1, "Question text is required"),
   answer: z.string().optional(),
+  isMath: z.boolean(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
   source: z.string().optional(),
@@ -63,6 +65,7 @@ export function CreateMathQuestionView() {
       chapterId: "",
       question: "",
       answer: "",
+      isMath: false,
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
       source: DEFAULT_SOURCE,
@@ -99,6 +102,7 @@ export function CreateMathQuestionView() {
         chapterId: data.chapterId,
         question: data.question.trim(),
         answer: data.answer?.trim() || null,
+        isMath: data.isMath,
         difficulty: data.difficulty,
         reference: referenceArray,
         source: data.source?.trim() || null,
@@ -358,6 +362,29 @@ export function CreateMathQuestionView() {
               <p className="text-[11px] text-outline">
                 Separate multiple references with commas.
               </p>
+            </div>
+            {/* Settings (Math Switch) */}
+            <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
+              <div>
+                <Label className="block font-headline text-sm font-bold text-on-surface">
+                  Math / LaTeX Formula (isMath)
+                </Label>
+                <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
+                  Enable LaTeX math rendering mode for mathematical equations and symbols in question & solution.
+                </span>
+              </div>
+              <Controller
+                name="isMath"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSubmitting}
+                    className="cursor-pointer"
+                  />
+                )}
+              />
             </div>
 
             {/* Form Action Buttons */}

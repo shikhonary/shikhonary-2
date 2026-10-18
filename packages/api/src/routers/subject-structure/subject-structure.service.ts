@@ -38,7 +38,7 @@ export async function saveSubjectStructure(
       // 2a. Insert direct question types if there are no sub-sections
       if (sec.questionTypes && sec.questionTypes.length > 0) {
         await tx.subjectQuestionType.createMany({
-          data: sec.questionTypes.map((qt) => ({
+          data: sec.questionTypes.map((qt, idx) => ({
             subjectId,
             sectionId: createdSection.id,
             questionTypeId: qt.questionTypeId,
@@ -46,6 +46,7 @@ export async function saveSubjectStructure(
             mark: qt.mark,
             requiredCount: qt.requiredCount,
             totalQuestions: qt.totalQuestions,
+            position: typeof qt.position === "number" ? qt.position : idx,
             markDistribution: qt.markDistribution ?? undefined,
           })),
         })
@@ -65,7 +66,7 @@ export async function saveSubjectStructure(
 
         if (sub.questionTypes && sub.questionTypes.length > 0) {
           await tx.subjectQuestionType.createMany({
-            data: sub.questionTypes.map((qt) => ({
+            data: sub.questionTypes.map((qt, idx) => ({
               subjectId,
               sectionId: createdSection.id,
               subSectionId: createdSubSection.id,
@@ -74,6 +75,7 @@ export async function saveSubjectStructure(
               mark: qt.mark,
               requiredCount: qt.requiredCount,
               totalQuestions: qt.totalQuestions,
+              position: typeof qt.position === "number" ? qt.position : idx,
               markDistribution: qt.markDistribution ?? undefined,
             })),
           })

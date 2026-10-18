@@ -125,13 +125,33 @@ export async function upsertQuestionPaperDistribution(
       },
     })
   } else {
+    const paperSubject = await tenantDb.questionPaperSubject.findUnique({
+      where: { id: input.paperSubjectId },
+      select: { subjectName: true },
+    })
+    const isEnglishSubject = /english|ইংরেজি/i.test(paperSubject?.subjectName || "")
+    const isInputNameEng = input.questionTypeName && !/[\u0980-\u09FF]/.test(input.questionTypeName)
+    const isInputLabelEng = input.questionTypeLabel && !/[\u0980-\u09FF]/.test(input.questionTypeLabel)
+    const isCustomLabelEng = sqType?.customLabel && !/[\u0980-\u09FF]/.test(sqType.customLabel)
+
+    const resolvedTypeName = isEnglishSubject
+      ? ((isInputNameEng ? input.questionTypeName : null) || qType?.nameEn || qType?.nameBn || "")
+      : (qType?.nameBn || input.questionTypeName || qType?.nameEn || "")
+
+    const resolvedTypeLabel = isEnglishSubject
+      ? ((isInputLabelEng ? input.questionTypeLabel : null) ||
+         (isCustomLabelEng ? sqType?.customLabel : null) ||
+         qType?.nameEn ||
+         null)
+      : (input.questionTypeLabel || sqType?.customLabel || qType?.nameBn || qType?.nameEn || null)
+
     dist = await tenantDb.questionPaperSubjectMarkDistribution.create({
       data: {
         paperSubjectId: input.paperSubjectId,
         questionTypeId: input.questionTypeId,
-        questionTypeName: input.questionTypeName,
+        questionTypeName: resolvedTypeName,
         questionTypeNameBn: input.questionTypeNameBn ?? qType?.nameBn ?? null,
-        questionTypeLabel: input.questionTypeLabel,
+        questionTypeLabel: resolvedTypeLabel,
         marksPerQuestion: input.marksPerQuestion,
         markDistribution: markDistribution as any,
         questionCount: input.questionCount,

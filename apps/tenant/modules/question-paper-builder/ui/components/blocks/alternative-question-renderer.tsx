@@ -172,6 +172,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const mcq = alt.mcq;
         const descriptiveQuestion = alt.descriptiveQuestion;
         const shortQuestion = alt.shortQuestion;
+        const numberInWords = alt.numberInWords;
         const wordMeaning = alt.wordMeaning;
         const makeSentences = alt.makeSentences;
         const oppositeWord = alt.oppositeWord;
@@ -181,6 +182,9 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const verbTense = alt.verbTense;
         const shuddhoAshuddho = alt.shuddhoAshuddho;
         const danBamMilkoron = alt.danBamMilkoron;
+        const mathQuestion = alt.mathQuestion;
+        const grammarQuestion = alt.grammarQuestion;
+        const seenComprehension = alt.seenComprehension;
 
         return (
           <div key={alt.id} className="w-full flex flex-col group/alt relative">
@@ -274,14 +278,15 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         {renderNumberSpacer()}
                         <div className="flex-1 w-full min-w-0">
                           <div
-                            className="m-0 w-full whitespace-pre-wrap font-normal text-foreground"
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
                             style={{
                               fontSize: questionStyle.fontSize,
                               fontFamily: questionStyle.fontFamily,
                               lineHeight: questionStyle.lineHeight,
+                              fontWeight: "bold",
                             }}
                           >
-                            <RenderMath text={formattedPrompt} />
+                            <RenderMath text={formattedPrompt} className="font-bold" />
                           </div>
                         </div>
                       </div>
@@ -1044,6 +1049,149 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 5.2 EXACT SEEN COMPREHENSION BLOCK REPRESENTATION */}
+              {seenComprehension && (() => {
+                const compDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === seenComprehension.questionTypeId ||
+                      d.questionTypeName?.toLowerCase().includes("seen") ||
+                      d.questionTypeName?.includes("পাঠ্যবই")
+                  ) || alt.distribution;
+
+                const rawLabel = compDist?.questionTypeLabel || compDist?.questionTypeName || seenComprehension.questionType?.label;
+                const compLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
+                const questions: any[] = Array.isArray(seenComprehension.questions) ? seenComprehension.questions : [];
+                const groupedQuestions = questions.reduce((acc: Record<number, any[]>, q: any) => {
+                  const gNum = q.groupNumber || 1;
+                  if (!acc[gNum]) acc[gNum] = [];
+                  acc[gNum].push(q);
+                  return acc;
+                }, {});
+                const groupKeys = Object.keys(groupedQuestions).map(Number).sort((a, b) => a - b);
+
+                return (
+                  <div className="w-full flex flex-col">
+                    {compLabel && (
+                      <div
+                        className="font-bold ml-[0px] mb-0.5 flex items-baseline gap-1"
+                        style={{
+                          fontSize: questionStyle.fontSize,
+                          fontFamily: questionStyle.fontFamily,
+                        }}
+                      >
+                        {renderNumberSpacer()}
+                        <span>{compLabel}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2 items-start w-full">
+                      {!compLabel && renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        {seenComprehension.passage && (
+                          <div className="my-1.5">
+                            <div
+                              className="m-0 text-foreground whitespace-pre-wrap w-full mb-1 leading-relaxed text-justify"
+                              style={{
+                                fontSize: questionStyle.fontSize,
+                                fontFamily: questionStyle.fontFamily,
+                                lineHeight: questionStyle.lineHeight,
+                              }}
+                            >
+                              <RenderMath text={seenComprehension.passage} />
+                            </div>
+                          </div>
+                        )}
+
+                        {groupKeys.length > 0 && (
+                          <div className="flex flex-col gap-2.5 mt-1">
+                            {groupKeys.map((gNum) => {
+                              const groupItems = groupedQuestions[gNum] || [];
+                              const groupTitle = groupItems[0]?.groupTitle;
+
+                              return (
+                                <div key={gNum} className="flex flex-col gap-1.5">
+                                  {groupTitle && (
+                                    <div
+                                      className="font-bold text-on-surface mt-1"
+                                      style={{
+                                        fontSize: questionStyle.fontSize,
+                                        fontFamily: questionStyle.fontFamily,
+                                      }}
+                                    >
+                                      <RenderMath text={groupTitle} />
+                                    </div>
+                                  )}
+
+                                  <div className="flex flex-col gap-1.5 pl-2">
+                                    {groupItems.map((sq: any, sIdx: number) => {
+                                      const subLabel = sq.itemLabel || String.fromCharCode(97 + sIdx);
+                                      const rawOptions = typeof sq.options === "string" ? JSON.parse(sq.options || "[]") : sq.options || [];
+                                      const optionsList = Array.isArray(rawOptions) ? rawOptions : [];
+
+                                      return (
+                                        <div key={sq.id || sIdx} className="flex flex-col gap-1">
+                                          <div className="flex justify-between items-baseline gap-2">
+                                            <div
+                                              className="flex items-baseline gap-1.5 flex-1"
+                                              style={{
+                                                fontSize: questionStyle.fontSize,
+                                                fontFamily: questionStyle.fontFamily,
+                                                lineHeight: questionStyle.lineHeight,
+                                              }}
+                                            >
+                                              <span className="font-bold shrink-0 min-w-[1.6em]">
+                                                ({subLabel})
+                                              </span>
+                                              <span className="flex-1 font-body">
+                                                <RenderMath text={sq.question} />
+                                              </span>
+                                            </div>
+
+                                            {sq.marks !== undefined && sq.marks !== null && (
+                                              <span
+                                                className="text-muted-foreground font-semibold shrink-0"
+                                                style={{
+                                                  fontSize: questionStyle.fontSize,
+                                                  fontFamily: questionStyle.fontFamily,
+                                                }}
+                                              >
+                                                [{sq.marks}]
+                                              </span>
+                                            )}
+                                          </div>
+
+                                          {optionsList.length > 0 && (
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pl-6 text-xs text-on-surface-variant">
+                                              {optionsList.map((opt: any, oIdx: number) => {
+                                                const optText = typeof opt === "string" ? opt : opt.text || opt.label || "";
+                                                const optKey = opt.key || String.fromCharCode(105 + oIdx);
+                                                return (
+                                                  <div key={oIdx} className="flex gap-1 items-baseline">
+                                                    <span className="font-bold text-primary">({optKey})</span>
+                                                    <span><RenderMath text={optText} /></span>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 6. EXACT SHORT ANSWER BLOCK REPRESENTATION */}
               {sa && (() => {
                 const saDist =
@@ -1623,9 +1771,9 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
-              {/* 6.11 SYNONYM / OPPOSITE WORD / SADHU TO CHOLITO / VERB TENSE / MAKE SENTENCE / WORD MEANING REPRESENTATION */}
-              {(synonym || oppositeWord || sadhuToCholito || verbTense || makeSentences || wordMeaning) && (() => {
-                const wordText = verbTense?.verb || sadhuToCholito?.sadhuText || sadhuToCholito?.word || synonym?.word || oppositeWord?.word || makeSentences?.word || wordMeaning?.word || "";
+              {/* 6.11 NUMBER IN WORDS / SYNONYM / OPPOSITE WORD / SADHU TO CHOLITO / VERB TENSE / MAKE SENTENCE / WORD MEANING REPRESENTATION */}
+              {(numberInWords || synonym || oppositeWord || sadhuToCholito || verbTense || makeSentences || wordMeaning) && (() => {
+                const wordText = numberInWords?.number || verbTense?.verb || sadhuToCholito?.sadhuText || sadhuToCholito?.word || synonym?.word || oppositeWord?.word || makeSentences?.word || wordMeaning?.word || "";
                 return (
                   <div className="w-full flex justify-between items-start gap-2">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
@@ -1647,8 +1795,30 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 );
               })()}
 
+              {/* 6.5 MATH / GRAMMAR QUESTION */}
+              {(mathQuestion || grammarQuestion) && (
+                <div className="flex justify-between items-start gap-2 w-full">
+                  <div className="flex gap-2 items-start flex-1 min-w-0">
+                    {renderNumberSpacer()}
+                    <div className="flex-1 w-full min-w-0">
+                      <div
+                        className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                        style={{
+                          fontSize: questionStyle.fontSize,
+                          fontFamily: questionStyle.fontFamily,
+                          lineHeight: questionStyle.lineHeight,
+                          fontWeight: questionStyle.fontWeight || "bold",
+                        }}
+                      >
+                        <RenderMath text={mathQuestion?.question || grammarQuestion?.question || alt.contentSnapshot?.question || ""} className="font-bold" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !shuddhoAshuddho && !danBamMilkoron && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
+              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !seenComprehension && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !shuddhoAshuddho && !danBamMilkoron && !mathQuestion && !grammarQuestion && !numberInWords && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

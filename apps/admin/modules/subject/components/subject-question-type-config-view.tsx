@@ -13,7 +13,23 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { Loader2, Save, HelpCircle, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react"
+import { Loader2, Save, HelpCircle, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, GripVertical } from "lucide-react"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 import { useSubjectById, useSaveSubjectStructure } from "../services/use-subject"
 import { useQuestionTypesList } from "../../question-type/services/use-question-type"
@@ -25,6 +41,7 @@ const questionTypeConfigSchema = z.object({
   mark: z.coerce.number().min(0, "Mark must be at least 0"),
   requiredCount: z.coerce.number().int().min(0, "Required count must be at least 0"),
   totalQuestions: z.coerce.number().int().min(0, "Total questions must be at least 0"),
+  position: z.number().int().optional(),
   markDistributionStr: z.string().optional(),
 })
 
@@ -146,9 +163,9 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
     if (subject) {
       const initialSections = subject.sections?.map((sec: any) => {
         // Find direct question types that belong to this section but don't have a sub-section
-        const directQuestionTypes = subject.subjectQuestionTypes?.filter(
+        const directQuestionTypes = (subject.subjectQuestionTypes?.filter(
           (sqt: any) => sqt.sectionId === sec.id && !sqt.subSectionId
-        ) || []
+        ) || []).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
 
         return {
           id: sec.id,
@@ -157,9 +174,9 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
           position: sec.position,
           instructions: sec.instructions ?? "",
           subSections: sec.subSections?.map((sub: any) => {
-            const subQuestionTypes = subject.subjectQuestionTypes?.filter(
+            const subQuestionTypes = (subject.subjectQuestionTypes?.filter(
               (sqt: any) => sqt.subSectionId === sub.id
-            ) || []
+            ) || []).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
 
             return {
               id: sub.id,
@@ -167,7 +184,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               nameBn: sub.nameBn,
               position: sub.position,
               instructions: sub.instructions ?? "",
-              questionTypes: subQuestionTypes.map((sqt: any) => {
+              questionTypes: subQuestionTypes.map((sqt: any, qtIdx: number) => {
                 let markDistributionStr = ""
                 if (sqt.markDistribution) {
                   try {
@@ -190,12 +207,13 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
                   mark: sqt.mark,
                   requiredCount: sqt.requiredCount,
                   totalQuestions: sqt.totalQuestions,
+                  position: typeof sqt.position === "number" ? sqt.position : qtIdx,
                   markDistributionStr,
                 }
               }),
             }
           }) || [],
-          questionTypes: directQuestionTypes.map((sqt: any) => {
+          questionTypes: directQuestionTypes.map((sqt: any, qtIdx: number) => {
             let markDistributionStr = ""
             if (sqt.markDistribution) {
               try {
@@ -218,6 +236,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               mark: sqt.mark,
               requiredCount: sqt.requiredCount,
               totalQuestions: sqt.totalQuestions,
+              position: typeof sqt.position === "number" ? sqt.position : qtIdx,
               markDistributionStr,
             }
           }),
@@ -241,7 +260,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
       // Map form mark distribution strings into Record<string, number> structures
       const processedSections = data.sections.map((sec: SectionConfig, secIdx: number) => {
         const processQtConfigs = (qts: QuestionTypeConfig[], path: string) => {
-          return qts.map((c: QuestionTypeConfig) => {
+          return qts.map((c: QuestionTypeConfig, qtIdx: number) => {
             let markDistribution: Record<string, number> | null = null
             if (c.markDistributionStr && c.markDistributionStr.trim()) {
               const parts = c.markDistributionStr
@@ -275,6 +294,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               mark: c.mark,
               requiredCount: c.requiredCount,
               totalQuestions: c.totalQuestions,
+              position: qtIdx,
               markDistribution,
             }
           })
@@ -443,10 +463,26 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
     name: `sections.${secIndex}.subSections`,
   })
 
-  const { fields: directQuestionTypes, append: appendDirectQt, remove: removeDirectQt } = useFieldArray({
+  const { fields: directQuestionTypes, append: appendDirectQt, remove: removeDirectQt, move: moveDirectQt } = useFieldArray({
     control,
     name: `sections.${secIndex}.questionTypes`,
   })
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      const oldIndex = directQuestionTypes.findIndex((item) => item.id === active.id)
+      const newIndex = directQuestionTypes.findIndex((item) => item.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        moveDirectQt(oldIndex, newIndex)
+      }
+    }
+  }
 
   return (
     <Card className="border border-outline-variant bg-white shadow-xs overflow-hidden">
@@ -588,17 +624,23 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
             {directQuestionTypes.length === 0 ? (
               <p className="text-xs text-center text-outline py-4">No question types added. Add a type or a sub-section above.</p>
             ) : (
-              <div className="space-y-2">
-                {directQuestionTypes.map((qtField, qtIndex) => (
-                  <QuestionTypeRow
-                    key={qtField.id}
-                    control={control}
-                    namePrefix={`sections.${secIndex}.questionTypes.${qtIndex}`}
-                    removeRow={() => removeDirectQt(qtIndex)}
-                    questionTypesList={questionTypesList}
-                  />
-                ))}
-              </div>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={directQuestionTypes.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                  <div className="space-y-2">
+                    {directQuestionTypes.map((qtField, qtIndex) => (
+                      <QuestionTypeRow
+                        key={qtField.id}
+                        id={qtField.id}
+                        index={qtIndex}
+                        control={control}
+                        namePrefix={`sections.${secIndex}.questionTypes.${qtIndex}`}
+                        removeRow={() => removeDirectQt(qtIndex)}
+                        questionTypesList={questionTypesList}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </div>
         )}
@@ -619,10 +661,26 @@ interface SubSectionCardProps {
 }
 
 function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questionTypesList }: SubSectionCardProps) {
-  const { fields: subQtFields, append: appendSubQt, remove: removeSubQt } = useFieldArray({
+  const { fields: subQtFields, append: appendSubQt, remove: removeSubQt, move: moveSubQt } = useFieldArray({
     control,
     name: `sections.${secIndex}.subSections.${subIndex}.questionTypes`,
   })
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      const oldIndex = subQtFields.findIndex((item) => item.id === active.id)
+      const newIndex = subQtFields.findIndex((item) => item.id === over.id)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        moveSubQt(oldIndex, newIndex)
+      }
+    }
+  }
 
   return (
     <div className="rounded-lg border border-outline-variant bg-surface-container-lowest/40 p-4 space-y-3">
@@ -694,17 +752,23 @@ function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questio
       {subQtFields.length === 0 ? (
         <p className="text-[11px] text-center text-outline py-2">No question formats mapped under this sub-section.</p>
       ) : (
-        <div className="space-y-2">
-          {subQtFields.map((qtField, qtIndex) => (
-            <QuestionTypeRow
-              key={qtField.id}
-              control={control}
-              namePrefix={`sections.${secIndex}.subSections.${subIndex}.questionTypes.${qtIndex}`}
-              removeRow={() => removeSubQt(qtIndex)}
-              questionTypesList={questionTypesList}
-            />
-          ))}
-        </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={subQtFields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {subQtFields.map((qtField, qtIndex) => (
+                <QuestionTypeRow
+                  key={qtField.id}
+                  id={qtField.id}
+                  index={qtIndex}
+                  control={control}
+                  namePrefix={`sections.${secIndex}.subSections.${subIndex}.questionTypes.${qtIndex}`}
+                  removeRow={() => removeSubQt(qtIndex)}
+                  questionTypesList={questionTypesList}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   )
@@ -714,15 +778,54 @@ function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questio
    QUESTION TYPE SPECIFICATION ROW
    ────────────────────────────────────────────────────────────────────────── */
 interface QuestionTypeRowProps {
+  id: string
+  index: number
   control: any
   namePrefix: string
   removeRow: () => void
   questionTypesList: any[]
 }
 
-function QuestionTypeRow({ control, namePrefix, removeRow, questionTypesList }: QuestionTypeRowProps) {
+function QuestionTypeRow({ id, index, control, namePrefix, removeRow, questionTypesList }: QuestionTypeRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.6 : 1,
+  }
+
   return (
-    <div className="flex flex-wrap sm:flex-nowrap items-end gap-3 bg-white p-3 rounded-lg border border-outline-variant/60 shadow-xs relative">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex flex-wrap sm:flex-nowrap items-end gap-2.5 sm:gap-3 bg-white p-3 rounded-lg border border-outline-variant/60 shadow-xs relative transition-shadow ${
+        isDragging ? "shadow-lg border-primary ring-1 ring-primary" : ""
+      }`}
+    >
+      <div className="flex items-center gap-1.5 self-center sm:self-end pb-1.5 shrink-0">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          title="Drag to reorder"
+          className="cursor-grab active:cursor-grabbing text-outline hover:text-foreground touch-none p-1 rounded-md hover:bg-surface-container-high transition-colors"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <span className="flex size-6 items-center justify-center rounded bg-surface-container-high text-[11px] font-bold text-on-surface-variant">
+          {index + 1}
+        </span>
+      </div>
+
       <div className="w-full sm:flex-1 min-w-[140px]">
         <Label className="text-[10px] text-outline font-semibold uppercase">Question Format</Label>
         <Controller

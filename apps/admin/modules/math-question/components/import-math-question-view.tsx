@@ -44,16 +44,18 @@ const sampleJsonTemplate = `[
   {
     "question": "একটি ক্রিকেট খেলায় তামিম ও সাকিবের মোট রান ১০৮। সাকিবের চেয়ে তামিম ১২ রান বেশি করেছে। কার রান কত?",
     "answer": "তামিমের রান ৬০ এবং সাকিবের রান ৪৮।",
+    "isMath": false,
     "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
     "difficulty": "MEDIUM",
     "popularityCount": 12
   },
   {
-    "question": "একটি সংখ্যার ৪ গুণ থেকে ৫ বিয়োগ করলে বিয়োগফল ১৯ হয়। সংখ্যাটি কত?",
-    "answer": "সংখ্যাটি ৬।",
+    "question": "যদি $x + y = 5$ এবং $x - y = 3$ হয়, তবে $x^2 + y^2$-এর মান কত?",
+    "answer": "আমরা জানি, $2(x^2 + y^2) = (x+y)^2 + (x-y)^2 = 5^2 + 3^2 = 25 + 9 = 34$। সুতরাং, $x^2 + y^2 = 17$।",
+    "isMath": true,
     "reference": ["চট্টগ্রাম বোর্ড ২০২২"],
-    "difficulty": "EASY",
-    "popularityCount": 8
+    "difficulty": "MEDIUM",
+    "popularityCount": 15
   }
 ]`
 
@@ -336,6 +338,24 @@ function EditableMathQuestionCard({
             </Badge>
           </button>
 
+          {/* Math Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => onChange({ ...item, isMath: !item.isMath })}
+            title="Click to toggle Math formula rendering"
+            className="cursor-pointer"
+          >
+            <Badge
+              variant={item.isMath ? "outline" : "ghost"}
+              className={cn(
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
+                item.isMath ? "border-primary text-primary bg-primary/5" : "text-muted-foreground"
+              )}
+            >
+              {item.isMath ? "∑ Math On" : "Text Only"}
+            </Badge>
+          </button>
+
           {/* Duplicate & Delete Buttons */}
           <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
             <Button
@@ -368,6 +388,7 @@ function EditableMathQuestionCard({
           label="Question Prompt / Context *"
           value={item.question || ""}
           multiline
+          isMath={Boolean(item.isMath)}
           placeholder="Enter question text / prompt..."
           onSave={(newVal) => onChange({ ...item, question: newVal })}
         />
@@ -377,6 +398,7 @@ function EditableMathQuestionCard({
           label="Answer (Optional)"
           value={item.answer || ""}
           multiline
+          isMath={Boolean(item.isMath)}
           placeholder="Enter answer (optional)..."
           onSave={(newVal) => onChange({ ...item, answer: newVal || null })}
           className="border-t border-outline-variant/30 pt-3"
@@ -551,6 +573,7 @@ export function ImportMathQuestionView() {
           academicChapterId: chapterId || null,
           question: String(questionText).trim(),
           answer: item.answer ? String(item.answer).trim() : null,
+          isMath: item.isMath !== undefined ? Boolean(item.isMath) : false,
           difficulty: item.difficulty || "MEDIUM",
           popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
           reference: Array.isArray(item.reference) ? item.reference : [],
@@ -654,6 +677,7 @@ export function ImportMathQuestionView() {
     const newQuestion = {
       question: "New Math Question...",
       answer: "",
+      isMath: false,
       difficulty: "MEDIUM",
       popularityCount: 0,
       reference: [],
@@ -681,6 +705,7 @@ export function ImportMathQuestionView() {
         academicChapterId: selectedChapterId || null,
         question: item.question.trim(),
         answer: item.answer ? String(item.answer).trim() : null,
+        isMath: Boolean(item.isMath),
         difficulty: item.difficulty as any,
         popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],

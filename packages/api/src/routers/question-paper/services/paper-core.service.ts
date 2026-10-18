@@ -172,6 +172,7 @@ export async function getQuestionPaperById(
   const shortQuestionIds = allPaperQuestions.map((q: any) => q.shortQuestionId).filter(Boolean) as string[]
   const makeQuestionIds = allPaperQuestions.map((q: any) => q.makeQuestionId).filter(Boolean) as string[]
   const wordMeaningIds = allPaperQuestions.map((q: any) => q.wordMeaningId).filter(Boolean) as string[]
+  const numberInWordsIds = allPaperQuestions.map((q: any) => q.numberInWordsId).filter(Boolean) as string[]
   const makeSentencesIds = allPaperQuestions.map((q: any) => q.makeSentencesId).filter(Boolean) as string[]
   const oppositeWordIds = allPaperQuestions.map((q: any) => q.oppositeWordId).filter(Boolean) as string[]
   const juktobornoIds = allPaperQuestions.map((q: any) => q.juktobornoId).filter(Boolean) as string[]
@@ -183,7 +184,9 @@ export async function getQuestionPaperById(
   const formFillupIds = allPaperQuestions.map((q: any) => q.formFillupId).filter(Boolean) as string[]
   const shuddhoAshuddhoIds = allPaperQuestions.map((q: any) => q.shuddhoAshuddhoId).filter(Boolean) as string[]
   const danBamMilkoronIds = allPaperQuestions.map((q: any) => q.danBamMilkoronId).filter(Boolean) as string[]
+  const mathQuestionIds = allPaperQuestions.map((q: any) => q.mathQuestionId).filter(Boolean) as string[]
   const grammarQuestionIds = allPaperQuestions.map((q: any) => q.grammarQuestionId).filter(Boolean) as string[]
+  const seenComprehensionIds = allPaperQuestions.map((q: any) => q.seenComprehensionId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
   const questionTypeIds = Array.from(
@@ -219,6 +222,7 @@ export async function getQuestionPaperById(
     shortQuestions,
     makeQuestionsList,
     wordMeanings,
+    numberInWordsList,
     makeSentencesList,
     oppositeWords,
     juktobornos,
@@ -230,7 +234,9 @@ export async function getQuestionPaperById(
     formFillups,
     shuddhoAshuddhos,
     danBamMilkorons,
+    mathQuestions,
     grammarQuestions,
+    seenComprehensions,
     academicClass,
     academicSubjects,
     questionTypes,
@@ -488,6 +494,15 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    numberInWordsIds.length > 0
+      ? (db as any).numberInWords.findMany({
+        where: { id: { in: numberInWordsIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     makeSentencesIds.length > 0
       ? (db as any).makeSentences.findMany({
         where: { id: { in: makeSentencesIds } },
@@ -587,10 +602,31 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    mathQuestionIds.length > 0
+      ? (db as any).mathQuestion.findMany({
+        where: { id: { in: mathQuestionIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     grammarQuestionIds.length > 0
       ? (db as any).grammarQuestion.findMany({
         where: { id: { in: grammarQuestionIds } },
         include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
+    seenComprehensionIds.length > 0
+      ? (db as any).seenComprehension.findMany({
+        where: { id: { in: seenComprehensionIds } },
+        include: {
+          questions: {
+            orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }],
+          },
           questionType: true,
           academicChapter: true,
         },
@@ -629,6 +665,7 @@ export async function getQuestionPaperById(
   const shortQuestionMap = new Map((shortQuestions as any[]).map((s: any) => [s.id, s]))
   const makeQuestionMap = new Map((makeQuestionsList as any[]).map((m: any) => [m.id, m]))
   const wordMeaningMap = new Map((wordMeanings as any[]).map((w: any) => [w.id, w]))
+  const numberInWordsMap = new Map((numberInWordsList as any[]).map((n: any) => [n.id, n]))
   const makeSentencesMap = new Map((makeSentencesList as any[]).map((m: any) => [m.id, m]))
   const oppositeWordMap = new Map((oppositeWords as any[]).map((o: any) => [o.id, o]))
   const juktobornoMap = new Map((juktobornos as any[]).map((j: any) => [j.id, { ...j, chapter: j.academicChapter }]))
@@ -640,7 +677,9 @@ export async function getQuestionPaperById(
   const formFillupMap = new Map((formFillups as any[]).map((f: any) => [f.id, { ...f, chapter: f.academicChapter }]))
   const shuddhoAshuddhoMap = new Map((shuddhoAshuddhos as any[]).map((s: any) => [s.id, { ...s, chapter: s.academicChapter }]))
   const danBamMilkoronMap = new Map((danBamMilkorons as any[]).map((d: any) => [d.id, { ...d, chapter: d.academicChapter }]))
+  const mathQuestionMap = new Map((mathQuestions as any[]).map((m: any) => [m.id, { ...m, chapter: m.academicChapter }]))
   const grammarQuestionMap = new Map((grammarQuestions as any[]).map((g: any) => [g.id, { ...g, chapter: g.academicChapter }]))
+  const seenComprehensionMap = new Map((seenComprehensions as any[]).map((sc: any) => [sc.id, { ...sc, chapter: sc.academicChapter }]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
 
@@ -687,6 +726,7 @@ export async function getQuestionPaperById(
     let resolvedShortQuestion = q.shortQuestionId ? shortQuestionMap.get(q.shortQuestionId) || null : null
     let resolvedMakeQuestion = q.makeQuestionId ? makeQuestionMap.get(q.makeQuestionId) || null : null
     let resolvedWordMeaning = q.wordMeaningId ? wordMeaningMap.get(q.wordMeaningId) || null : null
+    let resolvedNumberInWords = q.numberInWordsId ? numberInWordsMap.get(q.numberInWordsId) || null : null
     let resolvedMakeSentences = q.makeSentencesId ? makeSentencesMap.get(q.makeSentencesId) || null : null
     let resolvedOppositeWord = q.oppositeWordId ? oppositeWordMap.get(q.oppositeWordId) || null : null
     let resolvedJuktoborno = q.juktobornoId ? juktobornoMap.get(q.juktobornoId) || null : null
@@ -698,7 +738,9 @@ export async function getQuestionPaperById(
     let resolvedFormFillup = q.formFillupId ? formFillupMap.get(q.formFillupId) || null : null
     let resolvedShuddhoAshuddho = q.shuddhoAshuddhoId ? shuddhoAshuddhoMap.get(q.shuddhoAshuddhoId) || null : null
     let resolvedDanBamMilkoron = q.danBamMilkoronId ? danBamMilkoronMap.get(q.danBamMilkoronId) || null : null
+    let resolvedMathQuestion = q.mathQuestionId ? mathQuestionMap.get(q.mathQuestionId) || null : null
     let resolvedGrammarQuestion = q.grammarQuestionId ? grammarQuestionMap.get(q.grammarQuestionId) || null : null
+    let resolvedSeenComprehension = q.seenComprehensionId ? seenComprehensionMap.get(q.seenComprehensionId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
     if (!resolvedMcq && q.mcqId && q.contentSnapshot) {
@@ -785,6 +827,9 @@ export async function getQuestionPaperById(
     if (!resolvedWordMeaning && q.wordMeaningId && q.contentSnapshot) {
       resolvedWordMeaning = q.contentSnapshot as any
     }
+    if (!resolvedNumberInWords && q.numberInWordsId && q.contentSnapshot) {
+      resolvedNumberInWords = q.contentSnapshot as any
+    }
     if (!resolvedMakeSentences && q.makeSentencesId && q.contentSnapshot) {
       resolvedMakeSentences = q.contentSnapshot as any
     }
@@ -818,13 +863,32 @@ export async function getQuestionPaperById(
     if (!resolvedDanBamMilkoron && q.danBamMilkoronId && q.contentSnapshot) {
       resolvedDanBamMilkoron = q.contentSnapshot as any
     }
+    if (!resolvedMathQuestion && q.mathQuestionId && q.contentSnapshot) {
+      resolvedMathQuestion = q.contentSnapshot as any
+    }
     if (!resolvedGrammarQuestion && q.grammarQuestionId && q.contentSnapshot) {
       resolvedGrammarQuestion = q.contentSnapshot as any
+    }
+    if (!resolvedSeenComprehension && q.seenComprehensionId && q.contentSnapshot) {
+      resolvedSeenComprehension = q.contentSnapshot as any
+    }
+
+    if (resolvedSeenComprehension && q.selectedSubQuestionIds && Array.isArray(q.selectedSubQuestionIds) && q.selectedSubQuestionIds.length > 0) {
+      const selectedSet = new Set(q.selectedSubQuestionIds)
+      const allSubQuestions = resolvedSeenComprehension.questions || []
+      const filtered = allSubQuestions.filter((sq: any) => selectedSet.has(sq.id))
+      resolvedSeenComprehension = {
+        ...resolvedSeenComprehension,
+        allQuestions: allSubQuestions,
+        questions: filtered,
+      }
     }
 
     let resolvedDist = q.distributionId ? distMap.get(q.distributionId) || q.distribution || null : q.distribution || null
 
     const actualQuestionTypeId =
+      (resolvedSeenComprehension as any)?.questionTypeId ||
+      (resolvedMathQuestion as any)?.questionTypeId ||
       (resolvedGrammarQuestion as any)?.questionTypeId ||
       (resolvedDanBamMilkoron as any)?.questionTypeId ||
       (resolvedShuddhoAshuddho as any)?.questionTypeId ||
@@ -867,6 +931,7 @@ export async function getQuestionPaperById(
       for (const dist of distMap.values()) {
         const matchesExact = dist.questionTypeId === actualQuestionTypeId
         const matchesCategory =
+          (resolvedSeenComprehension && (dist.questionTypeName?.toLowerCase().includes("seen") || dist.questionTypeName?.toLowerCase().includes("comprehension") || dist.questionTypeName?.includes("পঠিত অনুচ্ছেদ"))) ||
           (resolvedGrammarQuestion && (dist.questionTypeName?.includes("ব্যাকরণ") || dist.questionTypeName?.toLowerCase().includes("grammar"))) ||
           (resolvedDanBamMilkoron && (dist.questionTypeName?.includes("মিলকরণ") || dist.questionTypeName?.includes("বাম-ডান") || dist.questionTypeName?.includes("ডান-বাম") || dist.questionTypeName?.toLowerCase().includes("dan bam") || dist.questionTypeName?.toLowerCase().includes("dan_bam") || dist.questionTypeName?.toLowerCase().includes("matching"))) ||
           (resolvedShuddhoAshuddho && (dist.questionTypeName?.includes("শুদ্ধ-অশুদ্ধ") || dist.questionTypeName?.includes("শুদ্ধ") || dist.questionTypeName?.toLowerCase().includes("shuddho") || dist.questionTypeName?.toLowerCase().includes("shuddho_ashuddho"))) ||
@@ -944,6 +1009,7 @@ export async function getQuestionPaperById(
       shortQuestion: resolvedShortQuestion,
       makeQuestion: resolvedMakeQuestion,
       wordMeaning: resolvedWordMeaning,
+      numberInWords: resolvedNumberInWords,
       makeSentences: resolvedMakeSentences,
       oppositeWord: resolvedOppositeWord,
       juktoborno: resolvedJuktoborno,
@@ -955,7 +1021,10 @@ export async function getQuestionPaperById(
       formFillup: resolvedFormFillup,
       shuddhoAshuddho: resolvedShuddhoAshuddho,
       danBamMilkoron: resolvedDanBamMilkoron,
+      mathQuestion: resolvedMathQuestion,
       grammarQuestion: resolvedGrammarQuestion,
+      seenComprehension: resolvedSeenComprehension,
+      selectedSubQuestionIds: q.selectedSubQuestionIds ?? [],
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
     }
   }
@@ -1184,15 +1253,30 @@ export async function createQuestionPaperFull(
       })
 
       const qType = qTypeMap.get(distInput.questionTypeId)
-      const questionTypeName = qType?.nameEn || qType?.nameBn || distInput.questionTypeName
+      const isEnglishSubject = /english|ইংরেজি/i.test(subjectInput.subjectName || "")
+
+      const isInputNameEng = distInput.questionTypeName && !/[\u0980-\u09FF]/.test(distInput.questionTypeName)
+      const isInputLabelEng = distInput.questionTypeLabel && !/[\u0980-\u09FF]/.test(distInput.questionTypeLabel)
+      const isCustomLabelEng = sqType?.customLabel && !/[\u0980-\u09FF]/.test(sqType.customLabel)
+
+      const questionTypeName = isEnglishSubject
+        ? ((isInputNameEng ? distInput.questionTypeName : null) || qType?.nameEn || qType?.nameBn || "")
+        : (qType?.nameBn || distInput.questionTypeNameBn || qType?.nameEn || distInput.questionTypeName || "")
+
       const questionTypeNameBn = qType?.nameBn || distInput.questionTypeNameBn || null
-      const questionTypeLabel =
-        distInput.questionTypeLabel ||
-        sqType?.customLabel ||
-        qType?.label ||
-        qType?.nameBn ||
-        qType?.nameEn ||
-        null
+
+      const questionTypeLabel = isEnglishSubject
+        ? ((isInputLabelEng ? distInput.questionTypeLabel : null) ||
+           (isCustomLabelEng ? sqType?.customLabel : null) ||
+           qType?.nameEn ||
+           qType?.label ||
+           null)
+        : (distInput.questionTypeLabel ||
+           sqType?.customLabel ||
+           qType?.label ||
+           qType?.nameBn ||
+           qType?.nameEn ||
+           null)
 
       const markDistribution = syncMarkDistribution(
         distInput.marksPerQuestion,
@@ -1513,7 +1597,10 @@ export async function duplicateQuestionPaper(
         punctuationId: question.punctuationId,
         shortCompositionId: question.shortCompositionId,
         shortQuestionId: question.shortQuestionId,
+        mathQuestionId: question.mathQuestionId,
         grammarQuestionId: question.grammarQuestionId,
+        seenComprehensionId: question.seenComprehensionId,
+        selectedSubQuestionIds: question.selectedSubQuestionIds || [],
         distributionId: newDistId,
         sectionId: newSectionId,
         orderIndex: question.orderIndex,
@@ -1552,7 +1639,10 @@ export async function duplicateQuestionPaper(
             punctuationId: alt.punctuationId,
             shortCompositionId: alt.shortCompositionId,
             shortQuestionId: alt.shortQuestionId,
+            mathQuestionId: alt.mathQuestionId,
             grammarQuestionId: alt.grammarQuestionId,
+            seenComprehensionId: alt.seenComprehensionId,
+            selectedSubQuestionIds: alt.selectedSubQuestionIds || [],
             distributionId: altDistId,
             sectionId: newSectionId,
             orderIndex: alt.orderIndex,

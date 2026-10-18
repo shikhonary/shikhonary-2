@@ -231,6 +231,7 @@ export function useAvailableQuestions(
     source?: string
     year?: number
     excludePaperId?: string
+    distributionId?: string
     page?: number
     limit?: number
     cursor?: string
@@ -349,6 +350,16 @@ export function useReplaceQuestion() {
   const queryClient = useQueryClient()
   return useMutation({
     ...trpc.questionPaper.replaceQuestion.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useUpdateQuestionPaperQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.updateQuestion.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
     },

@@ -35,7 +35,7 @@ const ShortCompositionEditableText = ({
   const itemStyles = useBuilderStore(state => state.settings.itemStyles);
   
   const customStyle = itemStyles?.[itemKey] || {};
-  const mergedStyle = { ...defaultStyle, ...customStyle };
+  const mergedStyle = { fontWeight: "bold", ...defaultStyle, ...customStyle };
   
   useEffect(() => {
     if (!isActive) return;
@@ -86,16 +86,16 @@ const ShortCompositionEditableText = ({
       <div 
         ref={textRef}
         onClick={() => setIsActive(true)}
-        className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} ${className}`}
+        className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} font-bold ${className}`}
         style={{
           fontSize: mergedStyle.fontSize,
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
-          fontWeight: mergedStyle.fontWeight,
+          fontWeight: mergedStyle.fontWeight || "bold",
         }}
       >
-        <RenderMath text={text} />
+        <RenderMath text={text} className="font-bold" />
       </div>
     </div>
   );
@@ -235,7 +235,7 @@ export const ShortCompositionBlock = ({ item }: { item: any }) => {
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,
-      fontWeight: settings.fontWeight || "normal"
+      fontWeight: "bold"
     };
   };
 
@@ -293,7 +293,7 @@ export const ShortCompositionBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      <div className="flex justify-between items-start gap-2 w-full">
+      <div className="flex justify-between items-start gap-2 w-full font-bold">
         <div className="flex gap-1 flex-1 relative flex-col">
           <div className="flex gap-2 items-start w-full">
             <span
@@ -306,12 +306,12 @@ export const ShortCompositionBlock = ({ item }: { item: any }) => {
               {item.masterNumber || 1}.
             </span>
             {renderSubQuestionLabel(label)}
-            <div className="flex-1 w-full min-w-0">
+            <div className="flex-1 w-full min-w-0 font-bold">
               <ShortCompositionEditableText 
                 text={formattedPrompt}
                 itemKey={`${item.id}-question`}
                 defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap font-normal text-foreground"
+                className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
               />
             </div>
             <div className="font-bold whitespace-nowrap text-right shrink-0" style={{

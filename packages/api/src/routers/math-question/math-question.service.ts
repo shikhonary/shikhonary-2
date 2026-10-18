@@ -53,7 +53,7 @@ async function resolveMathQuestionTypeId(db: any, requestedTypeId?: string | nul
 }
 
 export async function listMathQuestion(db: PrismaClient, input: ListMathQuestionInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, questionTypeId, difficulty, source, session, sort } = input
+  const { page, limit, query, subjectId, chapterId, academicChapterId, questionTypeId, difficulty, source, session, isMath, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
@@ -67,6 +67,7 @@ export async function listMathQuestion(db: PrismaClient, input: ListMathQuestion
   if (difficulty) where.difficulty = difficulty
   if (source) where.source = source
   if (session) where.session = session
+  if (typeof isMath === "boolean") where.isMath = isMath
 
   if (query) {
     where.OR = [
@@ -165,6 +166,7 @@ export async function createMathQuestion(db: PrismaClient, input: CreateMathQues
     data: {
       question: data.question,
       answer: data.answer || null,
+      isMath: data.isMath ?? false,
       reference: data.reference ?? [],
       source: data.source ? data.source.trim() : "গাইড বুক",
       session: data.session ? data.session.trim() : currentYear,
@@ -196,6 +198,7 @@ export async function updateMathQuestion(db: PrismaClient, input: UpdateMathQues
   const updateData: any = {
     ...(data.question !== undefined ? { question: data.question } : {}),
     ...(data.answer !== undefined ? { answer: data.answer || null } : {}),
+    ...(data.isMath !== undefined ? { isMath: data.isMath } : {}),
     reference: data.reference,
     difficulty: data.difficulty,
     popularityCount: data.popularityCount,
@@ -259,6 +262,7 @@ export async function importMathQuestion(db: PrismaClient, input: ImportMathQues
           data: {
             question: data.question,
             answer: data.answer || null,
+            isMath: data.isMath ?? false,
             reference: data.reference || [],
             source: data.source ? data.source.trim() : "গাইড বুক",
             session: data.session ? data.session.trim() : currentYear,

@@ -96,6 +96,8 @@ model User {
   updatedJuktobornos                 Juktoborno[]                  @relation("JuktobornoUpdater")
   createdOppositeWords               OppositeWord[]                @relation("OppositeWordCreator")
   updatedOppositeWords               OppositeWord[]                @relation("OppositeWordUpdater")
+  createdNumberInWords               NumberInWords[]               @relation("NumberInWordsCreator")
+  updatedNumberInWords               NumberInWords[]               @relation("NumberInWordsUpdater")
   createdWordMeanings                WordMeaning[]                 @relation("WordMeaningCreator")
   updatedWordMeanings                WordMeaning[]                 @relation("WordMeaningUpdater")
   createdGenderChanges               GenderChange[]                @relation("GenderChangeCreator")
@@ -112,6 +114,8 @@ model User {
   updatedMathQuestions               MathQuestion[]                @relation("MathQuestionUpdater")
   createdGrammarQuestions            GrammarQuestion[]             @relation("GrammarQuestionCreator")
   updatedGrammarQuestions            GrammarQuestion[]             @relation("GrammarQuestionUpdater")
+  createdSeenComprehensions          SeenComprehension[]           @relation("SeenComprehensionCreator")
+  updatedSeenComprehensions          SeenComprehension[]           @relation("SeenComprehensionUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -314,6 +318,7 @@ model Tenant {
   makeSentences               MakeSentences[]
   juktobornos                 Juktoborno[]
   oppositeWords               OppositeWord[]
+  numberInWords               NumberInWords[]
   wordMeanings                WordMeaning[]
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
@@ -322,6 +327,7 @@ model Tenant {
   danBamMilkorons             DanBamMilkoron[]
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
+  seenComprehensions          SeenComprehension[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -731,6 +737,7 @@ model AcademicSubject {
   makeSentences               MakeSentences[]
   juktobornos                 Juktoborno[]
   oppositeWords               OppositeWord[]
+  numberInWords               NumberInWords[]
   wordMeanings                WordMeaning[]
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
@@ -739,6 +746,7 @@ model AcademicSubject {
   danBamMilkorons             DanBamMilkoron[]
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
+  seenComprehensions          SeenComprehension[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -795,6 +803,7 @@ model AcademicChapter {
   makeSentences               MakeSentences[]
   juktobornos                 Juktoborno[]
   oppositeWords               OppositeWord[]
+  numberInWords               NumberInWords[]
   wordMeanings                WordMeaning[]
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
@@ -809,6 +818,7 @@ model AcademicChapter {
   danBamMilkorons             DanBamMilkoron[]
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
+  seenComprehensions          SeenComprehension[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -873,6 +883,7 @@ model QuestionType {
   makeSentences               MakeSentences[]
   juktobornos                 Juktoborno[]
   oppositeWords               OppositeWord[]
+  numberInWords               NumberInWords[]
   wordMeanings                WordMeaning[]
   genderChanges               GenderChange[]
   synonyms                    Synonym[]
@@ -881,6 +892,7 @@ model QuestionType {
   danBamMilkorons             DanBamMilkoron[]
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
+  seenComprehensions          SeenComprehension[]
 
   @@index([label])
   @@index([isActive])
@@ -899,6 +911,7 @@ model SubjectQuestionType {
   markDistribution Json?
   totalQuestions   Int     @default(0)
   requiredCount    Int     @default(0)
+  position         Int     @default(0)
 
   subject      AcademicSubject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   questionType QuestionType               @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
@@ -2703,6 +2716,61 @@ model OppositeWord {
   @@map("opposite_word")
 }
 
+model NumberInWords {
+  id        String   @id @default(cuid())
+  number    String
+  inWords   String
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Optional Relation to WordMeaning Dictionary Item ──
+  wordMeaningId String?
+  wordMeaning   WordMeaning? @relation(fields: [wordMeaningId], references: [id], onDelete: SetNull)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("NumberInWordsCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("NumberInWordsUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([wordMeaningId])
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("number_in_words")
+}
+
 model WordMeaning {
   id        String   @id @default(cuid())
   word      String
@@ -2737,6 +2805,7 @@ model WordMeaning {
   isActive Boolean @default(true)
 
   ekKothayProkashes EkKothayProkash[]
+  numberInWords     NumberInWords[]
 
   academicChapterId String?
   academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
@@ -3089,6 +3158,7 @@ model MathQuestion {
   id       String  @id @default(cuid())
   question String
   answer   String?
+  isMath   Boolean @default(false)
 
   reference String[] @default([])
   source    String?
@@ -3134,6 +3204,7 @@ model MathQuestion {
   @@index([deletedAt])
   @@index([academicChapterId])
   @@index([subjectId])
+  @@index([isMath])
   @@index([difficulty])
   @@map("math_question")
 }
@@ -3189,6 +3260,84 @@ model GrammarQuestion {
   @@index([subjectId])
   @@index([difficulty])
   @@map("grammar_question")
+}
+
+model SeenComprehension {
+  id                String   @id @default(cuid())
+  title             String?
+  passage           String
+  instruction       String?
+  source            String?
+  reference         String[] @default([])
+  session           String?
+
+  comprehensionType String   @default("SEEN_COMPREHENSION_1")
+
+  difficulty        String   @default("MEDIUM")
+  popularityCount   Int      @default(0)
+  totalMarks        Float?
+
+  subjectId         String
+  subject           AcademicSubject  @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  questionTypeId    String
+  questionType      QuestionType     @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  questions         SeenComprehensionQuestion[]
+
+  createdById       String?
+  creator           User?    @relation("SeenComprehensionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById       String?
+  updater           User?    @relation("SeenComprehensionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId          String?
+  tenant            Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal          Boolean  @default(true)
+  isActive          Boolean  @default(true)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([comprehensionType])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("seen_comprehension")
+}
+
+model SeenComprehensionQuestion {
+  id                  String            @id @default(cuid())
+  seenComprehensionId String
+  seenComprehension   SeenComprehension @relation(fields: [seenComprehensionId], references: [id], onDelete: Cascade)
+
+  groupNumber         Int               @default(1)
+  groupTitle          String?
+  itemLabel           String?
+  orderIndex          Int               @default(0)
+
+  type                String            @default("SHORT_ANSWER")
+  question            String
+  options             Json?             @default("[]")
+  answer              String?
+  explanation         String?
+  marks               Float             @default(1.0)
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([seenComprehensionId])
+  @@index([groupNumber])
+  @@map("seen_comprehension_question")
 }
 
 model QuestionReport {

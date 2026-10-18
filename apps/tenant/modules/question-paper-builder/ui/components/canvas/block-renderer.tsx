@@ -16,9 +16,12 @@ import { SummaryBlock } from "../blocks/summary-block";
 import { AmplificationBlock } from "../blocks/amplification-block";
 import { LetterBlock } from "../blocks/letter-block";
 import { ApplicationBlock } from "../blocks/application-block";
+import { MathQuestionBlock } from "../blocks/math-question-block";
 import { GrammarQuestionBlock } from "../blocks/grammar-question-block";
+import { SeenComprehensionBlock } from "../blocks/seen-comprehension-block";
 import { NewsReportBlock } from "../blocks/news-report-block";
 import { EssayBlock } from "../blocks/essay-block";
+import { NumberInWordsBlock } from "../blocks/number-in-words-block";
 import { WordMeaningBlock } from "../blocks/word-meaning-block";
 import { MakeSentenceBlock } from "../blocks/make-sentence-block";
 import { MakeQuestionBlock } from "../blocks/make-question-block";
@@ -334,6 +337,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <FormFillupBlock item={block.data.item} />;
     case "question-prose-essence":
       return <ProseEssenceBlock item={block.data.item} />;
+    case "question-number-in-words":
+      return <NumberInWordsBlock item={block.data.item} />;
     case "question-word-meaning":
       return <WordMeaningBlock item={block.data.item} />;
     case "question-make-sentence":
@@ -378,8 +383,12 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ShuddhoAshuddhoBlock item={block.data.item} />;
     case "question-dan-bam-milkoron":
       return <DanBamMilkoronBlock item={block.data.item} />;
+    case "question-math-question":
+      return <MathQuestionBlock item={block.data.item} />;
     case "question-grammar-question":
       return <GrammarQuestionBlock item={block.data.item} />;
+    case "question-seen-comprehension":
+      return <SeenComprehensionBlock item={block.data.item} />;
     case "question-correct-answer":
       return <CorrectAnswerBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
     case "dist-action":

@@ -101,6 +101,7 @@ export function getAdvancedTools(ctx: AssistantToolContext): ToolSet {
             "DESCRIPTIVE_QUESTION",
             "SHORT_QUESTION",
             "MAKE_QUESTION",
+            "NUMBER_IN_WORDS",
             "WORD_MEANING",
             "JUKTOBORNO",
             "EK_KOTHAY_PROKASH",

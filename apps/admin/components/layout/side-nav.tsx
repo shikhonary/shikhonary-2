@@ -25,6 +25,7 @@ import {
   Quote,
   PenTool,
   ArrowLeftRight,
+  Hash,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -68,6 +69,7 @@ const navGroups: NavGroup[] = [
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/pbqs", label: "PBQs", icon: HelpCircle },
+      { href: "/seen-comprehensions", label: "Seen Comprehensions", icon: BookOpen },
       { href: "/cs", label: "CS", icon: HelpCircle },
       { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/descriptive-questions", label: "Descriptive Questions", icon: HelpCircle },
@@ -79,6 +81,7 @@ const navGroups: NavGroup[] = [
       { href: "/juktoborno", label: "Juktoborno", icon: HelpCircle },
       { href: "/opposite-words", label: "Opposite Words", icon: ArrowLeftRight },
       { href: "/word-meaning", label: "Word Meaning", icon: HelpCircle },
+      { href: "/number-in-words", label: "Number in Words", icon: Hash },
       { href: "/shuddho-ashuddho", label: "Shuddho Ashuddho", icon: HelpCircle },
       { href: "/dan-bam-milkoron", label: "Dan Bam Milkoron", icon: ArrowLeftRight },
       { href: "/form-filling", label: "Form Filling", icon: HelpCircle },

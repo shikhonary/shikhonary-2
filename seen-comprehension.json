@@ -1,0 +1,180 @@
+[
+  {
+    "comprehensionType": "SEEN_COMPREHENSION_1",
+    "title": "Unit 1, Lesson 1: Bangabandhu's Childhood",
+    "instruction": "Read the passage carefully and answer the questions following it:",
+    "passage": "Sheikh Mujibur Rahman was born in the village of Tungipara under Gopalganj district on 17 March 1920. His father Sheikh Lutfar Rahman was a serestadar in the Gopalganj civil court and his mother was Sayera Khatun. Mujib was the third child among four daughters and two sons. His parents used to call him 'Khoka' affectionately. At the age of seven, in 1927, he was admitted to Gimadanga Primary School. Later he studied at Gopalganj Public School and completed his matriculation from Gopalganj Missionary School in 1942. From his early childhood, Mujib showed a deep sense of empathy for the poor and oppressed people around him. During his school days, he gave away his own umbrella to a poor classmate who was drenched in heavy rain. He also distributed rice from his father's granary to the famine-affected villagers. He was a brave, kind-hearted boy with a natural gift for leadership.",
+    "difficulty": "MEDIUM",
+    "reference": [
+      "Dhaka Board 2024",
+      "Chattogram Board 2023"
+    ],
+    "questions": [
+      {
+        "groupNumber": 1,
+        "groupTitle": "1. Choose the correct answer from the following alternatives:",
+        "itemLabel": "a",
+        "type": "MCQ",
+        "question": "Sheikh Mujibur Rahman was born in the year —",
+        "options": [
+          { "key": "i", "text": "1910" },
+          { "key": "ii", "text": "1920" },
+          { "key": "iii", "text": "1930" },
+          { "key": "iv", "text": "1940" }
+        ],
+        "answer": "ii",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 1,
+        "groupTitle": "1. Choose the correct answer from the following alternatives:",
+        "itemLabel": "b",
+        "type": "MCQ",
+        "question": "What was Sheikh Mujibur Rahman's childhood nickname?",
+        "options": [
+          { "key": "i", "text": "Moni" },
+          { "key": "ii", "text": "Khoka" },
+          { "key": "iii", "text": "Dulal" },
+          { "key": "iv", "text": "Manik" }
+        ],
+        "answer": "ii",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 1,
+        "groupTitle": "1. Choose the correct answer from the following alternatives:",
+        "itemLabel": "c",
+        "type": "MCQ",
+        "question": "In 1942, Mujib completed his matriculation from —",
+        "options": [
+          { "key": "i", "text": "Gimadanga Primary School" },
+          { "key": "ii", "text": "Gopalganj Public School" },
+          { "key": "iii", "text": "Gopalganj Missionary School" },
+          { "key": "iv", "text": "Dhaka Collegiate School" }
+        ],
+        "answer": "iii",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 1,
+        "groupTitle": "1. Choose the correct answer from the following alternatives:",
+        "itemLabel": "d",
+        "type": "MCQ",
+        "question": "The word 'empathy' in the passage closest in meaning to —",
+        "options": [
+          { "key": "i", "text": "cruelty" },
+          { "key": "ii", "text": "compassion" },
+          { "key": "iii", "text": "indifference" },
+          { "key": "iv", "text": "disregard" }
+        ],
+        "answer": "ii",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 1,
+        "groupTitle": "1. Choose the correct answer from the following alternatives:",
+        "itemLabel": "e",
+        "type": "MCQ",
+        "question": "Mujib gave away his own umbrella because his classmate was —",
+        "options": [
+          { "key": "i", "text": "shivering with cold" },
+          { "key": "ii", "text": "drenched in rain" },
+          { "key": "iii", "text": "suffering from illness" },
+          { "key": "iv", "text": "crying out loud" }
+        ],
+        "answer": "ii",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 2,
+        "groupTitle": "2. Write 'True' for correct statement and 'False' for incorrect statement.",
+        "itemLabel": "a",
+        "type": "TRUE_FALSE",
+        "question": "Sheikh Mujibur Rahman was the eldest child of his parents.",
+        "answer": "False. Correct Answer: He was the third child among four daughters and two sons.",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 2,
+        "groupTitle": "2. Write 'True' for correct statement and 'False' for incorrect statement.",
+        "itemLabel": "b",
+        "type": "TRUE_FALSE",
+        "question": "Sayera Khatun was the mother of Bangabandhu Sheikh Mujibur Rahman.",
+        "answer": "True",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 2,
+        "groupTitle": "2. Write 'True' for correct statement and 'False' for incorrect statement.",
+        "itemLabel": "c",
+        "type": "TRUE_FALSE",
+        "question": "At the age of seven, Mujib was admitted to Gimadanga Primary School.",
+        "answer": "True",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 2,
+        "groupTitle": "2. Write 'True' for correct statement and 'False' for incorrect statement.",
+        "itemLabel": "d",
+        "type": "TRUE_FALSE",
+        "question": "Sheikh Lutfar Rahman was an advocate in the Supreme Court.",
+        "answer": "False. Correct Answer: Sheikh Lutfar Rahman was a serestadar in the Gopalganj civil court.",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 2,
+        "groupTitle": "2. Write 'True' for correct statement and 'False' for incorrect statement.",
+        "itemLabel": "e",
+        "type": "TRUE_FALSE",
+        "question": "Mujib distributed rice from his father's granary to the famine-affected villagers.",
+        "answer": "True",
+        "marks": 1.0
+      },
+      {
+        "groupNumber": 3,
+        "groupTitle": "3. Answer the following questions:",
+        "itemLabel": "a",
+        "type": "SHORT_ANSWER",
+        "question": "Where and when was Sheikh Mujibur Rahman born?",
+        "answer": "Sheikh Mujibur Rahman was born in the village of Tungipara under Gopalganj district on 17 March 1920.",
+        "marks": 2.0
+      },
+      {
+        "groupNumber": 3,
+        "groupTitle": "3. Answer the following questions:",
+        "itemLabel": "b",
+        "type": "SHORT_ANSWER",
+        "question": "What was the occupation of Bangabandhu's father?",
+        "answer": "His father Sheikh Lutfar Rahman was a serestadar in the Gopalganj civil court.",
+        "marks": 2.0
+      },
+      {
+        "groupNumber": 3,
+        "groupTitle": "3. Answer the following questions:",
+        "itemLabel": "c",
+        "type": "SHORT_ANSWER",
+        "question": "How did Mujib help his poor classmate during a rainy day?",
+        "answer": "Mujib showed deep empathy by giving away his own umbrella to a poor classmate who was drenched in heavy rain.",
+        "marks": 2.0
+      },
+      {
+        "groupNumber": 3,
+        "groupTitle": "3. Answer the following questions:",
+        "itemLabel": "d",
+        "type": "SHORT_ANSWER",
+        "question": "From which school did Mujib pass his matriculation examination and in which year?",
+        "answer": "Mujib passed his matriculation examination from Gopalganj Missionary School in 1942.",
+        "marks": 2.0
+      },
+      {
+        "groupNumber": 3,
+        "groupTitle": "3. Answer the following questions:",
+        "itemLabel": "e",
+        "type": "SHORT_ANSWER",
+        "question": "Why did young Mujib distribute rice from his father's granary?",
+        "answer": "Young Mujib distributed rice from his father's granary to help the poor villagers who were affected by famine.",
+        "marks": 2.0
+      }
+    ]
+  }
+]

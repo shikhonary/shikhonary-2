@@ -36,9 +36,11 @@ import { SummaryPickerCard } from "@/modules/question-paper-builder/ui/component
 import { AmplificationPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/amplification-picker-card"
 import { LetterPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/letter-picker-card"
 import { ApplicationPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/application-picker-card"
+import { MathQuestionPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/math-question-picker-card"
 import { GrammarQuestionPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/grammar-question-picker-card"
 import { NewsReportPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/news-report-picker-card"
 import { EssayPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/essay-picker-card"
+import { NumberInWordsPickerCard, formatNumberInWords, toEnglishDigits } from "@/modules/question-paper-builder/ui/components/distribution-picker/number-in-words-picker-card"
 import { WordMeaningPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/word-meaning-picker-card"
 import { MakeSentencePickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/make-sentence-picker-card"
 import { MakeQuestionPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/make-question-picker-card"
@@ -148,12 +150,16 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   const currentPage = result?.page || page
 
   const handleCopyQuestion = (q: any) => {
-    let text = q.question || q.title || q.name || ""
+    let text = q.number
+      ? `${formatNumberInWords(q).numberText} - ${formatNumberInWords(q).inWordsText || q.inWords}`
+      : q.word
+        ? `${q.word} - ${q.meaning}`
+        : q.rawText || q.content || q.question || q.title || q.name || ""
     if (q.context) text = `উদ্দীপক:\n${q.context}\n\nপ্রশ্ন:\n${text}`
     if (q.options && Array.isArray(q.options)) {
       text += `\n\nবিকল্পসমূহ:\n` + q.options.map((opt: string, i: number) => `${i + 1}) ${opt}`).join("\n")
     }
-    if (q.answer) text += `\n\nসঠিক উত্তর: ${q.answer}`
+    if (q.answer || q.answerText) text += `\n\nসঠিক উত্তর: ${q.answer || q.answerText}`
 
     navigator.clipboard.writeText(text)
     setCopiedId(q.id)
@@ -173,7 +179,11 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
       chapterId: q.academicChapterId || q.chapterId,
       chapterNameEn: q.academicChapter?.nameEn || q.chapter?.nameEn,
       chapterNameBn: q.academicChapter?.nameBn || q.chapter?.nameBn,
-      questionText: q.question || q.title || q.name || "",
+      questionText: q.number
+        ? `${formatNumberInWords(q).numberText} - ${formatNumberInWords(q).inWordsText || q.inWords}`
+        : q.word
+          ? `${q.word} - ${q.meaning}`
+          : q.rawText || q.content || q.question || q.title || q.name || "",
       context: q.context,
       options: q.options,
       answer: q.answer,
@@ -241,12 +251,16 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
         return <LetterPickerCard {...cardProps} />
       case "APPLICATION":
         return <ApplicationPickerCard {...cardProps} />
+      case "MATH_QUESTION":
+        return <MathQuestionPickerCard {...cardProps} />
       case "GRAMMAR_QUESTION":
         return <GrammarQuestionPickerCard {...cardProps} />
       case "NEWS_REPORT":
         return <NewsReportPickerCard {...cardProps} />
       case "ESSAY":
         return <EssayPickerCard {...cardProps} />
+      case "NUMBER_IN_WORDS":
+        return <NumberInWordsPickerCard {...cardProps} />
       case "WORD_MEANING":
         return <WordMeaningPickerCard {...cardProps} />
       case "MAKE_SENTENCES":

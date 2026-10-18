@@ -19,9 +19,11 @@ import { SummaryPickerCard } from "./summary-picker-card";
 import { AmplificationPickerCard } from "./amplification-picker-card";
 import { LetterPickerCard } from "./letter-picker-card";
 import { ApplicationPickerCard } from "./application-picker-card";
+import { MathQuestionPickerCard } from "./math-question-picker-card";
 import { GrammarQuestionPickerCard } from "./grammar-question-picker-card";
 import { NewsReportPickerCard } from "./news-report-picker-card";
 import { EssayPickerCard } from "./essay-picker-card";
+import { NumberInWordsPickerCard } from "./number-in-words-picker-card";
 import { WordMeaningPickerCard } from "./word-meaning-picker-card";
 import { MakeSentencePickerCard } from "./make-sentence-picker-card";
 import { MakeQuestionPickerCard } from "./make-question-picker-card";
@@ -45,6 +47,7 @@ import { DescriptiveQuestionPickerCard } from "./descriptive-question-picker-car
 import { ShortQuestionPickerCard } from "./short-question-picker-card";
 import { ShuddhoAshuddhoPickerCard } from "./shuddho-ashuddho-picker-card";
 import { DanBamMilkoronPickerCard } from "./dan-bam-milkoron-picker-card";
+import { SeenComprehensionPickerCard } from "./seen-comprehension-picker-card";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "০";
@@ -79,8 +82,12 @@ export interface QuestionGridProps {
   source?: string;
   sort?: "newest" | "oldest";
   excludePaperId: string;
+  distributionId?: string;
   selectedIds: string[];
+  selectedSubQuestionIdsMap?: Record<string, string[]>;
   onToggle: (id: string) => void;
+  onToggleSubQuestion?: (passageId: string, subQuestionId: string, allSubIds: string[]) => void;
+  onSelectGroup?: (passageId: string, groupSubIds: string[], allSubIds: string[]) => void;
   page?: number;
   limit?: number;
   onPageChange?: (page: number) => void;
@@ -99,8 +106,12 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   source,
   sort,
   excludePaperId,
+  distributionId,
   selectedIds,
+  selectedSubQuestionIdsMap,
   onToggle,
+  onToggleSubQuestion,
+  onSelectGroup,
   page = 1,
   limit = 20,
   onPageChange,
@@ -118,6 +129,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     source: source && source !== "All" ? source : undefined,
     sort,
     excludePaperId,
+    distributionId,
     page,
     limit,
   });
@@ -190,6 +202,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <MakeSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "MAKE_QUESTION":
         return <MakeQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "NUMBER_IN_WORDS":
+        return <NumberInWordsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "WORD_MEANING":
         return <WordMeaningPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "OPPOSITE_WORD":
@@ -210,6 +224,19 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "PBQ":
         return <PbqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "SEEN_COMPREHENSION_1":
+      case "SEEN_COMPREHENSION_2":
+        return (
+          <SeenComprehensionPickerCard
+            key={q.id}
+            question={q}
+            isSelected={isSelected}
+            selectedSubQuestionIds={selectedSubQuestionIdsMap?.[q.id]}
+            onToggle={onToggle}
+            onToggleSubQuestion={onToggleSubQuestion}
+            onSelectGroup={onSelectGroup}
+          />
+        );
       case "CS":
         return <CsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "SA":
@@ -231,6 +258,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "APPLICATION":
         return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "MATH_QUESTION":
+        return <MathQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "GRAMMAR_QUESTION":
         return <GrammarQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "NEWS_REPORT":
@@ -249,7 +278,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     <div className="space-y-6">
       <div
         className={`grid gap-4 ${
-          category === "CQ"
+          category === "CQ" || category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2"
             ? "grid-cols-1 md:grid-cols-2"
             : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         }`}

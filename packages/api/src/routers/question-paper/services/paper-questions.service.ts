@@ -7,6 +7,7 @@ import type {
   ReorderQuestionPaperQuestionsInput,
   BulkAssignQuestionsInput,
   BulkRemoveQuestionsInput,
+  UpdateQuestionPaperQuestionInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
 import {
@@ -57,6 +58,7 @@ export async function addQuestionPaperQuestion(
     input.shortQuestionId,
     input.makeQuestionId,
     input.wordMeaningId,
+    input.numberInWordsId,
     input.makeSentencesId,
     input.oppositeWordId,
     input.juktobornoId,
@@ -68,7 +70,9 @@ export async function addQuestionPaperQuestion(
     input.formFillupId,
     input.shuddhoAshuddhoId,
     input.danBamMilkoronId,
+    input.mathQuestionId,
     input.grammarQuestionId,
+    input.seenComprehensionId,
   ].filter(Boolean)
 
   if (idsSet.length !== 1) {
@@ -247,6 +251,12 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "WordMeaning: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.numberInWordsId) {
+    const item = await (db as any).numberInWords.findUnique({ where: { id: input.numberInWordsId } })
+    if (!item) throw notFound("NumberInWords")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "NumberInWords: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.juktobornoId) {
     const item = await (db as any).juktoborno.findUnique({ where: { id: input.juktobornoId } })
     if (!item) throw notFound("Juktoborno")
@@ -313,11 +323,26 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "DanBamMilkoron: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.mathQuestionId) {
+    const item = await (db as any).mathQuestion.findUnique({ where: { id: input.mathQuestionId } })
+    if (!item) throw notFound("MathQuestion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "MathQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.grammarQuestionId) {
     const item = await (db as any).grammarQuestion.findUnique({ where: { id: input.grammarQuestionId } })
     if (!item) throw notFound("GrammarQuestion")
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "GrammarQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.seenComprehensionId) {
+    const item = await (db as any).seenComprehension.findUnique({
+      where: { id: input.seenComprehensionId },
+      include: { questions: { orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }] } },
+    })
+    if (!item) throw notFound("SeenComprehension")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "SeenComprehension: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   }
 
@@ -377,6 +402,7 @@ export async function addQuestionPaperQuestion(
       shortQuestionId: input.shortQuestionId,
       makeQuestionId: input.makeQuestionId,
       wordMeaningId: input.wordMeaningId,
+      numberInWordsId: input.numberInWordsId,
       juktobornoId: input.juktobornoId,
       ekKothayProkashId: input.ekKothayProkashId,
       makeSentencesId: input.makeSentencesId,
@@ -388,7 +414,10 @@ export async function addQuestionPaperQuestion(
       formFillupId: input.formFillupId,
       shuddhoAshuddhoId: input.shuddhoAshuddhoId,
       danBamMilkoronId: input.danBamMilkoronId,
+      mathQuestionId: input.mathQuestionId,
       grammarQuestionId: input.grammarQuestionId,
+      seenComprehensionId: input.seenComprehensionId,
+      selectedSubQuestionIds: input.selectedSubQuestionIds || [],
       distributionId: input.distributionId,
       sectionId: finalSectionId,
       subSectionId: finalSubSectionId,
@@ -451,6 +480,7 @@ export async function removeQuestionPaperQuestion(
     SHORT_QUESTION: "shortQuestionId",
     MAKE_QUESTION: "makeQuestionId",
     WORD_MEANING: "wordMeaningId",
+    NUMBER_IN_WORDS: "numberInWordsId",
     JUKTOBORNO: "juktobornoId",
     EK_KOTHAY_PROKASH: "ekKothayProkashId",
     MAKE_SENTENCES: "makeSentencesId",
@@ -463,7 +493,11 @@ export async function removeQuestionPaperQuestion(
     FORM_FILLING: "formFillupId",
     SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
     DAN_BAM_MILKORON: "danBamMilkoronId",
+    MATH_QUESTION: "mathQuestionId",
     GRAMMAR_QUESTION: "grammarQuestionId",
+    SEEN_COMPREHENSION_1: "seenComprehensionId",
+    SEEN_COMPREHENSION_2: "seenComprehensionId",
+    SEEN_COMPREHENSION: "seenComprehensionId",
   }
 
   const field = typeFieldMap[input.questionType]
@@ -937,6 +971,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.numberInWordsIds && input.numberInWordsIds.length > 0) {
+    for (const numberInWordsId of input.numberInWordsIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        numberInWordsId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.juktobornoIds && input.juktobornoIds.length > 0) {
     for (const juktobornoId of input.juktobornoIds) {
       recordsToCreate.push({
@@ -1080,11 +1127,50 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.mathQuestionIds && input.mathQuestionIds.length > 0) {
+    for (const mathQuestionId of input.mathQuestionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        mathQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.grammarQuestionIds && input.grammarQuestionIds.length > 0) {
     for (const grammarQuestionId of input.grammarQuestionIds) {
       recordsToCreate.push({
         questionPaperId: input.questionPaperId,
         grammarQuestionId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.seenComprehensionItems && input.seenComprehensionItems.length > 0) {
+    for (const item of input.seenComprehensionItems) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        seenComprehensionId: item.id,
+        selectedSubQuestionIds: item.selectedSubQuestionIds || [],
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  } else if (input.seenComprehensionIds && input.seenComprehensionIds.length > 0) {
+    for (const seenComprehensionId of input.seenComprehensionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        seenComprehensionId,
+        selectedSubQuestionIds: [],
         distributionId: input.distributionId,
         sectionId: finalSectionId,
         subSectionId: finalSubSectionId,
@@ -1179,6 +1265,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).makeQuestion.findUnique({ where: { id: record.makeQuestionId } })) as any
       } else if (record.wordMeaningId) {
         record.contentSnapshot = (await (db as any).wordMeaning.findUnique({ where: { id: record.wordMeaningId } })) as any
+      } else if (record.numberInWordsId) {
+        record.contentSnapshot = (await (db as any).numberInWords.findUnique({ where: { id: record.numberInWordsId } })) as any
       } else if (record.juktobornoId) {
         record.contentSnapshot = (await (db as any).juktoborno.findUnique({ where: { id: record.juktobornoId } })) as any
       } else if (record.ekKothayProkashId) {
@@ -1201,8 +1289,15 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).shuddhoAshuddho.findUnique({ where: { id: record.shuddhoAshuddhoId } })) as any
       } else if (record.danBamMilkoronId) {
         record.contentSnapshot = (await (db as any).danBamMilkoron.findUnique({ where: { id: record.danBamMilkoronId } })) as any
+      } else if (record.mathQuestionId) {
+        record.contentSnapshot = (await (db as any).mathQuestion.findUnique({ where: { id: record.mathQuestionId } })) as any
       } else if (record.grammarQuestionId) {
         record.contentSnapshot = (await (db as any).grammarQuestion.findUnique({ where: { id: record.grammarQuestionId } })) as any
+      } else if (record.seenComprehensionId) {
+        record.contentSnapshot = (await (db as any).seenComprehension.findUnique({
+          where: { id: record.seenComprehensionId },
+          include: { questions: { orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }] } },
+        })) as any
       }
     }
 
@@ -1263,6 +1358,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_makeQuestionId: { questionPaperId: input.questionPaperId, makeQuestionId: record.makeQuestionId } }
     } else if (record.wordMeaningId) {
       whereCondition = { questionPaperId_wordMeaningId: { questionPaperId: input.questionPaperId, wordMeaningId: record.wordMeaningId } }
+    } else if (record.numberInWordsId) {
+      whereCondition = { questionPaperId_numberInWordsId: { questionPaperId: input.questionPaperId, numberInWordsId: record.numberInWordsId } }
     } else if (record.juktobornoId) {
       whereCondition = { questionPaperId_juktobornoId: { questionPaperId: input.questionPaperId, juktobornoId: record.juktobornoId } }
     } else if (record.ekKothayProkashId) {
@@ -1285,14 +1382,29 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_shuddhoAshuddhoId: { questionPaperId: input.questionPaperId, shuddhoAshuddhoId: record.shuddhoAshuddhoId } }
     } else if (record.danBamMilkoronId) {
       whereCondition = { questionPaperId_danBamMilkoronId: { questionPaperId: input.questionPaperId, danBamMilkoronId: record.danBamMilkoronId } }
+    } else if (record.mathQuestionId) {
+      whereCondition = { questionPaperId_mathQuestionId: { questionPaperId: input.questionPaperId, mathQuestionId: record.mathQuestionId } }
     } else if (record.grammarQuestionId) {
       whereCondition = { questionPaperId_grammarQuestionId: { questionPaperId: input.questionPaperId, grammarQuestionId: record.grammarQuestionId } }
+    } else if (record.seenComprehensionId) {
+      whereCondition = {
+        questionPaperId_distributionId_seenComprehensionId: {
+          questionPaperId: input.questionPaperId,
+          distributionId: input.distributionId,
+          seenComprehensionId: record.seenComprehensionId,
+        },
+      }
     }
 
     await tenantDb.questionPaperQuestion.upsert({
       where: whereCondition,
       create: record,
-      update: { distributionId: input.distributionId, sectionId: input.sectionId ?? null, subSectionId: input.subSectionId ?? null },
+      update: {
+        distributionId: input.distributionId,
+        sectionId: input.sectionId ?? null,
+        subSectionId: input.subSectionId ?? null,
+        ...(record.selectedSubQuestionIds ? { selectedSubQuestionIds: record.selectedSubQuestionIds } : {}),
+      },
     })
   }
 
@@ -1351,6 +1463,7 @@ export async function bulkRemoveQuestions(
         { shortQuestionId: { in: input.questionIds } },
         { makeQuestionId: { in: input.questionIds } },
         { wordMeaningId: { in: input.questionIds } },
+        { numberInWordsId: { in: input.questionIds } },
         { juktobornoId: { in: input.questionIds } },
         { ekKothayProkashId: { in: input.questionIds } },
         { makeSentencesId: { in: input.questionIds } },
@@ -1362,7 +1475,9 @@ export async function bulkRemoveQuestions(
         { formFillupId: { in: input.questionIds } },
         { shuddhoAshuddhoId: { in: input.questionIds } },
         { danBamMilkoronId: { in: input.questionIds } },
+        { mathQuestionId: { in: input.questionIds } },
         { grammarQuestionId: { in: input.questionIds } },
+        { seenComprehensionId: { in: input.questionIds } },
       ],
     },
     select: { id: true, distributionId: true },
@@ -1416,4 +1531,43 @@ export async function bulkRemoveQuestions(
   })
 
   return { success: true }
+}
+
+export async function updateQuestionPaperQuestion(
+  tenantDb: TenantPrismaClient,
+  input: UpdateQuestionPaperQuestionInput,
+  actorId?: string
+) {
+  const existing = await tenantDb.questionPaperQuestion.findFirst({
+    where: {
+      id: input.id,
+      questionPaperId: input.questionPaperId,
+    },
+  })
+  if (!existing) throw notFound("QuestionPaperQuestion")
+
+  const data: any = {}
+  if (input.selectedSubQuestionIds !== undefined) {
+    data.selectedSubQuestionIds = input.selectedSubQuestionIds
+  }
+  if (input.assignedMarks !== undefined) {
+    data.assignedMarks = input.assignedMarks
+  }
+  if (input.overrides !== undefined) {
+    data.overrides = input.overrides
+  }
+
+  const updated = await tenantDb.questionPaperQuestion.update({
+    where: { id: input.id },
+    data,
+  })
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_UPDATED",
+    actorId,
+    changes: { questionId: input.id, ...data },
+  })
+
+  return updated
 }

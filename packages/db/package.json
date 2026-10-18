@@ -55,6 +55,7 @@
     "seed:class3-islamic-short-questions": "npx -y tsx scripts/seed-class3-islamic-short-questions.ts",
     "seed:class3-islamic-descriptive-questions": "npx -y tsx scripts/seed-class3-islamic-descriptive-questions.ts",
     "seed:class3-islamic-dan-bam-milkoron": "npx -y tsx scripts/seed-class3-islamic-dan-bam-milkoron.ts",
+    "seed:number-in-words": "tsx scripts/seed-number-in-words.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

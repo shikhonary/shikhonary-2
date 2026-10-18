@@ -235,6 +235,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   shortQuestionId: z.string().optional().nullable(),
   makeQuestionId: z.string().optional().nullable(),
   wordMeaningId: z.string().optional().nullable(),
+  numberInWordsId: z.string().optional().nullable(),
   juktobornoId: z.string().optional().nullable(),
   ekKothayProkashId: z.string().optional().nullable(),
   makeSentencesId: z.string().optional().nullable(),
@@ -246,7 +247,10 @@ export const addQuestionPaperQuestionSchema = z.object({
   formFillupId: z.string().optional().nullable(),
   shuddhoAshuddhoId: z.string().optional().nullable(),
   danBamMilkoronId: z.string().optional().nullable(),
+  mathQuestionId: z.string().optional().nullable(),
   grammarQuestionId: z.string().optional().nullable(),
+  seenComprehensionId: z.string().optional().nullable(),
+  selectedSubQuestionIds: z.array(z.string()).optional(),
   distributionId: z.string().min(1),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
@@ -338,6 +342,7 @@ export const getAvailableQuestionsSchema = z.object({
   source: z.string().optional(),
   year: z.number().int().optional(),
   excludePaperId: z.string().optional(),
+  distributionId: z.string().optional(),
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(20).optional(),
   cursor: z.string().optional(),
@@ -397,6 +402,7 @@ export const bulkAssignQuestionsSchema = z.object({
   shortQuestionIds: z.array(z.string()).optional(),
   makeQuestionIds: z.array(z.string()).optional(),
   wordMeaningIds: z.array(z.string()).optional(),
+  numberInWordsIds: z.array(z.string()).optional(),
   juktobornoIds: z.array(z.string()).optional(),
   ekKothayProkashIds: z.array(z.string()).optional(),
   makeSentencesIds: z.array(z.string()).optional(),
@@ -408,10 +414,28 @@ export const bulkAssignQuestionsSchema = z.object({
   formFillupIds: z.array(z.string()).optional(),
   shuddhoAshuddhoIds: z.array(z.string()).optional(),
   danBamMilkoronIds: z.array(z.string()).optional(),
+  mathQuestionIds: z.array(z.string()).optional(),
   grammarQuestionIds: z.array(z.string()).optional(),
+  seenComprehensionIds: z.array(z.string()).optional(),
+  seenComprehensionItems: z.array(
+    z.object({
+      id: z.string().min(1),
+      selectedSubQuestionIds: z.array(z.string()).optional(),
+    })
+  ).optional(),
 })
 
 export type BulkAssignQuestionsInput = z.infer<typeof bulkAssignQuestionsSchema>
+
+export const updateQuestionPaperQuestionSchema = z.object({
+  id: z.string().min(1),
+  questionPaperId: z.string().min(1),
+  selectedSubQuestionIds: z.array(z.string()).optional(),
+  assignedMarks: z.number().optional().nullable(),
+  overrides: z.record(z.any()).optional(),
+})
+
+export type UpdateQuestionPaperQuestionInput = z.infer<typeof updateQuestionPaperQuestionSchema>
 
 export const bulkRemoveQuestionsSchema = z.object({
   questionPaperId: z.string().min(1),

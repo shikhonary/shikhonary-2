@@ -35,6 +35,7 @@ export interface MathQuestionItem {
   id: string
   question: string
   answer?: string | null
+  isMath?: boolean
   difficulty: string
   reference: string[]
   popularityCount: number
@@ -230,6 +231,14 @@ export function MathQuestionTable({
                           </span>
                         )}
 
+                        {/* Math Badge */}
+                        {item.isMath && (
+                          <div className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded font-label-sm text-[11px] font-bold border border-amber-200">
+                            <span className="material-symbols-outlined text-[14px]">functions</span>
+                            <span>Math</span>
+                          </div>
+                        )}
+
                         {/* Popularity Badge */}
                         <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
                           👁️ {item.popularityCount} Views
@@ -252,7 +261,7 @@ export function MathQuestionTable({
                           "whitespace-pre-wrap font-medium",
                           /[\u0980-\u09FF]/.test(item.question) && "font-solaiman text-base"
                         )}>
-                          <RenderMath text={item.question} isMath={true} />
+                          <RenderMath text={item.question} isMath={item.isMath ?? false} />
                         </div>
                       </div>
 
@@ -266,7 +275,7 @@ export function MathQuestionTable({
                             "whitespace-pre-wrap font-medium text-neutral-800",
                             /[\u0980-\u09FF]/.test(item.answer) && "font-solaiman text-sm"
                           )}>
-                            <RenderMath text={item.answer} isMath={true} />
+                            <RenderMath text={item.answer} isMath={item.isMath ?? false} />
                           </div>
                         </div>
                       )}

@@ -199,6 +199,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     if (!paperQuery) return [];
     const newBlocks: PaperBlock[] = [];
     const renderedQuestionIds = new Set<string>();
+    const renderedPassageIds = new Map<string, number>();
     let globalWrittenNumber = 0;
     let globalSectionIndex = 0;
 
@@ -304,6 +305,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let newsReportIdx = 0;
         let essayIdx = 0;
         let makeSentencesIdx = 0;
+        let numberInWordsIdx = 0;
         let wordMeaningIdx = 0;
         let poemEssenceIdx = 0;
         let formFillupIdx = 0;
@@ -327,11 +329,15 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let descriptiveQuestionIdx = 0;
         let shuddhoAshuddhoIdx = 0;
         let shortQuestionIdx = 0;
+        let mathQuestionIdx = 0;
         let grammarQuestionIdx = 0;
+        let seenComprehensionIdx = 0;
         let makeQuestionIdx = 0;
         let pbqIdx = 0;
         let mcqIdx = 0;
         const totalMcqs = questions.filter((q: any) => q.mcq).length;
+        const totalSeenComprehensions = questions.filter((q: any) => q.seenComprehension).length;
+        const totalMathQuestions = questions.filter((q: any) => q.mathQuestion).length;
         const totalGrammarQuestions = questions.filter((q: any) => q.grammarQuestion).length;
         const totalEssences = questions.filter((q: any) => q.essence).length;
         const totalPoemEssences = questions.filter((q: any) => q.poemEssence).length;
@@ -353,6 +359,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalNewsReports = questions.filter((q: any) => q.newsReport).length;
         const totalEssays = questions.filter((q: any) => q.essay).length;
         const totalMakeSentences = questions.filter((q: any) => q.makeSentences).length;
+        const totalNumberInWords = questions.filter((q: any) => q.numberInWords).length;
         const totalWordMeanings = questions.filter((q: any) => q.wordMeaning).length;
         const totalJuktobornos = questions.filter((q: any) => q.juktoborno).length;
         const totalEkKothayProkash = questions.filter((q: any) => q.ekKothayProkash).length;
@@ -583,6 +590,58 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: pbqIdx === totalPbqs - 1 ? 4 : 0
             });
             pbqIdx++;
+          }
+          if (q.seenComprehension) {
+            const passageId = q.seenComprehension.id;
+            const previousOccurrenceNumber = renderedPassageIds.get(passageId);
+            const isPassageRepeated = previousOccurrenceNumber !== undefined;
+
+            const itemQuestions = Array.isArray(q.seenComprehension.questions) ? q.seenComprehension.questions : [];
+            const distinctGroupCount = new Set(itemQuestions.map((sq: any) => sq.groupNumber || 1)).size || 1;
+
+            const startQuestionNum = globalWrittenNumber + 1;
+            globalWrittenNumber += distinctGroupCount;
+
+            if (!isPassageRepeated) {
+              renderedPassageIds.set(passageId, startQuestionNum);
+            }
+
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-seen-comprehension",
+              data: {
+                item: {
+                  id: q.id,
+                  type: q.seenComprehension.comprehensionType || "SEEN_COMPREHENSION_1",
+                  data: q.seenComprehension,
+                  seenComprehension: q.seenComprehension,
+                  selectedSubQuestionIds: q.selectedSubQuestionIds || [],
+                  orderIndex: seenComprehensionIdx,
+                  masterNumber: startQuestionNum,
+                  startQuestionNumber: startQuestionNum,
+                  distinctGroupCount,
+                  isPassageRepeated,
+                  firstOccurrenceNumber: previousOccurrenceNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstComprehension: !isPassageRepeated,
+                  totalQuestions: totalSeenComprehensions,
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: seenComprehensionIdx === totalSeenComprehensions - 1 ? 4 : 0
+            });
+            seenComprehensionIdx++;
           }
           if (q.shortAnswer) {
             if (shortAnswerIdx === 0) {
@@ -1253,6 +1312,45 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             podNirnoyIdx++;
           }
+          if (q.numberInWords) {
+            if (numberInWordsIdx === 0) {
+              globalWrittenNumber++;
+              const numberInWordsQuestions = questions.filter((item: any) => item.numberInWords);
+              newBlocks.push({
+                id: `nw-${dist.id || q.id}`,
+                type: "question-number-in-words",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "NUMBER_IN_WORDS",
+                    numbers: numberInWordsQuestions.map((nwQ: any, nIdx: number) => {
+                      renderedQuestionIds.add(nwQ.id);
+                      return {
+                        id: nwQ.id,
+                        data: nwQ.numberInWords,
+                        orderIndex: nIdx,
+                        alternatives: nwQ.alternatives || [],
+                        assignedMarks: nwQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: numberInWordsQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameEn || dist.questionTypeName || "Write the following numbers in words:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            numberInWordsIdx++;
+          }
           if (q.wordMeaning) {
             if (wordMeaningIdx === 0) {
               globalWrittenNumber++;
@@ -1836,6 +1934,41 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: shortCompositionIdx === totalShortCompositions - 1 ? 4 : 0,
             });
             shortCompositionIdx++;
+          }
+          if (q.mathQuestion) {
+            if (mathQuestionIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-math-question",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "MATH_QUESTION",
+                  data: q.mathQuestion,
+                  orderIndex: mathQuestionIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstMathQuestion: mathQuestionIdx === 0,
+                  totalQuestions: totalMathQuestions,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "গণিত প্রশ্ন",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: mathQuestionIdx === totalMathQuestions - 1 ? 4 : 0,
+            });
+            mathQuestionIdx++;
           }
           if (q.grammarQuestion) {
             if (grammarQuestionIdx === 0) {

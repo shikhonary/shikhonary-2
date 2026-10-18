@@ -34,6 +34,7 @@ import {
   updateAlternativeQuestionSchema,
   autoFillDistributionSchema,
   replaceQuestionSchema,
+  updateQuestionPaperQuestionSchema,
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
@@ -44,6 +45,7 @@ import {
   deleteQuestionPaper,
   duplicateQuestionPaper,
   addQuestionPaperQuestion,
+  updateQuestionPaperQuestion,
   removeQuestionPaperQuestion,
   reorderQuestionPaperQuestions,
   upsertQuestionPaperSection,
@@ -160,10 +162,16 @@ export const questionPaperRouter = createTRPCRouter({
       generatePaperSets(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
     ),
 
-  addQuestion: tenantMemberProcedure
+   addQuestion: tenantMemberProcedure
     .input(addQuestionPaperQuestionSchema)
     .mutation(({ ctx, input }) =>
       addQuestionPaperQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
+    ),
+
+  updateQuestion: tenantMemberProcedure
+    .input(updateQuestionPaperQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      updateQuestionPaperQuestion(ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   removeQuestion: tenantMemberProcedure

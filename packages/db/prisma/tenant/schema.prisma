@@ -258,6 +258,7 @@ model QuestionPaperQuestion {
   shortQuestionId               String?
   makeQuestionId                String?
   wordMeaningId                 String?
+  numberInWordsId               String?
   juktobornoId                  String?
   ekKothayProkashId             String?
   makeSentencesId               String?
@@ -267,7 +268,10 @@ model QuestionPaperQuestion {
   formFillupId                  String?
   shuddhoAshuddhoId             String?
   danBamMilkoronId              String?
+  mathQuestionId                String?
   grammarQuestionId             String?
+  seenComprehensionId           String?
+  selectedSubQuestionIds        String[] @default([])
 
   // ── Alternative / OR Question Relationship ─────────────────
   // If null, this is the primary question slot.
@@ -337,6 +341,7 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, shortQuestionId])
   @@unique([questionPaperId, makeQuestionId])
   @@unique([questionPaperId, wordMeaningId])
+  @@unique([questionPaperId, numberInWordsId])
   @@unique([questionPaperId, makeSentencesId])
   @@unique([questionPaperId, juktobornoId])
   @@unique([questionPaperId, ekKothayProkashId])
@@ -346,7 +351,9 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, formFillupId])
   @@unique([questionPaperId, shuddhoAshuddhoId])
   @@unique([questionPaperId, danBamMilkoronId])
+  @@unique([questionPaperId, mathQuestionId])
   @@unique([questionPaperId, grammarQuestionId])
+  @@unique([questionPaperId, distributionId, seenComprehensionId], map: "qpq_qp_dist_seen_comp_key")
   @@index([parentQuestionId])
   @@index([questionPaperId])
   @@index([questionPaperId, parentQuestionId, orderIndex])
@@ -380,6 +387,7 @@ model QuestionPaperQuestion {
   @@index([shortQuestionId])
   @@index([makeQuestionId])
   @@index([wordMeaningId])
+  @@index([numberInWordsId])
   @@index([juktobornoId])
   @@index([ekKothayProkashId])
   @@index([makeSentencesId])
@@ -389,7 +397,9 @@ model QuestionPaperQuestion {
   @@index([formFillupId])
   @@index([shuddhoAshuddhoId])
   @@index([danBamMilkoronId])
+  @@index([mathQuestionId])
   @@index([grammarQuestionId])
+  @@index([seenComprehensionId])
   @@index([distributionId])
   @@index([sectionId])
   @@index([subSectionId])

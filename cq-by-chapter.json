@@ -3101,5 +3101,199 @@
         ]
       }
     ]
+  },
+  {
+    "chapter": "জ্যামিতি",
+    "questions": [
+      {
+        "context": null,
+        "questionA": "চিত্র দুইটির নাম লেখো।",
+        "questionB": "'খ' চিত্রের দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": "চিত্র দুইটির মধ্যে পার্থক্য কী?",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "চিত্র-ক: একটি বিষমবাহু চতুর্ভুজ এবং চিত্র-খ: একটি আয়তক্ষেত্র",
+            "content": "[চিত্র-ক: একটি বিষমবাহু চতুর্ভুজ এবং চিত্র-খ: একটি আয়তক্ষেত্র]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "সূক্ষ্মকোণটি অঙ্কন করো।",
+        "questionB": "অঙ্কিত কোণটির দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "$\\angle\\text{কখগ}$ একটি সূক্ষ্মকোণ।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "স্থূলকোণটি অঙ্কন করো।",
+        "questionB": "অঙ্কিত কোণটির দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "$\\angle\\text{কগখ}$ একটি স্থূলকোণ।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম চিত্রটির নাম ও দ্বিতীয় চিত্রে কয়টি কোণ আছে তা লেখো।",
+        "questionB": "দ্বিতীয় চিত্রের কোন কোণটি স্থূলকোণ এবং কেন?",
+        "questionC": "দ্বিতীয় চিত্রের সূক্ষ্মকোণ দুইটি চিহ্নিত করো।",
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "চিত্র-১: একটি কোণ $\\angle\\text{কখগ}$ এবং চিত্র-২: একটি ত্রিভুজ যার কোণগুলো হলো ঙ, চ ও ছ",
+            "content": "[চিত্র-১: একটি কোণ $\\angle\\text{কখগ}$ এবং চিত্র-২: একটি ত্রিভুজ যার কোণগুলো হলো ঙ, চ ও ছ]",
+            "url": null,
+            "table": null,
+            "bottomContent": "চিত্র দুইটি লক্ষ করো।",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "চিত্রে পাশাপাশি দুইটি কোণের পার্থক্য কত? কোনো প্যাটার্ন খুঁজে পাওয়া যায় কি না?",
+        "questionB": "প্যাটার্ন খুঁজে পেলে এর পরবর্তী দুইটি চিত্র অঙ্কনের মাধ্যমে প্যাটার্নটি সম্পূর্ণ করো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "পরপর চারটি কোণের চিত্র যাদের পরিমাপ যথাক্রমে ৩০°, ৬০°, ৯০° এবং ১২০°",
+            "content": "[পরপর চারটি কোণের চিত্র যাদের পরিমাপ যথাক্রমে ৩০°, ৬০°, ৯০° এবং ১২০°]",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ডট কাগজের সাহায্যে একটি বর্গ অঙ্কন করো।",
+        "questionB": "অঙ্কিত বর্গের দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "ডট কাগজের চিত্র: গ্রিড আকারে সাজানো বিন্দুসমূহ",
+            "content": "[ডট কাগজের চিত্র: গ্রিড আকারে সাজানো বিন্দুসমূহ]",
+            "url": null,
+            "table": null,
+            "bottomContent": "নিচে একটি ডট কাগজ দেওয়া হলো:",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "প্রথম চিত্রে কয়টি সূক্ষ্মকোণ ও কয়টি স্থূলকোণ আছে? চিহ্নিত করো।",
+        "questionB": "দ্বিতীয় চিত্রের নাম ও এর দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "চিত্র-১: একটি স্থূলকোণী ত্রিভুজ এবং চিত্র-২: একটি বর্গ",
+            "content": "[চিত্র-১: একটি স্থূলকোণী ত্রিভুজ এবং চিত্র-২: একটি বর্গ]",
+            "url": null,
+            "table": null,
+            "bottomContent": "নিচের চিত্রগুলো লক্ষ করো।",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "বৃত্তটি অঙ্কন করো।",
+        "questionB": "অঙ্কিত বৃত্তের বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "text",
+            "caption": null,
+            "content": "একটি বৃত্তের ব্যাসার্ধ ৩ সে.মি.।",
+            "url": null,
+            "table": null,
+            "bottomContent": null,
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      },
+      {
+        "context": null,
+        "questionA": "ডট কাগজের সাহায্যে একটি আয়ত অঙ্কন করো।",
+        "questionB": "অঙ্কিত আয়তের দুইটি বৈশিষ্ট্য লেখো।",
+        "questionC": null,
+        "questionD": null,
+        "difficulty": "MEDIUM",
+        "reference": [],
+        "attachments": [
+          {
+            "type": "image",
+            "caption": "ডট কাগজের চিত্র: আয়তাকার গ্রিডে বিন্যস্ত ডট বা বিন্দুর সারি",
+            "content": "[ডট কাগজের চিত্র: আয়তাকার গ্রিডে বিন্যস্ত ডট বা বিন্দুর সারি]",
+            "url": null,
+            "table": null,
+            "bottomContent": "নিচে একটি ডট কাগজ দেওয়া হলো:",
+            "tableBorder": false,
+            "position": 0
+          }
+        ]
+      }
+    ]
   }
 ]

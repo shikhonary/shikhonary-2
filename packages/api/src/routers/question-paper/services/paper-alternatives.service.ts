@@ -65,6 +65,7 @@ export async function addAlternativeQuestion(
     SHORT_QUESTION: "shortQuestionId",
     MAKE_QUESTION: "makeQuestionId",
     WORD_MEANING: "wordMeaningId",
+    NUMBER_IN_WORDS: "numberInWordsId",
     MAKE_SENTENCES: "makeSentencesId",
     OPPOSITE_WORD: "oppositeWordId",
     JUKTOBORNO: "juktobornoId",
@@ -77,7 +78,10 @@ export async function addAlternativeQuestion(
     FORM_FILLING: "formFillupId",
     SHUDDHO_ASHUDDHO: "shuddhoAshuddhoId",
     DAN_BAM_MILKORON: "danBamMilkoronId",
+    MATH_QUESTION: "mathQuestionId",
     GRAMMAR_QUESTION: "grammarQuestionId",
+    SEEN_COMPREHENSION_1: "seenComprehensionId",
+    SEEN_COMPREHENSION_2: "seenComprehensionId",
   }
 
   const fkField = typeFieldMap[input.questionType]
@@ -144,6 +148,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).makeQuestion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "WORD_MEANING") {
     altContent = await (db as any).wordMeaning.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "NUMBER_IN_WORDS") {
+    altContent = await (db as any).numberInWords.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "MAKE_SENTENCES") {
     altContent = await (db as any).makeSentences.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "OPPOSITE_WORD") {
@@ -166,8 +172,15 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).shuddhoAshuddho.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "DAN_BAM_MILKORON") {
     altContent = await (db as any).danBamMilkoron.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "MATH_QUESTION") {
+    altContent = await (db as any).mathQuestion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "GRAMMAR_QUESTION") {
     altContent = await (db as any).grammarQuestion.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "SEEN_COMPREHENSION_1" || input.questionType === "SEEN_COMPREHENSION_2") {
+    altContent = await (db as any).seenComprehension.findUnique({
+      where: { id: input.questionId },
+      include: { questions: { orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }] } },
+    })
   }
   if (!altContent) throw notFound(input.questionType)
 
@@ -348,7 +361,7 @@ export async function swapAlternativeQuestion(
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
     "letterId", "applicationId", "summaryId", "essenceId", "poemEssenceId", "proseEssenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId",
-    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId", "grammarQuestionId"
+    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "numberInWordsId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId", "mathQuestionId", "grammarQuestionId", "seenComprehensionId"
   ] as const
 
   const questionFields = [

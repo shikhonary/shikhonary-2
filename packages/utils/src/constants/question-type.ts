@@ -31,6 +31,7 @@ export const QUESTION_TYPES = {
   OPPOSITE_WORD: "Opposite Word",
   JUKTOBORNO: "Juktoborno",
   EK_KOTHAY_PROKASH: "Ek Kothay Prokash",
+  NUMBER_IN_WORDS: "Number in Words",
   WORD_MEANING: "Word Meaning",
   GENDER_CHANGE: "Gender Change",
   SYNONYM: "Synonym",
@@ -46,9 +47,33 @@ export const QUESTION_TYPES = {
   DAN_BAM_MILKORON: "Dan Bam Milkoron",
   MATH_QUESTION: "Math Question",
   GRAMMAR_QUESTION: "Grammar Question",
+  SEEN_COMPREHENSION_1: "Seen Comprehension 1",
+  SEEN_COMPREHENSION_2: "Seen Comprehension 2",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
+
+export const SEEN_COMPREHENSION_TYPES = {
+  SEEN_COMPREHENSION_1: "SEEN_COMPREHENSION_1",
+  SEEN_COMPREHENSION_2: "SEEN_COMPREHENSION_2",
+} as const
+
+export type SeenComprehensionType =
+  (typeof SEEN_COMPREHENSION_TYPES)[keyof typeof SEEN_COMPREHENSION_TYPES]
+
+export const COMPREHENSION_ITEM_TYPES = {
+  MCQ: "MCQ",
+  SHORT_ANSWER: "SHORT_ANSWER",
+  FILL_IN_THE_BLANKS: "FILL_IN_THE_BLANKS",
+  INFORMATION_TRANSFER: "INFORMATION_TRANSFER",
+  FLOW_CHART: "FLOW_CHART",
+  TRUE_FALSE: "TRUE_FALSE",
+  MATCHING: "MATCHING",
+  SUMMARY: "SUMMARY",
+} as const
+
+export type ComprehensionItemType =
+  (typeof COMPREHENSION_ITEM_TYPES)[keyof typeof COMPREHENSION_ITEM_TYPES]
 
 export const QUESTION_TYPE_CODES = {
   MCQ: "MCQ",
@@ -79,6 +104,7 @@ export const QUESTION_TYPE_CODES = {
   OPPOSITE_WORD: "OPPOSITE_WORD",
   JUKTOBORNO: "JUKTOBORNO",
   EK_KOTHAY_PROKASH: "EK_KOTHAY_PROKASH",
+  NUMBER_IN_WORDS: "NUMBER_IN_WORDS",
   WORD_MEANING: "WORD_MEANING",
   GENDER_CHANGE: "GENDER_CHANGE",
   SYNONYM: "SYNONYM",
@@ -94,6 +120,8 @@ export const QUESTION_TYPE_CODES = {
   DAN_BAM_MILKORON: "DAN_BAM_MILKORON",
   MATH_QUESTION: "MATH_QUESTION",
   GRAMMAR_QUESTION: "GRAMMAR_QUESTION",
+  SEEN_COMPREHENSION_1: "SEEN_COMPREHENSION_1",
+  SEEN_COMPREHENSION_2: "SEEN_COMPREHENSION_2",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -303,6 +331,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     defaultMark: 5,
     defaultPosition: 20,
   },
+  [QUESTION_TYPES.NUMBER_IN_WORDS]: {
+    nameEn: QUESTION_TYPES.NUMBER_IN_WORDS,
+    nameBn: "কথায় লেখ",
+    code: QUESTION_TYPE_CODES.NUMBER_IN_WORDS,
+    defaultMark: 5,
+    defaultPosition: 20,
+  },
   [QUESTION_TYPES.WORD_MEANING]: {
     nameEn: QUESTION_TYPES.WORD_MEANING,
     nameBn: "শব্দার্থ",
@@ -407,6 +442,20 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.GRAMMAR_QUESTION,
     defaultMark: 5,
     defaultPosition: 33,
+  },
+  [QUESTION_TYPES.SEEN_COMPREHENSION_1]: {
+    nameEn: QUESTION_TYPES.SEEN_COMPREHENSION_1,
+    nameBn: "পঠিত অনুচ্ছেদ ১ (সিন প্যাসেজ ১)",
+    code: QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1,
+    defaultMark: 15,
+    defaultPosition: 35,
+  },
+  [QUESTION_TYPES.SEEN_COMPREHENSION_2]: {
+    nameEn: QUESTION_TYPES.SEEN_COMPREHENSION_2,
+    nameBn: "পঠিত অনুচ্ছেদ ২ (সিন প্যাসেজ ২)",
+    code: QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2,
+    defaultMark: 10,
+    defaultPosition: 36,
   },
 } as const
 
@@ -647,6 +696,20 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     return QUESTION_TYPES.EK_KOTHAY_PROKASH
   }
   if (
+    lower === "number in words" ||
+    lower === "numbers in words" ||
+    lower === "number_in_words" ||
+    lower === "numbers_in_words" ||
+    lower.includes("number in word") ||
+    lower.includes("numbers in word") ||
+    lower.includes("কথায় লেখ") ||
+    lower.includes("কথায় লেখা") ||
+    lower.includes("সংখ্যা কথায়") ||
+    lower.includes("সংখ্যা কথায়")
+  ) {
+    return QUESTION_TYPES.NUMBER_IN_WORDS
+  }
+  if (
     lower === "word meaning" ||
     lower === "word meanings" ||
     lower === "word_meaning" ||
@@ -817,6 +880,26 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("ব্যাকরণ")
   ) {
     return QUESTION_TYPES.GRAMMAR_QUESTION
+  }
+  if (
+    lower === "seen comprehension 1" ||
+    lower === "seen_comprehension_1" ||
+    lower.includes("seen comprehension 1") ||
+    lower.includes("পঠিত অনুচ্ছেদ ১") ||
+    lower.includes("সিন প্যাসেজ ১") ||
+    lower.includes("seen passage 1")
+  ) {
+    return QUESTION_TYPES.SEEN_COMPREHENSION_1
+  }
+  if (
+    lower === "seen comprehension 2" ||
+    lower === "seen_comprehension_2" ||
+    lower.includes("seen comprehension 2") ||
+    lower.includes("পঠিত অনুচ্ছেদ ২") ||
+    lower.includes("সিন প্যাসেজ ২") ||
+    lower.includes("seen passage 2")
+  ) {
+    return QUESTION_TYPES.SEEN_COMPREHENSION_2
   }
 
   return null

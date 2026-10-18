@@ -82,6 +82,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const { data: statuses, isLoading: statusesLoading } = useQuestionPaperDistributionStatuses(paperId);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedSubQuestionIdsMap, setSelectedSubQuestionIdsMap] = useState<Record<string, string[]>>({});
   const [search, setSearch] = useState("");
   const [selectedChapterId, setSelectedChapterId] = useState<string>("All");
   const [selectedBoard, setSelectedBoard] = useState<string>("All");
@@ -106,6 +107,56 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       .filter((b) => b.subjectId === distStatus?.subjectId)
       .map((b) => b.id);
   }, [bookmarks, distStatus?.subjectId]);
+
+  const handleToggleSubQuestion = (passageId: string, subQuestionId: string, allSubIds: string[]) => {
+    setSelectedSubQuestionIdsMap((prev) => {
+      const currentList = prev[passageId] !== undefined ? prev[passageId] : allSubIds;
+      const exists = currentList.includes(subQuestionId);
+      const updated = exists ? currentList.filter((id) => id !== subQuestionId) : [...currentList, subQuestionId];
+
+      if (updated.length === 0) {
+        setSelectedIds((prevIds) => prevIds.filter((id) => id !== passageId));
+        const nextMap = { ...prev };
+        delete nextMap[passageId];
+        return nextMap;
+      }
+
+      setSelectedIds((prevIds) => (prevIds.includes(passageId) ? prevIds : [...prevIds, passageId]));
+      return { ...prev, [passageId]: updated };
+    });
+  };
+
+  const handleSelectGroup = (passageId: string, groupSubIds: string[], allSubIds: string[]) => {
+    setSelectedSubQuestionIdsMap((prev) => {
+      const isCardSelected = selectedIds.includes(passageId);
+      const currentList = isCardSelected
+        ? (prev[passageId] !== undefined ? prev[passageId] : allSubIds)
+        : [];
+
+      const isAllGroupSelected =
+        groupSubIds.length > 0 && groupSubIds.every((id) => currentList.includes(id));
+
+      let updated: string[];
+      if (isAllGroupSelected) {
+        // Toggle OFF: remove this group's IDs
+        updated = currentList.filter((id) => !groupSubIds.includes(id));
+      } else {
+        // Toggle ON: add missing group IDs
+        const toAdd = groupSubIds.filter((id) => !currentList.includes(id));
+        updated = [...currentList, ...toAdd];
+      }
+
+      if (updated.length === 0) {
+        setSelectedIds((prevIds) => prevIds.filter((id) => id !== passageId));
+        const nextMap = { ...prev };
+        delete nextMap[passageId];
+        return nextMap;
+      }
+
+      setSelectedIds((prevIds) => (prevIds.includes(passageId) ? prevIds : [...prevIds, passageId]));
+      return { ...prev, [passageId]: updated };
+    });
+  };
 
   const urlCategoryParam = (searchParams.get("category") || searchParams.get("type") || "").trim();
   const distCode = distStatus?.questionType?.code;
@@ -132,7 +183,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   } else {
     // Robust text fallback from distribution questionTypeName
     const lowerName = distTypeName.toLowerCase();
-    if (lowerName.includes("form fillup") || lowerName.includes("form filling") || lowerName.includes("form fill up") || lowerName.includes("ফরম পূরণ") || lowerName.includes("ফরমপুরণ")) {
+    if (lowerName.includes("seen comprehension 2") || lowerName.includes("seen_comprehension_2") || lowerName.includes("seen 2") || lowerName.includes("সীন কম্প্রিহেনশন ২") || lowerName.includes("সীন ২")) {
+      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2;
+    } else if (lowerName.includes("seen comprehension") || lowerName.includes("seen_comprehension") || lowerName.includes("seen 1") || lowerName.includes("সীন কম্প্রিহেনশন") || lowerName.includes("সীন ১") || lowerName.includes("সীন")) {
+      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
+    } else if (lowerName.includes("form fillup") || lowerName.includes("form filling") || lowerName.includes("form fill up") || lowerName.includes("ফরম পূরণ") || lowerName.includes("ফরমপুরণ")) {
       category = QUESTION_TYPE_CODES.FORM_FILLUP;
     } else if (lowerName.includes("poem essence") || lowerName.includes("poem_essence") || lowerName.includes("কবিতার মূলভাব")) {
       category = QUESTION_TYPE_CODES.POEM_ESSENCE;
@@ -174,6 +229,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.POD_NIRNOY;
     } else if (lowerName.includes("verb tense") || lowerName.includes("verb_tense") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("ক্রিয়ার কাল")) {
       category = QUESTION_TYPE_CODES.VERB_TENSE;
+    } else if (lowerName.includes("number in word") || lowerName.includes("numbers in word") || lowerName.includes("কথায় লেখ") || lowerName.includes("কথায় লেখা") || lowerName.includes("সংখ্যা কথায়") || lowerName.includes("সংখ্যা কথায়")) {
+      category = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
     } else if (lowerName.includes("word meaning") || lowerName.includes("word_meaning") || lowerName.includes("শব্দার্থ")) {
       category = QUESTION_TYPE_CODES.WORD_MEANING;
     } else if (lowerName.includes("make sentence") || lowerName.includes("make_sentence") || lowerName.includes("sentence making") || lowerName.includes("বাক্য রচনা") || lowerName.includes("বাক্য তৈরি") || lowerName.includes("বাক্য গঠন")) {
@@ -188,6 +245,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("math question") || lowerName.includes("math_question") || lowerName.includes("গণিত প্রশ্ন") || lowerName.includes("গণিত") || lowerName.includes("math")) {
+      category = QUESTION_TYPE_CODES.MATH_QUESTION;
     } else if (lowerName.includes("grammar question") || lowerName.includes("grammar_question") || lowerName.includes("ব্যাকরণ প্রশ্ন") || lowerName.includes("ব্যাকরণ")) {
       category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {
@@ -232,32 +291,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   });
   const sources = sourcesData ?? [];
 
-  if (paperLoading || statusesLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background font-display">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!distStatus) {
-    return (
-      <div className="flex flex-col h-screen items-center justify-center bg-background font-display">
-        <p className="text-red-500 font-medium">নম্বর বণ্টন পাওয়া যায়নি।</p>
-        <Button asChild className="mt-4">
-          <Link href={`/question-papers/${paperId}/builder`}>বিল্ডারে ফিরে যান</Link>
-        </Button>
-      </div>
-    );
-  }
-
   const subSectionQuestionsCount = urlSubSectionId
     ? (paperQuery?.questions || []).filter((q: any) => q.subSectionId === urlSubSectionId && q.distributionId === distributionId).length
     : (urlSectionId
       ? (paperQuery?.questions || []).filter((q: any) => q.sectionId === urlSectionId && q.distributionId === distributionId).length
-      : (distStatus.addedCount || 0));
+      : (distStatus?.addedCount || 0));
 
-  const effectiveTargetCount = isAlternativeMode ? 1 : (urlLimit ?? distStatus.targetCount ?? 0);
+  const effectiveTargetCount = isAlternativeMode ? 1 : (urlLimit ?? distStatus?.targetCount ?? 0);
   const maxSelectable = isAlternativeMode ? 1 : Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
@@ -278,6 +318,25 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   );
 
   const availableUnassigned = (availableData?.items || []).filter((q: any) => !q.isAssigned);
+
+  if (paperLoading || statusesLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background font-display">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!distStatus) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center bg-background font-display">
+        <p className="text-red-500 font-medium">নম্বর বণ্টন পাওয়া যায়নি।</p>
+        <Button asChild className="mt-4">
+          <Link href={`/question-papers/${paperId}/builder`}>বিল্ডারে ফিরে যান</Link>
+        </Button>
+      </div>
+    );
+  }
 
   const handleRandomSelect = () => {
     if (questionsLoading) return;
@@ -500,6 +559,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, newsReportIds: selectedIds });
       } else if (category === "ESSAY") {
         await bulkAssign({ ...payloadBase, essayIds: selectedIds });
+      } else if (category === "NUMBER_IN_WORDS") {
+        await bulkAssign({ ...payloadBase, numberInWordsIds: selectedIds });
       } else if (category === "WORD_MEANING") {
         await bulkAssign({ ...payloadBase, wordMeaningIds: selectedIds });
       } else if (category === "MAKE_SENTENCES") {
@@ -534,6 +595,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, shuddhoAshuddhoIds: selectedIds });
       } else if (category === "DAN_BAM_MILKORON") {
         await bulkAssign({ ...payloadBase, danBamMilkoronIds: selectedIds });
+      } else if (category === "MATH_QUESTION") {
+        await bulkAssign({ ...payloadBase, mathQuestionIds: selectedIds });
       } else if (category === "GRAMMAR_QUESTION") {
         await bulkAssign({ ...payloadBase, grammarQuestionIds: selectedIds });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
@@ -546,6 +609,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, fillInTheBlanksWithoutCluesIds: selectedIds });
       } else if (category === "SUBSTITUTION_TABLE") {
         await bulkAssign({ ...payloadBase, substitutionTableIds: selectedIds });
+      } else if (category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2") {
+        const seenComprehensionItems = selectedIds.map((id) => ({
+          id,
+          selectedSubQuestionIds: selectedSubQuestionIdsMap[id] || [],
+        }));
+        await bulkAssign({ ...payloadBase, seenComprehensionItems });
       } else {
         await bulkAssign({ ...payloadBase, mcqIds: selectedIds });
       }
@@ -1226,7 +1295,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             source={selectedSource}
             sort={selectedSort}
             excludePaperId={paperId}
+            distributionId={isAlternativeMode ? undefined : distributionId}
             selectedIds={selectedIds}
+            selectedSubQuestionIdsMap={selectedSubQuestionIdsMap}
+            onToggleSubQuestion={handleToggleSubQuestion}
+            onSelectGroup={handleSelectGroup}
             page={page}
             limit={limit}
             onPageChange={setPage}
@@ -1236,7 +1309,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             onToggle={(id) => {
               setSelectedIds(prev => {
                 if (prev.includes(id)) {
-                  return [];
+                  setSelectedSubQuestionIdsMap((m) => {
+                    const next = { ...m };
+                    delete next[id];
+                    return next;
+                  });
+                  return prev.filter((item) => item !== id);
                 }
                 if (isAlternativeMode) {
                   return [id];

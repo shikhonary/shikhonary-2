@@ -10,6 +10,7 @@ export const listMathQuestionSchema = paginationSchema.extend({
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  isMath: z.boolean().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
@@ -32,6 +33,7 @@ export type GetMathQuestionInput = z.infer<typeof getMathQuestionSchema>
 export const createMathQuestionSchema = z.object({
   question: z.string().min(1, "Question is required"),
   answer: z.string().optional().nullable(),
+  isMath: z.boolean().default(false),
   reference: z.array(z.string()).optional().default([]),
   source: z.string().optional().nullable(),
   session: z.string().optional().nullable(),

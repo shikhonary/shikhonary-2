@@ -6,6 +6,7 @@ const questionTypeConfigSchema = z.object({
   mark: z.number().min(0),
   requiredCount: z.number().int().min(0),
   totalQuestions: z.number().int().min(0),
+  position: z.number().int().default(0).optional(),
   markDistribution: z.record(z.string(), z.number()).optional().nullable(),
 })
 

@@ -8,6 +8,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+import { isResourceEnglish } from "@workspace/utils";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -237,6 +238,13 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
   // Passage text resolution
   const passageText = data.rawText || data.content || data.prompt || "";
 
+  // Dynamic language resolution
+  const isEnglish = isResourceEnglish({
+    subjectName: distStatus?.subjectName || item.distribution?.subjectName || item.subjectName,
+    questionTypeLabel: rawLabel,
+    content: passageText,
+  });
+
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid py-1">
       {/* Hover Controls */}
@@ -245,10 +253,10 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
           type="button"
           onClick={() => setShowAddAlternative(true)}
           className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
+          title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
         >
           <Split className="w-3 h-3" />
-          অথবা
+          {isEnglish ? "Or" : "অথবা"}
         </button>
         <button 
           onClick={handleRemove}
@@ -272,7 +280,7 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
                   fontFamily: questionStyle.fontFamily,
                 }}
               >
-                {toBengaliDigits(masterNum)}।
+                {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
               </span>
             ) : (
               <span
@@ -283,7 +291,7 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
                 }}
                 aria-hidden="true"
               >
-                {toBengaliDigits(masterNum)}।
+                {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
               </span>
             )}
             
@@ -293,7 +301,11 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
                   <EditableSectionLabel
                     distributionId={item.distributionId || data.distributionId || item.distribution?.id}
                     initialLabel={rawLabel}
-                    fallbackLabel="Use appropriate punctuation marks and capital letters where necessary in the following text:"
+                    fallbackLabel={
+                      isEnglish
+                        ? "Use appropriate punctuation marks and capital letters where necessary in the following text:"
+                        : "নিচের অনুচ্ছেদটিতে উপযুক্ত স্থানে বিরামচিহ্ন বসিয়ে লেখ:"
+                    }
                     questionType="PUNCTUATION"
                     questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
                     questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? attemptCount}
@@ -322,8 +334,12 @@ export const PunctuationBlock = ({ item }: { item: any }) => {
                 }}
               >
                 {attemptCount > 1 && !isFirst ? null : attemptCount > 1
-                  ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
-                  : toBengaliDigits(marksPerQuestion)}
+                  ? isEnglish
+                    ? `${marksPerQuestion} × ${attemptCount} = ${marksPerQuestion * attemptCount}`
+                    : `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+                  : isEnglish
+                    ? marksPerQuestion
+                    : toBengaliDigits(marksPerQuestion)}
               </div>
             )}
           </div>

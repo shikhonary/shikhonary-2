@@ -101,6 +101,9 @@ export async function getAcademicSubjectById(
         },
       },
       subjectQuestionTypes: {
+        orderBy: {
+          position: "asc",
+        },
         include: {
           questionType: true,
         },
@@ -116,6 +119,9 @@ export async function getAcademicSubjectById(
             },
             include: {
               subjectQuestionTypes: {
+                orderBy: {
+                  position: "asc",
+                },
                 include: {
                   questionType: true,
                 },
@@ -123,6 +129,9 @@ export async function getAcademicSubjectById(
             },
           },
           subjectQuestionTypes: {
+            orderBy: {
+              position: "asc",
+            },
             include: {
               questionType: true,
             },
@@ -228,13 +237,14 @@ export async function saveSubjectQuestionTypes(
     // Insert new associations
     if (questionTypes.length > 0) {
       await tx.subjectQuestionType.createMany({
-        data: questionTypes.map((qt) => ({
+        data: questionTypes.map((qt, idx) => ({
           subjectId,
           questionTypeId: qt.questionTypeId,
           customLabel: qt.customLabel?.trim() || null,
           mark: qt.mark,
           requiredCount: qt.requiredCount,
           totalQuestions: qt.totalQuestions,
+          position: typeof qt.position === "number" ? qt.position : idx,
           markDistribution: qt.markDistribution ?? undefined,
         })),
       })

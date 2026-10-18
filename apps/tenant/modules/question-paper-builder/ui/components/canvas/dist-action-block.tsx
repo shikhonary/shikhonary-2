@@ -136,6 +136,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.POD_NIRNOY;
     } else if (lowerName.includes("verb tense") || lowerName.includes("verb_tense") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়াপদ") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("ক্রিয়ার কাল") || lowerName.includes("কাল নির্ণয়") || lowerName.includes("কাল নির্ণয়")) {
       resolvedCategory = QUESTION_TYPE_CODES.VERB_TENSE;
+    } else if (lowerName.includes("number in word") || lowerName.includes("numbers in word") || lowerName.includes("কথায় লেখ") || lowerName.includes("কথায় লেখা") || lowerName.includes("সংখ্যা কথায়") || lowerName.includes("সংখ্যা কথায়")) {
+      resolvedCategory = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
     } else if (lowerName.includes("word meaning") || lowerName.includes("word_meaning") || lowerName.includes("শব্দার্থ")) {
       resolvedCategory = QUESTION_TYPE_CODES.WORD_MEANING;
     } else if (lowerName.includes("make sentence") || lowerName.includes("make_sentence") || lowerName.includes("sentence making") || lowerName.includes("বাক্য রচনা") || lowerName.includes("বাক্য তৈরি") || lowerName.includes("বাক্য গঠন")) {
@@ -150,6 +152,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       resolvedCategory = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lowerName.includes("math question") || lowerName.includes("math_question") || lowerName.includes("গণিত প্রশ্ন") || lowerName.includes("গণিত") || lowerName.includes("math")) {
+      resolvedCategory = QUESTION_TYPE_CODES.MATH_QUESTION;
     } else if (lowerName.includes("grammar question") || lowerName.includes("grammar_question") || lowerName.includes("ব্যাকরণ প্রশ্ন") || lowerName.includes("ব্যাকরণ")) {
       resolvedCategory = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lowerName.includes("short answer") || (lowerName.includes("short") && !lowerName.includes("composition")) || lowerName.includes("sa")) {

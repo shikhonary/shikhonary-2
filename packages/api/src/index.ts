@@ -461,6 +461,18 @@ export type {
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
+  ListNumberInWordsInput,
+  NumberInWordsStatsInput,
+  GetNumberInWordsInput,
+  CreateNumberInWordsInput,
+  UpdateNumberInWordsInput,
+  ToggleNumberInWordsActiveInput,
+  DeleteNumberInWordsInput,
+  BulkDeleteNumberInWordsInput,
+  ImportNumberInWordsInput,
+} from "./routers/number-in-words/number-in-words.schema"
+
+export type {
   ListMathQuestionInput,
   MathQuestionStatsInput,
   GetMathQuestionInput,
@@ -703,6 +715,8 @@ export {
   getSubjectDetails,
 } from "./routers/question-bank/question-bank.service"
 export type { NormalizedQuestionItem } from "./routers/question-bank/question-bank.service"
+
+export * from "./routers/seen-comprehension/seen-comprehension.schema"
 
 
 

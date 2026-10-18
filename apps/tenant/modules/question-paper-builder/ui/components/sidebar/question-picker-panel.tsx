@@ -17,9 +17,10 @@ import {
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, isResourceEnglish, type QuestionTypeCode } from "@workspace/utils";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
+import { formatNumberInWords, translateTag } from "../distribution-picker/number-in-words-picker-card";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -28,6 +29,19 @@ const toBengaliDigits = (num?: number | string | null): string => {
     .toString()
     .split("")
     .map((char) => (/\d/.test(char) ? bengaliDigits[parseInt(char)] : char))
+    .join("");
+};
+
+const toEnglishDigits = (num?: number | string | null): string => {
+  if (num === null || num === undefined || num === "") return "";
+  const bengaliToEnglish: Record<string, string> = {
+    "০": "0", "১": "1", "২": "2", "৩": "3", "৪": "4",
+    "৫": "5", "৬": "6", "৭": "7", "৮": "8", "৯": "9",
+  };
+  return num
+    .toString()
+    .split("")
+    .map((char) => bengaliToEnglish[char] ?? char)
     .join("");
 };
 
@@ -67,6 +81,10 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.CQ;
   } else if (normalized === QUESTION_TYPES.PBQ) {
     category = QUESTION_TYPE_CODES.PBQ;
+  } else if (normalized === QUESTION_TYPES.SEEN_COMPREHENSION_1) {
+    category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
+  } else if (normalized === QUESTION_TYPES.SEEN_COMPREHENSION_2) {
+    category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2;
   } else if (normalized === QUESTION_TYPES.SA) {
     category = QUESTION_TYPE_CODES.SA;
   } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
@@ -91,6 +109,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.NEWS_REPORT;
   } else if (normalized === QUESTION_TYPES.ESSAY) {
     category = QUESTION_TYPE_CODES.ESSAY;
+  } else if (normalized === QUESTION_TYPES.NUMBER_IN_WORDS) {
+    category = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
   } else if (normalized === QUESTION_TYPES.WORD_MEANING) {
     category = QUESTION_TYPE_CODES.WORD_MEANING;
   } else if (normalized === QUESTION_TYPES.MAKE_SENTENCES) {
@@ -159,6 +179,12 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
     } else if (lower.includes("punctuation") || lower.includes("capitalization") || lower.includes("বিরাম চিহ্ন") || lower.includes("যতিচিহ্ন")) {
       category = QUESTION_TYPE_CODES.PUNCTUATION;
+    } else if (lower.includes("seen comprehension 1") || lower.includes("seen passage 1") || lower.includes("সিন প্যাসেজ ১") || lower.includes("পঠিত অনুচ্ছেদ ১")) {
+      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
+    } else if (lower.includes("seen comprehension 2") || lower.includes("seen passage 2") || lower.includes("সিন প্যাসেজ ২") || lower.includes("পঠিত অনুচ্ছেদ ২")) {
+      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2;
+    } else if (lower.includes("seen comprehension") || lower.includes("seen passage") || lower.includes("পঠিত অনুচ্ছেদ")) {
+      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
     } else if (lower.includes("pbq") || lower.includes("passage") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
       category = QUESTION_TYPE_CODES.PBQ;
     } else if (lower.includes("essence") || lower.includes("সারমর্ম")) {
@@ -197,6 +223,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.POD_NIRNOY;
     } else if (lower.includes("verb tense") || lower.includes("verb_tense") || lower.includes("ক্রিয়াপদ") || lower.includes("ক্রিয়াপদ") || lower.includes("ক্রিয়ার কাল") || lower.includes("ক্রিয়ার কাল")) {
       category = QUESTION_TYPE_CODES.VERB_TENSE;
+    } else if (lower.includes("number in word") || lower.includes("numbers in word") || lower.includes("কথায় লেখ") || lower.includes("কথায় লেখা") || lower.includes("সংখ্যা কথায়") || lower.includes("সংখ্যা কথায়")) {
+      category = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
     } else if (lower.includes("word meaning") || lower.includes("word_meaning") || lower.includes("শব্দার্থ")) {
       category = QUESTION_TYPE_CODES.WORD_MEANING;
     } else if (lower.includes("make sentence") || lower.includes("make_sentence") || lower.includes("sentence making") || lower.includes("বাক্য রচনা") || lower.includes("বাক্য তৈরি") || lower.includes("বাক্য গঠন")) {
@@ -211,6 +239,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
     } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
+    } else if (lower.includes("math question") || lower.includes("math_question") || lower.includes("গণিত প্রশ্ন") || lower.includes("গণিত") || lower.includes("math")) {
+      category = QUESTION_TYPE_CODES.MATH_QUESTION;
     } else if (lower.includes("grammar question") || lower.includes("grammar_question") || lower.includes("ব্যাকরণ প্রশ্ন") || lower.includes("ব্যাকরণ")) {
       category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
     } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
@@ -226,6 +256,7 @@ export const QuestionPickerPanel: React.FC = () => {
       search: search.trim() || undefined,
       sort,
       excludePaperId: paperId || undefined,
+      distributionId: activeDistId || undefined,
       limit: 25,
     },
     Boolean(activeDist?.subjectId)
@@ -304,6 +335,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, newsReportIds: [questionId] });
       } else if (category === "ESSAY") {
         await assignQuestion({ ...payloadBase, essayIds: [questionId] });
+      } else if (category === "NUMBER_IN_WORDS") {
+        await assignQuestion({ ...payloadBase, numberInWordsIds: [questionId] });
       } else if (category === "WORD_MEANING") {
         await assignQuestion({ ...payloadBase, wordMeaningIds: [questionId] });
       } else if (category === "MAKE_SENTENCES") {
@@ -338,6 +371,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, shuddhoAshuddhoIds: [questionId] });
       } else if (category === "DAN_BAM_MILKORON") {
         await assignQuestion({ ...payloadBase, danBamMilkoronIds: [questionId] });
+      } else if (category === "MATH_QUESTION") {
+        await assignQuestion({ ...payloadBase, mathQuestionIds: [questionId] });
       } else if (category === "GRAMMAR_QUESTION") {
         await assignQuestion({ ...payloadBase, grammarQuestionIds: [questionId] });
       } else if (category === "RIGHT_FORM_OF_VERBS") {
@@ -350,6 +385,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, fillInTheBlanksWithoutCluesIds: [questionId] });
       } else if (category === "SUBSTITUTION_TABLE") {
         await assignQuestion({ ...payloadBase, substitutionTableIds: [questionId] });
+      } else if (category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2") {
+        await assignQuestion({ ...payloadBase, seenComprehensionIds: [questionId] });
       } else {
         await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
@@ -357,6 +394,25 @@ export const QuestionPickerPanel: React.FC = () => {
       toast.success("প্রশ্নটি প্রশ্নপত্রে যোগ করা হয়েছে!");
     } catch (err: any) {
       toast.error(err?.message || "প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
+    }
+  };
+
+  const handleQuickAssignGroup = async (questionId: string, groupSubIds: string[]) => {
+    if (!paperId || !activeDistId) return;
+    try {
+      const payloadBase = {
+        questionPaperId: paperId,
+        distributionId: activeDistId,
+        sectionId: activeSectionId || (activeDist as any)?.sectionId || undefined,
+        subSectionId: activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
+      };
+      await assignQuestion({
+        ...payloadBase,
+        seenComprehensionItems: [{ id: questionId, selectedSubQuestionIds: groupSubIds }],
+      });
+      toast.success("উপ-প্রশ্নসমূহ সফলভাবে যোগ করা হয়েছে!");
+    } catch (err: any) {
+      toast.error(err?.message || "উপ-প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
     }
   };
 
@@ -503,6 +559,12 @@ export const QuestionPickerPanel: React.FC = () => {
                 ? q.attachments.find((att: any) => att.caption)?.caption
                 : null;
 
+              const isCurrentEnglish = isResourceEnglish({
+                subjectName: activeDist?.subjectName,
+                questionTypeLabel: activeDist?.questionTypeLabel,
+                content: q.rawText || q.content || q.statement || q.question,
+              }) || category === "NUMBER_IN_WORDS" || category === "PARTS_OF_SPEECH" || category === "RIGHT_FORM_OF_VERBS" || category === "CHANGING_SENTENCES";
+
               return (
                 <div
                   key={q.id}
@@ -516,12 +578,14 @@ export const QuestionPickerPanel: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-1">
                       {(q.academicChapter || q.chapter) && (
                         <Badge variant="secondary" className="text-[10px] font-normal px-1.5 py-0">
-                          {q.academicChapter?.nameBn || q.academicChapter?.nameEn || q.chapter?.nameBn || q.chapter?.nameEn}
+                          {isCurrentEnglish
+                            ? (q.academicChapter?.nameEn || q.chapter?.nameEn || translateTag(q.academicChapter?.nameBn || q.chapter?.nameBn || ""))
+                            : (q.academicChapter?.nameBn || q.academicChapter?.nameEn || q.chapter?.nameBn || q.chapter?.nameEn)}
                         </Badge>
                       )}
-                      {category !== "WORD_MEANING" && q.type && (
+                      {category !== "WORD_MEANING" && category !== "NUMBER_IN_WORDS" && q.type && (
                         <Badge variant="outline" className="text-[10px] font-normal px-1.5 py-0 bg-primary/5 text-primary border-primary/20">
-                          {q.type === "SINGLE" ? "সাধারণ" : q.type === "MULTIPLE" ? "বহুপদি" : q.type === "COMBINED" ? "অভিন্ন" : q.type}
+                          {q.type === "SINGLE" ? (isCurrentEnglish ? "Single" : "সাধারণ") : q.type === "MULTIPLE" ? (isCurrentEnglish ? "Multiple" : "বহুপদি") : q.type === "COMBINED" ? (isCurrentEnglish ? "Combined" : "অভিন্ন") : q.type}
                         </Badge>
                       )}
                       {q.difficulty && (
@@ -533,7 +597,9 @@ export const QuestionPickerPanel: React.FC = () => {
                             q.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
                           )}
                         >
-                          {q.difficulty === "EASY" ? "সহজ" : q.difficulty === "MEDIUM" ? "মধ্যম" : q.difficulty === "HARD" ? "কঠিন" : q.difficulty}
+                          {isCurrentEnglish
+                            ? (q.difficulty ? q.difficulty.charAt(0).toUpperCase() + q.difficulty.slice(1).toLowerCase() : "")
+                            : (q.difficulty === "EASY" ? "সহজ" : q.difficulty === "MEDIUM" ? "মধ্যম" : q.difficulty === "HARD" ? "কঠিন" : q.difficulty)}
                         </span>
                       )}
                       {q.isMath && (
@@ -544,7 +610,7 @@ export const QuestionPickerPanel: React.FC = () => {
                     </div>
                     {isAssigned ? (
                       <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> যোগকৃত
+                        <CheckCircle2 className="w-3 h-3" /> {isCurrentEnglish ? "Added" : "যোগকৃত"}
                       </span>
                     ) : (
                       <Button
@@ -555,7 +621,7 @@ export const QuestionPickerPanel: React.FC = () => {
                         className="h-6 px-2 text-[11px] gap-1 text-primary hover:bg-primary/10 rounded-md font-bold cursor-pointer shrink-0"
                       >
                         <Plus className="w-3 h-3" />
-                        <span>যোগ</span>
+                        <span>{isCurrentEnglish ? "Add" : "যোগ"}</span>
                       </Button>
                     )}
                   </div>
@@ -586,7 +652,7 @@ export const QuestionPickerPanel: React.FC = () => {
                         <RenderMath text={q.rawText || q.content || q.prompt || ""} />
                         {(q.answerText || q.answer) && (
                           <span className="text-[11px] text-muted-foreground">
-                            Ans: <RenderMath text={q.answerText || q.answer} />
+                            {isCurrentEnglish ? "Ans:" : "উত্তর:"} <RenderMath text={q.answerText || q.answer} />
                           </span>
                         )}
                       </div>
@@ -600,8 +666,58 @@ export const QuestionPickerPanel: React.FC = () => {
                       <RenderMath text={q.questionA || q.context || "সৃজনশীল প্রশ্ন"} />
                     ) : category === "PBQ" ? (
                       <RenderMath text={q.context || q.questionA || "অনুচ্ছেদভিত্তিক প্রশ্ন"} />
+                    ) : category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2" ? (
+                      <div className="flex flex-col gap-1.5">
+                        {q.title && <div className="font-bold text-primary">{q.title}</div>}
+                        <div className="line-clamp-3 text-muted-foreground"><RenderMath text={q.passage || ""} /></div>
+                        {Array.isArray(q.questions) && q.questions.length > 0 && (
+                          <div className="flex flex-col gap-1 mt-1 pt-1 border-t border-dashed">
+                            <div className="text-[10px] text-muted-foreground font-semibold flex items-center justify-between">
+                              <span>📝 মোট {toBengaliDigits(q.questions.length)}টি উপ-প্রশ্ন</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {Array.from(new Set(q.questions.map((sq: any) => sq.groupNumber || 1))).map((gNum: any) => {
+                                const groupSubIds = q.questions.filter((sq: any) => (sq.groupNumber || 1) === gNum).map((sq: any) => sq.id);
+                                return (
+                                  <button
+                                    key={gNum}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleQuickAssignGroup(q.id, groupSubIds);
+                                    }}
+                                    className="px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                                    title={`শুধু গ্রুপ ${toBengaliDigits(gNum)} যোগ করুন`}
+                                  >
+                                    <Plus className="w-2.5 h-2.5" />
+                                    গ্রুপ {toBengaliDigits(gNum)} ({toBengaliDigits(groupSubIds.length)})
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : category === "PARAGRAPH" ? (
                       <RenderMath text={q.name || q.title || ""} />
+                    ) : category === "NUMBER_IN_WORDS" ? (
+                      (() => {
+                        const { numberText, inWordsText } = formatNumberInWords(q);
+                        return (
+                          <div className="flex flex-col gap-0.5">
+                            <div className="flex items-baseline gap-2">
+                              <span className="font-bold text-primary text-sm">
+                                <RenderMath text={numberText || q.title || q.name || ""} isMath={true} />
+                              </span>
+                              {inWordsText && (
+                                <span className="text-xs text-muted-foreground font-semibold">
+                                  ({inWordsText})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()
                     ) : category === "WORD_MEANING" ? (
                       <div className="flex flex-col gap-0.5">
                         <RenderMath text={q.word || q.title || q.name || ""} />
@@ -695,12 +811,13 @@ export const QuestionPickerPanel: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-1 mt-2 border-t border-outline-variant/30 pt-2">
                       {((q as any).source || (q as any).session) && (
                         <span className="px-1.5 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-semibold border border-primary/20">
-                          📚 {(q as any).source || "N/A"}{(q as any).session ? ` (${toBengaliDigits((q as any).session)})` : ""}
+                          📚 {isCurrentEnglish ? translateTag((q as any).source || "Textbook") : ((q as any).source || "N/A")}
+                          {(q as any).session ? ` (${isCurrentEnglish ? toEnglishDigits((q as any).session) : toBengaliDigits((q as any).session)})` : ""}
                         </span>
                       )}
                       {Array.isArray(q.reference) && q.reference.map((ref: string, rIdx: number) => (
                         <span key={rIdx} className="px-1.5 py-0.5 bg-muted text-[10px] font-medium rounded text-muted-foreground">
-                          🏷️ {ref}
+                          🏷️ {isCurrentEnglish ? translateTag(ref) : ref}
                         </span>
                       ))}
                     </div>

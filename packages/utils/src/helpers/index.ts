@@ -199,5 +199,40 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   }
 }
 
+/**
+ * Detects whether a question resource, paper, or distribution is in English.
+ * Evaluates subject name, question type label, and textual content.
+ */
+export function isResourceEnglish(options?: {
+  subjectName?: string | null;
+  subjectNameEn?: string | null;
+  subjectNameBn?: string | null;
+  questionTypeLabel?: string | null;
+  questionTypeName?: string | null;
+  content?: string | null;
+}): boolean {
+  if (!options) return false;
+
+  const combinedSubject = `${options.subjectName || ""} ${options.subjectNameEn || ""} ${options.subjectNameBn || ""}`.trim();
+  if (combinedSubject) {
+    if (/english|ইংরেজি/i.test(combinedSubject)) return true;
+    if (/bangla|বাংলা/i.test(combinedSubject)) return false;
+  }
+
+  if (options.questionTypeLabel && options.questionTypeLabel.trim().length > 0) {
+    if (!/[\u0980-\u09FF]/.test(options.questionTypeLabel)) return true;
+  }
+
+  if (options.questionTypeName && options.questionTypeName.trim().length > 0) {
+    if (!/[\u0980-\u09FF]/.test(options.questionTypeName) && /[a-zA-Z]/.test(options.questionTypeName)) return true;
+  }
+
+  if (options.content && options.content.trim().length > 0) {
+    return !/[\u0980-\u09FF]/.test(options.content);
+  }
+
+  return false;
+}
+
 
 

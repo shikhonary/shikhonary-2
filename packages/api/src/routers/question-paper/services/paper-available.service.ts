@@ -6,7 +6,7 @@ import type { GetAvailableQuestionsInput } from "../question-paper.schema"
 export type CategoryQueryConfig = {
   model: string
   searchFields: string[]
-  includes: Record<string, boolean>
+  includes: Record<string, any>
   excludedIdField: string
   hasIsActive: boolean
   fallbackWithoutTypeFilter?: boolean
@@ -146,6 +146,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     searchFields: ["word", "meaning"],
     includes: { academicChapter: true, questionType: true },
     excludedIdField: "wordMeaningId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  NUMBER_IN_WORDS: {
+    model: "numberInWords",
+    searchFields: ["number", "inWords"],
+    includes: { academicChapter: true, questionType: true },
+    excludedIdField: "numberInWordsId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
@@ -333,11 +341,45 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  MATH_QUESTION: {
+    model: "mathQuestion",
+    searchFields: ["question", "answer", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "mathQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   GRAMMAR_QUESTION: {
     model: "grammarQuestion",
     searchFields: ["question", "answer", "reference"],
     includes: { questionType: true, subject: true, academicChapter: true },
     excludedIdField: "grammarQuestionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  SEEN_COMPREHENSION_1: {
+    model: "seenComprehension",
+    searchFields: ["title", "passage", "instruction", "source", "reference"],
+    includes: {
+      questionType: true,
+      subject: true,
+      academicChapter: true,
+      questions: { orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }] },
+    },
+    excludedIdField: "seenComprehensionId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
+  SEEN_COMPREHENSION_2: {
+    model: "seenComprehension",
+    searchFields: ["title", "passage", "instruction", "source", "reference"],
+    includes: {
+      questionType: true,
+      subject: true,
+      academicChapter: true,
+      questions: { orderBy: [{ groupNumber: "asc" }, { orderIndex: "asc" }] },
+    },
+    excludedIdField: "seenComprehensionId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
@@ -350,6 +392,8 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.SA]: "SA",
   [QUESTION_TYPES.PBQ]: "PBQ",
   [QUESTION_TYPES.PARAGRAPH]: "PARAGRAPH",
+  [QUESTION_TYPES.SEEN_COMPREHENSION_1]: "SEEN_COMPREHENSION_1",
+  [QUESTION_TYPES.SEEN_COMPREHENSION_2]: "SEEN_COMPREHENSION_2",
   [QUESTION_TYPES.THOUGHT_EXPANSION]: "AMPLIFICATION",
   [QUESTION_TYPES.LETTER]: "LETTER",
   [QUESTION_TYPES.APPLICATION]: "APPLICATION",
@@ -372,6 +416,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.SHORT_COMPOSITION]: "SHORT_COMPOSITION",
   [QUESTION_TYPES.MAKE_QUESTION]: "MAKE_QUESTION",
   [QUESTION_TYPES.MAKE_SENTENCES]: "MAKE_SENTENCES",
+  [QUESTION_TYPES.NUMBER_IN_WORDS]: "NUMBER_IN_WORDS",
   [QUESTION_TYPES.WORD_MEANING]: "WORD_MEANING",
   [QUESTION_TYPES.OPPOSITE_WORD]: "OPPOSITE_WORD",
   [QUESTION_TYPES.JUKTOBORNO]: "JUKTOBORNO",
@@ -384,6 +429,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.FORM_FILLING]: "FORM_FILLUP",
   [QUESTION_TYPES.SHUDDHO_ASHUDDHO]: "SHUDDHO_ASHUDDHO",
   [QUESTION_TYPES.DAN_BAM_MILKORON]: "DAN_BAM_MILKORON",
+  [QUESTION_TYPES.MATH_QUESTION]: "MATH_QUESTION",
   [QUESTION_TYPES.GRAMMAR_QUESTION]: "GRAMMAR_QUESTION",
 }
 
@@ -401,6 +447,8 @@ export async function getAvailableQuestions(
     ? tenantDb.questionPaperQuestion.findMany({
       where: { questionPaperId: excludePaperId },
       select: {
+        distributionId: true,
+        selectedSubQuestionIds: true,
         mcqId: true,
         cqId: true,
         csId: true,
@@ -429,6 +477,7 @@ export async function getAvailableQuestions(
         shortQuestionId: true,
         makeQuestionId: true,
         wordMeaningId: true,
+        numberInWordsId: true,
         makeSentencesId: true,
         oppositeWordId: true,
         juktobornoId: true,
@@ -440,7 +489,9 @@ export async function getAvailableQuestions(
         formFillupId: true,
         shuddhoAshuddhoId: true,
         danBamMilkoronId: true,
+        mathQuestionId: true,
         grammarQuestionId: true,
+        seenComprehensionId: true,
       },
     })
     : Promise.resolve([])
@@ -464,9 +515,27 @@ export async function getAvailableQuestions(
 
   // Build excluded IDs map by field
   const excludedIds = new Map<string, Set<string>>()
-  for (const q of existingQuestions) {
+  const seenCompAssignedSubQuestions = new Map<string, Set<string>>()
+
+  for (const q of existingQuestions as any[]) {
+    if (q.seenComprehensionId) {
+      if (!seenCompAssignedSubQuestions.has(q.seenComprehensionId)) {
+        seenCompAssignedSubQuestions.set(q.seenComprehensionId, new Set())
+      }
+      if (Array.isArray(q.selectedSubQuestionIds)) {
+        for (const subId of q.selectedSubQuestionIds) {
+          seenCompAssignedSubQuestions.get(q.seenComprehensionId)!.add(subId)
+        }
+      }
+    }
+
     for (const [field, value] of Object.entries(q)) {
+      if (field === "distributionId" || field === "selectedSubQuestionIds") continue
       if (value) {
+        // If distributionId is specified, only exclude seenComprehension if already in THIS distribution
+        if (field === "seenComprehensionId" && input.distributionId && q.distributionId !== input.distributionId) {
+          continue
+        }
         if (!excludedIds.has(field)) excludedIds.set(field, new Set())
         excludedIds.get(field)!.add(value as string)
       }
@@ -518,12 +587,18 @@ export async function getAvailableQuestions(
     effectiveCategory === "PROSE_ESSENCE" ||
     effectiveCategory === "SHORT_QUESTION" ||
     effectiveCategory === "MAKE_QUESTION" ||
-    effectiveCategory === "DESCRIPTIVE_QUESTION"
+    effectiveCategory === "DESCRIPTIVE_QUESTION" ||
+    effectiveCategory === "SEEN_COMPREHENSION_1" ||
+    effectiveCategory === "SEEN_COMPREHENSION_2"
   ) {
     if (chapterId && chapterId !== "all" && chapterId !== "All") {
       where.academicChapterId = chapterId
     }
     delete where.chapterId
+  }
+
+  if (effectiveCategory === "SEEN_COMPREHENSION_1" || effectiveCategory === "SEEN_COMPREHENSION_2") {
+    where.comprehensionType = effectiveCategory
   }
 
   if (effectiveCategory === "APPLICATION" || effectiveCategory === "LETTER") {
@@ -628,6 +703,9 @@ export async function getAvailableQuestions(
       chapter: item.academicChapter || item.chapter,
       chapterId: item.academicChapterId || item.chapterId,
       isAssigned: excludedSet.has(item.id),
+      assignedSubQuestionIds: seenCompAssignedSubQuestions.has(item.id)
+        ? Array.from(seenCompAssignedSubQuestions.get(item.id)!)
+        : [],
     })),
     totalItems,
     page: resolvedPage,
@@ -671,7 +749,7 @@ export async function getAvailableBoardYears(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId
@@ -744,7 +822,7 @@ export async function getAvailableSources(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId
