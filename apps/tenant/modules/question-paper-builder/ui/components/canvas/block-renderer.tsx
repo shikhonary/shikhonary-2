@@ -26,6 +26,7 @@ import { WordMeaningBlock } from "../blocks/word-meaning-block";
 import { MakeSentenceBlock } from "../blocks/make-sentence-block";
 import { MakeQuestionBlock } from "../blocks/make-question-block";
 import { OppositeWordBlock } from "../blocks/opposite-word-block";
+import { GenderChangeBlock } from "../blocks/gender-change-block";
 import { JuktobornoBlock } from "../blocks/juktoborno-block";
 import { EkKothayProkashBlock } from "../blocks/ek-kothay-prokash-block";
 import { SynonymBlock } from "../blocks/synonym-block";
@@ -44,6 +45,7 @@ import { DescriptiveQuestionBlock } from "../blocks/descriptive-question-block";
 import { ShortQuestionBlock } from "../blocks/short-question-block";
 import { ShuddhoAshuddhoBlock } from "../blocks/shuddho-ashuddho-block";
 import { DanBamMilkoronBlock } from "../blocks/dan-bam-milkoron-block";
+import { RearrangeBlock } from "../blocks/rearrange-block";
 import { CorrectAnswerBlock } from "../blocks/correct-answer-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
@@ -69,12 +71,90 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
   const dismissSection = useBuilderStore((state) => state.dismissSection);
 
   const isActive = !isSectionFilled && activeSectionId === secId && !activeSubSectionId;
-  const formattedInst = instructions
-    ? instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
-      ? instructions.trim()
-      : `[${instructions.trim()}]`
+
+  const rawTitle = (titleBn || title)?.trim() || "";
+  const isGenericSection = rawTitle.toLowerCase() === "section";
+  const hasTitle = Boolean(rawTitle && !isGenericSection);
+
+  const rawInst = typeof instructions === "string" ? instructions.trim() : "";
+  const hasInstruction = Boolean(rawInst);
+  const formattedInst = hasInstruction
+    ? rawInst.startsWith("[") && rawInst.endsWith("]")
+      ? rawInst
+      : rawInst.startsWith("(") && rawInst.endsWith(")")
+      ? rawInst
+      : `[${rawInst}]`
     : null;
 
+  // Case 1: Neither title nor instruction
+  if (!hasTitle && !hasInstruction) {
+    if (isActive) {
+      return (
+        <div
+          onClick={() => secId && setActiveTarget({ sectionId: secId, subSectionId: null })}
+          className="group relative w-full my-1 py-1 flex items-center justify-between cursor-pointer bg-primary/5 ring-1 ring-primary/30 rounded px-2 print:hidden"
+        >
+          <div className="w-6" />
+          <span className="text-[10px] text-primary flex items-center gap-1 font-medium">
+            <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য বিভাগ
+          </span>
+          {!hasQuestions && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (secId) dismissSection(secId);
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded"
+              title="বিভাগ বন্ধ করুন"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      );
+    }
+    return null;
+  }
+
+  // Case 2: No title, but HAS instruction (Show instruction directly in builder canvas)
+  if (!hasTitle && hasInstruction) {
+    return (
+      <div 
+        onClick={() => secId && setActiveTarget({ sectionId: secId, subSectionId: null })}
+        className={`group relative w-full ${isFirstSection ? "mt-0" : "mt-4"} mb-2.5 flex flex-col items-center cursor-pointer transition-all ${
+          isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded px-2 py-0.5" : "hover:bg-muted/20"
+        }`}
+      >
+        <div className="flex items-center justify-between w-full">
+          <div className="w-6"></div>
+          <div className="font-semibold text-xs sm:text-sm text-center flex-1 italic text-foreground leading-normal">
+            {formattedInst}
+            {isActive && (
+              <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden not-italic">
+                <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+              </span>
+            )}
+          </div>
+          {!hasQuestions && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (secId) dismissSection(secId);
+              }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
+              title="বিভাগ বন্ধ করুন"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Case 3: Has title (and optional instruction)
   return (
     <div 
       onClick={() => secId && setActiveTarget({ sectionId: secId, subSectionId: null })}
@@ -85,7 +165,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
       <div className="flex items-center justify-between w-full">
         <div className="w-6"></div>
         <h3 className="font-bold text-base text-center flex-1">
-          {titleBn || title}
+          {rawTitle}
           {isActive && (
             <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
               <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
@@ -107,7 +187,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
         )}
       </div>
       {formattedInst && (
-        <p className="text-[9px] text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
+        <p className="text-xs text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
       )}
     </div>
   );
@@ -121,6 +201,11 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const { mutateAsync: deleteSubSection } = useDeleteSubSection();
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
+
+  const rawSubTitle = (titleBn || title)?.trim() || "";
+  const isGenericSub = rawSubTitle.toLowerCase() === "sub-section" || rawSubTitle.toLowerCase() === "subsection";
+  const hasSubTitle = Boolean(rawSubTitle && !isGenericSub && !hideTitle);
+
   const formattedInst = instructions
     ? instructions.trim().startsWith("(") && instructions.trim().endsWith(")")
       ? instructions.trim()
@@ -142,18 +227,52 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
         isActive ? "bg-primary/5 ring-1 ring-primary/30 rounded" : "hover:bg-muted/20"
       }`}
     >
-      <div className="flex items-center justify-between w-full">
-        <div className="w-6"></div>
-        <h4 className="font-semibold text-sm text-center flex-1">
-          {titleBn || title}
-          {isActive && (
-            <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
-              <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
-            </span>
+      {hasSubTitle ? (
+        <div className="flex items-center justify-between w-full">
+          <div className="w-6"></div>
+          <h4 className="font-semibold text-sm text-center flex-1">
+            {rawSubTitle}
+            {isActive && (
+              <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
+                <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+              </span>
+            )}
+          </h4>
+          {!hasQuestions && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (subId && sectionId) {
+                    try {
+                      await deleteSubSection({ sectionId, id: subId });
+                      toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                      if (nextSubSectionId) {
+                        setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
+                      } else {
+                        setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
+                      }
+                    } catch (err: any) {
+                      toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+                    }
+                  }
+                }}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
+                title="উপ-বিভাগ মুছুন"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
           )}
-        </h4>
-        {!hasQuestions && (
-          <div className="flex items-center gap-1">
+        </div>
+      ) : isActive ? (
+        <div className="flex items-center justify-between w-full print:hidden">
+          <div className="w-6"></div>
+          <span className="text-[10px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 mx-auto">
+            <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য উপ-বিভাগ
+          </span>
+          {!hasQuestions && (
             <button
               type="button"
               onClick={async (e) => {
@@ -162,11 +281,6 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                   try {
                     await deleteSubSection({ sectionId, id: subId });
                     toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
-                    if (nextSubSectionId) {
-                      setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
-                    } else {
-                      setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
-                    }
                   } catch (err: any) {
                     toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
                   }
@@ -177,9 +291,9 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
             >
               <X className="h-3.5 w-3.5" />
             </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      ) : null}
       {canShowBottomRow && (
         <div className="flex justify-between items-center w-full mt-0.5 mb-0.5 text-[12px] text-black">
           <div className="text-left font-normal text-black ml-[30px]">
@@ -347,6 +461,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <MakeQuestionBlock item={block.data.item} />;
     case "question-opposite-word":
       return <OppositeWordBlock item={block.data.item} />;
+    case "question-gender-change":
+      return <GenderChangeBlock item={block.data.item} />;
     case "question-juktoborno":
       return <JuktobornoBlock item={block.data.item} />;
     case "question-ek-kothay-prokash":
@@ -383,6 +499,8 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
       return <ShuddhoAshuddhoBlock item={block.data.item} />;
     case "question-dan-bam-milkoron":
       return <DanBamMilkoronBlock item={block.data.item} />;
+    case "question-rearrange":
+      return <RearrangeBlock item={block.data.item} />;
     case "question-math-question":
       return <MathQuestionBlock item={block.data.item} />;
     case "question-grammar-question":

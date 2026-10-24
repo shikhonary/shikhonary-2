@@ -29,6 +29,13 @@ interface EditableSectionLabelProps {
 const isMismatchedLabel = (label: string | null | undefined, questionType?: string): boolean => {
   if (!label) return false;
   const l = label.toLowerCase();
+  if (
+    questionType !== "POEM" &&
+    questionType !== "POEM_ESSENCE" &&
+    (l === "poem" || l === "poem:" || l.includes("কবিতা") || l.includes("কবিতাংশ") || l.includes("পদ্য"))
+  ) {
+    return true;
+  }
   if (questionType === "AMPLIFICATION" && (l.includes("অনুচ্ছেদ") || l.includes("প্রবন্ধ") || l.includes("সারাংশ"))) return true;
   if (questionType === "ESSAY" && (l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ") || l.includes("সারাংশ"))) return true;
   if (questionType === "PARAGRAPH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম"))) return true;
@@ -51,6 +58,7 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   if (questionType === "DESCRIPTIVE_QUESTION" && (l === "descriptive_question" || l === "descriptive question" || l === "রচনামূলক প্রশ্ন" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "SHORT_QUESTION" && (l === "short_question" || l === "short question" || l === "সংক্ষিপ্ত প্রশ্ন" || l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি"))) return true;
   if (questionType === "OPPOSITE_WORD" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক"))) return true;
+  if (questionType === "GENDER_CHANGE" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("বিপরীত") || l.includes("সমার্থক"))) return true;
   if (questionType === "JUKTOBORNO" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত"))) return true;
   if (questionType === "EK_KOTHAY_PROKASH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("সমার্থক") || l.includes("বিপরীত") || l.includes("যুক্তবর্ণ"))) return true;
   if (questionType === "SYNONYM" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম") || l.includes("আবেদনপত্র") || l.includes("প্রতিবেদন") || l.includes("চিঠি") || l.includes("বিপরীত"))) return true;

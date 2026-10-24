@@ -117,6 +117,7 @@ export async function upsertQuestionPaperDistribution(
         questionTypeLabel: input.questionTypeLabel ?? existing.questionTypeLabel,
         marksPerQuestion: input.marksPerQuestion,
         markDistribution: markDistribution as any,
+        renderMethod: input.renderMethod ?? existing.renderMethod ?? sqType?.renderMethod ?? 1,
         questionCount: input.questionCount,
         totalMarks,
         questionsToAttempt: input.questionsToAttempt ?? input.questionCount,
@@ -154,6 +155,7 @@ export async function upsertQuestionPaperDistribution(
         questionTypeLabel: resolvedTypeLabel,
         marksPerQuestion: input.marksPerQuestion,
         markDistribution: markDistribution as any,
+        renderMethod: sqType?.renderMethod ?? input.renderMethod ?? 1,
         questionCount: input.questionCount,
         totalMarks,
         questionsToAttempt: input.questionsToAttempt ?? input.questionCount,
@@ -388,6 +390,7 @@ export async function getQuestionPaperDistributionStatuses(
     alternativeCount: number
     marksPerQuestion: number
     markDistribution: any
+    renderMethod: number
     totalMarks: number
     status: "COMPLETED" | "ACTIVE" | "LOCKED" | "INCOMPLETE"
     sectionId: string | null
@@ -421,6 +424,7 @@ export async function getQuestionPaperDistributionStatuses(
         alternativeCount: altCount,
         marksPerQuestion: dist.marksPerQuestion,
         markDistribution: dist.markDistribution || null,
+        renderMethod: dist.renderMethod ?? 1,
         totalMarks: dist.totalMarks,
         status,
         sectionId: dist.sectionId || null,

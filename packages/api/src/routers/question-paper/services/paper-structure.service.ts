@@ -237,7 +237,7 @@ export async function upsertQuestionPaperSubject(
         pSection = await tenantDb.questionPaperSection.create({
           data: {
             questionPaperId: input.questionPaperId,
-            title: mSec.nameEn || mSec.nameBn || "Section",
+            title: mSec.nameEn || mSec.nameBn || "",
             titleBn: mSec.nameBn,
             orderIndex: mSec.position,
             instructions: mSec.instructions ?? null,

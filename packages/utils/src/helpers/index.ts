@@ -219,16 +219,32 @@ export function isResourceEnglish(options?: {
     if (/bangla|বাংলা/i.test(combinedSubject)) return false;
   }
 
+  // Content script is the most direct indicator: if content is provided, check its characters.
+  if (options.content && options.content.trim().length > 0) {
+    // If the content contains ANY Bengali script, it is Bengali.
+    if (/[\u0980-\u09FF]/.test(options.content)) {
+      return false;
+    }
+    // If the content contains English letters and no Bengali script, it is English.
+    if (/[a-zA-Z]/.test(options.content)) {
+      return true;
+    }
+  }
+
+  // If content gave no conclusion, check human question type label or name
   if (options.questionTypeLabel && options.questionTypeLabel.trim().length > 0) {
-    if (!/[\u0980-\u09FF]/.test(options.questionTypeLabel)) return true;
+    if (/[\u0980-\u09FF]/.test(options.questionTypeLabel)) return false;
+    // Don't treat database system codes / enum names (e.g. DAN_BAM_MILKORON, MCQ) as English indicators
+    if (/[a-zA-Z]/.test(options.questionTypeLabel) && !/^[A-Z0-9_-]+$/.test(options.questionTypeLabel.trim())) {
+      return true;
+    }
   }
 
   if (options.questionTypeName && options.questionTypeName.trim().length > 0) {
-    if (!/[\u0980-\u09FF]/.test(options.questionTypeName) && /[a-zA-Z]/.test(options.questionTypeName)) return true;
-  }
-
-  if (options.content && options.content.trim().length > 0) {
-    return !/[\u0980-\u09FF]/.test(options.content);
+    if (/[\u0980-\u09FF]/.test(options.questionTypeName)) return false;
+    if (/[a-zA-Z]/.test(options.questionTypeName) && !/^[A-Z0-9_-]+$/.test(options.questionTypeName.trim())) {
+      return true;
+    }
   }
 
   return false;
@@ -236,3 +252,5 @@ export function isResourceEnglish(options?: {
 
 
 
+
+export * from "./bengali"

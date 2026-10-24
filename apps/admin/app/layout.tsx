@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="bn"
       suppressHydrationWarning
       data-theme="shikhonary"
       className={cn(

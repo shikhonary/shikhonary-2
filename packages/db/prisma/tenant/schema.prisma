@@ -179,6 +179,7 @@ model QuestionPaperSubjectMarkDistribution {
   // ── Marks ───────────────────────────────────────────────────
   marksPerQuestion Float @default(0) // marks awarded per single question
   markDistribution Json? // Inherited from main.SubjectQuestionType.markDistribution
+  renderMethod     Int   @default(1) // Inherited from main.SubjectQuestionType.renderMethod (1: Direct title, 2: Options list)
   questionCount    Int   @default(0) // total questions of this type
 
   // Derived: totalMarks = marksPerQuestion × questionCount
@@ -263,6 +264,7 @@ model QuestionPaperQuestion {
   ekKothayProkashId             String?
   makeSentencesId               String?
   oppositeWordId                String?
+  genderChangeId                String?
   synonymId                     String?
   verbTenseId                   String?
   formFillupId                  String?
@@ -270,6 +272,7 @@ model QuestionPaperQuestion {
   danBamMilkoronId              String?
   mathQuestionId                String?
   grammarQuestionId             String?
+  rearrangeId                   String?
   seenComprehensionId           String?
   selectedSubQuestionIds        String[] @default([])
 
@@ -346,6 +349,7 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, juktobornoId])
   @@unique([questionPaperId, ekKothayProkashId])
   @@unique([questionPaperId, oppositeWordId])
+  @@unique([questionPaperId, genderChangeId])
   @@unique([questionPaperId, synonymId])
   @@unique([questionPaperId, verbTenseId])
   @@unique([questionPaperId, formFillupId])
@@ -353,6 +357,7 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, danBamMilkoronId])
   @@unique([questionPaperId, mathQuestionId])
   @@unique([questionPaperId, grammarQuestionId])
+  @@unique([questionPaperId, rearrangeId])
   @@unique([questionPaperId, distributionId, seenComprehensionId], map: "qpq_qp_dist_seen_comp_key")
   @@index([parentQuestionId])
   @@index([questionPaperId])
@@ -392,6 +397,7 @@ model QuestionPaperQuestion {
   @@index([ekKothayProkashId])
   @@index([makeSentencesId])
   @@index([oppositeWordId])
+  @@index([genderChangeId])
   @@index([synonymId])
   @@index([verbTenseId])
   @@index([formFillupId])
@@ -399,6 +405,7 @@ model QuestionPaperQuestion {
   @@index([danBamMilkoronId])
   @@index([mathQuestionId])
   @@index([grammarQuestionId])
+  @@index([rearrangeId])
   @@index([seenComprehensionId])
   @@index([distributionId])
   @@index([sectionId])

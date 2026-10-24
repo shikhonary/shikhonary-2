@@ -3,6 +3,8 @@
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { PickerCardWrapper } from "./picker-card-wrapper";
+import { isResourceEnglish } from "@workspace/utils";
+import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
 
 interface ApplicationPickerCardProps {
   question: any;
@@ -25,13 +27,18 @@ export const ApplicationPickerCard: React.FC<ApplicationPickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
-  const chapterName =
-    q.academicChapter?.nameBn ||
-    q.academicChapter?.nameEn ||
-    q.chapter?.nameBn ||
-    q.chapter?.nameEn;
-
   const titleText = q.title || q.name || q.question || "";
+
+  const isEnglish = isResourceEnglish({
+    subjectName: q.academicSubject?.nameEn || q.subject?.nameEn || q.academicSubject?.nameBn || q.subject?.nameBn,
+    content: titleText,
+  });
+
+  const rawChapterName = isEnglish
+    ? (q.academicChapter?.nameEn || q.chapter?.nameEn || q.academicChapter?.nameBn || q.chapter?.nameBn)
+    : (q.academicChapter?.nameBn || q.academicChapter?.nameEn || q.chapter?.nameBn || q.chapter?.nameEn);
+
+  const chapterName = rawChapterName && isEnglish ? translateTag(rawChapterName) : rawChapterName;
 
   return (
     <PickerCardWrapper
@@ -41,6 +48,8 @@ export const ApplicationPickerCard: React.FC<ApplicationPickerCardProps> = ({
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={q.difficulty}
+      typeLabel={isEnglish ? "Application" : "আবেদনপত্র"}
+      language={isEnglish ? "en" : "bn"}
     >
       <div className="flex flex-col gap-3 font-body">
         <div className="text-sm font-semibold text-foreground leading-relaxed">
@@ -52,8 +61,8 @@ export const ApplicationPickerCard: React.FC<ApplicationPickerCardProps> = ({
           <div className="flex flex-wrap items-center gap-1.5">
             {(q.source || q.session) && (
               <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
+                📚 {isEnglish ? translateTag(q.source || "Textbook") : (q.source || "N/A")}
+                {q.session ? ` (${isEnglish ? toEnglishDigits(q.session) : toBengaliDigits(q.session)})` : ""}
               </span>
             )}
             {Array.isArray(q.reference) && q.reference.length > 0 ? (
@@ -68,7 +77,7 @@ export const ApplicationPickerCard: React.FC<ApplicationPickerCardProps> = ({
             ) : (
               !(q.source || q.session) && (
                 <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
+                  {isEnglish ? "No reference tags" : "কোনো রেফারেন্স ট্যাগ নেই"}
                 </span>
               )
             )}

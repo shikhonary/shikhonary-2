@@ -117,6 +117,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.MAKE_SENTENCES;
   } else if (normalized === QUESTION_TYPES.OPPOSITE_WORD) {
     category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+  } else if (normalized === QUESTION_TYPES.GENDER_CHANGE) {
+    category = QUESTION_TYPE_CODES.GENDER_CHANGE;
   } else if (normalized === QUESTION_TYPES.JUKTOBORNO) {
     category = QUESTION_TYPE_CODES.JUKTOBORNO;
   } else if (normalized === QUESTION_TYPES.EK_KOTHAY_PROKASH) {
@@ -155,6 +157,8 @@ export const QuestionPickerPanel: React.FC = () => {
     category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
   } else if (normalized === QUESTION_TYPES.DAN_BAM_MILKORON) {
     category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
+  } else if (normalized === QUESTION_TYPES.REARRANGE) {
+    category = QUESTION_TYPE_CODES.REARRANGE;
   } else if (normalized === QUESTION_TYPES.GRAMMAR_QUESTION) {
     category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
   } else if (normalized === QUESTION_TYPES.FORM_FILLUP || normalized === QUESTION_TYPES.FORM_FILLING) {
@@ -211,6 +215,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.ESSAY;
     } else if (lower.includes("opposite word") || lower.includes("opposite_word") || lower.includes("বিপরীত শব্দ") || lower.includes("বিপরীত")) {
       category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+    } else if (lower.includes("gender change") || lower.includes("gender_change") || lower.includes("লিঙ্গ পরিবর্তন") || lower.includes("লিঙ্গান্তর") || lower.includes("লিঙ্গ")) {
+      category = QUESTION_TYPE_CODES.GENDER_CHANGE;
     } else if (lower.includes("juktoborno") || lower.includes("যুক্তবর্ণ")) {
       category = QUESTION_TYPE_CODES.JUKTOBORNO;
     } else if (lower.includes("ek kothay") || lower.includes("ek kothai") || lower.includes("এক কথায়") || lower.includes("এক কথায়")) {
@@ -237,6 +243,8 @@ export const QuestionPickerPanel: React.FC = () => {
       category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
     } else if (lower.includes("dan bam") || lower.includes("dan_bam") || lower.includes("বাম-ডান") || lower.includes("ডান-বাম") || lower.includes("মিলকরণ") || lower.includes("matching")) {
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
+    } else if (lower.includes("rearrange") || lower.includes("পুনর্বিন্যাস") || lower.includes("সাজিয়ে লেখ") || lower.includes("সাজিয়ে লেখ")) {
+      category = QUESTION_TYPE_CODES.REARRANGE;
     } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lower.includes("math question") || lower.includes("math_question") || lower.includes("গণিত প্রশ্ন") || lower.includes("গণিত") || lower.includes("math")) {
@@ -345,6 +353,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, makeQuestionIds: [questionId] });
       } else if (category === "OPPOSITE_WORD") {
         await assignQuestion({ ...payloadBase, oppositeWordIds: [questionId] });
+      } else if (category === "GENDER_CHANGE") {
+        await assignQuestion({ ...payloadBase, genderChangeIds: [questionId] });
       } else if (category === "JUKTOBORNO") {
         await assignQuestion({ ...payloadBase, juktobornoIds: [questionId] });
       } else if (category === "EK_KOTHAY_PROKASH") {
@@ -371,6 +381,8 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, shuddhoAshuddhoIds: [questionId] });
       } else if (category === "DAN_BAM_MILKORON") {
         await assignQuestion({ ...payloadBase, danBamMilkoronIds: [questionId] });
+      } else if (category === "REARRANGE") {
+        await assignQuestion({ ...payloadBase, rearrangeIds: [questionId] });
       } else if (category === "MATH_QUESTION") {
         await assignQuestion({ ...payloadBase, mathQuestionIds: [questionId] });
       } else if (category === "GRAMMAR_QUESTION") {
@@ -562,7 +574,7 @@ export const QuestionPickerPanel: React.FC = () => {
               const isCurrentEnglish = isResourceEnglish({
                 subjectName: activeDist?.subjectName,
                 questionTypeLabel: activeDist?.questionTypeLabel,
-                content: q.rawText || q.content || q.statement || q.question,
+                content: q.rawText || q.content || q.statement || q.question || (Array.isArray(q.leftColumn) ? q.leftColumn.join(" ") : ""),
               }) || category === "NUMBER_IN_WORDS" || category === "PARTS_OF_SPEECH" || category === "RIGHT_FORM_OF_VERBS" || category === "CHANGING_SENTENCES";
 
               return (
@@ -768,10 +780,49 @@ export const QuestionPickerPanel: React.FC = () => {
                       </div>
                     ) : category === "DAN_BAM_MILKORON" ? (
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-semibold text-primary">ডান-বাম মিলকরণ ({q.leftColumn?.length || 0} সারি)</span>
+                        <span className="font-semibold text-primary">
+                          {isCurrentEnglish
+                            ? `Matching (${q.leftColumn?.length || 0} rows)`
+                            : `ডান-বাম মিলকরণ (${q.leftColumn?.length || 0} সারি)`}
+                        </span>
                         {Array.isArray(q.leftColumn) && q.leftColumn[0] && (
                           <span className="text-[11px] text-muted-foreground line-clamp-1">
                             {q.leftColumn[0]} ↔ {q.rightColumn?.[0] || ""}
+                          </span>
+                        )}
+                      </div>
+                    ) : category === "REARRANGE" ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="font-semibold text-primary">
+                          {isCurrentEnglish
+                            ? `Rearrange (${q.options?.length || 0} sentences)`
+                            : `পুনর্বিন্যাস (${toBengaliDigits(q.options?.length || 0)}টি বাক্য)`}
+                        </span>
+                        {Array.isArray(q.options) && q.options.length > 0 && (
+                          <div className="space-y-1 mt-1 text-xs text-foreground font-medium">
+                            {q.options.slice(0, 4).map((opt: string, i: number) => {
+                              const optLabel = isCurrentEnglish
+                                ? `(${String.fromCharCode(97 + i)})`
+                                : `(${["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ"][i] || i + 1})`;
+                              return (
+                                <div key={i} className="flex items-start gap-1.5">
+                                  <span className="font-bold text-primary shrink-0">{optLabel}</span>
+                                  <span className="line-clamp-1">
+                                    <RenderMath text={opt} />
+                                  </span>
+                                </div>
+                              );
+                            })}
+                            {q.options.length > 4 && (
+                              <span className="text-[11px] text-muted-foreground italic">
+                                + {q.options.length - 4} {isCurrentEnglish ? "more sentences" : "টি আরও বাক্য"}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {q.answerKey && (
+                          <span className="text-[11px] text-muted-foreground font-semibold mt-0.5 font-mono">
+                            {isCurrentEnglish ? "Order: " : "ক্রম: "}{q.answerKey}
                           </span>
                         )}
                       </div>
@@ -787,7 +838,7 @@ export const QuestionPickerPanel: React.FC = () => {
                     ) : (
                       <RenderMath text={q.question || ""} isMath={q.isMath} />
                     )}
-                    {Array.isArray(q.options) && q.options.length > 0 && (
+                    {category !== "REARRANGE" && Array.isArray(q.options) && q.options.length > 0 && (
                       <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1.5 text-xs text-on-surface-variant font-medium">
                         {q.options.map((opt: string, i: number) => {
                           const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];

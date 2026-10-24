@@ -4,8 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "@workspace/ui/components/sonner"
-import { useImportMcqs, useAcademicClassesForSelection, useSubjectsForSelection, useChaptersForSelection } from "../services/use-mcq"
-import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
+import {
+  useImportMcqs,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+} from "../services/use-mcq"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -25,7 +29,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu"
 import type { CreateMcqInput } from "@workspace/api"
 import { cn } from "@workspace/ui/lib/utils"
@@ -33,37 +36,46 @@ import { RenderMath } from "@workspace/ui/components/render-math"
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import {
-  PlusIcon,
-  Trash2Icon,
-  CopyIcon,
-  CheckCircle2Icon,
-  Wand2Icon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-  ArrowLeftRightIcon,
-  ShuffleIcon,
-  CodeIcon,
-  FileCodeIcon,
-  UploadIcon,
-  SaveIcon,
-  CheckIcon,
-  HelpCircleIcon
+  Plus,
+  Trash2,
+  Copy,
+  CheckCircle2,
+  Wand2,
+  AlertTriangle,
+  ChevronUp,
+  ChevronDown,
+  ArrowLeftRight,
+  Shuffle,
+  Code,
+  FileCode,
+  Upload,
+  ArrowLeft,
+  Sparkles,
+  Layers,
+  AlertCircle,
+  Loader2,
+  ChevronsUpDown,
+  Maximize2,
+  Minimize2,
+  BookOpen,
 } from "lucide-react"
-import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS, toBengaliDigits } from "@workspace/utils"
 import { MCQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
+
+const BENGALI_OPTION_LABELS = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
+const ROMAN_NUMERALS = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"]
 
 const sampleJsonTemplate = `[
   {
-    "question": "What is Newton's second law of motion?",
+    "question": "নিউটনের গতির দ্বিতীয় সূত্রটি কী?",
     "answer": "F = ma",
     "options": ["F = ma", "F = mv", "E = mc^2", "P = IV"],
     "statements": [],
     "type": "SINGLE",
     "isMath": true,
-    "reference": ["Physics Board 2024"],
-    "explanation": "Force equals mass times acceleration.",
+    "reference": ["পদার্থবিজ্ঞান বোর্ড ২০২৪"],
+    "explanation": "বল = ভর × ত্বরণ (Force equals mass times acceleration)।",
     "questionUrl": null,
     "difficulty": "MEDIUM",
     "year": 2024,
@@ -74,7 +86,7 @@ const sampleJsonTemplate = `[
     "attachments": [
       {
         "type": "image",
-        "caption": "Figure 1: Illustration",
+        "caption": "চিত্র ১: বল ও ত্বরণের সম্পর্ক",
         "content": null,
         "url": "https://images.unsplash.com/photo-1543269865-cbf427effbad",
         "table": null,
@@ -86,7 +98,7 @@ const sampleJsonTemplate = `[
   }
 ]`
 
-// Smart JSON Syntax Repair Engine for Production
+// Smart JSON Syntax Repair Engine
 export function repairJsonSyntax(raw: string): string {
   let cleaned = raw.trim()
 
@@ -106,21 +118,19 @@ export function repairJsonSyntax(raw: string): string {
   // 3. Strip single-line comments (// comment)
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
-  // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes (b, f, n, r, t)
-  // e.g. \rightarrow, \times, \theta, \frac, \beta, \neq, \mathbf, \text, \tan, etc.
+  // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes
   cleaned = cleaned.replace(
     /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
     "\\\\$1"
   )
 
-  // 5. Fix any unescaped backslashes that are not valid JSON escape sequences (\", \\, \/, \b, \f, \n, \r, \t, \uXXXX)
-  // e.g. \(, \), \[, \], \alpha, \sum, \sqrt, \int, \le, \ge, \pm, etc.
+  // 5. Fix unescaped backslashes not part of valid JSON escapes
   cleaned = cleaned.replace(/(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\")
 
-  // 6. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 6. Remove trailing commas in objects & arrays
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
-  // 7. Wrap single object in array if not already an array
+  // 7. Wrap single object in array if needed
   if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
     cleaned = `[\n${cleaned}\n]`
   }
@@ -132,14 +142,12 @@ export function repairJsonSyntax(raw: string): string {
 export function findJsonErrorPosition(raw: string, errMessage: string) {
   const lines = raw.split("\n")
 
-  // Try position number e.g. "at position 123"
   const posMatch = errMessage.match(/position\s+(\d+)/i)
   let charPos = -1
   if (posMatch && posMatch[1]) {
     charPos = parseInt(posMatch[1], 10)
   }
 
-  // Try line number e.g. "at line 12 column 4" or "line 12"
   const lineMatch = errMessage.match(/line\s+(\d+)/i)
   const colMatch = errMessage.match(/column\s+(\d+)/i)
 
@@ -149,7 +157,7 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   if (charPos >= 0 && errorLine === -1) {
     let count = 0
     for (let i = 0; i < lines.length; i++) {
-      const lineLen = (lines[i]?.length || 0) + 1 // +1 for newline
+      const lineLen = (lines[i]?.length || 0) + 1
       if (count + lineLen >= charPos) {
         errorLine = i + 1
         errorCol = charPos - count + 1
@@ -181,194 +189,36 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   }
 }
 
-interface EditableFieldProps {
-  label?: string
-  value: string
-  placeholder?: string
-  multiline?: boolean
-  onSave: (newValue: string) => void
-  className?: string
-  textClassName?: string
-  badge?: React.ReactNode
-  isMath?: boolean
-}
-
-function EditableField({
-  label,
-  value,
-  placeholder = "Click to edit...",
-  multiline = false,
-  onSave,
-  className = "",
-  textClassName = "",
-  badge,
-  isMath,
-}: EditableFieldProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(value || "")
-
-  useEffect(() => {
-    setEditValue(value || "")
-  }, [value])
-
-  const handleBlur = () => {
-    setIsEditing(false)
-    if (editValue.trim() !== (value || "")) {
-      onSave(editValue.trim())
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) {
-      e.preventDefault()
-      handleBlur()
-    } else if (e.key === "Escape") {
-      setEditValue(value || "")
-      setIsEditing(false)
-    }
-  }
-
-  return (
-    <div className={cn("group relative transition-colors", className)}>
-      {label && (
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-            {label}
-          </span>
-          {badge}
-        </div>
-      )}
-      {isEditing ? (
-        <div className="space-y-1.5">
-          {multiline ? (
-            <Textarea
-              autoFocus
-              rows={3}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          ) : (
-            <Input
-              autoFocus
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          )}
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-            <span>Press Enter (or Ctrl+Enter) to save, Esc to cancel</span>
-            <button
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                handleBlur()
-              }}
-              className="text-xs font-semibold text-primary hover:underline cursor-pointer"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          onDoubleClick={() => setIsEditing(true)}
-          title="Click to edit"
-          className={cn(
-            "group/edit min-h-9 cursor-pointer rounded-lg border border-transparent bg-surface-container-lowest/50 p-2.5 transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-xs",
-            !value && "italic text-outline-variant",
-            textClassName
-          )}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <span className={cn(
-              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
-              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
-            )}>
-              <RenderMath text={value || placeholder} isMath={isMath} />
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsEditing(true)
-              }}
-              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 hover:bg-primary/20 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden animate-fade-in"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-interface EditableMcqCardProps {
+interface ParsedMcqCardProps {
   index: number
   item: CreateMcqInput
-  onChange: (updated: CreateMcqInput) => void
+  isExpanded: boolean
+  onToggleExpand: () => void
+  onChange: (updatedItem: CreateMcqInput) => void
   onDelete: () => void
   onDuplicate: () => void
 }
 
-function EditableMcqCard({
+/**
+ * Parsed MCQ Card matching the exact visual design concept of CreateMcqView
+ */
+function ParsedMcqCard({
   index,
   item,
+  isExpanded,
+  onToggleExpand,
   onChange,
   onDelete,
   onDuplicate,
-}: EditableMcqCardProps) {
-  console.log("EditableMcqCard item:", item)
-  const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
-  const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"]
-
-  const handleUpdateStatement = (stmtIdx: number, newText: string) => {
-    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
-    currentStatements[stmtIdx] = newText
-    onChange({
-      ...item,
-      statements: currentStatements,
-    })
-  }
-
-  const handleAddStatement = () => {
-    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
-    const nextRoman = romanNumerals[currentStatements.length] || String(currentStatements.length + 1)
-    const newStmtText = `${nextRoman}. New statement text`
-    onChange({
-      ...item,
-      statements: [...currentStatements, newStmtText],
-    })
-  }
-
-  const handleRemoveStatement = (stmtIdx: number) => {
-    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
-    const nextStatements = currentStatements.filter((_, idx) => idx !== stmtIdx)
-    onChange({
-      ...item,
-      statements: nextStatements,
-    })
-  }
-
-  const handleUpdateOption = (optIndex: number, newText: string) => {
+}: ParsedMcqCardProps) {
+  const handleUpdateOption = (optIndex: number, newVal: string) => {
     const newOptions = [...item.options]
-    const oldOptionText = newOptions[optIndex]
-    newOptions[optIndex] = newText
+    const oldVal = newOptions[optIndex]
+    newOptions[optIndex] = newVal
 
     let newAnswer = item.answer
-    if (item.answer === oldOptionText) {
-      newAnswer = newText
+    if (item.answer === oldVal) {
+      newAnswer = newVal
     }
 
     onChange({
@@ -379,23 +229,15 @@ function EditableMcqCard({
   }
 
   const handleAddOption = () => {
-    const nextOptionText = `Option ${item.options.length + 1}`
+    const newOptions = [...item.options, ""]
     onChange({
       ...item,
-      options: [...item.options, nextOptionText],
-    })
-  }
-
-  const handleAddOptionWithText = (optText: string) => {
-    if (!optText) return
-    onChange({
-      ...item,
-      options: [...item.options, optText],
-      answer: optText,
+      options: newOptions,
     })
   }
 
   const handleRemoveOption = (optIndex: number) => {
+    if (item.options.length <= 2) return
     const optToRemove = item.options[optIndex]
     const newOptions = item.options.filter((_, idx) => idx !== optIndex)
     let newAnswer = item.answer
@@ -458,6 +300,31 @@ function EditableMcqCard({
     })
   }
 
+  const handleAddStatement = () => {
+    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
+    onChange({
+      ...item,
+      statements: [...currentStatements, ""],
+    })
+  }
+
+  const handleUpdateStatement = (stmtIndex: number, newVal: string) => {
+    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
+    currentStatements[stmtIndex] = newVal
+    onChange({
+      ...item,
+      statements: currentStatements,
+    })
+  }
+
+  const handleRemoveStatement = (stmtIndex: number) => {
+    const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
+    onChange({
+      ...item,
+      statements: currentStatements.filter((_, idx) => idx !== stmtIndex),
+    })
+  }
+
   const handleMoveStatement = (fromIdx: number, direction: "prev" | "next") => {
     const currentStatements = Array.isArray(item.statements) ? [...item.statements] : []
     const targetIdx = direction === "prev" ? fromIdx - 1 : fromIdx + 1
@@ -478,729 +345,608 @@ function EditableMcqCard({
     })
   }
 
-  const handleUpdateAttachment = (
-    attIdx: number,
-    field: "caption" | "content" | "bottomContent" | "url",
-    val: string
-  ) => {
-    const currentAttachments = Array.isArray(item.attachments)
-      ? [...item.attachments]
-      : []
-    if (!currentAttachments[attIdx]) return
-
-    const updatedAtt = {
-      ...currentAttachments[attIdx],
-      [field]: val.trim() ? val : null,
-    }
-
-    currentAttachments[attIdx] = updatedAtt
-
-    onChange({
-      ...item,
-      attachments: currentAttachments,
-    })
-  }
-
-  const handleRemoveAttachment = (attIdx: number) => {
-    const currentAttachments = Array.isArray(item.attachments)
-      ? [...item.attachments]
-      : []
-    const nextAttachments = currentAttachments.filter((_, idx) => idx !== attIdx)
-    onChange({
-      ...item,
-      attachments: nextAttachments,
-    })
-  }
-
-  const handleAddAttachment = () => {
-    const currentAttachments = Array.isArray(item.attachments)
-      ? [...item.attachments]
-      : []
-    const newAtt = {
-      type: "text",
-      caption: "Context / Stimulus",
-      content: "",
-      bottomContent: null,
-      url: null,
-      table: null,
-      tableBorder: false,
-      position: currentAttachments.length,
-    }
-    onChange({
-      ...item,
-      attachments: [...currentAttachments, newAtt],
-    })
-  }
-
-  const handleToggleType = () => {
-    onChange({
-      ...item,
-      type: item.type === "SINGLE" ? "MULTIPLE" : "SINGLE",
-    })
-  }
-
-  const handleToggleMath = () => {
-    onChange({
-      ...item,
-      isMath: !item.isMath,
-    })
-  }
-
-  const handleToggleActive = () => {
-    onChange({
-      ...item,
-      isActive: item.isActive !== undefined ? !item.isActive : true,
-    })
-  }
-
-  const handleToggleDifficulty = () => {
-    const current = item.difficulty || "MEDIUM"
-    const next = current === "EASY" ? "MEDIUM" : current === "MEDIUM" ? "HARD" : "EASY"
-    onChange({
-      ...item,
-      difficulty: next as any,
-    })
-  }
-
-  const referenceString = Array.isArray(item.reference) ? item.reference.join(", ") : ""
-
-  const handleSaveReferences = (val: string) => {
-    const refs = val
-      .split(",")
-      .map((r) => r.trim())
-      .filter(Boolean)
-    onChange({
-      ...item,
-      reference: refs,
-    })
-  }
-
   const isAnswerMatchingOptions = item.options.includes(item.answer)
 
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant/60 bg-white shadow-xs transition-shadow hover:shadow-md">
-      {/* Card Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary-container font-headline text-xs font-bold text-on-primary-container">
-            #{index + 1}
-          </span>
-          <span className="text-xs font-semibold uppercase tracking-wider text-outline">
-            MCQ Preview
-          </span>
+    <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden transition-all hover:shadow-md">
+      {/* Header Bar matching Create CardHeader */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 sm:p-5">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary font-bold text-xs sm:text-sm border border-indigo-100 dark:border-primary/20 shrink-0">
+            #{toBengaliDigits(index + 1)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm sm:text-base font-bold font-headline text-foreground truncate">
+              {item.question ? item.question : `প্রশ্ন #${toBengaliDigits(index + 1)} (বিবরণ নেই)`}
+            </h4>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-[11px] text-muted-foreground">
+                অপশন: {toBengaliDigits(item.options.length)}টি | সঠিক উত্তর: {item.answer || "নির্ধারিত নয়"}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Interactive Controls & Badges */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Difficulty Toggle Badge */}
-          <button
-            type="button"
-            onClick={handleToggleDifficulty}
-            title="Click to cycle EASY / MEDIUM / HARD"
-            className="cursor-pointer"
+        {/* Quick Toggles & Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          {/* Difficulty Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-lg",
+              item.difficulty === "EASY" &&
+                "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60",
+              (item.difficulty === "MEDIUM" || !item.difficulty) &&
+                "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/60",
+              item.difficulty === "HARD" &&
+                "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/60"
+            )}
           >
+            {item.difficulty || "MEDIUM"}
+          </Badge>
+
+          {/* Math Mode Badge */}
+          {item.isMath && (
             <Badge
               variant="outline"
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
-                item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-300",
-                (item.difficulty === "MEDIUM" || !item.difficulty) && "bg-amber-50 text-amber-700 border-amber-300",
-                item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-300"
-              )}
+              className="px-2 py-0.5 text-[11px] font-bold rounded-lg border-indigo-200 text-indigo-700 bg-indigo-50 dark:bg-primary/10 dark:text-primary"
             >
-              Difficulty: {item.difficulty || "MEDIUM"}
+              ∑ ম্যাথ
             </Badge>
-          </button>
+          )}
 
-          {/* Question Type Toggle */}
-          <button
-            type="button"
-            onClick={handleToggleType}
-            title="Click to toggle SINGLE / MULTIPLE"
-            className="cursor-pointer"
+          {/* Active Status Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2 py-0.5 text-[11px] font-bold rounded-lg",
+              item.isActive !== false
+                ? "border-emerald-200 text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400"
+                : "border-slate-300 text-slate-500 bg-slate-50"
+            )}
           >
-            <Badge
-              variant={item.type === "SINGLE" ? "default" : "secondary"}
-              className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95"
-            >
-              Type: {item.type || "SINGLE"}
-            </Badge>
-          </button>
+            {item.isActive !== false ? "সক্রিয়" : "নিষ্ক্রিয়"}
+          </Badge>
 
-          {/* Math Mode Toggle */}
-          <button
-            type="button"
-            onClick={handleToggleMath}
-            title="Click to toggle Math formula rendering"
-            className="cursor-pointer"
-          >
-            <Badge
-              variant={item.isMath ? "outline" : "ghost"}
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
-                item.isMath ? "border-primary text-primary" : "text-muted-foreground"
-              )}
-            >
-              {item.isMath ? "∑ Math On" : "Text Only"}
-            </Badge>
-          </button>
-
-          {/* Active Status Toggle */}
-          <button
-            type="button"
-            onClick={handleToggleActive}
-            title="Click to toggle Active status"
-            className="cursor-pointer"
-          >
-            <Badge
-              variant="outline"
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
-                item.isActive !== false
-                  ? "border-emerald-500 text-emerald-600 bg-emerald-50"
-                  : "border-gray-400 text-gray-500 bg-gray-50"
-              )}
-            >
-              {item.isActive !== false ? "Active" : "Inactive"}
-            </Badge>
-          </button>
-
-          {/* Duplicate & Delete Buttons */}
-          <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 ml-1 pl-1 border-l border-slate-200 dark:border-white/[0.08]">
             <Button
               type="button"
               variant="ghost"
-              size="icon-xs"
+              size="icon"
               onClick={onDuplicate}
-              title="Duplicate MCQ"
-              className="text-on-surface-variant hover:bg-surface-container-high cursor-pointer"
+              title="প্রশ্ন ডুপ্লিকেট করুন"
+              className="size-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-primary/10 rounded-xl cursor-pointer"
             >
-              <CopyIcon className="size-4" />
+              <Copy className="size-3.5" />
             </Button>
             <Button
               type="button"
               variant="ghost"
-              size="icon-xs"
+              size="icon"
               onClick={onDelete}
-              title="Delete MCQ from import"
-              className="text-destructive hover:bg-destructive/10 cursor-pointer"
+              title="প্রশ্ন মুছে ফেলুন"
+              className="size-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl cursor-pointer"
             >
-              <Trash2Icon className="size-4" />
+              <Trash2 className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={onToggleExpand}
+              title={isExpanded ? "সংকুচিত করুন" : "প্রসারিত করে সম্পাদনা করুন"}
+              className="size-8 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-foreground cursor-pointer shadow-none"
+            >
+              {isExpanded ? (
+                <ChevronUp className="size-4" />
+              ) : (
+                <ChevronDown className="size-4" />
+              )}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Item Warnings Banner if validation mismatch */}
+      {/* Validation Warning Banner */}
       {(!isAnswerMatchingOptions || !item.question.trim()) && (
-        <div className="bg-amber-50 border-b border-amber-200 px-5 py-2.5 text-xs text-amber-900 flex flex-wrap items-center justify-between gap-2 font-medium">
+        <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200/60 dark:border-amber-800/40 px-5 py-2.5 text-xs text-amber-800 dark:text-amber-400 flex flex-wrap items-center justify-between gap-2 font-medium">
           <div className="flex items-center gap-2">
-            <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
+            <AlertTriangle className="size-4 text-amber-600 shrink-0" />
             <span>
               {!item.question.trim()
-                ? "Question text is empty."
-                : `Answer "${item.answer}" is not listed in Option Choices.`}
+                ? "প্রশ্নের বিবরণ ফাঁকা রয়েছে।"
+                : `উত্তর "${item.answer}" অপশন তালিকায় বিদ্যমান নেই।`}
             </span>
           </div>
           {item.answer && !isAnswerMatchingOptions && (
             <Button
               type="button"
-              size="xs"
+              size="sm"
               variant="outline"
-              onClick={() => handleAddOptionWithText(item.answer)}
-              className="bg-white border-amber-300 text-amber-900 hover:bg-amber-100 text-[11px] font-bold cursor-pointer shrink-0"
+              onClick={() => {
+                const newOptions = [...item.options, item.answer]
+                onChange({ ...item, options: newOptions })
+              }}
+              className="rounded-xl bg-white dark:bg-card border-amber-300 text-amber-900 dark:text-amber-300 hover:bg-amber-100 text-xs font-bold h-7 px-2.5 cursor-pointer shrink-0"
             >
-              + Add Answer to Options
+              + অপশনে উত্তর যোগ করুন
             </Button>
           )}
         </div>
       )}
 
-      {/* Card Content */}
-      <div className="p-5 space-y-4">
-        {/* Attachments Section (Images, Tables, Context Texts) */}
-        {((Array.isArray(item.attachments) && item.attachments.length > 0) || false) && (
-          <div className="space-y-3 rounded-xl border border-outline-variant/60 bg-surface-container-lowest/40 p-3.5">
+      {/* Card Content - Visible when expanded, matching CreateMcqView */}
+      {isExpanded && (
+        <CardContent className="p-6 sm:p-7 space-y-7 animate-in fade-in duration-150">
+          {/* Question Stem Textarea */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              প্রশ্নের মূল বিবরণ (Question Stem) <span className="text-rose-500">*</span>
+            </Label>
+            <Textarea
+              rows={3}
+              placeholder="বহুনির্বাচনি প্রশ্নের মূল বিবরণ লিখুন..."
+              value={item.question}
+              onChange={(e) => onChange({ ...item, question: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5"
+            />
+            {item.isMath && item.question && (
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-xs text-foreground">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">
+                  LaTeX ম্যাথ প্রিভিউ:
+                </span>
+                <RenderMath text={item.question} isMath={true} />
+              </div>
+            )}
+          </div>
+
+          {/* Statements (Optional for Roman Numeral MCQ) */}
+          <div className="space-y-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-5">
             <div className="flex items-center justify-between">
-              <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
-                Attachments & Context / Stimulus ({item.attachments?.length || 0})
-              </span>
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-foreground">
+                  বিবৃতি / উপ-উক্তি (ঐচ্ছিক - বহুপদী প্রশ্নের জন্য)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  যেমন: i. প্রথম উক্তি ii. দ্বিতীয় উক্তি iii. তৃতীয় উক্তি
+                </p>
+              </div>
               <Button
                 type="button"
-                variant="ghost"
-                size="xs"
-                onClick={handleAddAttachment}
-                className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
+                variant="outline"
+                size="sm"
+                onClick={handleAddStatement}
+                className="rounded-xl border border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary dark:hover:bg-primary/10 text-xs font-bold h-8 px-3 cursor-pointer"
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Attachment
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                বিবৃতি যোগ করুন
               </Button>
             </div>
 
-            <div className="space-y-3">
-              {item.attachments?.map((att: any, attIdx: number) => {
-                const type = (att.type || "").toLowerCase()
-                const isImage =
-                  type === "image" ||
-                  (att.url &&
-                    att.url !== "text-context" &&
-                    /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(att.url))
-                const isTable = type === "table" || Boolean(att.table)
+            {Array.isArray(item.statements) && item.statements.length > 0 ? (
+              <div className="space-y-2.5 pt-2">
+                {item.statements.map((stmt, stmtIdx) => (
+                  <div key={stmtIdx} className="flex items-center gap-2.5">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-xs font-bold text-indigo-700 dark:text-primary font-mono border border-indigo-100 dark:border-primary/20">
+                      {ROMAN_NUMERALS[stmtIdx] || stmtIdx + 1}.
+                    </span>
+                    <Input
+                      type="text"
+                      placeholder={`বিবৃতি #${stmtIdx + 1}...`}
+                      value={stmt}
+                      onChange={(e) => handleUpdateStatement(stmtIdx, e.target.value)}
+                      className="flex-1 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={stmtIdx === 0}
+                      onClick={() => handleMoveStatement(stmtIdx, "prev")}
+                      className="size-8 text-muted-foreground hover:text-indigo-600 rounded-lg disabled:opacity-25 cursor-pointer"
+                    >
+                      <ChevronUp className="size-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={stmtIdx === (item.statements?.length || 0) - 1}
+                      onClick={() => handleMoveStatement(stmtIdx, "next")}
+                      className="size-8 text-muted-foreground hover:text-indigo-600 rounded-lg disabled:opacity-25 cursor-pointer"
+                    >
+                      <ChevronDown className="size-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveStatement(stmtIdx)}
+                      className="size-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl cursor-pointer shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs italic text-muted-foreground pt-1">
+                কোনো উক্তি যোগ করা হয়নি। বহুপদী প্রশ্নের জন্য "+ বিবৃতি যোগ করুন"-এ ক্লিক করুন।
+              </p>
+            )}
+          </div>
+
+          {/* Answer Options Grid matching Create View */}
+          <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-foreground">
+                  উত্তর অপশনসমূহ (Answer Options) <span className="text-rose-500">*</span>
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  প্রতিটি অপশনের বিবরণ লিখুন এবং সঠিক উত্তর চিহ্নে ক্লিক করুন।
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {item.options.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShuffleOptions}
+                    className="rounded-xl text-xs font-bold text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-primary/10 h-8 px-3 cursor-pointer"
+                  >
+                    <Shuffle className="size-3.5 mr-1" />
+                    শাফল
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddOption}
+                  className="rounded-xl border border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary dark:hover:bg-primary/10 text-xs font-bold h-8 px-3 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  নতুন অপশন যোগ করুন
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {item.options.map((opt, optIdx) => {
+                const isCorrect = item.answer === opt
+                const optionLabel = BENGALI_OPTION_LABELS[optIdx] || String(optIdx + 1)
 
                 return (
                   <div
-                    key={att.id || attIdx}
-                    className="group/att rounded-xl border border-outline-variant/60 bg-white p-3.5 space-y-3 transition-all hover:border-outline-variant hover:shadow-xs"
+                    key={optIdx}
+                    className={cn(
+                      "space-y-2 rounded-2xl border p-3.5 transition-all",
+                      isCorrect
+                        ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 ring-1 ring-emerald-500/20"
+                        : "border-slate-200/80 dark:border-white/[0.08] bg-slate-50/30 dark:bg-white/[0.01]"
+                    )}
                   >
-                    {/* Attachment Header */}
-                    <div className="flex items-center justify-between gap-2 border-b border-outline-variant/30 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-secondary-container/40 text-[11px] font-bold text-secondary font-mono">
-                          #{attIdx + 1}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                        >
-                          {isImage ? "Image Attachment" : isTable ? "Table Attachment" : "Text / Stimulus"}
-                        </Badge>
-                      </div>
-
-                      <Button
+                    <div className="flex items-center justify-between">
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon-xs"
-                        onClick={() => handleRemoveAttachment(attIdx)}
-                        title="Remove attachment"
-                        className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                        onClick={() => handleSetCorrectAnswer(opt)}
+                        className="flex items-center gap-2 cursor-pointer text-left"
                       >
-                        <Trash2Icon className="size-3.5" />
-                      </Button>
-                    </div>
+                        <span
+                          className={cn(
+                            "flex size-6 items-center justify-center rounded-lg font-bold text-xs transition-colors",
+                            isCorrect
+                              ? "bg-emerald-600 text-white shadow-xs"
+                              : "bg-indigo-50 dark:bg-primary/10 text-indigo-700 dark:text-primary border border-indigo-100 dark:border-primary/20"
+                          )}
+                        >
+                          {isCorrect ? <CheckCircle2 className="size-3.5" /> : optionLabel}
+                        </span>
+                        <span
+                          className={cn(
+                            "text-xs font-bold",
+                            isCorrect
+                              ? "text-emerald-900 dark:text-emerald-300"
+                              : "text-foreground"
+                          )}
+                        >
+                          অপশন {optionLabel} {isCorrect && "(সঠিক উত্তর)"}
+                        </span>
+                      </button>
 
-                    {/* Top Caption Field */}
-                    <EditableField
-                      label="Top Caption (Header / Figure Title)"
-                      value={att.caption || ""}
-                      isMath={item.isMath}
-                      placeholder="Add top caption (e.g. Figure 1 / নিচের উদ্দীপকটি পড়ো)..."
-                      onSave={(val) => handleUpdateAttachment(attIdx, "caption", val)}
-                    />
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={optIdx === 0}
+                          onClick={() => handleMoveOption(optIdx, "prev")}
+                          className="size-7 text-muted-foreground hover:text-indigo-600 rounded-lg disabled:opacity-25 cursor-pointer"
+                        >
+                          <ChevronUp className="size-3.5" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={optIdx === item.options.length - 1}
+                          onClick={() => handleMoveOption(optIdx, "next")}
+                          className="size-7 text-muted-foreground hover:text-indigo-600 rounded-lg disabled:opacity-25 cursor-pointer"
+                        >
+                          <ChevronDown className="size-3.5" />
+                        </Button>
 
-                    {/* Content Field */}
-                    <EditableField
-                      label="Attachment Content (Passage / Stimulus Text)"
-                      value={att.content || ""}
-                      isMath={item.isMath}
-                      multiline
-                      placeholder="Add attachment content / stimulus text..."
-                      onSave={(val) => handleUpdateAttachment(attIdx, "content", val)}
-                    />
+                        {/* Swap Dropdown */}
+                        {item.options.length > 1 && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-7 text-muted-foreground hover:text-indigo-600 rounded-lg cursor-pointer"
+                              >
+                                <ArrowLeftRight className="size-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-52 bg-popover text-popover-foreground border border-slate-200/80 rounded-xl shadow-lg p-1.5"
+                            >
+                              <DropdownMenuLabel className="text-[10px] uppercase font-bold text-muted-foreground px-2 py-1">
+                                ({optionLabel}) এর সাথে অদলবদল:
+                              </DropdownMenuLabel>
+                              {item.options.map((otherOpt, otherIdx) => {
+                                if (otherIdx === optIdx) return null
+                                const otherLabel = BENGALI_OPTION_LABELS[otherIdx] || String(otherIdx + 1)
+                                return (
+                                  <DropdownMenuItem
+                                    key={otherIdx}
+                                    onClick={() => handleSwapOptions(optIdx, otherIdx)}
+                                    className="cursor-pointer text-xs flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg"
+                                  >
+                                    <span>অপশন {otherLabel}: {otherOpt || "(ফাঁকা)"}</span>
+                                    <ArrowLeftRight className="size-3 text-muted-foreground" />
+                                  </DropdownMenuItem>
+                                )
+                              })}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
 
-                    {/* Image URL & Visual Preview (if image) */}
-                    {isImage && (
-                      <div className="space-y-2 rounded-lg border border-outline-variant/40 bg-surface-container-low/30 p-2.5">
-                        <EditableField
-                          label="Image URL"
-                          value={att.url || ""}
-                          placeholder="https://example.com/image.png"
-                          onSave={(val) => handleUpdateAttachment(attIdx, "url", val)}
-                        />
-                        {att.url && att.url !== "text-context" && (
-                          <div className="inline-block mt-1">
-                            <img
-                              src={att.url}
-                              alt={att.caption || "Attachment Preview"}
-                              className="max-h-28 rounded-md border border-outline-variant/60 object-contain bg-white"
-                            />
-                          </div>
+                        {item.options.length > 2 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveOption(optIdx)}
+                            className="text-xs font-semibold text-rose-500 hover:text-rose-600 hover:underline cursor-pointer ml-1"
+                          >
+                            মুছুন
+                          </button>
                         )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Table Preview (if table) */}
-                    {isTable && att.table && (
-                      <div className="space-y-1 rounded-lg border border-outline-variant/40 bg-surface-container-low/30 p-2.5">
-                        <span className="font-label-sm text-[11px] font-bold uppercase tracking-wider text-outline block">
-                          Table Preview
-                        </span>
-                        <QuestionAttachments attachments={[att]} isMath={item.isMath} />
+                    <Input
+                      type="text"
+                      placeholder={`অপশন ${optionLabel}-এর বিবরণ লিখুন...`}
+                      value={opt}
+                      onChange={(e) => handleUpdateOption(optIdx, e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+                    />
+                    {item.isMath && opt && (
+                      <div className="text-[11px] text-muted-foreground px-1">
+                        <RenderMath text={opt} isMath={true} />
                       </div>
                     )}
-
-                    {/* Bottom Caption / Footnote Field */}
-                    <EditableField
-                      label="Bottom Caption (Footnote / Source Note)"
-                      value={att.bottomContent || ""}
-                      isMath={item.isMath}
-                      multiline
-                      placeholder="Add bottom caption / footnote (e.g. Source: Board 2024)..."
-                      onSave={(val) => handleUpdateAttachment(attIdx, "bottomContent", val)}
-                    />
                   </div>
                 )
               })}
             </div>
           </div>
-        )}
 
-        {/* Question Text */}
-        <EditableField
-          label="Question"
-          value={item.question}
-          isMath={item.isMath}
-          multiline
-          placeholder="Enter question text..."
-          onSave={(newQ) => onChange({ ...item, question: newQ })}
-        />
-
-        {/* Statements Section (e.g. i. Statement 1, ii. Statement 2) */}
-        <div className="space-y-2 border-t border-outline-variant/30 pt-3">
-          <div className="flex items-center justify-between">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
-              Statements / Sub-questions ({item.statements?.length || 0})
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={handleAddStatement}
-              className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
-            >
-              <PlusIcon className="size-3.5 mr-1" />
-              Add Statement
-            </Button>
-          </div>
-
-          {Array.isArray(item.statements) && item.statements.length > 0 ? (
+          {/* Correct Answer & Question Type */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
             <div className="space-y-2">
-              {item.statements.map((stmt, stmtIdx) => (
-                <div
-                  key={stmtIdx}
-                  className="group/stmt flex items-center gap-2.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-2 transition-all hover:border-outline-variant"
-                >
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-secondary-container/30 text-xs font-bold text-secondary font-mono">
-                    {romanNumerals[stmtIdx] || stmtIdx + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <EditableField
-                      value={stmt}
-                      isMath={item.isMath}
-                      placeholder="Statement text..."
-                      onSave={(newVal) => handleUpdateStatement(stmtIdx, newVal)}
-                    />
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0 opacity-100 md:opacity-0 md:group-hover/stmt:opacity-100 transition-opacity">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={stmtIdx === 0}
-                      onClick={() => handleMoveStatement(stmtIdx, "prev")}
-                      title="Move statement up"
-                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
-                    >
-                      <ChevronUpIcon className="size-3.5" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={stmtIdx === (item.statements?.length || 0) - 1}
-                      onClick={() => handleMoveStatement(stmtIdx, "next")}
-                      title="Move statement down"
-                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
-                    >
-                      <ChevronDownIcon className="size-3.5" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      onClick={() => handleRemoveStatement(stmtIdx)}
-                      title="Remove statement"
-                      className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
-                    >
-                      <Trash2Icon className="size-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs italic text-muted-foreground py-1">
-              No statements added. Click "+ Add Statement" for Roman numeral combination questions (i, ii, iii).
-            </p>
-          )}
-        </div>
-
-        {/* Options List */}
-        <div className="space-y-2 border-t border-outline-variant/30 pt-3">
-          <div className="flex items-center justify-between">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Option Choices ({item.options.length})
-            </span>
-            <div className="flex items-center gap-1.5">
-              {item.options.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleShuffleOptions}
-                  title="Shuffle / Randomize options order"
-                  className="text-xs font-semibold text-on-surface-variant hover:text-primary hover:bg-primary/10 cursor-pointer"
-                >
-                  <ShuffleIcon className="size-3.5 mr-1" />
-                  Shuffle
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={handleAddOption}
-                className="text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer"
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                সঠিক উত্তর (Correct Answer) <span className="text-rose-500">*</span>
+              </Label>
+              <Select
+                value={item.answer}
+                onValueChange={(val) => onChange({ ...item, answer: val })}
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Option
-              </Button>
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="সঠিক উত্তর নির্বাচন করুন..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                  {item.options.map((opt, idx) => {
+                    const label = BENGALI_OPTION_LABELS[idx] || String(idx + 1)
+                    return (
+                      <SelectItem key={idx} value={opt || `Option ${label}`}>
+                        অপশন {label}: {opt || "(ফাঁকা)"}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                প্রশ্নের ধরন (Question Type) <span className="text-rose-500">*</span>
+              </Label>
+              <Select
+                value={item.type || "SINGLE"}
+                onValueChange={(val) => onChange({ ...item, type: val })}
+              >
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="ধরন নির্বাচন করুন..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  <SelectItem value="SINGLE">একক সঠিক উত্তর (SINGLE)</SelectItem>
+                  <SelectItem value="MULTIPLE">একাধিক সঠিক উত্তর (MULTIPLE)</SelectItem>
+                  <SelectItem value="COMBINED">বহুপদী সমাপ্তিসূচক (COMBINED)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-            {item.options.map((opt, optIdx) => {
-              const isCorrect = item.answer === opt
-              const letter = optionLetters[optIdx] || String(optIdx + 1)
+          {/* Math & Active Flags */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+              <div>
+                <p className="text-sm font-bold text-foreground">গণিত / LaTeX সমীকরণ</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  KaTeX দিয়ে গাণিতিক সমীকরণ রেন্ডার করতে সক্রিয় করুন।
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={item.isMath}
+                onChange={(e) => onChange({ ...item, isMath: e.target.checked })}
+                className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+              />
+            </div>
 
-              return (
-                <div
-                  key={optIdx}
-                  className={cn(
-                    "group/option flex items-center gap-2.5 rounded-lg border p-2 transition-all",
-                    isCorrect
-                      ? "border-emerald-500 bg-emerald-50/60 ring-1 ring-emerald-500/20"
-                      : "border-outline-variant/40 bg-surface-container-lowest/30 hover:border-outline-variant"
-                  )}
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+              <div>
+                <p className="text-sm font-bold text-foreground">সক্রিয় প্রশ্নের অবস্থা</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={item.isActive !== false}
+                onChange={(e) => onChange({ ...item, isActive: e.target.checked })}
+                className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Explanation & Reference */}
+          <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                সঠিক উত্তরের ব্যাখ্যা / সমাধান (Explanation)
+              </Label>
+              <Textarea
+                rows={3}
+                placeholder="সঠিক উত্তরের বিস্তারিত ব্যাখ্যা বা সমাধান লিখুন..."
+                value={item.explanation || ""}
+                onChange={(e) => onChange({ ...item, explanation: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                রেফারেন্স / উৎস (কমা দিয়ে একাধিক উল্লেখ করুন)
+              </Label>
+              <Input
+                type="text"
+                placeholder="যেমন: ঢাকা বোর্ড ২০২৩, পাঠ্যবই পৃষ্ঠা ৪২..."
+                value={Array.isArray(item.reference) ? item.reference.join(", ") : ""}
+                onChange={(e) => {
+                  const refs = e.target.value
+                    .split(",")
+                    .map((r) => r.trim())
+                    .filter(Boolean)
+                  onChange({ ...item, reference: refs })
+                }}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+              />
+            </div>
+          </div>
+
+          {/* Metadata Settings */}
+          <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              মেটাডাটা ও অতিরিক্ত সেটিংস
+            </h5>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
+                </Label>
+                <Select
+                  value={item.difficulty || "MEDIUM"}
+                  onValueChange={(val) => onChange({ ...item, difficulty: val as any })}
                 >
-                  {/* Select as Correct Answer Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleSetCorrectAnswer(opt)}
-                    title={isCorrect ? "Correct Answer" : "Click to mark as correct answer"}
-                    className={cn(
-                      "flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-all cursor-pointer",
-                      isCorrect
-                        ? "border-emerald-600 bg-emerald-600 text-white"
-                        : "border-outline text-outline group-hover/option:border-primary group-hover/option:text-primary",
-                      /[\u0980-\u09FF]/.test(letter) && "font-solaiman"
-                    )}
-                  >
-                    {isCorrect ? <CheckCircle2Icon className="size-4" /> : letter}
-                  </button>
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                    <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Editable Option Text */}
-                  <div className="flex-1 min-w-0">
-                    <EditableField
-                      value={opt}
-                      isMath={item.isMath}
-                      placeholder={`Option ${letter}...`}
-                      onSave={(newVal) => handleUpdateOption(optIdx, newVal)}
-                      textClassName={isCorrect ? "font-bold text-emerald-900" : ""}
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  প্রশ্নের উৎস (Source)
+                </Label>
+                <Select
+                  value={item.source || DEFAULT_SOURCE}
+                  onValueChange={(val) => onChange({ ...item, source: val })}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                    <SelectValue placeholder="উৎস নির্বাচন করুন...">
+                      {item.source || DEFAULT_SOURCE}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {MCQ_SOURCE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Option Controls: Move Up/Down, Exchange With, Delete */}
-                  <div className="flex items-center gap-0.5 shrink-0 opacity-100 md:opacity-0 md:group-hover/option:opacity-100 transition-opacity">
-                    {/* Move Previous / Up */}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={optIdx === 0}
-                      onClick={() => handleMoveOption(optIdx, "prev")}
-                      title="Move option up / previous"
-                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
-                    >
-                      <ChevronUpIcon className="size-3.5" />
-                    </Button>
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  সেশন (Session)
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="যেমন: ২০২৬"
+                  value={(item as any).session || ""}
+                  onChange={(e) => onChange({ ...item, session: e.target.value } as any)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
 
-                    {/* Move Next / Down */}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-xs"
-                      disabled={optIdx === item.options.length - 1}
-                      onClick={() => handleMoveOption(optIdx, "next")}
-                      title="Move option down / next"
-                      className="size-6 text-muted-foreground hover:text-primary disabled:opacity-25 cursor-pointer"
-                    >
-                      <ChevronDownIcon className="size-3.5" />
-                    </Button>
-
-                    {/* Direct Exchange / Swap Dropdown Menu */}
-                    {item.options.length > 1 && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-xs"
-                            title={`Exchange position of option ${letter} with another option`}
-                            className="size-6 text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer"
-                          >
-                            <ArrowLeftRightIcon className="size-3.5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-56 bg-white p-1 shadow-lg border border-outline-variant/60 rounded-xl"
-                        >
-                          <DropdownMenuLabel className="text-[10px] uppercase font-bold text-muted-foreground px-2.5 py-1">
-                            Exchange ({letter}) with option:
-                          </DropdownMenuLabel>
-                          {item.options.map((otherOpt, otherIdx) => {
-                            if (otherIdx === optIdx) return null
-                            const otherLetter = optionLetters[otherIdx] || String(otherIdx + 1)
-                            return (
-                              <DropdownMenuItem
-                                key={otherIdx}
-                                onClick={() => handleSwapOptions(optIdx, otherIdx)}
-                                className="cursor-pointer text-xs flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
-                              >
-                                <span className="flex items-center gap-2 font-medium truncate">
-                                  <span className="flex size-5 items-center justify-center rounded-md bg-primary-container text-[11px] font-bold text-on-primary-container font-solaiman shrink-0">
-                                    {otherLetter}
-                                  </span>
-                                  <span className="truncate max-w-[130px] text-on-surface text-xs">
-                                    {otherOpt || `Option ${otherLetter}`}
-                                  </span>
-                                </span>
-                                <ArrowLeftRightIcon className="size-3 text-muted-foreground/70 shrink-0" />
-                              </DropdownMenuItem>
-                            )
-                          })}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-
-                    {/* Remove Option Button */}
-                    {item.options.length > 2 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-xs"
-                        onClick={() => handleRemoveOption(optIdx)}
-                        title="Remove option"
-                        className="size-6 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer"
-                      >
-                        <Trash2Icon className="size-3.5" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  পরীক্ষার বছর (ঐচ্ছিক)
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="যেমন: ২০২৪"
+                  value={item.year !== undefined && item.year !== null ? String(item.year) : ""}
+                  onChange={(e) =>
+                    onChange({
+                      ...item,
+                      year: e.target.value && !isNaN(Number(e.target.value)) ? Number(e.target.value) : null,
+                    })
+                  }
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Answer Key & Explanation Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
-          {/* Answer Field */}
-          <EditableField
-            label="Correct Answer Value"
-            value={item.answer}
-            isMath={item.isMath}
-            placeholder="Enter correct answer..."
-            onSave={(newAns) => onChange({ ...item, answer: newAns })}
-          />
-
-          {/* References Tag List */}
-          <EditableField
-            label="References (Comma-separated)"
-            value={referenceString}
-            placeholder="e.g. Physics Board 2024, Dhaka Board..."
-            onSave={handleSaveReferences}
-          />
-
-          {/* Difficulty */}
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-outline uppercase tracking-wider">Difficulty</span>
-            <Select
-              value={item.difficulty || "MEDIUM"}
-              onValueChange={(val) => onChange({ ...item, difficulty: val as any })}
-            >
-              <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-1 px-3 text-xs focus:ring-1 focus:ring-primary h-8 justify-between">
-                <SelectValue placeholder="Select Difficulty">
-                  {item.difficulty || "MEDIUM"}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg text-xs">
-                {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Source */}
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-outline uppercase tracking-wider">Source</span>
-            <Select
-              value={item.source || DEFAULT_SOURCE}
-              onValueChange={(val) => onChange({ ...item, source: val })}
-            >
-              <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-1 px-3 text-xs focus:ring-1 focus:ring-primary h-8 justify-between">
-                <SelectValue placeholder="Select Source">
-                  {item.source || DEFAULT_SOURCE}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg text-xs">
-                {MCQ_SOURCE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Session */}
-          <EditableField
-            label="Session"
-            value={(item as any).session || new Date().getFullYear().toString()}
-            placeholder="e.g. 2026"
-            onSave={(newSess) => onChange({ ...item, session: newSess || undefined } as any)}
-          />
-
-          {/* Year */}
-          <EditableField
-            label="Exam Year (Optional)"
-            value={item.year !== undefined && item.year !== null ? String(item.year) : ""}
-            placeholder="e.g. 2024..."
-            onSave={(newYr) => onChange({ ...item, year: newYr && !isNaN(Number(newYr)) ? Number(newYr) : undefined })}
-          />
-
-          {/* Question Type ID */}
-          <EditableField
-            label="Question Type ID (Optional)"
-            value={item.questionTypeId || ""}
-            placeholder="Enter question type ID..."
-            onSave={(newQTypeId) => onChange({ ...item, questionTypeId: newQTypeId || undefined })}
-          />
-        </div>
-
-        {/* Explanation */}
-        <EditableField
-          label="Explanation / Solution Notes"
-          value={item.explanation || ""}
-          isMath={item.isMath}
-          multiline
-          placeholder="Add explanation or solution notes (optional)..."
-          onSave={(newExp) => onChange({ ...item, explanation: newExp || undefined })}
-        />
-      </div>
+        </CardContent>
+      )}
     </Card>
   )
 }
@@ -1217,18 +963,16 @@ export function ImportMcqView() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>(QUESTION_DIFFICULTY.MEDIUM)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<CreateMcqInput[]>([])
+  const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({ 0: true })
   const [parseError, setParseError] = useState<string | null>(null)
   const [errorContext, setErrorContext] = useState<ReturnType<typeof findJsonErrorPosition>>(null)
 
-  // Academic classes dropdown query
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
 
-  // Subjects dropdown query filtered by selected Academic Class
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedAcademicClassId ? { academicClassId: selectedAcademicClassId } : undefined
   )
 
-  // Chapters dropdown query filtered by selected Subject
   const { data: chapters = [] } = useChaptersForSelection({
     subjectId: selectedSubjectId,
   })
@@ -1242,7 +986,14 @@ export function ImportMcqView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
+        validateAndParseJson(
+          content,
+          selectedAcademicClassId,
+          selectedSubjectId,
+          selectedChapterId,
+          selectedSource,
+          selectedDifficulty
+        )
       }
     }
     reader.readAsText(file)
@@ -1268,22 +1019,21 @@ export function ImportMcqView() {
     try {
       rawData = JSON.parse(textToParse)
     } catch (err: any) {
-      // Attempt silent auto-repair for common AI paste artifacts (smart quotes, trailing commas, markdown fences)
       const repaired = repairJsonSyntax(text)
       if (repaired && repaired !== text) {
         try {
           rawData = JSON.parse(repaired)
           textToParse = repaired
           setJsonText(repaired)
-          toast.success("Auto-repaired JSON formatting (smart quotes / trailing commas)!")
+          toast.success("JSON ফরম্যাট ও সিনট্যাক্স স্বয়ংক্রিয়ভাবে সংশোধন করা হয়েছে!")
         } catch {
-          // Both failed, proceed to display error diagnostic locator
+          // Both failed
         }
       }
 
       if (!rawData) {
-        const errMsg = err.message || "Invalid JSON syntax"
-        setParseError(`Syntax Error: ${errMsg}`)
+        const errMsg = err.message || "ভুল JSON সিনট্যাক্স"
+        setParseError(`সিনট্যাক্স ত্রুটি: ${errMsg}`)
         const errLoc = findJsonErrorPosition(text, errMsg)
         setErrorContext(errLoc)
         return
@@ -1294,7 +1044,7 @@ export function ImportMcqView() {
       const itemsArray = Array.isArray(rawData) ? rawData : [rawData]
 
       if (itemsArray.length === 0) {
-        setParseError("JSON array is empty.")
+        setParseError("JSON অ্যারেটি খালি।")
         return
       }
 
@@ -1303,7 +1053,8 @@ export function ImportMcqView() {
 
       const fallbackSource = overrideSource || selectedSource || DEFAULT_SOURCE
       const fallbackSession = new Date().getFullYear().toString()
-      const fallbackDifficulty = overrideDifficulty || selectedDifficulty || QUESTION_DIFFICULTY.MEDIUM
+      const fallbackDifficulty =
+        overrideDifficulty || selectedDifficulty || QUESTION_DIFFICULTY.MEDIUM
 
       itemsArray.forEach((item: any, idx: number) => {
         const itemNum = idx + 1
@@ -1311,19 +1062,23 @@ export function ImportMcqView() {
         const chapterId = item.chapterId || overrideChapterId
 
         if (!item.question || typeof item.question !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'question' string.`)
+          errors.push(`প্রশ্ন #${itemNum}: 'question' ফিল্ড অনুপস্থিত বা সঠিক নয়।`)
         }
         if (!item.answer || typeof item.answer !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'answer' string.`)
+          errors.push(`প্রশ্ন #${itemNum}: 'answer' ফিল্ড অনুপস্থিত বা সঠিক নয়।`)
         }
         if (!Array.isArray(item.options) || item.options.length < 1) {
-          errors.push(`Item #${itemNum}: 'options' must be a non-empty array of strings.`)
+          errors.push(`প্রশ্ন #${itemNum}: 'options' একটি খালি নয় এমন স্ট্রিং অ্যারে হতে হবে।`)
         }
         if (!subjectId) {
-          errors.push(`Item #${itemNum}: Missing 'subjectId'. Select a default Subject above or add subjectId to JSON.`)
+          errors.push(
+            `প্রশ্ন #${itemNum}: 'subjectId' পাওয়া যায়নি। উপরের ড্রপডাউন থেকে বিষয় নির্বাচন করুন।`
+          )
         }
         if (!chapterId) {
-          errors.push(`Item #${itemNum}: Missing 'chapterId'. Select a default Chapter above or add chapterId to JSON.`)
+          errors.push(
+            `প্রশ্ন #${itemNum}: 'chapterId' পাওয়া যায়নি। উপরের ড্রপডাউন থেকে অধ্যায় নির্বাচন করুন।`
+          )
         }
 
         let questionText = String(item.question || "").trim()
@@ -1337,7 +1092,7 @@ export function ImportMcqView() {
 
         const mappedAttachments = attachmentsArray
           .filter((att: any) => att && typeof att === "object")
-          .map((att: any, idx: number) => ({
+          .map((att: any, aIdx: number) => ({
             type: String(att.type || (att.url ? "image" : att.table ? "table" : "text")),
             caption: att.caption ? String(att.caption) : null,
             content: att.content ? String(att.content) : null,
@@ -1345,20 +1100,21 @@ export function ImportMcqView() {
             table: att.table !== undefined ? att.table : null,
             bottomContent: att.bottomContent ? String(att.bottomContent) : null,
             tableBorder: att.tableBorder !== undefined ? Boolean(att.tableBorder) : false,
-            position: att.position !== undefined && att.position !== null ? Number(att.position) : idx,
+            position:
+              att.position !== undefined && att.position !== null ? Number(att.position) : aIdx,
           }))
 
-        // Smart extraction of stimulus/context if embedded in the question stem
         if (!contextText && questionText.includes("\n\n")) {
-          // Look for common separators like "প্রশ্ন:", "প্রশ্নঃ", "Question:", "Q:"
           const parts = questionText.split(/\n\n(?:প্রশ্ন|প্রশ্নঃ|Q|Question)[\s:]*/i)
           if (parts.length >= 2) {
             contextText = parts[0]?.trim()
             questionText = parts.slice(1).join("\n\n").trim()
           } else {
-            // Fallback: split on the first double newline if it has keywords like "উদ্দীপক" or "অনুচ্ছেদ"
             const doubleNewlineIdx = questionText.indexOf("\n\n")
-            if (doubleNewlineIdx !== -1 && (questionText.includes("উদ্দীপক") || questionText.includes("অনুচ্ছেদ"))) {
+            if (
+              doubleNewlineIdx !== -1 &&
+              (questionText.includes("উদ্দীপক") || questionText.includes("অনুচ্ছেদ"))
+            ) {
               contextText = questionText.slice(0, doubleNewlineIdx).trim()
               questionText = questionText.slice(doubleNewlineIdx + 2).trim()
             }
@@ -1373,7 +1129,9 @@ export function ImportMcqView() {
           item.Difficulty ||
           item.DifficultyLevel ||
           ""
-        ).toString().trim()
+        )
+          .toString()
+          .trim()
 
         let itemDifficulty = fallbackDifficulty
 
@@ -1381,9 +1139,20 @@ export function ImportMcqView() {
           const upper = rawDiffStr.toUpperCase()
           if (upper === "EASY" || upper === "সহজ" || upper.includes("EASY") || upper === "1") {
             itemDifficulty = "EASY"
-          } else if (upper === "HARD" || upper === "কঠিন" || upper.includes("HARD") || upper === "3") {
+          } else if (
+            upper === "HARD" ||
+            upper === "কঠিন" ||
+            upper.includes("HARD") ||
+            upper === "3"
+          ) {
             itemDifficulty = "HARD"
-          } else if (upper === "MEDIUM" || upper === "মধ্যম" || upper === "সাধারণ" || upper.includes("MED") || upper === "2") {
+          } else if (
+            upper === "MEDIUM" ||
+            upper === "মধ্যম" ||
+            upper === "সাধারণ" ||
+            upper.includes("MED") ||
+            upper === "2"
+          ) {
             itemDifficulty = "MEDIUM"
           } else if (["EASY", "MEDIUM", "HARD"].includes(upper)) {
             itemDifficulty = upper as any
@@ -1398,53 +1167,50 @@ export function ImportMcqView() {
           answer: String(item.answer || "").trim(),
           options: Array.isArray(item.options) ? item.options.map(String) : [],
           statements: Array.isArray(item.statements) ? item.statements.map(String) : [],
-          type: item.type ? String(item.type) : "SINGLE",
-          isMath: item.isMath !== undefined
-            ? Boolean(item.isMath)
-            : Boolean(
-              /\$[^$\n]+\$/.test(questionText || "") ||
-              /\$[^$\n]+\$/.test(item.answer || "") ||
-              (Array.isArray(item.options) && item.options.some((opt: any) => /\$[^$\n]+\$/.test(String(opt)))) ||
-              (Array.isArray(item.statements) && item.statements.some((stmt: any) => /\$[^$\n]+\$/.test(String(stmt))))
-            ),
-          reference: Array.isArray(item.reference)
-            ? item.reference.map(String)
-            : Array.isArray(item.references)
-              ? item.references.map(String)
-              : typeof item.reference === "string" && item.reference.trim()
-                ? [item.reference.trim()]
-                : [],
-          explanation: item.explanation ? String(item.explanation) : undefined,
-          questionUrl: item.questionUrl ? String(item.questionUrl) : undefined,
-          context: contextText,
-          difficulty: itemDifficulty,
-          year: item.year !== undefined && item.year !== null && !isNaN(Number(item.year)) ? Number(item.year) : undefined,
+          type: item.type || "SINGLE",
+          isMath: item.isMath !== undefined ? Boolean(item.isMath) : true,
+          reference: Array.isArray(item.reference) ? item.reference.map(String) : [],
+          explanation: item.explanation ? String(item.explanation).trim() : null,
+          questionUrl: item.questionUrl ? String(item.questionUrl).trim() : null,
+          difficulty: itemDifficulty as any,
+          year: item.year && !isNaN(Number(item.year)) ? Number(item.year) : null,
           source: itemSource,
           session: itemSession,
-          questionTypeId: item.questionTypeId ? String(item.questionTypeId) : undefined,
+          questionTypeId: item.questionTypeId || null,
+          isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
           subjectId,
           chapterId,
-          isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
           attachments: mappedAttachments,
+          context: contextText,
         } as any)
       })
 
       if (errors.length > 0) {
-        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} more errors)` : ""))
+        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} আরও ত্রুটি)` : ""))
+        return
       }
 
       setParsedItems(validated)
+      // Expand first question by default
+      setExpandedCards({ 0: true })
     } catch (err: any) {
-      setParseError(`Validation Error: ${err.message || "Could not validate MCQ items."}`)
+      setParseError(err.message || "JSON যাচাইয়ে ত্রুটি ঘটেছে")
     }
   }
 
   const handleAutoFixJson = () => {
     if (!jsonText.trim()) return
-    const repaired = repairJsonSyntax(jsonText)
-    setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
-    toast.success("Attempted JSON syntax repair & formatting!")
+    const fixed = repairJsonSyntax(jsonText)
+    setJsonText(fixed)
+    validateAndParseJson(
+      fixed,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedChapterId,
+      selectedSource,
+      selectedDifficulty
+    )
+    toast.success("JSON ফরম্যাট ও সিনট্যাক্স স্বয়ংক্রিয়ভাবে ঠিক করা হয়েছে!")
   }
 
   const syncParsedItemsToText = (newItems: CreateMcqInput[]) => {
@@ -1456,7 +1222,14 @@ export function ImportMcqView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource, selectedDifficulty)
+    validateAndParseJson(
+      val,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedChapterId,
+      selectedSource,
+      selectedDifficulty
+    )
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -1465,7 +1238,14 @@ export function ImportMcqView() {
     setSelectedSubjectId("")
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "", selectedSource, selectedDifficulty)
+      validateAndParseJson(
+        jsonText,
+        value,
+        "",
+        "",
+        selectedSource,
+        selectedDifficulty
+      )
     }
   }
 
@@ -1474,7 +1254,14 @@ export function ImportMcqView() {
     setSelectedSubjectId(value)
     setSelectedChapterId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource, selectedDifficulty)
+      validateAndParseJson(
+        jsonText,
+        selectedAcademicClassId,
+        value,
+        "",
+        selectedSource,
+        selectedDifficulty
+      )
     }
   }
 
@@ -1482,7 +1269,14 @@ export function ImportMcqView() {
     const value = val ?? ""
     setSelectedChapterId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource, selectedDifficulty)
+      validateAndParseJson(
+        jsonText,
+        selectedAcademicClassId,
+        selectedSubjectId,
+        value,
+        selectedSource,
+        selectedDifficulty
+      )
     }
   }
 
@@ -1495,23 +1289,23 @@ export function ImportMcqView() {
   const handleDeleteParsedItem = (idx: number) => {
     const next = parsedItems.filter((_, i) => i !== idx)
     syncParsedItemsToText(next)
-    toast.info(`Removed question #${idx + 1} from import list.`)
+    toast.info(`প্রশ্ন #${toBengaliDigits(idx + 1)} তালিকা থেকে সরানো হয়েছে।`)
   }
 
   const handleDuplicateParsedItem = (idx: number) => {
     const itemToCopy = parsedItems[idx]
     if (!itemToCopy) return
     const next = [...parsedItems]
-    next.splice(idx + 1, 0, { ...itemToCopy, question: `${itemToCopy.question} (Copy)` })
+    next.splice(idx + 1, 0, { ...itemToCopy, question: `${itemToCopy.question} (কপি)` })
     syncParsedItemsToText(next)
-    toast.success(`Duplicated question #${idx + 1}.`)
+    toast.success(`প্রশ্ন #${toBengaliDigits(idx + 1)} সফলভাবে ডুপ্লিকেট করা হয়েছে।`)
   }
 
   const handleAddNewQuestionCard = () => {
     const newMcq: CreateMcqInput = {
-      question: "New MCQ Question text",
-      answer: "Option A",
-      options: ["Option A", "Option B", "Option C", "Option D"],
+      question: "",
+      answer: "",
+      options: ["", "", "", ""],
       statements: [],
       type: "SINGLE",
       isMath: false,
@@ -1526,16 +1320,25 @@ export function ImportMcqView() {
     } as any
     const next = [...parsedItems, newMcq]
     syncParsedItemsToText(next)
+    setExpandedCards((prev) => ({ ...prev, [next.length - 1]: true }))
+  }
+
+  const toggleAllExpanded = (expand: boolean) => {
+    const newMap: Record<number, boolean> = {}
+    parsedItems.forEach((_, idx) => {
+      newMap[idx] = expand
+    })
+    setExpandedCards(newMap)
   }
 
   const handleCopyTemplate = () => {
     navigator.clipboard.writeText(sampleJsonTemplate)
-    toast.success("Sample JSON template copied to clipboard!")
+    toast.success("নমুনা JSON টেমপ্লেট ক্লিপবোর্ডে কপি করা হয়েছে!")
   }
 
   const handleImport = async () => {
     if (parsedItems.length === 0 || parseError) {
-      toast.error("Please fix JSON errors before importing.")
+      toast.error("ইম্পোর্ট করার পূর্বে ত্রুটিসমূহ সংশোধন করুন।")
       return
     }
 
@@ -1547,103 +1350,112 @@ export function ImportMcqView() {
         difficulty: selectedDifficulty as any,
       })
 
-      toast.success(`Successfully imported ${result.importedCount} MCQ questions!`)
+      toast.success(`সফলভাবে ${toBengaliDigits(result.importedCount)}টি MCQ প্রশ্ন ইম্পোর্ট করা হয়েছে!`)
       setTimeout(() => {
         router.push("/mcqs")
-      }, 1000)
+      }, 800)
     } catch (err: any) {
-      toast.error(err.message || "Bulk import failed")
+      toast.error(err.message || "বাল্ক ইম্পোর্ট ব্যর্থ হয়েছে")
     }
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto pb-12">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end justify-between">
-        <div>
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/mcqs"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              MCQs
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm text-xs font-bold text-primary">Import JSON</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Import MCQs from JSON
-          </h2>
-          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Bulk upload questions or edit individual cards before importing into the question bank.
-          </p>
-        </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-12">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="JSON থেকে MCQ ইম্পোর্ট"
+        description="JSON ফাইল আপলোড বা সরাসরি টেক্সট পেস্ট করে একসাথে একাধিক বহুনির্বাচনি প্রশ্ন যাচাই, সম্পাদনা ও ইম্পোর্ট করুন।"
+        icon={Upload}
+        badge={{ label: "বাল্ক ইম্পোর্ট", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "MCQ তালিকা", href: "/mcqs" },
+          { label: "JSON ইম্পোর্ট" },
+        ]}
+      >
+        <div className="flex items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowSample(!showSample)}
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Code className="w-4 h-4" />
+            <span>{showSample ? "টেমপ্লেট লুকান" : "নমুনা JSON দেখুন"}</span>
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowSample(!showSample)}
-          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
-        >
-          <CodeIcon className="size-4" />
-          <span>{showSample ? "Hide Template" : "View Sample JSON"}</span>
-        </Button>
-      </div>
+          <Button
+            asChild
+            variant="outline"
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Link href="/mcqs">
+              <ArrowLeft className="w-4 h-4" />
+              <span>তালিকায় ফিরে যান</span>
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* Sample JSON Template Card */}
       {showSample && (
-        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-4 sm:p-6 animate-fade-in">
+        <Card className="rounded-2xl border border-indigo-200/70 dark:border-primary/20 bg-indigo-50/30 dark:bg-primary/5 p-5 sm:p-6 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <h4 className="font-headline-md text-base font-bold text-primary flex items-center gap-2">
-              <FileCodeIcon className="size-5" />
-              Expected JSON Structure
+            <h4 className="text-sm font-bold font-headline text-indigo-700 dark:text-primary flex items-center gap-2">
+              <FileCode className="size-4" />
+              প্রত্যাশিত JSON ফরম্যাট ও কাঠামো
             </h4>
             <Button
               type="button"
-              size="xs"
+              size="sm"
               variant="outline"
               onClick={handleCopyTemplate}
-              className="w-full sm:w-auto font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer justify-center"
+              className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer"
             >
-              Copy Template
+              টেমপ্লেট কপি করুন
             </Button>
           </div>
-          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-lg bg-surface-container-lowest p-3 sm:p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
+          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-xl bg-card p-4 font-mono text-xs text-foreground leading-relaxed border border-slate-200/80 dark:border-white/[0.08]">
             {sampleJsonTemplate}
           </pre>
         </Card>
       )}
 
-      {/* Main Hierarchy & Input Section */}
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-xs">
-        <CardHeader className="border-b border-outline-variant/30 p-6 bg-surface-container-low/30">
-          <CardTitle className="font-headline-md text-lg font-semibold text-on-surface">
-            Class, Subject & Chapter Hierarchy (Default Assignee)
-          </CardTitle>
-          <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Select Academic Class to dynamically filter Subjects and Chapters. If items in your JSON do not include `subjectId` or `chapterId`, they will be assigned below.
-          </p>
+      {/* Step 1 Card: Data Source & Hierarchy Setup */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <Layers className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              ১. শ্রেণি, বিষয় ও ডেটা সোর্স কনফিগারেশন
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              যেসব প্রশ্নে বিষয় বা অধ্যায় আইডি নেই, সেগুলোর জন্য ডিফল্ট তথ্য ও সোর্স নির্বাচন করে ফাইল আপলোড বা পেস্ট করুন।
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject, Chapter & Source 4-Column Dropdowns */}
+
+        <CardContent className="p-6 sm:p-8 space-y-6">
+          {/* Hierarchy Dropdowns matching Create View */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Class
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                শ্রেণি (Academic Class)
               </Label>
               <Select
                 value={selectedAcademicClassId || "all"}
                 onValueChange={handleAcademicClassChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Class (All Classes)..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="সব শ্রেণি..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  <SelectItem value="all" className="text-neutral-900">All Classes</SelectItem>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  <SelectItem value="all">সব শ্রেণি (All Classes)</SelectItem>
                   {academicClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
-                      {cls.nameEn}
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1652,20 +1464,20 @@ export function ImportMcqView() {
 
             {/* Default Subject */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট বিষয় (Subject)
               </Label>
               <Select
                 value={selectedSubjectId}
                 onValueChange={handleSubjectChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="ডিফল্ট বিষয় নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
                   {subjects.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                      {sub.nameEn}
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1674,27 +1486,27 @@ export function ImportMcqView() {
 
             {/* Default Chapter */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Chapter
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট অধ্যায় (Chapter)
               </Label>
               <Select
                 disabled={!selectedSubjectId}
                 value={selectedChapterId}
                 onValueChange={handleChapterChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
                   <SelectValue
                     placeholder={
                       selectedSubjectId
-                        ? "Select Default Chapter..."
-                        : "Select Subject first"
+                        ? "ডিফল্ট অধ্যায় নির্বাচন করুন..."
+                        : "প্রথমে বিষয় নির্বাচন করুন"
                     }
                   />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
                   {chapters.map((ch) => (
-                    <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
-                      {ch.nameEn}
+                    <SelectItem key={ch.id} value={ch.id}>
+                      {ch.nameBn || ch.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1703,26 +1515,32 @@ export function ImportMcqView() {
 
             {/* Default Source */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Source
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট উৎস (Source)
               </Label>
               <Select
                 value={selectedSource}
                 onValueChange={(val) => {
                   setSelectedSource(val)
                   if (jsonText) {
-                    validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, selectedChapterId, val)
+                    validateAndParseJson(
+                      jsonText,
+                      selectedAcademicClassId,
+                      selectedSubjectId,
+                      selectedChapterId,
+                      val
+                    )
                   }
                 }}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Source...">
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন...">
                     {selectedSource}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
                   {MCQ_SOURCE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -1731,107 +1549,109 @@ export function ImportMcqView() {
             </div>
           </div>
 
-          {/* Helper Warning if Class, Subject & Chapter are not selected */}
+          {/* Warning Banner if Hierarchy not chosen */}
           {(!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId) && (
-            <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs font-semibold">
-              <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
-              <span>Please select a Default Class, Default Subject, and Default Chapter above to unlock JSON file upload and text input.</span>
+            <div className="flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/70 dark:bg-amber-950/20 p-4 text-amber-800 dark:text-amber-400 text-xs font-medium">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+              <span>
+                JSON ফাইল আপলোড বা টেক্সট ইনপুট আনলক করতে অনুগ্রহ করে উপরে ডিফল্ট শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করুন।
+              </span>
             </div>
           )}
 
-          {/* JSON File Uploader */}
-          <div className="border-t border-outline-variant/30 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
-              Upload JSON File
+          {/* File Upload Section */}
+          <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              JSON ফাইল আপলোড করুন
             </Label>
             <input
               type="file"
               accept=".json,application/json"
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               onChange={handleFileUpload}
-              className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
+              className="block w-full text-sm text-foreground file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 dark:file:bg-primary/10 file:text-indigo-700 dark:file:text-primary hover:file:bg-indigo-100 dark:hover:file:bg-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
             />
           </div>
 
           {/* Or Paste JSON Textarea */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Or Paste JSON Content Below
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                অথবা সরাসরি JSON টেক্সট পেস্ট করুন
               </Label>
               {jsonText.trim() && (
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={handleAutoFixJson}
-                  className="text-xs font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+                  className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  ⚡ Auto-Fix & Format JSON
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় সিনট্যাক্স ফিক্স ও ফরম্যাট
                 </Button>
               )}
             </div>
             <Textarea
-              rows={6}
+              rows={5}
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               placeholder={
                 !selectedAcademicClassId || !selectedSubjectId || !selectedChapterId
-                  ? "Select Class, Subject, and Chapter above first to enable JSON input..."
-                  : "Paste JSON array here..."
+                  ? "প্রথমে উপরে শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করুন..."
+                  : "এখানে JSON অ্যারে পেস্ট করুন..."
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-white p-3 font-mono text-xs text-on-surface focus:ring-2 focus:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] p-3.5 font-mono text-xs text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
-          {/* Validation Status / Diagnostics */}
+          {/* Validation Diagnostics / Error Locator */}
           {parseError && (
-            <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
+            <div className="space-y-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-5 text-rose-700 dark:text-rose-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-                  <p className="font-bold text-sm">JSON Parsing Diagnostic Error</p>
+                  <AlertCircle className="size-5 text-rose-600 shrink-0" />
+                  <p className="font-bold text-sm">JSON সিনট্যাক্স ডায়াগনস্টিক ত্রুটি</p>
                 </div>
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
+                  className="rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs h-8 px-3 cursor-pointer shadow-xs w-full sm:w-auto justify-center"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  Auto-Fix JSON Syntax
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় ফিক্স প্রয়োগ করুন
                 </Button>
               </div>
 
-              <p className="font-mono text-xs leading-relaxed bg-white/80 p-2.5 rounded-lg border border-destructive/20 text-destructive">
+              <p className="font-mono text-xs leading-relaxed bg-white/90 dark:bg-card p-3 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-400">
                 {parseError}
               </p>
 
               {/* Code Snippet Error Pointer */}
               {errorContext && errorContext.linesContext.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-destructive/80">
-                    Syntax Error Location (Line {errorContext.line}
-                    {errorContext.col > 0 ? `, Column ${errorContext.col}` : ""}):
+                <div className="space-y-1.5 pt-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-rose-700/80">
+                    ত্রুটির সম্ভাব্য অবস্থান (লাইন {toBengaliDigits(errorContext.line)}
+                    {errorContext.col > 0 ? `, কলাম ${toBengaliDigits(errorContext.col)}` : ""}):
                   </p>
-                  <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 font-mono text-xs text-gray-200">
+                  <div className="overflow-x-auto rounded-xl bg-slate-900 p-3.5 font-mono text-xs text-slate-200">
                     {errorContext.linesContext.map((l) => (
                       <div
                         key={l.num}
                         className={cn(
-                          "flex items-center gap-3 px-2 py-0.5 rounded",
-                          l.isError && "bg-red-900/80 text-white font-bold border-l-4 border-red-500"
+                          "flex items-center gap-3 px-2 py-0.5 rounded-lg",
+                          l.isError && "bg-rose-950/80 text-white font-bold border-l-4 border-rose-500"
                         )}
                       >
-                        <span className="w-8 shrink-0 text-right text-gray-500 select-none">
-                          {l.num}
+                        <span className="w-8 shrink-0 text-right text-slate-500 select-none">
+                          {toBengaliDigits(l.num)}
                         </span>
                         <span className="whitespace-pre">{l.content}</span>
                         {l.isError && (
-                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-red-600 text-white px-1.5 py-0.5 rounded shrink-0">
-                            Error Here
+                          <span className="ml-auto text-[10px] uppercase font-bold tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-md shrink-0">
+                            এখানে ত্রুটি
                           </span>
                         )}
                       </div>
@@ -1842,14 +1662,15 @@ export function ImportMcqView() {
             </div>
           )}
 
+          {/* Validation Success Banner */}
           {!parseError && parsedItems.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 dark:bg-emerald-950/20 p-4 text-emerald-800 dark:text-emerald-300 text-sm">
               <div className="flex items-center gap-3">
-                <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                 <div>
-                  <p className="font-bold">JSON Parsed & Valid!</p>
-                  <p className="text-xs">
-                    {parsedItems.length} MCQ question(s) parsed successfully.
+                  <p className="font-bold">JSON যাচাইকরণ সফল হয়েছে!</p>
+                  <p className="text-xs text-emerald-700/80 dark:text-emerald-400">
+                    মোট {toBengaliDigits(parsedItems.length)}টি বহুনির্বাচনি প্রশ্ন সফলভাবে পার্স করা হয়েছে। নিচের প্রিভিউ কার্ডে পর্যালোচনা ও সম্পাদনা করুন।
                   </p>
                 </div>
               </div>
@@ -1858,83 +1679,127 @@ export function ImportMcqView() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
+                className="rounded-xl bg-white dark:bg-card border-emerald-300 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 font-bold text-xs h-9 px-4 cursor-pointer shrink-0 w-full sm:w-auto justify-center"
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Question Card
+                <Plus className="size-3.5 mr-1" />
+                নতুন প্রশ্ন কার্ড যোগ করুন
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Parsed Items Card-based MCQ Preview */}
-          {parsedItems.length > 0 && (
-            <div className="border-t border-outline-variant/30 pt-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                    <CodeIcon className="size-4 text-primary shrink-0" />
-                    Card Preview ({parsedItems.length} MCQ Questions)
-                  </h4>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddNewQuestionCard}
-                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center"
-                >
-                  <PlusIcon className="size-3.5 mr-1" />
-                  Add Question
-                </Button>
+      {/* Step 2 Section: Parsed Questions Review & Edit Cards */}
+      {parsedItems.length > 0 && (
+        <div className="space-y-6 pt-2">
+          {/* Section Header Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 shrink-0">
+                <BookOpen className="h-5 w-5" />
               </div>
-
-              {/* Grid of MCQ Preview Cards */}
-              <div className="space-y-6">
-                {parsedItems.map((item, idx) => (
-                  <EditableMcqCard
-                    key={idx}
-                    index={idx}
-                    item={item}
-                    onChange={(updated) => handleUpdateParsedItem(idx, updated)}
-                    onDelete={() => handleDeleteParsedItem(idx)}
-                    onDuplicate={() => handleDuplicateParsedItem(idx)}
-                  />
-                ))}
+              <div>
+                <h3 className="text-lg font-bold font-headline text-foreground flex items-center gap-2">
+                  <span>২. প্রশ্ন প্রিভিউ ও সম্পাদনা</span>
+                  <Badge variant="secondary" className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono">
+                    {toBengaliDigits(parsedItems.length)}টি প্রশ্ন
+                  </Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  প্রতিটি প্রশ্নের বিবরণ, অপশন ও সঠিক উত্তর চেক করুন এবং প্রয়োজনে সরাসরি সংশোধন করুন।
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Submit Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(true)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer"
+              >
+                <Maximize2 className="size-3.5 mr-1" />
+                সব প্রসারিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(false)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer"
+              >
+                <Minimize2 className="size-3.5 mr-1" />
+                সব সংকুচিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddNewQuestionCard}
+                className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary font-bold text-xs h-9 px-3.5 cursor-pointer"
+              >
+                <Plus className="size-3.5 mr-1" />
+                প্রশ্ন যোগ করুন
+              </Button>
+            </div>
+          </div>
+
+          {/* List of Parsed MCQ Cards */}
+          <div className="space-y-6">
+            {parsedItems.map((item, idx) => (
+              <ParsedMcqCard
+                key={idx}
+                index={idx}
+                item={item}
+                isExpanded={Boolean(expandedCards[idx])}
+                onToggleExpand={() =>
+                  setExpandedCards((prev) => ({
+                    ...prev,
+                    [idx]: !prev[idx],
+                  }))
+                }
+                onChange={(updated) => handleUpdateParsedItem(idx, updated)}
+                onDelete={() => handleDeleteParsedItem(idx)}
+                onDuplicate={() => handleDuplicateParsedItem(idx)}
+              />
+            ))}
+          </div>
+
+          {/* Form Actions Footer */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.push("/mcqs")}
-              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+              className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer justify-center"
             >
-              Cancel
+              বাতিল
             </Button>
             <Button
               type="button"
-              disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
+              disabled={
+                parsedItems.length === 0 ||
+                Boolean(parseError) ||
+                importMutation.isPending
+              }
               onClick={handleImport}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
+              className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {importMutation.isPending ? (
-                <Wand2Icon className="size-4 animate-spin shrink-0" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
               ) : (
-                <UploadIcon className="size-4 shrink-0" />
+                <Upload className="size-4 shrink-0" />
               )}
               <span>
                 {importMutation.isPending
-                  ? "Importing..."
-                  : `Import ${parsedItems.length} MCQs`}
+                  ? "ইম্পোর্ট করা হচ্ছে..."
+                  : `মোট ${toBengaliDigits(parsedItems.length)}টি প্রশ্ন ইম্পোর্ট করুন`}
               </span>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   )
 }

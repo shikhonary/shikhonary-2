@@ -168,6 +168,7 @@ export function CreateQuestionPaperStepper() {
             questionTypeLabel: dist.questionTypeLabel,
             marksPerQuestion: dist.marksPerQuestion,
             markDistribution: dist.markDistribution ?? { a: dist.marksPerQuestion },
+            renderMethod: dist.renderMethod,
             questionCount: dist.questionCount,
             questionsToAttempt: dist.questionsToAttempt ?? null,
             orderIndex: dist.orderIndex,

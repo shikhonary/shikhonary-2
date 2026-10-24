@@ -8,6 +8,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+import { isResourceEnglish } from "@workspace/utils";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -216,8 +217,46 @@ export const LetterBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
-  const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const renderMethod = Number(
+    item.renderMethod ??
+    item.distribution?.renderMethod ??
+    distStatus?.renderMethod ??
+    1
+  );
+
+  const rawTitle = data.title || data.name || data.question || "";
+  const isEnglish = isResourceEnglish({
+    subjectName: distStatus?.subjectName || item.distribution?.subjectName || item.subjectName,
+    questionTypeLabel: rawLabel,
+    content: rawTitle,
+  });
+
+  const bnSubLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const enSubLabels = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t"];
+  const subLabels = isEnglish ? enSubLabels : bnSubLabels;
   const label = subLabels[item.orderIndex] || "";
+
+  const totalQuestions = item.totalQuestions || 1;
+
+  const formatDirectLetterPrompt = (title: string, english: boolean) => {
+    if (!title || !title.trim()) return "";
+    const cleanTitle = title.trim();
+    if (english) {
+      if (/write\s+(a\s+)?letter/i.test(cleanTitle)) {
+        return cleanTitle;
+      }
+      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+      return `Write a letter on '${unquoted}'.`;
+    } else {
+      if (cleanTitle.includes("পত্র লেখ") || cleanTitle.includes("চিঠি লেখ") || cleanTitle.includes("চিঠি পাঠাও") || cleanTitle.includes("একটি পত্র")) {
+        return cleanTitle;
+      }
+      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+      return `’${unquoted}’ বিষয়ে একটি পত্র লেখো।`;
+    }
+  };
+
+  const directPromptText = formatDirectLetterPrompt(rawTitle, isEnglish);
 
   const renderSubQuestionLabel = (labelStr: string) => {
     const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
@@ -239,8 +278,6 @@ export const LetterBlock = ({ item }: { item: any }) => {
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
-  const titleText = data.title || data.name || "";
-
   return (
     <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
@@ -249,10 +286,10 @@ export const LetterBlock = ({ item }: { item: any }) => {
           type="button"
           onClick={() => setShowAddAlternative(true)}
           className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
+          title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
         >
           <Split className="w-3 h-3" />
-          অথবা
+          {isEnglish ? "Or" : "অথবা"}
         </button>
         <button 
           onClick={handleRemove}
@@ -265,81 +302,135 @@ export const LetterBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      {isFirst && (
-        <div className="flex justify-between items-start w-full">
-          <div 
-            className="font-bold ml-[0px] flex items-baseline gap-2" 
-            style={{
-              fontSize: questionStyle.fontSize,
-              fontFamily: questionStyle.fontFamily,
-            }}
-          >
-            <span
-              className="font-bold shrink-0 min-w-[1.8em]"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            >
-              {toBengaliDigits(masterNum)}।
-            </span>
-            <EditableSectionLabel
-              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={rawLabel}
-              fallbackLabel="যেকোনো একটি বিষয়ে পত্র লেখো:"
-              questionType="LETTER"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            />
+      {renderMethod === 1 ? (
+        <div className="flex justify-between items-start gap-2 w-full">
+          <div className="flex gap-1 flex-1 relative flex-col">
+            <div className="flex gap-2 items-start w-full">
+              <span
+                className="font-bold shrink-0 min-w-[1.8em]"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
+              </span>
+              {totalQuestions > 1 && renderSubQuestionLabel(label)}
+              <div className="flex-1 w-full min-w-0">
+                <LetterEditableText 
+                  text={directPromptText}
+                  itemKey={`${item.id}-question`}
+                  defaultStyle={questionStyle}
+                  className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Attached Alternatives */}
+            {item.alternatives && item.alternatives.length > 0 && (
+              <AlternativeQuestionRenderer
+                paperId={paperId || ""}
+                parentQuestionId={item.id}
+                alternatives={item.alternatives}
+                settings={settings}
+                masterNumber={masterNum}
+                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+              />
+            )}
           </div>
-          <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
+
+          <div className="font-bold whitespace-nowrap text-right shrink-0 ml-2" style={{
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
-            {toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+            {isEnglish ? marksPerQuestion : toBengaliDigits(marksPerQuestion)}
           </div>
         </div>
-      )}
-
-      <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex gap-1 flex-1 relative flex-col">
-          <div className="flex gap-2 items-start w-full">
-            <span
-              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
-              style={{
+      ) : (
+        <>
+          {isFirst && (
+            <div className="flex justify-between items-start w-full">
+              <div 
+                className="font-bold ml-[0px] flex items-baseline gap-2" 
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                <span
+                  className="font-bold shrink-0 min-w-[1.8em]"
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                >
+                  {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
+                </span>
+                <EditableSectionLabel
+                  distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+                  initialLabel={rawLabel}
+                  fallbackLabel={isEnglish ? "Write a letter on any one of the following:" : "যেকোনো একটি বিষয়ে পত্র লেখো:"}
+                  questionType="LETTER"
+                  questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+                  questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? attemptCount}
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                />
+              </div>
+              <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
-              }}
-              aria-hidden="true"
-            >
-              {toBengaliDigits(masterNum)}।
-            </span>
-            {renderSubQuestionLabel(label)}
-            <div className="flex-1 w-full min-w-0">
-              <LetterEditableText 
-                text={titleText}
-                itemKey={`${item.id}-question`}
-                defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
-              />
+              }}>
+                {isEnglish
+                  ? (marksPerQuestion * (attemptCount || 1))
+                  : (attemptCount > 1
+                    ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+                    : toBengaliDigits(marksPerQuestion * (attemptCount || 1)))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-between items-start gap-2 w-full">
+            <div className="flex gap-1 flex-1 relative flex-col">
+              <div className="flex gap-2 items-start w-full">
+                <span
+                  className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                  aria-hidden="true"
+                >
+                  {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
+                </span>
+                {renderSubQuestionLabel(label)}
+                <div className="flex-1 w-full min-w-0">
+                  <LetterEditableText 
+                    text={rawTitle}
+                    itemKey={`${item.id}-question`}
+                    defaultStyle={questionStyle}
+                    className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                  />
+                </div>
+              </div>
+
+              {/* Attached Alternatives */}
+              {item.alternatives && item.alternatives.length > 0 && (
+                <AlternativeQuestionRenderer
+                  paperId={paperId || ""}
+                  parentQuestionId={item.id}
+                  alternatives={item.alternatives}
+                  settings={settings}
+                  masterNumber={masterNum}
+                  primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
+                />
+              )}
             </div>
           </div>
-
-          {/* Attached Alternatives */}
-          {item.alternatives && item.alternatives.length > 0 && (
-            <AlternativeQuestionRenderer
-              paperId={paperId || ""}
-              parentQuestionId={item.id}
-              alternatives={item.alternatives}
-              settings={settings}
-              masterNumber={item.masterNumber || (item.orderIndex + 1)}
-              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
-            />
-          )}
-        </div>
-      </div>
+        </>
+      )}
 
       <AddAlternativeModal
         open={showAddAlternative}
@@ -350,7 +441,7 @@ export const LetterBlock = ({ item }: { item: any }) => {
         primaryQuestionType={questionType}
         subjectId={item.subjectId || distStatus?.subjectId || ""}
         primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? mark}
-        masterNumber={item.masterNumber || (item.orderIndex + 1)}
+        masterNumber={masterNum}
         distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
       />
     </div>

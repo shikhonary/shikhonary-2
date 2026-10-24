@@ -217,6 +217,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.CQ;
     } else if (lowerName.includes("opposite word") || lowerName.includes("opposite_word") || lowerName.includes("বিপরীত শব্দ") || lowerName.includes("বিপরীত")) {
       category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+    } else if (lowerName.includes("gender change") || lowerName.includes("gender_change") || lowerName.includes("লিঙ্গ পরিবর্তন") || lowerName.includes("লিঙ্গান্তর") || lowerName.includes("লিঙ্গ")) {
+      category = QUESTION_TYPE_CODES.GENDER_CHANGE;
     } else if (lowerName.includes("juktoborno") || lowerName.includes("যুক্তবর্ণ")) {
       category = QUESTION_TYPE_CODES.JUKTOBORNO;
     } else if (lowerName.includes("ek kothay") || lowerName.includes("ek kothai") || lowerName.includes("এক কথায়") || lowerName.includes("এক কথায়")) {
@@ -243,6 +245,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
     } else if (lowerName.includes("dan bam") || lowerName.includes("dan_bam") || lowerName.includes("বাম-ডান") || lowerName.includes("ডান-বাম") || lowerName.includes("মিলকরণ") || lowerName.includes("matching")) {
       category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
+    } else if (lowerName.includes("rearrange") || lowerName.includes("পুনর্বিন্যাস") || lowerName.includes("সাজিয়ে লেখ") || lowerName.includes("সাজিয়ে লেখ")) {
+      category = QUESTION_TYPE_CODES.REARRANGE;
     } else if (lowerName.includes("short question") || lowerName.includes("short_question") || lowerName.includes("sq") || lowerName.includes("সংক্ষিপ্ত প্রশ্ন")) {
       category = QUESTION_TYPE_CODES.SHORT_QUESTION;
     } else if (lowerName.includes("math question") || lowerName.includes("math_question") || lowerName.includes("গণিত প্রশ্ন") || lowerName.includes("গণিত") || lowerName.includes("math")) {
@@ -569,6 +573,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, makeQuestionIds: selectedIds });
       } else if (category === "OPPOSITE_WORD") {
         await bulkAssign({ ...payloadBase, oppositeWordIds: selectedIds });
+      } else if (category === "GENDER_CHANGE") {
+        await bulkAssign({ ...payloadBase, genderChangeIds: selectedIds });
       } else if (category === "JUKTOBORNO") {
         await bulkAssign({ ...payloadBase, juktobornoIds: selectedIds });
       } else if (category === "EK_KOTHAY_PROKASH") {
@@ -595,6 +601,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, shuddhoAshuddhoIds: selectedIds });
       } else if (category === "DAN_BAM_MILKORON") {
         await bulkAssign({ ...payloadBase, danBamMilkoronIds: selectedIds });
+      } else if (category === "REARRANGE") {
+        await bulkAssign({ ...payloadBase, rearrangeIds: selectedIds });
       } else if (category === "MATH_QUESTION") {
         await bulkAssign({ ...payloadBase, mathQuestionIds: selectedIds });
       } else if (category === "GRAMMAR_QUESTION") {

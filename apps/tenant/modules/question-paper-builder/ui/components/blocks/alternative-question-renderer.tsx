@@ -20,7 +20,9 @@ import { RenderChangingSentenceContent } from "./changing-sentence-block";
 import { RenderFillInTheBlanksContent, RenderCluesTable } from "./fill-in-the-blanks-with-clues-block";
 import { RenderSubstitutionTable } from "./substitution-table-block";
 import { RenderDanBamMilkoronTable } from "./dan-bam-milkoron-block";
+import { RenderRearrangeOptions } from "./rearrange-block";
 import { formatShortCompositionPrompt } from "./short-composition-block";
+import { isResourceEnglish } from "@workspace/utils";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -182,6 +184,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const verbTense = alt.verbTense;
         const shuddhoAshuddho = alt.shuddhoAshuddho;
         const danBamMilkoron = alt.danBamMilkoron;
+        const rearrange = alt.rearrange;
         const mathQuestion = alt.mathQuestion;
         const grammarQuestion = alt.grammarQuestion;
         const seenComprehension = alt.seenComprehension;
@@ -306,6 +309,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.toLowerCase().includes("essay")
                   ) || alt.distribution;
 
+                const altRenderMethod = Number(
+                  essayDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = essay.title || essay.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: essayDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: essayDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectEssayPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(an\s+)?essay/i.test(cleanTitle) || /composition/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write an essay on '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("রচনা করো") || cleanTitle.includes("রচনা লেখ") || cleanTitle.includes("প্রবন্ধ রচনা")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ বিষয়ে একটি প্রবন্ধ রচনা করো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectEssayPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
                 const rawLabel = essayDist?.questionTypeLabel || essay.questionType?.label;
                 const esLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
@@ -330,7 +388,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                     <div className="flex justify-between items-start gap-2 w-full">
                       <div className="flex gap-2 items-start flex-1 min-w-0">
                         {renderNumberSpacer()}
-                        {renderSubQuestionLabel("খ")}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                         <div className="flex-1 w-full min-w-0">
                           <div
                             className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -340,7 +398,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               lineHeight: questionStyle.lineHeight,
                             }}
                           >
-                            <RenderMath text={essay.title || essay.name || ""} />
+                            <RenderMath text={rawTitle} />
                           </div>
                         </div>
                       </div>
@@ -358,6 +416,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.includes("অনুচ্ছেদ") ||
                       d.questionTypeName?.toLowerCase().includes("paragraph")
                   ) || alt.distribution;
+
+                const altRenderMethod = Number(
+                  paragraphDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = paragraph.name || paragraph.title || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: paragraphDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: paragraphDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectParagraphPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(a\s+)?paragraph/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write a paragraph on '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("অনুচ্ছেদ রচনা") || cleanTitle.includes("অনুচ্ছেদ লেখ")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ বিষয়ে একটি অনুচ্ছেদ রচনা করো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectParagraphPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
 
                 const rawLabel = paragraphDist?.questionTypeLabel || paragraph.questionType?.label;
                 const pLabel = rawLabel?.trim()
@@ -382,11 +495,11 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       </div>
                     )}
 
-                    {/* Body: aligned with renderNumberSpacer and subquestion label (খ) */}
+                    {/* Body: aligned with renderNumberSpacer and subquestion label */}
                     <div className="flex justify-between items-start gap-2 w-full">
                       <div className="flex gap-2 items-start flex-1 min-w-0">
                         {renderNumberSpacer()}
-                        {renderSubQuestionLabel("খ")}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                         <div className="flex-1 w-full min-w-0">
                           <div
                             className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -396,7 +509,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               lineHeight: questionStyle.lineHeight,
                             }}
                           >
-                            <RenderMath text={paragraph.name || paragraph.title || ""} />
+                            <RenderMath text={rawTitle} />
                           </div>
                         </div>
                       </div>
@@ -415,6 +528,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.toLowerCase().includes("essence")
                   ) || alt.distribution;
 
+                const altRenderMethod = Number(
+                  essenceDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = essence.title || essence.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: essenceDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: essenceDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectEssencePrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(the\s+)?essence/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write the essence of '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("সারমর্ম লেখ") || cleanTitle.includes("সারমর্ম রচনা")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ — সারমর্ম লেখো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectEssencePrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
                 const rawLabel = essenceDist?.questionTypeLabel || essence.questionType?.label;
                 const eLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
@@ -424,7 +592,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
                       {renderNumberSpacer()}
-                      {renderSubQuestionLabel("খ")}
+                      {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                       <div className="flex-1 w-full min-w-0">
                         {eLabel && (
                           <span
@@ -445,7 +613,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                             lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={essence.title || essence.name || ""} />
+                          <RenderMath text={rawTitle} />
                         </span>
                       </div>
                     </div>
@@ -498,6 +666,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.toLowerCase().includes("summary")
                   ) || alt.distribution;
 
+                const altRenderMethod = Number(
+                  summaryDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = summary.title || summary.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: summaryDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: summaryDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectSummaryPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(a\s+)?summary/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write a summary of '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("সারাংশ লেখ") || cleanTitle.includes("সারাংশ রচনা")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ — সারাংশ লেখো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectSummaryPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
                 const rawLabel = summaryDist?.questionTypeLabel || summary.questionType?.label;
                 const sLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
@@ -507,7 +730,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
                       {renderNumberSpacer()}
-                      {renderSubQuestionLabel("খ")}
+                      {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                       <div className="flex-1 w-full min-w-0">
                         {sLabel && (
                           <span
@@ -528,7 +751,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                             lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={summary.title || summary.name || ""} />
+                          <RenderMath text={rawTitle} />
                         </span>
                       </div>
                     </div>
@@ -546,13 +769,46 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.toLowerCase().includes("poem")
                   ) || alt.distribution;
 
-                const rawLabel = poemDist?.questionTypeLabel || poemDist?.questionTypeName || poemEssence.questionType?.label;
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : "কবিতার মূলভাব লেখো:";
+                const altRenderMethod = Number(
+                  poemDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
 
                 const hasStanza = Boolean(poemEssence.poemStanza && poemEssence.poemStanza.trim().length > 0);
-                const pTitle = poemEssence.title || poemEssence.name || "";
+                const poemTitle = poemEssence.title || poemEssence.name || "";
+
+                const rawLabel = poemDist?.questionTypeLabel || poemDist?.questionTypeName || poemEssence.questionType?.label;
+                const isEnglish = isResourceEnglish({
+                  subjectName: poemDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: rawLabel,
+                  content: poemTitle || poemEssence.poemStanza || "",
+                });
+
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : isEnglish ? "Write the main theme of the poem:" : "কবিতার মূলভাব লেখো:";
+
+                const formatDirectPoemEssencePrompt = (title: string, english: boolean) => {
+                  if (!title || !title.trim()) return "";
+                  const cleanTitle = title.trim();
+                  if (english) {
+                    if (/write\s+(the\s+)?(main\s+theme|essence)/i.test(cleanTitle)) {
+                      return cleanTitle;
+                    }
+                    const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                    return `Write the main theme of the poem '${unquoted}'.`;
+                  } else {
+                    if (cleanTitle.includes("মূলভাব লেখ") || cleanTitle.includes("মূলভাব রচনা")) {
+                      return cleanTitle;
+                    }
+                    const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                    return `’${unquoted}’ কবিতার মূলভাব লেখো।`;
+                  }
+                };
+
+                const directPrompt = formatDirectPoemEssencePrompt(poemTitle, isEnglish);
+
                 return (
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
@@ -588,7 +844,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               fontFamily: questionStyle.fontFamily,
                             }}
                           >
-                            <RenderMath text={pTitle || pLabel} />
+                            <RenderMath text={altRenderMethod === 1 ? (directPrompt || pLabel) : (poemTitle || pLabel)} />
                           </div>
                         )}
                       </div>
@@ -607,13 +863,46 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.toLowerCase().includes("prose")
                   ) || alt.distribution;
 
-                const rawLabel = proseDist?.questionTypeLabel || proseDist?.questionTypeName || proseEssence.questionType?.label;
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : "গদ্যাংশের মূলভাব লেখো:";
+                const altRenderMethod = Number(
+                  proseDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
 
                 const hasPassage = Boolean(proseEssence.prosePassage && proseEssence.prosePassage.trim().length > 0);
-                const pTitle = proseEssence.title || proseEssence.name || "";
+                const proseTitle = proseEssence.title || proseEssence.name || "";
+
+                const rawLabel = proseDist?.questionTypeLabel || proseDist?.questionTypeName || proseEssence.questionType?.label;
+                const isEnglish = isResourceEnglish({
+                  subjectName: proseDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: rawLabel,
+                  content: proseTitle || proseEssence.prosePassage || "",
+                });
+
+                const pLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : isEnglish ? "Write the main theme of the prose:" : "গদ্যাংশের মূলভাব লেখো:";
+
+                const formatDirectProseEssencePrompt = (title: string, english: boolean) => {
+                  if (!title || !title.trim()) return "";
+                  const cleanTitle = title.trim();
+                  if (english) {
+                    if (/write\s+(the\s+)?(main\s+theme|essence)/i.test(cleanTitle)) {
+                      return cleanTitle;
+                    }
+                    const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                    return `Write the main theme of the prose '${unquoted}'.`;
+                  } else {
+                    if (cleanTitle.includes("মূলভাব লেখ") || cleanTitle.includes("মূলভাব রচনা")) {
+                      return cleanTitle;
+                    }
+                    const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                    return `’${unquoted}’ গদ্যাংশের মূলভাব লেখো।`;
+                  }
+                };
+
+                const directPrompt = formatDirectProseEssencePrompt(proseTitle, isEnglish);
+
                 return (
                   <div className="flex justify-between items-start gap-2 w-full">
                     <div className="flex gap-2 items-start flex-1 min-w-0">
@@ -650,7 +939,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               fontFamily: questionStyle.fontFamily,
                             }}
                           >
-                            <RenderMath text={pTitle || pLabel} />
+                            <RenderMath text={altRenderMethod === 1 ? (directPrompt || pLabel) : (proseTitle || pLabel)} />
                           </div>
                         )}
                       </div>
@@ -743,21 +1032,106 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 2. EXACT LETTER BLOCK REPRESENTATION */}
               {letter && (() => {
+                const letterDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === letter.questionTypeId ||
+                      d.questionTypeName?.includes("চিঠি") ||
+                      d.questionTypeName?.includes("পত্র") ||
+                      d.questionTypeName?.toLowerCase().includes("letter")
+                  ) || alt.distribution;
+
+                const altRenderMethod = Number(
+                  letterDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = letter.title || letter.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: letterDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: letterDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectLetterPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(a\s+)?letter/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write a letter on '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("পত্র লেখ") || cleanTitle.includes("চিঠি লেখ") || cleanTitle.includes("চিঠি পাঠাও") || cleanTitle.includes("একটি পত্র")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ বিষয়ে একটি পত্র লেখো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectLetterPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                const rawLabel = letterDist?.questionTypeLabel || letter.questionType?.label;
+                const lLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
                 return (
-                  <div className="flex justify-between items-start gap-2 w-full">
-                    <div className="flex gap-2 items-start flex-1 min-w-0">
-                      {renderNumberSpacer()}
-                      {renderSubQuestionLabel("খ")}
-                      <div className="flex-1 w-full min-w-0">
+                  <div className="w-full flex flex-col">
+                    {lLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
                         <div
-                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
-                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={letter.title || letter.name || ""} />
+                          {renderNumberSpacer()}
+                          <span>{lLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={rawTitle} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -767,21 +1141,106 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 3. EXACT APPLICATION BLOCK REPRESENTATION */}
               {application && (() => {
+                const appDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === application.questionTypeId ||
+                      d.questionTypeName?.includes("দরখাস্ত") ||
+                      d.questionTypeName?.includes("আবেদনপত্র") ||
+                      d.questionTypeName?.toLowerCase().includes("application")
+                  ) || alt.distribution;
+
+                const altRenderMethod = Number(
+                  appDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = application.title || application.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: appDist?.subjectName || alt.distribution?.subjectName || (paper as any)?.subject?.name,
+                  questionTypeLabel: appDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectApplicationPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(an?\s+)?application/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write an application for '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("দরখাস্ত লেখ") || cleanTitle.includes("আবেদনপত্র লেখ") || cleanTitle.includes("আবেদন করো") || cleanTitle.includes("একটি আবেদনপত্র") || cleanTitle.includes("দরখাস্ত রচনা")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ বিষয়ে একটি আবেদনপত্র লেখো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectApplicationPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                const rawLabel = appDist?.questionTypeLabel || application.questionType?.label;
+                const aLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
                 return (
-                  <div className="flex justify-between items-start gap-2 w-full">
-                    <div className="flex gap-2 items-start flex-1 min-w-0">
-                      {renderNumberSpacer()}
-                      {renderSubQuestionLabel("খ")}
-                      <div className="flex-1 w-full min-w-0">
+                  <div className="w-full flex flex-col">
+                    {aLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
                         <div
-                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
-                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={application.title || application.name || ""} />
+                          {renderNumberSpacer()}
+                          <span>{aLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={rawTitle} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -791,21 +1250,105 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 3.1 EXACT NEWS REPORT BLOCK REPRESENTATION */}
               {newsReport && (() => {
+                const newsDist =
+                  allDistributions.find(
+                    (d: any) =>
+                      d.questionTypeId === newsReport.questionTypeId ||
+                      d.questionTypeName?.includes("প্রতিবেদন") ||
+                      d.questionTypeName?.toLowerCase().includes("report")
+                  ) || alt.distribution;
+
+                const altRenderMethod = Number(
+                  newsDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = newsReport.title || newsReport.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: newsDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: newsDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectNewsReportPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/write\s+(a\s+)?(news\s+)?report/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Write a news report on '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("প্রতিবেদন রচনা") || cleanTitle.includes("প্রতিবেদন লেখ") || cleanTitle.includes("সংবাদ প্রতিবেদন")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ বিষয়ে একটি সংবাদ প্রতিবেদন রচনা করো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectNewsReportPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                const rawLabel = newsDist?.questionTypeLabel || newsReport.questionType?.label;
+                const nrLabel = rawLabel?.trim()
+                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
+                  : null;
+
                 return (
-                  <div className="flex justify-between items-start gap-2 w-full">
-                    <div className="flex gap-2 items-start flex-1 min-w-0">
-                      {renderNumberSpacer()}
-                      {renderSubQuestionLabel("খ")}
-                      <div className="flex-1 w-full min-w-0">
+                  <div className="w-full flex flex-col">
+                    {nrLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
                         <div
-                          className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
-                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={newsReport.title || newsReport.name || ""} />
+                          {renderNumberSpacer()}
+                          <span>{nrLabel}</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={rawTitle} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -822,6 +1365,61 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                       d.questionTypeName?.includes("ভাব-সম্প্রসারণ") ||
                       d.questionTypeName?.toLowerCase().includes("amplification")
                   ) || alt.distribution;
+
+                const altRenderMethod = Number(
+                  ampDist?.renderMethod ??
+                  alt.distribution?.renderMethod ??
+                  1
+                );
+
+                const rawTitle = amplification.title || amplification.name || "";
+                const isEnglish = isResourceEnglish({
+                  subjectName: ampDist?.subjectName || alt.distribution?.subjectName,
+                  questionTypeLabel: ampDist?.questionTypeLabel,
+                  content: rawTitle,
+                });
+
+                if (altRenderMethod === 1) {
+                  const formatDirectAmplificationPrompt = (title: string, english: boolean) => {
+                    if (!title || !title.trim()) return "";
+                    const cleanTitle = title.trim();
+                    if (english) {
+                      if (/expand\s+(the\s+idea)?/i.test(cleanTitle) || /amplify/i.test(cleanTitle)) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `Amplify the idea: '${unquoted}'.`;
+                    } else {
+                      if (cleanTitle.includes("ভাব-সম্প্রসারণ") || cleanTitle.includes("ভাব সম্প্রসারণ")) {
+                        return cleanTitle;
+                      }
+                      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+                      return `’${unquoted}’ ভাব-সম্প্রসারণ করো।`;
+                    }
+                  };
+
+                  const formattedText = formatDirectAmplificationPrompt(rawTitle, isEnglish);
+
+                  return (
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={formattedText} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
 
                 const rawLabel = ampDist?.questionTypeLabel || amplification.questionType?.label;
                 const ampLabel = rawLabel?.trim()
@@ -847,6 +1445,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                     <div className={`flex justify-between items-start gap-2 ${ampLabel ? "pl-4 mt-0.5" : "w-full"}`}>
                       <div className="flex gap-2 items-start flex-1 min-w-0">
                         {!ampLabel && renderNumberSpacer()}
+                        {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                         <div className="flex-1 w-full min-w-0">
                           <div
                             className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
@@ -856,7 +1455,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                               lineHeight: questionStyle.lineHeight,
                             }}
                           >
-                            <RenderMath text={amplification.title || amplification.name || ""} />
+                            <RenderMath text={rawTitle} />
                           </div>
                         </div>
                       </div>
@@ -1817,8 +2416,35 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 </div>
               )}
 
+              {/* 6.10.7 REARRANGE BLOCK REPRESENTATION */}
+              {rearrange && (() => {
+                const options: string[] = Array.isArray(rearrange.options) ? rearrange.options : [];
+                const isEnglish = isResourceEnglish({
+                  subjectName: (paper as any)?.subject?.name,
+                  content: options.join(" "),
+                });
+                return (
+                  <div className="w-full flex justify-between items-start gap-2">
+                    <div className="flex gap-2 items-start flex-1 min-w-0">
+                      {renderNumberSpacer()}
+                      <div className="flex-1 w-full min-w-0">
+                        <RenderRearrangeOptions
+                          options={options}
+                          isEnglish={isEnglish}
+                          style={{
+                            fontSize: questionStyle.fontSize,
+                            fontFamily: questionStyle.fontFamily,
+                            lineHeight: questionStyle.lineHeight,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 7. FALLBACK / MCQ */}
-              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !seenComprehension && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !shuddhoAshuddho && !danBamMilkoron && !mathQuestion && !grammarQuestion && !numberInWords && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
+              {!paragraph && !essence && !poem && !summary && !letter && !application && !amplification && !cq && !pbq && !seenComprehension && !sa && !newsReport && !essay && !partsOfSpeech && !punctuation && !rightFormOfVerb && !changingSentence && !fillInTheBlanksWithClues && !fillInTheBlanksWithoutClues && !substitutionTable && !shortComposition && !descriptiveQuestion && !shortQuestion && !shuddhoAshuddho && !danBamMilkoron && !rearrange && !mathQuestion && !grammarQuestion && !numberInWords && !wordMeaning && !makeSentences && !oppositeWord && !synonym && !sadhuToCholito && !podNirnoy && !verbTense && (
                 <div className="flex justify-between items-start gap-2 w-full">
                   <div className="flex gap-2 items-start flex-1 min-w-0">
                     {renderNumberSpacer()}

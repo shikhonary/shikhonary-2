@@ -124,6 +124,8 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       resolvedCategory = QUESTION_TYPE_CODES.CQ;
     } else if (lowerName.includes("opposite word") || lowerName.includes("opposite_word") || lowerName.includes("বিপরীত শব্দ") || lowerName.includes("বিপরীত")) {
       resolvedCategory = QUESTION_TYPE_CODES.OPPOSITE_WORD;
+    } else if (lowerName.includes("gender change") || lowerName.includes("gender_change") || lowerName.includes("লিঙ্গ পরিবর্তন") || lowerName.includes("লিঙ্গান্তর") || lowerName.includes("লিঙ্গ")) {
+      resolvedCategory = QUESTION_TYPE_CODES.GENDER_CHANGE;
     } else if (lowerName.includes("juktoborno") || lowerName.includes("যুক্তবর্ণ")) {
       resolvedCategory = QUESTION_TYPE_CODES.JUKTOBORNO;
     } else if (lowerName.includes("ek kothay") || lowerName.includes("ek kothai") || lowerName.includes("এক কথায়") || lowerName.includes("এক কথায়")) {

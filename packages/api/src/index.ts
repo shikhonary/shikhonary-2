@@ -461,6 +461,28 @@ export type {
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
+  ListRearrangeInput,
+  RearrangeStatsInput,
+  GetRearrangeInput,
+  CreateRearrangeInput,
+  UpdateRearrangeInput,
+  DeleteRearrangeInput,
+  BulkDeleteRearrangeInput,
+  ImportRearrangeInput,
+} from "./routers/rearrange/rearrange.schema"
+
+export {
+  listRearrangeSchema,
+  rearrangeStatsSchema,
+  getRearrangeSchema,
+  createRearrangeSchema,
+  updateRearrangeSchema,
+  deleteRearrangeSchema,
+  bulkDeleteRearrangeSchema,
+  importRearrangeSchema,
+} from "./routers/rearrange/rearrange.schema"
+
+export type {
   ListNumberInWordsInput,
   NumberInWordsStatsInput,
   GetNumberInWordsInput,
@@ -717,6 +739,7 @@ export {
 export type { NormalizedQuestionItem } from "./routers/question-bank/question-bank.service"
 
 export * from "./routers/seen-comprehension/seen-comprehension.schema"
+export * from "./routers/rearrange/rearrange.schema"
 
 
 

@@ -3,6 +3,8 @@
 import React from "react";
 import { RenderDanBamMilkoronTable } from "../blocks/dan-bam-milkoron-block";
 import { PickerCardWrapper } from "./picker-card-wrapper";
+import { isResourceEnglish } from "@workspace/utils";
+import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
 
 interface DanBamMilkoronPickerCardProps {
   question: any;
@@ -25,11 +27,45 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
   isSelected,
   onToggle,
 }) => {
-  const chapterName =
-    q.academicChapter?.nameBn ||
-    q.academicChapter?.nameEn ||
-    q.chapter?.nameBn ||
-    q.chapter?.nameEn;
+  const parseColumn = (col: any): string[] => {
+    if (Array.isArray(col)) return col;
+    if (typeof col === "string") {
+      try {
+        const parsed = JSON.parse(col);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        return [col];
+      }
+    }
+    return [];
+  };
+
+  const leftCol: string[] = parseColumn(q.leftColumn);
+  const rightCol: string[] = parseColumn(q.rightColumn);
+  const combinedContent = [
+    q.prompt,
+    q.title,
+    ...leftCol,
+    ...rightCol,
+  ].filter(Boolean).join(" ");
+
+  const isEnglish = isResourceEnglish({
+    subjectName:
+      q.academicSubject?.nameBn ||
+      q.subject?.nameBn ||
+      q.academicSubject?.nameEn ||
+      q.subject?.nameEn,
+    subjectNameEn: q.academicSubject?.nameEn || q.subject?.nameEn,
+    subjectNameBn: q.academicSubject?.nameBn || q.subject?.nameBn,
+    questionTypeLabel: q.questionTypeLabel || q.questionType?.nameBn,
+    content: combinedContent,
+  });
+
+  const rawChapterName = isEnglish
+    ? (q.academicChapter?.nameEn || q.chapter?.nameEn || q.academicChapter?.nameBn || q.chapter?.nameBn)
+    : (q.academicChapter?.nameBn || q.academicChapter?.nameEn || q.chapter?.nameBn || q.chapter?.nameEn);
+
+  const chapterName = rawChapterName && isEnglish ? translateTag(rawChapterName) : rawChapterName;
 
   return (
     <PickerCardWrapper
@@ -39,12 +75,15 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={q.difficulty}
+      typeLabel={isEnglish ? "Matching" : "ডান-বাম মিলকরণ"}
+      language={isEnglish ? "en" : "bn"}
     >
       <div className="flex flex-col gap-2 font-body">
         <div className="w-full">
           <RenderDanBamMilkoronTable
-            leftColumn={q.leftColumn || []}
-            rightColumn={q.rightColumn || []}
+            leftColumn={leftCol}
+            rightColumn={rightCol}
+            isEnglish={isEnglish}
           />
         </div>
 
@@ -53,8 +92,8 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
           <div className="flex flex-wrap items-center gap-1.5">
             {(q.source || q.session) && (
               <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
+                📚 {isEnglish ? translateTag(q.source || "Textbook") : (q.source || "N/A")}
+                {q.session ? ` (${isEnglish ? toEnglishDigits(q.session) : toBengaliDigits(q.session)})` : ""}
               </span>
             )}
             {Array.isArray(q.reference) && q.reference.length > 0 ? (
@@ -63,20 +102,25 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
                   key={rIdx}
                   className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
                 >
-                  🏷️ {ref}
+                  🏷️ {isEnglish ? translateTag(ref) : ref}
                 </span>
               ))
             ) : (
               !(q.source || q.session) && (
                 <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
+                  {isEnglish ? "No reference tags" : "কোনো রেফারেন্স ট্যাগ নেই"}
                 </span>
               )
             )}
           </div>
 
           <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-mono">
-            <span>কলাম সংখ্যা: {toBengaliDigits((q.leftColumn?.length || 0).toString())}</span>
+            <span>
+              {isEnglish ? "Rows:" : "সারি সংখ্যা:"}{" "}
+              {isEnglish
+                ? (leftCol.length || 0).toString()
+                : toBengaliDigits((leftCol.length || 0).toString())}
+            </span>
           </div>
         </div>
       </div>

@@ -28,6 +28,7 @@ import { WordMeaningPickerCard } from "./word-meaning-picker-card";
 import { MakeSentencePickerCard } from "./make-sentence-picker-card";
 import { MakeQuestionPickerCard } from "./make-question-picker-card";
 import { OppositeWordPickerCard } from "./opposite-word-picker-card";
+import { GenderChangePickerCard } from "./gender-change-picker-card";
 import { JuktobornoPickerCard } from "./juktoborno-picker-card";
 import { EkKothayProkashPickerCard } from "./ek-kothay-prokash-picker-card";
 import { SynonymPickerCard } from "./synonym-picker-card";
@@ -47,6 +48,7 @@ import { DescriptiveQuestionPickerCard } from "./descriptive-question-picker-car
 import { ShortQuestionPickerCard } from "./short-question-picker-card";
 import { ShuddhoAshuddhoPickerCard } from "./shuddho-ashuddho-picker-card";
 import { DanBamMilkoronPickerCard } from "./dan-bam-milkoron-picker-card";
+import { RearrangePickerCard } from "./rearrange-picker-card";
 import { SeenComprehensionPickerCard } from "./seen-comprehension-picker-card";
 
 const toBengaliDigits = (num?: number | string | null): string => {
@@ -196,6 +198,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <ShuddhoAshuddhoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "DAN_BAM_MILKORON":
         return <DanBamMilkoronPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "REARRANGE":
+        return <RearrangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "POEM":
         return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "MAKE_SENTENCES":
@@ -208,6 +212,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <WordMeaningPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "OPPOSITE_WORD":
         return <OppositeWordPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+      case "GENDER_CHANGE":
+        return <GenderChangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "JUKTOBORNO":
         return <JuktobornoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "EK_KOTHAY_PROKASH":

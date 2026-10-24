@@ -3,13 +3,24 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
-import { useMcqsList, useMcqStats, useAcademicClassesForSelection, useSubjectsForSelection, useChaptersForSelection } from "../services/use-mcq"
-import { useDeleteMcqModalStore } from "../store/use-delete-mcq-modal-store"
-import { McqListHeader } from "./mcq-list-header"
+import Link from "next/link"
+import {
+  useMcqsList,
+  useMcqStats,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+  useDeleteMcq,
+  useBulkDeleteMcqs,
+} from "../services/use-mcq"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { Button } from "@workspace/ui/components/button"
+import { toast } from "@workspace/ui/components/sonner"
+import { HelpCircle, Plus, Upload } from "lucide-react"
 import { McqStatsCards } from "./mcq-stats-cards"
 import { McqFilters } from "./mcq-filters"
 import { McqTable } from "./mcq-table"
-import { DeleteMcqModal } from "./delete-mcq-modal"
 import { useMcqSearchParams } from "../hooks/use-mcq-search-params"
 
 export function McqListView() {
@@ -40,8 +51,34 @@ export function McqListView() {
     })
   }
 
-  const openDeleteModal = useDeleteMcqModalStore((state) => state.openModal)
-  const openBulkDeleteModal = useDeleteMcqModalStore((state) => state.openBulkModal)
+  // Local state for delete dialogs (replaces Zustand delete modal store)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+
+  const deleteMutation = useDeleteMcq()
+  const bulkDeleteMutation = useBulkDeleteMcqs()
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await deleteMutation.mutateAsync({ id: deleteTarget.id })
+      toast.success("MCQ প্রশ্নটি সফলভাবে মুছে ফেলা হয়েছে।")
+      setDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "MCQ ডিলিট করা সম্ভব হয়নি")
+    }
+  }
+
+  const handleConfirmBulkDelete = async () => {
+    if (!bulkDeleteTarget) return
+    try {
+      const res = await bulkDeleteMutation.mutateAsync({ ids: bulkDeleteTarget })
+      toast.success(`সফলভাবে ${res.deletedCount}টি MCQ মুছে ফেলা হয়েছে।`)
+      setBulkDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "MCQ ডিলিট করা সম্ভব হয়নি")
+    }
+  }
 
   // Query MCQs list with search & filters
   const { data: mcqsData, isLoading, isError } = useMcqsList({
@@ -88,9 +125,30 @@ export function McqListView() {
   const totalPages = mcqsData?.totalPages ?? 1
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <McqListHeader />
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="বহুনির্বাচনি প্রশ্ন ব্যাংক (MCQ)"
+        description="শ্রেণি, বিষয় ও অধ্যায়ভিত্তিক বহুনির্বাচনি প্রশ্ন, অপশন, সঠিক উত্তর ও ব্যাখ্যা পরিচালনা করুন।"
+        icon={HelpCircle}
+        badge={{ label: "MCQ মডিউল", variant: "indigo" }}
+        action={{
+          label: "নতুন MCQ যোগ করুন",
+          href: "/mcqs/create",
+          icon: Plus,
+        }}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2"
+        >
+          <Link href="/mcqs/import">
+            <Upload className="w-4 h-4" />
+            <span>JSON ইমপোর্ট</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* Stats Cards */}
       <McqStatsCards
@@ -124,13 +182,13 @@ export function McqListView() {
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />
 
-      {/* Data Table */}
+      {/* Data Table / Question Cards */}
       <McqTable
         items={items as any}
         isLoading={isLoading}
         isError={isError}
-        onDelete={(id, question) => openDeleteModal(id, question)}
-        onBulkDelete={(selectedIds) => openBulkDeleteModal(selectedIds)}
+        onDelete={(id, question) => setDeleteTarget({ id, question })}
+        onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
@@ -139,8 +197,27 @@ export function McqListView() {
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
-      {/* Confirm Delete Modal */}
-      <DeleteMcqModal />
+      {/* Shared Single Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="MCQ প্রশ্ন ডিলিট করতে চান?"
+        itemName={deleteTarget?.question}
+        warningText="এই প্রশ্নটি ডিলিট করলে এর সমস্ত অপশন, সমাধান ও পরীক্ষা সংশ্লিষ্ট রেকর্ড প্রভাবিত হতে পারে।"
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Shared Bulk Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(bulkDeleteTarget && bulkDeleteTarget.length > 0)}
+        onClose={() => setBulkDeleteTarget(null)}
+        onConfirm={handleConfirmBulkDelete}
+        title={`${bulkDeleteTarget?.length ?? 0}টি MCQ ডিলিট নিশ্চিত করুন`}
+        itemName={`${bulkDeleteTarget?.length ?? 0}টি নির্বাচিত প্রশ্ন`}
+        warningText="নির্বাচিত সকল প্রশ্ন স্থায়ীভাবে মুছে যাবে। এটি আর ফেরানো সম্ভব নয়।"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }

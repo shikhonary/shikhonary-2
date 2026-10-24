@@ -243,18 +243,24 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
       const hasSections = paperQuery.sections && paperQuery.sections.length > 0;
 
+      const renderedDistIds = new Set<string>();
+
       const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
+        renderedDistIds.add(dist.id);
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
         const questions = subjectQuestions
           .filter((q: any) => {
             if (renderedQuestionIds.has(q.id)) return false;
+            // Every question MUST strictly belong to this distribution
+            if (q.distributionId !== dist.id) return false;
+
             if (extraOptions?.subSectionId) {
-              return q.subSectionId === extraOptions.subSectionId || (q.distributionId === dist.id && (!q.subSectionId || q.subSectionId === extraOptions.subSectionId));
+              return q.subSectionId === extraOptions.subSectionId || !q.subSectionId;
             }
             if (extraOptions?.sectionId) {
-              return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (q.distributionId === dist.id && !q.subSectionId);
+              return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (!q.sectionId && !q.subSectionId);
             }
-            return q.distributionId === dist.id;
+            return true;
           })
           .sort((a: any, b: any) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
 
@@ -313,6 +319,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let juktobornoIdx = 0;
         let ekKothayProkashIdx = 0;
         let oppositeWordIdx = 0;
+        let genderChangeIdx = 0;
         let synonymIdx = 0;
         let sadhuToCholitoIdx = 0;
         let podNirnoyIdx = 0;
@@ -323,6 +330,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         let fillInTheBlanksWithCluesIdx = 0;
         let fillInTheBlanksWithoutCluesIdx = 0;
         let danBamMilkoronIdx = 0;
+        let rearrangeIdx = 0;
         let substitutionTableIdx = 0;
         let punctuationIdx = 0;
         let shortCompositionIdx = 0;
@@ -364,6 +372,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalJuktobornos = questions.filter((q: any) => q.juktoborno).length;
         const totalEkKothayProkash = questions.filter((q: any) => q.ekKothayProkash).length;
         const totalOppositeWords = questions.filter((q: any) => q.oppositeWord).length;
+        const totalGenderChanges = questions.filter((q: any) => q.genderChange).length;
         const totalSynonyms = questions.filter((q: any) => q.synonym).length;
         const totalSadhuToCholitos = questions.filter((q: any) => q.sadhuToCholito).length;
         const totalPartsOfSpeech = questions.filter((q: any) => q.partsOfSpeech).length;
@@ -372,6 +381,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalFillInTheBlanksWithClues = questions.filter((q: any) => q.fillInTheBlanksWithClues).length;
         const totalFillInTheBlanksWithoutClues = questions.filter((q: any) => q.fillInTheBlanksWithoutClues).length;
         const totalDanBamMilkorons = questions.filter((q: any) => q.danBamMilkoron).length;
+        const totalRearranges = questions.filter((q: any) => q.rearrange).length;
         const totalSubstitutionTables = questions.filter((q: any) => q.substitutionTable).length;
         const totalPunctuation = questions.filter((q: any) => q.punctuation).length;
         const totalShortCompositions = questions.filter((q: any) => q.shortComposition).length;
@@ -842,6 +852,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -877,6 +888,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -912,6 +924,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -947,6 +960,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "অনুচ্ছেদ লিখ",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -982,6 +996,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.nameBn || dist.questionTypeName || "ভাব-সম্প্রসারণ করো",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1017,6 +1032,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1052,6 +1068,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1087,6 +1104,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1122,6 +1140,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.nameBn || dist.questionTypeName || "প্রবন্ধ রচনা লিখ:",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1196,6 +1215,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "কবিতার মূলভাব লেখো:",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1266,6 +1286,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "গদ্যাংশের মূলভাব লেখো:",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -1502,6 +1523,45 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               });
             }
             oppositeWordIdx++;
+          }
+          if (q.genderChange) {
+            if (genderChangeIdx === 0) {
+              globalWrittenNumber++;
+              const genderChangeQuestions = questions.filter((item: any) => item.genderChange);
+              newBlocks.push({
+                id: `gc-${dist.id || q.id}`,
+                type: "question-gender-change",
+                data: {
+                  item: {
+                    id: dist.id || q.id,
+                    type: "GENDER_CHANGE",
+                    words: genderChangeQuestions.map((gcQ: any, wIdx: number) => {
+                      renderedQuestionIds.add(gcQ.id);
+                      return {
+                        id: gcQ.id,
+                        data: gcQ.genderChange,
+                        orderIndex: wIdx,
+                        alternatives: gcQ.alternatives || [],
+                        assignedMarks: gcQ.assignedMarks,
+                        subjectId: subject.subjectId,
+                      };
+                    }),
+                    masterNumber: globalWrittenNumber,
+                    totalQuestions: genderChangeQuestions.length,
+                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionTypeName || "লিঙ্গ পরিবর্তন করো:",
+                    distributionId: dist.id,
+                    distribution: dist,
+                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                    subjectId: subject.subjectId,
+                    paperId,
+                  },
+                },
+                gap: 4,
+              });
+            }
+            genderChangeIdx++;
           }
           if (q.synonym) {
             if (synonymIdx === 0) {
@@ -1822,6 +1882,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
+                  subjectName: dist.subjectName || statusInfo?.subjectName,
                   assignedMarks: q.assignedMarks,
                   paperId,
                 },
@@ -1829,6 +1890,42 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               gap: danBamMilkoronIdx === totalDanBamMilkorons - 1 ? 4 : 0,
             });
             danBamMilkoronIdx++;
+          }
+          if (q.rearrange) {
+            if (rearrangeIdx === 0) {
+              globalWrittenNumber++;
+            }
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-rearrange",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "REARRANGE",
+                  data: q.rearrange,
+                  orderIndex: rearrangeIdx,
+                  masterNumber: globalWrittenNumber,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  isFirstRearrange: rearrangeIdx === 0,
+                  totalQuestions: totalRearranges,
+                  attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
+                  marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "নিচের বাক্যগুলো সঠিকভাবে সাজিয়ে লেখো:",
+                  distributionId: dist.id,
+                  distribution: dist,
+                  markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
+                  alternatives: q.alternatives || [],
+                  subjectId: subject.subjectId,
+                  subjectName: dist.subjectName || statusInfo?.subjectName,
+                  assignedMarks: q.assignedMarks,
+                  paperId,
+                },
+              },
+              gap: rearrangeIdx === totalRearranges - 1 ? 4 : 0,
+            });
+            rearrangeIdx++;
           }
           if (q.substitutionTable) {
             if (substitutionTableIdx === 0) {
@@ -1924,6 +2021,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "Write a short composition on the following topic:",
                   distributionId: dist.id,
                   distribution: dist,
+                  renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
                   markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
                   alternatives: q.alternatives || [],
                   subjectId: subject.subjectId,
@@ -2124,40 +2222,42 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           const prefix = "[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।";
 
           if (validSubSections.length > 0) {
-            const secReqSum = secDists.reduce((sum: number, d: any) => {
-              const st = statuses?.find((s: any) => s.distributionId === d.id);
-              return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
-            }, 0);
-            const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
+            if (!finalSecInstruction) {
+              const secReqSum = secDists.reduce((sum: number, d: any) => {
+                const st = statuses?.find((s: any) => s.distributionId === d.id);
+                return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
+              }, 0);
+              const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
 
-            const subClauses = validSubSections.map((s: any) => {
-              const name = (s.titleBn || s.title || "").trim();
-              const matchedDist = subToDistMap.get(s.id) || secDists[0];
-              const distQuestionCount = Number(matchedDist?.questionCount || 0);
-              const distQuestionsToAttempt = (matchedDist?.questionsToAttempt !== undefined && matchedDist?.questionsToAttempt !== null && Number(matchedDist.questionsToAttempt) > 0)
-                ? Number(matchedDist.questionsToAttempt)
-                : distQuestionCount;
+              const subClauses = validSubSections.map((s: any) => {
+                const name = (s.titleBn || s.title || "").trim();
+                const matchedDist = subToDistMap.get(s.id) || secDists[0];
+                const distQuestionCount = Number(matchedDist?.questionCount || 0);
+                const distQuestionsToAttempt = (matchedDist?.questionsToAttempt !== undefined && matchedDist?.questionsToAttempt !== null && Number(matchedDist.questionsToAttempt) > 0)
+                  ? Number(matchedDist.questionsToAttempt)
+                  : distQuestionCount;
 
-              const subAttempt = (s.questionsToAttempt && Number(s.questionsToAttempt) > 0)
-                ? Number(s.questionsToAttempt)
-                : (distQuestionsToAttempt > 0 ? distQuestionsToAttempt : (reqCount > 0 ? reqCount : 0));
+                const subAttempt = (s.questionsToAttempt && Number(s.questionsToAttempt) > 0)
+                  ? Number(s.questionsToAttempt)
+                  : (distQuestionsToAttempt > 0 ? distQuestionsToAttempt : (reqCount > 0 ? reqCount : 0));
 
-              const countBn = toBengaliDigits(subAttempt || 0);
-              return name ? `${name} থেকে যেকোনো ${countBn}টি` : `যেকোনো ${countBn}টি`;
-            });
+                const countBn = toBengaliDigits(subAttempt || 0);
+                return name ? `${name} থেকে যেকোনো ${countBn}টি` : `যেকোনো ${countBn}টি`;
+              });
 
-            let subBreakdownStr = "";
-            if (subClauses.length === 1) {
-              subBreakdownStr = `${subClauses[0]} প্রশ্নের উত্তর দিতে হবে`;
-            } else if (subClauses.length === 2) {
-              subBreakdownStr = `${subClauses[0]} এবং ${subClauses[1]} প্রশ্নের উত্তর দিতে হবে`;
-            } else if (subClauses.length > 2) {
-              const allExceptLast = subClauses.slice(0, -1).join(", ");
-              const last = subClauses[subClauses.length - 1];
-              subBreakdownStr = `${allExceptLast} এবং ${last} প্রশ্নের উত্তর দিতে হবে`;
+              let subBreakdownStr = "";
+              if (subClauses.length === 1) {
+                subBreakdownStr = `${subClauses[0]} প্রশ্নের উত্তর দিতে হবে`;
+              } else if (subClauses.length === 2) {
+                subBreakdownStr = `${subClauses[0]} এবং ${subClauses[1]} প্রশ্নের উত্তর দিতে হবে`;
+              } else if (subClauses.length > 2) {
+                const allExceptLast = subClauses.slice(0, -1).join(", ");
+                const last = subClauses[subClauses.length - 1];
+                subBreakdownStr = `${allExceptLast} এবং ${last} প্রশ্নের উত্তর দিতে হবে`;
+              }
+
+              finalSecInstruction = `${prefix} ${subBreakdownStr}।]`;
             }
-
-            finalSecInstruction = `${prefix} ${subBreakdownStr}।]`;
           } else if (finalSecInstruction) {
             const secReqSum = secDists.reduce((sum: number, d: any) => {
               const st = statuses?.find((s: any) => s.distributionId === d.id);
@@ -2176,18 +2276,26 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             }
             finalSecInstruction = updatedInst;
           } else {
-            const secReqSum = secDists.reduce((sum: number, d: any) => {
-              const st = statuses?.find((s: any) => s.distributionId === d.id);
-              return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
-            }, 0);
-            const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
-            const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
-            const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
+            const rawSecTitle = (sec.titleBn || sec.title)?.trim() || "";
+            const isGenericSec = rawSecTitle.toLowerCase() === "section";
+            const secHasTitle = Boolean(rawSecTitle && !isGenericSec);
 
-            if (provCount > 0 && reqCount >= provCount) {
-              finalSecInstruction = `${prefix} সবগুলো প্রশ্নের উত্তর দিতে হবে।]`;
-            } else if (reqCount > 0) {
-              finalSecInstruction = `${prefix} যেকোনো ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে।]`;
+            if (secHasTitle) {
+              const secReqSum = secDists.reduce((sum: number, d: any) => {
+                const st = statuses?.find((s: any) => s.distributionId === d.id);
+                return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
+              }, 0);
+              const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
+              const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
+              const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
+
+              if (provCount > 0 && reqCount >= provCount) {
+                finalSecInstruction = `${prefix} সবগুলো প্রশ্নের উত্তর দিতে হবে।]`;
+              } else if (reqCount > 0) {
+                finalSecInstruction = `${prefix} যেকোনো ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে।]`;
+              }
+            } else {
+              finalSecInstruction = null;
             }
           }
 
@@ -2229,8 +2337,15 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               const isSubActive = sub.id === activeSub.id;
               const subQuestionsCount = subjectQuestions.filter((q: any) => q.subSectionId === sub.id).length;
 
-              const targetDist = subToDistMap.get(sub.id) || secDists[0];
-              const targetDists = targetDist ? [targetDist] : [];
+              const subLinkedDists = secDists.filter((d: any) => 
+                d.subSections?.some((rel: any) => rel.subSectionId === sub.id) ||
+                subjectQuestions.some((q: any) => q.subSectionId === sub.id && q.distributionId === d.id)
+              );
+              const fallbackDist = subToDistMap.get(sub.id) || secDists[0];
+              const targetDist = fallbackDist;
+              const targetDists = subLinkedDists.length > 0
+                ? subLinkedDists
+                : (fallbackDist ? [fallbackDist] : []);
 
               const siblingSubSectionIds = validSubSections
                 .filter((s: any) => {
@@ -2379,6 +2494,14 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         if (unassignedDists.length > 0) {
           unassignedDists.forEach(renderDistribution);
         }
+
+        // Catch-all: Render any distributions with questions that haven't been rendered yet
+        subject.distributions?.forEach((d: any) => {
+          const hasUnrenderedQ = subjectQuestions.some((q: any) => q.distributionId === d.id && !renderedQuestionIds.has(q.id));
+          if (hasUnrenderedQ) {
+            renderDistribution(d);
+          }
+        });
       } else {
         subject.distributions?.forEach(renderDistribution);
       }

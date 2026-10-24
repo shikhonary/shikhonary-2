@@ -57,6 +57,7 @@ import { makeSentencesRouter } from "./routers/make-sentences/make-sentences.rou
 import { juktobornoRouter } from "./routers/juktoborno/juktoborno.router"
 import { oppositeWordRouter } from "./routers/opposite-word/opposite-word.router"
 import { wordMeaningRouter } from "./routers/word-meaning/word-meaning.router"
+import { rearrangeRouter } from "./routers/rearrange/rearrange.router"
 import { mathQuestionRouter } from "./routers/math-question/math-question.router"
 import { grammarQuestionRouter } from "./routers/grammar-question/grammar-question.router"
 import { ekKothayProkashRouter } from "./routers/ek-kothay-prokash/ek-kothay-prokash.router"
@@ -143,6 +144,7 @@ export const appRouter = createTRPCRouter({
   seenComprehension: seenComprehensionRouter,
   numberInWords: numberInWordsRouter,
   numbersInWord: numberInWordsRouter,
+  rearrange: rearrangeRouter,
 })
 
 /** Type used by the client to infer procedure types end-to-end. */

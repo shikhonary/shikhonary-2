@@ -38,6 +38,7 @@
     "seed:class3-ek-kothay-prokash": "npx -y tsx scripts/seed-class3-ek-kothay-prokash.ts",
     "seed:class3-paragraph": "npx -y tsx scripts/seed-class3-paragraph.ts",
     "seed:class3-essay": "npx -y tsx scripts/seed-class3-essay.ts",
+    "seed:class3-form-fillup": "npx -y tsx scripts/seed-class3-form-fillup.ts",
     "seed:class3-grammar": "npx -y tsx scripts/seed-class3-grammar.ts",
     "seed:class3-fill-in-the-blanks-with-clues": "npx -y tsx scripts/seed-class3-fill-in-the-blanks-with-clues.ts",
     "seed:class3-fill-in-the-blanks-without-clues": "npx -y tsx scripts/seed-class3-fill-in-the-blanks-without-clues.ts",

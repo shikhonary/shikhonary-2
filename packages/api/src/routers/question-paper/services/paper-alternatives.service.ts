@@ -68,6 +68,7 @@ export async function addAlternativeQuestion(
     NUMBER_IN_WORDS: "numberInWordsId",
     MAKE_SENTENCES: "makeSentencesId",
     OPPOSITE_WORD: "oppositeWordId",
+    GENDER_CHANGE: "genderChangeId",
     JUKTOBORNO: "juktobornoId",
     EK_KOTHAY_PROKASH: "ekKothayProkashId",
     SYNONYM: "synonymId",
@@ -80,6 +81,7 @@ export async function addAlternativeQuestion(
     DAN_BAM_MILKORON: "danBamMilkoronId",
     MATH_QUESTION: "mathQuestionId",
     GRAMMAR_QUESTION: "grammarQuestionId",
+    REARRANGE: "rearrangeId",
     SEEN_COMPREHENSION_1: "seenComprehensionId",
     SEEN_COMPREHENSION_2: "seenComprehensionId",
   }
@@ -176,6 +178,8 @@ export async function addAlternativeQuestion(
     altContent = await (db as any).mathQuestion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "GRAMMAR_QUESTION") {
     altContent = await (db as any).grammarQuestion.findUnique({ where: { id: input.questionId } })
+  } else if (input.questionType === "REARRANGE") {
+    altContent = await (db as any).rearrange.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "SEEN_COMPREHENSION_1" || input.questionType === "SEEN_COMPREHENSION_2") {
     altContent = await (db as any).seenComprehension.findUnique({
       where: { id: input.questionId },
@@ -361,7 +365,7 @@ export async function swapAlternativeQuestion(
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId",
     "letterId", "applicationId", "summaryId", "essenceId", "poemEssenceId", "proseEssenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId",
-    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "numberInWordsId", "makeSentencesId", "oppositeWordId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId", "mathQuestionId", "grammarQuestionId", "seenComprehensionId"
+    "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "numberInWordsId", "makeSentencesId", "oppositeWordId", "genderChangeId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId", "mathQuestionId", "grammarQuestionId", "rearrangeId", "seenComprehensionId"
   ] as const
 
   const questionFields = [

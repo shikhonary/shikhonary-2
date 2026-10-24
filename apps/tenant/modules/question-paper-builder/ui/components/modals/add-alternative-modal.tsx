@@ -75,6 +75,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.WORD_MEANING, nameBn: "শব্দার্থ", nameEn: "Word Meaning", desc: "শব্দের অর্থ লিখন" },
   { code: QUESTION_TYPE_CODES.MAKE_SENTENCES, nameBn: "বাক্য রচনা / বাক্য তৈরি", nameEn: "Make Sentences", desc: "প্রদত্ত শব্দ দিয়ে বাক্য রচনা" },
   { code: QUESTION_TYPE_CODES.OPPOSITE_WORD, nameBn: "বিপরীত শব্দ", nameEn: "Opposite Word", desc: "প্রদত্ত শব্দের বিপরীত শব্দ লিখন" },
+  { code: QUESTION_TYPE_CODES.GENDER_CHANGE, nameBn: "লিঙ্গ পরিবর্তন", nameEn: "Gender Change", desc: "প্রদত্ত শব্দের লিঙ্গ পরিবর্তন লিখন" },
   { code: QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH, nameBn: "এক কথায় প্রকাশ", nameEn: "Ek Kothay Prokash", desc: "এক কথায় প্রকাশ বা বাক্য সংকোচন" },
   { code: QUESTION_TYPE_CODES.JUKTOBORNO, nameBn: "যুক্তবর্ণ", nameEn: "Juktoborno", desc: "যুক্তবর্ণ ভেঙে শব্দ ও বাক্য গঠন" },
   { code: QUESTION_TYPE_CODES.SYNONYM, nameBn: "সমার্থক শব্দ", nameEn: "Synonym", desc: "প্রদত্ত শব্দের সমার্থক শব্দ লিখন" },
@@ -84,6 +85,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.FORM_FILLUP, nameBn: "ফরম পূরণ", nameEn: "Form Fillup", desc: "উদ্দীপক অনুযায়ী প্রাতিষ্ঠানিক বা ব্যক্তিগত ফরম পূরণ" },
   { code: QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO, nameBn: "শুদ্ধ অশুদ্ধ নির্ণয়", nameEn: "Shuddho Ashuddho", desc: "প্রদত্ত বাক্যের শুদ্ধ বা অশুদ্ধ রূপ নির্ণয়" },
   { code: QUESTION_TYPE_CODES.DAN_BAM_MILKORON, nameBn: "ডান-বাম মিলকরণ", nameEn: "Dan Bam Milkoron", desc: "বাম পাশের বাক্যাংশের সাথে ডান পাশের বাক্যাংশ মিলকরণ" },
+  { code: QUESTION_TYPE_CODES.REARRANGE, nameBn: "পুনর্বিন্যাস", nameEn: "Rearrange", desc: "এলোমেলো বাক্যগুলো সঠিকভাবে সাজিয়ে লেখা" },
 ];
 
 export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({

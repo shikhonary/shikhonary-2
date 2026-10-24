@@ -261,6 +261,14 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  GENDER_CHANGE: {
+    model: "genderChange",
+    searchFields: ["word", "genderWord", "reference"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "genderChangeId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
   JUKTOBORNO: {
     model: "juktoborno",
     searchFields: ["juktoborno", "source", "reference"],
@@ -383,9 +391,18 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
+  REARRANGE: {
+    model: "rearrange",
+    searchFields: ["answerKey", "source"],
+    includes: { questionType: true, subject: true, academicChapter: true },
+    excludedIdField: "rearrangeId",
+    hasIsActive: true,
+    fallbackWithoutTypeFilter: true,
+  },
 }
 
 export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
+  [QUESTION_TYPES.REARRANGE]: "REARRANGE",
   [QUESTION_TYPES.MCQ]: "MCQ",
   [QUESTION_TYPES.CQ]: "CQ",
   [QUESTION_TYPES.CS]: "CS",
@@ -419,6 +436,7 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.NUMBER_IN_WORDS]: "NUMBER_IN_WORDS",
   [QUESTION_TYPES.WORD_MEANING]: "WORD_MEANING",
   [QUESTION_TYPES.OPPOSITE_WORD]: "OPPOSITE_WORD",
+  [QUESTION_TYPES.GENDER_CHANGE]: "GENDER_CHANGE",
   [QUESTION_TYPES.JUKTOBORNO]: "JUKTOBORNO",
   [QUESTION_TYPES.EK_KOTHAY_PROKASH]: "EK_KOTHAY_PROKASH",
   [QUESTION_TYPES.SYNONYM]: "SYNONYM",
@@ -480,6 +498,7 @@ export async function getAvailableQuestions(
         numberInWordsId: true,
         makeSentencesId: true,
         oppositeWordId: true,
+        genderChangeId: true,
         juktobornoId: true,
         ekKothayProkashId: true,
         synonymId: true,
@@ -491,6 +510,7 @@ export async function getAvailableQuestions(
         danBamMilkoronId: true,
         mathQuestionId: true,
         grammarQuestionId: true,
+        rearrangeId: true,
         seenComprehensionId: true,
       },
     })
@@ -573,6 +593,7 @@ export async function getAvailableQuestions(
     effectiveCategory === "WORD_MEANING" ||
     effectiveCategory === "MAKE_SENTENCES" ||
     effectiveCategory === "OPPOSITE_WORD" ||
+    effectiveCategory === "GENDER_CHANGE" ||
     effectiveCategory === "JUKTOBORNO" ||
     effectiveCategory === "EK_KOTHAY_PROKASH" ||
     effectiveCategory === "SYNONYM" ||
@@ -583,6 +604,7 @@ export async function getAvailableQuestions(
     effectiveCategory === "FORM_FILLING" ||
     effectiveCategory === "SHUDDHO_ASHUDDHO" ||
     effectiveCategory === "DAN_BAM_MILKORON" ||
+    effectiveCategory === "REARRANGE" ||
     effectiveCategory === "POEM_ESSENCE" ||
     effectiveCategory === "PROSE_ESSENCE" ||
     effectiveCategory === "SHORT_QUESTION" ||
@@ -627,7 +649,13 @@ export async function getAvailableQuestions(
   // 4. Build search filter
   if (search && search.trim()) {
     const trimmed = search.trim()
-    if (config.searchFields.length === 1) {
+    if (config.model === "rearrange") {
+      where.OR = [
+        { options: { has: trimmed } },
+        { answerKey: { contains: trimmed, mode: "insensitive" } },
+        { source: { contains: trimmed, mode: "insensitive" } },
+      ]
+    } else if (config.searchFields.length === 1) {
       where[config.searchFields[0]!] = { contains: trimmed, mode: "insensitive" }
     } else {
       where.OR = config.searchFields.map((field) => ({
@@ -749,7 +777,7 @@ export async function getAvailableBoardYears(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "REARRANGE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId
@@ -822,7 +850,7 @@ export async function getAvailableSources(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId

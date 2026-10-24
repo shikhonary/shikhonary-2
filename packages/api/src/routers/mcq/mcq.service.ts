@@ -105,7 +105,15 @@ export async function getMcqById(db: PrismaClient, input: GetMcqInput) {
   const mcq = await db.mcq.findUnique({
     where: { id: input.id },
     include: {
-      subject: true,
+      subject: {
+        include: {
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
+        },
+      },
       chapter: true,
       questionType: true,
       attachments: {

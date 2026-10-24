@@ -71,6 +71,8 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).makeSentences.findUnique({ where: { id: pq.makeSentencesId } })
     } else if (pq.oppositeWordId) {
       content = await (db as any).oppositeWord.findUnique({ where: { id: pq.oppositeWordId } })
+    } else if (pq.genderChangeId) {
+      content = await (db as any).genderChange.findUnique({ where: { id: pq.genderChangeId } })
     } else if (pq.juktobornoId) {
       content = await (db as any).juktoborno.findUnique({ where: { id: pq.juktobornoId } })
     } else if (pq.ekKothayProkashId) {
@@ -93,6 +95,8 @@ export async function freezeQuestionSnapshots(
       content = await (db as any).mathQuestion.findUnique({ where: { id: pq.mathQuestionId } })
     } else if (pq.grammarQuestionId) {
       content = await (db as any).grammarQuestion.findUnique({ where: { id: pq.grammarQuestionId } })
+    } else if (pq.rearrangeId) {
+      content = await (db as any).rearrange.findUnique({ where: { id: pq.rearrangeId } })
     }
 
     if (content) {

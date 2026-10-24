@@ -8,6 +8,7 @@ export interface WizardDistribution {
   questionTypeLabel?: string | null
   marksPerQuestion: number
   markDistribution?: any
+  renderMethod?: number
   questionCount: number
   questionsToAttempt: number | null
   orderIndex: number

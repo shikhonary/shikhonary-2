@@ -49,6 +49,7 @@ export const QUESTION_TYPES = {
   GRAMMAR_QUESTION: "Grammar Question",
   SEEN_COMPREHENSION_1: "Seen Comprehension 1",
   SEEN_COMPREHENSION_2: "Seen Comprehension 2",
+  REARRANGE: "Rearrange",
 } as const
 
 export type QuestionTypeName = (typeof QUESTION_TYPES)[keyof typeof QUESTION_TYPES]
@@ -122,6 +123,7 @@ export const QUESTION_TYPE_CODES = {
   GRAMMAR_QUESTION: "GRAMMAR_QUESTION",
   SEEN_COMPREHENSION_1: "SEEN_COMPREHENSION_1",
   SEEN_COMPREHENSION_2: "SEEN_COMPREHENSION_2",
+  REARRANGE: "REARRANGE",
 } as const
 
 export type QuestionTypeCode = (typeof QUESTION_TYPE_CODES)[keyof typeof QUESTION_TYPE_CODES]
@@ -456,6 +458,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
     code: QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2,
     defaultMark: 10,
     defaultPosition: 36,
+  },
+  [QUESTION_TYPES.REARRANGE]: {
+    nameEn: QUESTION_TYPES.REARRANGE,
+    nameBn: "পুনর্বিন্যাস",
+    code: QUESTION_TYPE_CODES.REARRANGE,
+    defaultMark: 10,
+    defaultPosition: 37,
   },
 } as const
 
@@ -900,6 +909,19 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
     lower.includes("seen passage 2")
   ) {
     return QUESTION_TYPES.SEEN_COMPREHENSION_2
+  }
+  if (
+    lower === "rearrange" ||
+    lower === "re-arrange" ||
+    lower === "re arrangement" ||
+    lower === "re-arrangement" ||
+    lower === "rearrangement" ||
+    lower.includes("rearrange") ||
+    lower.includes("re-arrange") ||
+    lower.includes("পুনর্বিন্যাস") ||
+    lower.includes("পুনর্বিন্যাসকরণ")
+  ) {
+    return QUESTION_TYPES.REARRANGE
   }
 
   return null

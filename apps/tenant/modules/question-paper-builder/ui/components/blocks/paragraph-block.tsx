@@ -6,6 +6,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+import { isResourceEnglish } from "@workspace/utils";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -191,6 +192,13 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
     });
   };
 
+  const rawLabel = 
+    distStatus?.questionTypeLabel ||
+    item.distribution?.questionTypeLabel ||
+    item.questionTypeLabel ||
+    distStatus?.questionTypeName ||
+    item.distribution?.questionTypeName;
+
   const getQuestionStyle = () => {
     return {
       fontSize: settings.fontSize,
@@ -203,8 +211,46 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
 
   const questionStyle = getQuestionStyle();
 
-  const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const renderMethod = Number(
+    item.renderMethod ??
+    item.distribution?.renderMethod ??
+    distStatus?.renderMethod ??
+    1
+  );
+
+  const rawTitle = data.name || data.title || data.question || "";
+  const isEnglish = isResourceEnglish({
+    subjectName: distStatus?.subjectName || item.distribution?.subjectName || item.subjectName,
+    questionTypeLabel: rawLabel,
+    content: rawTitle,
+  });
+
+  const bnSubLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
+  const enSubLabels = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t"];
+  const subLabels = isEnglish ? enSubLabels : bnSubLabels;
   const label = subLabels[item.orderIndex] || "";
+
+  const totalQuestions = item.totalQuestions || 1;
+
+  const formatDirectParagraphPrompt = (title: string, english: boolean) => {
+    if (!title || !title.trim()) return "";
+    const cleanTitle = title.trim();
+    if (english) {
+      if (/write\s+(a\s+)?paragraph/i.test(cleanTitle)) {
+        return cleanTitle;
+      }
+      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+      return `Write a paragraph on '${unquoted}'.`;
+    } else {
+      if (cleanTitle.includes("অনুচ্ছেদ রচনা") || cleanTitle.includes("অনুচ্ছেদ লেখ")) {
+        return cleanTitle;
+      }
+      const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
+      return `’${unquoted}’ বিষয়ে একটি অনুচ্ছেদ রচনা করো।`;
+    }
+  };
+
+  const directPromptText = formatDirectParagraphPrompt(rawTitle, isEnglish);
 
   const renderSubQuestionLabel = (labelStr: string) => {
     const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
@@ -231,10 +277,10 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
           type="button"
           onClick={() => setShowAddAlternative(true)}
           className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
+          title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
         >
           <Split className="w-3 h-3" />
-          অথবা
+          {isEnglish ? "Or" : "অথবা"}
         </button>
         <button 
           onClick={handleRemove}
@@ -247,84 +293,134 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      {item.isFirstParagraph && (
-        <div className="flex justify-between items-start w-full">
-          <div 
-            className="font-bold ml-[0px] flex items-baseline gap-2" 
-            style={{
-              fontSize: questionStyle.fontSize,
-              fontFamily: questionStyle.fontFamily,
-            }}
-          >
-            <span
-              className="font-bold shrink-0 min-w-[1.8em]"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            >
-              {toBengaliDigits(item.masterNumber || 1)}।
-            </span>
-            <EditableSectionLabel
-              distributionId={item.distributionId || data.distributionId || item.distribution?.id}
-              initialLabel={distStatus?.questionTypeLabel || item.distribution?.questionTypeLabel || item.questionTypeLabel}
-              fallbackLabel="যেকোনো একটি বিষয়ে অনুচ্ছেদ রচনা করো:"
-              questionType="PARAGRAPH"
-              questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
-              questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            />
+      {renderMethod === 1 ? (
+        <div className="flex justify-between items-start gap-2 w-full">
+          <div className="flex gap-1 flex-1 relative flex-col">
+            <div className="flex gap-2 items-start w-full">
+              <span
+                className="font-bold shrink-0 min-w-[1.8em]"
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                {isEnglish ? `${item.masterNumber || 1}.` : `${toBengaliDigits(item.masterNumber || 1)}।`}
+              </span>
+              {totalQuestions > 1 && renderSubQuestionLabel(label)}
+              <div className="flex-1 w-full min-w-0">
+                <ParagraphEditableText 
+                  text={directPromptText}
+                  itemKey={`${item.id}-question`}
+                  defaultStyle={questionStyle}
+                  className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Attached Alternatives */}
+            {item.alternatives && item.alternatives.length > 0 && (
+              <AlternativeQuestionRenderer
+                paperId={paperId || ""}
+                parentQuestionId={item.id}
+                alternatives={item.alternatives}
+                settings={settings}
+                masterNumber={item.masterNumber || (item.orderIndex + 1)}
+                primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
+              />
+            )}
           </div>
-          <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
+
+          <div className="font-bold whitespace-nowrap text-right shrink-0 ml-2" style={{
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
           }}>
-            {attemptCount > 1
-              ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
-              : toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+            {isEnglish ? marksPerQuestion : toBengaliDigits(marksPerQuestion)}
           </div>
         </div>
-      )}
-      <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex gap-1 flex-1 relative flex-col">
-          <div className="flex gap-2 items-start w-full">
-            <span
-              className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
-              style={{
+      ) : (
+        <>
+          {item.isFirstParagraph && (
+            <div className="flex justify-between items-start w-full">
+              <div 
+                className="font-bold ml-[0px] flex items-baseline gap-2" 
+                style={{
+                  fontSize: questionStyle.fontSize,
+                  fontFamily: questionStyle.fontFamily,
+                }}
+              >
+                <span
+                  className="font-bold shrink-0 min-w-[1.8em]"
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                >
+                  {isEnglish ? `${item.masterNumber || 1}.` : `${toBengaliDigits(item.masterNumber || 1)}।`}
+                </span>
+                <EditableSectionLabel
+                  distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+                  initialLabel={rawLabel}
+                  fallbackLabel={isEnglish ? "Write a paragraph on any one of the following:" : "যেকোনো একটি বিষয়ে অনুচ্ছেদ রচনা করো:"}
+                  questionType="PARAGRAPH"
+                  questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+                  questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                />
+              </div>
+              <div className="font-bold whitespace-nowrap text-right shrink-0" style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
-              }}
-              aria-hidden="true"
-            >
-              {toBengaliDigits(item.masterNumber || 1)}।
-            </span>
-            {renderSubQuestionLabel(label)}
-            <div className="flex-1 w-full min-w-0">
-              <ParagraphEditableText 
-                text={data.name}
-                itemKey={`${item.id}-question`}
-                defaultStyle={questionStyle}
-                className="m-0 w-full whitespace-pre-wrap"
-              />
+              }}>
+                {isEnglish
+                  ? (marksPerQuestion * (attemptCount || 1))
+                  : (attemptCount > 1
+                    ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
+                    : toBengaliDigits(marksPerQuestion * (attemptCount || 1)))}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-between items-start gap-2 w-full">
+            <div className="flex gap-1 flex-1 relative flex-col">
+              <div className="flex gap-2 items-start w-full">
+                <span
+                  className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
+                  style={{
+                    fontSize: questionStyle.fontSize,
+                    fontFamily: questionStyle.fontFamily,
+                  }}
+                  aria-hidden="true"
+                >
+                  {isEnglish ? `${item.masterNumber || 1}.` : `${toBengaliDigits(item.masterNumber || 1)}।`}
+                </span>
+                {renderSubQuestionLabel(label)}
+                <div className="flex-1 w-full min-w-0">
+                  <ParagraphEditableText 
+                    text={rawTitle}
+                    itemKey={`${item.id}-question`}
+                    defaultStyle={questionStyle}
+                    className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                  />
+                </div>
+              </div>
+
+              {/* Attached Alternatives */}
+              {item.alternatives && item.alternatives.length > 0 && (
+                <AlternativeQuestionRenderer
+                  paperId={paperId || ""}
+                  parentQuestionId={item.id}
+                  alternatives={item.alternatives}
+                  settings={settings}
+                  masterNumber={item.masterNumber || (item.orderIndex + 1)}
+                  primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
+                />
+              )}
             </div>
           </div>
-
-          {/* Attached Alternatives */}
-          {item.alternatives && item.alternatives.length > 0 && (
-            <AlternativeQuestionRenderer
-              paperId={paperId || ""}
-              parentQuestionId={item.id}
-              alternatives={item.alternatives}
-              settings={settings}
-              masterNumber={item.masterNumber || (item.orderIndex + 1)}
-              primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
-            />
-          )}
-        </div>
-      </div>
+        </>
+      )}
 
       <AddAlternativeModal
         open={showAddAlternative}

@@ -47,6 +47,7 @@ const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   EK_KOTHAY_PROKASH: "ekKothayProkashIds",
   MAKE_SENTENCES: "makeSentencesIds",
   OPPOSITE_WORD: "oppositeWordIds",
+  GENDER_CHANGE: "genderChangeIds",
   SYNONYM: "synonymIds",
   SADHU_TO_CHOLITO: "sadhuToCholitoIds",
   POD_NIRNOY: "podNirnoyIds",
@@ -57,6 +58,7 @@ const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   DAN_BAM_MILKORON: "danBamMilkoronIds",
   MATH_QUESTION: "mathQuestionIds",
   GRAMMAR_QUESTION: "grammarQuestionIds",
+  REARRANGE: "rearrangeIds",
   SEEN_COMPREHENSION_1: "seenComprehensionIds",
   SEEN_COMPREHENSION_2: "seenComprehensionIds",
 };
@@ -95,6 +97,7 @@ const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
   EK_KOTHAY_PROKASH: "ekKothayProkashId",
   MAKE_SENTENCES: "makeSentencesId",
   OPPOSITE_WORD: "oppositeWordId",
+  GENDER_CHANGE: "genderChangeId",
   SYNONYM: "synonymId",
   SADHU_TO_CHOLITO: "sadhuToCholitoId",
   POD_NIRNOY: "podNirnoyId",
@@ -105,6 +108,7 @@ const CATEGORY_TO_SINGLE_FIELD: Record<string, string> = {
   DAN_BAM_MILKORON: "danBamMilkoronId",
   MATH_QUESTION: "mathQuestionId",
   GRAMMAR_QUESTION: "grammarQuestionId",
+  REARRANGE: "rearrangeId",
   SEEN_COMPREHENSION_1: "seenComprehensionId",
   SEEN_COMPREHENSION_2: "seenComprehensionId",
 };

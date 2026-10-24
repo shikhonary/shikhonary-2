@@ -41,6 +41,7 @@ const questionTypeConfigSchema = z.object({
   mark: z.coerce.number().min(0, "Mark must be at least 0"),
   requiredCount: z.coerce.number().int().min(0, "Required count must be at least 0"),
   totalQuestions: z.coerce.number().int().min(0, "Total questions must be at least 0"),
+  renderMethod: z.coerce.number().int().default(1).optional(),
   position: z.number().int().optional(),
   markDistributionStr: z.string().optional(),
 })
@@ -74,6 +75,7 @@ interface QuestionTypeConfig {
   mark: number
   requiredCount: number
   totalQuestions: number
+  renderMethod?: number
   markDistributionStr?: string
 }
 
@@ -207,6 +209,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
                   mark: sqt.mark,
                   requiredCount: sqt.requiredCount,
                   totalQuestions: sqt.totalQuestions,
+                  renderMethod: sqt.renderMethod ?? 1,
                   position: typeof sqt.position === "number" ? sqt.position : qtIdx,
                   markDistributionStr,
                 }
@@ -236,6 +239,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               mark: sqt.mark,
               requiredCount: sqt.requiredCount,
               totalQuestions: sqt.totalQuestions,
+              renderMethod: sqt.renderMethod ?? 1,
               position: typeof sqt.position === "number" ? sqt.position : qtIdx,
               markDistributionStr,
             }
@@ -294,6 +298,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               mark: c.mark,
               requiredCount: c.requiredCount,
               totalQuestions: c.totalQuestions,
+              renderMethod: c.renderMethod ?? 1,
               position: qtIdx,
               markDistribution,
             }
@@ -551,7 +556,7 @@ function SectionCard({ control, secIndex, totalSections, moveSection, removeSect
             <Button
               type="button"
               variant="outline"
-              onClick={() => appendDirectQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+              onClick={() => appendDirectQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, renderMethod: 1, markDistributionStr: "" })}
               className="flex items-center gap-1 text-xs h-8 border-outline text-primary hover:bg-primary/5"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -713,7 +718,7 @@ function SubSectionCard({ control, secIndex, subIndex, removeSubSection, questio
           <Button
             type="button"
             variant="outline"
-            onClick={() => appendSubQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, markDistributionStr: "" })}
+            onClick={() => appendSubQt({ questionTypeId: "", customLabel: "", mark: 0, requiredCount: 0, totalQuestions: 0, renderMethod: 1, markDistributionStr: "" })}
             className="flex items-center gap-1 text-[11px] h-7 border-outline text-primary hover:bg-primary/5 bg-white"
           >
             <Plus className="h-3 w-3" />
@@ -930,6 +935,32 @@ function QuestionTypeRow({ id, index, control, namePrefix, removeRow, questionTy
               onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
               className="h-9 text-center text-xs"
             />
+          )}
+        />
+      </div>
+
+      <div className="w-[125px] shrink-0">
+        <Label className="text-[10px] text-outline font-semibold uppercase">Render Style</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.renderMethod`}
+          render={({ field }) => (
+            <Select
+              onValueChange={(val) => field.onChange(parseInt(val, 10))}
+              value={field.value !== undefined && field.value !== null ? field.value.toString() : "1"}
+            >
+              <SelectTrigger className="h-9 text-xs">
+                <SelectValue placeholder="Style" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1" className="text-xs">
+                  1: Direct Title
+                </SelectItem>
+                <SelectItem value="2" className="text-xs">
+                  2: Choice List
+                </SelectItem>
+              </SelectContent>
+            </Select>
           )}
         />
       </div>

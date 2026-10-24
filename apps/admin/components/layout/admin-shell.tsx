@@ -23,7 +23,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex font-sans">
+    <div className="bg-background text-foreground min-h-screen flex font-sans w-full min-w-0">
       {/* Side Navigation (Desktop & Tablet) */}
       <SideNav
         isCollapsed={isCollapsed}
@@ -32,15 +32,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Wrapper */}
       <div
-        className={`flex flex-1 flex-col min-h-screen transition-all duration-300 ${
+        className={`flex flex-1 flex-col min-h-screen transition-all duration-300 w-full min-w-0 ${
           isCollapsed ? "md:ml-20" : "md:ml-64"
         }`}
       >
         {/* Top Navigation (Sticky Header) */}
         <TopNav />
 
-        {/* Main Workspace Canvas */}
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        {/* Main Workspace Canvas with Unified Max Width */}
+        <main className="flex-1 w-full min-w-0 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8">
+          <div className="w-full max-w-7xl mx-auto min-w-0">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )

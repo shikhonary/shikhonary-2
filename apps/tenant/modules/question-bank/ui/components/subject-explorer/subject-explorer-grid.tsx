@@ -64,6 +64,7 @@ import { DescriptiveQuestionPickerCard } from "@/modules/question-paper-builder/
 import { ShortQuestionPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/short-question-picker-card"
 import { ShuddhoAshuddhoPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/shuddho-ashuddho-picker-card"
 import { DanBamMilkoronPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/dan-bam-milkoron-picker-card"
+import { RearrangePickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/rearrange-picker-card"
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "০"
@@ -210,6 +211,8 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
         return <PartsOfSpeechPickerCard {...cardProps} />
       case "DAN_BAM_MILKORON":
         return <DanBamMilkoronPickerCard {...cardProps} />
+      case "REARRANGE":
+        return <RearrangePickerCard {...cardProps} />
       case "RIGHT_FORM_OF_VERBS":
         return <RightFormOfVerbPickerCard {...cardProps} />
       case "FILL_IN_THE_BLANKS_WITH_CLUES":

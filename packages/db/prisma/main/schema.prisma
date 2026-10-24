@@ -116,6 +116,16 @@ model User {
   updatedGrammarQuestions            GrammarQuestion[]             @relation("GrammarQuestionUpdater")
   createdSeenComprehensions          SeenComprehension[]           @relation("SeenComprehensionCreator")
   updatedSeenComprehensions          SeenComprehension[]           @relation("SeenComprehensionUpdater")
+  createdRearranges                  Rearrange[]                   @relation("RearrangeCreator")
+  updatedRearranges                  Rearrange[]                   @relation("RearrangeUpdater")
+  createdAdditions                   Addition[]                    @relation("AdditionCreator")
+  updatedAdditions                   Addition[]                    @relation("AdditionUpdater")
+  createdSubtractions                Subtraction[]                 @relation("SubtractionCreator")
+  updatedSubtractions                Subtraction[]                 @relation("SubtractionUpdater")
+  createdMultiplications             Multiplication[]              @relation("MultiplicationCreator")
+  updatedMultiplications             Multiplication[]              @relation("MultiplicationUpdater")
+  createdMathDivisions               MathDivision[]                @relation("MathDivisionCreator")
+  updatedMathDivisions               MathDivision[]                @relation("MathDivisionUpdater")
 
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
@@ -328,6 +338,11 @@ model Tenant {
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
   seenComprehensions          SeenComprehension[]
+  rearranges                  Rearrange[]
+  additions                   Addition[]
+  subtractions                Subtraction[]
+  multiplications             Multiplication[]
+  mathDivisions               MathDivision[]
 
   @@index([isActive])
   @@index([deletedAt, isActive])
@@ -747,6 +762,11 @@ model AcademicSubject {
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
   seenComprehensions          SeenComprehension[]
+  rearranges                  Rearrange[]
+  additions                   Addition[]
+  subtractions                Subtraction[]
+  multiplications             Multiplication[]
+  mathDivisions               MathDivision[]
 
   @@index([isActive])
   @@index([academicYearId])
@@ -819,6 +839,11 @@ model AcademicChapter {
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
   seenComprehensions          SeenComprehension[]
+  rearranges                  Rearrange[]
+  additions                   Addition[]
+  subtractions                Subtraction[]
+  multiplications             Multiplication[]
+  mathDivisions               MathDivision[]
 
   @@unique([subjectId, position])
   @@index([isActive])
@@ -893,6 +918,11 @@ model QuestionType {
   mathQuestions               MathQuestion[]
   grammarQuestions            GrammarQuestion[]
   seenComprehensions          SeenComprehension[]
+  rearranges                  Rearrange[]
+  additions                   Addition[]
+  subtractions                Subtraction[]
+  multiplications             Multiplication[]
+  mathDivisions               MathDivision[]
 
   @@index([label])
   @@index([isActive])
@@ -911,6 +941,7 @@ model SubjectQuestionType {
   markDistribution Json?
   totalQuestions   Int     @default(0)
   requiredCount    Int     @default(0)
+  renderMethod     Int     @default(1)
   position         Int     @default(0)
 
   subject      AcademicSubject            @relation(fields: [subjectId], references: [id], onDelete: Cascade)
@@ -3338,6 +3369,281 @@ model SeenComprehensionQuestion {
   @@index([seenComprehensionId])
   @@index([groupNumber])
   @@map("seen_comprehension_question")
+}
+
+model Rearrange {
+  id        String   @id @default(cuid())
+  options   String[] @default([])
+  answerKey String?
+
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("RearrangeCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("RearrangeUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([difficulty])
+  @@map("rearrange")
+}
+
+model Addition {
+  id       String  @id @default(cuid())
+  question String
+  answer   String?
+  isMath   Boolean @default(true)
+
+  // ── Source & Reference ──
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("AdditionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("AdditionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([isMath])
+  @@index([difficulty])
+  @@map("addition")
+}
+
+model Subtraction {
+  id       String  @id @default(cuid())
+  question String
+  answer   String?
+  isMath   Boolean @default(true)
+
+  // ── Source & Reference ──
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("SubtractionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("SubtractionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([isMath])
+  @@index([difficulty])
+  @@map("subtraction")
+}
+
+model Multiplication {
+  id       String  @id @default(cuid())
+  question String
+  answer   String?
+  isMath   Boolean @default(true)
+
+  // ── Source & Reference ──
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("MultiplicationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("MultiplicationUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([isMath])
+  @@index([difficulty])
+  @@map("multiplication")
+}
+
+model MathDivision {
+  id       String  @id @default(cuid())
+  question String
+  answer   String?
+  isMath   Boolean @default(true)
+
+  // ── Source & Reference ──
+  reference String[] @default([])
+  source    String?
+  session   String?
+
+  // ── Enrichment Fields ──
+  difficulty      String @default("MEDIUM")
+  popularityCount Int    @default(0)
+
+  // ── Academic Hierarchy ──
+  subjectId String
+  subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  academicChapterId String?
+  academicChapter   AcademicChapter? @relation(fields: [academicChapterId], references: [id], onDelete: SetNull)
+
+  // ── Question Type (required) ──
+  questionTypeId String
+  questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Restrict)
+
+  // ── Creator & Multi-Tenancy Tracking ──────────────────────
+  createdById String?
+  creator     User?   @relation("MathDivisionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  updatedById String?
+  updater     User?   @relation("MathDivisionUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  isGlobal Boolean @default(true)
+  // ──────────────────────────────────────────────────────────
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([createdById])
+  @@index([tenantId, isGlobal])
+  @@index([questionTypeId])
+  @@index([deletedAt])
+  @@index([academicChapterId])
+  @@index([subjectId])
+  @@index([isMath])
+  @@index([difficulty])
+  @@map("math_division")
 }
 
 model QuestionReport {

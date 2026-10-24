@@ -310,6 +310,7 @@ export function StepSubjectsDistribution({
       questionTypeLabel: resolvedTypeLabel,
       marksPerQuestion: marksNum,
       markDistribution: markDist,
+      renderMethod: preset?.renderMethod ?? 1,
       questionCount: finalQuestionCount,
       questionsToAttempt: finalQuestionsToAttempt,
       orderIndex,

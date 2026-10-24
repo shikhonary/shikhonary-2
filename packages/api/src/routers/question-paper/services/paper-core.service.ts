@@ -175,6 +175,7 @@ export async function getQuestionPaperById(
   const numberInWordsIds = allPaperQuestions.map((q: any) => q.numberInWordsId).filter(Boolean) as string[]
   const makeSentencesIds = allPaperQuestions.map((q: any) => q.makeSentencesId).filter(Boolean) as string[]
   const oppositeWordIds = allPaperQuestions.map((q: any) => q.oppositeWordId).filter(Boolean) as string[]
+  const genderChangeIds = allPaperQuestions.map((q: any) => q.genderChangeId).filter(Boolean) as string[]
   const juktobornoIds = allPaperQuestions.map((q: any) => q.juktobornoId).filter(Boolean) as string[]
   const ekKothayProkashIds = allPaperQuestions.map((q: any) => q.ekKothayProkashId).filter(Boolean) as string[]
   const synonymIds = allPaperQuestions.map((q: any) => q.synonymId).filter(Boolean) as string[]
@@ -186,6 +187,7 @@ export async function getQuestionPaperById(
   const danBamMilkoronIds = allPaperQuestions.map((q: any) => q.danBamMilkoronId).filter(Boolean) as string[]
   const mathQuestionIds = allPaperQuestions.map((q: any) => q.mathQuestionId).filter(Boolean) as string[]
   const grammarQuestionIds = allPaperQuestions.map((q: any) => q.grammarQuestionId).filter(Boolean) as string[]
+  const rearrangeIds = allPaperQuestions.map((q: any) => q.rearrangeId).filter(Boolean) as string[]
   const seenComprehensionIds = allPaperQuestions.map((q: any) => q.seenComprehensionId).filter(Boolean) as string[]
 
   const subjectIds = Array.from(new Set(paper.subjects.map((s) => s.subjectId).filter(Boolean)))
@@ -225,6 +227,7 @@ export async function getQuestionPaperById(
     numberInWordsList,
     makeSentencesList,
     oppositeWords,
+    genderChanges,
     juktobornos,
     ekKothayProkashs,
     synonyms,
@@ -236,6 +239,7 @@ export async function getQuestionPaperById(
     danBamMilkorons,
     mathQuestions,
     grammarQuestions,
+    rearranges,
     seenComprehensions,
     academicClass,
     academicSubjects,
@@ -521,6 +525,15 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    genderChangeIds.length > 0
+      ? (db as any).genderChange.findMany({
+        where: { id: { in: genderChangeIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     juktobornoIds.length > 0
       ? (db as any).juktoborno.findMany({
         where: { id: { in: juktobornoIds } },
@@ -620,6 +633,15 @@ export async function getQuestionPaperById(
         },
       })
       : [],
+    rearrangeIds.length > 0
+      ? (db as any).rearrange.findMany({
+        where: { id: { in: rearrangeIds } },
+        include: {
+          questionType: true,
+          academicChapter: true,
+        },
+      })
+      : [],
     seenComprehensionIds.length > 0
       ? (db as any).seenComprehension.findMany({
         where: { id: { in: seenComprehensionIds } },
@@ -668,6 +690,7 @@ export async function getQuestionPaperById(
   const numberInWordsMap = new Map((numberInWordsList as any[]).map((n: any) => [n.id, n]))
   const makeSentencesMap = new Map((makeSentencesList as any[]).map((m: any) => [m.id, m]))
   const oppositeWordMap = new Map((oppositeWords as any[]).map((o: any) => [o.id, o]))
+  const genderChangeMap = new Map((genderChanges as any[]).map((g: any) => [g.id, g]))
   const juktobornoMap = new Map((juktobornos as any[]).map((j: any) => [j.id, { ...j, chapter: j.academicChapter }]))
   const ekKothayProkashMap = new Map((ekKothayProkashs as any[]).map((e: any) => [e.id, { ...e, chapter: e.academicChapter }]))
   const synonymMap = new Map((synonyms as any[]).map((s: any) => [s.id, s]))
@@ -679,6 +702,7 @@ export async function getQuestionPaperById(
   const danBamMilkoronMap = new Map((danBamMilkorons as any[]).map((d: any) => [d.id, { ...d, chapter: d.academicChapter }]))
   const mathQuestionMap = new Map((mathQuestions as any[]).map((m: any) => [m.id, { ...m, chapter: m.academicChapter }]))
   const grammarQuestionMap = new Map((grammarQuestions as any[]).map((g: any) => [g.id, { ...g, chapter: g.academicChapter }]))
+  const rearrangeMap = new Map((rearranges as any[]).map((r: any) => [r.id, { ...r, chapter: r.academicChapter }]))
   const seenComprehensionMap = new Map((seenComprehensions as any[]).map((sc: any) => [sc.id, { ...sc, chapter: sc.academicChapter }]))
   const subjectMap = new Map(academicSubjects.map((s) => [s.id, s]))
   const qTypeMap = new Map(questionTypes.map((t) => [t.id, t]))
@@ -729,6 +753,7 @@ export async function getQuestionPaperById(
     let resolvedNumberInWords = q.numberInWordsId ? numberInWordsMap.get(q.numberInWordsId) || null : null
     let resolvedMakeSentences = q.makeSentencesId ? makeSentencesMap.get(q.makeSentencesId) || null : null
     let resolvedOppositeWord = q.oppositeWordId ? oppositeWordMap.get(q.oppositeWordId) || null : null
+    let resolvedGenderChange = q.genderChangeId ? genderChangeMap.get(q.genderChangeId) || null : null
     let resolvedJuktoborno = q.juktobornoId ? juktobornoMap.get(q.juktobornoId) || null : null
     let resolvedEkKothayProkash = q.ekKothayProkashId ? ekKothayProkashMap.get(q.ekKothayProkashId) || null : null
     let resolvedSynonym = q.synonymId ? synonymMap.get(q.synonymId) || null : null
@@ -740,6 +765,7 @@ export async function getQuestionPaperById(
     let resolvedDanBamMilkoron = q.danBamMilkoronId ? danBamMilkoronMap.get(q.danBamMilkoronId) || null : null
     let resolvedMathQuestion = q.mathQuestionId ? mathQuestionMap.get(q.mathQuestionId) || null : null
     let resolvedGrammarQuestion = q.grammarQuestionId ? grammarQuestionMap.get(q.grammarQuestionId) || null : null
+    let resolvedRearrange = q.rearrangeId ? rearrangeMap.get(q.rearrangeId) || null : null
     let resolvedSeenComprehension = q.seenComprehensionId ? seenComprehensionMap.get(q.seenComprehensionId) || null : null
 
     // If published snapshot exists and live wasn't found (or is published), fallback to snapshot
@@ -836,6 +862,9 @@ export async function getQuestionPaperById(
     if (!resolvedOppositeWord && q.oppositeWordId && q.contentSnapshot) {
       resolvedOppositeWord = q.contentSnapshot as any
     }
+    if (!resolvedGenderChange && q.genderChangeId && q.contentSnapshot) {
+      resolvedGenderChange = q.contentSnapshot as any
+    }
     if (!resolvedJuktoborno && q.juktobornoId && q.contentSnapshot) {
       resolvedJuktoborno = q.contentSnapshot as any
     }
@@ -869,6 +898,9 @@ export async function getQuestionPaperById(
     if (!resolvedGrammarQuestion && q.grammarQuestionId && q.contentSnapshot) {
       resolvedGrammarQuestion = q.contentSnapshot as any
     }
+    if (!resolvedRearrange && q.rearrangeId && q.contentSnapshot) {
+      resolvedRearrange = q.contentSnapshot as any
+    }
     if (!resolvedSeenComprehension && q.seenComprehensionId && q.contentSnapshot) {
       resolvedSeenComprehension = q.contentSnapshot as any
     }
@@ -890,6 +922,7 @@ export async function getQuestionPaperById(
       (resolvedSeenComprehension as any)?.questionTypeId ||
       (resolvedMathQuestion as any)?.questionTypeId ||
       (resolvedGrammarQuestion as any)?.questionTypeId ||
+      (resolvedRearrange as any)?.questionTypeId ||
       (resolvedDanBamMilkoron as any)?.questionTypeId ||
       (resolvedShuddhoAshuddho as any)?.questionTypeId ||
       (resolvedFormFillup as any)?.questionTypeId ||
@@ -900,6 +933,7 @@ export async function getQuestionPaperById(
       (resolvedEkKothayProkash as any)?.questionTypeId ||
       (resolvedJuktoborno as any)?.questionTypeId ||
       (resolvedOppositeWord as any)?.questionTypeId ||
+      (resolvedGenderChange as any)?.questionTypeId ||
       (resolvedMakeSentences as any)?.questionTypeId ||
       (resolvedMakeQuestion as any)?.questionTypeId ||
       (resolvedWordMeaning as any)?.questionTypeId ||
@@ -933,6 +967,7 @@ export async function getQuestionPaperById(
         const matchesCategory =
           (resolvedSeenComprehension && (dist.questionTypeName?.toLowerCase().includes("seen") || dist.questionTypeName?.toLowerCase().includes("comprehension") || dist.questionTypeName?.includes("পঠিত অনুচ্ছেদ"))) ||
           (resolvedGrammarQuestion && (dist.questionTypeName?.includes("ব্যাকরণ") || dist.questionTypeName?.toLowerCase().includes("grammar"))) ||
+          (resolvedRearrange && (dist.questionTypeName?.includes("পুনর্বিন্যাস") || dist.questionTypeName?.toLowerCase().includes("rearrange"))) ||
           (resolvedDanBamMilkoron && (dist.questionTypeName?.includes("মিলকরণ") || dist.questionTypeName?.includes("বাম-ডান") || dist.questionTypeName?.includes("ডান-বাম") || dist.questionTypeName?.toLowerCase().includes("dan bam") || dist.questionTypeName?.toLowerCase().includes("dan_bam") || dist.questionTypeName?.toLowerCase().includes("matching"))) ||
           (resolvedShuddhoAshuddho && (dist.questionTypeName?.includes("শুদ্ধ-অশুদ্ধ") || dist.questionTypeName?.includes("শুদ্ধ") || dist.questionTypeName?.toLowerCase().includes("shuddho") || dist.questionTypeName?.toLowerCase().includes("shuddho_ashuddho"))) ||
           (resolvedFormFillup && (dist.questionTypeName?.includes("ফরম পূরণ") || dist.questionTypeName?.includes("ফরমপুরণ") || dist.questionTypeName?.toLowerCase().includes("form fillup") || dist.questionTypeName?.toLowerCase().includes("form_fillup") || dist.questionTypeName?.toLowerCase().includes("form filling") || dist.questionTypeName?.toLowerCase().includes("form_filling"))) ||
@@ -943,6 +978,7 @@ export async function getQuestionPaperById(
           (resolvedEkKothayProkash && (dist.questionTypeName?.includes("এক কথায়") || dist.questionTypeName?.includes("এক কথায়") || dist.questionTypeName?.toLowerCase().includes("ek kothay") || dist.questionTypeName?.toLowerCase().includes("ek kothai"))) ||
           (resolvedJuktoborno && (dist.questionTypeName?.includes("যুক্তবর্ণ") || dist.questionTypeName?.toLowerCase().includes("juktoborno"))) ||
           (resolvedOppositeWord && (dist.questionTypeName?.includes("বিপরীত") || dist.questionTypeName?.toLowerCase().includes("opposite word") || dist.questionTypeName?.toLowerCase().includes("opposite_word"))) ||
+          (resolvedGenderChange && (dist.questionTypeName?.includes("লিঙ্গ") || dist.questionTypeName?.toLowerCase().includes("gender change") || dist.questionTypeName?.toLowerCase().includes("gender_change"))) ||
           (resolvedMakeSentences && (dist.questionTypeName?.includes("বাক্য তৈরি") || dist.questionTypeName?.toLowerCase().includes("make sentence") || dist.questionTypeName?.toLowerCase().includes("make_sentence"))) ||
           (resolvedMakeQuestion && (dist.questionTypeName?.includes("প্রশ্ন তৈরি") || dist.questionTypeName?.toLowerCase().includes("make question") || dist.questionTypeName?.toLowerCase().includes("make_question") || dist.questionTypeName?.toLowerCase().includes("wh question") || dist.questionTypeName?.toLowerCase().includes("wh_question"))) ||
           (resolvedWordMeaning && (dist.questionTypeName?.includes("শব্দার্থ") || dist.questionTypeName?.toLowerCase().includes("word meaning") || dist.questionTypeName?.toLowerCase().includes("word_meaning"))) ||
@@ -1012,6 +1048,7 @@ export async function getQuestionPaperById(
       numberInWords: resolvedNumberInWords,
       makeSentences: resolvedMakeSentences,
       oppositeWord: resolvedOppositeWord,
+      genderChange: resolvedGenderChange,
       juktoborno: resolvedJuktoborno,
       ekKothayProkash: resolvedEkKothayProkash,
       synonym: resolvedSynonym,
@@ -1023,6 +1060,7 @@ export async function getQuestionPaperById(
       danBamMilkoron: resolvedDanBamMilkoron,
       mathQuestion: resolvedMathQuestion,
       grammarQuestion: resolvedGrammarQuestion,
+      rearrange: resolvedRearrange,
       seenComprehension: resolvedSeenComprehension,
       selectedSubQuestionIds: q.selectedSubQuestionIds ?? [],
       alternatives: (q.alternatives || []).map(enrichSingleQuestion),
@@ -1185,7 +1223,7 @@ export async function createQuestionPaperFull(
       const pSection = await tenantDb.questionPaperSection.create({
         data: {
           questionPaperId: paper.id,
-          title: mSec.nameEn || mSec.nameBn || "Section",
+          title: mSec.nameEn || mSec.nameBn || "",
           titleBn: mSec.nameBn,
           orderIndex: mSec.position,
           instructions: mSec.instructions ?? null,
@@ -1271,10 +1309,12 @@ export async function createQuestionPaperFull(
            qType?.nameEn ||
            qType?.label ||
            null)
-        : (distInput.questionTypeLabel ||
+        : ((distInput.questionTypeLabel && /[\u0980-\u09FF]/.test(distInput.questionTypeLabel) ? distInput.questionTypeLabel : null) ||
            sqType?.customLabel ||
-           qType?.label ||
+           (qType?.label && /[\u0980-\u09FF]/.test(qType.label) ? qType.label : null) ||
            qType?.nameBn ||
+           distInput.questionTypeLabel ||
+           qType?.label ||
            qType?.nameEn ||
            null)
 
@@ -1308,6 +1348,7 @@ export async function createQuestionPaperFull(
           questionTypeLabel,
           marksPerQuestion: distInput.marksPerQuestion,
           markDistribution: markDistribution as any,
+          renderMethod: sqType?.renderMethod ?? distInput.renderMethod ?? 1,
           questionCount: distInput.questionCount,
           totalMarks,
           questionsToAttempt: distInput.questionsToAttempt ?? distInput.questionCount,
@@ -1556,6 +1597,7 @@ export async function duplicateQuestionPaper(
           questionTypeLabel: (dist as any).questionTypeLabel ?? null,
           marksPerQuestion: dist.marksPerQuestion,
           markDistribution: (dist.markDistribution as any) ?? undefined,
+          renderMethod: dist.renderMethod ?? 1,
           questionCount: dist.questionCount,
           totalMarks: dist.totalMarks,
           questionsToAttempt: dist.questionsToAttempt,

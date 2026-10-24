@@ -61,6 +61,7 @@ export async function addQuestionPaperQuestion(
     input.numberInWordsId,
     input.makeSentencesId,
     input.oppositeWordId,
+    input.genderChangeId,
     input.juktobornoId,
     input.ekKothayProkashId,
     input.synonymId,
@@ -72,6 +73,7 @@ export async function addQuestionPaperQuestion(
     input.danBamMilkoronId,
     input.mathQuestionId,
     input.grammarQuestionId,
+    input.rearrangeId,
     input.seenComprehensionId,
   ].filter(Boolean)
 
@@ -281,6 +283,12 @@ export async function addQuestionPaperQuestion(
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "OppositeWord: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.genderChangeId) {
+    const item = await (db as any).genderChange.findUnique({ where: { id: input.genderChangeId } })
+    if (!item) throw notFound("GenderChange")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "GenderChange: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.synonymId) {
     const item = await (db as any).synonym.findUnique({ where: { id: input.synonymId } })
     if (!item) throw notFound("Synonym")
@@ -334,6 +342,12 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("GrammarQuestion")
     resolvedQuestionTypeId = (item as any).questionTypeId ?? null
     questionLabel = "GrammarQuestion: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.rearrangeId) {
+    const item = await (db as any).rearrange.findUnique({ where: { id: input.rearrangeId } })
+    if (!item) throw notFound("Rearrange")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "Rearrange: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.seenComprehensionId) {
     const item = await (db as any).seenComprehension.findUnique({
@@ -407,6 +421,7 @@ export async function addQuestionPaperQuestion(
       ekKothayProkashId: input.ekKothayProkashId,
       makeSentencesId: input.makeSentencesId,
       oppositeWordId: input.oppositeWordId,
+      genderChangeId: input.genderChangeId,
       synonymId: input.synonymId,
       sadhuToCholitoId: input.sadhuToCholitoId,
       podNirnoyId: input.podNirnoyId,
@@ -416,6 +431,7 @@ export async function addQuestionPaperQuestion(
       danBamMilkoronId: input.danBamMilkoronId,
       mathQuestionId: input.mathQuestionId,
       grammarQuestionId: input.grammarQuestionId,
+      rearrangeId: input.rearrangeId,
       seenComprehensionId: input.seenComprehensionId,
       selectedSubQuestionIds: input.selectedSubQuestionIds || [],
       distributionId: input.distributionId,
@@ -485,6 +501,7 @@ export async function removeQuestionPaperQuestion(
     EK_KOTHAY_PROKASH: "ekKothayProkashId",
     MAKE_SENTENCES: "makeSentencesId",
     OPPOSITE_WORD: "oppositeWordId",
+    GENDER_CHANGE: "genderChangeId",
     SYNONYM: "synonymId",
     SADHU_TO_CHOLITO: "sadhuToCholitoId",
     POD_NIRNOY: "podNirnoyId",
@@ -495,6 +512,7 @@ export async function removeQuestionPaperQuestion(
     DAN_BAM_MILKORON: "danBamMilkoronId",
     MATH_QUESTION: "mathQuestionId",
     GRAMMAR_QUESTION: "grammarQuestionId",
+    REARRANGE: "rearrangeId",
     SEEN_COMPREHENSION_1: "seenComprehensionId",
     SEEN_COMPREHENSION_2: "seenComprehensionId",
     SEEN_COMPREHENSION: "seenComprehensionId",
@@ -1023,6 +1041,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.genderChangeIds && input.genderChangeIds.length > 0) {
+    for (const genderChangeId of input.genderChangeIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        genderChangeId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.ekKothayProkashIds && input.ekKothayProkashIds.length > 0) {
     for (const ekKothayProkashId of input.ekKothayProkashIds) {
       recordsToCreate.push({
@@ -1153,6 +1184,19 @@ export async function bulkAssignQuestions(
     }
   }
 
+  if (input.rearrangeIds && input.rearrangeIds.length > 0) {
+    for (const rearrangeId of input.rearrangeIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        rearrangeId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
   if (input.seenComprehensionItems && input.seenComprehensionItems.length > 0) {
     for (const item of input.seenComprehensionItems) {
       recordsToCreate.push({
@@ -1275,6 +1319,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).makeSentences.findUnique({ where: { id: record.makeSentencesId } })) as any
       } else if (record.oppositeWordId) {
         record.contentSnapshot = (await (db as any).oppositeWord.findUnique({ where: { id: record.oppositeWordId } })) as any
+      } else if (record.genderChangeId) {
+        record.contentSnapshot = (await (db as any).genderChange.findUnique({ where: { id: record.genderChangeId } })) as any
       } else if (record.synonymId) {
         record.contentSnapshot = (await (db as any).synonym.findUnique({ where: { id: record.synonymId } })) as any
       } else if (record.sadhuToCholitoId) {
@@ -1293,6 +1339,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await (db as any).mathQuestion.findUnique({ where: { id: record.mathQuestionId } })) as any
       } else if (record.grammarQuestionId) {
         record.contentSnapshot = (await (db as any).grammarQuestion.findUnique({ where: { id: record.grammarQuestionId } })) as any
+      } else if (record.rearrangeId) {
+        record.contentSnapshot = (await (db as any).rearrange.findUnique({ where: { id: record.rearrangeId } })) as any
       } else if (record.seenComprehensionId) {
         record.contentSnapshot = (await (db as any).seenComprehension.findUnique({
           where: { id: record.seenComprehensionId },
@@ -1368,6 +1416,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_makeSentencesId: { questionPaperId: input.questionPaperId, makeSentencesId: record.makeSentencesId } }
     } else if (record.oppositeWordId) {
       whereCondition = { questionPaperId_oppositeWordId: { questionPaperId: input.questionPaperId, oppositeWordId: record.oppositeWordId } }
+    } else if (record.genderChangeId) {
+      whereCondition = { questionPaperId_genderChangeId: { questionPaperId: input.questionPaperId, genderChangeId: record.genderChangeId } }
     } else if (record.synonymId) {
       whereCondition = { questionPaperId_synonymId: { questionPaperId: input.questionPaperId, synonymId: record.synonymId } }
     } else if (record.sadhuToCholitoId) {
@@ -1386,6 +1436,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_mathQuestionId: { questionPaperId: input.questionPaperId, mathQuestionId: record.mathQuestionId } }
     } else if (record.grammarQuestionId) {
       whereCondition = { questionPaperId_grammarQuestionId: { questionPaperId: input.questionPaperId, grammarQuestionId: record.grammarQuestionId } }
+    } else if (record.rearrangeId) {
+      whereCondition = { questionPaperId_rearrangeId: { questionPaperId: input.questionPaperId, rearrangeId: record.rearrangeId } }
     } else if (record.seenComprehensionId) {
       whereCondition = {
         questionPaperId_distributionId_seenComprehensionId: {
@@ -1477,6 +1529,7 @@ export async function bulkRemoveQuestions(
         { danBamMilkoronId: { in: input.questionIds } },
         { mathQuestionId: { in: input.questionIds } },
         { grammarQuestionId: { in: input.questionIds } },
+        { rearrangeId: { in: input.questionIds } },
         { seenComprehensionId: { in: input.questionIds } },
       ],
     },
