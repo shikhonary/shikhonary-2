@@ -12,9 +12,9 @@ export type DescriptiveQuestionSortOption = (typeof descriptiveQuestionSortOptio
 
 export const descriptiveQuestionSearchParamsParsers = {
   query: parseAsString.withDefault(""),
-  classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<DescriptiveQuestionSortOption>(Array.from(descriptiveQuestionSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),

@@ -3,14 +3,18 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listShortQuestionsSchema = paginationSchema.extend({
+  academicClassId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.number().int().optional(),
+  isActive: z.boolean().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
+  search: z.string().optional(),
 })
 
 export type ListShortQuestionsInput = z.infer<typeof listShortQuestionsSchema>
@@ -18,6 +22,7 @@ export type ListShortQuestionsInput = z.infer<typeof listShortQuestionsSchema>
 export const shortQuestionStatsSchema = z.object({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
+  academicClassId: z.string().optional(),
 })
 
 export type ShortQuestionStatsInput = z.infer<typeof shortQuestionStatsSchema>
@@ -34,6 +39,7 @@ export const createShortQuestionSchema = z.object({
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().min(1, "Chapter is required"),
+  isActive: z.boolean().optional().default(true),
 })
 
 export type CreateShortQuestionInput = z.infer<typeof createShortQuestionSchema>
@@ -43,6 +49,13 @@ export const updateShortQuestionSchema = createShortQuestionSchema.partial().ext
 })
 
 export type UpdateShortQuestionInput = z.infer<typeof updateShortQuestionSchema>
+
+export const toggleShortQuestionActiveSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+export type ToggleShortQuestionActiveInput = z.infer<typeof toggleShortQuestionActiveSchema>
 
 export const deleteShortQuestionSchema = idSchema
 export type DeleteShortQuestionInput = z.infer<typeof deleteShortQuestionSchema>

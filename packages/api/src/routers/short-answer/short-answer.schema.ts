@@ -12,10 +12,9 @@ export const listShortAnswersSchema = z.object({
   source: z.string().optional(),
   session: z.string().optional(),
   year: z.number().optional(),
+  board: z.string().optional(),
   isMath: z.boolean().optional(),
-  sort: z
-    .enum(["createdAt_desc", "createdAt_asc", "question_asc", "question_desc"])
-    .default("createdAt_desc"),
+  sort: z.string().optional().default("newest"),
 })
 
 export const shortAnswerStatsSchema = z.object({

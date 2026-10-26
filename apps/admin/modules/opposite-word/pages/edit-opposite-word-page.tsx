@@ -7,9 +7,5 @@ interface EditOppositeWordPageProps {
 }
 
 export function EditOppositeWordPage({ id }: EditOppositeWordPageProps) {
-  return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <EditOppositeWordView id={id} />
-    </div>
-  )
+  return <EditOppositeWordView id={id} />
 }

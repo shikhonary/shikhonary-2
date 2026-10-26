@@ -1,33 +1,36 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import {
   useMakeQuestionList,
   useMakeQuestionStats,
   useAcademicClassesForSelection,
   useSubjectsForSelection,
   useChaptersForSelection,
-  useEssencesForSelection,
+  useBoardYearsForSelection,
+  useDeleteMakeQuestion,
+  useBulkDeleteMakeQuestion,
 } from "../services/use-make-question"
-import { useDeleteMakeQuestionModalStore } from "../store/use-delete-make-question-modal-store"
-import { MakeQuestionListHeader } from "./make-question-list-header"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { Button } from "@workspace/ui/components/button"
+import { toast } from "@workspace/ui/components/sonner"
+import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
+import { BookOpen, Plus, Upload } from "lucide-react"
 import { MakeQuestionStatsCards } from "./make-question-stats-cards"
 import { MakeQuestionFilters } from "./make-question-filters"
 import { MakeQuestionTable } from "./make-question-table"
-import { DeleteMakeQuestionModal } from "./delete-make-question-modal"
-import { useMakeQuestionSearchParams } from "../hooks/use-make-question-search-params"
+import { useMakeQuestionSearchParams, type MakeQuestionSortOption } from "../hooks/use-make-question-search-params"
 
 export function MakeQuestionListView() {
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
-
   const [
     {
       query: searchQuery,
+      classId: selectedAcademicClassId,
       subjectId: selectedSubjectId,
       chapterId: selectedChapterId,
-      essenceId: selectedEssenceId,
-      difficulty: selectedDifficulty,
+      board: selectedBoard,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -35,84 +38,143 @@ export function MakeQuestionListView() {
     setSearchParams,
   ] = useMakeQuestionSearchParams()
 
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+
   const handleAcademicClassChange = (classId: string) => {
-    setSelectedAcademicClassId(classId)
     setSearchParams({
+      classId,
       subjectId: "All",
       chapterId: "All",
+      board: "All",
       page: 1,
     })
   }
 
-  const handleSubjectChange = (subjectId: string) => {
-    setSearchParams({
-      subjectId,
-      chapterId: "All",
-      essenceId: "All",
-      page: 1,
-    })
+  // Local state for single & bulk delete (Zero Zustand stores)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; statement: string } | null>(null)
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+
+  const deleteMutation = useDeleteMakeQuestion()
+  const bulkDeleteMutation = useBulkDeleteMakeQuestion()
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await deleteMutation.mutateAsync({ id: deleteTarget.id })
+      toast.success("এন্ট্রিটি সফলভাবে মুছে ফেলা হয়েছে।")
+      setDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "এন্ট্রি ডিলিট করা সম্ভব হয়নি")
+    }
   }
 
-  const openDeleteModal = useDeleteMakeQuestionModalStore((state) => state.openModal)
-  const openBulkDeleteModal = useDeleteMakeQuestionModalStore((state) => state.openBulkModal)
+  const handleConfirmBulkDelete = async () => {
+    if (!bulkDeleteTarget) return
+    try {
+      const res = await bulkDeleteMutation.mutateAsync({ ids: bulkDeleteTarget })
+      toast.success(`সফলভাবে ${toBengaliDigits(res.deletedCount)}টি এন্ট্রি মুছে ফেলা হয়েছে।`)
+      setBulkDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "এন্ট্রি ডিলিট করা সম্ভব হয়নি")
+    }
+  }
 
-  // Query MakeQuestion list
-  const { data: questionsData, isLoading, isError } = useMakeQuestionList({
-    limit,
-    page: currentPage,
-    query: searchQuery || undefined,
-    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-    academicChapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-    essenceId: selectedEssenceId !== "All" ? selectedEssenceId : undefined,
-    difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
-    sort: selectedSort,
-  })
+  // Parse board / year
+  let boardSource: string | undefined = undefined
+  let boardYear: number | undefined = undefined
+  if (selectedBoard !== "All") {
+    const parts = selectedBoard.split("-")
+    const possibleYear = Number(parts[parts.length - 1])
+    if (!isNaN(possibleYear) && parts.length > 1) {
+      boardYear = possibleYear
+      boardSource = parts.slice(0, parts.length - 1).join("-")
+    } else {
+      boardSource = selectedBoard
+    }
+  }
 
-  // Query Stats
-  const { data: statsData } = useMakeQuestionStats(
-    selectedSubjectId !== "All" || selectedChapterId !== "All" || selectedEssenceId !== "All"
-      ? {
-          subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-          chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-          academicChapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-          essenceId: selectedEssenceId !== "All" ? selectedEssenceId : undefined,
-        }
+  // Dependent queries
+  const { data: subjects = [] } = useSubjectsForSelection(
+    selectedAcademicClassId && selectedAcademicClassId !== "All"
+      ? { academicClassId: selectedAcademicClassId }
       : undefined
   )
 
-  // Subjects dropdown
-  const { data: subjects = [] } = useSubjectsForSelection(
-    selectedAcademicClassId !== "All" ? { academicClassId: selectedAcademicClassId } : undefined
-  )
-
-  // Chapters dropdown
   const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
+    selectedSubjectId && selectedSubjectId !== "All"
+      ? { subjectId: selectedSubjectId }
+      : undefined
   )
 
-  // Essences dropdown
-  const { data: essences = [] } = useEssencesForSelection(
-    selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
-  )
+  const { data: boardYears = [] } = useBoardYearsForSelection({
+    subjectId: selectedSubjectId && selectedSubjectId !== "All" ? selectedSubjectId : undefined,
+    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+  })
 
-  const items = questionsData?.items ?? []
-  const totalItems = questionsData?.totalItems ?? items.length
-  const totalPages = questionsData?.totalPages ?? 1
+  // Primary list query
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    isError,
+  } = useMakeQuestionList({
+    query: searchQuery || undefined,
+    academicClassId: selectedAcademicClassId === "All" ? undefined : selectedAcademicClassId,
+    subjectId: selectedSubjectId === "All" ? undefined : selectedSubjectId,
+    academicChapterId: selectedChapterId === "All" ? undefined : selectedChapterId,
+    source: boardSource,
+    year: boardYear,
+    sort: selectedSort === "All" ? undefined : selectedSort,
+    page: currentPage,
+    limit,
+  })
+
+  // Summary statistics query
+  const { data: statsData, isLoading: isStatsLoading } = useMakeQuestionStats({
+    academicClassId: selectedAcademicClassId === "All" ? undefined : selectedAcademicClassId,
+    subjectId: selectedSubjectId === "All" ? undefined : selectedSubjectId,
+    academicChapterId: selectedChapterId === "All" ? undefined : selectedChapterId,
+  })
+
+  const items = listData?.items ?? []
+  const totalItems = listData?.totalItems ?? 0
+  const totalPages = listData?.totalPages ?? 1
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <MakeQuestionListHeader />
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="প্রশ্ন তৈরি ব্যাংক (Make Question)"
+        description="বক্তব্য থেকে প্রশ্ন তৈরি ও অনুশীলনের অধ্যায়ভিত্তিক প্রশ্ন ব্যাংক ব্যবস্থাপনা করুন।"
+        badge={{ label: "Make Question মডিউল", variant: "indigo" }}
+        icon={BookOpen}
+        action={{
+          label: "নতুন এন্ট্রি যোগ করুন",
+          href: "/make-questions/create",
+          icon: Plus,
+        }}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2 font-headline"
+        >
+          <Link href="/make-questions/import" prefetch={true}>
+            <Upload className="w-4 h-4" />
+            <span>JSON ইমপোর্ট</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
-      {/* Stats Cards */}
+      {/* Summary Counts Cards */}
       <MakeQuestionStatsCards
         totalCount={statsData?.totalCount}
-        difficultyCounts={statsData?.difficultyCounts}
-        isLoading={isLoading}
+        activeCount={statsData?.activeCount}
+        inactiveCount={statsData?.inactiveCount}
+        hardCount={statsData?.difficultyCounts?.HARD}
+        isLoading={isStatsLoading || isListLoading}
       />
 
-      {/* Filters */}
+      {/* Filters Form */}
       <MakeQuestionFilters
         searchQuery={searchQuery}
         onSearchChange={(query) => setSearchParams({ query, page: 1 })}
@@ -120,27 +182,25 @@ export function MakeQuestionListView() {
         onAcademicClassChange={handleAcademicClassChange}
         academicClasses={academicClasses}
         selectedSubjectId={selectedSubjectId}
-        onSubjectChange={handleSubjectChange}
+        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
         subjects={subjects}
         selectedChapterId={selectedChapterId}
-        onChapterChange={(chapterId) => setSearchParams({ chapterId, page: 1 })}
+        onChapterChange={(chapterId) => setSearchParams({ chapterId, board: "All", page: 1 })}
         chapters={chapters}
-        selectedEssenceId={selectedEssenceId}
-        onEssenceChange={(essenceId) => setSearchParams({ essenceId, page: 1 })}
-        essences={essences}
-        selectedDifficulty={selectedDifficulty}
-        onDifficultyChange={(difficulty) => setSearchParams({ difficulty, page: 1 })}
+        selectedBoard={selectedBoard}
+        onBoardChange={(board) => setSearchParams({ board, page: 1 })}
+        boardYears={boardYears}
         selectedSort={selectedSort}
-        onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
+        onSortChange={(sort) => setSearchParams({ sort: sort as MakeQuestionSortOption, page: 1 })}
       />
 
-      {/* Table */}
+      {/* Questions List Cards & Table */}
       <MakeQuestionTable
         items={items as any}
-        isLoading={isLoading}
+        isLoading={isListLoading}
         isError={isError}
-        onDelete={(id, statementSnippet) => openDeleteModal(id, statementSnippet)}
-        onBulkDelete={(ids) => openBulkDeleteModal(ids)}
+        onDelete={(id, snippet) => setDeleteTarget({ id, statement: snippet })}
+        onBulkDelete={(ids) => setBulkDeleteTarget(ids)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
@@ -149,8 +209,27 @@ export function MakeQuestionListView() {
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
-      {/* Delete Modal */}
-      <DeleteMakeQuestionModal />
+      {/* Shared Single Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="এন্ট্রিটি ডিলিট করতে চান?"
+        itemName={deleteTarget?.statement}
+        warningText="এই প্রশ্ন তৈরির এন্ট্রিটি ডিলিট করলে এটি স্থায়ীভাবে মুছে যাবে।"
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Shared Bulk Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(bulkDeleteTarget && bulkDeleteTarget.length > 0)}
+        onClose={() => setBulkDeleteTarget(null)}
+        onConfirm={handleConfirmBulkDelete}
+        title="নির্বাচিত এন্ট্রিগুলো ডিলিট করতে চান?"
+        itemName={bulkDeleteTarget ? `${toBengaliDigits(bulkDeleteTarget.length)}টি এন্ট্রি` : ""}
+        warningText="নির্বাচিত এন্ট্রিসমূহ স্থায়ীভাবে মুছে ফেলা হবে।"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }

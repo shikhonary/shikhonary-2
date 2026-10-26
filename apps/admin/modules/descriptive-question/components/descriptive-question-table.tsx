@@ -5,31 +5,18 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Edit3, Trash2 } from "lucide-react"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
-
-function getPaginationItems(currentPage: number, totalPages: number): (number | "ellipsis-start" | "ellipsis-end")[] {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1)
-  }
-
-  if (currentPage <= 4) {
-    return [1, 2, 3, 4, 5, "ellipsis-end", totalPages]
-  }
-
-  if (currentPage >= totalPages - 3) {
-    return [1, "ellipsis-start", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
-  }
-
-  return [1, "ellipsis-start", currentPage - 1, currentPage, currentPage + 1, "ellipsis-end", totalPages]
-}
+  DataTablePagination,
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
+import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
+import {
+  Trash2,
+  FileText,
+  Plus,
+} from "lucide-react"
 
 export interface DescriptiveQuestionItem {
   id: string
@@ -46,12 +33,29 @@ export interface DescriptiveQuestionItem {
   subject?: {
     id: string
     nameEn: string
-    nameBn?: string
+    nameBn: string
+    code?: string | null
+    group?: string | null
+    classSubjects?: {
+      academicClass?: {
+        id: string
+        nameEn: string
+        nameBn: string
+      } | null
+    }[]
   } | null
   chapter?: {
     id: string
     nameEn: string
-    nameBn?: string
+    nameBn: string
+    position?: number
+  } | null
+  questionType?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    label: string
+    mark: number
   } | null
 }
 
@@ -82,8 +86,6 @@ export function DescriptiveQuestionTable({
   onPageChange,
   onLimitChange,
 }: DescriptiveQuestionTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const handleSelectAll = (checked: boolean) => {
@@ -107,211 +109,192 @@ export function DescriptiveQuestionTable({
 
   return (
     <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
+      {/* Selection Toolbar */}
+      {items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card p-3 sm:p-4 shadow-xs">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-foreground font-headline">
+                সবগুলো নির্বাচন করুন ({toBengaliDigits(items.length)}টি)
               </span>
-              <Button
-                type="button"
-                onClick={() => {
-                  onBulkDelete(selectedIds)
-                  setSelectedIds([])
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Delete Selected</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+            </label>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="animate-spin text-primary text-sm font-bold">
-              Loading...
-            </span>
-            <span className="font-body-md text-sm font-medium">Loading Descriptive Questions...</span>
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-white/[0.08]">
+                <span className="text-xs font-semibold text-indigo-600 dark:text-primary font-body">
+                  {toBengaliDigits(selectedIds.length)}টি নির্বাচিত
+                </span>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    onBulkDelete(selectedIds)
+                    setSelectedIds([])
+                  }}
+                  className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>নির্বাচিতগুলো মুছুন</span>
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Loading Skeleton State */}
+      {isLoading && (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-6 shadow-xs animate-pulse space-y-4"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-white/10" />
+                <div className="h-5 w-24 bg-slate-200 dark:bg-white/10 rounded-lg" />
+                <div className="h-5 w-32 bg-slate-200 dark:bg-white/10 rounded-lg" />
+              </div>
+              <div className="h-6 w-3/4 bg-slate-200 dark:bg-white/10 rounded-md" />
+              <div className="space-y-2 pt-2">
+                <div className="h-4 w-full bg-slate-200 dark:bg-white/10 rounded" />
+                <div className="h-4 w-5/6 bg-slate-200 dark:bg-white/10 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {/* Error State */}
       {isError && !isLoading && (
-        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-xl font-bold">⚠️ Error</span>
-            <span className="font-body-md text-sm font-medium">
-              Error loading Descriptive Questions. Please try refreshing.
-            </span>
-          </div>
+        <div className="py-16 text-center rounded-2xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-6">
+          <FileText className="h-10 w-10 mx-auto text-red-500 mb-3" />
+          <h3 className="text-lg font-bold text-red-700 dark:text-red-400 font-headline">
+            রচনামূলক প্রশ্ন লোড করতে সমস্যা হয়েছে
+          </h3>
+          <p className="text-sm text-red-600/80 mt-1 max-w-sm mx-auto font-body">
+            সার্ভার থেকে রচনামূলক প্রশ্ন লোড করা যায়নি। অনুগ্রহ করে পেজটি রিফ্রেশ করুন।
+          </p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !isError && items.length === 0 && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-2xl">📝</span>
-            <p className="font-headline-md text-xl font-bold text-on-surface">
-              No Descriptive Questions Found
-            </p>
-            <p className="font-body-md text-sm text-outline max-w-md">
-              Try adjusting filters or add a new descriptive question to the bank.
-            </p>
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs py-16 px-6 text-center select-none">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center mb-4 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <FileText className="w-8 h-8 stroke-[1.8]" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+            কোনো রচনামূলক প্রশ্ন পাওয়া যায়নি
+          </h3>
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
+            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন রচনামূলক প্রশ্ন যোগ করুন।
+          </p>
+          <div className="mt-6">
+            <Button
+              asChild
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
+            >
+              <Link href="/descriptive-questions/create" prefetch={true}>
+                <Plus className="w-4 h-4" />
+                <span>নতুন প্রশ্ন যোগ করুন</span>
+              </Link>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* CARD VIEW LAYOUT */}
+      {/* Populated Question Cards List */}
       {!isLoading && !isError && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
             const snippet = item.question.length > 80 ? item.question.substring(0, 80) + "..." : item.question
 
+            const classNames = item.subject?.classSubjects
+              ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+              .filter(Boolean)
+            const className = classNames && classNames.length > 0 ? classNames.join(", ") : null
+
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
-                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+                  "bg-card border rounded-2xl p-5 sm:p-6 transition-all duration-200 relative group shadow-xs hover:shadow-md",
+                  isSelected
+                    ? "border-indigo-600 ring-2 ring-indigo-500/20 bg-indigo-50/15"
+                    : "border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300"
                 )}
               >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4 sm:gap-6">
                   {/* Selection Checkbox & Main Info */}
                   <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                          #{globalIndex}
-                        </span>
-
-                        {/* Subject Badge */}
-                        {item.subject && (
-                          <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                            {item.subject.nameBn || item.subject.nameEn}
-                          </span>
-                        )}
-
-                        {/* Chapter Badge */}
-                        {item.chapter && (
-                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                            {item.chapter.nameBn || item.chapter.nameEn}
-                          </span>
-                        )}
-
+                      {/* Question Card Header */}
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        academicClassName={className}
+                        subjectName={item.subject?.nameBn || item.subject?.nameEn || ""}
+                        chapterName={item.chapter?.nameBn || item.chapter?.nameEn || ""}
+                      >
                         {/* Popularity Badge */}
-                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
-                          👁️ {item.popularityCount} Views
-                        </span>
-
-                        {/* Difficulty Badge */}
-                        <span className={cn(
-                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                        )}>
-                          {item.difficulty}
-                        </span>
-                      </div>
-
-                      {/* Question Text Box */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed space-y-2">
-                        <div className={cn(
-                          "whitespace-pre-wrap font-medium",
-                          /[\u0980-\u09FF]/.test(item.question) && "font-solaiman text-base"
-                        )}>
-                          <RenderMath text={item.question} isMath={true} />
-                        </div>
-                        {item.answer && (
-                          <div className="border-t border-secondary/20 pt-2 text-xs text-muted-foreground">
-                            <span className="font-bold text-primary mr-1">উত্তর:</span>
-                            <RenderMath text={item.answer} isMath={true} />
-                          </div>
+                        {item.popularityCount > 0 && (
+                          <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-bold border border-blue-200/60 font-body">
+                            👁️ {toBengaliDigits(item.popularityCount)} ভিউ
+                          </span>
                         )}
-                      </div>
+                      </QuestionCardHeader>
 
-                      {/* Reference Tags & ID Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {((item as any).source || (item as any).session) && (
-                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
-                            </span>
-                          )}
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                              >
-                                🏷️ {ref}
-                              </span>
-                            ))
-                          ) : (
-                            !((item as any).source || (item as any).session) && (
-                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                            )
-                          )}
+                      {/* Question Stem Link */}
+                      <Link
+                        href={`/descriptive-questions/${item.id}/edit`}
+                        prefetch={true}
+                        className="block font-headline text-base sm:text-lg font-bold text-foreground hover:text-indigo-600 dark:hover:text-primary transition-colors leading-relaxed"
+                      >
+                        <RenderMath text={item.question} isMath={true} />
+                      </Link>
+
+                      {/* Answer Box (If Present) */}
+                      {item.answer && (
+                        <div className="rounded-xl border border-indigo-100/80 dark:border-primary/20 bg-indigo-50/30 dark:bg-primary/[0.03] p-3.5 text-xs text-foreground font-body leading-relaxed">
+                          <span className="font-bold text-indigo-700 dark:text-primary mr-1.5 font-headline">
+                            উত্তর:
+                          </span>
+                          <RenderMath text={item.answer} isMath={true} />
                         </div>
+                      )}
 
-                        <span className="text-[11px] font-mono text-outline/60">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                      {/* Clean Footer: Source, Session & Reference */}
+                      <QuestionCardFooter
+                        source={item.source}
+                        session={item.session}
+                        references={item.reference}
+                      />
                     </div>
                   </div>
 
                   {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/descriptive-questions/${item.id}/edit`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-                      title="Edit Question"
-                    >
-                      <Edit3 className="size-5 mx-auto" />
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, snippet)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-                      title="Delete Question"
-                    >
-                      <Trash2 className="size-5 mx-auto" />
-                    </button>
-                  </div>
+                  <QuestionCardActions
+                    editHref={`/descriptive-questions/${item.id}/edit`}
+                    onDelete={() => onDelete(item.id, snippet)}
+                    editTitle="রচনামূলক প্রশ্ন সম্পাদনা করুন"
+                    deleteTitle="রচনামূলক প্রশ্ন মুছুন"
+                  />
                 </div>
               </div>
             )
@@ -321,121 +304,14 @@ export function DescriptiveQuestionTable({
 
       {/* Pagination Footer */}
       {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-2xl p-4 shadow-xs">
-          {/* Left: Summary & Rows Per Page */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant text-center sm:text-left">
-              Showing <span className="font-bold text-on-surface">{displayStart}-{displayEnd}</span> of{" "}
-              <span className="font-bold text-on-surface">{totalItems}</span> descriptive questions
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          {/* Right: Responsive Page Navigation */}
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-center w-full lg:w-auto">
-            {/* First Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(1)}
-              title="First page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronsLeft className="size-4" />
-            </Button>
-
-            {/* Previous Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              title="Previous page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-
-            {/* Numbered Page Buttons & Ellipses */}
-            <div className="flex items-center gap-1 flex-wrap justify-center">
-              {getPaginationItems(currentPage, totalPages).map((pItem, i) => {
-                if (pItem === "ellipsis-start" || pItem === "ellipsis-end") {
-                  return (
-                    <span
-                      key={`${pItem}-${i}`}
-                      className="flex size-8 sm:size-9 items-center justify-center text-xs text-muted-foreground select-none"
-                    >
-                      <MoreHorizontal className="size-4" />
-                    </span>
-                  )
-                }
-
-                const pageNum = pItem as number
-                const isCurrent = currentPage === pageNum
-
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={isCurrent ? "default" : "outline"}
-                    size="icon"
-                    onClick={() => onPageChange(pageNum)}
-                    className={cn(
-                      "size-8 sm:size-9 rounded-lg text-xs font-semibold transition-all cursor-pointer",
-                      isCurrent
-                        ? "bg-primary font-bold text-white hover:bg-primary shadow-xs"
-                        : "border-outline-variant/60 bg-white hover:bg-surface-container-high text-on-surface hover:text-primary"
-                    )}
-                  >
-                    {pageNum}
-                  </Button>
-                )
-              })}
-            </div>
-
-            {/* Next Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              title="Next page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-
-            {/* Last Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(totalPages)}
-              title="Last page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronsRight className="size-4" />
-            </Button>
-          </div>
-        </div>
+        <DataTablePagination
+          page={currentPage}
+          limit={itemsPerPage}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+          entityName="রচনামূলক প্রশ্ন"
+        />
       )}
     </div>
   )

@@ -28,20 +28,46 @@ export async function listPbqs(
 
   if (input.difficulty) where.difficulty = input.difficulty
 
-  if (input.board) {
+  if (input.source && input.year !== undefined) {
+    const boardRef = [input.source, input.year].filter(Boolean).join("-")
+    where.OR = [
+      { AND: [{ source: input.source }, { session: String(input.year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else {
+    if (input.source) where.source = input.source
+    if (input.session) where.session = input.session
+    if (input.year !== undefined) {
+      where.reference = { has: String(input.year) }
+    }
+  }
+
+  if (input.board && !input.source) {
     where.reference = { has: input.board }
   }
 
   if (input.query) {
-    where.OR = [
+    const queryConditions: any[] = [
       { questionA: { contains: input.query, mode: "insensitive" } },
       { questionB: { contains: input.query, mode: "insensitive" } },
       { questionC: { contains: input.query, mode: "insensitive" } },
       { questionD: { contains: input.query, mode: "insensitive" } },
       { questionE: { contains: input.query, mode: "insensitive" } },
       { context: { contains: input.query, mode: "insensitive" } },
+      { source: { contains: input.query, mode: "insensitive" } },
+      { session: { contains: input.query, mode: "insensitive" } },
       { reference: { has: input.query } },
     ]
+    if (where.OR) {
+      where.AND = [
+        ...(where.AND || []),
+        { OR: where.OR },
+        { OR: queryConditions },
+      ]
+      delete where.OR
+    } else {
+      where.OR = queryConditions
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -49,6 +75,10 @@ export async function listPbqs(
     orderBy = { createdAt: "desc" }
   } else if (input.sort === "oldest") {
     orderBy = { createdAt: "asc" }
+  } else if (input.sort === "question_asc") {
+    orderBy = { questionA: "asc" }
+  } else if (input.sort === "question_desc") {
+    orderBy = { questionA: "desc" }
   } else if (input.sort === "context_asc") {
     orderBy = { context: "asc" }
   } else if (input.sort === "context_desc") {
@@ -73,6 +103,17 @@ export async function listPbqs(
             nameEn: true,
             code: true,
             group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -122,7 +163,11 @@ export async function getPbqById(db: PrismaClient, input: GetPbqInput) {
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       academicChapter: true,
@@ -184,6 +229,7 @@ export async function createPbq(
   }
 
   const marksDistribution = input.marks || { a: 2, b: 2, c: 2, d: 2, e: 2 }
+  const sessionVal = input.session || (input.year ? String(input.year) : null)
 
   return db.pBQ.create({
     data: {
@@ -196,6 +242,8 @@ export async function createPbq(
       questionC: input.questionC,
       questionD: input.questionD,
       questionE: input.questionE,
+      source: input.source || null,
+      session: sessionVal,
       reference: input.reference || [],
       difficulty: input.difficulty ?? "MEDIUM",
       marks: marksDistribution,
@@ -223,6 +271,7 @@ export async function updatePbq(
 
   const chapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
   const userId = ctx?.session?.user?.id || null
+  const sessionVal = data.session !== undefined ? data.session : (data.year ? String(data.year) : undefined)
 
   return db.pBQ.update({
     where: { id },
@@ -236,6 +285,8 @@ export async function updatePbq(
       questionC: data.questionC,
       questionD: data.questionD,
       questionE: data.questionE,
+      source: data.source !== undefined ? data.source : undefined,
+      session: sessionVal,
       reference: data.reference,
       difficulty: data.difficulty,
       marks: data.marks !== undefined ? (data.marks as any) : undefined,
@@ -335,6 +386,7 @@ export async function importPbqs(
         const resolvedQuestionTypeId = pbq.questionTypeId || defaultPbqQt?.id || ""
 
         const marksDistribution = pbq.marks || { a: 2, b: 2, c: 2, d: 2, e: 2 }
+        const sessionVal = pbq.session || (pbq.year ? String(pbq.year) : null)
 
         const createdPbq = await tx.pBQ.create({
           data: {
@@ -347,6 +399,8 @@ export async function importPbqs(
             questionC: pbq.questionC,
             questionD: pbq.questionD,
             questionE: pbq.questionE,
+            source: pbq.source || null,
+            session: sessionVal,
             reference: pbq.reference || [],
             difficulty: pbq.difficulty ?? "MEDIUM",
             marks: marksDistribution,

@@ -29,14 +29,14 @@ export function McqStatsCards({
       iconBg: "bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20",
     },
     {
-      title: "সক্রিয় প্রশ্ন",
+      title: "অ্যাক্টিভ প্রশ্ন",
       value: activeCount,
       icon: CheckCircle2,
       iconColor: "text-emerald-600 dark:text-emerald-400",
       iconBg: "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40",
     },
     {
-      title: "নিষ্ক্রিয় প্রশ্ন",
+      title: "ইনঅ্যাক্টিভ প্রশ্ন",
       value: inactiveCount,
       icon: AlertCircle,
       iconColor: "text-amber-600 dark:text-amber-400",

@@ -2,21 +2,23 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useToggleMcqActive } from "../services/use-mcq"
-import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import { DataTableEmptyState } from "@/components/shared/data-table-empty-state"
+import {
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
 import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
 import {
   Edit3,
   Trash2,
   FileQuestion,
   Calculator,
-  CheckCircle2,
   Tag,
   BookOpen,
   Check,
@@ -51,6 +53,13 @@ export interface McqItem {
     nameBn: string
     code?: string | null
     group?: string | null
+    classSubjects?: {
+      academicClass?: {
+        id: string
+        nameEn: string
+        nameBn: string
+      } | null
+    }[]
   }
   chapter: {
     id: string
@@ -87,7 +96,6 @@ export function McqTable({
   onLimitChange,
 }: McqTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const toggleActiveMutation = useToggleMcqActive()
 
   const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
   const romanNumerals = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"]
@@ -105,18 +113,6 @@ export function McqTable({
       setSelectedIds((prev) => [...prev, id])
     } else {
       setSelectedIds((prev) => prev.filter((item) => item !== id))
-    }
-  }
-
-  const handleToggleActive = async (id: string, currentActive: boolean) => {
-    try {
-      await toggleActiveMutation.mutateAsync({
-        id,
-        isActive: !currentActive,
-      })
-      toast.success(!currentActive ? "MCQ সক্রিয় করা হয়েছে।" : "MCQ নিষ্ক্রিয় করা হয়েছে।")
-    } catch (err: any) {
-      toast.error(err.message || "MCQ স্ট্যাটাস পরিবর্তন করা সম্ভব হয়নি")
     }
   }
 
@@ -214,7 +210,7 @@ export function McqTable({
               asChild
               className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
             >
-              <Link href="/mcqs/create">
+              <Link href="/mcqs/create" prefetch={true}>
                 <span>নতুন MCQ যোগ করুন</span>
               </Link>
             </Button>
@@ -228,6 +224,10 @@ export function McqTable({
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+            const classNames = item.subject?.classSubjects
+              ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+              .filter(Boolean)
+            const className = classNames && classNames.length > 0 ? classNames.join(", ") : null
 
             return (
               <div
@@ -250,73 +250,14 @@ export function McqTable({
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-white/[0.06] font-mono text-[11px] font-bold text-slate-700 dark:text-muted-foreground rounded-lg border border-slate-200/60 dark:border-white/[0.04]">
-                          #{toBengaliDigits(globalIndex)}
-                        </span>
-
-                        {/* Subject Badge */}
-                        <span className="px-2.5 py-0.5 bg-indigo-50 dark:bg-primary/10 text-indigo-700 dark:text-primary rounded-lg text-xs font-bold border border-indigo-200/60 dark:border-primary/20 font-body">
-                          {item.subject.nameBn || item.subject.nameEn}
-                        </span>
-
-                        {/* Chapter Badge */}
-                        <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-muted-foreground rounded-lg text-xs font-semibold border border-slate-200/60 dark:border-white/[0.04] font-body">
-                          {item.chapter.nameBn || item.chapter.nameEn}
-                        </span>
-
-                        {/* Type Badge */}
-                        <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/40 uppercase font-headline">
-                          {item.type}
-                        </span>
-
-                        {/* Math Badge */}
-                        {item.isMath && (
-                          <div className="flex items-center gap-1 px-2.5 py-0.5 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 rounded-lg text-[11px] font-bold border border-purple-200/60 dark:border-purple-800/40 font-body">
-                            <Calculator className="w-3.5 h-3.5" />
-                            <span>গণিত</span>
-                          </div>
-                        )}
-
-                        {/* Difficulty Badge */}
-                        {item.difficulty && (
-                          <span
-                            className={cn(
-                              "px-2.5 py-0.5 rounded-lg text-[11px] font-bold border uppercase font-headline",
-                              item.difficulty === "EASY" &&
-                                "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60",
-                              item.difficulty === "MEDIUM" &&
-                                "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/60",
-                              item.difficulty === "HARD" &&
-                                "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/60"
-                            )}
-                          >
-                            {item.difficulty === "EASY"
-                              ? "সহজ"
-                              : item.difficulty === "MEDIUM"
-                              ? "মাঝারি"
-                              : item.difficulty === "HARD"
-                              ? "কঠিন"
-                              : item.difficulty}
-                          </span>
-                        )}
-
-                        {/* Active Status Badge Toggle */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleActive(item.id, item.isActive)}
-                          className={cn(
-                            "px-2.5 py-0.5 rounded-lg text-xs font-bold transition-all cursor-pointer font-body border",
-                            item.isActive
-                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60 hover:bg-emerald-100"
-                              : "bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-muted-foreground border-slate-200 hover:bg-slate-200"
-                          )}
-                        >
-                          {item.isActive ? "সক্রিয়" : "নিষ্ক্রিয়"}
-                        </button>
-                      </div>
+                      {/* Shared Header Badges Row */}
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        academicClassName={className}
+                        subjectName={item.subject.nameBn || item.subject.nameEn}
+                        chapterName={item.chapter.nameBn || item.chapter.nameEn}
+                        isMath={item.isMath}
+                      />
 
                       {/* Attachments Section */}
                       {Array.isArray(item.attachments) && item.attachments.length > 0 && (
@@ -328,6 +269,7 @@ export function McqTable({
                       {/* Question Text */}
                       <Link
                         href={`/mcqs/${item.id}/edit`}
+                        prefetch={true}
                         className="block font-headline text-base sm:text-lg font-bold text-slate-900 dark:text-foreground leading-snug group-hover:text-indigo-600 transition-colors"
                       >
                         <RenderMath text={item.question} isMath={item.isMath} />
@@ -412,59 +354,22 @@ export function McqTable({
                         </div>
                       )}
 
-                      {/* Reference Tags & ID Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/70 dark:border-white/[0.06] pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {(item.source || item.session) && (
-                            <span className="px-2.5 py-0.5 bg-indigo-50 dark:bg-primary/10 text-indigo-700 dark:text-primary rounded-lg text-[11px] font-semibold flex items-center gap-1 border border-indigo-100 dark:border-primary/20 font-body">
-                              <BookOpen className="w-3 h-3" />
-                              <span>
-                                {item.source || "পাঠ্যবই"}
-                                {item.session ? ` (${toBengaliDigits(item.session)})` : ""}
-                              </span>
-                            </span>
-                          )}
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-muted-foreground rounded-lg text-[11px] font-medium border border-slate-200/60 dark:border-white/[0.04] flex items-center gap-1"
-                              >
-                                <Tag className="w-3 h-3 text-slate-400" />
-                                <span>{ref}</span>
-                              </span>
-                            ))
-                          ) : !item.source && !item.session ? (
-                            <span className="text-[11px] text-muted-foreground italic font-body">কোনো রেফারেন্স ট্যাগ নেই</span>
-                          ) : null}
-                        </div>
-
-                        <span className="text-[11px] font-mono text-muted-foreground">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                      {/* Shared Footer */}
+                      <QuestionCardFooter
+                        source={item.source}
+                        session={item.session}
+                        references={item.reference}
+                      />
                     </div>
                   </div>
 
-                  {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-slate-200/80 dark:border-white/[0.06] pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/mcqs/${item.id}/edit`}
-                      className="p-2.5 hover:bg-slate-100 dark:hover:bg-white/[0.06] rounded-xl text-indigo-600 dark:text-primary transition-all cursor-pointer border border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300 text-center flex-1 md:flex-initial"
-                      title="MCQ সম্পাদনা করুন"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, item.question)}
-                      className="p-2.5 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl text-red-600 dark:text-red-400 transition-all cursor-pointer border border-slate-200/80 dark:border-white/[0.08] hover:border-red-300 flex-1 md:flex-initial"
-                      title="MCQ মুছুন"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  {/* Shared Actions Column */}
+                  <QuestionCardActions
+                    editHref={`/mcqs/${item.id}/edit`}
+                    onDelete={() => onDelete(item.id, item.question)}
+                    editTitle="MCQ সম্পাদনা করুন"
+                    deleteTitle="MCQ মুছুন"
+                  />
                 </div>
               </div>
             )

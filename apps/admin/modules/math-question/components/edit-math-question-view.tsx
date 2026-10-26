@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
@@ -19,7 +19,6 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { Switch } from "@workspace/ui/components/switch"
 import {
   Select,
   SelectContent,
@@ -27,21 +26,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { ChevronRightIcon } from "lucide-react"
-import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { RenderMath } from "@workspace/ui/components/render-math"
+import { PageHeader } from "@/components/shared/page-header"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { MATH_QUESTION_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import {
+  Calculator,
+  Save,
+  Loader2,
+  ArrowLeft,
+  AlertCircle,
+  Clock,
+  Sparkles,
+  Edit3,
+} from "lucide-react"
 
 const editMathQuestionFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
-  question: z.string().min(1, "Question text is required"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করুন"),
+  question: z.string().min(1, "প্রশ্নের বিবরণ আবশ্যক"),
   answer: z.string().optional(),
   isMath: z.boolean(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.string().optional(),
+  isActive: z.boolean(),
 })
 
 type EditMathQuestionFormData = z.infer<typeof editMathQuestionFormSchema>
@@ -52,9 +64,46 @@ interface EditMathQuestionViewProps {
 
 export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewProps) {
   const router = useRouter()
-  const { data: item, isLoading, isError } = useMathQuestionById(mathQuestionId)
+  const { data: initialData, isLoading, isError } = useMathQuestionById(mathQuestionId)
   const updateMutation = useUpdateMathQuestion()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Academic Class Selection Query
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+
+  // Resolve initial classId robustly from subject or chapter relationships
+  const initialClassId = useMemo(() => {
+    if (!initialData) return ""
+    return (
+      (initialData as any).subject?.classSubjects?.[0]?.classId ||
+      (initialData as any).subject?.classSubjects?.[0]?.academicClass?.id ||
+      (initialData as any).academicChapter?.subject?.classSubjects?.[0]?.classId ||
+      (initialData as any).academicChapter?.subject?.classSubjects?.[0]?.academicClass?.id ||
+      (initialData as any).classId ||
+      ""
+    )
+  }, [initialData])
+
+  // Synchronize form values directly with loaded math question data
+  const formValues = useMemo(() => {
+    if (!initialData) return undefined
+    return {
+      classId: initialClassId,
+      subjectId: initialData.subjectId || "",
+      chapterId: (initialData as any).academicChapterId || (initialData as any).chapterId || "",
+      question: initialData.question || "",
+      answer: initialData.answer || "",
+      isMath: initialData.isMath ?? true,
+      difficulty: (initialData.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
+      referenceText: Array.isArray(initialData.reference)
+        ? initialData.reference.join(", ")
+        : "",
+      source: (initialData as any).source ? String((initialData as any).source).trim() : DEFAULT_SOURCE,
+      session: initialData.session || new Date().getFullYear().toString(),
+      year: (initialData as any).year ? String((initialData as any).year) : "",
+      isActive: initialData.isActive !== undefined ? initialData.isActive : true,
+    }
+  }, [initialData, initialClassId])
 
   const {
     register,
@@ -62,7 +111,6 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
     control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditMathQuestionFormData>({
     resolver: zodResolver(editMathQuestionFormSchema),
@@ -72,42 +120,73 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
       chapterId: "",
       question: "",
       answer: "",
-      isMath: false,
+      isMath: true,
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
       source: DEFAULT_SOURCE,
       session: new Date().getFullYear().toString(),
+      year: "",
+      isActive: true,
+    },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
     },
   })
 
   const selectedClassId = watch("classId")
-  const selectedSubjectId = watch("subjectId")
+  const activeClassId = selectedClassId || initialClassId
 
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
-  )
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
 
-  useEffect(() => {
-    if (item) {
-      const classId = (item.subject as any)?.classSubjects?.[0]?.classId || ""
-      reset({
-        classId,
-        subjectId: item.subjectId || "",
-        chapterId: item.academicChapterId || "",
-        question: item.question || "",
-        answer: item.answer || "",
-        isMath: Boolean((item as any)?.isMath),
-        difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
-        referenceText: item.reference ? item.reference.join(", ") : "",
-        source: item.source || DEFAULT_SOURCE,
-        session: item.session || new Date().getFullYear().toString(),
-      })
+  const selectedSubjectId = watch("subjectId")
+  const activeSubjectId = selectedSubjectId || initialData?.subjectId || ""
+
+  const { data: chapters = [] } = useChaptersForSelection(
+    activeSubjectId ? { subjectId: activeSubjectId } : undefined
+  )
+
+  // Combined fallback classes map
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const initialClass = initialData?.subject?.classSubjects?.[0]?.academicClass
+    if (initialClass) map.set(initialClass.id, initialClass)
+    for (const cls of academicClasses) map.set(cls.id, cls)
+    return Array.from(map.values())
+  }, [academicClasses, initialData])
+
+  // Combined fallback subjects map
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if (initialData?.subject) map.set(initialData.subject.id, initialData.subject)
+    for (const sub of subjects) map.set(sub.id, sub)
+    return Array.from(map.values())
+  }, [subjects, initialData])
+
+  // Combined fallback chapters map
+  const combinedChapters = useMemo(() => {
+    const map = new Map<string, any>()
+    if (initialData?.academicChapter)
+      map.set(initialData.academicChapter.id, initialData.academicChapter)
+    for (const ch of chapters) map.set(ch.id, ch)
+    return Array.from(map.values())
+  }, [chapters, initialData])
+
+  // Combined fallback sources
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...MATH_QUESTION_SOURCE_OPTIONS]
+    const cur = (initialData as any)?.source ? String((initialData as any).source).trim() : null
+    if (cur && !list.some((s) => s.value === cur)) {
+      list.unshift({ value: cur, label: cur })
     }
-  }, [item, reset])
+    return list
+  }, [initialData])
+
+  const watchQuestion = watch("question")
+  const watchAnswer = watch("answer")
+  const watchIsMath = watch("isMath")
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -122,112 +201,150 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
             .filter((r) => r.length > 0)
         : []
 
+      const resolvedSession =
+        data.session?.trim() ||
+        (data.year ? data.year.trim() : new Date().getFullYear().toString())
+
       await updateMutation.mutateAsync({
         id: mathQuestionId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
+        academicChapterId: data.chapterId,
         question: data.question.trim(),
         answer: data.answer?.trim() || null,
         isMath: data.isMath,
         difficulty: data.difficulty,
         reference: referenceArray,
-        source: data.source?.trim() || null,
-        session: data.session?.trim() || null,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: resolvedSession,
+        isActive: data.isActive,
       })
 
-      toast.success("Math Question updated successfully!")
-      router.push("/math-questions")
+      toast.success("গণিত প্রশ্নটি সফলভাবে হালনাগাদ করা হয়েছে।")
+      setTimeout(() => {
+        router.push("/math-questions")
+      }, 800)
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update Math Question")
-      toast.error(err.message || "Failed to update Math Question")
+      const msg = err.message || "গণিত প্রশ্ন আপডেটে সমস্যা হয়েছে"
+      setErrorMessage(msg)
+      toast.error(msg)
     }
   }
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6 space-y-4">
-        <div className="h-48 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest/50 animate-pulse flex items-center justify-center">
-          <span className="text-sm text-outline">Loading question details...</span>
-        </div>
+      <div className="w-full max-w-7xl mx-auto py-20 flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-primary" />
+        <p className="text-sm font-medium text-muted-foreground font-body">
+          গণিত প্রশ্নের তথ্যাবলি লোড হচ্ছে...
+        </p>
       </div>
     )
   }
 
-  if (isError || !item) {
+  if (isError || !initialData) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6">
-        <div className="rounded-2xl border border-red-500/20 bg-red-50 p-8 text-center text-red-600">
-          <p className="font-semibold">Math Question not found</p>
-          <p className="text-xs text-red-500 mt-1">The question may have been deleted.</p>
-          <Button asChild variant="outline" className="mt-4 rounded-xl">
-            <Link href="/math-questions">Return to list</Link>
-          </Button>
-        </div>
+      <div className="w-full max-w-lg mx-auto my-12 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-8 text-center text-rose-700 dark:text-rose-400">
+        <AlertCircle className="w-10 h-10 mx-auto stroke-[1.8]" />
+        <h3 className="mt-3 text-lg font-bold font-headline">গণিত প্রশ্ন পাওয়া যায়নি</h3>
+        <p className="mt-1 text-sm text-rose-600/80">
+          অনুরোধকৃত গণিত প্রশ্নটি সার্ভার থেকে লোড করা সম্ভব হয়নি।
+        </p>
+        <Button
+          asChild
+          className="mt-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 text-sm shadow-xs font-headline"
+        >
+          <Link href="/math-questions" prefetch={true}>
+            তালিকায় ফিরে যান
+          </Link>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
-      {/* Breadcrumb Header */}
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-outline">
-        <Link href="/math-questions" className="hover:text-primary transition-colors">
-          Math Questions
-        </Link>
-        <ChevronRightIcon className="h-4 w-4" />
-        <span className="font-semibold text-on-surface">Edit Question</span>
-      </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header matching EditMcqView */}
+      <PageHeader
+        title="গণিত প্রশ্ন সম্পাদনা"
+        description="শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করে প্রশ্নপত্র ভান্ডারে গণিত প্রশ্ন, সমাধান ও তথ্য হালনাগাদ করুন।"
+        icon={Calculator}
+        badge={{ label: "সম্পাদনা মোড", variant: "amber" }}
+        breadcrumbs={[
+          { label: "গণিত প্রশ্ন তালিকা", href: "/math-questions" },
+          { label: "প্রশ্ন সম্পাদনা" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+        >
+          <Link href="/math-questions" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
-      <div className="flex flex-col gap-1">
-        <h2 className="font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-          Edit Math Question
-        </h2>
-        <p className="text-xs sm:text-sm text-on-surface-variant">
-          Update question text, solution, classification taxonomy, and reference metadata.
-        </p>
-      </div>
-
+      {/* Error Alert */}
       {errorMessage && (
-        <div className="rounded-xl border border-red-500/20 bg-red-50 p-4 text-sm text-red-600">
-          {errorMessage}
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMessage}</p>
         </div>
       )}
 
-      <Card className="rounded-2xl border border-outline-variant/30 bg-white shadow-sm overflow-hidden">
-        <CardHeader className="border-b border-outline-variant/20 bg-surface-container-low/50 px-6 py-4">
-          <CardTitle className="text-base font-bold text-on-surface">
-            Edit Details
-          </CardTitle>
+      {/* Main Form Card matching EditMcqView */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100/80 dark:border-amber-900/40 shrink-0">
+            <Edit3 className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              গণিত প্রশ্নের বিবরণ ও সমাধান সম্পাদনা
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              শ্রেণি, বিষয়, অধ্যায়, মূল সমস্যা, সমাধান ও তথ্যসূত্র নির্ভুলভাবে হালনাগাদ করুন।
+            </p>
+          </div>
         </CardHeader>
 
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Academic Classification Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Class */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Academic Class <span className="text-red-500">*</span>
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Class, Subject & Chapter Hierarchy Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {/* Class with Dynamic Key */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
                 </Label>
                 <Controller
                   name="classId"
                   control={control}
                   render={({ field }) => (
                     <Select
-                      value={field.value}
+                      key={`class-${field.value}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value || ""}
                       onValueChange={(val) => {
                         field.onChange(val)
                         setValue("subjectId", "")
                         setValue("chapterId", "")
                       }}
                     >
-                      <SelectTrigger className="w-full rounded-xl">
-                        <SelectValue placeholder="Select Class" />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
                       </SelectTrigger>
-                      <SelectContent>
-                        {academicClasses.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.nameEn} {c.nameBn ? `(${c.nameBn})` : ""}
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem
+                            key={cls.id}
+                            value={cls.id}
+                            label={cls.nameBn || cls.nameEn}
+                          >
+                            {cls.nameBn || cls.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -235,34 +352,45 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
                   )}
                 />
                 {errors.classId && (
-                  <p className="text-xs text-red-500">{errors.classId.message}</p>
+                  <p className="text-xs text-rose-500 font-medium">{errors.classId.message}</p>
                 )}
               </div>
 
-              {/* Subject */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Subject <span className="text-red-500">*</span>
+              {/* Subject with Dynamic Key */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Subject) <span className="text-rose-500">*</span>
                 </Label>
                 <Controller
                   name="subjectId"
                   control={control}
                   render={({ field }) => (
                     <Select
-                      value={field.value}
-                      disabled={!selectedClassId}
+                      key={`subject-select-${field.value || "empty"}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || !activeClassId}
+                      value={field.value || ""}
                       onValueChange={(val) => {
                         field.onChange(val)
                         setValue("chapterId", "")
                       }}
                     >
-                      <SelectTrigger className="w-full rounded-xl">
-                        <SelectValue placeholder="Select Subject" />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue
+                          placeholder={
+                            activeClassId
+                              ? "বিষয় নির্বাচন করুন..."
+                              : "প্রথমে শ্রেণি নির্বাচন করুন"
+                          }
+                        />
                       </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.nameEn} {s.nameBn ? `(${s.nameBn})` : ""}
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedSubjects.map((sub) => (
+                          <SelectItem
+                            key={sub.id}
+                            value={sub.id}
+                            label={sub.nameBn || sub.nameEn}
+                          >
+                            {sub.nameBn || sub.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -270,31 +398,42 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
                   )}
                 />
                 {errors.subjectId && (
-                  <p className="text-xs text-red-500">{errors.subjectId.message}</p>
+                  <p className="text-xs text-rose-500 font-medium">{errors.subjectId.message}</p>
                 )}
               </div>
 
-              {/* Chapter */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Chapter <span className="text-red-500">*</span>
+              {/* Chapter with Dynamic Key */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায় (Chapter) <span className="text-rose-500">*</span>
                 </Label>
                 <Controller
                   name="chapterId"
                   control={control}
                   render={({ field }) => (
                     <Select
-                      value={field.value}
-                      disabled={!selectedSubjectId}
+                      key={`chapter-select-${field.value || "empty"}-${combinedChapters.length}`}
+                      disabled={isSubmitting || !activeSubjectId}
+                      value={field.value || ""}
                       onValueChange={field.onChange}
                     >
-                      <SelectTrigger className="w-full rounded-xl">
-                        <SelectValue placeholder="Select Chapter" />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue
+                          placeholder={
+                            activeSubjectId
+                              ? "অধ্যায় নির্বাচন করুন..."
+                              : "প্রথমে বিষয় নির্বাচন করুন"
+                          }
+                        />
                       </SelectTrigger>
-                      <SelectContent>
-                        {chapters.map((ch) => (
-                          <SelectItem key={ch.id} value={ch.id}>
-                            {ch.nameEn} {ch.nameBn ? `(${ch.nameBn})` : ""}
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedChapters.map((ch) => (
+                          <SelectItem
+                            key={ch.id}
+                            value={ch.id}
+                            label={ch.nameBn || ch.nameEn}
+                          >
+                            {ch.nameBn || ch.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -302,159 +441,273 @@ export function EditMathQuestionView({ mathQuestionId }: EditMathQuestionViewPro
                   )}
                 />
                 {errors.chapterId && (
-                  <p className="text-xs text-red-500">{errors.chapterId.message}</p>
+                  <p className="text-xs text-rose-500 font-medium">{errors.chapterId.message}</p>
                 )}
               </div>
             </div>
 
-            {/* Question Text */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                Question <span className="text-red-500">*</span>
+            {/* Question Stem Text */}
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                প্রশ্নের মূল বিবরণ (Question Stem) <span className="text-rose-500">*</span>
               </Label>
               <Textarea
+                disabled={isSubmitting}
+                rows={4}
+                placeholder="গণিত সমস্যার মূল বিবরণ লিখুন..."
                 {...register("question")}
-                rows={3}
-                placeholder="Math problem statement..."
-                className="w-full rounded-xl border border-outline-variant/40 bg-white p-3 text-sm focus:border-primary"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 leading-relaxed font-body"
               />
               {errors.question && (
-                <p className="text-xs text-red-500">{errors.question.message}</p>
+                <p className="text-xs text-rose-500 font-medium">{errors.question.message}</p>
               )}
             </div>
 
+            {/* Live KaTeX LaTeX Preview for Question */}
+            {watchQuestion && watchQuestion.trim() !== "" && (
+              <div className="rounded-2xl border border-indigo-100 dark:border-primary/20 bg-indigo-50/30 dark:bg-primary/5 p-4 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-primary uppercase tracking-wider font-headline">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>লাইভ প্রশ্ন প্রিভিউ (Live Question Preview)</span>
+                </div>
+                <div className="text-sm text-foreground font-medium whitespace-pre-wrap leading-relaxed font-body">
+                  <RenderMath text={watchQuestion} isMath={watchIsMath} />
+                </div>
+              </div>
+            )}
+
             {/* Answer / Solution Text */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                Answer / Solution (Optional)
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                উত্তর / সমাধান (Solution / Answer) (ঐচ্ছিক)
               </Label>
               <Textarea
-                {...register("answer")}
-                rows={3}
-                placeholder="Final answer or step-by-step solution..."
-                className="w-full rounded-xl border border-outline-variant/40 bg-white p-3 text-sm focus:border-primary"
-              />
-            </div>
-
-            {/* Difficulty, Source, Session Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Difficulty */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Difficulty Level
-                </Label>
-                <Controller
-                  name="difficulty"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full rounded-xl">
-                        <SelectValue placeholder="Select Difficulty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="EASY">Easy</SelectItem>
-                        <SelectItem value="MEDIUM">Medium</SelectItem>
-                        <SelectItem value="HARD">Hard</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              {/* Source */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Question Source
-                </Label>
-                <Controller
-                  name="source"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full rounded-xl">
-                        <SelectValue placeholder="Source" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MATH_QUESTION_SOURCE_OPTIONS.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              {/* Session / Year */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                  Session / Year
-                </Label>
-                <Input
-                  {...register("session")}
-                  placeholder="2026"
-                  className="rounded-xl border-outline-variant/40"
-                />
-              </div>
-            </div>
-
-            {/* Board References */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-outline uppercase tracking-wider">
-                Board / School References (Comma separated)
-              </Label>
-              <Input
-                {...register("referenceText")}
-                placeholder="e.g. ঢাকা বোর্ড ২০২৪, রাজউক উত্তরা মডেল কলেজ ২০২৩"
-                className="rounded-xl border-outline-variant/40"
-              />
-              <p className="text-[11px] text-outline">
-                Separate multiple references with commas.
-              </p>
-            </div>
-
-            {/* Settings (Math Switch) */}
-            <div className="flex items-center justify-between rounded-xl border border-outline-variant bg-surface-container-low/30 p-5">
-              <div>
-                <Label className="block font-headline text-sm font-bold text-on-surface">
-                  Math / LaTeX Formula (isMath)
-                </Label>
-                <span className="font-body text-xs text-on-surface-variant leading-relaxed block mt-0.5">
-                  Enable LaTeX math rendering mode for mathematical equations and symbols in question & solution.
-                </span>
-              </div>
-              <Controller
-                name="isMath"
-                control={control}
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isSubmitting}
-                    className="cursor-pointer"
-                  />
-                )}
-              />
-            </div>
-
-            {/* Form Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant/20">
-              <Button
-                type="button"
-                variant="outline"
-                asChild
-                className="rounded-xl"
-              >
-                <Link href="/math-questions">Cancel</Link>
-              </Button>
-              <Button
-                type="submit"
                 disabled={isSubmitting}
-                className="rounded-xl bg-primary text-white hover:bg-primary/90 font-semibold px-6"
-              >
-                {isSubmitting ? "Updating..." : "Save Changes"}
-              </Button>
+                rows={3}
+                placeholder="গণিত সমস্যার বিস্তারিত সমাধান বা উত্তর লিখুন..."
+                {...register("answer")}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 leading-relaxed font-body"
+              />
+            </div>
+
+            {/* Live KaTeX LaTeX Preview for Answer */}
+            {watchAnswer && watchAnswer.trim() !== "" && (
+              <div className="rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/10 p-4 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider font-headline">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>লাইভ সমাধান প্রিভিউ (Live Solution Preview)</span>
+                </div>
+                <div className="text-sm text-foreground font-medium whitespace-pre-wrap leading-relaxed font-body">
+                  <RenderMath text={watchAnswer} isMath={watchIsMath} />
+                </div>
+              </div>
+            )}
+
+            {/* Toggle Flags: Math Formula & Active State matching MCQ style */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              {/* Is Math */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground font-headline">
+                    গণিত / LaTeX সমীকরণ
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                    প্রশ্ন ও উত্তরে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে অ্যাক্টিভ করুন।
+                  </p>
+                </div>
+                <Controller
+                  name="isMath"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Is Active */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground font-headline">
+                    অ্যাক্টিভ প্রশ্নের অবস্থা
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                    পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                  </p>
+                </div>
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Context & Metadata Settings matching MCQ layout */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+                <Sparkles className="w-3.5 h-3.5" />
+                মেটাডাটা ও অতিরিক্ত সেটিংস
+              </h3>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* Difficulty */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
+                  </Label>
+                  <Controller
+                    name="difficulty"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`difficulty-select-${field.value || "empty"}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.difficulty && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.difficulty.message}</p>
+                  )}
+                </div>
+
+                {/* Source */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্নের উৎস (Source)
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`source-select-${field.value || "empty"}-${combinedSources.length}`}
+                        disabled={isSubmitting}
+                        value={field.value || DEFAULT_SOURCE}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {combinedSources.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.source && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.source.message}</p>
+                  )}
+                </div>
+
+                {/* Session */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    সেশন (Session)
+                  </Label>
+                  <Input
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৬"
+                    {...register("session")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.session && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.session.message}</p>
+                  )}
+                </div>
+
+                {/* Year */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    পরীক্ষার বছর (ঐচ্ছিক)
+                  </Label>
+                  <Input
+                    type="number"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৪"
+                    {...register("year")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.year && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.year.message}</p>
+                  )}
+                </div>
+
+                {/* Reference */}
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    রেফারেন্স / উৎস (কমা দিয়ে একাধিক উল্লেখ করুন)
+                  </Label>
+                  <Input
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ঢাকা বোর্ড ২০২৪, পাঠ্যবই পৃষ্ঠা ৪২..."
+                    {...register("referenceText")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions Footer matching EditMcqView */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-body">
+                <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span>হালনাগাদ করা পরিবর্তনটি ডাটাবেজে সংরক্ষিত হবে</span>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
+                <Button
+                  asChild
+                  variant="outline"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer font-headline"
+                >
+                  <Link href="/math-questions" prefetch={true}>
+                    বাতিল
+                  </Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 font-headline"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  ) : (
+                    <Save className="w-4 h-4 shrink-0" />
+                  )}
+                  <span>{isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : "হালনাগাদ সংরক্ষণ করুন"}</span>
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

@@ -8,6 +8,7 @@ import {
   bulkDeleteShortQuestionsSchema,
   importShortQuestionsSchema,
   shortQuestionStatsSchema,
+  toggleShortQuestionActiveSchema,
 } from "./short-question.schema"
 import {
   createShortQuestion,
@@ -18,6 +19,7 @@ import {
   bulkDeleteShortQuestions,
   importShortQuestions,
   getShortQuestionStats,
+  toggleShortQuestionActive,
 } from "./short-question.service"
 
 export const shortQuestionRouter = createTRPCRouter({
@@ -40,6 +42,10 @@ export const shortQuestionRouter = createTRPCRouter({
   update: superAdminProcedure
     .input(updateShortQuestionSchema)
     .mutation(({ ctx, input }) => updateShortQuestion(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleShortQuestionActiveSchema)
+    .mutation(({ ctx, input }) => toggleShortQuestionActive(ctx.db, input)),
 
   delete: superAdminProcedure
     .input(deleteShortQuestionSchema)

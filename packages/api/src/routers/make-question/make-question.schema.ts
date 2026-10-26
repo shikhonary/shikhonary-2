@@ -3,25 +3,34 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listMakeQuestionSchema = paginationSchema.extend({
+  academicClassId: z.string().optional(),
+  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
   essenceId: z.string().optional(),
+  board: z.string().optional(),
+  questionTypeId: z.string().optional(),
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.number().int().optional(),
+  isActive: z.boolean().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
+  search: z.string().optional(),
 })
 
 export type ListMakeQuestionInput = z.infer<typeof listMakeQuestionSchema>
 
 export const makeQuestionStatsSchema = z.object({
+  academicClassId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
   essenceId: z.string().optional(),
+  questionTypeId: z.string().optional(),
 })
 
 export type MakeQuestionStatsInput = z.infer<typeof makeQuestionStatsSchema>
@@ -43,6 +52,8 @@ export const createMakeQuestionSchema = z.object({
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().optional().nullable(),
   academicChapterId: z.string().optional().nullable(),
+  questionTypeId: z.string().optional().nullable(),
+  isActive: z.boolean().default(true),
 })
 
 export type CreateMakeQuestionInput = z.infer<typeof createMakeQuestionSchema>
@@ -61,6 +72,13 @@ export const bulkDeleteMakeQuestionSchema = z.object({
 })
 
 export type BulkDeleteMakeQuestionInput = z.infer<typeof bulkDeleteMakeQuestionSchema>
+
+export const toggleMakeQuestionActiveSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+export type ToggleMakeQuestionActiveInput = z.infer<typeof toggleMakeQuestionActiveSchema>
 
 export const importMakeQuestionSchema = z.object({
   questions: z.array(createMakeQuestionSchema).min(1, "At least one question making entry is required"),

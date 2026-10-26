@@ -9,6 +9,7 @@ import type {
   BulkDeleteGrammarQuestionInput,
   ImportGrammarQuestionInput,
   GrammarQuestionStatsInput,
+  ToggleGrammarQuestionActiveInput,
 } from "./grammar-question.schema"
 
 async function resolveGrammarQuestionTypeId(db: any, requestedTypeId?: string | null) {
@@ -53,29 +54,88 @@ async function resolveGrammarQuestionTypeId(db: any, requestedTypeId?: string | 
 }
 
 export async function listGrammarQuestion(db: PrismaClient, input: ListGrammarQuestionInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, questionTypeId, difficulty, source, session, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    search,
+    academicClassId,
+    classId,
+    subjectId,
+    chapterId,
+    academicChapterId,
+    questionTypeId,
+    difficulty,
+    source,
+    session,
+    year,
+    board,
+    isActive,
+    sort,
+  } = input
+
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
   const targetChapterId = academicChapterId || chapterId
+  const targetClassId = academicClassId || classId
 
-  if (subjectId) where.subjectId = subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (questionTypeId) where.questionTypeId = questionTypeId
-  if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+  if (targetClassId && targetClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: targetClassId,
+        },
+      },
+    }
+  }
 
-  if (query) {
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (questionTypeId && questionTypeId !== "All") where.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (typeof isActive === "boolean") where.isActive = isActive
+
+  if (board && board !== "All") {
     where.OR = [
-      { question: { contains: query, mode: "insensitive" } },
-      { answer: { contains: query, mode: "insensitive" } },
-      { source: { contains: query, mode: "insensitive" } },
-      { session: { contains: query, mode: "insensitive" } },
-      { reference: { has: query } },
+      { reference: { has: board } },
+      { source: { contains: board, mode: "insensitive" } },
     ]
+  }
+
+  if (source && source !== "All" && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    const existingOr = where.OR || []
+    where.OR = [
+      ...existingOr,
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else if (source && source !== "All") {
+    where.source = source
+  }
+
+  if (session && !year && session !== "All") where.session = session
+
+  const searchQuery = search || query
+  if (searchQuery) {
+    const searchFilter = [
+      { question: { contains: searchQuery, mode: "insensitive" } },
+      { answer: { contains: searchQuery, mode: "insensitive" } },
+      { source: { contains: searchQuery, mode: "insensitive" } },
+      { session: { contains: searchQuery, mode: "insensitive" } },
+      { reference: { has: searchQuery } },
+    ]
+
+    if (where.OR) {
+      where.AND = [{ OR: where.OR }, { OR: searchFilter }]
+      delete where.OR
+    } else {
+      where.OR = searchFilter
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -83,6 +143,10 @@ export async function listGrammarQuestion(db: PrismaClient, input: ListGrammarQu
     orderBy = { createdAt: "desc" }
   } else if (sort === "oldest" || sort === "createdAt_asc") {
     orderBy = { createdAt: "asc" }
+  } else if (sort === "question_asc") {
+    orderBy = { question: "asc" }
+  } else if (sort === "question_desc") {
+    orderBy = { question: "desc" }
   } else if (sort === "popularity" || sort === "popularity_desc") {
     orderBy = { popularityCount: "desc" }
   }
@@ -99,6 +163,17 @@ export async function listGrammarQuestion(db: PrismaClient, input: ListGrammarQu
             id: true,
             nameEn: true,
             nameBn: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -137,7 +212,11 @@ export async function getGrammarQuestionById(db: PrismaClient, input: GetGrammar
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       academicChapter: true,
@@ -173,6 +252,7 @@ export async function createGrammarQuestion(db: PrismaClient, input: CreateGramm
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : true,
       ...(userId ? { createdById: userId } : {}),
     },
     include: {
@@ -201,6 +281,7 @@ export async function updateGrammarQuestion(db: PrismaClient, input: UpdateGramm
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
     ...(resolvedQuestionTypeId ? { questionTypeId: resolvedQuestionTypeId } : {}),
+    ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
     ...(userId ? { updatedById: userId } : {}),
   }
 
@@ -244,6 +325,29 @@ export async function bulkDeleteGrammarQuestion(db: PrismaClient, input: BulkDel
   return { deletedCount: res.count }
 }
 
+export async function toggleGrammarQuestionActive(
+  db: PrismaClient,
+  input: ToggleGrammarQuestionActiveInput
+) {
+  const item = await db.grammarQuestion.findUnique({
+    where: { id: input.id },
+    select: { id: true, isActive: true },
+  })
+
+  if (!item) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Grammar Question entry with ID ${input.id} not found`,
+    })
+  }
+
+  return db.grammarQuestion.update({
+    where: { id: input.id },
+    data: { isActive: input.isActive },
+    select: { id: true, isActive: true },
+  })
+}
+
 export async function importGrammarQuestion(db: PrismaClient, input: ImportGrammarQuestionInput, userId?: string | null) {
   const currentYear = new Date().getFullYear().toString()
 
@@ -267,6 +371,7 @@ export async function importGrammarQuestion(db: PrismaClient, input: ImportGramm
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive !== undefined ? data.isActive : true,
             ...(userId ? { createdById: userId } : {}),
           },
         })
@@ -286,12 +391,25 @@ export async function getGrammarQuestionStats(db: PrismaClient, input: GrammarQu
   const where: any = {}
   const targetChapterId = input.academicChapterId || input.chapterId
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (input.questionTypeId) where.questionTypeId = input.questionTypeId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (input.questionTypeId && input.questionTypeId !== "All") where.questionTypeId = input.questionTypeId
+
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.grammarQuestion.count({ where }),
+    db.grammarQuestion.count({ where: { ...where, isActive: true } }),
+    db.grammarQuestion.count({ where: { ...where, isActive: false } }),
     db.grammarQuestion.count({ where: { ...where, difficulty: "EASY" } }),
     db.grammarQuestion.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.grammarQuestion.count({ where: { ...where, difficulty: "HARD" } }),
@@ -299,10 +417,50 @@ export async function getGrammarQuestionStats(db: PrismaClient, input: GrammarQu
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string; academicChapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    NOT: { reference: { equals: [] } },
+  }
+  const targetChapterId = input.academicChapterId || input.chapterId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+
+  const questions = await db.grammarQuestion.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

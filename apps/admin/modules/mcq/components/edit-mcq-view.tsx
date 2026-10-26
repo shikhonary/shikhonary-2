@@ -119,7 +119,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
       questionUrl: mcq.questionUrl || "",
       difficulty: (mcq.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
       year: (mcq as any).year ? String((mcq as any).year) : "",
-      source: (mcq as any).source || DEFAULT_SOURCE,
+      source: (mcq as any).source ? String((mcq as any).source).trim() : DEFAULT_SOURCE,
       session: (mcq as any).session || new Date().getFullYear().toString(),
       questionTypeId: mcq.questionTypeId || "",
       isActive: mcq.isActive !== undefined ? mcq.isActive : true,
@@ -217,6 +217,16 @@ export function EditMcqView({ id }: EditMcqViewProps) {
     return Array.from(map.values())
   }, [chapters, mcq?.chapter])
 
+  // Ensure source from MCQ is immediately present in source options list
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...MCQ_SOURCE_OPTIONS]
+    const currentSource = (mcq as any)?.source ? String((mcq as any).source).trim() : null
+    if (currentSource && !list.some((s) => s.value === currentSource)) {
+      list.unshift({ value: currentSource, label: currentSource })
+    }
+    return list
+  }, [mcq])
+
   const {
     fields: optionFields,
     append: appendOption,
@@ -310,7 +320,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
           asChild
           className="mt-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 text-sm shadow-xs"
         >
-          <Link href="/mcqs">MCQ তালিকায় ফিরে যান</Link>
+          <Link href="/mcqs" prefetch={true}>MCQ তালিকায় ফিরে যান</Link>
         </Button>
       </div>
     )
@@ -334,7 +344,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
           variant="outline"
           className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <Link href="/mcqs">
+          <Link href="/mcqs" prefetch={true}>
             <ArrowLeft className="w-4 h-4" />
             <span>তালিকায় ফিরে যান</span>
           </Link>
@@ -645,6 +655,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                   control={control}
                   render={({ field }) => (
                     <Select
+                      key={`answer-select-${field.value || "empty"}-${currentOptions.length}`}
                       disabled={isSubmitting}
                       value={field.value}
                       onValueChange={field.onChange}
@@ -685,6 +696,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                   control={control}
                   render={({ field }) => (
                     <Select
+                      key={`type-select-${field.value || "empty"}`}
                       disabled={isSubmitting}
                       value={field.value}
                       onValueChange={field.onChange}
@@ -715,7 +727,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                     গণিত / LaTeX সমীকরণ
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    প্রশ্ন ও অপশনে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে সক্রিয় করুন।
+                    প্রশ্ন ও অপশনে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে অ্যাক্টিভ করুন।
                   </p>
                 </div>
                 <Controller
@@ -736,7 +748,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
               <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
                 <div>
                   <p className="text-sm font-bold text-foreground">
-                    সক্রিয় প্রশ্নের অবস্থা
+                    অ্যাক্টিভ প্রশ্নের অবস্থা
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
@@ -806,6 +818,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`difficulty-select-${field.value || "empty"}`}
                         disabled={isSubmitting}
                         value={field.value}
                         onValueChange={field.onChange}
@@ -838,6 +851,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`question-type-select-${field.value || "none"}-${questionTypes.length}`}
                         disabled={isSubmitting}
                         value={field.value || "none"}
                         onValueChange={(val) =>
@@ -875,6 +889,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`source-select-${field.value || "empty"}-${combinedSources.length}`}
                         disabled={isSubmitting}
                         value={field.value}
                         onValueChange={field.onChange}
@@ -883,7 +898,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                           <SelectValue placeholder="উৎস নির্বাচন করুন..." />
                         </SelectTrigger>
                         <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
-                          {MCQ_SOURCE_OPTIONS.map((opt) => (
+                          {combinedSources.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
                             </SelectItem>
@@ -955,13 +970,14 @@ export function EditMcqView({ id }: EditMcqViewProps) {
               </div>
               <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
                 <Button
-                  type="button"
+                  asChild
                   variant="outline"
                   disabled={isSubmitting}
-                  onClick={() => router.push("/mcqs")}
                   className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer"
                 >
-                  বাতিল
+                  <Link href="/mcqs" prefetch={true}>
+                    বাতিল
+                  </Link>
                 </Button>
                 <Button
                   type="submit"
@@ -973,7 +989,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
                   ) : (
                     <Save className="w-4 h-4 shrink-0" />
                   )}
-                  <span>{isSubmitting ? "হালনাগাদ করা হচ্ছে..." : "হালনাগাদ সংরক্ষণ করুন"}</span>
+                  <span>{isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : "সংরক্ষণ করুন"}</span>
                 </Button>
               </div>
             </div>

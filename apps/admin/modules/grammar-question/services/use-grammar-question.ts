@@ -3,6 +3,7 @@ import { trpc } from "@/trpc/client"
 import type {
   ListGrammarQuestionInput,
   GrammarQuestionStatsInput,
+  ToggleGrammarQuestionActiveInput,
 } from "@workspace/api"
 
 export function useGrammarQuestionsList(input: ListGrammarQuestionInput = { limit: 20 }) {
@@ -17,6 +18,40 @@ export function useGrammarQuestionById(id: string, enabled = true) {
   return useQuery({
     ...trpc.grammarQuestion.byId.queryOptions({ id }),
     enabled: Boolean(id) && enabled,
+  })
+}
+
+export function useBoardYearsForSelection(input: {
+  subjectId?: string
+  chapterId?: string
+  academicChapterId?: string
+}) {
+  const subjectId = input.subjectId === "All" || !input.subjectId ? "" : input.subjectId
+  const chapterId = input.chapterId === "All" ? undefined : input.chapterId
+  const academicChapterId = input.academicChapterId === "All" ? undefined : input.academicChapterId
+
+  return useQuery({
+    ...trpc.grammarQuestion.boardYears.queryOptions(
+      {
+        subjectId,
+        chapterId,
+        academicChapterId,
+      },
+      {
+        enabled: Boolean(subjectId),
+      }
+    ),
+  })
+}
+
+export function useToggleGrammarQuestionActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.grammarQuestion.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.grammarQuestion.pathFilter())
+    },
   })
 }
 

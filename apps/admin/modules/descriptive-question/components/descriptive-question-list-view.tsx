@@ -1,95 +1,235 @@
 "use client"
 
-import { useDescriptiveQuestionSearchParams, type DescriptiveQuestionSortOption } from "../hooks/use-descriptive-question-search-params"
+import { useState } from "react"
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { trpc } from "@/trpc/client"
 import {
   useDescriptiveQuestionsList,
   useDescriptiveQuestionStats,
   useAcademicClassesForSelection,
   useSubjectsForSelection,
   useChaptersForSelection,
+  useDeleteDescriptiveQuestion,
+  useBulkDeleteDescriptiveQuestions,
 } from "../services/use-descriptive-question"
-import { useDeleteDescriptiveQuestionModalStore } from "../store/use-delete-descriptive-question-modal-store"
-import { DescriptiveQuestionListHeader } from "./descriptive-question-list-header"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { Button } from "@workspace/ui/components/button"
+import { toast } from "@workspace/ui/components/sonner"
+import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
+import { BookOpen, Plus, Upload } from "lucide-react"
 import { DescriptiveQuestionStatsCards } from "./descriptive-question-stats-cards"
 import { DescriptiveQuestionFilters } from "./descriptive-question-filters"
 import { DescriptiveQuestionTable } from "./descriptive-question-table"
-import { DeleteDescriptiveQuestionModal } from "./delete-descriptive-question-modal"
+import { useDescriptiveQuestionSearchParams } from "../hooks/use-descriptive-question-search-params"
 
 export function DescriptiveQuestionListView() {
-  const [params, setParams] = useDescriptiveQuestionSearchParams()
-  const { openModal, openBulkModal } = useDeleteDescriptiveQuestionModalStore()
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
 
-  // Queries
-  const { data: classes = [] } = useAcademicClassesForSelection()
-  const { data: subjects = [] } = useSubjectsForSelection({
-    academicClassId: params.classId === "All" ? undefined : params.classId,
-  })
-  const { data: chapters = [] } = useChaptersForSelection({
-    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
+  const [
+    {
+      query: searchQuery,
+      subjectId: selectedSubjectId,
+      chapterId: selectedChapterId,
+      board: selectedBoard,
+      difficulty: selectedDifficulty,
+      sort: selectedSort,
+      page: currentPage,
+      limit,
+    },
+    setSearchParams,
+  ] = useDescriptiveQuestionSearchParams()
+
+  const handleAcademicClassChange = (classId: string) => {
+    setSelectedAcademicClassId(classId)
+    setSearchParams({
+      subjectId: "All",
+      chapterId: "All",
+      board: "All",
+      page: 1,
+    })
+  }
+
+  // Local state for single & bulk delete (Zero Zustand stores)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+
+  const deleteMutation = useDeleteDescriptiveQuestion()
+  const bulkDeleteMutation = useBulkDeleteDescriptiveQuestions()
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await deleteMutation.mutateAsync({ id: deleteTarget.id })
+      toast.success("রচনামূলক প্রশ্নটি সফলভাবে মুছে ফেলা হয়েছে।")
+      setDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "প্রশ্নটি ডিলিট করা সম্ভব হয়নি")
+    }
+  }
+
+  const handleConfirmBulkDelete = async () => {
+    if (!bulkDeleteTarget) return
+    try {
+      const res = await bulkDeleteMutation.mutateAsync({ ids: bulkDeleteTarget })
+      toast.success(`সফলভাবে ${res.deletedCount}টি রচনামূলক প্রশ্ন মুছে ফেলা হয়েছে।`)
+      setBulkDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "প্রশ্নসমূহ ডিলিট করা সম্ভব হয়নি")
+    }
+  }
+
+  // Parse filters
+  let boardSource: string | undefined = undefined
+  let boardYear: number | undefined = undefined
+  if (selectedBoard && selectedBoard !== "All") {
+    const parts = selectedBoard.split("_")
+    if (parts.length > 1) {
+      boardSource = parts[0]
+      const yr = Number(parts[1])
+      if (!isNaN(yr)) boardYear = yr
+    }
+  }
+
+  // Query descriptive questions list with search & filters
+  const { data: listData, isLoading, isError } = useDescriptiveQuestionsList({
+    limit,
+    page: currentPage,
+    query: searchQuery || undefined,
+    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
+    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+    board: selectedBoard !== "All" ? selectedBoard : undefined,
+    source: boardSource,
+    year: boardYear,
+    difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
+    sort: selectedSort,
   })
 
-  const { data: statsData, isLoading: isStatsLoading } = useDescriptiveQuestionStats({
-    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
-    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
+  // Fetch Board + Year combinations for this subject / chapter if selected
+  const { data: boardYearsData } = useQuery({
+    ...trpc.descriptiveQuestion.boardYears.queryOptions({
+      subjectId: selectedSubjectId,
+      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+    }),
+    enabled: selectedSubjectId !== "All",
   })
+  const boardYears = boardYearsData ?? []
 
-  const {
-    data: listData,
-    isLoading: isListLoading,
-    isError,
-  } = useDescriptiveQuestionsList({
-    query: params.query || undefined,
-    subjectId: params.subjectId === "All" ? undefined : params.subjectId,
-    chapterId: params.chapterId === "All" ? undefined : params.chapterId,
-    difficulty: params.difficulty === "All" ? undefined : params.difficulty,
-    sort: params.sort === "All" ? undefined : params.sort,
-    page: params.page,
-    limit: params.limit,
-  })
+  // Query stats
+  const { data: statsData } = useDescriptiveQuestionStats(
+    selectedSubjectId !== "All" || selectedChapterId !== "All"
+      ? {
+          subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
+          chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+        }
+      : undefined
+  )
+
+  // Query subjects & chapters for dropdown filters
+  const { data: subjects = [] } = useSubjectsForSelection(
+    selectedAcademicClassId !== "All" ? { academicClassId: selectedAcademicClassId } : undefined
+  )
+  const { data: chapters = [] } = useChaptersForSelection(
+    selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
+  )
+
+  const items = listData?.items ?? []
+  const totalItems = listData?.totalItems ?? items.length
+  const totalPages = listData?.totalPages ?? 1
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
-      <DescriptiveQuestionListHeader />
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="রচনামূলক প্রশ্ন ব্যাংক (Descriptive Questions)"
+        description="শ্রেণি, বিষয় ও অধ্যায়ভিত্তিক রচনামূলক প্রশ্ন, উত্তর, বোর্ড প্রশ্ন ও শিক্ষাবর্ষ পরিচালনা করুন।"
+        icon={BookOpen}
+        badge={{ label: "Descriptive মডিউল", variant: "indigo" }}
+        action={{
+          label: "নতুন প্রশ্ন যোগ করুন",
+          href: "/descriptive-questions/create",
+          icon: Plus,
+        }}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2"
+        >
+          <Link href="/descriptive-questions/import" prefetch={true}>
+            <Upload className="w-4 h-4" />
+            <span>JSON ইমপোর্ট</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
+      {/* Stats Cards */}
       <DescriptiveQuestionStatsCards
         totalCount={statsData?.totalCount}
+        activeCount={statsData?.activeCount}
+        inactiveCount={statsData?.inactiveCount}
         difficultyCounts={statsData?.difficultyCounts}
-        isLoading={isStatsLoading}
+        isLoading={isLoading}
       />
 
+      {/* Filters */}
       <DescriptiveQuestionFilters
-        searchQuery={params.query}
-        onSearchChange={(query) => setParams({ query, page: 1 })}
-        selectedAcademicClassId={params.classId}
-        onAcademicClassChange={(clsId) => setParams({ classId: clsId, subjectId: "All", chapterId: "All", page: 1 })}
-        academicClasses={classes}
-        selectedSubjectId={params.subjectId}
-        onSubjectChange={(subjectId) => setParams({ subjectId, chapterId: "All", page: 1 })}
+        searchQuery={searchQuery}
+        onSearchChange={(query) => setSearchParams({ query, page: 1 })}
+        selectedAcademicClassId={selectedAcademicClassId}
+        onAcademicClassChange={handleAcademicClassChange}
+        academicClasses={academicClasses}
+        selectedSubjectId={selectedSubjectId}
+        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
         subjects={subjects}
-        selectedChapterId={params.chapterId}
-        onChapterChange={(chapterId) => setParams({ chapterId, page: 1 })}
+        selectedChapterId={selectedChapterId}
+        onChapterChange={(chapterId) => setSearchParams({ chapterId, board: "All", page: 1 })}
         chapters={chapters}
-        selectedDifficulty={params.difficulty}
-        onDifficultyChange={(difficulty) => setParams({ difficulty, page: 1 })}
-        selectedSort={params.sort}
-        onSortChange={(sort) => setParams({ sort: sort as DescriptiveQuestionSortOption, page: 1 })}
+        selectedBoard={selectedBoard}
+        onBoardChange={(board) => setSearchParams({ board, page: 1 })}
+        boardYears={boardYears}
+        selectedSort={selectedSort}
+        onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />
 
+      {/* Data Table / Question Cards */}
       <DescriptiveQuestionTable
-        items={listData?.items ?? []}
-        isLoading={isListLoading}
+        items={items as any}
+        isLoading={isLoading}
         isError={isError}
-        onDelete={(id, text) => openModal(id, text)}
-        onBulkDelete={(ids) => openBulkModal(ids)}
-        currentPage={listData?.page ?? params.page}
-        itemsPerPage={listData?.limit ?? params.limit}
-        totalItems={listData?.totalItems ?? 0}
-        totalPages={listData?.totalPages ?? 1}
-        onPageChange={(page) => setParams({ page })}
-        onLimitChange={(limit) => setParams({ limit, page: 1 })}
+        onDelete={(id, question) => setDeleteTarget({ id, question })}
+        onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
+        currentPage={currentPage}
+        itemsPerPage={limit}
+        totalItems={totalItems}
+        totalPages={totalPages}
+        onPageChange={(page) => setSearchParams({ page })}
+        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
-      <DeleteDescriptiveQuestionModal />
+      {/* Shared Single Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="রচনামূলক প্রশ্ন ডিলিট করতে চান?"
+        itemName={deleteTarget?.question}
+        warningText="এই রচনামূলক প্রশ্নটি ডিলিট করলে এর সমাধান ও পরীক্ষা সংশ্লিষ্ট রেকর্ড প্রভাবিত হতে পারে।"
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Shared Bulk Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(bulkDeleteTarget && bulkDeleteTarget.length > 0)}
+        onClose={() => setBulkDeleteTarget(null)}
+        onConfirm={handleConfirmBulkDelete}
+        title="নির্বাচিত রচনামূলক প্রশ্নগুলো ডিলিট করতে চান?"
+        itemName={bulkDeleteTarget ? `${toBengaliDigits(bulkDeleteTarget.length)}টি রচনামূলক প্রশ্ন` : ""}
+        warningText="নির্বাচিত প্রশ্নসমূহ স্থায়ীভাবে মুছে ফেলা হবে।"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }

@@ -26,6 +26,19 @@ function getPaginationPages(currentPage: number, totalPages: number): (number | 
   return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages]
 }
 
+function getMobilePaginationPages(currentPage: number, totalPages: number): (number | "...")[] {
+  if (totalPages <= 4) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+  if (currentPage <= 2) {
+    return [1, 2, "...", totalPages]
+  }
+  if (currentPage >= totalPages - 1) {
+    return [1, "...", totalPages - 1, totalPages]
+  }
+  return [1, "...", currentPage, "...", totalPages]
+}
+
 export interface DataTablePaginationProps {
   page: number
   limit: number
@@ -70,12 +83,12 @@ export function DataTablePagination({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 sm:pt-6 border-t border-slate-200/80 dark:border-white/[0.08] w-full select-none",
+        "flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-slate-200/80 dark:border-white/[0.08] w-full select-none",
         className
       )}
     >
       {/* Left Item Counter & Items Per Page Dropdown */}
-      <div className="flex items-center gap-3.5 flex-wrap justify-center sm:justify-start">
+      <div className="flex items-center gap-2.5 sm:gap-3.5 flex-wrap justify-center sm:justify-start w-full sm:w-auto text-center sm:text-left">
         <div className="text-xs text-slate-500 dark:text-muted-foreground font-body">
           {showingLabel}{" "}
           <span className="font-bold text-foreground font-headline">
@@ -116,19 +129,50 @@ export function DataTablePagination({
       </div>
 
       {/* Right Page Controls: Previous, Numbered Buttons, Next */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center justify-center gap-1 w-full sm:w-auto">
         <Button
           variant="outline"
           size="sm"
           disabled={page <= 1 || isLoading}
           onClick={() => onPageChange(page - 1)}
-          className="h-8 px-2.5 text-xs rounded-lg border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] disabled:opacity-40 cursor-pointer font-headline"
+          className="h-8 px-2 sm:px-2.5 text-xs rounded-lg border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] disabled:opacity-40 cursor-pointer font-headline shrink-0"
+          title={prevLabel}
         >
-          <ChevronLeft className="w-3.5 h-3.5 mr-1" />
-          <span>{prevLabel}</span>
+          <ChevronLeft className="w-3.5 h-3.5 sm:mr-1" />
+          <span className="hidden sm:inline">{prevLabel}</span>
         </Button>
 
-        <div className="flex items-center gap-1 px-1">
+        {/* Mobile Page Numbers (Fewer navigation buttons for compact fit) */}
+        <div className="flex sm:hidden items-center gap-1 px-0.5">
+          {getMobilePaginationPages(page, totalPages).map((p, idx) =>
+            p === "..." ? (
+              <span
+                key={`m-dots-${idx}`}
+                className="px-1 text-xs text-slate-400 dark:text-muted-foreground select-none"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={`m-page-${p}`}
+                type="button"
+                disabled={isLoading}
+                onClick={() => onPageChange(p as number)}
+                className={cn(
+                  "min-w-7 h-7 px-1 rounded-lg text-xs font-semibold font-headline transition-colors cursor-pointer",
+                  page === p
+                    ? "bg-primary text-primary-foreground shadow-xs font-bold"
+                    : "text-slate-600 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:text-foreground"
+                )}
+              >
+                {formatNumber(p as number)}
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Desktop Page Numbers (Full spread) */}
+        <div className="hidden sm:flex items-center gap-1 px-1">
           {getPaginationPages(page, totalPages).map((p, idx) =>
             p === "..." ? (
               <span
@@ -161,10 +205,11 @@ export function DataTablePagination({
           size="sm"
           disabled={page >= totalPages || isLoading}
           onClick={() => onPageChange(page + 1)}
-          className="h-8 px-2.5 text-xs rounded-lg border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] disabled:opacity-40 cursor-pointer font-headline"
+          className="h-8 px-2 sm:px-2.5 text-xs rounded-lg border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] disabled:opacity-40 cursor-pointer font-headline shrink-0"
+          title={nextLabel}
         >
-          <span>{nextLabel}</span>
-          <ChevronRight className="w-3.5 h-3.5 ml-1" />
+          <span className="hidden sm:inline">{nextLabel}</span>
+          <ChevronRight className="w-3.5 h-3.5 sm:ml-1" />
         </Button>
       </div>
     </div>

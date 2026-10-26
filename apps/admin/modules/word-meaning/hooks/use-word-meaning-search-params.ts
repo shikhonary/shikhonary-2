@@ -15,6 +15,7 @@ export const wordMeaningSearchParamsParsers = {
   classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<WordMeaningSortOption>(Array.from(wordMeaningSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),

@@ -9,6 +9,7 @@ import type {
   BulkDeleteMakeQuestionInput,
   ImportMakeQuestionInput,
   MakeQuestionStatsInput,
+  ToggleMakeQuestionActiveInput,
 } from "./make-question.schema"
 
 async function resolveMakeQuestionQuestionTypeId(db: any) {
@@ -47,31 +48,92 @@ async function resolveMakeQuestionQuestionTypeId(db: any) {
 }
 
 export async function listMakeQuestion(db: PrismaClient, input: ListMakeQuestionInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, essenceId, difficulty, source, session, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    search,
+    academicClassId,
+    classId,
+    subjectId,
+    chapterId,
+    academicChapterId,
+    essenceId,
+    questionTypeId,
+    difficulty,
+    source,
+    session,
+    year,
+    board,
+    isActive,
+    sort,
+  } = input
+
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
   const targetChapterId = academicChapterId || chapterId
+  const targetClassId = academicClassId || classId
 
-  if (subjectId) where.subjectId = subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (essenceId) where.essenceId = essenceId
-  if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+  if (targetClassId && targetClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: targetClassId,
+        },
+      },
+    }
+  }
 
-  if (query) {
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (essenceId && essenceId !== "All") where.essenceId = essenceId
+  if (questionTypeId && questionTypeId !== "All") where.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (typeof isActive === "boolean") where.isActive = isActive
+
+  if (board && board !== "All") {
     where.OR = [
-      { statement: { contains: query, mode: "insensitive" } },
-      { answer: { contains: query, mode: "insensitive" } },
-      { clue: { contains: query, mode: "insensitive" } },
-      { context: { contains: query, mode: "insensitive" } },
-      { source: { contains: query, mode: "insensitive" } },
-      { session: { contains: query, mode: "insensitive" } },
-      { reference: { has: query } },
+      { reference: { has: board } },
+      { source: { contains: board, mode: "insensitive" } },
     ]
+  }
+
+  if (source && source !== "All" && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    const existingOr = where.OR || []
+    where.OR = [
+      ...existingOr,
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else if (source && source !== "All") {
+    where.source = source
+  }
+
+  if (session && !year && session !== "All") where.session = session
+
+  const searchQuery = search || query
+  if (searchQuery) {
+    const searchFilter = [
+      { statement: { contains: searchQuery, mode: "insensitive" } },
+      { answer: { contains: searchQuery, mode: "insensitive" } },
+      { clue: { contains: searchQuery, mode: "insensitive" } },
+      { context: { contains: searchQuery, mode: "insensitive" } },
+      { source: { contains: searchQuery, mode: "insensitive" } },
+      { session: { contains: searchQuery, mode: "insensitive" } },
+      { reference: { has: searchQuery } },
+    ]
+
+    if (where.OR) {
+      where.AND = [{ OR: where.OR }, { OR: searchFilter }]
+      delete where.OR
+    } else {
+      where.OR = searchFilter
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -95,10 +157,18 @@ export async function listMakeQuestion(db: PrismaClient, input: ListMakeQuestion
       orderBy,
       include: {
         subject: {
-          select: {
-            id: true,
-            nameEn: true,
-            nameBn: true,
+          include: {
+            classSubjects: {
+              include: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -143,7 +213,17 @@ export async function getMakeQuestionById(db: PrismaClient, input: GetMakeQuesti
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: {
+                select: {
+                  id: true,
+                  nameEn: true,
+                  nameBn: true,
+                },
+              },
+            },
+          },
         },
       },
       academicChapter: true,
@@ -164,7 +244,7 @@ export async function getMakeQuestionById(db: PrismaClient, input: GetMakeQuesti
 
 export async function createMakeQuestion(db: PrismaClient, input: CreateMakeQuestionInput, userId?: string | null) {
   const data = input
-  const resolvedQuestionTypeId = await resolveMakeQuestionQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveMakeQuestionQuestionTypeId(db))
   const targetChapterId = data.academicChapterId || data.chapterId || null
   const currentYear = new Date().getFullYear().toString()
 
@@ -183,6 +263,7 @@ export async function createMakeQuestion(db: PrismaClient, input: CreateMakeQues
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : true,
       ...(userId ? { createdById: userId } : {}),
     },
     include: {
@@ -198,7 +279,7 @@ export async function updateMakeQuestion(db: PrismaClient, input: UpdateMakeQues
   const { id, ...data } = input
 
   await getMakeQuestionById(db, { id })
-  const resolvedQuestionTypeId = await resolveMakeQuestionQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveMakeQuestionQuestionTypeId(db))
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
   const currentYear = new Date().getFullYear().toString()
 
@@ -226,6 +307,10 @@ export async function updateMakeQuestion(db: PrismaClient, input: UpdateMakeQues
 
   if (targetChapterId !== undefined) {
     updateData.academicChapterId = targetChapterId
+  }
+
+  if (data.isActive !== undefined) {
+    updateData.isActive = data.isActive
   }
 
   return db.makeQuestion.update({
@@ -257,6 +342,28 @@ export async function bulkDeleteMakeQuestion(db: PrismaClient, input: BulkDelete
   return { deletedCount: res.count }
 }
 
+export async function toggleMakeQuestionActive(
+  db: PrismaClient,
+  input: ToggleMakeQuestionActiveInput,
+  userId?: string | null
+) {
+  await getMakeQuestionById(db, { id: input.id })
+
+  return db.makeQuestion.update({
+    where: { id: input.id },
+    data: {
+      isActive: input.isActive,
+      ...(userId ? { updatedById: userId } : {}),
+    },
+    include: {
+      subject: true,
+      academicChapter: true,
+      essence: true,
+      questionType: true,
+    },
+  })
+}
+
 export async function importMakeQuestion(db: PrismaClient, input: ImportMakeQuestionInput, userId?: string | null) {
   const resolvedQuestionTypeId = await resolveMakeQuestionQuestionTypeId(db)
   const currentYear = new Date().getFullYear().toString()
@@ -283,6 +390,7 @@ export async function importMakeQuestion(db: PrismaClient, input: ImportMakeQues
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive !== undefined ? data.isActive : true,
             ...(userId ? { createdById: userId } : {}),
           },
         })
@@ -302,12 +410,26 @@ export async function getMakeQuestionStats(db: PrismaClient, input: MakeQuestion
   const where: any = {}
   const targetChapterId = input.academicChapterId || input.chapterId
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (input.essenceId) where.essenceId = input.essenceId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (input.essenceId && input.essenceId !== "All") where.essenceId = input.essenceId
+  if (input.questionTypeId && input.questionTypeId !== "All") where.questionTypeId = input.questionTypeId
+
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.makeQuestion.count({ where }),
+    db.makeQuestion.count({ where: { ...where, isActive: true } }),
+    db.makeQuestion.count({ where: { ...where, isActive: false } }),
     db.makeQuestion.count({ where: { ...where, difficulty: "EASY" } }),
     db.makeQuestion.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.makeQuestion.count({ where: { ...where, difficulty: "HARD" } }),
@@ -315,10 +437,50 @@ export async function getMakeQuestionStats(db: PrismaClient, input: MakeQuestion
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string; academicChapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    NOT: { reference: { equals: [] } },
+  }
+  const targetChapterId = input.academicChapterId || input.chapterId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+
+  const questions = await db.makeQuestion.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

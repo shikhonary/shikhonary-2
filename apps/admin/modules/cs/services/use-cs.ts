@@ -151,3 +151,23 @@ export function useChaptersForSelection(input?: { subjectId?: string }) {
     enabled: input === undefined || (subjectId !== undefined && subjectId !== ""),
   })
 }
+
+
+/**
+ * Hook to fetch Board + Year combinations for CS questions.
+ */
+export function useCsBoardYears(
+  input: { subjectId?: string; chapterId?: string },
+  enabled = true
+) {
+  const subjectId = input?.subjectId === "All" ? undefined : input?.subjectId
+  const chapterId = input?.chapterId === "All" ? undefined : input?.chapterId
+
+  return useQuery({
+    ...trpc.cs.boardYears.queryOptions({
+      subjectId: subjectId || "",
+      chapterId,
+    }),
+    enabled: Boolean(subjectId) && enabled,
+  })
+}

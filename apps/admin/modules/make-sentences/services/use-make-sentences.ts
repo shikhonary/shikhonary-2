@@ -3,6 +3,7 @@ import { trpc } from "@/trpc/client"
 import type {
   ListMakeSentencesInput,
   MakeSentencesStatsInput,
+  ToggleMakeSentencesActiveInput,
 } from "@workspace/api"
 
 export function useMakeSentencesList(input: ListMakeSentencesInput = { limit: 20 }) {
@@ -17,6 +18,40 @@ export function useMakeSentencesById(id: string, enabled = true) {
   return useQuery({
     ...trpc.makeSentences.byId.queryOptions({ id }),
     enabled: Boolean(id) && enabled,
+  })
+}
+
+export function useBoardYearsForSelection(input: {
+  subjectId?: string
+  chapterId?: string
+  academicChapterId?: string
+}) {
+  const subjectId = input.subjectId === "All" || !input.subjectId ? "" : input.subjectId
+  const chapterId = input.chapterId === "All" ? undefined : input.chapterId
+  const academicChapterId = input.academicChapterId === "All" ? undefined : input.academicChapterId
+
+  return useQuery({
+    ...trpc.makeSentences.boardYears.queryOptions(
+      {
+        subjectId,
+        chapterId,
+        academicChapterId,
+      },
+      {
+        enabled: Boolean(subjectId),
+      }
+    ),
+  })
+}
+
+export function useToggleMakeSentencesActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.makeSentences.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.makeSentences.pathFilter())
+    },
   })
 }
 

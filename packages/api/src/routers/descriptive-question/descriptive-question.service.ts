@@ -9,6 +9,7 @@ import type {
   BulkDeleteDescriptiveQuestionsInput,
   ImportDescriptiveQuestionsInput,
   DescriptiveQuestionStatsInput,
+  DescriptiveQuestionBoardYearsInput,
 } from "./descriptive-question.schema"
 
 // Helper function to resolve 'Descriptive Question' question type ID
@@ -47,24 +48,56 @@ async function resolveDescriptiveQuestionTypeId(db: any) {
 }
 
 export async function listDescriptiveQuestions(db: PrismaClient, input: ListDescriptiveQuestionsInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, source, session, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, board, year, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
-  const where: any = {}
+  const where: any = {
+    deletedAt: null,
+  }
 
   if (subjectId) where.subjectId = subjectId
   if (chapterId) where.chapterId = chapterId
   if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+
+  if (source && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    where.OR = [
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else {
+    if (source) where.source = source
+    if (session) where.session = session
+    if (year !== undefined) {
+      where.reference = { has: String(year) }
+    }
+  }
+
+  if (board && !source) {
+    where.reference = { has: board }
+  }
 
   if (query) {
-    where.OR = [
+    const queryConditions: any[] = [
       { question: { contains: query, mode: "insensitive" } },
+      { answer: { contains: query, mode: "insensitive" } },
+      { source: { contains: query, mode: "insensitive" } },
+      { session: { contains: query, mode: "insensitive" } },
       { reference: { has: query } },
     ]
+
+    if (where.OR) {
+      where.AND = [
+        ...(where.AND || []),
+        { OR: where.OR },
+        { OR: queryConditions },
+      ]
+      delete where.OR
+    } else {
+      where.OR = queryConditions
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -90,22 +123,36 @@ export async function listDescriptiveQuestions(db: PrismaClient, input: ListDesc
         subject: {
           select: {
             id: true,
-            nameEn: true,
             nameBn: true,
+            nameEn: true,
+            code: true,
+            group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         chapter: {
           select: {
             id: true,
-            nameEn: true,
             nameBn: true,
+            nameEn: true,
+            position: true,
           },
         },
         questionType: {
           select: {
             id: true,
-            nameEn: true,
             nameBn: true,
+            nameEn: true,
             label: true,
             mark: true,
           },
@@ -130,7 +177,11 @@ export async function getDescriptiveQuestionById(db: PrismaClient, input: GetDes
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       chapter: true,
@@ -157,13 +208,14 @@ export async function createDescriptiveQuestion(db: PrismaClient, input: CreateD
       question: data.question,
       answer: data.answer ?? null,
       reference: data.reference ?? [],
-      source: data.source ?? "গাইড বুক",
+      source: data.source ?? "পাঠ্যবই",
       session: data.session ?? new Date().getFullYear().toString(),
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive ?? true,
     },
     include: {
       subject: true,
@@ -193,6 +245,7 @@ export async function updateDescriptiveQuestion(db: PrismaClient, input: UpdateD
       subjectId: data.subjectId,
       chapterId: data.chapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive,
     },
     include: {
       subject: true,
@@ -233,13 +286,14 @@ export async function importDescriptiveQuestions(db: PrismaClient, input: Import
             question: data.question,
             answer: data.answer ?? null,
             reference: data.reference || [],
-            source: data.source ?? "গাইড বুক",
+            source: data.source ?? "পাঠ্যবই",
             session: data.session ?? new Date().getFullYear().toString(),
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             chapterId: data.chapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive ?? true,
           },
         })
         results.push(createdQuestion)
@@ -255,12 +309,14 @@ export async function importDescriptiveQuestions(db: PrismaClient, input: Import
 }
 
 export async function getDescriptiveQuestionStats(db: PrismaClient, input: DescriptiveQuestionStatsInput = {}) {
-  const where: any = {}
+  const where: any = { deletedAt: null }
   if (input.subjectId) where.subjectId = input.subjectId
   if (input.chapterId) where.chapterId = input.chapterId
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.descriptiveQuestion.count({ where }),
+    db.descriptiveQuestion.count({ where: { ...where, isActive: true } }),
+    db.descriptiveQuestion.count({ where: { ...where, isActive: false } }),
     db.descriptiveQuestion.count({ where: { ...where, difficulty: "EASY" } }),
     db.descriptiveQuestion.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.descriptiveQuestion.count({ where: { ...where, difficulty: "HARD" } }),
@@ -268,10 +324,49 @@ export async function getDescriptiveQuestionStats(db: PrismaClient, input: Descr
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getDescriptiveQuestionBoardYears(
+  db: PrismaClient,
+  input: DescriptiveQuestionBoardYearsInput
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    deletedAt: null,
+    NOT: { reference: { equals: [] } },
+  }
+  if (input.chapterId) where.chapterId = input.chapterId
+
+  const questions = await db.descriptiveQuestion.findMany({
+    where,
+    select: {
+      reference: true,
+      source: true,
+      session: true,
+    },
+  })
+
+  const map = new Map<string, { boardName: string; year?: string; rawRef: string }>()
+  for (const q of questions) {
+    for (const ref of q.reference) {
+      if (ref && !map.has(ref)) {
+        const parts = ref.split("-")
+        map.set(ref, {
+          boardName: parts[0] || ref,
+          year: parts[1] || undefined,
+          rawRef: ref,
+        })
+      }
+    }
+  }
+
+  return Array.from(map.values())
 }

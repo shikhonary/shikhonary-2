@@ -6,8 +6,8 @@ export const grammarQuestionSortOptions = [
   "oldest",
   "question_asc",
   "question_desc",
-  "popularity",
 ] as const
+
 export type GrammarQuestionSortOption = (typeof grammarQuestionSortOptions)[number]
 
 export const grammarQuestionSearchParamsParsers = {
@@ -15,7 +15,7 @@ export const grammarQuestionSearchParamsParsers = {
   classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
-  difficulty: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<GrammarQuestionSortOption>(Array.from(grammarQuestionSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

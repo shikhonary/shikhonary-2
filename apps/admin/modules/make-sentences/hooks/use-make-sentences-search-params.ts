@@ -6,8 +6,8 @@ export const makeSentencesSortOptions = [
   "oldest",
   "word_asc",
   "word_desc",
-  "popularity",
 ] as const
+
 export type MakeSentencesSortOption = (typeof makeSentencesSortOptions)[number]
 
 export const makeSentencesSearchParamsParsers = {
@@ -15,7 +15,7 @@ export const makeSentencesSearchParamsParsers = {
   classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
-  difficulty: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<MakeSentencesSortOption>(Array.from(makeSentencesSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

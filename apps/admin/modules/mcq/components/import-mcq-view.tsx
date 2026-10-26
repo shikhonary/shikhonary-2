@@ -405,7 +405,7 @@ function ParsedMcqCard({
                 : "border-slate-300 text-slate-500 bg-slate-50"
             )}
           >
-            {item.isActive !== false ? "সক্রিয়" : "নিষ্ক্রিয়"}
+            {item.isActive !== false ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"}
           </Badge>
 
           {/* Action Buttons */}
@@ -799,7 +799,7 @@ function ParsedMcqCard({
               <div>
                 <p className="text-sm font-bold text-foreground">গণিত / LaTeX সমীকরণ</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  KaTeX দিয়ে গাণিতিক সমীকরণ রেন্ডার করতে সক্রিয় করুন।
+                  KaTeX দিয়ে গাণিতিক সমীকরণ রেন্ডার করতে অ্যাক্টিভ করুন।
                 </p>
               </div>
               <input
@@ -812,7 +812,7 @@ function ParsedMcqCard({
 
             <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
               <div>
-                <p className="text-sm font-bold text-foreground">সক্রিয় প্রশ্নের অবস্থা</p>
+                <p className="text-sm font-bold text-foreground">অ্যাক্টিভ প্রশ্নের অবস্থা</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
                 </p>
@@ -911,19 +911,6 @@ function ParsedMcqCard({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  সেশন (Session)
-                </Label>
-                <Input
-                  type="text"
-                  placeholder="যেমন: ২০২৬"
-                  value={(item as any).session || ""}
-                  onChange={(e) => onChange({ ...item, session: e.target.value } as any)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
-                />
               </div>
 
               <div className="space-y-2">
@@ -1388,7 +1375,7 @@ export function ImportMcqView() {
             variant="outline"
             className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
           >
-            <Link href="/mcqs">
+            <Link href="/mcqs" prefetch={true}>
               <ArrowLeft className="w-4 h-4" />
               <span>তালিকায় ফিরে যান</span>
             </Link>
@@ -1602,7 +1589,7 @@ export function ImportMcqView() {
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] p-3.5 font-mono text-xs text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-card p-3.5 font-mono text-xs text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -1769,12 +1756,13 @@ export function ImportMcqView() {
           {/* Form Actions Footer */}
           <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
             <Button
-              type="button"
+              asChild
               variant="outline"
-              onClick={() => router.push("/mcqs")}
               className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer justify-center"
             >
-              বাতিল
+              <Link href="/mcqs" prefetch={true}>
+                বাতিল
+              </Link>
             </Button>
             <Button
               type="button"

@@ -173,7 +173,7 @@ export function McqFilters({
       onResetAll={handleReset}
       filterButtonLabel="ফিল্টার"
       filtersHeading="MCQ ফিল্টারসমূহ"
-      activeFiltersLabel="সক্রিয় ফিল্টারসমূহ:"
+      activeFiltersLabel="অ্যাক্টিভ ফিল্টারসমূহ:"
       resetLabel="রিসেট"
       resetAllLabel="সব রিসেট"
       applyFiltersLabel="ফিল্টার প্রয়োগ করুন"

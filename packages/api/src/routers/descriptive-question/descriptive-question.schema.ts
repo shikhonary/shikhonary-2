@@ -8,6 +8,8 @@ export const listDescriptiveQuestionsSchema = paginationSchema.extend({
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  board: z.string().optional(),
+  year: z.number().int().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
@@ -22,6 +24,13 @@ export const descriptiveQuestionStatsSchema = z.object({
 
 export type DescriptiveQuestionStatsInput = z.infer<typeof descriptiveQuestionStatsSchema>
 
+export const descriptiveQuestionBoardYearsSchema = z.object({
+  subjectId: z.string(),
+  chapterId: z.string().optional(),
+})
+
+export type DescriptiveQuestionBoardYearsInput = z.infer<typeof descriptiveQuestionBoardYearsSchema>
+
 export const getDescriptiveQuestionSchema = idSchema
 export type GetDescriptiveQuestionInput = z.infer<typeof getDescriptiveQuestionSchema>
 
@@ -35,6 +44,7 @@ export const createDescriptiveQuestionSchema = z.object({
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().min(1, "Chapter is required"),
+  isActive: z.boolean().optional().default(true),
 })
 
 export type CreateDescriptiveQuestionInput = z.infer<typeof createDescriptiveQuestionSchema>

@@ -1,20 +1,25 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useCqById, useUpdateCq, useSubjectsForSelection, useChaptersForSelection, useAcademicClassesForSelection } from "../services/use-cq"
+import {
+  useCqById,
+  useUpdateCq,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+  useAcademicClassesForSelection,
+} from "../services/use-cq"
 import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { HelpCircle } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -24,14 +29,25 @@ import {
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { CQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
+import {
+  HelpCircle,
+  ArrowLeft,
+  Clock,
+  Loader2,
+  Save,
+  AlertCircle,
+  Sparkles,
+  BookOpen,
+} from "lucide-react"
 
 const editCqFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করা আবশ্যক"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করা আবশ্যক"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করা আবশ্যক"),
   context: z.string().optional(),
-  questionA: z.string().min(1, "Question A text is required"),
-  questionB: z.string().min(1, "Question B text is required"),
+  questionA: z.string().min(1, "ক প্রশ্ন লেখা আবশ্যক"),
+  questionB: z.string().min(1, "খ প্রশ্ন লেখা আবশ্যক"),
   questionC: z.string().optional(),
   questionD: z.string().optional(),
   answerA: z.string().optional(),
@@ -54,10 +70,14 @@ const editCqFormSchema = z.object({
 
 type EditCqFormData = z.infer<typeof editCqFormSchema>
 
-export function EditCqView() {
+export interface EditCqViewProps {
+  id?: string
+}
+
+export function EditCqView({ id }: EditCqViewProps = {}) {
   const router = useRouter()
   const params = useParams()
-  const cqId = params.id as string
+  const cqId = id || (params?.id as string)
 
   const { data: cqData, isLoading: isCqLoading, isError } = useCqById(cqId)
   const updateMutation = useUpdateCq()
@@ -67,13 +87,52 @@ export function EditCqView() {
   const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
   const questionTypes = questionTypesData?.questionTypes ?? []
 
+  const initialClassId = useMemo(() => {
+    if (!cqData) return ""
+    return (
+      (cqData as any)?.subject?.classSubjects?.[0]?.academicClass?.id ||
+      (cqData as any)?.subject?.classSubjects?.[0]?.classId ||
+      ""
+    )
+  }, [cqData])
+
+  const formValues = useMemo<EditCqFormData | undefined>(() => {
+    if (!cqData) return undefined
+
+    return {
+      classId: initialClassId,
+      subjectId: cqData.subjectId,
+      chapterId: cqData.chapterId,
+      context: cqData.context || "",
+      questionA: cqData.questionA,
+      questionB: cqData.questionB,
+      questionC: cqData.questionC || "",
+      questionD: cqData.questionD || "",
+      answerA: cqData.answer?.answerA || "",
+      answerB: cqData.answer?.answerB || "",
+      answerC: cqData.answer?.answerC || "",
+      answerD: cqData.answer?.answerD || "",
+      explanation: cqData.answer?.explanation || "",
+      referenceText: cqData.reference?.join(", ") || "",
+      difficulty: cqData.difficulty as any,
+      year: (cqData as any).year !== null && (cqData as any).year !== undefined ? String((cqData as any).year) : "",
+      source: (cqData as any).source || DEFAULT_SOURCE,
+      session: (cqData as any).session || ((cqData as any).year ? String((cqData as any).year) : ""),
+      questionTypeId: cqData.questionTypeId || "",
+      isActive: Boolean(cqData.isActive),
+      marksA: String((cqData.marks as any)?.a ?? "1"),
+      marksB: String((cqData.marks as any)?.b ?? "2"),
+      marksC: String((cqData.marks as any)?.c ?? "3"),
+      marksD: String((cqData.marks as any)?.d ?? "4"),
+    }
+  }, [cqData, initialClassId])
+
   const {
     register,
     handleSubmit,
     control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditCqFormData>({
     resolver: zodResolver(editCqFormSchema),
@@ -94,7 +153,8 @@ export function EditCqView() {
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       year: "",
-      source: "",
+      source: DEFAULT_SOURCE,
+      session: String(new Date().getFullYear()),
       questionTypeId: "",
       isActive: true,
       marksA: "1",
@@ -102,48 +162,72 @@ export function EditCqView() {
       marksC: "3",
       marksD: "4",
     },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
+    },
   })
 
-  // Load existing data
-  useEffect(() => {
-    if (cqData) {
-      reset({
-        classId: cqData.subject.classSubjects[0]?.classId || "",
-        subjectId: cqData.subjectId,
-        chapterId: cqData.chapterId,
-        context: cqData.context || "",
-        questionA: cqData.questionA,
-        questionB: cqData.questionB,
-        questionC: cqData.questionC || "",
-        questionD: cqData.questionD || "",
-        answerA: cqData.answer?.answerA || "",
-        answerB: cqData.answer?.answerB || "",
-        answerC: cqData.answer?.answerC || "",
-        answerD: cqData.answer?.answerD || "",
-        explanation: cqData.answer?.explanation || "",
-        referenceText: cqData.reference?.join(", ") || "",
-        difficulty: cqData.difficulty as any,
-        year: (cqData as any).year !== null && (cqData as any).year !== undefined ? String((cqData as any).year) : "",
-        source: (cqData as any).source || DEFAULT_SOURCE,
-        session: (cqData as any).session || ((cqData as any).year ? String((cqData as any).year) : ""),
-        questionTypeId: cqData.questionTypeId || "",
-        isActive: cqData.isActive,
-        marksA: String((cqData.marks as any)?.a ?? "1"),
-        marksB: String((cqData.marks as any)?.b ?? "2"),
-        marksC: String((cqData.marks as any)?.c ?? "3"),
-        marksD: String((cqData.marks as any)?.d ?? "4"),
-      })
-    }
-  }, [cqData, reset])
-
   const selectedClassId = watch("classId")
+  const activeClassId = selectedClassId || initialClassId
+
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
+
   const selectedSubjectId = watch("subjectId")
+  const activeSubjectId = selectedSubjectId || cqData?.subjectId
+
   const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+    activeSubjectId ? { subjectId: activeSubjectId } : undefined
   )
+
+  // Ensure initial academic class is immediately visible
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const initialClass = (cqData as any)?.subject?.classSubjects?.[0]?.academicClass
+    if (initialClass) {
+      map.set(initialClass.id, initialClass)
+    }
+    for (const cls of academicClasses) {
+      map.set(cls.id, cls)
+    }
+    return Array.from(map.values())
+  }, [academicClasses, cqData])
+
+  // Ensure subject from CQ is immediately present in options
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if (cqData?.subject) {
+      map.set(cqData.subject.id, cqData.subject)
+    }
+    for (const sub of subjects) {
+      map.set(sub.id, sub)
+    }
+    return Array.from(map.values())
+  }, [subjects, cqData?.subject])
+
+  // Ensure chapter from CQ is immediately present in options
+  const combinedChapters = useMemo(() => {
+    const map = new Map<string, any>()
+    if (cqData?.chapter) {
+      map.set(cqData.chapter.id, cqData.chapter)
+    }
+    for (const ch of chapters) {
+      map.set(ch.id, ch)
+    }
+    return Array.from(map.values())
+  }, [chapters, cqData?.chapter])
+
+  // Ensure source from CQ is immediately present in source options list
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...CQ_SOURCE_OPTIONS]
+    const currentSource = (cqData as any)?.source ? String((cqData as any).source).trim() : null
+    if (currentSource && !list.some((s) => s.value === currentSource)) {
+      list.unshift({ value: currentSource, label: currentSource })
+    }
+    return list
+  }, [cqData])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting || isCqLoading
 
@@ -197,12 +281,12 @@ export function EditCqView() {
         },
       })
 
-      toast.success("Creative Question updated successfully.")
+      toast.success("সৃজনশীল প্রশ্নটি সফলভাবে হালনাগাদ করা হয়েছে।")
       setTimeout(() => {
         router.push("/cqs")
-      }, 1000)
+      }, 800)
     } catch (err: any) {
-      const msg = err.message || "Failed to update Creative Question"
+      const msg = err.message || "CQ প্রশ্ন হালনাগাদ করা সম্ভব হয়নি"
       setErrorMessage(msg)
       toast.error(msg)
     }
@@ -210,302 +294,459 @@ export function EditCqView() {
 
   if (isCqLoading) {
     return (
-      <div className="py-24 text-center">
-        <span className="material-symbols-outlined animate-spin text-4xl text-primary">
-          progress_activity
-        </span>
-        <p className="mt-2 text-sm text-outline">Loading question details...</p>
+      <div className="w-full max-w-5xl mx-auto py-24 flex flex-col items-center justify-center gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 dark:text-primary" />
+        <p className="text-sm font-medium text-muted-foreground font-body">CQ প্রশ্ন লোড হচ্ছে...</p>
       </div>
     )
   }
 
-  if (isError) {
+  if (isError || !cqData) {
     return (
-      <div className="py-24 text-center text-error">
-        <span className="material-symbols-outlined text-4xl">error</span>
-        <p className="mt-2 text-sm font-medium">Failed to load Creative Question.</p>
-        <Link href="/cqs" className="text-primary hover:underline text-xs mt-3 block">Back to CQs</Link>
+      <div className="w-full max-w-lg mx-auto my-12 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-8 text-center text-rose-700 dark:text-rose-400">
+        <AlertCircle className="w-10 h-10 mx-auto stroke-[1.8]" />
+        <h3 className="mt-3 text-lg font-bold font-headline">CQ পাওয়া যায়নি</h3>
+        <p className="mt-1 text-sm text-rose-600/80 font-body">
+          অনুরোধকৃত সৃজনশীল প্রশ্নটি সার্ভার থেকে লোড করা সম্ভব হয়নি।
+        </p>
+        <Button
+          asChild
+          className="mt-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 text-sm shadow-xs font-headline"
+        >
+          <Link href="/cqs" prefetch={true}>
+            CQ তালিকায় ফিরে যান
+          </Link>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header Section */}
-      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end justify-between">
-        <div className="max-w-2xl">
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/cqs"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              CQs
-            </Link>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="font-label-sm text-xs font-bold text-primary">Edit CQ</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Edit Creative Question
-          </h2>
-          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Modify the existing creative question structure, sub-questions, answer schemes, or marks.
-          </p>
-        </div>
-      </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-12">
+      {/* Shared Page Header matching MCQ Benchmark */}
+      <PageHeader
+        title="সৃজনশীল প্রশ্ন সম্পাদনা"
+        description="শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করে প্রশ্নপত্র ভান্ডারে সৃজনশীল প্রশ্ন, উদ্দীপক, উপ-প্রশ্ন ও উত্তরপত্র পরিবর্তন করুন।"
+        icon={HelpCircle}
+        badge={{ label: "সম্পাদনা মোড", variant: "amber" }}
+        breadcrumbs={[
+          { label: "CQ তালিকা", href: "/cqs" },
+          { label: "CQ সম্পাদনা" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+        >
+          <Link href="/cqs" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="mb-6 flex items-center gap-3 rounded-xl border border-error/30 bg-error-container/20 p-4 text-error">
-          <span className="material-symbols-outlined">error</span>
-          <span className="font-body-md text-sm font-medium">{errorMessage}</span>
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMessage}</p>
         </div>
       )}
 
-      {/* Form Card */}
-      <Card className="mx-auto max-w-4xl overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
-        <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
-          <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-            <HelpCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+      {/* Main Form Card */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
           </div>
           <div>
-            <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
-              Question Specifications
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              প্রশ্নের বিবরণ ও কনফিগারেশন
             </CardTitle>
-            <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5">
-              Update classes, context, sub-question stems, answer sheets, and reference settings
+            <p className="text-xs text-muted-foreground mt-0.5 font-body">
+              একাডেমিক তথ্য, উদ্দীপক, উপ-প্রশ্ন (ক, খ, গ, ঘ) এবং উত্তরপত্র পরিবর্তন করুন।
             </p>
           </div>
         </CardHeader>
-        <CardContent className="p-8">
+
+        <CardContent className="p-6 sm:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Read-only Class, Subject & Chapter Info */}
-            <div className="bg-surface-container-low border border-outline-variant/60 rounded-xl p-5 flex flex-col sm:flex-row gap-6 text-xs sm:text-sm text-on-surface-variant font-medium">
-              <div className="flex-1">
-                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Academic Class</span>
-                <span className="font-semibold text-on-surface text-sm">{(cqData as any)?.academicClass?.nameEn || "N/A"}</span>
+            {/* Academic Class, Subject & Chapter Selection */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {/* Class */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="classId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`class-select-${field.value}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64 font-body">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem key={cls.id} value={cls.id}>
+                            {cls.nameBn || cls.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.classId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.classId.message}</p>
+                )}
               </div>
-              <div className="flex-1">
-                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Subject</span>
-                <span className="font-semibold text-on-surface text-sm">{(cqData as any)?.subject?.nameEn || "N/A"}</span>
+
+              {/* Subject */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="subjectId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`subject-select-${field.value}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || (!activeClassId && !field.value)}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue placeholder="বিষয় নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64 font-body">
+                        {combinedSubjects.map((sub) => (
+                          <SelectItem key={sub.id} value={sub.id}>
+                            {sub.nameBn || sub.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.subjectId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.subjectId.message}</p>
+                )}
               </div>
-              <div className="flex-1">
-                <span className="text-outline uppercase text-[10px] tracking-wider block font-bold mb-1">Chapter</span>
-                <span className="font-semibold text-on-surface text-sm">{(cqData as any)?.chapter?.nameEn || "N/A"}</span>
+
+              {/* Chapter */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায় (Chapter) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="chapterId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`chapter-select-${field.value}-${combinedChapters.length}`}
+                      disabled={isSubmitting || (!activeSubjectId && !field.value)}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue placeholder="অধ্যায় নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64 font-body">
+                        {combinedChapters.map((ch) => (
+                          <SelectItem key={ch.id} value={ch.id}>
+                            {ch.nameBn || ch.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.chapterId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.chapterId.message}</p>
+                )}
               </div>
             </div>
 
             {/* Stimulus Passage Text */}
-            <div className="space-y-2 border-t border-outline-variant pt-6">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Stimulus / Passage Context
+            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
               </Label>
               <Textarea
                 disabled={isSubmitting}
                 rows={4}
-                placeholder="Enter the creative question stimulus text or context passage..."
+                placeholder="সৃজনশীল প্রশ্নের উদ্দীপক বা দৃশ্যপট এখানে লিখুন..."
                 {...register("context")}
-                className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-on-surface transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden text-sm"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
               />
             </div>
 
             {/* Sub-Questions A, B, C, D Stems */}
-            <div className="space-y-6 border-t border-outline-variant pt-6">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
-                Question Stems & Marks Configuration
-              </h3>
+            <div className="space-y-5 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-primary font-headline flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4" />
+                  উপ-প্রশ্ন ও নম্বর বণ্টন
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  ক (জ্ঞান), খ (অনুধাবন), গ (প্রয়োগ) ও ঘ (উচ্চতর দক্ষতা) উপ-প্রশ্ন ও তাদের নম্বর পরিবর্তন করুন।
+                </p>
+              </div>
 
               <div className="space-y-4">
                 {/* Question A */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-3 space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface">ক. Knowledge-based Question Stem (A) *</Label>
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="e.g. বল কাকে বলে? / What is Force?"
-                      {...register("questionA")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 h-auto"
-                    />
-                    {errors.questionA && <p className="text-xs text-error">{errors.questionA.message}</p>}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface-variant">Marks (A)</Label>
-                    <Input
-                      type="number"
-                      disabled={isSubmitting}
-                      {...register("marksA")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 text-sm h-auto"
-                    />
+                <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                    <div className="md:col-span-3 space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        ক. জ্ঞানমূলক উপ-প্রশ্ন (A) <span className="text-rose-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        disabled={isSubmitting}
+                        placeholder="যেমন: বল কাকে বলে?"
+                        {...register("questionA")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                      {errors.questionA && (
+                        <p className="text-xs text-rose-500 font-medium">{errors.questionA.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        নম্বর (ক)
+                      </Label>
+                      <Input
+                        type="number"
+                        disabled={isSubmitting}
+                        {...register("marksA")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Question B */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-3 space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface">খ. Comprehension Question Stem (B) *</Label>
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="e.g. ওহমের সূত্রটি ব্যাখ্যা কর। / Explain Ohm's Law."
-                      {...register("questionB")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 h-auto"
-                    />
-                    {errors.questionB && <p className="text-xs text-error">{errors.questionB.message}</p>}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface-variant">Marks (B)</Label>
-                    <Input
-                      type="number"
-                      disabled={isSubmitting}
-                      {...register("marksB")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 text-sm h-auto"
-                    />
+                <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                    <div className="md:col-span-3 space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        খ. অনুধাবনমূলক উপ-প্রশ্ন (B) <span className="text-rose-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        disabled={isSubmitting}
+                        placeholder="যেমন: নিউটনের গতিবিদ্যার ২য় সূত্রটি ব্যাখ্যা কর।"
+                        {...register("questionB")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                      {errors.questionB && (
+                        <p className="text-xs text-rose-500 font-medium">{errors.questionB.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        নম্বর (খ)
+                      </Label>
+                      <Input
+                        type="number"
+                        disabled={isSubmitting}
+                        {...register("marksB")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Question C */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-3 space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface">গ. Application Question Stem (C) (Optional)</Label>
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="e.g. উদ্দীপকের তথ্যের আলোকে ত্বরণ নির্ণয় কর। / Calculate acceleration from the stimulus."
-                      {...register("questionC")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 h-auto"
-                    />
-                    {errors.questionC && <p className="text-xs text-error">{errors.questionC.message}</p>}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface-variant">Marks (C)</Label>
-                    <Input
-                      type="number"
-                      disabled={isSubmitting}
-                      {...register("marksC")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 text-sm h-auto"
-                    />
+                <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                    <div className="md:col-span-3 space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        গ. প্রয়োগমূলক উপ-প্রশ্ন (C) (ঐচ্ছিক)
+                      </Label>
+                      <Input
+                        type="text"
+                        disabled={isSubmitting}
+                        placeholder="যেমন: উদ্দীপকের তথ্যের আলোকে ত্বরণ নির্ণয় কর।"
+                        {...register("questionC")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                      {errors.questionC && (
+                        <p className="text-xs text-rose-500 font-medium">{errors.questionC.message}</p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        নম্বর (গ)
+                      </Label>
+                      <Input
+                        type="number"
+                        disabled={isSubmitting}
+                        {...register("marksC")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Question D */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                  <div className="md:col-span-3 space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface">ঘ. Higher Ability Question Stem (D) (Optional)</Label>
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="e.g. উদ্দীপকের শক্তির নিত্যতার সূত্রটি বজায় থাকে কিনা যুক্তিসহ আলোচনা কর।"
-                      {...register("questionD")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 h-auto"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="font-bold text-xs text-on-surface-variant">Marks (D)</Label>
-                    <Input
-                      type="number"
-                      disabled={isSubmitting}
-                      {...register("marksD")}
-                      className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 text-sm h-auto"
-                    />
+                <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                    <div className="md:col-span-3 space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        ঘ. উচ্চতর দক্ষতামূলক উপ-প্রশ্ন (D) (ঐচ্ছিক)
+                      </Label>
+                      <Input
+                        type="text"
+                        disabled={isSubmitting}
+                        placeholder="যেমন: উদ্দীপকের বস্তুটির বেগ দ্বিগুণ করতে কত বল লাগবে গাণিতিক বিশ্লেষণ দাও।"
+                        {...register("questionD")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        নম্বর (ঘ)
+                      </Label>
+                      <Input
+                        type="number"
+                        disabled={isSubmitting}
+                        {...register("marksD")}
+                        className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Answer Solutions */}
-            <div className="space-y-6 border-t border-outline-variant pt-6">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
-                Solutions / Ideal Answers (Optional)
-              </h3>
+            <div className="space-y-5 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-primary font-headline flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4" />
+                  সমাধান ও আদর্শ উত্তরপত্র (ঐচ্ছিক)
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রতিটি উপ-প্রশ্নের আদর্শ উত্তর ও সামগ্রিক ব্যাখ্যা পরিবর্তন করুন।
+                </p>
+              </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Answer A */}
-                <div className="space-y-1.5">
-                  <Label className="font-bold text-xs text-on-surface">উত্তর ক (Solution A)</Label>
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    উত্তর ক (Solution A)
+                  </Label>
                   <Textarea
                     disabled={isSubmitting}
                     rows={2}
-                    placeholder="Enter model answer or marking scheme for Part A..."
+                    placeholder="ক প্রশ্নের আদর্শ উত্তর লিখুন..."
                     {...register("answerA")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
                   />
                 </div>
 
                 {/* Answer B */}
-                <div className="space-y-1.5">
-                  <Label className="font-bold text-xs text-on-surface">উত্তর খ (Solution B)</Label>
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    উত্তর খ (Solution B)
+                  </Label>
                   <Textarea
                     disabled={isSubmitting}
                     rows={2}
-                    placeholder="Enter model answer or marking scheme for Part B..."
+                    placeholder="খ প্রশ্নের আদর্শ উত্তর লিখুন..."
                     {...register("answerB")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
                   />
                 </div>
 
                 {/* Answer C */}
-                <div className="space-y-1.5">
-                  <Label className="font-bold text-xs text-on-surface">উত্তর গ (Solution C)</Label>
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    উত্তর গ (Solution C)
+                  </Label>
                   <Textarea
                     disabled={isSubmitting}
                     rows={3}
-                    placeholder="Enter model answer or marking scheme for Part C..."
+                    placeholder="গ প্রশ্নের আদর্শ উত্তর লিখুন..."
                     {...register("answerC")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
                   />
                 </div>
 
                 {/* Answer D */}
-                <div className="space-y-1.5">
-                  <Label className="font-bold text-xs text-on-surface">উত্তর ঘ (Solution D)</Label>
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    উত্তর ঘ (Solution D)
+                  </Label>
                   <Textarea
                     disabled={isSubmitting}
                     rows={3}
-                    placeholder="Enter model answer or marking scheme for Part D..."
+                    placeholder="ঘ প্রশ্নের আদর্শ উত্তর লিখুন..."
                     {...register("answerD")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
                   />
                 </div>
+              </div>
 
-                {/* Overall Explanation */}
-                <div className="space-y-1.5 border-t border-outline-variant/30 pt-4">
-                  <Label className="font-bold text-xs text-on-surface">উত্তর বিশ্লেষণ (Answer Explanation / Assessment Notes)</Label>
-                  <Textarea
-                    disabled={isSubmitting}
-                    rows={3}
-                    placeholder="Detailed explanation, formula steps, or scoring directives for assessors..."
-                    {...register("explanation")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
-                  />
-                </div>
+              {/* Overall Explanation */}
+              <div className="space-y-2 pt-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উত্তর বিশ্লেষণ ও সামগ্রিক ব্যাখ্যা
+                </Label>
+                <Textarea
+                  disabled={isSubmitting}
+                  rows={3}
+                  placeholder="প্রশ্নটির সামগ্রিক মূল্যায়ন নির্দেশিকা ও ব্যাখ্যা..."
+                  {...register("explanation")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body"
+                />
               </div>
             </div>
 
             {/* Reference & Metadata Settings */}
-            <div className="space-y-6 border-t border-outline-variant pt-6">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary">
-                Enrichment & Context Settings
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+                <Sparkles className="w-3.5 h-3.5" />
+                মেটাডাটা ও অতিরিক্ত সেটিংস
               </h3>
-              
+
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Difficulty */}
                 <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Difficulty *
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
                   </Label>
                   <Controller
                     name="difficulty"
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`difficulty-select-${field.value}`}
                         disabled={isSubmitting}
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:ring-2 focus:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
-                          <SelectValue placeholder="Select Difficulty..." />
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
                           {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
@@ -516,32 +757,33 @@ export function EditCqView() {
                     )}
                   />
                   {errors.difficulty && (
-                    <p className="text-xs text-error">{errors.difficulty.message}</p>
+                    <p className="text-xs text-rose-500 font-medium">{errors.difficulty.message}</p>
                   )}
                 </div>
 
                 {/* Question Type Template */}
                 <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Question Type Template (Optional)
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্ন কাঠামো টেমপ্লেট (ঐচ্ছিক)
                   </Label>
                   <Controller
                     name="questionTypeId"
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`type-select-${field.value}`}
                         disabled={isSubmitting}
                         value={field.value || "none"}
                         onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
                       >
-                        <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface transition-all focus:ring-2 focus:ring-primary/20 h-auto justify-between focus-visible:outline-hidden">
-                          <SelectValue placeholder="Select Type Template..." />
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="টেমপ্লেট নির্বাচন করুন..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-64">
-                          <SelectItem value="none">None</SelectItem>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64 font-body">
+                          <SelectItem value="none">কোনোটি নয় (None)</SelectItem>
                           {questionTypes.map((t: any) => (
                             <SelectItem key={t.id} value={t.id}>
-                              {t.nameEn} ({t.label} - {t.mark} marks)
+                              {t.nameEn} ({t.label} - {t.mark} নম্বর)
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -552,28 +794,27 @@ export function EditCqView() {
 
                 {/* Source */}
                 <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Source (উৎস)
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্নের উৎস (Source)
                   </Label>
                   <Controller
                     name="source"
                     control={control}
                     render={({ field }) => (
                       <Select
+                        key={`source-select-${field.value}-${combinedSources.length}`}
                         disabled={isSubmitting}
                         value={field.value || DEFAULT_SOURCE}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-on-surface h-10 justify-between focus-visible:outline-hidden cursor-pointer text-sm">
-                          <SelectValue placeholder="Select Source..." />
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন...">
+                            {field.value}
+                          </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {CQ_SOURCE_OPTIONS.map((opt) => (
-                            <SelectItem
-                              key={opt.value}
-                              value={opt.value}
-                              className="text-neutral-900 text-xs"
-                            >
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
+                          {combinedSources.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
                             </SelectItem>
                           ))}
@@ -585,43 +826,40 @@ export function EditCqView() {
 
                 {/* Session */}
                 <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Session / Year (Optional)
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    সেশন / সাল
                   </Label>
                   <Input
                     disabled={isSubmitting}
                     type="text"
-                    placeholder="e.g. 2026, 2025-26..."
+                    placeholder="যেমন: ২০২৬"
                     {...register("session")}
-                    className="w-full rounded-lg border border-outline-variant bg-white p-3 font-body-md text-sm text-on-surface h-10"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
                   />
-                  {errors.session && (
-                    <p className="text-xs text-error">{errors.session.message}</p>
-                  )}
                 </div>
 
                 {/* References */}
                 <div className="space-y-2 md:col-span-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Reference Tags (Comma-separated)
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    রেফারেন্স / উৎস ট্যাগ (কমা দিয়ে একাধিক উল্লেখ করুন)
                   </Label>
                   <Input
                     type="text"
                     disabled={isSubmitting}
-                    placeholder="e.g. NCTB Textbook Chapter 2, physics-ref-09"
+                    placeholder="যেমন: NCTB Textbook Chapter 2, Dhaka Board 2024"
                     {...register("referenceText")}
-                    className="w-full rounded-lg border border-outline-variant bg-white py-3 px-4 font-body-md text-sm transition-all focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
                   />
                 </div>
 
-                {/* Is Active State */}
-                <div className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-lowest p-4 md:col-span-2 mt-4">
+                {/* Is Active Status Switch/Checkbox */}
+                <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 md:col-span-2 mt-2">
                   <div>
-                    <p className="font-label-sm text-sm font-bold text-on-surface">
-                      Active Question State
+                    <p className="text-sm font-bold text-foreground font-headline">
+                      অ্যাক্টিভ প্রশ্ন স্ট্যাটাস
                     </p>
-                    <p className="font-body-md text-xs text-on-surface-variant">
-                      Make this creative question live immediately in test modules and student practice assessments.
+                    <p className="text-xs text-muted-foreground font-body mt-0.5">
+                      প্রশ্নটি সরাসরি অ্যাক্টিভ রাখতে এবং শিক্ষার্থী বা পরীক্ষা মডিউলে প্রদর্শন করতে এটি চেক করুন।
                     </p>
                   </div>
                   <Controller
@@ -630,9 +868,9 @@ export function EditCqView() {
                     render={({ field }) => (
                       <input
                         type="checkbox"
-                        checked={field.value}
+                        checked={Boolean(field.value)}
                         onChange={(e) => field.onChange(e.target.checked)}
-                        className="h-5 w-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer"
+                        className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
                       />
                     )}
                   />
@@ -640,35 +878,34 @@ export function EditCqView() {
               </div>
             </div>
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-outline-variant/40 pt-6 sm:pt-8 mt-6">
-              <div className="flex items-center justify-center sm:justify-start space-x-2 text-on-surface-variant">
-                <span className="material-symbols-outlined text-sm">history</span>
-                <span className="text-[12px]">Last updated {cqData?.updatedAt ? new Date(cqData.updatedAt).toLocaleDateString() : ""}</span>
+            {/* Form Actions Footer matching Benchmark */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-body">
+                <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span>প্রশ্নটির যাবতীয় পরিবর্তন সংরক্ষিত হবে</span>
               </div>
-              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
                 <Button
-                  type="button"
+                  asChild
                   variant="outline"
                   disabled={isSubmitting}
-                  onClick={() => router.push("/cqs")}
-                  className="w-full sm:w-auto rounded-lg border border-outline px-6 sm:px-8 py-2.5 sm:py-3 font-bold !text-primary transition-all active:scale-95 hover:bg-surface-container-low hover:!text-primary cursor-pointer h-auto normal-case tracking-normal disabled:opacity-50 text-sm"
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer font-headline"
                 >
-                  Cancel
+                  <Link href="/cqs" prefetch={true}>
+                    বাতিল
+                  </Link>
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex w-full sm:w-auto items-center justify-center space-x-2 rounded-lg bg-primary-container px-8 sm:px-10 py-2.5 sm:py-3 font-bold text-on-primary-container shadow-md transition-all active:scale-95 hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto normal-case tracking-normal text-sm"
+                  className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 font-headline"
                 >
                   {isSubmitting ? (
-                    <span className="material-symbols-outlined animate-spin text-[18px] sm:text-[20px]">
-                      progress_activity
-                    </span>
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                   ) : (
-                    <span className="material-symbols-outlined text-[18px] sm:text-[20px]">save</span>
+                    <Save className="w-4 h-4 shrink-0" />
                   )}
-                  <span>{isSubmitting ? "Updating..." : "Update Creative Question"}</span>
+                  <span>{isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : "সংরক্ষণ করুন"}</span>
                 </Button>
               </div>
             </div>

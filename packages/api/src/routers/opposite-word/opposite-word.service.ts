@@ -7,6 +7,7 @@ import type {
   ListOppositeWordInput,
   UpdateOppositeWordInput,
   BulkDeleteOppositeWordInput,
+  ToggleOppositeWordActiveInput,
   ImportOppositeWordInput,
   OppositeWordStatsInput,
 } from "./opposite-word.schema"
@@ -45,29 +46,89 @@ async function resolveOppositeWordQuestionTypeId(db: any) {
 }
 
 export async function listOppositeWord(db: PrismaClient, input: ListOppositeWordInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    search,
+    academicClassId,
+    classId,
+    subjectId,
+    chapterId,
+    academicChapterId,
+    questionTypeId,
+    difficulty,
+    source,
+    session,
+    year,
+    board,
+    isActive,
+    sort,
+  } = input
+
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
   const targetChapterId = academicChapterId || chapterId
+  const targetClassId = academicClassId || classId
 
-  if (subjectId) where.subjectId = subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+  if (targetClassId && targetClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: targetClassId,
+        },
+      },
+    }
+  }
 
-  if (query) {
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (questionTypeId && questionTypeId !== "All") where.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (typeof isActive === "boolean") where.isActive = isActive
+
+  if (board && board !== "All") {
     where.OR = [
-      { word: { contains: query, mode: "insensitive" } },
-      { oppositeWord: { contains: query, mode: "insensitive" } },
-      { oppositeWords: { has: query } },
-      { source: { contains: query, mode: "insensitive" } },
-      { session: { contains: query, mode: "insensitive" } },
-      { reference: { has: query } },
+      { reference: { has: board } },
+      { source: { contains: board, mode: "insensitive" } },
     ]
+  }
+
+  if (source && source !== "All" && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    const existingOr = where.OR || []
+    where.OR = [
+      ...existingOr,
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else if (source && source !== "All") {
+    where.source = source
+  }
+
+  if (session && !year && session !== "All") where.session = session
+
+  const searchQuery = search || query
+  if (searchQuery) {
+    const searchFilter = [
+      { word: { contains: searchQuery, mode: "insensitive" } },
+      { oppositeWord: { contains: searchQuery, mode: "insensitive" } },
+      { oppositeWords: { has: searchQuery } },
+      { source: { contains: searchQuery, mode: "insensitive" } },
+      { session: { contains: searchQuery, mode: "insensitive" } },
+      { reference: { has: searchQuery } },
+    ]
+
+    if (where.OR) {
+      where.AND = [{ OR: where.OR }, { OR: searchFilter }]
+      delete where.OR
+    } else {
+      where.OR = searchFilter
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -91,10 +152,18 @@ export async function listOppositeWord(db: PrismaClient, input: ListOppositeWord
       orderBy,
       include: {
         subject: {
-          select: {
-            id: true,
-            nameEn: true,
-            nameBn: true,
+          include: {
+            classSubjects: {
+              include: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -133,7 +202,17 @@ export async function getOppositeWordById(db: PrismaClient, input: GetOppositeWo
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: {
+                select: {
+                  id: true,
+                  nameEn: true,
+                  nameBn: true,
+                },
+              },
+            },
+          },
         },
       },
       academicChapter: true,
@@ -151,25 +230,29 @@ export async function getOppositeWordById(db: PrismaClient, input: GetOppositeWo
   return item
 }
 
-export async function createOppositeWord(db: PrismaClient, input: CreateOppositeWordInput, userId?: string | null) {
+export async function createOppositeWord(
+  db: PrismaClient,
+  input: CreateOppositeWordInput,
+  userId?: string | null
+) {
   const data = input
-  const resolvedQuestionTypeId = await resolveOppositeWordQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveOppositeWordQuestionTypeId(db))
   const targetChapterId = data.academicChapterId || data.chapterId || null
-  const currentYear = new Date().getFullYear().toString()
 
   return db.oppositeWord.create({
     data: {
       word: data.word,
-      oppositeWord: data.oppositeWord || null,
+      oppositeWord: data.oppositeWord,
       oppositeWords: data.oppositeWords ?? [],
       reference: data.reference ?? [],
       source: data.source ? data.source.trim() : "গাইড বুক",
-      session: data.session ? data.session.trim() : currentYear,
+      session: data.session ? data.session.trim() : new Date().getFullYear().toString(),
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : true,
       ...(userId ? { createdById: userId } : {}),
     },
     include: {
@@ -180,19 +263,24 @@ export async function createOppositeWord(db: PrismaClient, input: CreateOpposite
   })
 }
 
-export async function updateOppositeWord(db: PrismaClient, input: UpdateOppositeWordInput, userId?: string | null) {
+export async function updateOppositeWord(
+  db: PrismaClient,
+  input: UpdateOppositeWordInput,
+  userId?: string | null
+) {
   const { id, ...data } = input
 
   await getOppositeWordById(db, { id })
-  const resolvedQuestionTypeId = await resolveOppositeWordQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveOppositeWordQuestionTypeId(db))
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
-  const currentYear = new Date().getFullYear().toString()
 
   const updateData: any = {
     word: data.word,
-    oppositeWord: data.oppositeWord !== undefined ? data.oppositeWord : undefined,
+    oppositeWord: data.oppositeWord,
     oppositeWords: data.oppositeWords,
     reference: data.reference,
+    source: data.source,
+    session: data.session,
     difficulty: data.difficulty,
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
@@ -200,16 +288,12 @@ export async function updateOppositeWord(db: PrismaClient, input: UpdateOpposite
     ...(userId ? { updatedById: userId } : {}),
   }
 
-  if (data.source !== undefined) {
-    updateData.source = data.source ? data.source.trim() : null
-  }
-
-  if (data.session !== undefined) {
-    updateData.session = data.session ? data.session.trim() : currentYear
+  if (data.isActive !== undefined) {
+    updateData.isActive = data.isActive
   }
 
   if (targetChapterId !== undefined) {
-    updateData.academicChapterId = targetChapterId || null
+    updateData.academicChapterId = targetChapterId
   }
 
   return db.oppositeWord.update({
@@ -240,7 +324,32 @@ export async function bulkDeleteOppositeWord(db: PrismaClient, input: BulkDelete
   return { deletedCount: res.count }
 }
 
-export async function importOppositeWord(db: PrismaClient, input: ImportOppositeWordInput, userId?: string | null) {
+export async function toggleOppositeWordActive(
+  db: PrismaClient,
+  input: ToggleOppositeWordActiveInput,
+  userId?: string | null
+) {
+  await getOppositeWordById(db, { id: input.id })
+
+  return db.oppositeWord.update({
+    where: { id: input.id },
+    data: {
+      isActive: input.isActive,
+      ...(userId ? { updatedById: userId } : {}),
+    },
+    include: {
+      subject: true,
+      academicChapter: true,
+      questionType: true,
+    },
+  })
+}
+
+export async function importOppositeWord(
+  db: PrismaClient,
+  input: ImportOppositeWordInput,
+  userId?: string | null
+) {
   const resolvedQuestionTypeId = await resolveOppositeWordQuestionTypeId(db)
   const currentYear = new Date().getFullYear().toString()
 
@@ -254,16 +363,17 @@ export async function importOppositeWord(db: PrismaClient, input: ImportOpposite
         const createdItem = await tx.oppositeWord.create({
           data: {
             word: data.word,
-            oppositeWord: data.oppositeWord || null,
+            oppositeWord: data.oppositeWord,
             oppositeWords: data.oppositeWords || [],
             reference: data.reference || [],
             source: data.source ? data.source.trim() : "গাইড বুক",
-            session: currentYear,
+            session: data.session ? data.session.trim() : currentYear,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive !== undefined ? data.isActive : true,
             ...(userId ? { createdById: userId } : {}),
           },
         })
@@ -283,11 +393,25 @@ export async function getOppositeWordStats(db: PrismaClient, input: OppositeWord
   const where: any = {}
   const targetChapterId = input.academicChapterId || input.chapterId
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (input.questionTypeId && input.questionTypeId !== "All") where.questionTypeId = input.questionTypeId
+
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.oppositeWord.count({ where }),
+    db.oppositeWord.count({ where: { ...where, isActive: true } }),
+    db.oppositeWord.count({ where: { ...where, isActive: false } }),
     db.oppositeWord.count({ where: { ...where, difficulty: "EASY" } }),
     db.oppositeWord.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.oppositeWord.count({ where: { ...where, difficulty: "HARD" } }),
@@ -295,10 +419,50 @@ export async function getOppositeWordStats(db: PrismaClient, input: OppositeWord
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string; academicChapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    NOT: { reference: { equals: [] } },
+  }
+  const targetChapterId = input.academicChapterId || input.chapterId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+
+  const questions = await db.oppositeWord.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

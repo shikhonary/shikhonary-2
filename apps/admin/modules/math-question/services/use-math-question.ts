@@ -20,6 +20,19 @@ export function useMathQuestionById(id: string, enabled = true) {
   })
 }
 
+export function useBoardYearsForSelection(input?: { subjectId?: string; chapterId?: string }) {
+  const subjectId = input?.subjectId === "All" ? undefined : input?.subjectId
+  const chapterId = input?.chapterId === "All" ? undefined : input?.chapterId
+
+  return useQuery({
+    ...trpc.mathQuestion.boardYears.queryOptions({
+      subjectId: subjectId || "",
+      chapterId,
+    }),
+    enabled: Boolean(subjectId),
+  })
+}
+
 export function useCreateMathQuestion() {
   const queryClient = useQueryClient()
 
@@ -36,6 +49,17 @@ export function useUpdateMathQuestion() {
 
   return useMutation({
     ...trpc.mathQuestion.update.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.mathQuestion.pathFilter())
+    },
+  })
+}
+
+export function useToggleMathQuestionActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.mathQuestion.toggleActive.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.mathQuestion.pathFilter())
     },

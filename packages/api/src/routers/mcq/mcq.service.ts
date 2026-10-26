@@ -63,6 +63,17 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
             nameEn: true,
             code: true,
             group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         chapter: {

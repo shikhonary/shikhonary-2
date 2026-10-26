@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { createTRPCRouter, superAdminProcedure } from "../../trpc"
 import {
   createMakeSentencesSchema,
@@ -6,6 +7,7 @@ import {
   listMakeSentencesSchema,
   updateMakeSentencesSchema,
   bulkDeleteMakeSentencesSchema,
+  toggleMakeSentencesActiveSchema,
   importMakeSentencesSchema,
   makeSentencesStatsSchema,
 } from "./make-sentences.schema"
@@ -16,6 +18,8 @@ import {
   listMakeSentences,
   updateMakeSentences,
   bulkDeleteMakeSentences,
+  toggleMakeSentencesActive,
+  getBoardYears,
   importMakeSentences,
   getMakeSentencesStats,
 } from "./make-sentences.service"
@@ -48,6 +52,20 @@ export const makeSentencesRouter = createTRPCRouter({
   bulkDelete: superAdminProcedure
     .input(bulkDeleteMakeSentencesSchema)
     .mutation(({ ctx, input }) => bulkDeleteMakeSentences(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleMakeSentencesActiveSchema)
+    .mutation(({ ctx, input }) => toggleMakeSentencesActive(ctx.db, input, ctx.session?.user?.id)),
+
+  boardYears: superAdminProcedure
+    .input(
+      z.object({
+        subjectId: z.string(),
+        chapterId: z.string().optional(),
+        academicChapterId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
 
   import: superAdminProcedure
     .input(importMakeSentencesSchema)

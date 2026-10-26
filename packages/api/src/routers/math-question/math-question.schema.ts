@@ -3,22 +3,29 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listMathQuestionSchema = paginationSchema.extend({
+  academicClassId: z.string().optional(),
+  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
+  board: z.string().optional(),
   questionTypeId: z.string().optional(),
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.number().int().optional(),
+  isActive: z.boolean().optional(),
   isMath: z.boolean().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
+  search: z.string().optional(),
 })
 
 export type ListMathQuestionInput = z.infer<typeof listMathQuestionSchema>
 
 export const mathQuestionStatsSchema = z.object({
+  academicClassId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
@@ -43,6 +50,7 @@ export const createMathQuestionSchema = z.object({
   chapterId: z.string().optional().nullable(),
   academicChapterId: z.string().optional().nullable(),
   questionTypeId: z.string().optional().nullable(),
+  isActive: z.boolean().default(true),
 })
 
 export type CreateMathQuestionInput = z.infer<typeof createMathQuestionSchema>
@@ -61,6 +69,13 @@ export const bulkDeleteMathQuestionSchema = z.object({
 })
 
 export type BulkDeleteMathQuestionInput = z.infer<typeof bulkDeleteMathQuestionSchema>
+
+export const toggleMathQuestionActiveSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+export type ToggleMathQuestionActiveInput = z.infer<typeof toggleMathQuestionActiveSchema>
 
 export const importMathQuestionSchema = z.object({
   questions: z.array(createMathQuestionSchema).min(1, "At least one math question entry is required"),

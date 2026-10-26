@@ -5,15 +5,14 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
+import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
+import { BookOpen, Trash2 } from "lucide-react"
 
 export interface MakeQuestionItem {
   id: string
@@ -26,12 +25,20 @@ export interface MakeQuestionItem {
   source?: string | null
   session?: string | null
   reference: string[]
+  isActive: boolean
   createdAt: Date | string
   updatedAt: Date | string
   subject?: {
     id: string
     nameEn: string
     nameBn?: string
+    classSubjects?: {
+      academicClass?: {
+        id: string
+        nameEn: string
+        nameBn?: string
+      } | null
+    }[]
   } | null
   academicChapter?: {
     id: string
@@ -53,7 +60,7 @@ interface MakeQuestionTableProps {
   currentPage: number
   itemsPerPage: number
   totalItems: number
-  totalPages: number
+  totalPages?: number
   onPageChange: (page: number) => void
   onLimitChange?: (limit: number) => void
 }
@@ -67,12 +74,9 @@ export function MakeQuestionTable({
   currentPage,
   itemsPerPage,
   totalItems,
-  totalPages,
   onPageChange,
   onLimitChange,
 }: MakeQuestionTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const handleSelectAll = (checked: boolean) => {
@@ -96,240 +100,200 @@ export function MakeQuestionTable({
 
   return (
     <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
+      {/* Selection Toolbar */}
+      {!isLoading && !isError && items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card p-3 sm:p-4 shadow-xs">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-foreground font-headline">
+                সবগুলো নির্বাচন করুন ({toBengaliDigits(items.length)}টি)
               </span>
-              <Button
-                type="button"
-                onClick={() => {
-                  onBulkDelete(selectedIds)
-                  setSelectedIds([])
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Delete Selected</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+            </label>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="animate-spin text-primary text-sm font-bold">
-              Loading...
-            </span>
-            <span className="font-body-md text-sm font-medium">Loading Question Making Entries...</span>
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-white/[0.08]">
+                <span className="text-xs font-semibold text-indigo-600 dark:text-primary font-body">
+                  {toBengaliDigits(selectedIds.length)}টি নির্বাচিত
+                </span>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    onBulkDelete(selectedIds)
+                    setSelectedIds([])
+                  }}
+                  className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-xs font-headline"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>নির্বাচিতগুলো ডিলিট করুন</span>
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Loading Skeleton State matching Short Answer Blueprint */}
+      {isLoading && (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-6 shadow-xs animate-pulse space-y-4"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-white/10" />
+                <div className="h-5 w-24 bg-slate-200 dark:bg-white/10 rounded-lg" />
+                <div className="h-5 w-32 bg-slate-200 dark:bg-white/10 rounded-lg" />
+              </div>
+              <div className="h-6 w-3/4 bg-slate-200 dark:bg-white/10 rounded-md" />
+              <div className="space-y-2 pt-2">
+                <div className="h-4 w-full bg-slate-200 dark:bg-white/10 rounded" />
+                <div className="h-4 w-5/6 bg-slate-200 dark:bg-white/10 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {/* Error State */}
       {isError && !isLoading && (
-        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-xl font-bold">⚠️ Error</span>
-            <span className="font-body-md text-sm font-medium">
-              Error loading Question Making entries. Please try refreshing.
-            </span>
-          </div>
+        <div className="overflow-hidden rounded-2xl border border-red-200 dark:border-red-900/30 bg-red-50/20 dark:bg-red-950/10 shadow-xs p-12 text-center text-red-600 font-headline">
+          <BookOpen className="h-10 w-10 mx-auto text-red-500 mb-3" />
+          <p className="text-base font-bold">প্রশ্ন তৈরির ডেটা লোড করা সম্ভব হয়নি।</p>
+          <p className="text-xs text-muted-foreground mt-1 font-body">
+            অনুগ্রহ করে পৃষ্ঠাটি রিলোড দিন অথবা কিছুক্ষণ পর চেষ্টা করুন।
+          </p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !isError && items.length === 0 && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-2xl">❓</span>
-            <p className="font-headline-md text-xl font-bold text-on-surface">
-              No Question Making Entries Found
-            </p>
-            <p className="font-body-md text-sm text-outline max-w-md">
-              Try adjusting filters or add a new question making entry to the bank.
-            </p>
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs py-16 px-6 text-center select-none">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center mb-4 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <BookOpen className="w-8 h-8 stroke-[1.8]" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+            কোনো প্রশ্ন তৈরির এন্ট্রি পাওয়া যায়নি
+          </h3>
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
+            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন প্রশ্ন তৈরির এন্ট্রি যোগ করুন।
+          </p>
+          <div className="mt-6">
+            <Button
+              asChild
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
+            >
+              <Link href="/make-questions/create" prefetch={true}>
+                <span>নতুন এন্ট্রি যোগ করুন</span>
+              </Link>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* CARD VIEW LAYOUT */}
+      {/* Populated Question Cards List */}
       {!isLoading && !isError && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const mainText = item.statement || item.context || "No statement text"
-            const snippet = mainText.length > 80 ? mainText.substring(0, 80) + "..." : mainText
+            const rawClass = item.subject?.classSubjects?.[0]?.academicClass
+            const className = rawClass ? rawClass.nameBn || rawClass.nameEn : null
+            const chapter = item.academicChapter
+            const mainText = item.statement || item.context || "(খালি বক্তব্য)"
 
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
-                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+                  "bg-card border rounded-2xl p-5 sm:p-6 transition-all duration-200 relative group shadow-xs hover:shadow-md",
+                  isSelected
+                    ? "border-indigo-600 ring-2 ring-indigo-500/20 bg-indigo-50/15"
+                    : "border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300"
                 )}
               >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                  {/* Selection Checkbox & Main Info */}
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4 sm:gap-6">
+                  {/* Left: Checkbox & Main Info */}
                   <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                          #{globalIndex}
-                        </span>
+                      {/* Shared Header Badges Row */}
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        academicClassName={className}
+                        subjectName={item.subject?.nameBn || item.subject?.nameEn}
+                        chapterName={chapter?.nameBn || chapter?.nameEn}
+                      />
 
-                        {/* Subject Badge */}
-                        {item.subject && (
-                          <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                            {item.subject.nameBn || item.subject.nameEn}
+                      {/* Statement Presentation */}
+                      <Link
+                        href={`/make-questions/${item.id}/edit`}
+                        prefetch={true}
+                        className="block font-headline text-base sm:text-lg font-bold text-slate-900 dark:text-foreground leading-snug group-hover:text-indigo-600 transition-colors"
+                      >
+                        <RenderMath text={mainText} isMath={/[\$\\]/.test(mainText)} />
+                      </Link>
+
+                      {/* Answer / Target Question */}
+                      {item.answer && (
+                        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 text-xs text-foreground leading-relaxed flex items-start gap-2">
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400 shrink-0 uppercase tracking-wider text-[11px] font-headline">
+                            উদ্দিষ্ট প্রশ্ন / উত্তর:
                           </span>
-                        )}
-
-                        {/* Chapter Badge */}
-                        {item.academicChapter && (
-                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                            {item.academicChapter.nameBn || item.academicChapter.nameEn}
-                          </span>
-                        )}
-
-                        {/* Popularity Badge */}
-                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
-                          👁️ {item.popularityCount ?? 0} Views
-                        </span>
-
-                        {/* Difficulty Badge */}
-                        <span className={cn(
-                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                        )}>
-                          {item.difficulty || "MEDIUM"}
-                        </span>
-                      </div>
-
-                      {/* Statement & Question Box */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed space-y-2">
-                        <div className={cn(
-                          "whitespace-pre-wrap font-bold text-lg text-primary",
-                          /[\u0980-\u09FF]/.test(mainText) && "font-solaiman text-xl"
-                        )}>
-                          <RenderMath text={mainText} isMath={true} />
+                          <div className="whitespace-pre-wrap font-medium font-body text-sm">
+                            <RenderMath text={item.answer} isMath={/[\$\\]/.test(item.answer)} />
+                          </div>
                         </div>
+                      )}
 
-                        {item.answer && (
-                          <div className="text-sm font-medium text-on-surface-variant pt-2 border-t border-secondary/10">
-                            <span className="font-bold text-outline text-xs uppercase tracking-wider mr-2">উদ্দিষ্ট প্রশ্ন / উত্তর:</span>
-                            <RenderMath text={item.answer} isMath={true} />
-                          </div>
-                        )}
-
-                        {(item.clue || item.context) && (
-                          <div className="text-xs font-medium text-amber-900 pt-1 flex flex-wrap items-center gap-3">
-                            {item.clue && (
-                              <span>
-                                <span className="font-bold text-amber-700 uppercase tracking-wider">Clue: </span>
-                                <span>{item.clue}</span>
-                              </span>
-                            )}
-                            {item.context && item.statement && (
-                              <span>
-                                <span className="font-bold text-amber-700 uppercase tracking-wider">Context: </span>
-                                <span>{item.context}</span>
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Source & Reference Tags & Essence Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {/* Source & Session Badge */}
-                          {(item.source || item.session) && (
-                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                              📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+                      {/* Clue & Context Tags */}
+                      {(item.clue || item.context) && (
+                        <div className="flex flex-wrap items-center gap-2 pt-1">
+                          {item.clue && (
+                            <span className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-medium border border-amber-200/60 dark:border-amber-800/40 font-body">
+                              <span className="font-bold font-headline uppercase mr-1">ক্লু:</span> {item.clue}
                             </span>
                           )}
-
-                          {/* Parent Essence Badge */}
-                          {item.essence && (
-                            <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded text-[11px] font-semibold border border-indigo-200">
-                              ✨ {item.essence.title || "Linked Essence"}
+                          {item.context && (
+                            <span className="px-2.5 py-1 bg-slate-100 dark:bg-white/[0.04] text-muted-foreground rounded-lg text-xs font-medium border border-slate-200 dark:border-white/[0.08] font-body">
+                              <span className="font-bold font-headline uppercase mr-1">প্রসঙ্গ:</span> {item.context}
                             </span>
                           )}
-
-                          {/* Reference Tags */}
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                              >
-                                🏷️ {ref}
-                              </span>
-                            ))
-                          ) : (
-                            !(item.source || item.session) && !item.essence && (
-                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                            )
-                          )}
                         </div>
+                      )}
 
-                        <span className="text-[11px] font-mono text-outline/60">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                      {/* Shared Footer */}
+                      <QuestionCardFooter
+                        source={item.source}
+                        session={item.session}
+                        references={item.reference}
+                      />
                     </div>
                   </div>
 
-                  {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/make-questions/${item.id}/edit`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-                      title="Edit Question Entry"
-                    >
-                      <Edit3 className="size-5 mx-auto" />
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, snippet)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-                      title="Delete Question Entry"
-                    >
-                      <Trash2 className="size-5 mx-auto" />
-                    </button>
-                  </div>
+                  {/* Shared Actions Column */}
+                  <QuestionCardActions
+                    editHref={`/make-questions/${item.id}/edit`}
+                    onDelete={() => onDelete(item.id, mainText)}
+                    editLabel="এডিট"
+                    deleteLabel="ডিলিট"
+                    editTitle="এন্ট্রি সম্পাদনা করুন"
+                    deleteTitle="এন্ট্রি মুছুন"
+                  />
                 </div>
               </div>
             )
@@ -337,69 +301,18 @@ export function MakeQuestionTable({
         </div>
       )}
 
-      {/* Pagination Footer */}
+      {/* Pagination */}
       {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> question making entries
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? "default" : "ghost"}
-                onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary"
-                    : "hover:bg-surface-container-high text-on-surface"
-                }`}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <DataTablePagination
+          page={currentPage}
+          limit={itemsPerPage}
+          totalItems={totalItems}
+          entityName="টি প্রশ্ন তৈরির এন্ট্রি"
+          isLoading={isLoading}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+          pageSizeOptions={[10, 20, 50, 100]}
+        />
       )}
     </div>
   )

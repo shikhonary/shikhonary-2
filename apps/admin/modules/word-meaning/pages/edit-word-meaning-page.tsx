@@ -7,9 +7,5 @@ interface EditWordMeaningPageProps {
 }
 
 export function EditWordMeaningPage({ id }: EditWordMeaningPageProps) {
-  return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <EditWordMeaningView id={id} />
-    </div>
-  )
+  return <EditWordMeaningView id={id} />
 }

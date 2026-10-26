@@ -19,10 +19,31 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
   if (input.chapterId) where.chapterId = input.chapterId
   if (input.difficulty) where.difficulty = input.difficulty
 
+  if (input.source && input.year !== undefined) {
+    const boardRef = [input.source, input.year].filter(Boolean).join("-")
+    where.OR = [
+      { AND: [{ source: input.source }, { session: String(input.year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else {
+    if (input.source) where.source = input.source
+    if (input.session) where.session = input.session
+    if (input.year !== undefined) {
+      where.reference = { has: String(input.year) }
+    }
+  }
+
+  if (input.board && !input.source) {
+    where.reference = { has: input.board }
+  }
+
   if (input.query) {
     where.OR = [
       { questionA: { contains: input.query, mode: "insensitive" } },
       { questionB: { contains: input.query, mode: "insensitive" } },
+      { source: { contains: input.query, mode: "insensitive" } },
+      { session: { contains: input.query, mode: "insensitive" } },
+      { reference: { has: input.query } },
     ]
   }
 
@@ -31,6 +52,10 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
     orderBy = { createdAt: "desc" }
   } else if (input.sort === "oldest") {
     orderBy = { createdAt: "asc" }
+  } else if (input.sort === "question_asc") {
+    orderBy = { questionA: "asc" }
+  } else if (input.sort === "question_desc") {
+    orderBy = { questionA: "desc" }
   }
 
   const page = input.page ?? 1
@@ -51,6 +76,17 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
             nameEn: true,
             code: true,
             group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         chapter: {
@@ -90,7 +126,11 @@ export async function getCsById(db: PrismaClient, input: GetCsInput) {
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       chapter: true,
@@ -163,6 +203,8 @@ export async function createCs(db: PrismaClient, input: CreateCsInput) {
       questionB: data.questionB,
       reference: data.reference ?? [],
       difficulty: data.difficulty,
+      source: data.source ?? null,
+      session: data.session ?? null,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
     },
@@ -210,6 +252,8 @@ export async function updateCs(db: PrismaClient, input: UpdateCsInput) {
       questionB: data.questionB,
       reference: data.reference,
       difficulty: data.difficulty,
+      source: data.source !== undefined ? data.source : undefined,
+      session: data.session !== undefined ? data.session : undefined,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
     },
@@ -308,6 +352,8 @@ export async function importCs(db: PrismaClient, input: ImportCsInput) {
             questionB: data.questionB,
             reference: data.reference || [],
             difficulty: data.difficulty ?? "MEDIUM",
+            source: data.source ?? null,
+            session: data.session ?? null,
             questionTypeId: resolvedQuestionTypeId || undefined,
             isActive: data.isActive ?? true,
           },
@@ -348,4 +394,49 @@ export async function getCsStats(db: PrismaClient, input: CsStatsInput = {}) {
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    OR: [
+      { NOT: { reference: { equals: [] } } },
+      { AND: [{ source: { not: null } }, { session: { not: null } }] },
+    ],
+  }
+  if (input.chapterId) where.chapterId = input.chapterId
+
+  const questions = await (db as any).cS.findMany({
+    where,
+    select: { reference: true, source: true, session: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    if (q.source && q.session) {
+      const key = `${q.source}-${q.session}`
+      countMap.set(key, (countMap.get(key) || 0) + 1)
+    }
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      if (q.source && q.session && ref === `${q.source}-${q.session}`) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

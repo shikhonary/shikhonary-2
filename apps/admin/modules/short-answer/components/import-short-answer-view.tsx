@@ -25,21 +25,25 @@ import {
 } from "@workspace/ui/components/select"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments"
+import { PageHeader } from "@/components/shared/page-header"
+import { toBengaliDigits, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { SHORT_ANSWER_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 import "katex/dist/katex.min.css"
 import {
-  PlusIcon,
-  Trash2Icon,
-  CopyIcon,
-  CheckCircle2Icon,
-  Wand2Icon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  CodeIcon,
-  FileCodeIcon,
-  UploadIcon,
+  Plus,
+  Trash2,
+  Copy,
+  CheckCircle2,
+  Wand2,
+  AlertTriangle,
+  Code,
+  FileCode,
+  Upload,
+  ArrowLeft,
+  Loader2,
+  Sparkles,
 } from "lucide-react"
-import { SHORT_ANSWER_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 
 const sampleJsonTemplate = `[
   {
@@ -50,7 +54,7 @@ const sampleJsonTemplate = `[
     "difficulty": "EASY",
     "source": "গাইড বুক",
     "session": "2026",
-    "reference": ["Physics Ch1"],
+    "reference": ["পদার্থবিজ্ঞান ১ম অধ্যায়"],
     "attachments": [
       {
         "type": "image",
@@ -70,8 +74,15 @@ const sampleJsonTemplate = `[
 export function repairJsonSyntax(raw: string): string {
   let cleaned = raw.trim()
   cleaned = cleaned.replace(/^```(?:json)?\s*/gi, "").replace(/\s*```$/g, "").trim()
+  if (cleaned.endsWith(",")) {
+    cleaned = cleaned.slice(0, -1).trim()
+  }
   cleaned = cleaned.replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
+  cleaned = cleaned.replace(
+    /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
+    "\\\\$1"
+  )
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
   if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
     cleaned = `[\n${cleaned}\n]`
@@ -137,7 +148,7 @@ interface EditableFieldProps {
 function EditableField({
   label,
   value,
-  placeholder = "Click to edit...",
+  placeholder = "সম্পাদনা করতে ক্লিক করুন...",
   multiline = false,
   onSave,
   className = "",
@@ -173,7 +184,7 @@ function EditableField({
     <div className={cn("group relative transition-colors", className)}>
       {label && (
         <div className="flex items-center justify-between mb-1">
-          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
+          <span className="font-headline text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
             {label}
           </span>
           {badge}
@@ -189,10 +200,7 @@ function EditableField({
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
+              className="w-full rounded-xl border-2 border-indigo-500 bg-background p-2.5 text-sm font-medium focus:outline-hidden font-body"
             />
           ) : (
             <Input
@@ -201,41 +209,35 @@ function EditableField({
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
+              className="w-full rounded-xl border-2 border-indigo-500 bg-background px-3 py-2 text-sm font-medium focus:outline-hidden font-body"
             />
           )}
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-            <span>Press Enter to save, Esc to cancel</span>
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1 font-body">
+            <span>সংরক্ষণে Enter চাপুন, বাতিলের জন্য Esc চাপুন</span>
             <button
               type="button"
               onMouseDown={(e) => {
                 e.preventDefault()
                 handleBlur()
               }}
-              className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+              className="text-xs font-semibold text-indigo-600 hover:underline cursor-pointer"
             >
-              Save
+              সংরক্ষণ
             </button>
           </div>
         </div>
       ) : (
         <div
           onDoubleClick={() => setIsEditing(true)}
-          title="Click to edit"
+          title="সম্পাদনা করতে ডাবল-ক্লিক করুন"
           className={cn(
-            "group/edit min-h-9 cursor-pointer rounded-lg border border-transparent bg-surface-container-lowest/50 p-2.5 transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-xs",
-            !value && "italic text-outline-variant",
+            "group/edit min-h-9 cursor-pointer rounded-xl border border-transparent bg-slate-50/50 dark:bg-white/[0.02] p-2.5 transition-all hover:border-indigo-300 hover:bg-indigo-50/30",
+            !value && "italic text-muted-foreground",
             textClassName
           )}
         >
           <div className="flex items-start justify-between gap-2">
-            <span className={cn(
-              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
-              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
-            )}>
+            <span className="flex-1 whitespace-pre-wrap font-medium text-foreground text-sm leading-relaxed font-body">
               <RenderMath text={value || placeholder} isMath={isMath} />
             </span>
             <button
@@ -244,9 +246,9 @@ function EditableField({
                 e.stopPropagation()
                 setIsEditing(true)
               }}
-              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden"
+              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] font-bold text-indigo-600 dark:text-primary shrink-0 bg-indigo-50 dark:bg-primary/10 px-2 py-0.5 rounded-md select-none cursor-pointer border-0 outline-hidden font-headline"
             >
-              Edit
+              এডিট
             </button>
           </div>
         </div>
@@ -258,12 +260,13 @@ function EditableField({
 interface EditableSaCardProps {
   index: number
   item: any
+  defaultSource?: string
   onChange: (updated: any) => void
   onDelete: () => void
   onDuplicate: () => void
 }
 
-function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: EditableSaCardProps) {
+function EditableSaCard({ index, item, defaultSource, onChange, onDelete, onDuplicate }: EditableSaCardProps) {
   const handleToggleDifficulty = () => {
     const difficulties = ["EASY", "MEDIUM", "HARD"]
     const nextIdx = (difficulties.indexOf(item.difficulty || "MEDIUM") + 1) % difficulties.length
@@ -279,15 +282,21 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
     onChange({ ...item, reference: refs })
   }
 
+  const diffMap: Record<string, { label: string; className: string }> = {
+    EASY: { label: "সহজ", className: "border-emerald-500 text-emerald-700 bg-emerald-50" },
+    MEDIUM: { label: "মাঝারি", className: "border-amber-500 text-amber-700 bg-amber-50" },
+    HARD: { label: "কঠিন", className: "border-rose-500 text-rose-700 bg-rose-50" },
+  }
+
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant/60 bg-white shadow-xs hover:shadow-md transition-shadow">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
+    <Card className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs hover:shadow-md transition-shadow">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] px-5 py-3.5">
         <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary-container font-headline text-xs font-bold text-on-primary-container">
-            #{index + 1}
+          <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-100 dark:bg-primary/20 font-solaiman text-xs font-bold text-indigo-700 dark:text-primary">
+            #{toBengaliDigits(index + 1)}
           </span>
-          <span className="text-xs font-semibold uppercase tracking-wider text-outline">
-            Short Answer Preview
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+            সংক্ষিপ্ত উত্তর প্রিভিউ
           </span>
         </div>
 
@@ -297,13 +306,11 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
             <Badge
               variant="outline"
               className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                item.difficulty === "EASY" && "border-emerald-500 text-emerald-700 bg-emerald-50",
-                item.difficulty === "MEDIUM" && "border-amber-500 text-amber-700 bg-amber-50",
-                item.difficulty === "HARD" && "border-red-500 text-red-700 bg-red-50"
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider font-body",
+                diffMap[item.difficulty]?.className || diffMap["MEDIUM"]!.className
               )}
             >
-              {item.difficulty || "MEDIUM"}
+              {diffMap[item.difficulty]?.label || "মাঝারি"}
             </Badge>
           </button>
 
@@ -311,17 +318,17 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
           <button
             type="button"
             onClick={() => onChange({ ...item, isMath: !item.isMath })}
-            title="Click to toggle Math formula rendering"
+            title="গণিত মোড পরিবর্তন করুন"
             className="cursor-pointer"
           >
             <Badge
               variant={item.isMath ? "outline" : "ghost"}
               className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95",
-                item.isMath ? "border-primary text-primary bg-primary/5" : "text-muted-foreground"
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-transform active:scale-95 font-body",
+                item.isMath ? "border-indigo-500 text-indigo-600 bg-indigo-50 dark:bg-primary/10" : "text-muted-foreground"
               )}
             >
-              {item.isMath ? "∑ Math On" : "Text Only"}
+              {item.isMath ? "∑ গণিত সক্রিয়" : "টেক্সট"}
             </Badge>
           </button>
 
@@ -330,46 +337,46 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
             <Badge
               variant="outline"
               className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                item.isActive !== false ? "border-emerald-500 text-emerald-600 bg-emerald-50" : "border-gray-400 text-gray-500 bg-gray-50"
+                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider font-body",
+                item.isActive !== false ? "border-emerald-500 text-emerald-600 bg-emerald-50" : "border-slate-400 text-slate-500 bg-slate-50"
               )}
             >
-              {item.isActive !== false ? "Active" : "Inactive"}
+              {item.isActive !== false ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"}
             </Badge>
           </button>
 
           {/* Delete & Duplicate */}
-          <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
+          <div className="flex items-center gap-1 ml-2 border-l border-slate-200 dark:border-white/[0.08] pl-2">
             <Button
               type="button"
               variant="ghost"
               size="icon-xs"
               onClick={onDuplicate}
-              title="Duplicate"
-              className="text-on-surface-variant hover:bg-surface-container-high cursor-pointer size-7"
+              title="কপি করুন"
+              className="text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06] cursor-pointer size-7"
             >
-              <CopyIcon className="size-4" />
+              <Copy className="size-4" />
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="icon-xs"
               onClick={onDelete}
-              title="Delete"
-              className="text-destructive hover:bg-destructive/10 cursor-pointer size-7"
+              title="মুছুন"
+              className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 cursor-pointer size-7"
             >
-              <Trash2Icon className="size-4" />
+              <Trash2 className="size-4" />
             </Button>
           </div>
         </div>
       </div>
 
       <div className="p-5 space-y-4">
-        {/* Attachments Section (Images, Tables, Context Texts) */}
+        {/* Attachments Section */}
         {Array.isArray(item.attachments) && item.attachments.length > 0 && (
-          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
-              Attachments ({item.attachments.length})
+          <div className="space-y-1.5 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5">
+            <span className="font-headline text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-1">
+              সংযুক্তি ({toBengaliDigits(item.attachments.length)}টি)
             </span>
             <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
           </div>
@@ -377,20 +384,20 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
 
         {/* Question Text */}
         <EditableField
-          label="Question Text *"
+          label="প্রশ্ন (Question Stem) *"
           value={item.question || ""}
           multiline
           isMath={item.isMath}
-          placeholder="Enter question text..."
+          placeholder="প্রশ্নের বিষয়বস্তু লিখুন..."
           onSave={(newVal) => onChange({ ...item, question: newVal })}
         />
 
         {/* Options (Optional) */}
         <EditableField
-          label="Answer Options (Optional, Comma-separated)"
+          label="উত্তর অপশনসমূহ (ঐচ্ছিক, কমা দিয়ে আলাদা করুন)"
           value={Array.isArray(item.options) ? item.options.join(", ") : ""}
           isMath={item.isMath}
-          placeholder="e.g. Option A, Option B, Option C, Option D"
+          placeholder="যেমন: অপশন ১, অপশন ২, অপশন ৩, অপশন ৪"
           onSave={(newVal) => {
             const arr = newVal ? newVal.split(",").map((s: string) => s.trim()).filter(Boolean) : []
             onChange({ ...item, options: arr })
@@ -399,37 +406,30 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
 
         {/* Answer Text */}
         <EditableField
-          label="Model Answer (Optional)"
+          label="আদর্শ উত্তর / সমাধান (ঐচ্ছিক)"
           value={item.answer || ""}
           multiline
           isMath={item.isMath}
-          placeholder="Enter answer guidelines..."
+          placeholder="উত্তর বা সমাধান নির্দেশিকা লিখুন..."
           onSave={(newVal) => onChange({ ...item, answer: newVal || undefined })}
         />
 
-        {/* References, Source & Session */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3 items-center">
-          <EditableField
-            label="References (Comma-separated)"
-            value={Array.isArray(item.reference) ? item.reference.join(", ") : ""}
-            placeholder="e.g. Physics Ch1, Panjeree 2024..."
-            onSave={handleSaveReferences}
-          />
-
+        {/* Clean Metadata: Source & References (Zero Session Input Clutter) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-3 items-center">
           <div className="space-y-1.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-              Source (উৎস)
+            <span className="font-headline text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+              উৎস (Source)
             </span>
             <Select
-              value={item.source || DEFAULT_SOURCE}
+              value={item.source || defaultSource || DEFAULT_SOURCE}
               onValueChange={(val) => onChange({ ...item, source: val })}
             >
-              <SelectTrigger className="w-full bg-white h-9 text-xs">
-                <SelectValue placeholder="Select Source..." />
+              <SelectTrigger className="w-full bg-background h-10 text-xs rounded-xl border border-slate-200 dark:border-white/[0.08] font-body">
+                <SelectValue placeholder="উৎস নির্বাচন করুন..." />
               </SelectTrigger>
-              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
+              <SelectContent className="bg-popover text-popover-foreground border border-slate-200 dark:border-white/[0.08] shadow-md font-body">
                 {SHORT_ANSWER_SOURCE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
+                  <SelectItem key={opt.value} value={opt.value} className="text-xs">
                     {opt.label}
                   </SelectItem>
                 ))}
@@ -437,17 +437,12 @@ function EditableSaCard({ index, item, onChange, onDelete, onDuplicate }: Editab
             </Select>
           </div>
 
-          <div className="space-y-1.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-              Session (শিক্ষাবর্ষ)
-            </span>
-            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
-              <span>{item.session || (item.year ? String(item.year) : new Date().getFullYear())}</span>
-              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
-                Auto Current Year
-              </Badge>
-            </div>
-          </div>
+          <EditableField
+            label="রেফারেন্স ট্যাগ (কমা দিয়ে আলাদা করুন)"
+            value={Array.isArray(item.reference) ? item.reference.join(", ") : ""}
+            placeholder="যেমন: পদার্থবিজ্ঞান ১ম অধ্যায়, পাঞ্জেরী ২০২৪..."
+            onSave={handleSaveReferences}
+          />
         </div>
       </div>
     </Card>
@@ -527,7 +522,7 @@ export function ImportShortAnswerView() {
           rawData = JSON.parse(repaired)
           textToParse = repaired
           setJsonText(repaired)
-          toast.success("Auto-repaired JSON formatting quotes & commas!")
+          toast.success("JSON ফরম্যাট স্বয়ংক্রিয়ভাবে সংশোধন করা হয়েছে!")
         } catch {
           // Keep raw errors
         }
@@ -544,7 +539,7 @@ export function ImportShortAnswerView() {
     try {
       const itemsArray = Array.isArray(rawData) ? rawData : [rawData]
       if (itemsArray.length === 0) {
-        setParseError("JSON array is empty.")
+        setParseError("JSON অ্যারে খালি পাওয়া গেছে।")
         return
       }
 
@@ -557,13 +552,13 @@ export function ImportShortAnswerView() {
         const chapterId = item.chapterId || overrideChapterId
 
         if (!item.question || typeof item.question !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'question' stem string.`)
+          errors.push(`আইটেম #${toBengaliDigits(itemNum)}: 'question' ফিল্ড অনুপস্থিত।`)
         }
         if (!subjectId) {
-          errors.push(`Item #${itemNum}: Missing 'subjectId'. Select subject default or append to JSON.`)
+          errors.push(`আইটেম #${toBengaliDigits(itemNum)}: বিষয় অনুপস্থিত।`)
         }
         if (!chapterId) {
-          errors.push(`Item #${itemNum}: Missing 'chapterId'. Select chapter default or append to JSON.`)
+          errors.push(`আইটেম #${toBengaliDigits(itemNum)}: অধ্যায় অনুপস্থিত।`)
         }
 
         const attachmentsArray = Array.isArray(item.attachments)
@@ -612,12 +607,12 @@ export function ImportShortAnswerView() {
       })
 
       if (errors.length > 0) {
-        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} more errors)` : ""))
+        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} আরও ত্রুটি)` : ""))
       }
 
       setParsedItems(validated)
     } catch (err: any) {
-      setParseError(`Validation Error: ${err.message || "Could not validate short answers."}`)
+      setParseError(`যাচাইকরণে ত্রুটি: ${err.message || "সংক্ষিপ্ত উত্তর প্রসেস করা সম্ভব হয়নি।"}`)
     }
   }
 
@@ -626,7 +621,7 @@ export function ImportShortAnswerView() {
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
     validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
-    toast.success("JSON syntax repaired!")
+    toast.success("JSON ফরম্যাট স্বয়ংক্রিয়ভাবে সংশোধন করা হয়েছে!")
   }
 
   const syncParsedItemsToText = (newItems: any[]) => {
@@ -685,7 +680,7 @@ export function ImportShortAnswerView() {
     const next = [...parsedItems]
     next.splice(idx + 1, 0, {
       ...itemToCopy,
-      question: `${itemToCopy.question} (Copy)`,
+      question: `${itemToCopy.question} (কপি)`,
     })
     syncParsedItemsToText(next)
   }
@@ -710,12 +705,12 @@ export function ImportShortAnswerView() {
 
   const handleCopyTemplate = () => {
     navigator.clipboard.writeText(sampleJsonTemplate)
-    toast.success("Template copied!")
+    toast.success("টেমপ্লেট কপি করা হয়েছে!")
   }
 
   const handleImport = async () => {
     if (parsedItems.length === 0 || parseError) {
-      toast.error("Please resolve JSON syntax errors first.")
+      toast.error("অনুগ্রহ করে প্রথমে JSON ত্রুটি সমাধান করুন।")
       return
     }
 
@@ -739,103 +734,105 @@ export function ImportShortAnswerView() {
       }))
 
       const res = await importMutation.mutateAsync({ shortAnswers: payload })
-      toast.success(`Successfully imported ${res.importedCount} Short Answers!`)
+      toast.success(`সফলভাবে ${toBengaliDigits(res.importedCount)}টি সংক্ষিপ্ত উত্তর ইমপোর্ট করা হয়েছে!`)
       setTimeout(() => {
         router.push("/short-answers")
-      }, 1000)
+      }, 800)
     } catch (err: any) {
-      toast.error(err.message || "Failed to bulk import short answers.")
+      toast.error(err.message || "সংক্ষিপ্ত উত্তর ইমপোর্ট করা সম্ভব হয়নি।")
     }
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto pb-12">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end justify-between">
-        <div>
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/short-answers"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              Short Answers
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-12">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="JSON থেকে সংক্ষিপ্ত উত্তর ইমপোর্ট"
+        description="একসাথে একাধিক সংক্ষিপ্ত উত্তর প্রশ্ন আপলোড করুন এবং সংরক্ষণ করার পূর্বে প্রিভিউ দেখে সম্পাদনা করুন।"
+        icon={Upload}
+        badge={{ label: "JSON ইমপোর্ট", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "সংক্ষিপ্ত উত্তর তালিকা", href: "/short-answers" },
+          { label: "JSON ইমপোর্ট" },
+        ]}
+      >
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowSample(!showSample)}
+            className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2 font-headline"
+          >
+            <Code className="size-4" />
+            <span>{showSample ? "টেমপ্লেট লুকান" : "নমুনা JSON দেখুন"}</span>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs font-headline"
+          >
+            <Link href="/short-answers" prefetch={true}>
+              <ArrowLeft className="w-4 h-4" />
+              <span>তালিকায় ফিরে যান</span>
             </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm text-xs font-bold text-primary">Import JSON</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Import Short Answers from JSON
-          </h2>
-          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Bulk upload questions or double-click to customize individual cards before saving.
-          </p>
+          </Button>
         </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowSample(!showSample)}
-          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
-        >
-          <CodeIcon className="size-4" />
-          <span>{showSample ? "Hide Template" : "View Sample JSON"}</span>
-        </Button>
-      </div>
+      </PageHeader>
 
       {/* Sample JSON Template Card */}
       {showSample && (
-        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-4 sm:p-6 animate-fade-in">
+        <Card className="overflow-hidden rounded-2xl border border-indigo-200 dark:border-primary/20 bg-indigo-50/20 dark:bg-primary/5 p-5 sm:p-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <h4 className="font-headline-md text-base font-bold text-primary flex items-center gap-2">
-              <FileCodeIcon className="size-5" />
-              Expected JSON Structure
+            <h4 className="font-headline text-base font-bold text-indigo-700 dark:text-primary flex items-center gap-2">
+              <FileCode className="size-5" />
+              প্রত্যাশিত JSON ফরম্যাট
             </h4>
             <Button
               type="button"
-              size="xs"
+              size="sm"
               variant="outline"
               onClick={handleCopyTemplate}
-              className="w-full sm:w-auto font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer justify-center"
+              className="rounded-xl border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold text-xs cursor-pointer font-headline"
             >
-              Copy Template
+              টেমপ্লেট কপি করুন
             </Button>
           </div>
-          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-lg bg-surface-container-lowest p-3 sm:p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
+          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-xl bg-card p-4 font-mono text-xs text-foreground leading-relaxed border border-slate-200/80 dark:border-white/[0.08]">
             {sampleJsonTemplate}
           </pre>
         </Card>
       )}
 
       {/* Main Hierarchy & Input Section */}
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-xs">
-        <CardHeader className="border-b border-outline-variant/30 p-6 bg-surface-container-low/30">
-          <CardTitle className="font-headline-md text-lg font-semibold text-on-surface">
-            Class, Subject & Chapter Hierarchy (Default Assignee)
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] p-6 bg-slate-50/50 dark:bg-white/[0.02]">
+          <CardTitle className="font-headline text-lg font-bold text-foreground">
+            শ্রেণি, বিষয় ও অধ্যায় নির্ধারণ (ডিফল্ট মান)
           </CardTitle>
-          <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Choose taxonomy values. Submissions without inline keys will be assigned these values by default.
+          <p className="font-body text-xs text-muted-foreground mt-1">
+            ডিফল্ট মান নির্বাচন করুন। যে প্রশ্নগুলোতে নির্দিষ্ট বিষয় বা অধ্যায় উল্লেখ থাকবে না, সেগুলো স্বয়ংক্রিয়ভাবে এই মানগুলো গ্রহণ করবে।
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {/* Taxonomy Grid */}
+          {/* Taxonomy Grid (4 Columns: Class, Subject, Chapter, Default Source - ZERO manual session input) */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Class
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                শ্রেণি (Academic Class)
               </Label>
               <Select
                 value={selectedAcademicClassId || "all"}
                 onValueChange={handleAcademicClassChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface bg-white h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Class..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 cursor-pointer font-body">
+                  <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  <SelectItem value="all" className="text-neutral-900">All Classes</SelectItem>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200 dark:border-white/[0.08] font-body">
+                  <SelectItem value="all">সকল শ্রেণি</SelectItem>
                   {academicClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
-                      {cls.nameEn}
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -844,20 +841,20 @@ export function ImportShortAnswerView() {
 
             {/* Subject */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                ডিফল্ট বিষয় (Subject)
               </Label>
               <Select
                 value={selectedSubjectId}
                 onValueChange={handleSubjectChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface bg-white h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 cursor-pointer font-body">
+                  <SelectValue placeholder="বিষয় নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200 dark:border-white/[0.08] font-body">
                   {subjects.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                      {sub.nameEn}
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -866,21 +863,21 @@ export function ImportShortAnswerView() {
 
             {/* Chapter */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Chapter
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                ডিফল্ট অধ্যায় (Chapter)
               </Label>
               <Select
                 disabled={!selectedSubjectId}
                 value={selectedChapterId}
                 onValueChange={handleChapterChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface bg-white h-10 cursor-pointer disabled:opacity-50">
-                  <SelectValue placeholder={selectedSubjectId ? "Select Default Chapter..." : "Select Subject first"} />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 cursor-pointer font-body disabled:opacity-50">
+                  <SelectValue placeholder={selectedSubjectId ? "অধ্যায় নির্বাচন করুন..." : "প্রথমে বিষয় নির্বাচন করুন"} />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200 dark:border-white/[0.08] font-body">
                   {chapters.map((ch) => (
-                    <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
-                      {ch.nameEn}
+                    <SelectItem key={ch.id} value={ch.id}>
+                      {ch.nameBn || ch.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -889,19 +886,19 @@ export function ImportShortAnswerView() {
 
             {/* Default Source Select */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Source (উৎস) *
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                উৎস (Source) *
               </Label>
               <Select
                 value={selectedSource}
                 onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Source..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 cursor-pointer font-body">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200 dark:border-white/[0.08] font-body">
                   {SHORT_ANSWER_SOURCE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -912,42 +909,42 @@ export function ImportShortAnswerView() {
 
           {/* Warning Notification */}
           {(!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId) && (
-            <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs font-semibold">
-              <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
-              <span>Select academic class, subject, and chapter above to unlock pasting and upload controls.</span>
+            <div className="flex items-center gap-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 p-3.5 text-amber-800 dark:text-amber-400 text-xs font-semibold font-body">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+              <span>উপরে শ্রেণি, বিষয় এবং অধ্যায় নির্বাচন করুন যাতে JSON আপলোড সক্রিয় হয়।</span>
             </div>
           )}
 
           {/* JSON File Uploader */}
-          <div className="border-t border-outline-variant/30 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
-              Upload JSON File
+          <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 font-headline">
+              JSON ফাইল আপলোড করুন
             </Label>
             <input
               type="file"
               accept=".json"
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               onChange={handleFileUpload}
-              className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50"
+              className="block w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer disabled:opacity-50 font-body"
             />
           </div>
 
           {/* Textarea Paste */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Or Paste JSON Content Below
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                অথবা নিচে JSON কোড পেস্ট করুন
               </Label>
               {jsonText.trim() && (
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={handleAutoFixJson}
-                  className="text-xs font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+                  className="rounded-xl border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-bold text-xs cursor-pointer font-headline gap-1.5"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  ⚡ Auto-Fix & Format JSON
+                  <Wand2 className="size-3.5" />
+                  <span>অটো-ফিক্স ও ফরম্যাট JSON</span>
                 </Button>
               )}
             </div>
@@ -956,61 +953,61 @@ export function ImportShortAnswerView() {
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               placeholder={
                 !selectedAcademicClassId || !selectedSubjectId || !selectedChapterId
-                  ? "Select Class, Subject, and Chapter above first to enable JSON input..."
-                  : "Paste JSON array here..."
+                  ? "প্রথমে উপরে শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করুন..."
+                  : "এখানে JSON অ্যারে পেস্ট করুন..."
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-white p-3 font-mono text-xs text-on-surface focus:ring-2 focus:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] p-3.5 font-mono text-xs text-foreground focus:border-indigo-600 disabled:opacity-50"
             />
           </div>
 
           {/* Validation Diagnostics */}
           {parseError && (
-            <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
+            <div className="space-y-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-                  <p className="font-bold text-sm">JSON Syntax Diagnostics Error</p>
+                  <AlertTriangle className="size-5 text-rose-600 shrink-0" />
+                  <p className="font-bold text-sm font-headline">JSON সিনট্যাক্স ত্রুটি</p>
                 </div>
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
+                  className="rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs cursor-pointer shadow-xs font-headline gap-1.5"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  Auto-Fix JSON Syntax
+                  <Wand2 className="size-3.5" />
+                  <span>স্বয়ংক্রিয়ভাবে সংশোধন করুন</span>
                 </Button>
               </div>
 
-              <p className="font-mono text-xs leading-relaxed bg-white/80 p-2.5 rounded-lg border border-destructive/20 text-destructive">
+              <p className="font-mono text-xs leading-relaxed bg-card p-3 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-600">
                 {parseError}
               </p>
 
               {/* Code Snippet Error Pointer */}
               {errorContext && errorContext.linesContext.length > 0 && (
                 <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-destructive/80">
-                    Syntax Error Location (Line {errorContext.line}
-                    {errorContext.col > 0 ? `, Column ${errorContext.col}` : ""}):
+                  <p className="text-xs font-bold uppercase tracking-wider text-rose-700/80 font-headline">
+                    ত্রুটির স্থান (লাইন {toBengaliDigits(errorContext.line)}
+                    {errorContext.col > 0 ? `, কলাম ${toBengaliDigits(errorContext.col)}` : ""}):
                   </p>
-                  <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 font-mono text-xs text-gray-200">
+                  <div className="overflow-x-auto rounded-xl bg-slate-900 p-3 font-mono text-xs text-slate-200">
                     {errorContext.linesContext.map((l) => (
                       <div
                         key={l.num}
                         className={cn(
                           "flex items-center gap-3 px-2 py-0.5 rounded",
-                          l.isError && "bg-red-900/80 text-white font-bold border-l-4 border-red-500"
+                          l.isError && "bg-rose-900/80 text-white font-bold border-l-4 border-rose-500"
                         )}
                       >
-                        <span className="w-8 shrink-0 text-right text-gray-500 select-none">
-                          {l.num}
+                        <span className="w-8 shrink-0 text-right text-slate-500 select-none">
+                          {toBengaliDigits(l.num)}
                         </span>
                         <span className="whitespace-pre">{l.content}</span>
                         {l.isError && (
-                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-red-600 text-white px-1.5 py-0.5 rounded shrink-0">
-                            Error Here
+                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-rose-600 text-white px-1.5 py-0.5 rounded shrink-0">
+                            ত্রুটি এখানে
                           </span>
                         )}
                       </div>
@@ -1022,12 +1019,12 @@ export function ImportShortAnswerView() {
           )}
 
           {!parseError && parsedItems.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/60 dark:bg-emerald-950/20 p-4 text-emerald-800 dark:text-emerald-400 text-sm">
               <div className="flex items-center gap-3">
-                <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                 <div>
-                  <p className="font-bold">JSON Parsed Successfully!</p>
-                  <p className="text-xs">{parsedItems.length} question(s) parsed and validated.</p>
+                  <p className="font-bold font-headline">JSON সফলভাবে যাচাই করা হয়েছে!</p>
+                  <p className="text-xs font-body">{toBengaliDigits(parsedItems.length)}টি সংক্ষিপ্ত উত্তর প্রশ্ন পাওয়া গেছে।</p>
                 </div>
               </div>
               <Button
@@ -1035,31 +1032,31 @@ export function ImportShortAnswerView() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
+                className="rounded-xl bg-card border-emerald-300 text-emerald-800 hover:bg-emerald-50 font-bold text-xs cursor-pointer shrink-0 font-headline gap-1.5"
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Question Card
+                <Plus className="size-3.5" />
+                <span>নতুন কার্ড যোগ করুন</span>
               </Button>
             </div>
           )}
 
           {/* List Previews */}
           {parsedItems.length > 0 && (
-            <div className="border-t border-outline-variant/30 pt-6 space-y-6">
+            <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                  <CodeIcon className="size-4 text-primary shrink-0" />
-                  Editable Previews ({parsedItems.length} Questions)
+                <h4 className="font-headline text-base font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="size-4 text-indigo-600 dark:text-primary shrink-0" />
+                  সম্পাদনাযোগ্য প্রিভিউ ({toBengaliDigits(parsedItems.length)}টি প্রশ্ন)
                 </h4>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={handleAddNewQuestionCard}
-                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center animate-fade-in"
+                  className="rounded-xl font-bold text-xs text-indigo-600 dark:text-primary border-indigo-200 hover:bg-indigo-50 cursor-pointer font-headline gap-1.5"
                 >
-                  <PlusIcon className="size-3.5 mr-1" />
-                  Add Question
+                  <Plus className="size-3.5" />
+                  <span>প্রশ্ন যোগ করুন</span>
                 </Button>
               </div>
 
@@ -1069,6 +1066,7 @@ export function ImportShortAnswerView() {
                     key={idx}
                     index={idx}
                     item={item}
+                    defaultSource={selectedSource}
                     onChange={(updated) => handleUpdateParsedItem(idx, updated)}
                     onDelete={() => handleDeleteParsedItem(idx)}
                     onDuplicate={() => handleDuplicateParsedItem(idx)}
@@ -1079,27 +1077,32 @@ export function ImportShortAnswerView() {
           )}
 
           {/* Submit Action buttons */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6 font-bold">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-200/80 dark:border-white/[0.08] pt-6 font-bold">
             <Button
-              type="button"
+              asChild
               variant="outline"
-              onClick={() => router.push("/short-answers")}
-              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+              className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer font-headline"
             >
-              Cancel
+              <Link href="/short-answers" prefetch={true}>
+                বাতিল
+              </Link>
             </Button>
             <Button
               type="button"
               disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
               onClick={handleImport}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary/95 disabled:opacity-50 cursor-pointer h-auto"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer font-headline disabled:opacity-50"
             >
               {importMutation.isPending ? (
-                <Wand2Icon className="size-4 animate-spin shrink-0" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
               ) : (
-                <UploadIcon className="size-4 shrink-0" />
+                <Upload className="size-4 shrink-0" />
               )}
-              <span>{importMutation.isPending ? "Importing..." : `Import ${parsedItems.length} Short Answers`}</span>
+              <span>
+                {importMutation.isPending
+                  ? "ইমপোর্ট করা হচ্ছে..."
+                  : `${toBengaliDigits(parsedItems.length)}টি সংক্ষিপ্ত উত্তর ইমপোর্ট করুন`}
+              </span>
             </Button>
           </div>
         </CardContent>

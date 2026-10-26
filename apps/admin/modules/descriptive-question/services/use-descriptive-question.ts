@@ -3,6 +3,7 @@ import { trpc } from "@/trpc/client"
 import type {
   ListDescriptiveQuestionsInput,
   DescriptiveQuestionStatsInput,
+  DescriptiveQuestionBoardYearsInput,
 } from "@workspace/api"
 
 export function useDescriptiveQuestionsList(input: ListDescriptiveQuestionsInput = { limit: 20 }) {
@@ -11,6 +12,13 @@ export function useDescriptiveQuestionsList(input: ListDescriptiveQuestionsInput
 
 export function useDescriptiveQuestionStats(input?: DescriptiveQuestionStatsInput) {
   return useSuspenseQuery(trpc.descriptiveQuestion.stats.queryOptions(input))
+}
+
+export function useDescriptiveQuestionBoardYears(input: DescriptiveQuestionBoardYearsInput) {
+  return useQuery({
+    ...trpc.descriptiveQuestion.boardYears.queryOptions(input),
+    enabled: Boolean(input.subjectId) && input.subjectId !== "All",
+  })
 }
 
 export function useDescriptiveQuestionById(id: string, enabled = true) {

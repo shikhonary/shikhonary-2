@@ -181,6 +181,7 @@ export function PageHeader({
                   {item.href ? (
                     <Link
                       href={item.href}
+                      prefetch={true}
                       className="hover:text-indigo-600 dark:hover:text-primary transition-colors"
                     >
                       {item.label}

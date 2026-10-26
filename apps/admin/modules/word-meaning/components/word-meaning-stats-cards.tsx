@@ -1,133 +1,57 @@
 "use client"
 
-import { Skeleton } from "@workspace/ui/components/skeleton"
-import { Badge } from "@workspace/ui/components/badge"
-import { Type, BarChart2 } from "lucide-react"
+import { StatsCards, type StatCardItem } from "@/components/shared"
+import { BookOpen, CheckCircle, XCircle, AlertTriangle } from "lucide-react"
 
 interface WordMeaningStatsCardsProps {
   totalCount?: number
-  difficultyCounts?: {
-    EASY: number
-    MEDIUM: number
-    HARD: number
-  }
+  activeCount?: number
+  inactiveCount?: number
+  hardCount?: number
   isLoading?: boolean
 }
 
 export function WordMeaningStatsCards({
-  totalCount = 0,
-  difficultyCounts = { EASY: 0, MEDIUM: 0, HARD: 0 },
-  isLoading = false,
+  totalCount,
+  activeCount,
+  inactiveCount,
+  hardCount,
+  isLoading,
 }: WordMeaningStatsCardsProps) {
-  if (isLoading) {
-    return (
-      <div className="mb-6">
-        <div className="flex flex-wrap gap-2 sm:hidden">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-7 w-20 rounded-md bg-surface-container-high" />
-          ))}
-        </div>
-        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-xl bg-surface-container-high" />
-          ))}
-        </div>
-      </div>
-    )
-  }
+  const cards: StatCardItem[] = [
+    {
+      title: "মোট শব্দার্থ",
+      value: totalCount,
+      icon: BookOpen,
+      iconColor: "text-indigo-600 dark:text-primary",
+      iconBgColor: "bg-indigo-50 dark:bg-primary/10",
+      description: "শব্দার্থ প্রশ্ন ব্যাংকে মোট শব্দ",
+    },
+    {
+      title: "অ্যাক্টিভ শব্দার্থ",
+      value: activeCount,
+      icon: CheckCircle,
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      iconBgColor: "bg-emerald-50 dark:bg-emerald-500/10",
+      description: "বর্তমানে ব্যবহারের জন্য সক্রিয়",
+    },
+    {
+      title: "ইনঅ্যাক্টিভ শব্দার্থ",
+      value: inactiveCount,
+      icon: XCircle,
+      iconColor: "text-amber-600 dark:text-amber-400",
+      iconBgColor: "bg-amber-50 dark:bg-amber-500/10",
+      description: "সাময়িকভাবে স্থগিত রাখা শব্দার্থ",
+    },
+    {
+      title: "কঠিন স্তর (Hard)",
+      value: hardCount,
+      icon: AlertTriangle,
+      iconColor: "text-rose-600 dark:text-rose-400",
+      iconBgColor: "bg-rose-50 dark:bg-rose-500/10",
+      description: "উচ্চতর দক্ষতার শব্দার্থ প্রশ্ন",
+    },
+  ]
 
-  return (
-    <div className="mb-6">
-      {/* Mobile View (< sm): Badges */}
-      <div className="flex flex-wrap items-center gap-2 sm:hidden">
-        <Badge variant="outline" className="rounded-md border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary normal-case tracking-normal">
-          Total Words: {totalCount ?? 0}
-        </Badge>
-        <Badge variant="outline" className="rounded-md border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 normal-case tracking-normal">
-          Easy: {difficultyCounts?.EASY ?? 0}
-        </Badge>
-        <Badge variant="outline" className="rounded-md border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-600 normal-case tracking-normal">
-          Medium: {difficultyCounts?.MEDIUM ?? 0}
-        </Badge>
-        <Badge variant="outline" className="rounded-md border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-600 normal-case tracking-normal">
-          Hard: {difficultyCounts?.HARD ?? 0}
-        </Badge>
-      </div>
-
-      {/* Desktop & Tablet View (>= sm): Full Cards */}
-      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* Total Words */}
-        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all hover:shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-            <Type className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="font-label-sm text-xs font-medium uppercase tracking-wider text-outline">
-              Total Word Meanings
-            </p>
-            <h3 className="font-headline-md text-2xl font-bold text-on-surface">
-              {totalCount ?? 0}
-            </h3>
-            <p className="mt-0.5 text-xs text-outline">
-              শব্দার্থ ভাণ্ডার
-            </p>
-          </div>
-        </div>
-
-        {/* Easy */}
-        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all hover:shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 shrink-0">
-            <BarChart2 className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="font-label-sm text-xs font-medium uppercase tracking-wider text-outline">
-              Easy Difficulty
-            </p>
-            <h3 className="font-headline-md text-2xl font-bold text-emerald-600">
-              {difficultyCounts?.EASY ?? 0}
-            </h3>
-            <p className="mt-0.5 text-xs text-outline">
-              Common vocabulary meanings
-            </p>
-          </div>
-        </div>
-
-        {/* Medium */}
-        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all hover:shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 shrink-0">
-            <BarChart2 className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="font-label-sm text-xs font-medium uppercase tracking-wider text-outline">
-              Medium Difficulty
-            </p>
-            <h3 className="font-headline-md text-2xl font-bold text-amber-600">
-              {difficultyCounts?.MEDIUM ?? 0}
-            </h3>
-            <p className="mt-0.5 text-xs text-outline">
-              Standard textbook word meanings
-            </p>
-          </div>
-        </div>
-
-        {/* Hard */}
-        <div className="flex items-center gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4 transition-all hover:shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-600 shrink-0">
-            <BarChart2 className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="font-label-sm text-xs font-medium uppercase tracking-wider text-outline">
-              Hard Difficulty
-            </p>
-            <h3 className="font-headline-md text-2xl font-bold text-red-600">
-              {difficultyCounts?.HARD ?? 0}
-            </h3>
-            <p className="mt-0.5 text-xs text-outline">
-              Advanced literary meanings
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  return <StatsCards cards={cards} isLoading={isLoading} />
 }

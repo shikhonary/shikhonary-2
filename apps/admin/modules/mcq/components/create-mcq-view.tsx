@@ -212,7 +212,7 @@ export function CreateMcqView() {
           variant="outline"
           className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <Link href="/mcqs">
+          <Link href="/mcqs" prefetch={true}>
             <ArrowLeft className="w-4 h-4" />
             <span>তালিকায় ফিরে যান</span>
           </Link>
@@ -593,7 +593,7 @@ export function CreateMcqView() {
                     গণিত / LaTeX সমীকরণ
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    প্রশ্ন ও অপশনে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে সক্রিয় করুন।
+                    প্রশ্ন ও অপশনে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে অ্যাক্টিভ করুন।
                   </p>
                 </div>
                 <Controller
@@ -614,7 +614,7 @@ export function CreateMcqView() {
               <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
                 <div>
                   <p className="text-sm font-bold text-foreground">
-                    সক্রিয় প্রশ্নের অবস্থা
+                    অ্যাক্টিভ প্রশ্নের অবস্থা
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
@@ -838,13 +838,14 @@ export function CreateMcqView() {
               </div>
               <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
                 <Button
-                  type="button"
+                  asChild
                   variant="outline"
                   disabled={isSubmitting}
-                  onClick={() => router.push("/mcqs")}
                   className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer"
                 >
-                  বাতিল
+                  <Link href="/mcqs" prefetch={true}>
+                    বাতিল
+                  </Link>
                 </Button>
                 <Button
                   type="submit"

@@ -9,6 +9,7 @@ import type {
   BulkDeleteMakeSentencesInput,
   ImportMakeSentencesInput,
   MakeSentencesStatsInput,
+  ToggleMakeSentencesActiveInput,
 } from "./make-sentences.schema"
 
 async function resolveMakeSentencesQuestionTypeId(db: any) {
@@ -48,27 +49,87 @@ async function resolveMakeSentencesQuestionTypeId(db: any) {
 }
 
 export async function listMakeSentences(db: PrismaClient, input: ListMakeSentencesInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, source, session, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    search,
+    academicClassId,
+    classId,
+    subjectId,
+    chapterId,
+    academicChapterId,
+    questionTypeId,
+    difficulty,
+    source,
+    session,
+    year,
+    board,
+    isActive,
+    sort,
+  } = input
+
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
   const targetChapterId = academicChapterId || chapterId
+  const targetClassId = academicClassId || classId
 
-  if (subjectId) where.subjectId = subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+  if (targetClassId && targetClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: targetClassId,
+        },
+      },
+    }
+  }
 
-  if (query) {
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (questionTypeId && questionTypeId !== "All") where.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (typeof isActive === "boolean") where.isActive = isActive
+
+  if (board && board !== "All") {
     where.OR = [
-      { word: { contains: query, mode: "insensitive" } },
-      { source: { contains: query, mode: "insensitive" } },
-      { session: { contains: query, mode: "insensitive" } },
-      { reference: { has: query } },
+      { reference: { has: board } },
+      { source: { contains: board, mode: "insensitive" } },
     ]
+  }
+
+  if (source && source !== "All" && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    const existingOr = where.OR || []
+    where.OR = [
+      ...existingOr,
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else if (source && source !== "All") {
+    where.source = source
+  }
+
+  if (session && !year && session !== "All") where.session = session
+
+  const searchQuery = search || query
+  if (searchQuery) {
+    const searchFilter = [
+      { word: { contains: searchQuery, mode: "insensitive" } },
+      { source: { contains: searchQuery, mode: "insensitive" } },
+      { session: { contains: searchQuery, mode: "insensitive" } },
+      { reference: { has: searchQuery } },
+    ]
+
+    if (where.OR) {
+      where.AND = [{ OR: where.OR }, { OR: searchFilter }]
+      delete where.OR
+    } else {
+      where.OR = searchFilter
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -92,10 +153,18 @@ export async function listMakeSentences(db: PrismaClient, input: ListMakeSentenc
       orderBy,
       include: {
         subject: {
-          select: {
-            id: true,
-            nameEn: true,
-            nameBn: true,
+          include: {
+            classSubjects: {
+              include: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -134,7 +203,17 @@ export async function getMakeSentencesById(db: PrismaClient, input: GetMakeSente
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: {
+                select: {
+                  id: true,
+                  nameEn: true,
+                  nameBn: true,
+                },
+              },
+            },
+          },
         },
       },
       academicChapter: true,
@@ -154,7 +233,7 @@ export async function getMakeSentencesById(db: PrismaClient, input: GetMakeSente
 
 export async function createMakeSentences(db: PrismaClient, input: CreateMakeSentencesInput, userId?: string | null) {
   const data = input
-  const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveMakeSentencesQuestionTypeId(db))
   const targetChapterId = data.academicChapterId || data.chapterId || null
   const currentYear = new Date().getFullYear().toString()
 
@@ -169,6 +248,7 @@ export async function createMakeSentences(db: PrismaClient, input: CreateMakeSen
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : true,
       ...(userId ? { createdById: userId } : {}),
     },
     include: {
@@ -183,7 +263,7 @@ export async function updateMakeSentences(db: PrismaClient, input: UpdateMakeSen
   const { id, ...data } = input
 
   await getMakeSentencesById(db, { id })
-  const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveMakeSentencesQuestionTypeId(db))
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
   const currentYear = new Date().getFullYear().toString()
 
@@ -207,6 +287,10 @@ export async function updateMakeSentences(db: PrismaClient, input: UpdateMakeSen
 
   if (targetChapterId !== undefined) {
     updateData.academicChapterId = targetChapterId
+  }
+
+  if (data.isActive !== undefined) {
+    updateData.isActive = data.isActive
   }
 
   return db.makeSentences.update({
@@ -237,6 +321,27 @@ export async function bulkDeleteMakeSentences(db: PrismaClient, input: BulkDelet
   return { deletedCount: res.count }
 }
 
+export async function toggleMakeSentencesActive(
+  db: PrismaClient,
+  input: ToggleMakeSentencesActiveInput,
+  userId?: string | null
+) {
+  await getMakeSentencesById(db, { id: input.id })
+
+  return db.makeSentences.update({
+    where: { id: input.id },
+    data: {
+      isActive: input.isActive,
+      ...(userId ? { updatedById: userId } : {}),
+    },
+    include: {
+      subject: true,
+      academicChapter: true,
+      questionType: true,
+    },
+  })
+}
+
 export async function importMakeSentences(db: PrismaClient, input: ImportMakeSentencesInput, userId?: string | null) {
   const resolvedQuestionTypeId = await resolveMakeSentencesQuestionTypeId(db)
   const currentYear = new Date().getFullYear().toString()
@@ -253,12 +358,13 @@ export async function importMakeSentences(db: PrismaClient, input: ImportMakeSen
             word: data.word,
             reference: data.reference || [],
             source: data.source ? data.source.trim() : "গাইড বুক",
-            session: currentYear,
+            session: data.session ? data.session.trim() : currentYear,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive !== undefined ? data.isActive : true,
             ...(userId ? { createdById: userId } : {}),
           },
         })
@@ -278,11 +384,25 @@ export async function getMakeSentencesStats(db: PrismaClient, input: MakeSentenc
   const where: any = {}
   const targetChapterId = input.academicChapterId || input.chapterId
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (input.questionTypeId && input.questionTypeId !== "All") where.questionTypeId = input.questionTypeId
+
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.makeSentences.count({ where }),
+    db.makeSentences.count({ where: { ...where, isActive: true } }),
+    db.makeSentences.count({ where: { ...where, isActive: false } }),
     db.makeSentences.count({ where: { ...where, difficulty: "EASY" } }),
     db.makeSentences.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.makeSentences.count({ where: { ...where, difficulty: "HARD" } }),
@@ -290,10 +410,50 @@ export async function getMakeSentencesStats(db: PrismaClient, input: MakeSentenc
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string; academicChapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    NOT: { reference: { equals: [] } },
+  }
+  const targetChapterId = input.academicChapterId || input.chapterId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+
+  const questions = await db.makeSentences.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

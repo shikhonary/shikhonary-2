@@ -4,6 +4,8 @@ export const pbqSortOptions = [
   "All",
   "newest",
   "oldest",
+  "question_asc",
+  "question_desc",
   "context_asc",
   "context_desc",
 ] as const

@@ -7,6 +7,7 @@ import type {
   ListJuktobornoInput,
   UpdateJuktobornoInput,
   BulkDeleteJuktobornoInput,
+  ToggleJuktobornoActiveInput,
   ImportJuktobornoInput,
   JuktobornoStatsInput,
 } from "./juktoborno.schema"
@@ -45,23 +46,87 @@ async function resolveJuktobornoQuestionTypeId(db: any) {
 }
 
 export async function listJuktoborno(db: PrismaClient, input: ListJuktobornoInput) {
-  const { page, limit, query, subjectId, chapterId, academicChapterId, difficulty, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    search,
+    academicClassId,
+    classId,
+    subjectId,
+    chapterId,
+    academicChapterId,
+    questionTypeId,
+    difficulty,
+    source,
+    session,
+    year,
+    board,
+    isActive,
+    sort,
+  } = input
+
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
   const targetChapterId = academicChapterId || chapterId
+  const targetClassId = academicClassId || classId
 
-  if (subjectId) where.subjectId = subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
-  if (difficulty) where.difficulty = difficulty
+  if (targetClassId && targetClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: targetClassId,
+        },
+      },
+    }
+  }
 
-  if (query) {
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (questionTypeId && questionTypeId !== "All") where.questionTypeId = questionTypeId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (typeof isActive === "boolean") where.isActive = isActive
+
+  if (board && board !== "All") {
     where.OR = [
-      { juktoborno: { contains: query, mode: "insensitive" } },
-      { reference: { has: query } },
+      { reference: { has: board } },
+      { source: { contains: board, mode: "insensitive" } },
     ]
+  }
+
+  if (source && source !== "All" && year !== undefined) {
+    const boardRef = [source, year].filter(Boolean).join("-")
+    const existingOr = where.OR || []
+    where.OR = [
+      ...existingOr,
+      { AND: [{ source }, { session: String(year) }] },
+      { reference: { has: boardRef } },
+    ]
+  } else if (source && source !== "All") {
+    where.source = source
+  }
+
+  if (session && !year && session !== "All") where.session = session
+
+  const searchQuery = search || query
+  if (searchQuery) {
+    const searchFilter = [
+      { juktoborno: { contains: searchQuery, mode: "insensitive" } },
+      { source: { contains: searchQuery, mode: "insensitive" } },
+      { session: { contains: searchQuery, mode: "insensitive" } },
+      { reference: { has: searchQuery } },
+    ]
+
+    if (where.OR) {
+      where.AND = [{ OR: where.OR }, { OR: searchFilter }]
+      delete where.OR
+    } else {
+      where.OR = searchFilter
+    }
   }
 
   let orderBy: any = { createdAt: "desc" }
@@ -85,10 +150,18 @@ export async function listJuktoborno(db: PrismaClient, input: ListJuktobornoInpu
       orderBy,
       include: {
         subject: {
-          select: {
-            id: true,
-            nameEn: true,
-            nameBn: true,
+          include: {
+            classSubjects: {
+              include: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -145,22 +218,28 @@ export async function getJuktobornoById(db: PrismaClient, input: GetJuktobornoIn
   return item
 }
 
-export async function createJuktoborno(db: PrismaClient, input: CreateJuktobornoInput) {
+export async function createJuktoborno(
+  db: PrismaClient,
+  input: CreateJuktobornoInput,
+  userId?: string | null
+) {
   const data = input
-  const resolvedQuestionTypeId = await resolveJuktobornoQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveJuktobornoQuestionTypeId(db))
   const targetChapterId = data.academicChapterId || data.chapterId || null
 
   return db.juktoborno.create({
     data: {
       juktoborno: data.juktoborno,
       reference: data.reference ?? [],
-      source: data.source,
-      session: data.session,
+      source: data.source ? data.source.trim() : "গাইড বুক",
+      session: data.session ? data.session.trim() : new Date().getFullYear().toString(),
       difficulty: data.difficulty,
       popularityCount: data.popularityCount ?? 0,
       subjectId: data.subjectId,
       academicChapterId: targetChapterId,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      ...(userId ? { createdById: userId } : {}),
     },
     include: {
       subject: true,
@@ -170,11 +249,15 @@ export async function createJuktoborno(db: PrismaClient, input: CreateJuktoborno
   })
 }
 
-export async function updateJuktoborno(db: PrismaClient, input: UpdateJuktobornoInput) {
+export async function updateJuktoborno(
+  db: PrismaClient,
+  input: UpdateJuktobornoInput,
+  userId?: string | null
+) {
   const { id, ...data } = input
 
   await getJuktobornoById(db, { id })
-  const resolvedQuestionTypeId = await resolveJuktobornoQuestionTypeId(db)
+  const resolvedQuestionTypeId = data.questionTypeId || (await resolveJuktobornoQuestionTypeId(db))
   const targetChapterId = data.academicChapterId !== undefined ? data.academicChapterId : data.chapterId
 
   const updateData: any = {
@@ -186,6 +269,11 @@ export async function updateJuktoborno(db: PrismaClient, input: UpdateJuktoborno
     popularityCount: data.popularityCount,
     subjectId: data.subjectId,
     questionTypeId: resolvedQuestionTypeId,
+    ...(userId ? { updatedById: userId } : {}),
+  }
+
+  if (data.isActive !== undefined) {
+    updateData.isActive = data.isActive
   }
 
   if (targetChapterId !== undefined) {
@@ -220,8 +308,34 @@ export async function bulkDeleteJuktoborno(db: PrismaClient, input: BulkDeleteJu
   return { deletedCount: res.count }
 }
 
-export async function importJuktoborno(db: PrismaClient, input: ImportJuktobornoInput) {
+export async function toggleJuktobornoActive(
+  db: PrismaClient,
+  input: ToggleJuktobornoActiveInput,
+  userId?: string | null
+) {
+  await getJuktobornoById(db, { id: input.id })
+
+  return db.juktoborno.update({
+    where: { id: input.id },
+    data: {
+      isActive: input.isActive,
+      ...(userId ? { updatedById: userId } : {}),
+    },
+    include: {
+      subject: true,
+      academicChapter: true,
+      questionType: true,
+    },
+  })
+}
+
+export async function importJuktoborno(
+  db: PrismaClient,
+  input: ImportJuktobornoInput,
+  userId?: string | null
+) {
   const resolvedQuestionTypeId = await resolveJuktobornoQuestionTypeId(db)
+  const currentYear = new Date().getFullYear().toString()
 
   const created = await db.$transaction(
     async (tx) => {
@@ -234,13 +348,15 @@ export async function importJuktoborno(db: PrismaClient, input: ImportJuktoborno
           data: {
             juktoborno: data.juktoborno,
             reference: data.reference || [],
-            source: data.source,
-            session: data.session,
+            source: data.source ? data.source.trim() : "গাইড বুক",
+            session: data.session ? data.session.trim() : currentYear,
             difficulty: data.difficulty ?? "MEDIUM",
             popularityCount: data.popularityCount ?? 0,
             subjectId: data.subjectId,
             academicChapterId: targetChapterId,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive !== undefined ? data.isActive : true,
+            ...(userId ? { createdById: userId } : {}),
           },
         })
         results.push(createdItem)
@@ -259,11 +375,25 @@ export async function getJuktobornoStats(db: PrismaClient, input: JuktobornoStat
   const where: any = {}
   const targetChapterId = input.academicChapterId || input.chapterId
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (targetChapterId) where.academicChapterId = targetChapterId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      ...where.subject,
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+  if (input.questionTypeId && input.questionTypeId !== "All") where.questionTypeId = input.questionTypeId
+
+  const [totalCount, activeCount, inactiveCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.juktoborno.count({ where }),
+    db.juktoborno.count({ where: { ...where, isActive: true } }),
+    db.juktoborno.count({ where: { ...where, isActive: false } }),
     db.juktoborno.count({ where: { ...where, difficulty: "EASY" } }),
     db.juktoborno.count({ where: { ...where, difficulty: "MEDIUM" } }),
     db.juktoborno.count({ where: { ...where, difficulty: "HARD" } }),
@@ -271,10 +401,50 @@ export async function getJuktobornoStats(db: PrismaClient, input: JuktobornoStat
 
   return {
     totalCount,
+    activeCount,
+    inactiveCount,
     difficultyCounts: {
       EASY: easyCount,
       MEDIUM: mediumCount,
       HARD: hardCount,
     },
   }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: { subjectId: string; chapterId?: string; academicChapterId?: string }
+) {
+  const where: any = {
+    subjectId: input.subjectId,
+    NOT: { reference: { equals: [] } },
+  }
+  const targetChapterId = input.academicChapterId || input.chapterId
+  if (targetChapterId && targetChapterId !== "All") where.academicChapterId = targetChapterId
+
+  const questions = await db.juktoborno.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const q of questions) {
+    for (const ref of q.reference || []) {
+      if (!ref) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  return Array.from(countMap.entries()).map(([rawRef, count]) => {
+    const parts = rawRef.split("-")
+    const yearStr = parts[parts.length - 1]
+    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+    return {
+      rawRef,
+      boardName,
+      year,
+      count,
+    }
+  })
 }

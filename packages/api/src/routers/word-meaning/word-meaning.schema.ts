@@ -3,26 +3,42 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listWordMeaningSchema = paginationSchema.extend({
+  academicClassId: z.string().optional(),
+  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
+  questionTypeId: z.string().optional(),
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.union([z.string(), z.number()]).optional(),
+  board: z.string().optional(),
+  isActive: z.boolean().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
   query: z.string().optional(),
+  search: z.string().optional(),
 })
 
 export type ListWordMeaningInput = z.infer<typeof listWordMeaningSchema>
 
 export const wordMeaningStatsSchema = z.object({
+  academicClassId: z.string().optional(),
+  classId: z.string().optional(),
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
   academicChapterId: z.string().optional(),
 })
 
 export type WordMeaningStatsInput = z.infer<typeof wordMeaningStatsSchema>
+
+export const wordMeaningBoardYearsSchema = z.object({
+  subjectId: z.string().optional(),
+  chapterId: z.string().optional(),
+})
+
+export type WordMeaningBoardYearsInput = z.infer<typeof wordMeaningBoardYearsSchema>
 
 export const getWordMeaningSchema = idSchema
 export type GetWordMeaningInput = z.infer<typeof getWordMeaningSchema>
@@ -38,6 +54,8 @@ export const createWordMeaningSchema = z.object({
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().optional().nullable(),
   academicChapterId: z.string().optional().nullable(),
+  questionTypeId: z.string().optional().nullable(),
+  isActive: z.boolean().optional().default(true),
 })
 
 export type CreateWordMeaningInput = z.infer<typeof createWordMeaningSchema>
@@ -56,6 +74,13 @@ export const bulkDeleteWordMeaningSchema = z.object({
 })
 
 export type BulkDeleteWordMeaningInput = z.infer<typeof bulkDeleteWordMeaningSchema>
+
+export const toggleWordMeaningActiveSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+export type ToggleWordMeaningActiveInput = z.infer<typeof toggleWordMeaningActiveSchema>
 
 export const importWordMeaningSchema = z.object({
   questions: z.array(createWordMeaningSchema).min(1, "At least one word meaning entry is required"),

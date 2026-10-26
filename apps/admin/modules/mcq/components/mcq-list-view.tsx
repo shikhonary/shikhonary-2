@@ -143,7 +143,7 @@ export function McqListView() {
           variant="outline"
           className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2"
         >
-          <Link href="/mcqs/import">
+          <Link href="/mcqs/import" prefetch={true}>
             <Upload className="w-4 h-4" />
             <span>JSON ইমপোর্ট</span>
           </Link>

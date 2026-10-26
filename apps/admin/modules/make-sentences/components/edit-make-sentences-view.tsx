@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
@@ -25,19 +25,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { ChevronRightIcon, Loader2 } from "lucide-react"
-import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { RenderMath } from "@workspace/ui/components/render-math"
+import { PageHeader } from "@/components/shared/page-header"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { MAKE_SENTENCES_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import {
+  BookOpen,
+  Save,
+  Loader2,
+  ArrowLeft,
+  AlertCircle,
+  Sparkles,
+  Edit3,
+} from "lucide-react"
 
 const editMakeSentencesFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
-  word: z.string().min(1, "Word text is required"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করুন"),
+  word: z.string().min(1, "শব্দ আবশ্যক"),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  year: z.string().optional(),
+  isActive: z.boolean(),
 })
 
 type EditMakeSentencesFormData = z.infer<typeof editMakeSentencesFormSchema>
@@ -48,9 +60,44 @@ interface EditMakeSentencesViewProps {
 
 export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
   const router = useRouter()
-  const { data: item, isLoading, isError } = useMakeSentencesById(id)
+  const { data: initialData, isLoading, isError } = useMakeSentencesById(id)
   const updateMutation = useUpdateMakeSentences()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Academic Class Selection Query
+  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+
+  // Resolve initial classId robustly from subject or chapter relationships
+  const initialClassId = useMemo(() => {
+    if (!initialData) return ""
+    return (
+      (initialData as any).subject?.classSubjects?.[0]?.classId ||
+      (initialData as any).subject?.classSubjects?.[0]?.academicClass?.id ||
+      (initialData as any).academicChapter?.subject?.classSubjects?.[0]?.classId ||
+      (initialData as any).academicChapter?.subject?.classSubjects?.[0]?.academicClass?.id ||
+      (initialData as any).classId ||
+      ""
+    )
+  }, [initialData])
+
+  // Synchronize form values directly with loaded make-sentences data
+  const formValues = useMemo(() => {
+    if (!initialData) return undefined
+    return {
+      classId: initialClassId,
+      subjectId: initialData.subjectId || "",
+      chapterId: (initialData as any).academicChapterId || (initialData as any).chapterId || "",
+      word: initialData.word || "",
+      difficulty: (initialData.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
+      referenceText: Array.isArray(initialData.reference)
+        ? initialData.reference.join(", ")
+        : "",
+      source: (initialData as any).source ? String((initialData as any).source).trim() : DEFAULT_SOURCE,
+      session: initialData.session || new Date().getFullYear().toString(),
+      year: (initialData as any).year ? String((initialData as any).year) : "",
+      isActive: initialData.isActive !== undefined ? initialData.isActive : true,
+    }
+  }, [initialData, initialClassId])
 
   const {
     register,
@@ -58,7 +105,6 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
     control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditMakeSentencesFormData>({
     resolver: zodResolver(editMakeSentencesFormSchema),
@@ -69,40 +115,68 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
       word: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "",
-      session: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
+      year: "",
+      isActive: true,
+    },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
     },
   })
 
   const selectedClassId = watch("classId")
-  const selectedSubjectId = watch("subjectId")
+  const activeClassId = selectedClassId || initialClassId
 
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
+
+  const selectedSubjectId = watch("subjectId")
+  const activeSubjectId = selectedSubjectId || initialData?.subjectId || ""
+
   const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+    activeSubjectId ? { subjectId: activeSubjectId } : undefined
   )
 
-  useEffect(() => {
-    if (item) {
-      const subject = item.subject as any
-      const chapter = item.academicChapter as any
-      const classIdFromSubject = subject?.classSubjects?.[0]?.classId || ""
+  // Combined fallback classes map
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const initialClass = initialData?.subject?.classSubjects?.[0]?.academicClass
+    if (initialClass) map.set(initialClass.id, initialClass)
+    for (const cls of academicClasses) map.set(cls.id, cls)
+    return Array.from(map.values())
+  }, [academicClasses, initialData])
 
-      reset({
-        classId: classIdFromSubject,
-        subjectId: item.subjectId,
-        chapterId: item.academicChapterId || "",
-        word: item.word,
-        difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
-        referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: (item as any).source || DEFAULT_SOURCE,
-        session: (item as any).session || new Date().getFullYear().toString(),
-      })
+  // Combined fallback subjects map
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if (initialData?.subject) map.set(initialData.subject.id, initialData.subject)
+    for (const sub of subjects) map.set(sub.id, sub)
+    return Array.from(map.values())
+  }, [subjects, initialData])
+
+  // Combined fallback chapters map
+  const combinedChapters = useMemo(() => {
+    const map = new Map<string, any>()
+    if (initialData?.academicChapter)
+      map.set(initialData.academicChapter.id, initialData.academicChapter)
+    for (const ch of chapters) map.set(ch.id, ch)
+    return Array.from(map.values())
+  }, [chapters, initialData])
+
+  // Combined fallback sources
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...MAKE_SENTENCES_SOURCE_OPTIONS]
+    const cur = (initialData as any)?.source ? String((initialData as any).source).trim() : null
+    if (cur && !list.some((s) => s.value === cur)) {
+      list.unshift({ value: cur, label: cur })
     }
-  }, [item, reset])
+    return list
+  }, [initialData])
+
+  const watchWord = watch("word")
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -117,6 +191,10 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
             .filter((r) => r.length > 0)
         : []
 
+      const resolvedSession =
+        data.session?.trim() ||
+        (data.year ? data.year.trim() : new Date().getFullYear().toString())
+
       await updateMutation.mutateAsync({
         id,
         subjectId: data.subjectId,
@@ -125,16 +203,15 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
         word: data.word.trim(),
         difficulty: data.difficulty,
         reference: referenceArray,
-        source: data.source?.trim() || null,
-        session: data.session?.trim() || null,
+        source: data.source ? data.source.trim() : DEFAULT_SOURCE,
+        session: resolvedSession,
+        isActive: data.isActive,
       })
 
-      toast.success("Word entry updated successfully.")
-      setTimeout(() => {
-        router.push("/make-sentences")
-      }, 1000)
+      toast.success("শব্দ সফলভাবে হালনাগাদ করা হয়েছে।")
+      router.push("/make-sentences")
     } catch (err: any) {
-      const msg = err.message || "Failed to update word entry"
+      const msg = err.message || "শব্দ আপডেট করা সম্ভব হয়নি"
       setErrorMessage(msg)
       toast.error(msg)
     }
@@ -142,272 +219,423 @@ export function EditMakeSentencesView({ id }: EditMakeSentencesViewProps) {
 
   if (isLoading) {
     return (
-      <div className="py-20 text-center text-outline flex flex-col items-center justify-center gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="text-sm font-medium">Loading word entry details...</span>
+      <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6 animate-pulse">
+        <div className="h-20 bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.08]" />
+        <div className="h-96 bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.08]" />
       </div>
     )
   }
 
-  if (isError || !item) {
+  if (isError || !initialData) {
     return (
-      <div className="py-20 text-center text-error border border-error/30 rounded-xl bg-error-container/20">
-        <p className="font-bold text-base">Error loading word entry</p>
-        <p className="text-xs mt-1">The requested word entry with ID &quot;{id}&quot; was not found.</p>
-        <Link href="/make-sentences" className="mt-4 inline-block">
-          <Button variant="outline" className="text-xs">Back to List</Button>
-        </Link>
+      <div className="w-full max-w-7xl mx-auto p-4 sm:p-6">
+        <div className="rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20 p-8 text-center text-rose-600 dark:text-rose-400">
+          <AlertCircle className="w-10 h-10 mx-auto mb-3" />
+          <p className="text-base font-bold font-headline">শব্দটি পাওয়া যায়নি</p>
+          <p className="text-xs text-muted-foreground mt-1 font-body">
+            অনুরোধকৃত বাক্য গঠনের শব্দটির তথ্য সার্ভারে বিদ্যমান নেই অথবা মুছে ফেলা হয়েছে।
+          </p>
+          <div className="mt-6">
+            <Button asChild className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 font-headline">
+              <Link href="/make-sentences" prefetch={true}>
+                তালিকায় ফিরে যান
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end justify-between">
-        <div className="max-w-2xl">
-          <nav className="mb-4 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/make-sentences"
-              className="font-label-sm hover:text-primary transition-colors cursor-pointer text-xs"
-            >
-              Make Sentences
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm font-bold text-primary text-xs">Edit Word</span>
-          </nav>
-          <h2 className="mb-2 font-headline-md text-3xl font-extrabold text-primary">
-            Edit Sentence Making Word
-          </h2>
-          <p className="font-body-md text-on-surface-variant leading-relaxed text-sm">
-            Update word details for &quot;{item.word}&quot;.
-          </p>
-        </div>
-      </div>
+    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+      {/* Page Header */}
+      <PageHeader
+        title="বাক্য গঠনের শব্দ সম্পাদনা করুন"
+        description="শ্রেণি, বিষয়, অধ্যায়, শব্দ ও মেটাডাটার বিবরণ হালনাগাদ করুন।"
+        badge={{ label: "এডিট মোড", variant: "indigo" }}
+        icon={Edit3}
+        breadcrumbs={[
+          { label: "ড্যাশবোর্ড", href: "/" },
+          { label: "বাক্য গঠন", href: "/make-sentences" },
+          { label: "সম্পাদনা" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2 font-headline cursor-pointer"
+        >
+          <Link href="/make-sentences" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
+      {/* Error Callout Banner */}
       {errorMessage && (
-        <div className="mb-6 rounded-lg bg-error/10 border border-error/20 p-4 text-xs font-semibold text-error">
-          {errorMessage}
+        <div className="rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20 p-4 text-sm text-rose-600 dark:text-rose-400 flex items-start gap-3 shadow-xs">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <div className="flex-1 font-body">
+            <p className="font-bold font-headline">ত্রুটি ঘটেছে</p>
+            <p className="text-xs mt-0.5">{errorMessage}</p>
+          </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Academic Context */}
-        <Card className="border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs rounded-xl">
-          <CardHeader className="p-0 pb-6">
-            <CardTitle className="text-base font-bold text-on-surface">
-              Academic Context
+      {/* Main Edit Card */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] p-6 sm:p-8 bg-slate-50/50 dark:bg-white/[0.02] flex flex-row items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary flex items-center justify-center shrink-0 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <BookOpen className="w-6 h-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold text-foreground font-headline">
+              বাক্য গঠনের বিবরণ সম্পাদনা
             </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Class */}
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Class *</Label>
-              <Controller
-                name="classId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("subjectId", "")
-                      setValue("chapterId", "")
-                    }}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select Class" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {academicClasses.map((cls) => (
-                        <SelectItem key={cls.id} value={cls.id}>
-                          {cls.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.classId && (
-                <p className="text-[11px] font-medium text-error">{errors.classId.message}</p>
-              )}
-            </div>
+            <p className="text-xs text-muted-foreground mt-0.5 font-body">
+              শ্রেণি, বিষয়, অধ্যায়, মূল শব্দ ও তথ্যসূত্র নির্ভুলভাবে হালনাগাদ করুন।
+            </p>
+          </div>
+        </CardHeader>
 
-            {/* Subject */}
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Subject *</Label>
-              <Controller
-                name="subjectId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("chapterId", "")
-                    }}
-                    disabled={!selectedClassId}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder={!selectedClassId ? "Select Class First" : "Select Subject"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {subjects.map((sub) => (
-                        <SelectItem key={sub.id} value={sub.id}>
-                          {sub.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.subjectId && (
-                <p className="text-[11px] font-medium text-error">{errors.subjectId.message}</p>
-              )}
-            </div>
-
-            {/* Chapter */}
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Chapter *</Label>
-              <Controller
-                name="chapterId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!selectedSubjectId}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder={!selectedSubjectId ? "Select Subject First" : "Select Chapter"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {chapters.map((ch) => (
-                        <SelectItem key={ch.id} value={ch.id}>
-                          {ch.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.chapterId && (
-                <p className="text-[11px] font-medium text-error">{errors.chapterId.message}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Word Content */}
-        <Card className="border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs rounded-xl">
-          <CardHeader className="p-0 pb-6">
-            <CardTitle className="text-base font-bold text-on-surface">
-              Word Content
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 space-y-6">
-            {/* Word Input */}
-            <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Word *</Label>
-              <Input
-                {...register("word")}
-                placeholder="Enter word (e.g. পরিবেশ, বিদ্যালয়, বাগান)..."
-                className="bg-white font-solaiman text-base font-semibold"
-              />
-              {errors.word && (
-                <p className="text-[11px] font-medium text-error">{errors.word.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Difficulty */}
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Class, Subject & Chapter Hierarchy Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {/* Class */}
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Difficulty</Label>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
+                </Label>
                 <Controller
-                  name="difficulty"
+                  name="classId"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full bg-white">
-                        <SelectValue />
+                    <Select
+                      key={`class-select-${field.value || "empty"}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value || ""}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between font-body">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="EASY">EASY</SelectItem>
-                        <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                        <SelectItem value="HARD">HARD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              {/* Reference */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Board Reference (Comma-separated)</Label>
-                <Input
-                  {...register("referenceText")}
-                  placeholder="e.g. ঢাকা বোর্ড ২০২৪, সমাপনী পরীক্ষা"
-                  className="bg-white"
-                />
-              </div>
-
-              {/* Source */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Source (উৎস)</Label>
-                <Controller
-                  name="source"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select Source" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                        {MAKE_SENTENCES_SOURCE_OPTIONS.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
-                            {opt.label}
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem key={cls.id} value={cls.id} label={cls.nameBn || cls.nameEn}>
+                            {cls.nameBn || cls.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
+                {errors.classId && (
+                  <p className="text-xs text-rose-500 font-medium font-body">{errors.classId.message}</p>
+                )}
               </div>
 
-              {/* Session */}
+              {/* Subject */}
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Session / Year (Optional)</Label>
-                <Input
-                  {...register("session")}
-                  placeholder="e.g. 2026, 2025-26..."
-                  className="bg-white"
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  বিষয় (Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="subjectId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`subject-select-${field.value || "empty"}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || !activeClassId}
+                      value={field.value || ""}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50 font-body">
+                        <SelectValue
+                          placeholder={
+                            activeClassId
+                              ? "বিষয় নির্বাচন করুন..."
+                              : "প্রথমে শ্রেণি নির্বাচন করুন"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedSubjects.map((sub) => (
+                          <SelectItem key={sub.id} value={sub.id} label={sub.nameBn || sub.nameEn}>
+                            {sub.nameBn || sub.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.subjectId && (
+                  <p className="text-xs text-rose-500 font-medium font-body">{errors.subjectId.message}</p>
+                )}
+              </div>
+
+              {/* Chapter */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  অধ্যায় (Chapter) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="chapterId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`chapter-select-${field.value || "empty"}-${combinedChapters.length}`}
+                      disabled={isSubmitting || !activeSubjectId}
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50 font-body">
+                        <SelectValue
+                          placeholder={
+                            activeSubjectId
+                              ? "অধ্যায় নির্বাচন করুন..."
+                              : "প্রথমে বিষয় নির্বাচন করুন"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedChapters.map((ch) => (
+                          <SelectItem key={ch.id} value={ch.id} label={ch.nameBn || ch.nameEn}>
+                            {ch.nameBn || ch.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.chapterId && (
+                  <p className="text-xs text-rose-500 font-medium font-body">{errors.chapterId.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Word Statement Text */}
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                মূল শব্দ (Word) <span className="text-rose-500">*</span>
+              </Label>
+              <Input
+                disabled={isSubmitting}
+                placeholder="বাক্য গঠনের মূল শব্দ লিখুন (যেমন: বিদ্যালয়, পরিবেশ, সততা)..."
+                {...register("word")}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-headline font-semibold"
+              />
+              {errors.word && (
+                <p className="text-xs text-rose-500 font-medium font-body">{errors.word.message}</p>
+              )}
+            </div>
+
+            {/* Live Preview for Word */}
+            {watchWord && watchWord.trim() !== "" && (
+              <div className="rounded-2xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/10 p-4 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-primary uppercase tracking-wider font-headline">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>লাইভ শব্দ প্রিভিউ (Live Word Preview)</span>
+                </div>
+                <div className="text-base sm:text-lg text-foreground font-bold whitespace-pre-wrap leading-relaxed font-headline">
+                  <RenderMath text={watchWord} isMath={/[\$\\]/.test(watchWord)} />
+                </div>
+              </div>
+            )}
+
+            {/* Active Toggle Flag */}
+            <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground font-headline">
+                    অ্যাক্টিভ শব্দের অবস্থা
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                    পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                  </p>
+                </div>
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Submit Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Link href="/make-sentences">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isSubmitting}
-              className="rounded-lg border-outline-variant px-6 py-2.5 text-xs font-bold"
-            >
-              Cancel
-            </Button>
-          </Link>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-lg bg-primary px-6 py-2.5 text-xs font-bold text-white hover:bg-primary/90"
-          >
-            {isSubmitting ? "Updating..." : "Update Word Entry"}
-          </Button>
-        </div>
-      </form>
+            {/* Context & Metadata Settings */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+                <Sparkles className="w-3.5 h-3.5" />
+                মেটাডাটা ও অতিরিক্ত সেটিংস
+              </h3>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* Difficulty */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
+                  </Label>
+                  <Controller
+                    name="difficulty"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`difficulty-select-${field.value || "empty"}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between font-body">
+                          <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.difficulty && (
+                    <p className="text-xs text-rose-500 font-medium font-body">{errors.difficulty.message}</p>
+                  )}
+                </div>
+
+                {/* Source */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    প্রশ্নের উৎস (Source)
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`source-select-${field.value || "empty"}-${combinedSources.length}`}
+                        disabled={isSubmitting}
+                        value={field.value || DEFAULT_SOURCE}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between font-body">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {combinedSources.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.source && (
+                    <p className="text-xs text-rose-500 font-medium font-body">{errors.source.message}</p>
+                  )}
+                </div>
+
+                {/* Session */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    সেশন (Session)
+                  </Label>
+                  <Input
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৬"
+                    {...register("session")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                  />
+                  {errors.session && (
+                    <p className="text-xs text-rose-500 font-medium font-body">{errors.session.message}</p>
+                  )}
+                </div>
+
+                {/* Year */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    পরীক্ষার বছর (ঐচ্ছিক)
+                  </Label>
+                  <Input
+                    type="number"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৪"
+                    {...register("year")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                  />
+                  {errors.year && (
+                    <p className="text-xs text-rose-500 font-medium font-body">{errors.year.message}</p>
+                  )}
+                </div>
+
+                {/* Reference */}
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    রেফারেন্স / উৎস ট্যাগ (কমা দিয়ে একাধিক উল্লেখ করুন)
+                  </Label>
+                  <Input
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ঢাকা বোর্ড ২০২৩, পাঠ্যবই পৃষ্ঠা ৪২..."
+                    {...register("referenceText")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 font-body"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions Bar */}
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <Button
+                asChild
+                type="button"
+                variant="outline"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto rounded-xl border-slate-200 dark:border-white/[0.08] text-foreground font-semibold px-6 h-11 font-headline cursor-pointer"
+              >
+                <Link href="/make-sentences" prefetch={true}>
+                  বাতিল করুন
+                </Link>
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>আপডেট হচ্ছে...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>পরিবর্তন সংরক্ষণ করুন</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

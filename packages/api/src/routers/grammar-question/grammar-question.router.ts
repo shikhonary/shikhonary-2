@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { createTRPCRouter, superAdminProcedure } from "../../trpc"
 import {
   createGrammarQuestionSchema,
@@ -8,6 +9,7 @@ import {
   bulkDeleteGrammarQuestionSchema,
   importGrammarQuestionSchema,
   grammarQuestionStatsSchema,
+  toggleGrammarQuestionActiveSchema,
 } from "./grammar-question.schema"
 import {
   createGrammarQuestion,
@@ -18,6 +20,8 @@ import {
   bulkDeleteGrammarQuestion,
   importGrammarQuestion,
   getGrammarQuestionStats,
+  toggleGrammarQuestionActive,
+  getBoardYears,
 } from "./grammar-question.service"
 
 export const grammarQuestionRouter = createTRPCRouter({
@@ -48,6 +52,20 @@ export const grammarQuestionRouter = createTRPCRouter({
   bulkDelete: superAdminProcedure
     .input(bulkDeleteGrammarQuestionSchema)
     .mutation(({ ctx, input }) => bulkDeleteGrammarQuestion(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleGrammarQuestionActiveSchema)
+    .mutation(({ ctx, input }) => toggleGrammarQuestionActive(ctx.db, input)),
+
+  boardYears: superAdminProcedure
+    .input(
+      z.object({
+        subjectId: z.string(),
+        chapterId: z.string().optional(),
+        academicChapterId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
 
   import: superAdminProcedure
     .input(importGrammarQuestionSchema)

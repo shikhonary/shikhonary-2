@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { createTRPCRouter, superAdminProcedure } from "../../trpc"
 import {
   createMakeQuestionSchema,
@@ -6,6 +7,7 @@ import {
   listMakeQuestionSchema,
   updateMakeQuestionSchema,
   bulkDeleteMakeQuestionSchema,
+  toggleMakeQuestionActiveSchema,
   importMakeQuestionSchema,
   makeQuestionStatsSchema,
 } from "./make-question.schema"
@@ -16,6 +18,8 @@ import {
   listMakeQuestion,
   updateMakeQuestion,
   bulkDeleteMakeQuestion,
+  toggleMakeQuestionActive,
+  getBoardYears,
   importMakeQuestion,
   getMakeQuestionStats,
 } from "./make-question.service"
@@ -48,6 +52,20 @@ export const makeQuestionRouter = createTRPCRouter({
   bulkDelete: superAdminProcedure
     .input(bulkDeleteMakeQuestionSchema)
     .mutation(({ ctx, input }) => bulkDeleteMakeQuestion(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleMakeQuestionActiveSchema)
+    .mutation(({ ctx, input }) => toggleMakeQuestionActive(ctx.db, input, ctx.session?.user?.id)),
+
+  boardYears: superAdminProcedure
+    .input(
+      z.object({
+        subjectId: z.string(),
+        chapterId: z.string().optional(),
+        academicChapterId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
 
   import: superAdminProcedure
     .input(importMakeQuestionSchema)

@@ -10,7 +10,7 @@ export function useShortQuestionsList(input: ListShortQuestionsInput = { limit: 
 }
 
 export function useShortQuestionStats(input?: ShortQuestionStatsInput) {
-  return useSuspenseQuery(trpc.shortQuestion.stats.queryOptions(input))
+  return useQuery(trpc.shortQuestion.stats.queryOptions(input))
 }
 
 export function useShortQuestionById(id: string, enabled = true) {
@@ -36,6 +36,17 @@ export function useUpdateShortQuestion() {
 
   return useMutation({
     ...trpc.shortQuestion.update.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.shortQuestion.pathFilter())
+    },
+  })
+}
+
+export function useToggleShortQuestionActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.shortQuestion.toggleActive.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.shortQuestion.pathFilter())
     },

@@ -7,9 +7,5 @@ interface EditMakeSentencesPageProps {
 }
 
 export function EditMakeSentencesPage({ id }: EditMakeSentencesPageProps) {
-  return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <EditMakeSentencesView id={id} />
-    </div>
-  )
+  return <EditMakeSentencesView id={id} />
 }

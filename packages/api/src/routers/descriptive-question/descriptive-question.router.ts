@@ -8,6 +8,7 @@ import {
   bulkDeleteDescriptiveQuestionsSchema,
   importDescriptiveQuestionsSchema,
   descriptiveQuestionStatsSchema,
+  descriptiveQuestionBoardYearsSchema,
 } from "./descriptive-question.schema"
 import {
   createDescriptiveQuestion,
@@ -18,6 +19,7 @@ import {
   bulkDeleteDescriptiveQuestions,
   importDescriptiveQuestions,
   getDescriptiveQuestionStats,
+  getDescriptiveQuestionBoardYears,
 } from "./descriptive-question.service"
 
 export const descriptiveQuestionRouter = createTRPCRouter({
@@ -28,6 +30,10 @@ export const descriptiveQuestionRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(descriptiveQuestionStatsSchema.optional())
     .query(({ ctx, input }) => getDescriptiveQuestionStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(descriptiveQuestionBoardYearsSchema)
+    .query(({ ctx, input }) => getDescriptiveQuestionBoardYears(ctx.db, input)),
 
   byId: superAdminProcedure
     .input(getDescriptiveQuestionSchema)

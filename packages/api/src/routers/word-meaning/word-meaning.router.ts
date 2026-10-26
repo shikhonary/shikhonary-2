@@ -8,6 +8,8 @@ import {
   bulkDeleteWordMeaningSchema,
   importWordMeaningSchema,
   wordMeaningStatsSchema,
+  toggleWordMeaningActiveSchema,
+  wordMeaningBoardYearsSchema,
 } from "./word-meaning.schema"
 import {
   createWordMeaning,
@@ -18,6 +20,8 @@ import {
   bulkDeleteWordMeaning,
   importWordMeaning,
   getWordMeaningStats,
+  toggleWordMeaningActive,
+  getWordMeaningBoardYears,
 } from "./word-meaning.service"
 
 export const wordMeaningRouter = createTRPCRouter({
@@ -33,6 +37,10 @@ export const wordMeaningRouter = createTRPCRouter({
     .input(getWordMeaningSchema)
     .query(({ ctx, input }) => getWordMeaningById(ctx.db, input)),
 
+  boardYears: superAdminProcedure
+    .input(wordMeaningBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getWordMeaningBoardYears(ctx.db, input ?? {})),
+
   create: superAdminProcedure
     .input(createWordMeaningSchema)
     .mutation(({ ctx, input }) => createWordMeaning(ctx.db, input, ctx.session?.user?.id)),
@@ -40,6 +48,10 @@ export const wordMeaningRouter = createTRPCRouter({
   update: superAdminProcedure
     .input(updateWordMeaningSchema)
     .mutation(({ ctx, input }) => updateWordMeaning(ctx.db, input, ctx.session?.user?.id)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleWordMeaningActiveSchema)
+    .mutation(({ ctx, input }) => toggleWordMeaningActive(ctx.db, input, ctx.session?.user?.id)),
 
   delete: superAdminProcedure
     .input(deleteWordMeaningSchema)

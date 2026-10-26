@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { createTRPCRouter, superAdminProcedure } from "../../trpc"
 import {
   createOppositeWordSchema,
@@ -6,6 +7,7 @@ import {
   listOppositeWordSchema,
   updateOppositeWordSchema,
   bulkDeleteOppositeWordSchema,
+  toggleOppositeWordActiveSchema,
   importOppositeWordSchema,
   oppositeWordStatsSchema,
 } from "./opposite-word.schema"
@@ -16,6 +18,8 @@ import {
   listOppositeWord,
   updateOppositeWord,
   bulkDeleteOppositeWord,
+  toggleOppositeWordActive,
+  getBoardYears,
   importOppositeWord,
   getOppositeWordStats,
 } from "./opposite-word.service"
@@ -48,6 +52,20 @@ export const oppositeWordRouter = createTRPCRouter({
   bulkDelete: superAdminProcedure
     .input(bulkDeleteOppositeWordSchema)
     .mutation(({ ctx, input }) => bulkDeleteOppositeWord(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleOppositeWordActiveSchema)
+    .mutation(({ ctx, input }) => toggleOppositeWordActive(ctx.db, input, ctx.session?.user?.id)),
+
+  boardYears: superAdminProcedure
+    .input(
+      z.object({
+        subjectId: z.string(),
+        chapterId: z.string().optional(),
+        academicChapterId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
 
   import: superAdminProcedure
     .input(importOppositeWordSchema)

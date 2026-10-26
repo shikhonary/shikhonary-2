@@ -13,7 +13,7 @@ import {
 } from "./short-answer.schema"
 
 export async function listShortAnswers(db: PrismaClient, input: ListShortAnswersInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, source, session, year, isMath, sort } = input
+  const { page, limit, query, subjectId, chapterId, difficulty, source, session, year, board, isMath, sort } = input
   const skip = (page - 1) * limit
 
   const where: any = {}
@@ -37,6 +37,10 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
     }
   }
 
+  if (board && !source) {
+    where.reference = { has: board }
+  }
+
   if (query) {
     const queryConditions: any[] = [
       { question: { contains: query, mode: "insensitive" } },
@@ -58,8 +62,10 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
   }
 
   let orderBy: any = { createdAt: "desc" }
-  if (sort === "createdAt_asc") {
+  if (sort === "createdAt_asc" || sort === "oldest") {
     orderBy = { createdAt: "asc" }
+  } else if (sort === "createdAt_desc" || sort === "newest") {
+    orderBy = { createdAt: "desc" }
   } else if (sort === "question_asc") {
     orderBy = { question: "asc" }
   } else if (sort === "question_desc") {
@@ -78,6 +84,19 @@ export async function listShortAnswers(db: PrismaClient, input: ListShortAnswers
             id: true,
             nameEn: true,
             nameBn: true,
+            code: true,
+            group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         chapter: {
@@ -121,7 +140,11 @@ export async function getShortAnswerById(db: PrismaClient, input: GetShortAnswer
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       chapter: true,

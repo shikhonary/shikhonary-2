@@ -3,6 +3,7 @@ import { trpc } from "@/trpc/client"
 import type {
   ListOppositeWordInput,
   OppositeWordStatsInput,
+  ToggleOppositeWordActiveInput,
 } from "@workspace/api"
 
 export function useOppositeWordList(input: ListOppositeWordInput = { limit: 20 }) {
@@ -17,6 +18,40 @@ export function useOppositeWordById(id: string, enabled = true) {
   return useQuery({
     ...trpc.oppositeWord.byId.queryOptions({ id }),
     enabled: Boolean(id) && enabled,
+  })
+}
+
+export function useBoardYearsForSelection(input: {
+  subjectId?: string
+  chapterId?: string
+  academicChapterId?: string
+}) {
+  const subjectId = input.subjectId === "All" || !input.subjectId ? "" : input.subjectId
+  const chapterId = input.chapterId === "All" ? undefined : input.chapterId
+  const academicChapterId = input.academicChapterId === "All" ? undefined : input.academicChapterId
+
+  return useQuery({
+    ...trpc.oppositeWord.boardYears.queryOptions(
+      {
+        subjectId,
+        chapterId,
+        academicChapterId,
+      },
+      {
+        enabled: Boolean(subjectId),
+      }
+    ),
+  })
+}
+
+export function useToggleOppositeWordActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.oppositeWord.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.oppositeWord.pathFilter())
+    },
   })
 }
 

@@ -70,6 +70,10 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
     orderBy = { createdAt: "desc" }
   } else if (input.sort === "oldest") {
     orderBy = { createdAt: "asc" }
+  } else if (input.sort === "question_asc") {
+    orderBy = { questionA: "asc" }
+  } else if (input.sort === "question_desc") {
+    orderBy = { questionA: "desc" }
   } else if (input.sort === "context_asc") {
     orderBy = { context: "asc" }
   } else if (input.sort === "context_desc") {
@@ -94,6 +98,17 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
             nameEn: true,
             code: true,
             group: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameBn: true,
+                    nameEn: true,
+                  },
+                },
+              },
+            },
           },
         },
         chapter: {
@@ -139,7 +154,11 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
     include: {
       subject: {
         include: {
-          classSubjects: true,
+          classSubjects: {
+            include: {
+              academicClass: true,
+            },
+          },
         },
       },
       chapter: true,

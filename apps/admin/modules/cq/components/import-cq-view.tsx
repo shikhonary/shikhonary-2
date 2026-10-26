@@ -4,8 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "@workspace/ui/components/sonner"
-import { useImportCqs, useAcademicClassesForSelection, useSubjectsForSelection, useChaptersForSelection } from "../services/use-cq"
-import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
+import {
+  useImportCqs,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+} from "../services/use-cq"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -24,23 +28,29 @@ import { RenderMath } from "@workspace/ui/components/render-math"
 import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
 import "katex/dist/katex.min.css"
 import {
-  PlusIcon,
-  Trash2Icon,
-  CopyIcon,
-  CheckCircle2Icon,
-  Wand2Icon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  CodeIcon,
-  FileCodeIcon,
-  UploadIcon,
-  SaveIcon,
-  CheckIcon,
-  HelpCircleIcon,
-  GraduationCap
+  Plus,
+  Trash2,
+  Copy,
+  CheckCircle2,
+  Wand2,
+  AlertTriangle,
+  ChevronUp,
+  ChevronDown,
+  Code,
+  FileCode,
+  Upload,
+  ArrowLeft,
+  Sparkles,
+  Layers,
+  AlertCircle,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  BookOpen,
 } from "lucide-react"
-import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS, toBengaliDigits } from "@workspace/utils"
 import { CQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
 
 const sampleJsonTemplate = `[
   {
@@ -53,7 +63,7 @@ const sampleJsonTemplate = `[
     "source": "সহায়ক সংকলন",
     "session": "2024",
     "year": 2024,
-    "reference": ["Board 2024"],
+    "reference": ["ঢাকা বোর্ড ২০২৪"],
     "attachments": [
       {
         "type": "image",
@@ -76,6 +86,11 @@ export function repairJsonSyntax(raw: string): string {
   // 1. Strip markdown code fencing (```json ... ``` or ``` ...)
   cleaned = cleaned.replace(/^```(?:json)?\s*/gi, "").replace(/\s*```$/g, "").trim()
 
+  // Remove trailing comma at the end of the input (e.g. }, -> })
+  if (cleaned.endsWith(",")) {
+    cleaned = cleaned.slice(0, -1).trim()
+  }
+
   // 2. Normalize smart quotes to standard quotes
   cleaned = cleaned
     .replace(/[“”]/g, '"')
@@ -85,17 +100,15 @@ export function repairJsonSyntax(raw: string): string {
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
   // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes (b, f, n, r, t)
-  // e.g. \rightarrow, \times, \theta, \frac, \beta, \neq, \mathbf, \text, \tan, etc.
   cleaned = cleaned.replace(
     /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
     "\\\\$1"
   )
 
-  // 5. Fix any unescaped backslashes that are not valid JSON escape sequences (\", \\, \/, \b, \f, \n, \r, \t, \uXXXX)
-  // e.g. \(, \), \[, \], \alpha, \sum, \sqrt, \int, \le, \ge, \pm, etc.
+  // 5. Fix any unescaped backslashes that are not valid JSON escape sequences
   cleaned = cleaned.replace(/(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\")
 
-  // 6. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 6. Remove trailing commas in objects & arrays
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
   // 7. Wrap single object in array if not already an array
@@ -110,14 +123,12 @@ export function repairJsonSyntax(raw: string): string {
 export function findJsonErrorPosition(raw: string, errMessage: string) {
   const lines = raw.split("\n")
 
-  // Try position number e.g. "at position 123"
   const posMatch = errMessage.match(/position\s+(\d+)/i)
   let charPos = -1
   if (posMatch && posMatch[1]) {
     charPos = parseInt(posMatch[1], 10)
   }
 
-  // Try line number e.g. "at line 12 column 4" or "line 12"
   const lineMatch = errMessage.match(/line\s+(\d+)/i)
   const colMatch = errMessage.match(/column\s+(\d+)/i)
 
@@ -127,7 +138,7 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   if (charPos >= 0 && errorLine === -1) {
     let count = 0
     for (let i = 0; i < lines.length; i++) {
-      const lineLen = (lines[i]?.length || 0) + 1 // +1 for newline
+      const lineLen = (lines[i]?.length || 0) + 1
       if (count + lineLen >= charPos) {
         errorLine = i + 1
         errorCol = charPos - count + 1
@@ -159,386 +170,532 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   }
 }
 
-interface EditableFieldProps {
-  label?: string
-  value: string
-  placeholder?: string
-  multiline?: boolean
-  onSave: (newValue: string) => void
-  className?: string
-  textClassName?: string
-  badge?: React.ReactNode
-  isMath?: boolean
-}
-
-function EditableField({
-  label,
-  value,
-  placeholder = "Click to edit...",
-  multiline = false,
-  onSave,
-  className = "",
-  textClassName = "",
-  badge,
-  isMath = true,
-}: EditableFieldProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(value || "")
-
-  useEffect(() => {
-    setEditValue(value || "")
-  }, [value])
-
-  const handleBlur = () => {
-    setIsEditing(false)
-    if (editValue.trim() !== (value || "")) {
-      onSave(editValue.trim())
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) {
-      e.preventDefault()
-      handleBlur()
-    } else if (e.key === "Escape") {
-      setEditValue(value || "")
-      setIsEditing(false)
-    }
-  }
-
-  return (
-    <div className={cn("group relative transition-colors", className)}>
-      {label && (
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-            {label}
-          </span>
-          {badge}
-        </div>
-      )}
-      {isEditing ? (
-        <div className="space-y-1.5">
-          {multiline ? (
-            <Textarea
-              autoFocus
-              rows={3}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          ) : (
-            <Input
-              autoFocus
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          )}
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-            <span>Press Enter (or Ctrl+Enter) to save, Esc to cancel</span>
-            <button
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                handleBlur()
-              }}
-              className="text-xs font-semibold text-primary hover:underline cursor-pointer"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          onDoubleClick={() => setIsEditing(true)}
-          title="Click to edit"
-          className={cn(
-            "group/edit min-h-9 cursor-pointer rounded-lg border border-transparent bg-surface-container-lowest/50 p-2.5 transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-xs",
-            !value && "italic text-outline-variant",
-            textClassName
-          )}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <span className={cn(
-              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
-              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
-            )}>
-              <RenderMath text={value || placeholder} isMath={isMath} />
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsEditing(true)
-              }}
-              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 hover:bg-primary/20 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden animate-fade-in"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-interface EditableCqCardProps {
+interface ParsedCqCardProps {
   index: number
   item: any
-  onChange: (updated: any) => void
+  isExpanded: boolean
+  onToggleExpand: () => void
+  onChange: (updatedItem: any) => void
   onDelete: () => void
   onDuplicate: () => void
 }
 
-function EditableCqCard({
+/**
+ * Parsed CQ Card matching the visual benchmark of MCQ and CreateCqView
+ */
+function ParsedCqCard({
   index,
   item,
+  isExpanded,
+  onToggleExpand,
   onChange,
   onDelete,
   onDuplicate,
-}: EditableCqCardProps) {
-  const handleToggleDifficulty = () => {
-    const difficulties = ["EASY", "MEDIUM", "HARD"]
-    const nextIdx = (difficulties.indexOf(item.difficulty || "MEDIUM") + 1) % difficulties.length
-    onChange({
-      ...item,
-      difficulty: difficulties[nextIdx],
-    })
-  }
+}: ParsedCqCardProps) {
+  const totalMarks =
+    (Number(item.marks?.a) || 1) +
+    (Number(item.marks?.b) || 2) +
+    (item.questionC ? Number(item.marks?.c) || 3 : 0) +
+    (item.questionD ? Number(item.marks?.d) || 4 : 0)
 
-  const handleToggleActive = () => {
-    onChange({
-      ...item,
-      isActive: item.isActive !== false ? false : true,
-    })
-  }
-
-  const handleSaveReferences = (val: string) => {
-    const refs = val
-      .split(",")
-      .map((r) => r.trim())
-      .filter(Boolean)
-    onChange({
-      ...item,
-      reference: refs,
-    })
-  }
+  const hasStimulus = Boolean(item.context && String(item.context).trim().length > 0)
+  const hasQuestionA = Boolean(item.questionA && String(item.questionA).trim().length > 0)
+  const hasQuestionB = Boolean(item.questionB && String(item.questionB).trim().length > 0)
 
   const referenceString = Array.isArray(item.reference) ? item.reference.join(", ") : ""
 
+  const handleUpdateMarks = (part: "a" | "b" | "c" | "d", val: string) => {
+    const num = Number(val) || 0
+    onChange({
+      ...item,
+      marks: {
+        ...(item.marks || {}),
+        [part]: num,
+      },
+    })
+  }
+
+  const handleUpdateAnswer = (part: "answerA" | "answerB" | "answerC" | "answerD" | "explanation", val: string) => {
+    onChange({
+      ...item,
+      answer: {
+        ...(item.answer || {}),
+        [part]: val,
+      },
+    })
+  }
+
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant/60 bg-white shadow-xs transition-shadow hover:shadow-md">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary-container font-headline text-xs font-bold text-on-primary-container">
-            #{index + 1}
-          </span>
-          <span className="text-xs font-semibold uppercase tracking-wider text-outline">
-            CQ Preview
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Difficulty Toggle */}
-          <button type="button" onClick={handleToggleDifficulty} className="cursor-pointer">
-            <Badge
-              variant="outline"
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                item.difficulty === "EASY" && "border-emerald-500 text-emerald-700 bg-emerald-50",
-                item.difficulty === "MEDIUM" && "border-amber-500 text-amber-700 bg-amber-50",
-                item.difficulty === "HARD" && "border-red-500 text-red-700 bg-red-50"
-              )}
-            >
-              {item.difficulty || "MEDIUM"}
-            </Badge>
-          </button>
-
-          {/* Active Status */}
-          <button type="button" onClick={handleToggleActive} className="cursor-pointer">
-            <Badge
-              variant="outline"
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                item.isActive !== false
-                  ? "border-emerald-500 text-emerald-600 bg-emerald-50"
-                  : "border-gray-400 text-gray-500 bg-gray-50"
-              )}
-            >
-              {item.isActive !== false ? "Active" : "Inactive"}
-            </Badge>
-          </button>
-
-          {/* Duplicate & Delete Buttons */}
-          <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              onClick={onDuplicate}
-              title="Duplicate CQ"
-              className="text-on-surface-variant hover:bg-surface-container-high cursor-pointer"
-            >
-              <CopyIcon className="size-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              onClick={onDelete}
-              title="Delete CQ from import"
-              className="text-destructive hover:bg-destructive/10 cursor-pointer"
-            >
-              <Trash2Icon className="size-4" />
-            </Button>
+    <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden transition-all hover:shadow-md">
+      {/* Header Bar matching Benchmark */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 sm:p-5">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary font-bold text-xs sm:text-sm border border-indigo-100 dark:border-primary/20 shrink-0 font-solaiman">
+            #{toBengaliDigits(index + 1)}
           </div>
-        </div>
-      </div>
-
-      <div className="p-5 space-y-4">
-        {/* Attachments Section (Images, Tables, Context Texts) */}
-        {Array.isArray(item.attachments) && item.attachments.length > 0 && (
-          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block mb-1">
-              Attachments ({item.attachments.length})
-            </span>
-            <QuestionAttachments attachments={item.attachments} isMath={true} />
-          </div>
-        )}
-
-        {/* Stimulus / Context (উদ্দীপক) */}
-        {item.context && (
-          <div className="space-y-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest/30 p-3.5">
-            <EditableField
-              label="উদ্দীপক / Context (Stimulus)"
-              value={item.context}
-              multiline={true}
-              placeholder="উদ্দীপক / Context text..."
-              onSave={(newVal) => onChange({ ...item, context: newVal || null })}
-              isMath={true}
-            />
-          </div>
-        )}
-
-        {/* Stems Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
-          <EditableField
-            label="ক. Question A (Knowledge)"
-            value={item.questionA}
-            placeholder="Question A stem..."
-            onSave={(newVal) => onChange({ ...item, questionA: newVal })}
-          />
-          <EditableField
-            label="খ. Question B (Comprehension)"
-            value={item.questionB}
-            placeholder="Question B stem..."
-            onSave={(newVal) => onChange({ ...item, questionB: newVal })}
-          />
-          <EditableField
-            label="গ. Question C (Application) (Optional)"
-            value={item.questionC || ""}
-            placeholder="Question C stem (optional)..."
-            onSave={(newVal) => onChange({ ...item, questionC: newVal || undefined })}
-          />
-          <EditableField
-            label="ঘ. Question D (Higher Ability)"
-            value={item.questionD || ""}
-            placeholder="Question D stem (optional)..."
-            onSave={(newVal) => onChange({ ...item, questionD: newVal || undefined })}
-          />
-        </div>
-
-        {/* Answers Grid */}
-        <div className="border-t border-outline-variant/30 pt-3 space-y-3">
-          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline block">Answers</span>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <EditableField
-              label="Answer A"
-              value={item.answer?.answerA || ""}
-              placeholder="Answer A..."
-              onSave={(newVal) => onChange({ ...item, answer: { ...(item.answer || {}), answerA: newVal } })}
-            />
-            <EditableField
-              label="Answer B"
-              value={item.answer?.answerB || ""}
-              placeholder="Answer B..."
-              onSave={(newVal) => onChange({ ...item, answer: { ...(item.answer || {}), answerB: newVal } })}
-            />
-            <EditableField
-              label="Answer C"
-              value={item.answer?.answerC || ""}
-              placeholder="Answer C..."
-              onSave={(newVal) => onChange({ ...item, answer: { ...(item.answer || {}), answerC: newVal } })}
-            />
-            <EditableField
-              label="Answer D"
-              value={item.answer?.answerD || ""}
-              placeholder="Answer D..."
-              onSave={(newVal) => onChange({ ...item, answer: { ...(item.answer || {}), answerD: newVal } })}
-            />
-          </div>
-          <EditableField
-            label="Explanation / Assessment Notes"
-            value={item.answer?.explanation || ""}
-            multiline
-            placeholder="Explanation..."
-            onSave={(newVal) => onChange({ ...item, answer: { ...(item.answer || {}), explanation: newVal } })}
-          />
-        </div>
-
-        {/* References, Source & Session */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-outline-variant/30 pt-3 items-center">
-          <EditableField
-            label="References (Comma-separated)"
-            value={referenceString}
-            placeholder="e.g. Board 2024..."
-            onSave={handleSaveReferences}
-          />
-
-          <div className="space-y-1.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-              Source (উৎস)
-            </span>
-            <Select
-              value={item.source || DEFAULT_SOURCE}
-              onValueChange={(val) => onChange({ ...item, source: val })}
-            >
-              <SelectTrigger className="w-full bg-white h-9 text-xs">
-                <SelectValue placeholder="Select Source..." />
-              </SelectTrigger>
-              <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                {CQ_SOURCE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-              Session (শিক্ষাবর্ষ)
-            </span>
-            <div className="flex h-9 items-center justify-between rounded-md border border-outline-variant/40 bg-surface-container-low px-3 text-xs text-on-surface-variant font-medium">
-              <span>{item.session || (item.year ? String(item.year) : new Date().getFullYear())}</span>
-              <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
-                Auto Current Year
-              </Badge>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm sm:text-base font-bold font-headline text-foreground truncate">
+              {hasStimulus
+                ? item.context
+                : hasQuestionA
+                ? `ক. ${item.questionA}`
+                : `সৃজনশীল প্রশ্ন #${toBengaliDigits(index + 1)}`}
+            </h4>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-[11px] text-muted-foreground font-body">
+                উপ-প্রশ্ন: ক, খ{item.questionC ? ", গ" : ""}{item.questionD ? ", ঘ" : ""} | মোট নম্বর:{" "}
+                {toBengaliDigits(totalMarks)}
+              </span>
             </div>
           </div>
         </div>
+
+        {/* Quick Badges & Controls */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          {/* Difficulty Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-lg font-headline",
+              item.difficulty === "EASY" &&
+                "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60",
+              (item.difficulty === "MEDIUM" || !item.difficulty) &&
+                "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/60",
+              item.difficulty === "HARD" &&
+                "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/60"
+            )}
+          >
+            {item.difficulty || "MEDIUM"}
+          </Badge>
+
+          {/* Active Status Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2 py-0.5 text-[11px] font-bold rounded-lg font-body",
+              item.isActive !== false
+                ? "border-emerald-200 text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400"
+                : "border-slate-300 text-slate-500 bg-slate-50 dark:bg-white/[0.04]"
+            )}
+          >
+            {item.isActive !== false ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"}
+          </Badge>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 ml-1 pl-1 border-l border-slate-200 dark:border-white/[0.08]">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onDuplicate}
+              title="CQ ডুপ্লিকেট করুন"
+              className="size-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-primary/10 rounded-xl cursor-pointer"
+            >
+              <Copy className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onDelete}
+              title="CQ মুছে ফেলুন"
+              className="size-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl cursor-pointer"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={onToggleExpand}
+              title={isExpanded ? "সংকুচিত করুন" : "প্রসারিত করে সম্পাদনা করুন"}
+              className="size-8 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-foreground cursor-pointer shadow-none"
+            >
+              {isExpanded ? (
+                <ChevronUp className="size-4" />
+              ) : (
+                <ChevronDown className="size-4" />
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
+
+      {/* Collapsed State Summary Preview */}
+      {!isExpanded && (
+        <div className="p-4 sm:p-5 space-y-3 bg-card font-body text-xs text-foreground">
+          {hasStimulus && (
+            <div className="rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] p-3 leading-relaxed">
+              <span className="font-bold text-foreground font-headline mr-1.5">উদ্দীপক:</span>
+              <RenderMath text={item.context} isMath={true} />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="p-2.5 rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/30 dark:bg-white/[0.01]">
+              <span className="font-bold text-indigo-600 dark:text-primary font-headline mr-1">ক:</span>
+              <span>{item.questionA || "(জ্ঞানমূলক প্রশ্ন ফাঁকা)"}</span>
+              <span className="ml-1 text-muted-foreground font-mono">[{toBengaliDigits(item.marks?.a || 1)}]</span>
+            </div>
+            <div className="p-2.5 rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/30 dark:bg-white/[0.01]">
+              <span className="font-bold text-indigo-600 dark:text-primary font-headline mr-1">খ:</span>
+              <span>{item.questionB || "(অনুধাবনমূলক প্রশ্ন ফাঁকা)"}</span>
+              <span className="ml-1 text-muted-foreground font-mono">[{toBengaliDigits(item.marks?.b || 2)}]</span>
+            </div>
+            {item.questionC && (
+              <div className="p-2.5 rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/30 dark:bg-white/[0.01]">
+                <span className="font-bold text-indigo-600 dark:text-primary font-headline mr-1">গ:</span>
+                <span>{item.questionC}</span>
+                <span className="ml-1 text-muted-foreground font-mono">[{toBengaliDigits(item.marks?.c || 3)}]</span>
+              </div>
+            )}
+            {item.questionD && (
+              <div className="p-2.5 rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/30 dark:bg-white/[0.01]">
+                <span className="font-bold text-indigo-600 dark:text-primary font-headline mr-1">ঘ:</span>
+                <span>{item.questionD}</span>
+                <span className="ml-1 text-muted-foreground font-mono">[{toBengaliDigits(item.marks?.d || 4)}]</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Validation Warning Banner */}
+      {(!hasQuestionA || !hasQuestionB) && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border-t border-b border-amber-200/60 dark:border-amber-800/40 px-5 py-2.5 text-xs text-amber-800 dark:text-amber-400 flex flex-wrap items-center justify-between gap-2 font-medium">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+            <span>সৃজনশীল প্রশ্নের জন্য &apos;ক&apos; (জ্ঞান) এবং &apos;খ&apos; (অনুধাবন) উপ-প্রশ্ন থাকা আবশ্যক।</span>
+          </div>
+        </div>
+      )}
+
+      {/* Card Content - Visible when expanded */}
+      {isExpanded && (
+        <CardContent className="p-6 sm:p-7 space-y-7 animate-in fade-in duration-150">
+          {/* Stimulus Passage Textarea */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
+            </Label>
+            <Textarea
+              rows={3}
+              placeholder="সৃজনশীল প্রশ্নের উদ্দীপক লিখুন..."
+              value={item.context || ""}
+              onChange={(e) => onChange({ ...item, context: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
+            />
+            {item.context && (
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-xs text-foreground">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">
+                  LaTeX ম্যাথ প্রিভিউ:
+                </span>
+                <RenderMath text={item.context} isMath={true} />
+              </div>
+            )}
+          </div>
+
+          {/* Sub-Questions A, B, C, D Stems and Marks */}
+          <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+              <BookOpen className="w-3.5 h-3.5" />
+              উপ-প্রশ্ন ও নম্বর বণ্টন
+            </h4>
+
+            {/* Part A */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+              <div className="md:col-span-3 space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  ক. জ্ঞানমূলক উপ-প্রশ্ন (A) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="ক উপ-প্রশ্ন..."
+                  value={item.questionA || ""}
+                  onChange={(e) => onChange({ ...item, questionA: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  নম্বর (ক)
+                </Label>
+                <Input
+                  type="number"
+                  value={item.marks?.a ?? 1}
+                  onChange={(e) => handleUpdateMarks("a", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+            </div>
+
+            {/* Part B */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+              <div className="md:col-span-3 space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  খ. অনুধাবনমূলক উপ-প্রশ্ন (B) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="খ উপ-প্রশ্ন..."
+                  value={item.questionB || ""}
+                  onChange={(e) => onChange({ ...item, questionB: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  নম্বর (খ)
+                </Label>
+                <Input
+                  type="number"
+                  value={item.marks?.b ?? 2}
+                  onChange={(e) => handleUpdateMarks("b", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+            </div>
+
+            {/* Part C */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+              <div className="md:col-span-3 space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  গ. প্রয়োগমূলক উপ-প্রশ্ন (C) (ঐচ্ছিক)
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="গ উপ-প্রশ্ন..."
+                  value={item.questionC || ""}
+                  onChange={(e) => onChange({ ...item, questionC: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  নম্বর (গ)
+                </Label>
+                <Input
+                  type="number"
+                  value={item.marks?.c ?? 3}
+                  onChange={(e) => handleUpdateMarks("c", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+            </div>
+
+            {/* Part D */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+              <div className="md:col-span-3 space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  ঘ. উচ্চতর দক্ষতামূলক উপ-প্রশ্ন (D) (ঐচ্ছিক)
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="ঘ উপ-প্রশ্ন..."
+                  value={item.questionD || ""}
+                  onChange={(e) => onChange({ ...item, questionD: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  নম্বর (ঘ)
+                </Label>
+                <Input
+                  type="number"
+                  value={item.marks?.d ?? 4}
+                  onChange={(e) => handleUpdateMarks("d", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Solution Answers Section */}
+          <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+              <Sparkles className="w-3.5 h-3.5" />
+              সমাধান ও উত্তরপত্র (ঐচ্ছিক)
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উত্তর ক (Answer A)
+                </Label>
+                <Textarea
+                  rows={2}
+                  placeholder="ক প্রশ্নের আদর্শ উত্তর..."
+                  value={item.answer?.answerA || ""}
+                  onChange={(e) => handleUpdateAnswer("answerA", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উত্তর খ (Answer B)
+                </Label>
+                <Textarea
+                  rows={2}
+                  placeholder="খ প্রশ্নের আদর্শ উত্তর..."
+                  value={item.answer?.answerB || ""}
+                  onChange={(e) => handleUpdateAnswer("answerB", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উত্তর গ (Answer C)
+                </Label>
+                <Textarea
+                  rows={2}
+                  placeholder="গ প্রশ্নের আদর্শ উত্তর..."
+                  value={item.answer?.answerC || ""}
+                  onChange={(e) => handleUpdateAnswer("answerC", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উত্তর ঘ (Answer D)
+                </Label>
+                <Textarea
+                  rows={2}
+                  placeholder="ঘ প্রশ্নের আদর্শ উত্তর..."
+                  value={item.answer?.answerD || ""}
+                  onChange={(e) => handleUpdateAnswer("answerD", e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                উত্তর বিশ্লেষণ ও সামগ্রিক ব্যাখ্যা
+              </Label>
+              <Textarea
+                rows={2}
+                placeholder="প্রশ্নটির সামগ্রিক ব্যাখ্যা..."
+                value={item.answer?.explanation || ""}
+                onChange={(e) => handleUpdateAnswer("explanation", e.target.value)}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3 font-body"
+              />
+            </div>
+          </div>
+
+          {/* Metadata Section */}
+          <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5 font-headline">
+              <Sparkles className="w-3.5 h-3.5" />
+              মেটাডাটা ও সেটিংস
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Difficulty */}
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  কাঠিন্য
+                </Label>
+                <Select
+                  value={item.difficulty || "MEDIUM"}
+                  onValueChange={(val) => onChange({ ...item, difficulty: val })}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-xs h-10 px-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Source */}
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উৎস (Source)
+                </Label>
+                <Select
+                  value={item.source || DEFAULT_SOURCE}
+                  onValueChange={(val) => onChange({ ...item, source: val })}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-xs h-10 px-3">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {CQ_SOURCE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Year */}
+              <div className="space-y-1.5">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  সাল / বছর
+                </Label>
+                <Input
+                  type="number"
+                  placeholder="যেমন: ২০২৪"
+                  value={item.year || ""}
+                  onChange={(e) => onChange({ ...item, year: e.target.value ? Number(e.target.value) : null })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-xs h-10 px-3 font-body"
+                />
+              </div>
+            </div>
+
+            {/* References */}
+            <div className="space-y-1.5">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                রেফারেন্স ট্যাগ (কমা দিয়ে একাধিক উল্লেখ করুন)
+              </Label>
+              <Input
+                type="text"
+                placeholder="যেমন: ঢাকা বোর্ড ২০২৪, পাঠ্যবই পৃষ্ঠা ৪২"
+                value={referenceString}
+                onChange={(e) => {
+                  const arr = e.target.value
+                    .split(",")
+                    .map((r) => r.trim())
+                    .filter(Boolean)
+                  onChange({ ...item, reference: arr })
+                }}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-xs h-10 px-3.5 font-body"
+              />
+            </div>
+
+            {/* Active Status Checkbox */}
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5">
+              <div>
+                <p className="text-xs font-bold text-foreground font-headline">অ্যাক্টিভ প্রশ্ন স্ট্যাটাস</p>
+                <p className="text-[11px] text-muted-foreground font-body">প্রশ্নটি শিক্ষার্থী ও পরীক্ষার মডিউলে সক্রিয় থাকবে।</p>
+              </div>
+              <input
+                type="checkbox"
+                checked={item.isActive !== false}
+                onChange={(e) => onChange({ ...item, isActive: e.target.checked })}
+                className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Attachments Section */}
+          {Array.isArray(item.attachments) && item.attachments.length > 0 && (
+            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                সংযুক্ত চিত্র / মিডিয়া ({toBengaliDigits(item.attachments.length)}টি)
+              </Label>
+              <QuestionAttachments attachments={item.attachments} isMath={true} />
+            </div>
+          )}
+        </CardContent>
+      )}
     </Card>
   )
 }
@@ -547,36 +704,119 @@ export function ImportCqView() {
   const router = useRouter()
   const importMutation = useImportCqs()
 
-  const [jsonText, setJsonText] = useState<string>("")
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
-  const [selectedChapterId, setSelectedChapterId] = useState<string>("")
-  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
-  const [showSample, setShowSample] = useState<boolean>(false)
+  const [jsonText, setJsonText] = useState("")
   const [parsedItems, setParsedItems] = useState<any[]>([])
   const [parseError, setParseError] = useState<string | null>(null)
-  const [errorContext, setErrorContext] = useState<ReturnType<typeof findJsonErrorPosition>>(null)
+  const [errorContext, setErrorContext] = useState<{
+    line: number
+    col: number
+    linesContext: { num: number; content: string; isError: boolean }[]
+  } | null>(null)
+  const [showSample, setShowSample] = useState(false)
+  const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({})
 
+  // Dropdown States for Hierarchy
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState("")
+  const [selectedSubjectId, setSelectedSubjectId] = useState("")
+  const [selectedChapterId, setSelectedChapterId] = useState("")
+  const [selectedSource, setSelectedSource] = useState(DEFAULT_SOURCE)
+
+  // Data queries
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedAcademicClassId ? { academicClassId: selectedAcademicClassId } : undefined
   )
-  const { data: chapters = [] } = useChaptersForSelection({
-    subjectId: selectedSubjectId,
-  })
+  const { data: chapters = [] } = useChaptersForSelection(
+    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+  )
 
-  const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
-  const questionTypes = questionTypesData?.questionTypes ?? []
+  const handleAcademicClassChange = (classId: string) => {
+    setSelectedAcademicClassId(classId === "all" ? "" : classId)
+    setSelectedSubjectId("")
+    setSelectedChapterId("")
+  }
 
-  const handleSourceChange = (sourceVal: string) => {
-    setSelectedSource(sourceVal)
-    if (parsedItems.length > 0) {
-      const updated = parsedItems.map((item) => ({
-        ...item,
-        source: item.source || sourceVal,
-      }))
-      syncParsedItemsToText(updated)
+  const handleSubjectChange = (subjectId: string) => {
+    setSelectedSubjectId(subjectId)
+    setSelectedChapterId("")
+  }
+
+  const handleChapterChange = (chapterId: string) => {
+    setSelectedChapterId(chapterId)
+  }
+
+  // Parse and validate raw JSON input
+  const validateAndParseJson = (
+    rawText: string,
+    classId: string,
+    subId: string,
+    chapId: string,
+    src: string
+  ) => {
+    setParseError(null)
+    setErrorContext(null)
+
+    if (!rawText.trim()) {
+      setParsedItems([])
+      return
     }
+
+    try {
+      const parsed = JSON.parse(rawText)
+      const list = Array.isArray(parsed) ? parsed : [parsed]
+
+      const normalizedList = list.map((item) => {
+        const marksObj = {
+          a: item.marks?.a || 1,
+          b: item.marks?.b || 2,
+          c: item.questionC ? item.marks?.c || 3 : 0,
+          d: item.questionD ? item.marks?.d || 4 : 0,
+        }
+
+        return {
+          classId: item.classId || classId || undefined,
+          subjectId: item.subjectId || subId || undefined,
+          chapterId: item.chapterId || chapId || undefined,
+          context: item.context?.trim() || null,
+          questionA: String(item.questionA || "").trim(),
+          questionB: String(item.questionB || "").trim(),
+          questionC: item.questionC ? String(item.questionC).trim() : null,
+          questionD: item.questionD ? String(item.questionD).trim() : null,
+          difficulty: item.difficulty || QUESTION_DIFFICULTY.MEDIUM,
+          year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
+          source: item.source ? String(item.source).trim() : src,
+          session: item.session ? String(item.session).trim() : (item.year ? String(item.year) : null),
+          reference: Array.isArray(item.reference) ? item.reference : [],
+          isActive: item.isActive !== false,
+          marks: marksObj,
+          answer: item.answer ? {
+            answerA: item.answer.answerA?.trim() || null,
+            answerB: item.answer.answerB?.trim() || null,
+            answerC: item.answer.answerC?.trim() || null,
+            answerD: item.answer.answerD?.trim() || null,
+            explanation: item.answer.explanation?.trim() || null,
+          } : null,
+          attachments: Array.isArray(item.attachments) ? item.attachments : [],
+        }
+      })
+
+      setParsedItems(normalizedList)
+    } catch (err: any) {
+      setParseError(err.message || "Invalid JSON syntax")
+      const diag = findJsonErrorPosition(rawText, err.message || "")
+      setErrorContext(diag)
+    }
+  }
+
+  const handleJsonChange = (text: string) => {
+    setJsonText(text)
+    validateAndParseJson(
+      text,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedChapterId,
+      selectedSource
+    )
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -586,227 +826,85 @@ export function ImportCqView() {
     const reader = new FileReader()
     reader.onload = (event) => {
       const content = event.target?.result as string
-      if (content) {
-        setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
-      }
+      setJsonText(content)
+      validateAndParseJson(
+        content,
+        selectedAcademicClassId,
+        selectedSubjectId,
+        selectedChapterId,
+        selectedSource
+      )
+      toast.success("JSON ফাইল সফলভাবে লোড করা হয়েছে।")
+    }
+    reader.onerror = () => {
+      toast.error("ফাইল পড়তে ত্রুটি হয়েছে।")
     }
     reader.readAsText(file)
-  }
-
-  const validateAndParseJson = (
-    text: string,
-    overrideClassId: string,
-    overrideSubjectId: string,
-    overrideChapterId: string,
-    overrideSource?: string
-  ) => {
-    setParseError(null)
-    setErrorContext(null)
-    setParsedItems([])
-
-    if (!text.trim()) return
-
-    let textToParse = text
-    let rawData: any = null
-
-    try {
-      rawData = JSON.parse(textToParse)
-    } catch (err: any) {
-      // Attempt silent auto-repair for common AI paste artifacts
-      const repaired = repairJsonSyntax(text)
-      if (repaired && repaired !== text) {
-        try {
-          rawData = JSON.parse(repaired)
-          textToParse = repaired
-          setJsonText(repaired)
-          toast.success("Auto-repaired JSON formatting (smart quotes / LaTeX escapes / trailing commas)!")
-        } catch {
-          // Both failed
-        }
-      }
-
-      if (!rawData) {
-        const errMsg = err.message || "Invalid JSON syntax"
-        setParseError(`Syntax Error: ${errMsg}`)
-        const errLoc = findJsonErrorPosition(text, errMsg)
-        setErrorContext(errLoc)
-        return
-      }
-    }
-
-    try {
-      const itemsArray = Array.isArray(rawData) ? rawData : [rawData]
-
-      if (itemsArray.length === 0) {
-        setParseError("JSON array is empty.")
-        return
-      }
-
-      const currentDefaultSource = overrideSource || selectedSource || DEFAULT_SOURCE
-      const currentYear = new Date().getFullYear().toString()
-      const validated: any[] = []
-      const errors: string[] = []
-
-      itemsArray.forEach((item: any, idx: number) => {
-        const itemNum = idx + 1
-        const subjectId = item.subjectId || overrideSubjectId
-        const chapterId = item.chapterId || overrideChapterId
-
-        if (!item.questionA || typeof item.questionA !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'questionA' stem.`)
-        }
-        if (!item.questionB || typeof item.questionB !== "string") {
-          errors.push(`Item #${itemNum}: Missing or invalid 'questionB' stem.`)
-        }
-        if (item.questionC && typeof item.questionC !== "string") {
-          errors.push(`Item #${itemNum}: Invalid 'questionC' stem.`)
-        }
-        if (!subjectId) {
-          errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
-        }
-        if (!chapterId) {
-          errors.push(`Item #${itemNum}: Missing 'chapterId'. Select default Chapter or add to JSON.`)
-        }
-
-        const attachmentsArray = Array.isArray(item.attachments)
-          ? item.attachments
-          : Array.isArray(item.attachment)
-          ? item.attachment
-          : []
-
-        const mappedAttachments = attachmentsArray
-          .filter((att: any) => att && typeof att === "object")
-          .map((att: any, aIdx: number) => ({
-            type: String(att.type || (att.url ? "image" : att.table ? "table" : "text")),
-            caption: att.caption ? String(att.caption) : null,
-            content: att.content ? String(att.content) : null,
-            url: att.url && att.url !== "text-context" ? String(att.url) : null,
-            table: att.table !== undefined ? att.table : null,
-            bottomContent: att.bottomContent ? String(att.bottomContent) : null,
-            tableBorder: att.tableBorder !== undefined ? Boolean(att.tableBorder) : false,
-            position: att.position !== undefined && att.position !== null ? Number(att.position) : aIdx,
-          }))
-
-        validated.push({
-          subjectId,
-          chapterId,
-          context: item.context?.trim() || null,
-          questionA: String(item.questionA || "").trim(),
-          questionB: String(item.questionB || "").trim(),
-          questionC: item.questionC ? String(item.questionC).trim() : null,
-          questionD: item.questionD?.trim() || null,
-          difficulty: item.difficulty || "MEDIUM",
-          year: item.year !== undefined && item.year !== null ? Number(item.year) : null,
-          source: item.source ? String(item.source).trim() : currentDefaultSource,
-          session: item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear),
-          reference: Array.isArray(item.reference) ? item.reference : [],
-          isActive: item.isActive !== false,
-          attachments: mappedAttachments,
-          answer: item.answer ? {
-            answerA: item.answer?.answerA?.trim() || null,
-            answerB: item.answer?.answerB?.trim() || null,
-            answerC: item.answer?.answerC?.trim() || null,
-            answerD: item.answer?.answerD?.trim() || null,
-            explanation: item.answer?.explanation?.trim() || null,
-          } : null,
-        })
-      })
-
-      if (errors.length > 0) {
-        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} more errors)` : ""))
-      }
-
-      setParsedItems(validated)
-    } catch (err: any) {
-      setParseError(`Validation Error: ${err.message || "Could not validate CQ items."}`)
-    }
   }
 
   const handleAutoFixJson = () => {
     if (!jsonText.trim()) return
     const repaired = repairJsonSyntax(jsonText)
     setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
-    toast.success("Attempted JSON syntax repair & formatting!")
+    validateAndParseJson(
+      repaired,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedChapterId,
+      selectedSource
+    )
+    toast.success("সিনট্যাক্স স্বয়ংক্রিয়ভাবে মেরামত করা হয়েছে!")
   }
 
-  const syncParsedItemsToText = (newItems: any[]) => {
-    setParsedItems(newItems)
-    setParseError(null)
-    setErrorContext(null)
-    setJsonText(JSON.stringify(newItems, null, 2))
-  }
-
-  const handleJsonChange = (val: string) => {
-    setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId, selectedChapterId, selectedSource)
-  }
-
-  const handleAcademicClassChange = (val: string) => {
-    const value = val === "all" ? "" : (val ?? "")
-    setSelectedAcademicClassId(value)
-    setSelectedSubjectId("")
-    setSelectedChapterId("")
-    if (jsonText) {
-      validateAndParseJson(jsonText, value, "", "", selectedSource)
+  const syncParsedItemsToText = (updatedItems: any[]) => {
+    try {
+      const formatted = JSON.stringify(updatedItems, null, 2)
+      setJsonText(formatted)
+      setParseError(null)
+      setErrorContext(null)
+    } catch (e) {
+      // ignore serialization error
     }
   }
 
-  const handleSubjectChange = (val: string | null) => {
-    const value = val ?? ""
-    setSelectedSubjectId(value)
-    setSelectedChapterId("")
-    if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value, "", selectedSource)
-    }
-  }
-
-  const handleChapterChange = (val: string | null) => {
-    const value = val ?? ""
-    setSelectedChapterId(value)
-    if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, selectedSubjectId, value, selectedSource)
-    }
-  }
-
-  const handleUpdateParsedItem = (idx: number, updated: any) => {
+  const handleUpdateParsedItem = (idx: number, updatedItem: any) => {
     const next = [...parsedItems]
-    next[idx] = updated
+    next[idx] = updatedItem
+    setParsedItems(next)
     syncParsedItemsToText(next)
   }
 
   const handleDeleteParsedItem = (idx: number) => {
     const next = parsedItems.filter((_, i) => i !== idx)
+    setParsedItems(next)
     syncParsedItemsToText(next)
-    toast.info(`Removed question #${idx + 1} from import list.`)
+    toast.success(`প্রশ্ন #${toBengaliDigits(idx + 1)} মুছে ফেলা হয়েছে।`)
   }
 
   const handleDuplicateParsedItem = (idx: number) => {
-    const itemToCopy = parsedItems[idx]
-    if (!itemToCopy) return
-    const next = [...parsedItems]
-    next.splice(idx + 1, 0, {
-      ...itemToCopy,
-      questionA: `${itemToCopy.questionA} (Copy)`,
-    })
+    const itemToClone = parsedItems[idx]
+    if (!itemToClone) return
+    const cloned = JSON.parse(JSON.stringify(itemToClone))
+    const next = [...parsedItems.slice(0, idx + 1), cloned, ...parsedItems.slice(idx + 1)]
+    setParsedItems(next)
     syncParsedItemsToText(next)
-    toast.success(`Duplicated question #${idx + 1}.`)
+    toast.success(`প্রশ্ন #${toBengaliDigits(idx + 1)} ডুপ্লিকেট করা হয়েছে।`)
   }
 
   const handleAddNewQuestionCard = () => {
-    const currentYear = new Date().getFullYear().toString()
-    const newCq = {
-      context: "উদ্দীপক...",
-      questionA: "ক. নতুন প্রশ্ন",
-      questionB: "খ. নতুন প্রশ্ন",
-      questionC: "গ. নতুন প্রশ্ন",
-      questionD: "ঘ. নতুন প্রশ্ন",
+    const newCard = {
+      context: "",
+      questionA: "",
+      questionB: "",
+      questionC: "",
+      questionD: "",
       difficulty: "MEDIUM",
       source: selectedSource || DEFAULT_SOURCE,
-      session: currentYear,
-      isActive: true,
+      session: new Date().getFullYear().toString(),
+      year: new Date().getFullYear(),
       reference: [],
+      isActive: true,
+      marks: { a: 1, b: 2, c: 3, d: 4 },
       answer: {
         answerA: "",
         answerB: "",
@@ -814,19 +912,31 @@ export function ImportCqView() {
         answerD: "",
         explanation: "",
       },
+      attachments: [],
     }
-    const next = [...parsedItems, newCq]
+    const next = [newCard, ...parsedItems]
+    setParsedItems(next)
     syncParsedItemsToText(next)
+    setExpandedCards((prev) => ({ ...prev, 0: true }))
+    toast.success("নতুন CQ কার্ড যোগ করা হয়েছে।")
+  }
+
+  const toggleAllExpanded = (expand: boolean) => {
+    const newExpanded: Record<number, boolean> = {}
+    parsedItems.forEach((_, idx) => {
+      newExpanded[idx] = expand
+    })
+    setExpandedCards(newExpanded)
   }
 
   const handleCopyTemplate = () => {
     navigator.clipboard.writeText(sampleJsonTemplate)
-    toast.success("Sample JSON template copied to clipboard!")
+    toast.success("নমুনা JSON টেমপ্লেট ক্লিপবোর্ডে কপি করা হয়েছে!")
   }
 
   const handleImport = async () => {
     if (parsedItems.length === 0 || parseError) {
-      toast.error("Please fix JSON errors before importing.")
+      toast.error("ইম্পোর্ট করার পূর্বে JSON ত্রুটি সমাধান করুন।")
       return
     }
 
@@ -834,26 +944,33 @@ export function ImportCqView() {
       const currentYear = new Date().getFullYear().toString()
       const payload = parsedItems.map((item) => {
         const marksObj = {
-          a: item.marks?.a || 1,
-          b: item.marks?.b || 2,
-          c: item.questionC ? (item.marks?.c || 3) : 0,
-          d: item.questionD ? (item.marks?.d || 4) : 0,
+          a: Number(item.marks?.a) || 1,
+          b: Number(item.marks?.b) || 2,
+          c: item.questionC ? Number(item.marks?.c) || 3 : 0,
+          d: item.questionD ? Number(item.marks?.d) || 4 : 0,
         }
 
-        const sessionVal = item.session ? String(item.session).trim() : (item.year ? String(item.year) : currentYear)
-        const parsedYear = item.year !== undefined && item.year !== null
-          ? Number(item.year)
-          : (!isNaN(Number(sessionVal)) ? Number(sessionVal) : null)
+        const sessionVal = item.session
+          ? String(item.session).trim()
+          : item.year
+          ? String(item.year)
+          : currentYear
+        const parsedYear =
+          item.year !== undefined && item.year !== null
+            ? Number(item.year)
+            : !isNaN(Number(sessionVal))
+            ? Number(sessionVal)
+            : null
 
         return {
-          classId: selectedAcademicClassId,
-          subjectId: selectedSubjectId,
-          chapterId: selectedChapterId,
+          classId: item.classId || selectedAcademicClassId || undefined,
+          subjectId: item.subjectId || selectedSubjectId,
+          chapterId: item.chapterId || selectedChapterId,
           context: item.context?.trim() || null,
-          questionA: item.questionA.trim(),
-          questionB: item.questionB.trim(),
-          questionC: item.questionC?.trim() || null,
-          questionD: item.questionD?.trim() || null,
+          questionA: String(item.questionA || "").trim(),
+          questionB: String(item.questionB || "").trim(),
+          questionC: item.questionC ? String(item.questionC).trim() : null,
+          questionD: item.questionD ? String(item.questionD).trim() : null,
           difficulty: item.difficulty as any,
           year: parsedYear,
           source: item.source ? String(item.source).trim() : (selectedSource || DEFAULT_SOURCE),
@@ -873,103 +990,112 @@ export function ImportCqView() {
       })
 
       const res = await importMutation.mutateAsync({ cqs: payload as any })
-      toast.success(`Successfully imported ${res.importedCount} Creative Questions!`)
+      toast.success(`মোট ${toBengaliDigits(res.importedCount)}টি সৃজনশীল প্রশ্ন সফলভাবে ইম্পোর্ট করা হয়েছে!`)
       setTimeout(() => {
         router.push("/cqs")
       }, 1000)
     } catch (err: any) {
-      toast.error(err.message || "Failed to bulk import creative questions.")
+      toast.error(err.message || "বাল্ক CQ ইম্পোর্ট করা সম্ভব হয়নি।")
     }
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto pb-12">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end justify-between">
-        <div>
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/cqs"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              CQs
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm text-xs font-bold text-primary">Import JSON</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Import CQs from JSON
-          </h2>
-          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Bulk upload creative questions or edit individual cards before importing into the question bank.
-          </p>
-        </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-12">
+      {/* Shared Page Header matching MCQ Benchmark */}
+      <PageHeader
+        title="JSON থেকে CQ ইম্পোর্ট"
+        description="JSON ফাইল আপলোড বা সরাসরি টেক্সট পেস্ট করে একসাথে একাধিক সৃজনশীল প্রশ্ন যাচাই, সম্পাদনা ও ইম্পোর্ট করুন।"
+        icon={Upload}
+        badge={{ label: "বাল্ক ইম্পোর্ট", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "CQ তালিকা", href: "/cqs" },
+          { label: "JSON ইম্পোর্ট" },
+        ]}
+      >
+        <div className="flex items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowSample(!showSample)}
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs font-headline"
+          >
+            <Code className="w-4 h-4" />
+            <span>{showSample ? "টেমপ্লেট লুকান" : "নমুনা JSON দেখুন"}</span>
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowSample(!showSample)}
-          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
-        >
-          <CodeIcon className="size-4" />
-          <span>{showSample ? "Hide Template" : "View Sample JSON"}</span>
-        </Button>
-      </div>
+          <Button
+            asChild
+            variant="outline"
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs font-headline"
+          >
+            <Link href="/cqs" prefetch={true}>
+              <ArrowLeft className="w-4 h-4" />
+              <span>তালিকায় ফিরে যান</span>
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* Sample JSON Template Card */}
       {showSample && (
-        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-4 sm:p-6 animate-fade-in">
+        <Card className="rounded-2xl border border-indigo-200/70 dark:border-primary/20 bg-indigo-50/30 dark:bg-primary/5 p-5 sm:p-6 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <h4 className="font-headline-md text-base font-bold text-primary flex items-center gap-2">
-              <FileCodeIcon className="size-5" />
-              Expected JSON Structure
+            <h4 className="text-sm font-bold font-headline text-indigo-700 dark:text-primary flex items-center gap-2">
+              <FileCode className="size-4" />
+              প্রত্যাশিত JSON ফরম্যাট ও কাঠামো
             </h4>
             <Button
               type="button"
-              size="xs"
+              size="sm"
               variant="outline"
               onClick={handleCopyTemplate}
-              className="w-full sm:w-auto font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer justify-center"
+              className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer font-headline"
             >
-              Copy Template
+              টেমপ্লেট কপি করুন
             </Button>
           </div>
-          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-lg bg-surface-container-lowest p-3 sm:p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
+          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-xl bg-card p-4 font-mono text-xs text-foreground leading-relaxed border border-slate-200/80 dark:border-white/[0.08]">
             {sampleJsonTemplate}
           </pre>
         </Card>
       )}
 
-      {/* Main Hierarchy & Input Section */}
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-xs">
-        <CardHeader className="border-b border-outline-variant/30 p-6 bg-surface-container-low/30">
-          <CardTitle className="font-headline-md text-lg font-semibold text-on-surface">
-            Class, Subject & Chapter Hierarchy (Default Assignee)
-          </CardTitle>
-          <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Select Academic Class to dynamically filter Subjects and Chapters. If items in your JSON do not include `subjectId` or `chapterId`, they will be assigned below.
-          </p>
+      {/* Step 1 Card: Data Source & Hierarchy Setup */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <Layers className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              ১. শ্রেণি, বিষয় ও ডেটা সোর্স কনফিগারেশন
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5 font-body">
+              যেসব প্রশ্নে বিষয় বা অধ্যায় আইডি নেই, সেগুলোর জন্য ডিফল্ট তথ্য ও সোর্স নির্বাচন করে ফাইল আপলোড বা পেস্ট করুন।
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          {/* Academic Class, Subject, Chapter & Source Dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+        <CardContent className="p-6 sm:p-8 space-y-6">
+          {/* Hierarchy Dropdowns matching Create View */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Class
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                শ্রেণি (Academic Class)
               </Label>
               <Select
                 value={selectedAcademicClassId || "all"}
                 onValueChange={handleAcademicClassChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Class (All Classes)..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="সব শ্রেণি..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  <SelectItem value="all" className="text-neutral-900">All Classes</SelectItem>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
+                  <SelectItem value="all">সব শ্রেণি (All Classes)</SelectItem>
                   {academicClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
-                      {cls.nameEn}
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -978,20 +1104,20 @@ export function ImportCqView() {
 
             {/* Default Subject */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট বিষয় (Subject)
               </Label>
               <Select
                 value={selectedSubjectId}
                 onValueChange={handleSubjectChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="ডিফল্ট বিষয় নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
                   {subjects.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                      {sub.nameEn}
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -1000,48 +1126,61 @@ export function ImportCqView() {
 
             {/* Default Chapter */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Chapter
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট অধ্যায় (Chapter)
               </Label>
               <Select
                 disabled={!selectedSubjectId}
                 value={selectedChapterId}
                 onValueChange={handleChapterChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
                   <SelectValue
                     placeholder={
                       selectedSubjectId
-                        ? "Select Default Chapter..."
-                        : "Select Subject first"
+                        ? "ডিফল্ট অধ্যায় নির্বাচন করুন..."
+                        : "প্রথমে বিষয় নির্বাচন করুন"
                     }
                   />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
                   {chapters.map((ch) => (
-                    <SelectItem key={ch.id} value={ch.id} className="text-neutral-900">
-                      {ch.nameEn}
+                    <SelectItem key={ch.id} value={ch.id}>
+                      {ch.nameBn || ch.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Default Source Select */}
+            {/* Default Source */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Source (উৎস) *
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট উৎস (Source)
               </Label>
               <Select
                 value={selectedSource}
-                onValueChange={(val) => handleSourceChange(val ?? DEFAULT_SOURCE)}
+                onValueChange={(val) => {
+                  setSelectedSource(val)
+                  if (jsonText) {
+                    validateAndParseJson(
+                      jsonText,
+                      selectedAcademicClassId,
+                      selectedSubjectId,
+                      selectedChapterId,
+                      val
+                    )
+                  }
+                }}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Source..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন...">
+                    {selectedSource}
+                  </SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
                   {CQ_SOURCE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value} className="text-neutral-900">
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -1050,107 +1189,109 @@ export function ImportCqView() {
             </div>
           </div>
 
-          {/* Helper Warning if Class, Subject & Chapter are not selected */}
+          {/* Warning Banner if Hierarchy not chosen */}
           {(!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId) && (
-            <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs font-semibold">
-              <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
-              <span>Please select a Default Class, Default Subject, and Default Chapter above to unlock JSON file upload and text input.</span>
+            <div className="flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/70 dark:bg-amber-950/20 p-4 text-amber-800 dark:text-amber-400 text-xs font-medium font-body">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+              <span>
+                JSON ফাইল আপলোড বা টেক্সট ইনপুট আনলক করতে অনুগ্রহ করে উপরে ডিফল্ট শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করুন।
+              </span>
             </div>
           )}
 
-          {/* JSON File Uploader */}
-          <div className="border-t border-outline-variant/30 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
-              Upload JSON File
+          {/* File Upload Section */}
+          <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              JSON ফাইল আপলোড করুন
             </Label>
             <input
               type="file"
               accept=".json,application/json"
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               onChange={handleFileUpload}
-              className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
+              className="block w-full text-sm text-foreground file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 dark:file:bg-primary/10 file:text-indigo-700 dark:file:text-primary hover:file:bg-indigo-100 dark:hover:file:bg-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none font-body"
             />
           </div>
 
           {/* Or Paste JSON Textarea */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Or Paste JSON Content Below
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                অথবা সরাসরি JSON টেক্সট পেস্ট করুন
               </Label>
               {jsonText.trim() && (
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={handleAutoFixJson}
-                  className="text-xs font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+                  className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer font-headline"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  ⚡ Auto-Fix & Format JSON
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় সিনট্যাক্স ফিক্স ও ফরম্যাট
                 </Button>
               )}
             </div>
             <Textarea
-              rows={6}
+              rows={5}
               disabled={!selectedAcademicClassId || !selectedSubjectId || !selectedChapterId}
               placeholder={
                 !selectedAcademicClassId || !selectedSubjectId || !selectedChapterId
-                  ? "Select Class, Subject, and Chapter above first to enable JSON input..."
-                  : "Paste JSON array here..."
+                  ? "প্রথমে উপরে শ্রেণি, বিষয় ও অধ্যায় নির্বাচন করুন..."
+                  : "এখানে JSON অ্যারে পেস্ট করুন..."
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-white p-3 font-mono text-xs text-on-surface focus:ring-2 focus:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] p-3.5 font-mono text-xs text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
-          {/* Validation Status / Diagnostics */}
+          {/* Validation Diagnostics / Error Locator */}
           {parseError && (
-            <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
+            <div className="space-y-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-5 text-rose-700 dark:text-rose-400 font-body">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-                  <p className="font-bold text-sm">JSON Parsing Diagnostic Error</p>
+                  <AlertCircle className="size-5 text-rose-600 shrink-0" />
+                  <p className="font-bold text-sm font-headline">JSON সিনট্যাক্স ডায়াগনস্টিক ত্রুটি</p>
                 </div>
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
+                  className="rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs h-8 px-3 cursor-pointer shadow-xs w-full sm:w-auto justify-center font-headline"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  Auto-Fix JSON Syntax
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় ফিক্স প্রয়োগ করুন
                 </Button>
               </div>
 
-              <p className="font-mono text-xs leading-relaxed bg-white/80 p-2.5 rounded-lg border border-destructive/20 text-destructive">
+              <p className="font-mono text-xs leading-relaxed bg-white/90 dark:bg-card p-3 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-400">
                 {parseError}
               </p>
 
               {/* Code Snippet Error Pointer */}
               {errorContext && errorContext.linesContext.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-destructive/80">
-                    Syntax Error Location (Line {errorContext.line}
-                    {errorContext.col > 0 ? `, Column ${errorContext.col}` : ""}):
+                <div className="space-y-1.5 pt-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-rose-700/80 font-headline">
+                    ত্রুটির সম্ভাব্য অবস্থান (লাইন {toBengaliDigits(errorContext.line)}
+                    {errorContext.col > 0 ? `, কলাম ${toBengaliDigits(errorContext.col)}` : ""}):
                   </p>
-                  <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 font-mono text-xs text-gray-200">
+                  <div className="overflow-x-auto rounded-xl bg-slate-900 p-3.5 font-mono text-xs text-slate-200">
                     {errorContext.linesContext.map((l) => (
                       <div
                         key={l.num}
                         className={cn(
-                          "flex items-center gap-3 px-2 py-0.5 rounded",
-                          l.isError && "bg-red-900/80 text-white font-bold border-l-4 border-red-500"
+                          "flex items-center gap-3 px-2 py-0.5 rounded-lg",
+                          l.isError && "bg-rose-950/80 text-white font-bold border-l-4 border-rose-500"
                         )}
                       >
-                        <span className="w-8 shrink-0 text-right text-gray-500 select-none">
-                          {l.num}
+                        <span className="w-8 shrink-0 text-right text-slate-500 select-none">
+                          {toBengaliDigits(l.num)}
                         </span>
                         <span className="whitespace-pre">{l.content}</span>
                         {l.isError && (
-                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-red-600 text-white px-1.5 py-0.5 rounded shrink-0">
-                            Error Here
+                          <span className="ml-auto text-[10px] uppercase font-bold tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-md shrink-0 font-headline">
+                            এখানে ত্রুটি
                           </span>
                         )}
                       </div>
@@ -1161,14 +1302,15 @@ export function ImportCqView() {
             </div>
           )}
 
+          {/* Validation Success Banner */}
           {!parseError && parsedItems.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 dark:bg-emerald-950/20 p-4 text-emerald-800 dark:text-emerald-300 text-sm font-body">
               <div className="flex items-center gap-3">
-                <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                 <div>
-                  <p className="font-bold">JSON Parsed & Valid!</p>
-                  <p className="text-xs">
-                    {parsedItems.length} CQ question(s) parsed successfully.
+                  <p className="font-bold font-headline">JSON যাচাইকরণ সফল হয়েছে!</p>
+                  <p className="text-xs text-emerald-700/80 dark:text-emerald-400">
+                    মোট {toBengaliDigits(parsedItems.length)}টি সৃজনশীল প্রশ্ন সফলভাবে পার্স করা হয়েছে। নিচের প্রিভিউ কার্ডে পর্যালোচনা ও সম্পাদনা করুন।
                   </p>
                 </div>
               </div>
@@ -1177,83 +1319,128 @@ export function ImportCqView() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
+                className="rounded-xl bg-white dark:bg-card border-emerald-300 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 font-bold text-xs h-9 px-4 cursor-pointer shrink-0 w-full sm:w-auto justify-center font-headline"
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add Question Card
+                <Plus className="size-3.5 mr-1" />
+                নতুন CQ কার্ড যোগ করুন
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Parsed Items Card-based CQ Preview */}
-          {parsedItems.length > 0 && (
-            <div className="border-t border-outline-variant/30 pt-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                    <CodeIcon className="size-4 text-primary shrink-0" />
-                    Card Preview ({parsedItems.length} CQ Questions)
-                  </h4>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddNewQuestionCard}
-                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center"
-                >
-                  <PlusIcon className="size-3.5 mr-1" />
-                  Add Question
-                </Button>
+      {/* Step 2 Section: Parsed CQ Review & Edit Cards */}
+      {parsedItems.length > 0 && (
+        <div className="space-y-6 pt-2">
+          {/* Section Header Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 shrink-0">
+                <BookOpen className="h-5 w-5" />
               </div>
-
-              {/* Grid of CQ Preview Cards */}
-              <div className="space-y-6">
-                {parsedItems.map((item, idx) => (
-                  <EditableCqCard
-                    key={idx}
-                    index={idx}
-                    item={item}
-                    onChange={(updated) => handleUpdateParsedItem(idx, updated)}
-                    onDelete={() => handleDeleteParsedItem(idx)}
-                    onDuplicate={() => handleDuplicateParsedItem(idx)}
-                  />
-                ))}
+              <div>
+                <h3 className="text-lg font-bold font-headline text-foreground flex items-center gap-2">
+                  <span>২. প্রশ্ন প্রিভিউ ও সম্পাদনা</span>
+                  <Badge variant="secondary" className="px-2.5 py-0.5 rounded-full text-xs font-bold font-solaiman">
+                    {toBengaliDigits(parsedItems.length)}টি প্রশ্ন
+                  </Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রতিটি সৃজনশীল প্রশ্নের উদ্দীপক, উপ-প্রশ্ন (ক, খ, গ, ঘ) ও সমাধান চেক করুন এবং প্রয়োজনে সরাসরি সংশোধন করুন।
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Submit Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(true)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer font-headline"
+              >
+                <Maximize2 className="size-3.5 mr-1" />
+                সব প্রসারিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(false)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer font-headline"
+              >
+                <Minimize2 className="size-3.5 mr-1" />
+                সব সংকুচিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddNewQuestionCard}
+                className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary font-bold text-xs h-9 px-3.5 cursor-pointer font-headline"
+              >
+                <Plus className="size-3.5 mr-1" />
+                CQ যোগ করুন
+              </Button>
+            </div>
+          </div>
+
+          {/* List of Parsed CQ Cards */}
+          <div className="space-y-6">
+            {parsedItems.map((item, idx) => (
+              <ParsedCqCard
+                key={idx}
+                index={idx}
+                item={item}
+                isExpanded={Boolean(expandedCards[idx])}
+                onToggleExpand={() =>
+                  setExpandedCards((prev) => ({
+                    ...prev,
+                    [idx]: !prev[idx],
+                  }))
+                }
+                onChange={(updated) => handleUpdateParsedItem(idx, updated)}
+                onDelete={() => handleDeleteParsedItem(idx)}
+                onDuplicate={() => handleDuplicateParsedItem(idx)}
+              />
+            ))}
+          </div>
+
+          {/* Form Actions Footer */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
             <Button
-              type="button"
+              asChild
               variant="outline"
-              onClick={() => router.push("/cqs")}
-              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+              className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer justify-center font-headline"
             >
-              Cancel
+              <Link href="/cqs" prefetch={true}>
+                বাতিল
+              </Link>
             </Button>
             <Button
               type="button"
-              disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
+              disabled={
+                parsedItems.length === 0 ||
+                Boolean(parseError) ||
+                importMutation.isPending
+              }
               onClick={handleImport}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
+              className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 font-headline"
             >
               {importMutation.isPending ? (
-                <Wand2Icon className="size-4 animate-spin shrink-0" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
               ) : (
-                <UploadIcon className="size-4 shrink-0" />
+                <Upload className="size-4 shrink-0" />
               )}
               <span>
                 {importMutation.isPending
-                  ? "Importing..."
-                  : `Import ${parsedItems.length} CQs`}
+                  ? "ইম্পোর্ট করা হচ্ছে..."
+                  : `মোট ${toBengaliDigits(parsedItems.length)}টি CQ ইম্পোর্ট করুন`}
               </span>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   )
 }

@@ -7,6 +7,9 @@ export default async function CreatePbqRoute() {
 
   // Prefetch selectors and question type templates
   void queryClient.prefetchQuery(
+    trpc.academicClass.list.queryOptions({ limit: 100 })
+  )
+  void queryClient.prefetchQuery(
     trpc.academicSubject.list.queryOptions({ limit: 100 })
   )
   void queryClient.prefetchQuery(

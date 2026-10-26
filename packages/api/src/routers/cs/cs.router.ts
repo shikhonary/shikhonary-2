@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { createTRPCRouter, superAdminProcedure } from "../../trpc"
 import {
   createCsSchema,
@@ -20,12 +21,22 @@ import {
   toggleCsActive,
   importCs,
   getCsStats,
+  getBoardYears,
 } from "./cs.service"
 
 export const csRouter = createTRPCRouter({
   list: superAdminProcedure
     .input(listCsSchema)
     .query(({ ctx, input }) => listCs(ctx.db, input)),
+
+  boardYears: superAdminProcedure
+    .input(
+      z.object({
+        subjectId: z.string(),
+        chapterId: z.string().optional(),
+      })
+    )
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
 
   stats: superAdminProcedure
     .input(csStatsSchema.optional())

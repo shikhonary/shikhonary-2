@@ -8,6 +8,7 @@ export const oppositeWordSortOptions = [
   "word_desc",
   "popularity",
 ] as const
+
 export type OppositeWordSortOption = (typeof oppositeWordSortOptions)[number]
 
 export const oppositeWordSearchParamsParsers = {
@@ -15,7 +16,7 @@ export const oppositeWordSearchParamsParsers = {
   classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
-  difficulty: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<OppositeWordSortOption>(Array.from(oppositeWordSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

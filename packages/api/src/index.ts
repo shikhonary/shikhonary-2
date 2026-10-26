@@ -397,6 +397,7 @@ export type {
 export type {
   ListDescriptiveQuestionsInput,
   DescriptiveQuestionStatsInput,
+  DescriptiveQuestionBoardYearsInput,
   GetDescriptiveQuestionInput,
   CreateDescriptiveQuestionInput,
   UpdateDescriptiveQuestionInput,
@@ -424,8 +425,21 @@ export type {
   UpdateMakeSentencesInput,
   DeleteMakeSentencesInput,
   BulkDeleteMakeSentencesInput,
+  ToggleMakeSentencesActiveInput,
   ImportMakeSentencesInput,
 } from "./routers/make-sentences/make-sentences.schema"
+
+export {
+  listMakeQuestionSchema,
+  makeQuestionStatsSchema,
+  getMakeQuestionSchema,
+  createMakeQuestionSchema,
+  updateMakeQuestionSchema,
+  deleteMakeQuestionSchema,
+  bulkDeleteMakeQuestionSchema,
+  toggleMakeQuestionActiveSchema,
+  importMakeQuestionSchema,
+} from "./routers/make-question/make-question.schema"
 
 export type {
   ListJuktobornoInput,
@@ -435,7 +449,20 @@ export type {
   UpdateJuktobornoInput,
   DeleteJuktobornoInput,
   BulkDeleteJuktobornoInput,
+  ToggleJuktobornoActiveInput,
   ImportJuktobornoInput,
+} from "./routers/juktoborno/juktoborno.schema"
+
+export {
+  listJuktobornoSchema,
+  juktobornoStatsSchema,
+  getJuktobornoSchema,
+  createJuktobornoSchema,
+  updateJuktobornoSchema,
+  deleteJuktobornoSchema,
+  bulkDeleteJuktobornoSchema,
+  toggleJuktobornoActiveSchema,
+  importJuktobornoSchema,
 } from "./routers/juktoborno/juktoborno.schema"
 
 export type {
@@ -446,18 +473,46 @@ export type {
   UpdateOppositeWordInput,
   DeleteOppositeWordInput,
   BulkDeleteOppositeWordInput,
+  ToggleOppositeWordActiveInput,
   ImportOppositeWordInput,
+} from "./routers/opposite-word/opposite-word.schema"
+
+export {
+  listOppositeWordSchema,
+  oppositeWordStatsSchema,
+  getOppositeWordSchema,
+  createOppositeWordSchema,
+  updateOppositeWordSchema,
+  deleteOppositeWordSchema,
+  bulkDeleteOppositeWordSchema,
+  toggleOppositeWordActiveSchema,
+  importOppositeWordSchema,
 } from "./routers/opposite-word/opposite-word.schema"
 
 export type {
   ListWordMeaningInput,
   WordMeaningStatsInput,
+  WordMeaningBoardYearsInput,
   GetWordMeaningInput,
   CreateWordMeaningInput,
   UpdateWordMeaningInput,
   DeleteWordMeaningInput,
   BulkDeleteWordMeaningInput,
+  ToggleWordMeaningActiveInput,
   ImportWordMeaningInput,
+} from "./routers/word-meaning/word-meaning.schema"
+
+export {
+  listWordMeaningSchema,
+  wordMeaningStatsSchema,
+  wordMeaningBoardYearsSchema,
+  getWordMeaningSchema,
+  createWordMeaningSchema,
+  updateWordMeaningSchema,
+  deleteWordMeaningSchema,
+  bulkDeleteWordMeaningSchema,
+  toggleWordMeaningActiveSchema,
+  importWordMeaningSchema,
 } from "./routers/word-meaning/word-meaning.schema"
 
 export type {
@@ -502,6 +557,7 @@ export type {
   UpdateMathQuestionInput,
   DeleteMathQuestionInput,
   BulkDeleteMathQuestionInput,
+  ToggleMathQuestionActiveInput,
   ImportMathQuestionInput,
 } from "./routers/math-question/math-question.schema"
 
@@ -513,8 +569,21 @@ export type {
   UpdateGrammarQuestionInput,
   DeleteGrammarQuestionInput,
   BulkDeleteGrammarQuestionInput,
+  ToggleGrammarQuestionActiveInput,
   ImportGrammarQuestionInput,
 } from "./routers/grammar-question/grammar-question.schema"
+
+export {
+  listMakeSentencesSchema,
+  makeSentencesStatsSchema,
+  getMakeSentencesSchema,
+  createMakeSentencesSchema,
+  updateMakeSentencesSchema,
+  deleteMakeSentencesSchema,
+  bulkDeleteMakeSentencesSchema,
+  toggleMakeSentencesActiveSchema,
+  importMakeSentencesSchema,
+} from "./routers/make-sentences/make-sentences.schema"
 
 export type {
   ListEkKothayProkashInput,
@@ -611,6 +680,7 @@ export type {
   UpdateMakeQuestionInput,
   DeleteMakeQuestionInput,
   BulkDeleteMakeQuestionInput,
+  ToggleMakeQuestionActiveInput,
   ImportMakeQuestionInput,
 } from "./routers/make-question/make-question.schema"
 
@@ -685,6 +755,7 @@ export {
   updateMathQuestionSchema,
   deleteMathQuestionSchema,
   bulkDeleteMathQuestionSchema,
+  toggleMathQuestionActiveSchema,
   importMathQuestionSchema,
 } from "./routers/math-question/math-question.schema"
 
@@ -696,6 +767,7 @@ export {
   updateGrammarQuestionSchema,
   deleteGrammarQuestionSchema,
   bulkDeleteGrammarQuestionSchema,
+  toggleGrammarQuestionActiveSchema,
   importGrammarQuestionSchema,
 } from "./routers/grammar-question/grammar-question.schema"
 
@@ -740,6 +812,7 @@ export type { NormalizedQuestionItem } from "./routers/question-bank/question-ba
 
 export * from "./routers/seen-comprehension/seen-comprehension.schema"
 export * from "./routers/rearrange/rearrange.schema"
+
 
 
 
