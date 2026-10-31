@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
+import { categorizeReference } from "@workspace/utils"
 import type {
   CreateMcqInput,
   DeleteMcqInput,
@@ -531,13 +532,13 @@ export async function getMcqStats(db: PrismaClient, input: McqStatsInput = {}) {
 
 export async function getBoardYears(
   db: PrismaClient,
-  input: { subjectId: string; chapterId?: string }
+  input: { subjectId?: string; chapterId?: string } = {}
 ) {
   const where: any = {
-    subjectId: input.subjectId,
     NOT: { reference: { equals: [] } },
   }
-  if (input.chapterId) where.chapterId = input.chapterId
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
 
   const questions = await db.mcq.findMany({
     where,
@@ -552,16 +553,33 @@ export async function getBoardYears(
     }
   }
 
-  return Array.from(countMap.entries()).map(([rawRef, count]) => {
-    const parts = rawRef.split("-")
-    const yearStr = parts[parts.length - 1]
-    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
-    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
-    return {
-      rawRef,
-      boardName,
-      year,
-      count,
-    }
-  })
+  const categoryOrder: Record<string, number> = {
+    BOARD: 1,
+    CADET: 2,
+    SCHOOL: 3,
+    TEST_EXAM: 4,
+    TEXTBOOK: 5,
+    OTHER: 6,
+  }
+
+  return Array.from(countMap.entries())
+    .map(([rawRef, count]) => {
+      const parts = rawRef.split("-")
+      const yearStr = parts[parts.length - 1]
+      const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+      const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+      const category = categorizeReference(rawRef)
+      return {
+        rawRef,
+        boardName,
+        year,
+        category,
+        count,
+      }
+    })
+    .sort((a, b) => {
+      const diff = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99)
+      if (diff !== 0) return diff
+      return b.count - a.count
+    })
 }

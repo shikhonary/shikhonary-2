@@ -8,7 +8,8 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
-    "db:generate": "turbo generate --filter=@workspace/db"
+    "db:generate": "turbo generate --filter=@workspace/db",
+    "seed:mcq": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-mcq-json.ts"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

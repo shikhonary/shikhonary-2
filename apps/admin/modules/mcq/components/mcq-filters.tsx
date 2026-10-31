@@ -1,8 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
 import { DataTableFilterBar, type ActiveFilterChip } from "@/components/shared/data-table-filter-bar"
+import { toBengaliDigits, toEnglishDigits, extractReferenceYear } from "@workspace/utils"
 
 interface SubjectOption {
   id: string
@@ -71,7 +80,43 @@ export function McqFilters({
       ? chapters.filter((c) => c.subjectId === selectedSubjectId)
       : chapters
 
-  const isBoardDisabled = !selectedSubjectId || selectedSubjectId === "All"
+  const isBoardDisabled = boardYears.length === 0
+
+  const groupedReferencesByYear = React.useMemo(() => {
+    const yearMap = new Map<string, Array<{ rawRef: string; count: number }>>()
+    const noYearList: Array<{ rawRef: string; count: number }> = []
+
+    for (const b of boardYears) {
+      const rawRef = typeof b === "string" ? b : b.rawRef || b.boardName || b.board || ""
+      if (!rawRef) continue
+      const count = typeof b === "object" && typeof b.count === "number" ? b.count : 1
+
+      const year = extractReferenceYear(rawRef)
+      if (year) {
+        if (!yearMap.has(year)) {
+          yearMap.set(year, [])
+        }
+        yearMap.get(year)!.push({ rawRef, count })
+      } else {
+        noYearList.push({ rawRef, count })
+      }
+    }
+
+    // Sort years descending (e.g. ২০২৬, ২০২৫, ২০২৪, ২০২৩...)
+    const sortedYears = Array.from(yearMap.keys()).sort((a, b) => {
+      const numA = Number(toEnglishDigits(a)) || 0
+      const numB = Number(toEnglishDigits(b)) || 0
+      return numB - numA
+    })
+
+    return {
+      years: sortedYears.map((yr) => ({
+        year: yr,
+        items: yearMap.get(yr)!.sort((a, b) => b.count - a.count),
+      })),
+      noYear: noYearList.sort((a, b) => b.count - a.count),
+    }
+  }, [boardYears])
 
   const getSortLabel = (sort: string) => {
     switch (sort) {
@@ -132,7 +177,7 @@ export function McqFilters({
   if (selectedBoard && selectedBoard !== "All") {
     activeFilterChips.push({
       id: "board",
-      label: `বোর্ড: ${selectedBoard}`,
+      label: `বোর্ড / রেফারেন্স: ${selectedBoard}`,
       onRemove: () => onBoardChange("All"),
     })
   }
@@ -251,27 +296,44 @@ export function McqFilters({
         </Select>
       </div>
 
-      {/* 4. Board / Year Select */}
-      <div className="min-w-[130px]">
+      {/* 4. Board / Reference Select */}
+      <div className="min-w-[155px]">
         <Select
           value={selectedBoard}
           onValueChange={(val) => onBoardChange(val ?? "All")}
           disabled={isBoardDisabled}
         >
           <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer disabled:opacity-50">
-            <SelectValue placeholder="বোর্ড প্রশ্ন" />
+            <SelectValue placeholder="বোর্ড / রেফারেন্স" />
           </SelectTrigger>
-          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-60 font-body">
-            <SelectItem value="All">সকল প্রশ্ন / বোর্ড</SelectItem>
-            {boardYears.map((bYear: any, idx: number) => {
-              const label = typeof bYear === "string" ? bYear : `${bYear.board ?? ""} ${bYear.year ?? ""}`.trim()
-              const value = typeof bYear === "string" ? bYear : `${bYear.board ?? ""}_${bYear.year ?? ""}`
-              return (
-                <SelectItem key={idx} value={value}>
-                  {label}
-                </SelectItem>
-              )
-            })}
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-72 font-body">
+            <SelectItem value="All">সকল প্রশ্ন / রেফারেন্স</SelectItem>
+
+            {groupedReferencesByYear.years.map((yearGroup) => (
+              <SelectGroup key={yearGroup.year}>
+                <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
+                  📅 {yearGroup.year} সাল
+                </SelectLabel>
+                {yearGroup.items.map((item) => (
+                  <SelectItem key={item.rawRef} value={item.rawRef}>
+                    {item.rawRef} ({toBengaliDigits(item.count)})
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+
+            {groupedReferencesByYear.noYear.length > 0 && (
+              <SelectGroup>
+                <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
+                  📌 সাধারণ / প্রতিষ্ঠান রেফারেন্স
+                </SelectLabel>
+                {groupedReferencesByYear.noYear.map((item) => (
+                  <SelectItem key={item.rawRef} value={item.rawRef}>
+                    {item.rawRef} ({toBengaliDigits(item.count)})
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )}
           </SelectContent>
         </Select>
       </div>

@@ -92,13 +92,12 @@ export function McqListView() {
     sort: selectedSort,
   })
 
-  // Fetch Board + Year combinations for this subject / chapter if selected
+  // Fetch Board + Reference combinations (scoped by subject / chapter if selected)
   const { data: boardYearsData } = useQuery({
     ...trpc.mcq.boardYears.queryOptions({
-      subjectId: selectedSubjectId,
+      subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
       chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     }),
-    enabled: selectedSubjectId !== "All",
   })
   const boardYears = boardYearsData ?? []
 
