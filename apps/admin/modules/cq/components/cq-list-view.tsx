@@ -33,6 +33,8 @@ export function CqListView() {
       subjectId: selectedSubjectId,
       chapterId: selectedChapterId,
       board: selectedBoard,
+      isActive: selectedIsActive,
+      hasReport: selectedHasReport,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -79,21 +81,6 @@ export function CqListView() {
     }
   }
 
-  // Parse filters
-  let boardSource: string | undefined = undefined
-  let boardYear: number | undefined = undefined
-  if (selectedBoard && selectedBoard !== "All") {
-    const parts = selectedBoard.split("-")
-    const yearPart = parts[parts.length - 1]
-    const sourcePart = parts.slice(0, parts.length - 1).join("-")
-    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
-      boardSource = sourcePart
-      boardYear = Number(yearPart)
-    } else {
-      boardSource = selectedBoard
-    }
-  }
-
   // Query CQs list with search & filters
   const { data: cqsData, isLoading, isError } = useCqsList({
     limit,
@@ -102,18 +89,17 @@ export function CqListView() {
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
-    source: boardSource,
-    year: boardYear,
+    isActive: selectedIsActive !== "All" ? selectedIsActive : undefined,
+    hasReport: selectedHasReport !== "All" ? selectedHasReport : undefined,
     sort: selectedSort,
   })
 
-  // Fetch Board + Year combinations for this subject / chapter if selected
+  // Fetch Board + Reference combinations (scoped by subject / chapter if selected)
   const { data: boardYearsData } = useQuery({
     ...trpc.cq.boardYears.queryOptions({
-      subjectId: selectedSubjectId,
+      subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
       chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     }),
-    enabled: selectedSubjectId !== "All",
   })
   const boardYears = boardYearsData ?? []
 
@@ -190,6 +176,10 @@ export function CqListView() {
         selectedBoard={selectedBoard}
         onBoardChange={(board) => setSearchParams({ board, page: 1 })}
         boardYears={boardYears}
+        selectedIsActive={selectedIsActive}
+        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
+        selectedHasReport={selectedHasReport}
+        onHasReportChange={(hasReport) => setSearchParams({ hasReport, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />

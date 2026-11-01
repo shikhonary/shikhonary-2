@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
+import { categorizeReference } from "@workspace/utils"
 import type {
   CreateCqInput,
   DeleteCqInput,
@@ -15,25 +16,38 @@ import type {
 export async function listCqs(db: PrismaClient, input: ListCqsInput) {
   const where: any = {}
   
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.chapterId = input.chapterId
-  if (input.difficulty) where.difficulty = input.difficulty
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
+  if (input.difficulty && input.difficulty !== "All") where.difficulty = input.difficulty
+  if (input.source && input.source !== "All") where.source = input.source
+  if (input.session && input.session !== "All") where.session = input.session
 
-  if (input.source && input.year !== undefined) {
-    const boardRef = [input.source, input.year].filter(Boolean).join("-")
-    where.OR = [
-      { AND: [{ source: input.source }, { session: String(input.year) }] },
-      { reference: { has: boardRef } },
-    ]
-  } else {
-    if (input.source) where.source = input.source
-    if (input.session) where.session = input.session
-    if (input.year !== undefined) {
-      where.reference = { has: String(input.year) }
+  if (input.isActive !== undefined && input.isActive !== "All") {
+    if (typeof input.isActive === "boolean") {
+      where.isActive = input.isActive
+    } else if (input.isActive === "true" || input.isActive === "ACTIVE") {
+      where.isActive = true
+    } else if (input.isActive === "false" || input.isActive === "INACTIVE") {
+      where.isActive = false
     }
   }
 
-  if (input.board && !input.source) {
+  if (input.hasReport !== undefined && input.hasReport !== "All") {
+    const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
+    const reports = await db.questionReport.findMany({
+      where: { entityType: "CQ" },
+      select: { entityId: true },
+      distinct: ["entityId"],
+    })
+    const reportedIds = reports.map((r) => r.entityId)
+    if (isReported) {
+      where.id = { in: reportedIds }
+    } else {
+      where.id = { notIn: reportedIds }
+    }
+  }
+
+  if (input.board && input.board !== "All") {
     where.reference = { has: input.board }
   }
 
@@ -139,8 +153,29 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
     db.cq.count({ where }),
   ])
 
+  const itemIds = items.map((it) => it.id)
+  const itemReports =
+    itemIds.length > 0
+      ? await db.questionReport.findMany({
+          where: { entityType: "CQ", entityId: { in: itemIds } },
+          select: { entityId: true, status: true, reportType: true, description: true },
+        })
+      : []
+
+  const reportMap = new Map<string, typeof itemReports>()
+  for (const rep of itemReports) {
+    if (!reportMap.has(rep.entityId)) reportMap.set(rep.entityId, [])
+    reportMap.get(rep.entityId)!.push(rep)
+  }
+
+  const enhancedItems = items.map((item) => ({
+    ...item,
+    hasReport: reportMap.has(item.id),
+    reports: reportMap.get(item.id) || [],
+  }))
+
   return {
-    items,
+    items: enhancedItems,
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,
@@ -637,16 +672,16 @@ export async function getCqStats(db: PrismaClient, input: CqStatsInput = {}) {
 
 export async function getBoardYears(
   db: PrismaClient,
-  input: { subjectId: string; chapterId?: string }
+  input: { subjectId?: string; chapterId?: string } = {}
 ) {
   const where: any = {
-    subjectId: input.subjectId,
     OR: [
       { NOT: { reference: { equals: [] } } },
       { AND: [{ source: { not: null } }, { session: { not: null } }] },
     ],
   }
-  if (input.chapterId) where.chapterId = input.chapterId
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
 
   const questions = await db.cq.findMany({
     where,
@@ -666,16 +701,33 @@ export async function getBoardYears(
     }
   }
 
-  return Array.from(countMap.entries()).map(([rawRef, count]) => {
-    const parts = rawRef.split("-")
-    const yearStr = parts[parts.length - 1]
-    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
-    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
-    return {
-      rawRef,
-      boardName,
-      year,
-      count,
-    }
-  })
+  const categoryOrder: Record<string, number> = {
+    BOARD: 1,
+    CADET: 2,
+    SCHOOL: 3,
+    TEST_EXAM: 4,
+    TEXTBOOK: 5,
+    OTHER: 6,
+  }
+
+  return Array.from(countMap.entries())
+    .map(([rawRef, count]) => {
+      const parts = rawRef.split("-")
+      const yearStr = parts[parts.length - 1]
+      const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+      const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+      const category = categorizeReference(rawRef)
+      return {
+        rawRef,
+        boardName,
+        year,
+        category,
+        count,
+      }
+    })
+    .sort((a, b) => {
+      const diff = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99)
+      if (diff !== 0) return diff
+      return b.count - a.count
+    })
 }

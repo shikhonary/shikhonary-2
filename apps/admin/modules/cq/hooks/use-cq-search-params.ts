@@ -14,6 +14,8 @@ export const cqSearchParamsParsers = {
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
   board: parseAsString.withDefault("All"),
+  isActive: parseAsString.withDefault("All"),
+  hasReport: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<CqSortOption>(Array.from(cqSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

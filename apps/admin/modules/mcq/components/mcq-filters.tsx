@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { DataTableFilterBar, type ActiveFilterChip } from "@/components/shared/data-table-filter-bar"
-import { toBengaliDigits, toEnglishDigits, extractReferenceYear } from "@workspace/utils"
+import { toBengaliDigits, toEnglishDigits, extractReferenceYear, MCQ_TYPE_OPTIONS } from "@workspace/utils"
 
 interface SubjectOption {
   id: string
@@ -49,6 +49,10 @@ interface McqFiltersProps {
   boardYears?: any[]
   selectedType: string
   onTypeChange: (value: string) => void
+  selectedIsActive: string
+  onIsActiveChange: (value: string) => void
+  selectedHasReport: string
+  onHasReportChange: (value: string) => void
   selectedSort: string
   onSortChange: (value: string) => void
   onResetAll?: () => void
@@ -71,6 +75,10 @@ export function McqFilters({
   boardYears = [],
   selectedType,
   onTypeChange,
+  selectedIsActive,
+  onIsActiveChange,
+  selectedHasReport,
+  onHasReportChange,
   selectedSort,
   onSortChange,
   onResetAll,
@@ -183,10 +191,30 @@ export function McqFilters({
   }
 
   if (selectedType && selectedType !== "All") {
+    const typeOpt = MCQ_TYPE_OPTIONS.find((t) => t.value === selectedType)
+    const label = typeOpt ? typeOpt.labelBn : selectedType
     activeFilterChips.push({
       id: "type",
-      label: `ধরন: ${selectedType}`,
+      label: `ধরন: ${label}`,
       onRemove: () => onTypeChange("All"),
+    })
+  }
+
+  if (selectedIsActive && selectedIsActive !== "All") {
+    const label = selectedIsActive === "ACTIVE" ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"
+    activeFilterChips.push({
+      id: "isActive",
+      label: `স্ট্যাটাস: ${label}`,
+      onRemove: () => onIsActiveChange("All"),
+    })
+  }
+
+  if (selectedHasReport && selectedHasReport !== "All") {
+    const label = selectedHasReport === "YES" ? "রিপোর্ট আছে" : "রিপোর্ট ছাড়া"
+    activeFilterChips.push({
+      id: "hasReport",
+      label: `রিপোর্ট: ${label}`,
+      onRemove: () => onHasReportChange("All"),
     })
   }
 
@@ -205,6 +233,8 @@ export function McqFilters({
     onChapterChange("All")
     onBoardChange("All")
     onTypeChange("All")
+    onIsActiveChange("All")
+    onHasReportChange("All")
     onSortChange("All")
     onResetAll?.()
   }
@@ -338,7 +368,52 @@ export function McqFilters({
         </Select>
       </div>
 
-      {/* 5. Sort Select */}
+      {/* 5. MCQ Type Select */}
+      <div className="min-w-[130px]">
+        <Select value={selectedType} onValueChange={(val) => onTypeChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সকল ধরন" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">সকল ধরন</SelectItem>
+            {MCQ_TYPE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.labelBn}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 6. Active/Inactive Status Select */}
+      <div className="min-w-[120px]">
+        <Select value={selectedIsActive} onValueChange={(val) => onIsActiveChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সকল স্ট্যাটাস" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">সকল স্ট্যাটাস</SelectItem>
+            <SelectItem value="ACTIVE">অ্যাক্টিভ</SelectItem>
+            <SelectItem value="INACTIVE">ইনঅ্যাক্টিভ</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 7. Has Report Select */}
+      <div className="min-w-[125px]">
+        <Select value={selectedHasReport} onValueChange={(val) => onHasReportChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="রিপোর্ট স্ট্যাটাস" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">সকল প্রশ্ন</SelectItem>
+            <SelectItem value="YES">⚠️ রিপোর্ট আছে</SelectItem>
+            <SelectItem value="NO">✅ রিপোর্ট ছাড়া</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 8. Sort Select */}
       <div className="min-w-[130px]">
         <Select value={selectedSort} onValueChange={(val) => onSortChange(val ?? "All")}>
           <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">

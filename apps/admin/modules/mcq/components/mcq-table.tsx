@@ -13,7 +13,7 @@ import {
   QuestionCardFooter,
   QuestionCardActions,
 } from "@/components/shared"
-import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
+import { toBengaliDigits, MCQ_TYPE_OPTIONS } from "@workspace/utils"
 import {
   Edit3,
   Trash2,
@@ -22,6 +22,7 @@ import {
   Tag,
   BookOpen,
   Check,
+  AlertTriangle,
 } from "lucide-react"
 
 export interface McqItem {
@@ -40,6 +41,8 @@ export interface McqItem {
   subjectId: string
   chapterId: string
   isActive: boolean
+  hasReport?: boolean
+  reports?: any[]
   createdAt: Date | string
   updatedAt: Date | string
   difficulty?: string | null
@@ -257,7 +260,26 @@ export function McqTable({
                         subjectName={item.subject.nameBn || item.subject.nameEn}
                         chapterName={item.chapter.nameBn || item.chapter.nameEn}
                         isMath={item.isMath}
-                      />
+                      >
+                        {item.type && (
+                          <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-semibold border border-blue-200/60 dark:border-blue-800/40 font-body">
+                            {MCQ_TYPE_OPTIONS.find((t) => t.value === item.type)?.labelBn || item.type}
+                          </span>
+                        )}
+
+                        {!item.isActive && (
+                          <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold border border-amber-200/60 dark:border-amber-800/40 font-body">
+                            ইনঅ্যাক্টিভ
+                          </span>
+                        )}
+
+                        {item.hasReport && (
+                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body">
+                            <AlertTriangle className="w-3 h-3 text-rose-500" />
+                            <span>রিপোর্ট ({toBengaliDigits(item.reports?.length || 1)})</span>
+                          </span>
+                        )}
+                      </QuestionCardHeader>
 
                       {/* Attachments Section */}
                       {Array.isArray(item.attachments) && item.attachments.length > 0 && (

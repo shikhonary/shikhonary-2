@@ -16,14 +16,39 @@ import type {
 export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   const where: any = {}
   
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.chapterId = input.chapterId
-  if (input.type) where.type = input.type
-  if (input.difficulty) where.difficulty = input.difficulty
-  if (input.source) where.source = input.source
-  if (input.session) where.session = input.session
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
+  if (input.type && input.type !== "All") where.type = input.type
+  if (input.difficulty && input.difficulty !== "All") where.difficulty = input.difficulty
+  if (input.source && input.source !== "All") where.source = input.source
+  if (input.session && input.session !== "All") where.session = input.session
 
-  if (input.board) {
+  if (input.isActive !== undefined && input.isActive !== "All") {
+    if (typeof input.isActive === "boolean") {
+      where.isActive = input.isActive
+    } else if (input.isActive === "true" || input.isActive === "ACTIVE") {
+      where.isActive = true
+    } else if (input.isActive === "false" || input.isActive === "INACTIVE") {
+      where.isActive = false
+    }
+  }
+
+  if (input.hasReport !== undefined && input.hasReport !== "All") {
+    const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
+    const reports = await db.questionReport.findMany({
+      where: { entityType: "MCQ" },
+      select: { entityId: true },
+      distinct: ["entityId"],
+    })
+    const reportedIds = reports.map((r) => r.entityId)
+    if (isReported) {
+      where.id = { in: reportedIds }
+    } else {
+      where.id = { notIn: reportedIds }
+    }
+  }
+
+  if (input.board && input.board !== "All") {
     where.reference = { has: input.board }
   }
 
@@ -104,8 +129,29 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
     db.mcq.count({ where }),
   ])
 
+  const itemIds = items.map((it) => it.id)
+  const itemReports =
+    itemIds.length > 0
+      ? await db.questionReport.findMany({
+          where: { entityType: "MCQ", entityId: { in: itemIds } },
+          select: { entityId: true, status: true, reportType: true, description: true },
+        })
+      : []
+
+  const reportMap = new Map<string, typeof itemReports>()
+  for (const rep of itemReports) {
+    if (!reportMap.has(rep.entityId)) reportMap.set(rep.entityId, [])
+    reportMap.get(rep.entityId)!.push(rep)
+  }
+
+  const enhancedItems = items.map((item) => ({
+    ...item,
+    hasReport: reportMap.has(item.id),
+    reports: reportMap.get(item.id) || [],
+  }))
+
   return {
-    items,
+    items: enhancedItems,
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,

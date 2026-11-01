@@ -34,6 +34,8 @@ export function McqListView() {
       chapterId: selectedChapterId,
       board: selectedBoard,
       type: selectedType,
+      isActive: selectedIsActive,
+      hasReport: selectedHasReport,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -89,6 +91,8 @@ export function McqListView() {
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
     type: selectedType !== "All" ? selectedType : undefined,
+    isActive: selectedIsActive !== "All" ? selectedIsActive : undefined,
+    hasReport: selectedHasReport !== "All" ? selectedHasReport : undefined,
     sort: selectedSort,
   })
 
@@ -177,6 +181,10 @@ export function McqListView() {
         boardYears={boardYears}
         selectedType={selectedType}
         onTypeChange={(type) => setSearchParams({ type, page: 1 })}
+        selectedIsActive={selectedIsActive}
+        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
+        selectedHasReport={selectedHasReport}
+        onHasReportChange={(hasReport) => setSearchParams({ hasReport, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />

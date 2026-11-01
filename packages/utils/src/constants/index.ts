@@ -270,5 +270,38 @@ export const DEFAULT_SOURCE = "সহায়ক সংকলন"
 // Question Types & Bilingual Mappings
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// MCQ Types
+// ---------------------------------------------------------------------------
+
+export const MCQ_TYPES = {
+  SINGLE: "SINGLE",
+  MULTIPLE: "MULTIPLE",
+  COMBINED: "COMBINED",
+} as const
+
+export type McqType = (typeof MCQ_TYPES)[keyof typeof MCQ_TYPES]
+
+export const MCQ_TYPE_OPTIONS = [
+  {
+    value: MCQ_TYPES.SINGLE,
+    label: "সাধারণ বহুনির্বাচনি (Single)",
+    labelBn: "সাধারণ বহুনির্বাচনি",
+    labelEn: "Single Choice",
+  },
+  {
+    value: MCQ_TYPES.MULTIPLE,
+    label: "বহুপদী সমাপ্তিসূচক (Multiple)",
+    labelBn: "বহুপদী সমাপ্তিসূচক",
+    labelEn: "Multiple Choice",
+  },
+  {
+    value: MCQ_TYPES.COMBINED,
+    label: "অভিন্ন তথ্যভিত্তিক (Combined)",
+    labelBn: "অভিন্ন তথ্যভিত্তিক",
+    labelEn: "Combined / Stimulus",
+  },
+] as const
+
 export * from "./question-type"
 

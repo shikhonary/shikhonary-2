@@ -56,16 +56,30 @@ const BENGALI_OPTION_MAP: Record<string, number> = {
   "1": 0, "2": 1, "3": 2, "4": 3,
 };
 
+function isQuestionNoReference(ref: string): boolean {
+  const trimmed = ref.trim();
+  if (trimmed.startsWith("অনন্য প্রশ্ন")) return true;
+  if (trimmed.startsWith("প্রশ্ন নং") || trimmed.startsWith("প্রশ্ন নম্বর") || trimmed.startsWith("প্রশ্ন")) return true;
+  if (/^\[?cite:\s*[^\]]+\]?/i.test(trimmed)) return true;
+  if (/^cite:\s*[^\]]+/i.test(trimmed)) return true;
+  return /^(?:প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+|q(?:uestion)?\s*(?:no\.?)?\s*[-:–.]?\s*\d+)$/i.test(trimmed);
+}
+
 export function normalizeReferences(rawList: string[]): string[] {
   const result: string[] = [];
 
   for (const raw of rawList) {
     if (!raw || typeof raw !== "string") continue;
+    let text = raw.replace(/\[cite:\s*[^\]]+\]/gi, "").trim();
 
     // 1. Split by semicolon ';'
-    const semiParts = raw.split(";").map(s => s.trim()).filter(Boolean);
+    const semiParts = text.split(/[;；|]+/).map(s => s.trim()).filter(Boolean);
 
     for (const part of semiParts) {
+      if (!part || isQuestionNoReference(part)) {
+        continue;
+      }
+
       // 2. Multi-year expansion (e.g. "নি. প. ২০২৫, ২০২৪" -> ["নি. প. ২০২৫", "নি. প. ২০২৪"])
       const multiYearMatch = part.match(/^([\u0980-\u09FF\w\.\s]+?)\s+([০-৯\d]{2,4}(?:\s*,\s*[০-৯\d]{2,4})+)$/);
 
@@ -94,22 +108,27 @@ export function extractContextAndRefs(rawContext: string | null | undefined): {
     return { cleanedContext: null, extractedRefs: [] };
   }
 
+  let text = rawContext.trim();
+  text = text.replace(/\[cite:\s*[^\]]+\]/gi, "").trim();
+
   // 1. Strip question header at beginning (e.g. 'নিচের উদ্দীপকটি পড়ে ৯১ ও ৯২ নম্বর প্রশ্নের উত্তর দাও:')
-  let text = rawContext
+  text = text
     .replace(/^(?:নিচের\s+)?(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি|অংশটুকু|কবিতাংশটি|নাট্যাংশটি|দৃশ্যপটটি)\s+(?:পড়ে|পড়ে|লক্ষ\s*কর[েো]|দেখে)[\s\S]*?প্রশ্নের\s*উত্তর\s*দাও[ঃ:।-]*\s*/i, "")
     .trim();
 
   const extractedRefs: string[] = [];
 
-  // 2. Extract trailing bracketed reference (e.g. '[য. বো. ১৬]' or '[কু. বো. ১৭; চ. বো. ১৯]')
-  const endBracketMatch = text.match(/\[([^\]]+)\]\s*$/);
-  if (endBracketMatch) {
-    const rawRefInside = endBracketMatch[1]!.trim();
-    if (rawRefInside) {
-      extractedRefs.push(rawRefInside);
+  // 2. Extract bracketed references from context text (e.g. '[য. বো. ১৬]' or '[কু. বো. ১৭; চ. বো. ১৯]')
+  const bracketMatches = text.match(/\[([^\]]+)\]/g);
+  if (bracketMatches) {
+    for (const bm of bracketMatches) {
+      const rawRefInside = bm.replace(/^\[/, "").replace(/\]$/, "").trim();
+      if (rawRefInside && !isQuestionNoReference(rawRefInside)) {
+        extractedRefs.push(rawRefInside);
+      }
     }
-    // Remove the bracketed reference from context text so the passage is pure
-    text = text.replace(/\[([^\]]+)\]\s*$/, "").trim();
+    // Remove the brackets from text, preserving trailing punctuation
+    text = text.replace(/\s*\[([^\]]+)\]\s*([?।|.]?)/g, "$2").trim();
   }
 
   return {
@@ -123,16 +142,21 @@ export function extractQuestionAndRefs(rawQuestion: string): {
   extractedRefs: string[];
 } {
   let text = rawQuestion.replace(/^[০-৯\d]+[.)।|\-\s]+/g, "").trim();
+  text = text.replace(/\[cite:\s*[^\]]+\]/gi, "").trim();
+
   const extractedRefs: string[] = [];
 
-  // If question ends with bracketed reference, e.g. "বাংলা গদ্যের জনক কে? [ঢা. বো. ২০]"
-  const endBracketMatch = text.match(/\[([^\]]+)\]\s*$/);
-  if (endBracketMatch) {
-    const rawRefInside = endBracketMatch[1]!.trim();
-    if (rawRefInside) {
-      extractedRefs.push(rawRefInside);
+  // Extract bracketed references (e.g. "‘অভাগীর স্বর্গ’ গল্পের গতিশীল চরিত্র কোনটি? [য. বো. ২৪]")
+  const bracketMatches = text.match(/\[([^\]]+)\]/g);
+  if (bracketMatches) {
+    for (const bm of bracketMatches) {
+      const rawRefInside = bm.replace(/^\[/, "").replace(/\]$/, "").trim();
+      if (rawRefInside && !isQuestionNoReference(rawRefInside)) {
+        extractedRefs.push(rawRefInside);
+      }
     }
-    text = text.replace(/\[([^\]]+)\]\s*$/, "").trim();
+    // Remove bracket from question text, keeping any trailing question mark or punctuation
+    text = text.replace(/\s*\[([^\]]+)\]\s*([?।|.]?)/g, "$2").trim();
   }
 
   return {
@@ -141,13 +165,56 @@ export function extractQuestionAndRefs(rawQuestion: string): {
   };
 }
 
+export function extractExplanationAndRefs(rawExplanation: string | null | undefined): {
+  cleanExplanation: string | null;
+  extractedRefs: string[];
+} {
+  if (!rawExplanation || typeof rawExplanation !== "string") {
+    return { cleanExplanation: null, extractedRefs: [] };
+  }
+
+  let text = rawExplanation.trim();
+  text = text.replace(/\[cite:\s*[^\]]+\]/gi, "").trim();
+
+  const extractedRefs: string[] = [];
+
+  const bracketMatches = text.match(/\[([^\]]+)\]/g);
+  if (bracketMatches) {
+    for (const bm of bracketMatches) {
+      const rawRefInside = bm.replace(/^\[/, "").replace(/\]$/, "").trim();
+      if (rawRefInside && !isQuestionNoReference(rawRefInside)) {
+        extractedRefs.push(rawRefInside);
+      }
+    }
+    text = text.replace(/\s*\[([^\]]+)\]\s*([?।|.]?)/g, "$2").trim();
+  }
+
+  return {
+    cleanExplanation: text || null,
+    extractedRefs,
+  };
+}
+
 async function seedSingleFile(filePath: string, forceClean: boolean = false) {
   const fileContent = readFileSync(filePath, "utf-8");
-  const data: RawPayload = JSON.parse(fileContent);
+  let data: RawPayload;
+  try {
+    data = JSON.parse(fileContent);
+  } catch (err: any) {
+    console.warn(`[Skip] Invalid JSON in ${filePath} (skipping): ${err.message}`);
+    return;
+  }
 
   const rawQuestions = data.questions || data.mcqs || [];
   if (rawQuestions.length === 0) {
     console.log(`[Skip] No questions found in ${filePath}`);
+    return;
+  }
+
+  // Verify this is an MCQ file (questions must have options and a question stem)
+  const isMcq = rawQuestions.some((q) => Array.isArray(q.options) && typeof q.question === "string");
+  if (!isMcq) {
+    console.log(`[Skip] ${filePath} does not appear to be an MCQ file (skipping).`);
     return;
   }
 
@@ -206,6 +273,7 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
 
     const { cleanQuestion, extractedRefs: qExtractedRefs } = extractQuestionAndRefs(q.question);
     const { cleanedContext, extractedRefs: ctxExtractedRefs } = extractContextAndRefs(q.context);
+    const { cleanExplanation, extractedRefs: expExtractedRefs } = extractExplanationAndRefs(q.explanation);
 
     const cleanOptions = (q.options || []).map((opt) => 
       opt.replace(/^[ক-ঘa-d\d]+[.)।|\-\s]+/g, "").trim()
@@ -236,24 +304,44 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
       stmt.replace(/^(?:[iI]{1,3}|iv|IV|[১-৪\d]+|[a-dA-D])[.)।|\-\s]+/g, "").trim()
     );
 
-    // Combine any references in `q.reference` with ones extracted from bracketed context and question
+    // Combine any references in `q.reference` with ones extracted from bracketed context, question, and explanation
     const combinedRefs = [
       ...(q.reference || []),
       ...qExtractedRefs,
       ...ctxExtractedRefs,
+      ...expExtractedRefs,
     ];
     const normalizedRefs = normalizeReferences(combinedRefs);
-    const questionType = q.type || (cleanStatements.length > 0 ? "MULTIPLE" : cleanedContext ? "COMBINED" : "SINGLE");
+    const questionType = (cleanedContext || q.hasAttachment)
+      ? "COMBINED"
+      : (q.type || (cleanStatements.length > 0 ? "MULTIPLE" : "SINGLE"));
     const isMathDetected = Boolean(q.isMath || /[\$\\\{\}\^]|(?:\\frac|\\sqrt|\\times)/.test(cleanQuestion));
     const finalSource = q.source || sourceName;
     const finalSession = q.session || sessionYear;
 
-    // Check if this exact question already exists in this chapter (Deduplication)
-    const existing = await prisma.mcq.findFirst({
+    // Check if matching question already exists in this chapter (Deduplication)
+    const existingCandidates = await prisma.mcq.findMany({
       where: {
         chapterId: matchedChapter.id,
-        question: cleanQuestion
+        question: cleanQuestion,
+      },
+      include: {
+        attachments: true,
+      },
+    });
+
+    const existing = existingCandidates.find((c) => {
+      // If context is present (COMBINED question), ensure stimulus content matches
+      if (cleanedContext) {
+        const passage = c.attachments.find((a) => a.type === "PASSAGE");
+        if (passage?.content?.trim() !== cleanedContext.trim()) {
+          return false;
+        }
       }
+      if (cleanStatements.length > 0 || c.statements.length > 0) {
+        return JSON.stringify(c.statements) === JSON.stringify(cleanStatements);
+      }
+      return JSON.stringify(c.options) === JSON.stringify(cleanOptions);
     });
 
     let currentMcqId: string;
@@ -269,7 +357,7 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
           type: questionType,
           isMath: isMathDetected,
           reference: normalizedRefs,
-          explanation: q.explanation || null,
+          explanation: cleanExplanation,
           source: finalSource,
           session: finalSession,
           isActive: true,
@@ -288,7 +376,7 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
           type: questionType,
           isMath: isMathDetected,
           reference: normalizedRefs,
-          explanation: q.explanation || null,
+          explanation: cleanExplanation,
           source: finalSource,
           session: finalSession,
           subjectId: matchedChapter.subjectId,
@@ -307,7 +395,8 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
       });
 
       const attachmentType = q.attachmentType || (cleanedContext ? "PASSAGE" : "DIAGRAM");
-      const caption = q.attachmentDescription || (cleanedContext ? "উদ্দীপক" : "চিত্র সংযুক্ত করুন");
+      const rawCaption = q.attachmentDescription?.trim();
+      const caption = rawCaption && rawCaption !== "উদ্দীপক" ? rawCaption : (cleanedContext ? null : "চিত্র সংযুক্ত করুন");
       const content = cleanedContext || null;
 
       if (!existingAttachment) {
@@ -338,6 +427,27 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
           description: q.attachmentDescription || "Visual media required",
           reference: normalizedRefs.join(", ") || "N/A"
         });
+
+        // Ensure a QuestionReport is logged in DB so Admin "রিপোর্ট স্ট্যাটাস" filter tags it
+        const existingReport = await prisma.questionReport.findFirst({
+          where: {
+            entityType: "MCQ",
+            entityId: currentMcqId,
+            reportType: "MISSING_IMAGE",
+          },
+        });
+
+        if (!existingReport) {
+          await prisma.questionReport.create({
+            data: {
+              entityType: "MCQ",
+              entityId: currentMcqId,
+              reportType: "MISSING_IMAGE",
+              description: q.attachmentDescription || "চিত্র / ডায়াগ্রাম সংযোজন প্রয়োজন",
+              status: "PENDING",
+            },
+          });
+        }
       }
     }
   }
@@ -398,11 +508,13 @@ async function main() {
   }
 }
 
-main()
-  .catch((err) => {
-    console.error("\n❌ Seeding Error:", err.message);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (process.argv[1]?.replace(/\\/g, "/").includes("seed-mcq-json")) {
+  main()
+    .catch((err) => {
+      console.error("\n❌ Seeding Error:", err.message);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

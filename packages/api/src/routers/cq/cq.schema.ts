@@ -9,6 +9,8 @@ export const listCqsSchema = paginationSchema.extend({
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  isActive: z.union([z.boolean(), z.string()]).optional(),
+  hasReport: z.union([z.boolean(), z.string()]).optional(),
   year: z.number().int().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),

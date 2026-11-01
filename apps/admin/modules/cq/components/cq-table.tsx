@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   Tag,
   BookOpen,
+  AlertTriangle,
 } from "lucide-react"
 
 export interface CqItem {
@@ -38,6 +39,8 @@ export interface CqItem {
   session?: string | null
   marks?: any
   isActive: boolean
+  hasReport?: boolean
+  reports?: any[]
   attachments?: QuestionAttachmentItemData[]
   createdAt: Date | string
   updatedAt: Date | string
@@ -267,7 +270,20 @@ export function CqTable({
                         academicClassName={className}
                         subjectName={item.subject.nameBn || item.subject.nameEn}
                         chapterName={item.chapter.nameBn || item.chapter.nameEn}
-                      />
+                      >
+                        {!item.isActive && (
+                          <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold border border-amber-200/60 dark:border-amber-800/40 font-body">
+                            ইনঅ্যাক্টিভ
+                          </span>
+                        )}
+
+                        {item.hasReport && (
+                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body">
+                            <AlertTriangle className="w-3 h-3 text-rose-500" />
+                            <span>রিপোর্ট ({toBengaliDigits(item.reports?.length || 1)})</span>
+                          </span>
+                        )}
+                      </QuestionCardHeader>
 
                       {/* Attachments Section */}
                       {(() => {
