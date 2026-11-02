@@ -100,6 +100,25 @@ export function categorizeReference(ref: string | null | undefined): ReferenceCa
   return "OTHER"
 }
 
+/**
+ * Identifies references that are actually source types, curriculum classifications,
+ * or cognitive domains rather than formal board/institution/exam references.
+ */
+export function isIgnoredReference(ref: string | null | undefined): boolean {
+  if (!ref || typeof ref !== "string") return true
+  const trimmed = ref.trim()
+  if (!trimmed) return true
+
+  // 1. Source compilation / Guide books
+  if (/সহায়ক\s*সংকলন|সহায়ক\s*সংকলন/i.test(trimmed)) return true
+  if (/^(?:গাইড\s*বুক|বৃত্তি\s*সহায়িকা|মডেল\s*টেস্ট\s*সংকলন)$/i.test(trimmed)) return true
+
+  // 2. Cognitive domains / Bloom's taxonomy
+  if (/^(?:জ্ঞান|অনুধাবন|প্রয়োগ|প্রয়োগ|উচ্চতর\s*দক্ষতা)$/i.test(trimmed)) return true
+
+  return false
+}
+
 const BN_TO_EN_DIGITS: Record<string, string> = {
   "০": "0", "১": "1", "২": "2", "৩": "3", "৪": "4",
   "৫": "5", "৬": "6", "৭": "7", "৮": "8", "৯": "9",

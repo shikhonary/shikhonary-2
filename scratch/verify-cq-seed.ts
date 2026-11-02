@@ -11,16 +11,50 @@ const connectionString = process.env.MAIN_DATABASE_URL || process.env.DATABASE_U
 const adapter = new PrismaPg({ connectionString: connectionString! });
 const prisma = new PrismaClient({ adapter });
 
+function getBengaliVariants(str: string): string[] {
+  const trimmed = str.trim();
+  const canon = trimmed
+    .replace(/\u09AF\u09BC/g, "\u09DF") // য + ় -> য়
+    .replace(/\u09A1\u09BC/g, "\u09DC") // ড + ় -> ড়
+    .replace(/\u09A2\u09BC/g, "\u09DD"); // ঢ + ় -> ঢ়
+  const decomp = trimmed
+    .replace(/\u09DF/g, "\u09AF\u09BC")
+    .replace(/\u09DC/g, "\u09A1\u09BC")
+    .replace(/\u09DD/g, "\u09A2\u09BC");
+  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+}
+
 async function verify() {
   const chapterName = process.argv[2] || "ফুলের বিবাহ";
-  const ch = await prisma.academicChapter.findFirst({
+  const variants = getBengaliVariants(chapterName);
+  const searchConditions = variants.flatMap((v) => [
+    { nameBn: v },
+    { nameEn: { equals: v, mode: "insensitive" as const } },
+  ]);
+
+  let ch = await prisma.academicChapter.findFirst({
     where: {
-      OR: [
-        { nameBn: { contains: chapterName } },
-        { nameEn: { contains: chapterName } }
-      ]
-    }
+      OR: searchConditions,
+      isActive: true,
+    },
   });
+
+  if (!ch) {
+    const partialConditions = variants.flatMap((v) => [
+      { nameBn: { contains: v, mode: "insensitive" as const } },
+      { nameEn: { contains: v, mode: "insensitive" as const } },
+    ]);
+    ch = await prisma.academicChapter.findFirst({
+      where: {
+        OR: partialConditions,
+        isActive: true,
+      },
+      orderBy: {
+        position: "asc",
+      },
+    });
+  }
 
   if (!ch) {
     console.log(`Chapter "${chapterName}" not found.`);

@@ -27,6 +27,7 @@
     "clean:databases:except-mandori": "npx -y tsx prisma/seed/clean-except-mandori.ts",
     "clean:branches": "npx -y tsx scripts/delete-branches.ts",
     "clean:mcq-references": "npx -y tsx scripts/clean-mcq-references.ts",
+    "sync:mcq-attachment-refs": "npx -y tsx scripts/sync-mcq-attachment-references.ts",
     "clean:attachment-captions": "npx -y tsx scripts/clean-attachment-captions.ts",
     "clean:word-meaning-references": "npx -y tsx scripts/clean-word-meaning-references.ts",
     "update:poem-board-book-source": "npx -y tsx scripts/update-poem-board-book-source.ts",

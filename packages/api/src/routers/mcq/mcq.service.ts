@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
-import { categorizeReference } from "@workspace/utils"
+import { categorizeReference, isIgnoredReference } from "@workspace/utils"
 import type {
   CreateMcqInput,
   DeleteMcqInput,
@@ -49,7 +49,32 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   }
 
   if (input.board && input.board !== "All") {
-    where.reference = { has: input.board }
+    if (input.board === "SCHOOL_ALL") {
+      const questionsWithRef = await db.mcq.findMany({
+        where: {
+          NOT: { reference: { equals: [] } },
+          ...(where.subjectId ? { subjectId: where.subjectId } : {}),
+          ...(where.chapterId ? { chapterId: where.chapterId } : {}),
+        },
+        select: { reference: true },
+      })
+      const schoolRefs = new Set<string>()
+      for (const q of questionsWithRef) {
+        for (const ref of q.reference || []) {
+          if (!ref || isIgnoredReference(ref)) continue
+          if (categorizeReference(ref) === "SCHOOL") {
+            schoolRefs.add(ref)
+          }
+        }
+      }
+      if (schoolRefs.size > 0) {
+        where.reference = { hasSome: Array.from(schoolRefs) }
+      } else {
+        where.id = "__NO_MATCHING_SCHOOL_MCQ__"
+      }
+    } else {
+      where.reference = { has: input.board }
+    }
   }
 
   if (input.query) {
@@ -594,7 +619,7 @@ export async function getBoardYears(
   const countMap = new Map<string, number>()
   for (const q of questions) {
     for (const ref of q.reference || []) {
-      if (!ref) continue
+      if (!ref || isIgnoredReference(ref)) continue
       countMap.set(ref, (countMap.get(ref) || 0) + 1)
     }
   }

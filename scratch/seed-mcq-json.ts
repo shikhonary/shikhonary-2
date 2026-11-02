@@ -70,10 +70,15 @@ export function normalizeReferences(rawList: string[]): string[] {
 
   for (const raw of rawList) {
     if (!raw || typeof raw !== "string") continue;
-    let text = raw.replace(/\[cite:\s*[^\]]+\]/gi, "").trim();
+    let text = raw
+      .replace(/\[cite:\s*[^\]]+\]/gi, "")
+      .replace(/\[?\bcite:\s*\d+\b\]?/gi, "")
+      .replace(/\s*\|\s*প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+/gi, "")
+      .replace(/,\s*প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+/gi, "")
+      .trim();
 
-    // 1. Split by semicolon ';'
-    const semiParts = text.split(/[;；|]+/).map(s => s.trim()).filter(Boolean);
+    // 1. Split by semicolon ';' or comma before 'নি.প.'
+    const semiParts = text.split(/[;；|]+|,\s*(?=নি[.\s]*প)/).map(s => s.trim()).filter(Boolean);
 
     for (const part of semiParts) {
       if (!part || isQuestionNoReference(part)) {
@@ -195,6 +200,20 @@ export function extractExplanationAndRefs(rawExplanation: string | null | undefi
   };
 }
 
+function getBengaliVariants(str: string): string[] {
+  const trimmed = str.trim();
+  const canon = trimmed
+    .replace(/\u09AF\u09BC/g, "\u09DF") // য + ় -> য়
+    .replace(/\u09A1\u09BC/g, "\u09DC") // ড + ় -> ড়
+    .replace(/\u09A2\u09BC/g, "\u09DD"); // ঢ + ় -> ঢ়
+  const decomp = trimmed
+    .replace(/\u09DF/g, "\u09AF\u09BC")
+    .replace(/\u09DC/g, "\u09A1\u09BC")
+    .replace(/\u09DD/g, "\u09A2\u09BC");
+  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+}
+
 async function seedSingleFile(filePath: string, forceClean: boolean = false) {
   const fileContent = readFileSync(filePath, "utf-8");
   let data: RawPayload;
@@ -224,18 +243,41 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     return;
   }
 
-  // Find matching chapter in the database
-  const matchedChapter = await prisma.academicChapter.findFirst({
+  // Find matching chapter in the database (Exact match first, then fallback to partial/contains)
+  const variants = getBengaliVariants(chapterTitle);
+  const searchConditions = variants.flatMap((v) => [
+    { nameBn: v },
+    { nameEn: { equals: v, mode: "insensitive" as const } },
+  ]);
+
+  let matchedChapter = await prisma.academicChapter.findFirst({
     where: {
-      OR: [
-        { nameBn: { contains: chapterTitle } },
-        { nameEn: { contains: chapterTitle, mode: "insensitive" } }
-      ]
+      OR: searchConditions,
+      isActive: true,
     },
     include: {
-      subject: true
-    }
+      subject: true,
+    },
   });
+
+  if (!matchedChapter) {
+    const partialConditions = variants.flatMap((v) => [
+      { nameBn: { contains: v, mode: "insensitive" as const } },
+      { nameEn: { contains: v, mode: "insensitive" as const } },
+    ]);
+    matchedChapter = await prisma.academicChapter.findFirst({
+      where: {
+        OR: partialConditions,
+        isActive: true,
+      },
+      include: {
+        subject: true,
+      },
+      orderBy: {
+        position: "asc",
+      },
+    });
+  }
 
   if (!matchedChapter) {
     console.error(`[Error] Chapter "${chapterTitle}" not found in database! (File: ${filePath})`);
@@ -348,6 +390,10 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
 
     if (existing) {
       // Update existing record (refreshes fields without wiping previous questions)
+      const mergedRefs = normalizeReferences([
+        ...(existing.reference || []),
+        ...combinedRefs,
+      ]);
       const updated = await prisma.mcq.update({
         where: { id: existing.id },
         data: {
@@ -356,7 +402,7 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
           statements: cleanStatements,
           type: questionType,
           isMath: isMathDetected,
-          reference: normalizedRefs,
+          reference: mergedRefs,
           explanation: cleanExplanation,
           source: finalSource,
           session: finalSession,

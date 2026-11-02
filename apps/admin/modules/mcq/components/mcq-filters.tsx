@@ -11,7 +11,14 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { DataTableFilterBar, type ActiveFilterChip } from "@/components/shared/data-table-filter-bar"
-import { toBengaliDigits, toEnglishDigits, extractReferenceYear, MCQ_TYPE_OPTIONS } from "@workspace/utils"
+import {
+  toBengaliDigits,
+  toEnglishDigits,
+  extractReferenceYear,
+  categorizeReference,
+  isIgnoredReference,
+  MCQ_TYPE_OPTIONS,
+} from "@workspace/utils"
 
 interface SubjectOption {
   id: string
@@ -90,14 +97,22 @@ export function McqFilters({
 
   const isBoardDisabled = boardYears.length === 0
 
-  const groupedReferencesByYear = React.useMemo(() => {
+  const { groupedReferences, totalSchoolCount } = React.useMemo(() => {
     const yearMap = new Map<string, Array<{ rawRef: string; count: number }>>()
     const noYearList: Array<{ rawRef: string; count: number }> = []
+    let schoolCount = 0
 
     for (const b of boardYears) {
       const rawRef = typeof b === "string" ? b : b.rawRef || b.boardName || b.board || ""
-      if (!rawRef) continue
+      if (!rawRef || isIgnoredReference(rawRef)) continue
       const count = typeof b === "object" && typeof b.count === "number" ? b.count : 1
+
+      const category = typeof b === "object" && b.category ? b.category : categorizeReference(rawRef)
+
+      if (category === "SCHOOL") {
+        schoolCount += count
+        continue
+      }
 
       const year = extractReferenceYear(rawRef)
       if (year) {
@@ -118,11 +133,14 @@ export function McqFilters({
     })
 
     return {
-      years: sortedYears.map((yr) => ({
-        year: yr,
-        items: yearMap.get(yr)!.sort((a, b) => b.count - a.count),
-      })),
-      noYear: noYearList.sort((a, b) => b.count - a.count),
+      groupedReferences: {
+        years: sortedYears.map((yr) => ({
+          year: yr,
+          items: yearMap.get(yr)!.sort((a, b) => b.count - a.count),
+        })),
+        noYear: noYearList.sort((a, b) => b.count - a.count),
+      },
+      totalSchoolCount: schoolCount,
     }
   }, [boardYears])
 
@@ -183,9 +201,13 @@ export function McqFilters({
   }
 
   if (selectedBoard && selectedBoard !== "All") {
+    const label =
+      selectedBoard === "SCHOOL_ALL"
+        ? "শীর্ষস্থানীয় সকল বিদ্যালয় ও কলেজ"
+        : selectedBoard
     activeFilterChips.push({
       id: "board",
-      label: `বোর্ড / রেফারেন্স: ${selectedBoard}`,
+      label: `বোর্ড / রেফারেন্স: ${label}`,
       onRemove: () => onBoardChange("All"),
     })
   }
@@ -339,7 +361,13 @@ export function McqFilters({
           <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-72 font-body">
             <SelectItem value="All">সকল প্রশ্ন / রেফারেন্স</SelectItem>
 
-            {groupedReferencesByYear.years.map((yearGroup) => (
+            {(totalSchoolCount > 0 || selectedBoard === "SCHOOL_ALL") && (
+              <SelectItem value="SCHOOL_ALL" className="font-medium text-primary">
+                🏫 শীর্ষস্থানীয় সকল বিদ্যালয় ও কলেজ ({toBengaliDigits(totalSchoolCount)})
+              </SelectItem>
+            )}
+
+            {groupedReferences.years.map((yearGroup) => (
               <SelectGroup key={yearGroup.year}>
                 <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
                   📅 {yearGroup.year} সাল
@@ -352,12 +380,12 @@ export function McqFilters({
               </SelectGroup>
             ))}
 
-            {groupedReferencesByYear.noYear.length > 0 && (
+            {groupedReferences.noYear.length > 0 && (
               <SelectGroup>
                 <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
-                  📌 সাধারণ / প্রতিষ্ঠান রেফারেন্স
+                  📌 অন্যান্য রেফারেন্স
                 </SelectLabel>
-                {groupedReferencesByYear.noYear.map((item) => (
+                {groupedReferences.noYear.map((item) => (
                   <SelectItem key={item.rawRef} value={item.rawRef}>
                     {item.rawRef} ({toBengaliDigits(item.count)})
                   </SelectItem>

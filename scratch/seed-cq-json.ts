@@ -127,6 +127,20 @@ function normalizeReferences(rawRefs?: string[]): string[] {
   return Array.from(normalized);
 }
 
+function getBengaliVariants(str: string): string[] {
+  const trimmed = str.trim();
+  const canon = trimmed
+    .replace(/\u09AF\u09BC/g, "\u09DF") // য + ় -> য়
+    .replace(/\u09A1\u09BC/g, "\u09DC") // ড + ় -> ড়
+    .replace(/\u09A2\u09BC/g, "\u09DD"); // ঢ + ় -> ঢ়
+  const decomp = trimmed
+    .replace(/\u09DF/g, "\u09AF\u09BC")
+    .replace(/\u09DC/g, "\u09A1\u09BC")
+    .replace(/\u09DD/g, "\u09A2\u09BC");
+  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+}
+
 async function seedSingleCqFile(filePath: string, forceClean = false) {
   console.log(`\n======================================================`);
   console.log(`CQ FILE:           ${filePath}`);
@@ -145,27 +159,41 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
     return;
   }
 
-  // 1. Resolve Target Chapter
-  const searchTitle = data.chapterTitle.trim();
-  const normalizedTitle = searchTitle.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  // 1. Resolve Target Chapter (Exact match first, then fallback to partial/contains)
+  const variants = getBengaliVariants(data.chapterTitle);
+  const searchConditions = variants.flatMap((v) => [
+    { nameBn: v },
+    { nameEn: { equals: v, mode: "insensitive" as const } },
+  ]);
 
-  const matchedChapter = await prisma.academicChapter.findFirst({
+  let matchedChapter = await prisma.academicChapter.findFirst({
     where: {
-      OR: [
-        { nameBn: { contains: searchTitle, mode: "insensitive" } },
-        { nameEn: { contains: searchTitle, mode: "insensitive" } },
-        { nameBn: { contains: normalizedTitle, mode: "insensitive" } },
-        { nameEn: { contains: normalizedTitle, mode: "insensitive" } },
-      ],
+      OR: searchConditions,
       isActive: true,
     },
     include: {
       subject: true,
     },
-    orderBy: {
-      position: "asc",
-    },
   });
+
+  if (!matchedChapter) {
+    const partialConditions = variants.flatMap((v) => [
+      { nameBn: { contains: v, mode: "insensitive" as const } },
+      { nameEn: { contains: v, mode: "insensitive" as const } },
+    ]);
+    matchedChapter = await prisma.academicChapter.findFirst({
+      where: {
+        OR: partialConditions,
+        isActive: true,
+      },
+      include: {
+        subject: true,
+      },
+      orderBy: {
+        position: "asc",
+      },
+    });
+  }
 
   if (!matchedChapter) {
     console.error(`\x1b[31m✖ No active chapter found matching: "${searchTitle}"\x1b[0m`);
@@ -251,6 +279,10 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
     let currentCqId: string;
 
     if (existingCq) {
+      const mergedRefs = normalizeReferences([
+        ...(existingCq.reference || []),
+        ...(q.reference || []),
+      ]);
       await prisma.cq.update({
         where: { id: existingCq.id },
         data: {
@@ -259,7 +291,7 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
           questionC,
           questionD,
           context: null, // Keep null on cq table; stimulus is stored in QuestionAttachment
-          reference: normalizedRefs,
+          reference: mergedRefs,
           difficulty: q.difficulty || "MEDIUM",
           marks: defaultMarks,
           source: sourceName,
