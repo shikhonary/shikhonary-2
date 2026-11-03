@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
@@ -20,6 +20,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import {
   Select,
   SelectContent,
@@ -45,6 +46,24 @@ const editCsFormSchema = z.object({
   classId: z.string().min(1, "শ্রেণি নির্বাচন করা আবশ্যক"),
   subjectId: z.string().min(1, "বিষয় নির্বাচন করা আবশ্যক"),
   chapterId: z.string().min(1, "অধ্যায় নির্বাচন করা আবশ্যক"),
+  context: z.string().optional(),
+  contextCaption: z.string().optional(),
+  contextBottomContent: z.string().optional(),
+  mediaAttachments: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        type: z.string(),
+        caption: z.string().nullable().optional(),
+        content: z.string().nullable().optional(),
+        url: z.string().nullable().optional(),
+        table: z.any().nullable().optional(),
+        bottomContent: z.string().nullable().optional(),
+        tableBorder: z.boolean().nullable().optional(),
+        position: z.number().optional(),
+      })
+    )
+    .optional(),
   questionA: z.string().min(1, "ক প্রশ্ন লেখা আবশ্যক"),
   questionB: z.string().min(1, "খ প্রশ্ন লেখা আবশ্যক"),
   referenceText: z.string().optional(),
@@ -88,10 +107,40 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
     if (!cs) return undefined
     const refText = Array.isArray(cs.reference) ? cs.reference.join(", ") : ""
 
+    const passageAttachment = (cs.attachments || []).find(
+      (a: any) =>
+        (a.type === "PASSAGE" || a.type === "text") &&
+        Boolean(a.content && a.content.trim())
+    ) || (cs.attachments || []).find(
+      (a: any) => a.type === "PASSAGE" || a.type === "text"
+    )
+
+    const initialContext = passageAttachment?.content?.trim() || ""
+    const initialContextCaption = passageAttachment?.caption?.trim() || ""
+    const initialContextBottomContent = passageAttachment?.bottomContent?.trim() || ""
+
+    const mediaAttachments = ((cs.attachments || []) as any[])
+      .filter((a: any) => a.id !== passageAttachment?.id && a.type !== "PASSAGE" && a.type !== "text")
+      .map((a: any) => ({
+        id: a.id,
+        type: a.type || "image",
+        caption: a.caption || "",
+        content: a.content || "",
+        url: a.url || "",
+        table: a.table || null,
+        bottomContent: a.bottomContent || "",
+        tableBorder: Boolean(a.tableBorder),
+        position: a.position ?? 0,
+      }))
+
     return {
       classId: initialClassId,
       subjectId: cs.subjectId || "",
       chapterId: cs.chapterId || "",
+      context: initialContext,
+      contextCaption: initialContextCaption,
+      contextBottomContent: initialContextBottomContent,
+      mediaAttachments,
       questionA: cs.questionA || "",
       questionB: cs.questionB || "",
       referenceText: refText,
@@ -115,6 +164,10 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
       classId: "",
       subjectId: "",
       chapterId: "",
+      context: "",
+      contextCaption: "",
+      contextBottomContent: "",
+      mediaAttachments: [],
       questionA: "",
       questionB: "",
       referenceText: "",
@@ -128,6 +181,16 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
       keepDirtyValues: true,
     },
   })
+
+  const { fields: mediaFields } = useFieldArray({
+    control,
+    name: "mediaAttachments",
+  })
+
+  const watchContext = watch("context")
+  const watchContextCaption = watch("contextCaption")
+  const watchContextBottomContent = watch("contextBottomContent")
+  const watchMediaAttachments = watch("mediaAttachments")
 
   const selectedClassId = watch("classId")
   const activeClassId = selectedClassId || initialClassId
@@ -203,10 +266,46 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
             .filter((r) => r.length > 0)
         : []
 
+      const compiledAttachments: any[] = []
+
+      // 1. Passage / Stimulus attachment (if context or captions are provided)
+      const hasPassageData = Boolean(
+        data.context?.trim() || data.contextCaption?.trim() || data.contextBottomContent?.trim()
+      )
+      if (hasPassageData) {
+        compiledAttachments.push({
+          type: "PASSAGE",
+          content: data.context?.trim() || null,
+          caption: data.contextCaption?.trim() || null,
+          bottomContent: data.contextBottomContent?.trim() || null,
+          position: 0,
+        })
+      }
+
+      // 2. Media attachments (images, tables, etc.) with their edited captions
+      if (Array.isArray(data.mediaAttachments)) {
+        for (const mAtt of data.mediaAttachments) {
+          compiledAttachments.push({
+            type: mAtt.type || "image",
+            url: mAtt.url || null,
+            table: mAtt.table || null,
+            tableBorder: mAtt.tableBorder ?? false,
+            caption: mAtt.caption?.trim() || null,
+            content: mAtt.content?.trim() || null,
+            bottomContent: mAtt.bottomContent?.trim() || null,
+            position: compiledAttachments.length,
+          })
+        }
+      }
+
       await updateMutation.mutateAsync({
         id: targetId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
+        context: data.context?.trim() || null,
+        contextCaption: data.contextCaption?.trim() || null,
+        contextBottomContent: data.contextBottomContent?.trim() || null,
+        attachments: compiledAttachments,
         questionA: data.questionA.trim(),
         questionB: data.questionB.trim(),
         difficulty: data.difficulty,
@@ -427,6 +526,169 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
                 )}
               </div>
             </div>
+
+            {/* Stimulus Passage & Question Attachment */}
+            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রশ্নপত্রের মূল উদ্দীপক, শীর্ষ ক্যাপশন ও নিচের পাদটীকা/উৎস
+                </p>
+              </div>
+
+              {/* Top Caption Input */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  শীর্ষক / ক্যাপশন (Attachment Caption - ঐচ্ছিক)
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="যেমন: উদ্দীপক-১, নিচের অনুচ্ছেদটি পড়ে প্রশ্নের উত্তর দাও..."
+                  {...register("contextCaption")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+
+              {/* Main Stimulus Passage Textarea */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  উদ্দীপকের মূল বিবরণ (Passage Content)
+                </Label>
+                <Textarea
+                  disabled={isSubmitting}
+                  rows={4}
+                  placeholder="সৃজনশীল প্রশ্নের উদ্দীপক বা দৃশ্যপট এখানে লিখুন..."
+                  {...register("context")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
+                />
+              </div>
+
+              {/* Bottom Caption / Source Content Input */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  নিচের ক্যাপশন / উৎস (Bottom Caption Content - ঐচ্ছিক)
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="যেমন: — হজরত সুলায়মান (আ.), উৎস: প্রথম আলো, পাঠ্যবই পৃষ্ঠা ২০..."
+                  {...register("contextBottomContent")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+
+              {/* Live Preview of the Stimulus Passage */}
+              {((watchContext && watchContext.trim()) ||
+                (watchContextCaption && watchContextCaption.trim()) ||
+                (watchContextBottomContent && watchContextBottomContent.trim())) && (
+                <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-4 text-xs space-y-2">
+                  <span className="font-semibold text-muted-foreground block text-[11px] uppercase tracking-wider">
+                    উদ্দীপক প্রিভিউ:
+                  </span>
+                  {watchContextCaption && watchContextCaption.trim() && (
+                    <div className="font-bold text-sm text-foreground font-headline">
+                      <RenderMath text={watchContextCaption.trim()} isMath={true} />
+                    </div>
+                  )}
+                  {watchContext && watchContext.trim() && (
+                    <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed text-sm">
+                      <RenderMath text={watchContext.trim()} isMath={true} />
+                    </div>
+                  )}
+                  {watchContextBottomContent && watchContextBottomContent.trim() && (
+                    <div className="text-muted-foreground font-body italic text-xs pt-1 border-t border-slate-200/50 dark:border-white/[0.05]">
+                      <RenderMath text={watchContextBottomContent.trim()} isMath={true} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Other Media Attachments (Images, Tables, Diagrams, etc.) */}
+            {mediaFields.length > 0 && (
+              <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+                <div>
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                    সংযুক্ত উপাদান (Media Attachments - ছবি, ছক ইত্যাদি)
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                    প্রশ্নে সংযুক্ত ছবি বা ছকের ক্যাপশন এবং নিচের বিবরণ হালনাগাদ করুন
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  {mediaFields.map((field, idx) => {
+                    const currentAtt = watchMediaAttachments?.[idx] || field
+                    return (
+                      <div
+                        key={field.id}
+                        className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5 space-y-3"
+                      >
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-white/[0.06]">
+                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary font-headline">
+                            সংযুক্তি #{idx + 1} ({field.type.toUpperCase()})
+                          </span>
+                        </div>
+
+                        {/* Thumbnail / Preview if Image */}
+                        {field.url && (
+                          <div className="py-2">
+                            <img
+                              src={field.url}
+                              alt={currentAtt.caption || "Attachment Preview"}
+                              className="max-h-36 rounded-xl border border-slate-200 dark:border-white/[0.08] object-contain bg-white dark:bg-black/20 p-1"
+                            />
+                          </div>
+                        )}
+
+                        {/* Top Caption Input */}
+                        <div className="space-y-1">
+                          <Label className="block text-[11px] font-semibold text-muted-foreground">
+                            ক্যাপশন (Top Caption)
+                          </Label>
+                          <Input
+                            disabled={isSubmitting}
+                            placeholder="ছবির বা ছকের শিরোনাম/ক্যাপশন লিখুন..."
+                            {...register(`mediaAttachments.${idx}.caption`)}
+                            className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+                          />
+                        </div>
+
+                        {/* Bottom Caption Content Input */}
+                        <div className="space-y-1">
+                          <Label className="block text-[11px] font-semibold text-muted-foreground">
+                            নিচের ক্যাপশন / বিবরণ (Bottom Caption Content)
+                          </Label>
+                          <Input
+                            disabled={isSubmitting}
+                            placeholder="নিচের বিবরণ বা উৎস লিখুন..."
+                            {...register(`mediaAttachments.${idx}.bottomContent`)}
+                            className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+                          />
+                        </div>
+
+                        {/* Real-time Math Preview for this attachment */}
+                        {(currentAtt.caption?.trim() || currentAtt.bottomContent?.trim()) && (
+                          <div className="rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.02] p-3 text-xs space-y-1">
+                            {currentAtt.caption?.trim() && (
+                              <div className="font-semibold text-foreground">
+                                <RenderMath text={currentAtt.caption.trim()} isMath={true} />
+                              </div>
+                            )}
+                            {currentAtt.bottomContent?.trim() && (
+                              <div className="text-muted-foreground italic">
+                                <RenderMath text={currentAtt.bottomContent.trim()} isMath={true} />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Sub-Questions A & B Stems */}
             <div className="space-y-5 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">

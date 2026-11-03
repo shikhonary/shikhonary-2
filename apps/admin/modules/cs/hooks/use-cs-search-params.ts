@@ -14,6 +14,8 @@ export const csSearchParamsParsers = {
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
   board: parseAsString.withDefault("All"),
+  isActive: parseAsString.withDefault("All"),
+  hasReport: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<CsSortOption>(Array.from(csSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

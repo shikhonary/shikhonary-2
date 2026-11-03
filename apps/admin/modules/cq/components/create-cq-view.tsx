@@ -28,6 +28,7 @@ import {
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { CQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import { PageHeader } from "@/components/shared/page-header"
 import {
   Plus,
@@ -116,6 +117,7 @@ export function CreateCqView() {
   })
 
   const selectedClassId = watch("classId")
+  const watchContext = watch("context")
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedClassId ? { academicClassId: selectedClassId } : undefined
   )
@@ -360,9 +362,14 @@ export function CreateCqView() {
 
             {/* Stimulus Passage Text */}
             <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
-              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
+                </Label>
+                <span className="text-[11px] text-muted-foreground">
+                  প্রশ্নপত্রের মূল উদ্দীপক বা দৃশ্যপট (ঐচ্ছিক)
+                </span>
+              </div>
               <Textarea
                 disabled={isSubmitting}
                 rows={4}
@@ -370,6 +377,16 @@ export function CreateCqView() {
                 {...register("context")}
                 className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
               />
+              {watchContext && watchContext.trim() && (
+                <div className="mt-2 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-3.5 text-xs">
+                  <span className="font-semibold text-muted-foreground block mb-1">
+                    উদ্দীপক প্রিভিউ:
+                  </span>
+                  <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed">
+                    <RenderMath text={watchContext} isMath={true} />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Sub-Questions A, B, C, D Stems */}

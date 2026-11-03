@@ -19,6 +19,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import {
   Select,
   SelectContent,
@@ -44,6 +45,9 @@ const createCsFormSchema = z.object({
   classId: z.string().min(1, "শ্রেণি নির্বাচন করা আবশ্যক"),
   subjectId: z.string().min(1, "বিষয় নির্বাচন করা আবশ্যক"),
   chapterId: z.string().min(1, "অধ্যায় নির্বাচন করা আবশ্যক"),
+  context: z.string().optional(),
+  contextCaption: z.string().optional(),
+  contextBottomContent: z.string().optional(),
   questionA: z.string().min(1, "ক প্রশ্ন লেখা আবশ্যক"),
   questionB: z.string().min(1, "খ প্রশ্ন লেখা আবশ্যক"),
   referenceText: z.string().optional(),
@@ -77,6 +81,9 @@ export function CreateCsView() {
       classId: "",
       subjectId: "",
       chapterId: "",
+      context: "",
+      contextCaption: "",
+      contextBottomContent: "",
       questionA: "",
       questionB: "",
       referenceText: "",
@@ -86,6 +93,10 @@ export function CreateCsView() {
       isActive: true,
     },
   })
+
+  const watchContext = watch("context")
+  const watchContextCaption = watch("contextCaption")
+  const watchContextBottomContent = watch("contextBottomContent")
 
   const selectedClassId = watch("classId")
   const { data: subjects = [] } = useSubjectsForSelection(
@@ -109,9 +120,27 @@ export function CreateCsView() {
             .filter((r) => r.length > 0)
         : []
 
+      const compiledAttachments: any[] = []
+      const hasPassageData = Boolean(
+        data.context?.trim() || data.contextCaption?.trim() || data.contextBottomContent?.trim()
+      )
+      if (hasPassageData) {
+        compiledAttachments.push({
+          type: "PASSAGE",
+          content: data.context?.trim() || null,
+          caption: data.contextCaption?.trim() || null,
+          bottomContent: data.contextBottomContent?.trim() || null,
+          position: 0,
+        })
+      }
+
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
         chapterId: data.chapterId,
+        context: data.context?.trim() || null,
+        contextCaption: data.contextCaption?.trim() || null,
+        contextBottomContent: data.contextBottomContent?.trim() || null,
+        attachments: compiledAttachments,
         questionA: data.questionA.trim(),
         questionB: data.questionB.trim(),
         difficulty: data.difficulty,
@@ -302,6 +331,84 @@ export function CreateCsView() {
                   <p className="text-xs text-rose-500 font-medium">{errors.chapterId.message}</p>
                 )}
               </div>
+            </div>
+
+            {/* Stimulus Passage & Question Attachment */}
+            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রশ্নপত্রের মূল উদ্দীপক, শীর্ষ ক্যাপশন ও নিচের পাদটীকা/উৎস
+                </p>
+              </div>
+
+              {/* Top Caption Input */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  শীর্ষক / ক্যাপশন (Attachment Caption - ঐচ্ছিক)
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="যেমন: উদ্দীপক-১, নিচের অনুচ্ছেদটি পড়ে প্রশ্নের উত্তর দাও..."
+                  {...register("contextCaption")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+
+              {/* Main Stimulus Passage Textarea */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  উদ্দীপকের মূল বিবরণ (Passage Content)
+                </Label>
+                <Textarea
+                  disabled={isSubmitting}
+                  rows={4}
+                  placeholder="সৃজনশীল প্রশ্নের উদ্দীপক বা দৃশ্যপট এখানে লিখুন..."
+                  {...register("context")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
+                />
+              </div>
+
+              {/* Bottom Caption / Source Content Input */}
+              <div className="space-y-1.5">
+                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
+                  নিচের ক্যাপশন / উৎস (Bottom Caption Content - ঐচ্ছিক)
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="যেমন: — হজরত সুলায়মান (আ.), উৎস: প্রথম আলো, পাঠ্যবই পৃষ্ঠা ২০..."
+                  {...register("contextBottomContent")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
+                />
+              </div>
+
+              {/* Live Preview of the Stimulus Passage */}
+              {((watchContext && watchContext.trim()) ||
+                (watchContextCaption && watchContextCaption.trim()) ||
+                (watchContextBottomContent && watchContextBottomContent.trim())) && (
+                <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-4 text-xs space-y-2">
+                  <span className="font-semibold text-muted-foreground block text-[11px] uppercase tracking-wider">
+                    উদ্দীপক প্রিভিউ:
+                  </span>
+                  {watchContextCaption && watchContextCaption.trim() && (
+                    <div className="font-bold text-sm text-foreground font-headline">
+                      <RenderMath text={watchContextCaption.trim()} isMath={true} />
+                    </div>
+                  )}
+                  {watchContext && watchContext.trim() && (
+                    <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed text-sm">
+                      <RenderMath text={watchContext.trim()} isMath={true} />
+                    </div>
+                  )}
+                  {watchContextBottomContent && watchContextBottomContent.trim() && (
+                    <div className="text-muted-foreground font-body italic text-xs pt-1 border-t border-slate-200/50 dark:border-white/[0.05]">
+                      <RenderMath text={watchContextBottomContent.trim()} isMath={true} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Sub-Questions A & B Stems */}

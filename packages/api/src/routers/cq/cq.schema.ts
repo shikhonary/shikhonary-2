@@ -37,6 +37,8 @@ export const createCqSchema = z.object({
   questionC: z.string().optional().nullable(),
   questionD: z.string().optional().nullable(),
   context: z.string().optional().nullable(),
+  contextCaption: z.string().optional().nullable(),
+  contextBottomContent: z.string().optional().nullable(),
   reference: z.array(z.string()).optional().default([]),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   year: z.number().int().optional().nullable(),

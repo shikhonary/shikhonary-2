@@ -218,14 +218,21 @@ export async function getCqById(db: PrismaClient, input: GetCqInput) {
 }
 
 export async function createCq(db: PrismaClient, input: CreateCqInput) {
-  const { attachments, answer, ...data } = input
+  const { attachments, answer, context, contextCaption, contextBottomContent, ...data } = input
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (data.context && data.context.trim() && allAttachments.length === 0) {
-    allAttachments.push({
-      url: "text-context",
-      type: "text",
-      caption: data.context.trim(),
-      position: 99,
+  const contextText = context?.trim() || null
+  const captionText = contextCaption?.trim() || null
+  const bottomText = contextBottomContent?.trim() || null
+  const hasPassage = allAttachments.some(
+    (a) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+  )
+  if ((contextText || captionText || bottomText) && !hasPassage) {
+    allAttachments.unshift({
+      type: "PASSAGE",
+      content: contextText,
+      caption: captionText,
+      bottomContent: bottomText,
+      position: 0,
     })
   }
 
@@ -286,7 +293,7 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
       questionB: data.questionB,
       questionC: data.questionC || null,
       questionD: data.questionD || null,
-      context: data.context || null,
+      context: null, // Actual context is stored in QuestionAttachment
       reference: refList,
       source: resolvedSource,
       session: resolvedSession,
@@ -357,19 +364,56 @@ export async function createCq(db: PrismaClient, input: CreateCqInput) {
 }
 
 export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
-  const { id, attachments, answer, ...data } = input
-  
-  // Verify existence
-  await getCqById(db, { id })
+  const { id, attachments, answer, context, contextCaption, contextBottomContent, ...data } = input
 
-  const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (data.context && data.context.trim() && allAttachments.length === 0) {
-    allAttachments.push({
-      url: "text-context",
-      type: "text",
-      caption: data.context.trim(),
-      position: 99,
-    })
+  // Verify existence and load existing attachments
+  const existingCq = await getCqById(db, { id })
+
+  // Synchronize context and captions with QuestionAttachment when attachments is not explicitly provided
+  if (attachments === undefined && (context !== undefined || contextCaption !== undefined || contextBottomContent !== undefined)) {
+    const textAtt = existingCq.attachments?.find(
+      (a) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+    ) || existingCq.attachments?.find(
+      (a) => a.type === "PASSAGE" || (a.type === "text" && !a.url) || a.url === "text-context"
+    )
+
+    const trimmedContext = context !== undefined ? (context?.trim() || null) : (textAtt?.content || null)
+    const trimmedCaption = contextCaption !== undefined ? (contextCaption?.trim() || null) : (textAtt?.caption || null)
+    const trimmedBottom = contextBottomContent !== undefined ? (contextBottomContent?.trim() || null) : (textAtt?.bottomContent || null)
+
+    if (trimmedContext || trimmedCaption || trimmedBottom) {
+      if (textAtt) {
+        await db.questionAttachment.update({
+          where: { id: textAtt.id },
+          data: {
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            type: "PASSAGE",
+            url: null,
+          },
+        })
+      } else {
+        await db.questionAttachment.create({
+          data: {
+            cqId: id,
+            type: "PASSAGE",
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            url: null,
+            position: 0,
+          },
+        })
+      }
+    } else {
+      // Context and captions were cleared by the user
+      if (textAtt) {
+        await db.questionAttachment.delete({
+          where: { id: textAtt.id },
+        })
+      }
+    }
   }
 
   let resolvedQuestionTypeId = data.questionTypeId
@@ -406,59 +450,67 @@ export async function updateCq(db: PrismaClient, input: UpdateCqInput) {
     ? (Array.isArray(data.reference) ? data.reference : [])
     : undefined
 
+  const updateData: any = {
+    subjectId: data.subjectId,
+    chapterId: data.chapterId,
+    questionA: data.questionA,
+    questionB: data.questionB,
+    questionC: data.questionC !== undefined ? (data.questionC || null) : undefined,
+    questionD: data.questionD !== undefined ? (data.questionD || null) : undefined,
+    context: null, // As question attachment is the actual context, do not put it in context value
+    reference: resolvedReference,
+    source: data.source !== undefined ? (data.source?.trim() || null) : undefined,
+    session: data.session !== undefined
+      ? (data.session?.trim() || null)
+      : (data.year !== undefined ? String(data.year) : undefined),
+    difficulty: data.difficulty,
+    marks: marksDistribution !== undefined ? marksDistribution : undefined,
+    questionTypeId: resolvedQuestionTypeId || undefined,
+    isActive: data.isActive,
+    answer: answer
+      ? {
+          upsert: {
+            create: {
+              answerA: answer.answerA || null,
+              answerB: answer.answerB || null,
+              answerC: answer.answerC || null,
+              answerD: answer.answerD || null,
+              explanation: answer.explanation || null,
+            },
+            update: {
+              answerA: answer.answerA !== undefined ? answer.answerA : undefined,
+              answerB: answer.answerB !== undefined ? answer.answerB : undefined,
+              answerC: answer.answerC !== undefined ? answer.answerC : undefined,
+              answerD: answer.answerD !== undefined ? answer.answerD : undefined,
+              explanation: answer.explanation !== undefined ? answer.explanation : undefined,
+            },
+          },
+        }
+      : undefined,
+  }
+
+  if (attachments !== undefined) {
+    const allAttachments = Array.isArray(attachments) ? [...attachments] : []
+    updateData.attachments = allAttachments.length > 0
+      ? {
+          deleteMany: {},
+          create: allAttachments.map((att, idx) => ({
+            type: att.type ?? "image",
+            caption: att.caption ?? null,
+            content: att.content ?? null,
+            url: att.url ?? null,
+            table: att.table ?? undefined,
+            bottomContent: att.bottomContent ?? null,
+            tableBorder: att.tableBorder ?? false,
+            position: att.position !== undefined && att.position !== null ? att.position : idx,
+          })),
+        }
+      : { deleteMany: {} }
+  }
+
   return db.cq.update({
     where: { id },
-    data: {
-      subjectId: data.subjectId,
-      chapterId: data.chapterId,
-      questionA: data.questionA,
-      questionB: data.questionB,
-      questionC: data.questionC !== undefined ? (data.questionC || null) : undefined,
-      questionD: data.questionD !== undefined ? (data.questionD || null) : undefined,
-      context: data.context !== undefined ? (data.context || null) : undefined,
-      reference: resolvedReference,
-      source: data.source !== undefined ? (data.source?.trim() || null) : undefined,
-      session: data.session !== undefined
-        ? (data.session?.trim() || null)
-        : (data.year !== undefined ? String(data.year) : undefined),
-      difficulty: data.difficulty,
-      marks: marksDistribution !== undefined ? marksDistribution : undefined,
-      questionTypeId: resolvedQuestionTypeId || undefined,
-      isActive: data.isActive,
-      answer: answer
-        ? {
-            upsert: {
-              create: {
-                answerA: answer.answerA || null,
-                answerB: answer.answerB || null,
-                answerC: answer.answerC || null,
-                answerD: answer.answerD || null,
-                explanation: answer.explanation || null,
-              },
-              update: {
-                answerA: answer.answerA !== undefined ? answer.answerA : undefined,
-                answerB: answer.answerB !== undefined ? answer.answerB : undefined,
-                answerC: answer.answerC !== undefined ? answer.answerC : undefined,
-                answerD: answer.answerD !== undefined ? answer.answerD : undefined,
-                explanation: answer.explanation !== undefined ? answer.explanation : undefined,
-              },
-            },
-          }
-        : undefined,
-      attachments: allAttachments.length > 0 ? {
-        deleteMany: {},
-        create: allAttachments.map((att, idx) => ({
-          type: att.type ?? "image",
-          caption: att.caption ?? null,
-          content: att.content ?? null,
-          url: att.url ?? null,
-          table: att.table ?? undefined,
-          bottomContent: att.bottomContent ?? null,
-          tableBorder: att.tableBorder ?? false,
-          position: att.position !== undefined && att.position !== null ? att.position : idx,
-        })),
-      } : { deleteMany: {} },
-    } as any,
+    data: updateData,
     include: {
       answer: true,
       attachments: {

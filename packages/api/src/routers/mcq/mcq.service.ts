@@ -218,14 +218,21 @@ export async function getMcqById(db: PrismaClient, input: GetMcqInput) {
 }
 
 export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
-  const { attachments, context, ...data } = input
+  const { attachments, context, contextCaption, contextBottomContent, ...data } = input
   const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (context && context.trim() && allAttachments.length === 0) {
-    allAttachments.push({
-      url: "text-context",
-      type: "text",
-      caption: context.trim(),
-      position: 99,
+  const contextText = context?.trim() || null
+  const captionText = contextCaption?.trim() || null
+  const bottomText = contextBottomContent?.trim() || null
+  const hasPassage = allAttachments.some(
+    (a) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+  )
+  if ((contextText || captionText || bottomText) && !hasPassage) {
+    allAttachments.unshift({
+      type: "PASSAGE",
+      content: contextText,
+      caption: captionText,
+      bottomContent: bottomText,
+      position: 0,
     })
   }
 
@@ -306,23 +313,60 @@ export async function createMcq(db: PrismaClient, input: CreateMcqInput) {
 }
 
 export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
-  const { id, attachments, context, ...data } = input
-  
-  // Verify existence
-  await getMcqById(db, { id })
+  const { id, attachments, context, contextCaption, contextBottomContent, ...data } = input
 
-  const allAttachments = Array.isArray(attachments) ? [...attachments] : []
-  if (context && context.trim() && allAttachments.length === 0) {
-    allAttachments.push({
-      url: "text-context",
-      type: "text",
-      caption: context.trim(),
-      position: 99,
-    })
+  // Verify existence and load existing attachments
+  const existingMcq = await getMcqById(db, { id })
+
+  // Synchronize context and captions with QuestionAttachment when attachments is not explicitly provided
+  if (attachments === undefined && (context !== undefined || contextCaption !== undefined || contextBottomContent !== undefined)) {
+    const textAtt = existingMcq.attachments?.find(
+      (a) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+    ) || existingMcq.attachments?.find(
+      (a) => a.type === "PASSAGE" || (a.type === "text" && !a.url) || a.url === "text-context"
+    )
+
+    const trimmedContext = context !== undefined ? (context?.trim() || null) : (textAtt?.content || null)
+    const trimmedCaption = contextCaption !== undefined ? (contextCaption?.trim() || null) : (textAtt?.caption || null)
+    const trimmedBottom = contextBottomContent !== undefined ? (contextBottomContent?.trim() || null) : (textAtt?.bottomContent || null)
+
+    if (trimmedContext || trimmedCaption || trimmedBottom) {
+      if (textAtt) {
+        await db.questionAttachment.update({
+          where: { id: textAtt.id },
+          data: {
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            type: "PASSAGE",
+            url: null,
+          },
+        })
+      } else {
+        await db.questionAttachment.create({
+          data: {
+            mcqId: id,
+            type: "PASSAGE",
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            url: null,
+            position: 0,
+          },
+        })
+      }
+    } else {
+      // Context and captions were cleared by the user
+      if (textAtt) {
+        await db.questionAttachment.delete({
+          where: { id: textAtt.id },
+        })
+      }
+    }
   }
 
   let resolvedQuestionTypeId = data.questionTypeId
-  if (!resolvedQuestionTypeId) {
+  if (!resolvedQuestionTypeId && data.subjectId) {
     const qt = await db.questionType.findFirst({
       where: {
         OR: [
@@ -374,7 +418,11 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
     difficulty: data.difficulty,
     questionTypeId: resolvedQuestionTypeId || undefined,
     isActive: data.isActive,
-    attachments: allAttachments ? {
+  }
+
+  if (attachments !== undefined) {
+    const allAttachments = Array.isArray(attachments) ? [...attachments] : []
+    updateData.attachments = {
       deleteMany: {},
       create: allAttachments.map((att, idx) => ({
         type: att.type ?? "image",
@@ -386,7 +434,7 @@ export async function updateMcq(db: PrismaClient, input: UpdateMcqInput) {
         tableBorder: att.tableBorder ?? false,
         position: att.position !== undefined && att.position !== null ? att.position : idx,
       })),
-    } : undefined,
+    }
   }
 
   if (data.source !== undefined) {

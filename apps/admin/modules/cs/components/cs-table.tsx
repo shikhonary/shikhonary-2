@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments"
 import {
   DataTablePagination,
   QuestionCardHeader,
@@ -16,6 +17,7 @@ import {
   Trash2,
   FileQuestion,
   BookOpen,
+  AlertTriangle,
 } from "lucide-react"
 
 export interface CsItem {
@@ -27,8 +29,11 @@ export interface CsItem {
   source?: string | null
   session?: string | null
   isActive: boolean
+  hasReport?: boolean
+  reports?: any[]
   createdAt: Date | string
   updatedAt: Date | string
+  attachments?: any[]
   subject: {
     id: string
     nameEn: string
@@ -234,7 +239,37 @@ export function CsTable({
                         academicClassName={className}
                         subjectName={item.subject.nameBn || item.subject.nameEn}
                         chapterName={item.chapter?.nameBn || item.chapter?.nameEn}
-                      />
+                      >
+                        {!item.isActive && (
+                          <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold border border-amber-200/60 dark:border-amber-800/40 font-body">
+                            ইনঅ্যাক্টিভ
+                          </span>
+                        )}
+
+                        {item.hasReport && (
+                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body">
+                            <AlertTriangle className="w-3 h-3 text-rose-500" />
+                            <span>রিপোর্ট ({toBengaliDigits(item.reports?.length || 1)})</span>
+                          </span>
+                        )}
+                      </QuestionCardHeader>
+
+                      {/* Attachments Section (Stimulus passage, media, etc.) */}
+                      {(() => {
+                        const attachmentsList = Array.isArray(item.attachments) ? item.attachments : []
+                        const hasRealAttachments = attachmentsList.some(
+                          (att) => (att.url && att.url !== "text-context") || att.type === "image" || att.type === "table" || Boolean(att.content)
+                        )
+                        const filteredAttachments = hasRealAttachments
+                          ? attachmentsList.filter((att) => att.url !== "text-context")
+                          : attachmentsList
+
+                        return filteredAttachments.length > 0 ? (
+                          <div className="space-y-1.5 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5">
+                            <QuestionAttachments attachments={filteredAttachments} isMath={true} />
+                          </div>
+                        ) : null
+                      })()}
 
                       {/* Sub-Questions A & B (Direct presentation with indicator badges) */}
                       <div className="space-y-2.5 pl-3 sm:pl-4 border-l-2 border-indigo-500 py-1 bg-slate-50/60 dark:bg-white/[0.02] rounded-r-xl p-3 sm:p-4">

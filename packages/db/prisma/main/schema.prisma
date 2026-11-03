@@ -1126,12 +1126,14 @@ model QuestionAttachment {
   shortAnswerId         String?
   descriptiveQuestionId String?
   shortQuestionId       String?
+  csId                  String?
 
   mcq                 Mcq?                 @relation(fields: [mcqId], references: [id], onDelete: Cascade)
   cq                  Cq?                  @relation(fields: [cqId], references: [id], onDelete: Cascade)
   shortAnswer         ShortAnswer?         @relation(fields: [shortAnswerId], references: [id], onDelete: Cascade)
   descriptiveQuestion DescriptiveQuestion? @relation(fields: [descriptiveQuestionId], references: [id], onDelete: Cascade)
   shortQuestion       ShortQuestion?       @relation(fields: [shortQuestionId], references: [id], onDelete: Cascade)
+  cs                  CS?                  @relation(fields: [csId], references: [id], onDelete: Cascade)
 
   type          String
   caption       String?
@@ -1150,6 +1152,7 @@ model QuestionAttachment {
   @@index([shortAnswerId])
   @@index([descriptiveQuestionId])
   @@index([shortQuestionId])
+  @@index([csId])
   @@map("question_attachment")
 }
 
@@ -1526,6 +1529,9 @@ model CS {
   // ──────────────────────────────────────────────────────────
 
   isActive Boolean @default(true)
+
+  // ── Child Relations ──
+  attachments QuestionAttachment[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

@@ -28,7 +28,9 @@ import {
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { MCQ_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { RenderMath } from "@workspace/ui/components/render-math"
 import { PageHeader } from "@/components/shared/page-header"
+import { QuestionAttachmentUploader, type AttachmentItem } from "@/components/shared"
 import {
   HelpCircle,
   ArrowLeft,
@@ -57,6 +59,7 @@ const createMcqFormSchema = z.object({
   referenceText: z.string().optional(),
   explanation: z.string().optional(),
   questionUrl: z.string().optional(),
+  context: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   year: z.string().optional(),
   source: z.string().optional(),
@@ -105,6 +108,7 @@ export function CreateMcqView() {
       referenceText: "",
       explanation: "",
       questionUrl: "",
+      context: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       year: "",
       source: DEFAULT_SOURCE,
@@ -115,6 +119,8 @@ export function CreateMcqView() {
   })
 
   const selectedClassId = watch("classId")
+  const watchContext = watch("context")
+  const watchIsMath = watch("isMath")
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedClassId ? { academicClassId: selectedClassId } : undefined
   )
@@ -173,6 +179,7 @@ export function CreateMcqView() {
         reference: referenceArray,
         explanation: data.explanation?.trim() || null,
         questionUrl: data.questionUrl?.trim() || null,
+        context: data.context?.trim() || null,
         difficulty: data.difficulty,
         year: parsedYear,
         source: data.source?.trim() || DEFAULT_SOURCE,
@@ -373,6 +380,35 @@ export function CreateMcqView() {
                   <p className="text-xs text-rose-500 font-medium">{errors.chapterId.message}</p>
                 )}
               </div>
+            </div>
+
+            {/* Context / Stimulus Passage Text */}
+            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div className="flex items-center justify-between">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উদ্দীপক / অনুচ্ছেদ (Context / Stimulus)
+                </Label>
+                <span className="text-[11px] text-muted-foreground">
+                  অভিন্ন তথ্যভিত্তিক বা বহুপদী প্রশ্নের উদ্দীপক (ঐচ্ছিক)
+                </span>
+              </div>
+              <Textarea
+                disabled={isSubmitting}
+                rows={4}
+                placeholder="উদ্দীপক বা অনুচ্ছেদ লিখুন (যদি থাকে)..."
+                {...register("context")}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
+              />
+              {watchContext && watchContext.trim() && (
+                <div className="mt-2 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-3.5 text-xs">
+                  <span className="font-semibold text-muted-foreground block mb-1">
+                    উদ্দীপক প্রিভিউ:
+                  </span>
+                  <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed">
+                    <RenderMath text={watchContext} isMath={watchIsMath} />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Question Stem Text */}

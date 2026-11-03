@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
+import { categorizeReference, isIgnoredReference } from "@workspace/utils"
 import type {
   CreateCsInput,
   DeleteCsInput,
@@ -15,26 +16,64 @@ import type {
 export async function listCs(db: PrismaClient, input: ListCsInput) {
   const where: any = {}
 
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.chapterId = input.chapterId
-  if (input.difficulty) where.difficulty = input.difficulty
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
+  if (input.difficulty && input.difficulty !== "All") where.difficulty = input.difficulty
+  if (input.source && input.source !== "All") where.source = input.source
+  if (input.session && input.session !== "All") where.session = input.session
 
-  if (input.source && input.year !== undefined) {
-    const boardRef = [input.source, input.year].filter(Boolean).join("-")
-    where.OR = [
-      { AND: [{ source: input.source }, { session: String(input.year) }] },
-      { reference: { has: boardRef } },
-    ]
-  } else {
-    if (input.source) where.source = input.source
-    if (input.session) where.session = input.session
-    if (input.year !== undefined) {
-      where.reference = { has: String(input.year) }
+  if (input.isActive !== undefined && input.isActive !== "All") {
+    if (typeof input.isActive === "boolean") {
+      where.isActive = input.isActive
+    } else if (input.isActive === "true" || input.isActive === "ACTIVE") {
+      where.isActive = true
+    } else if (input.isActive === "false" || input.isActive === "INACTIVE") {
+      where.isActive = false
     }
   }
 
-  if (input.board && !input.source) {
-    where.reference = { has: input.board }
+  if (input.hasReport !== undefined && input.hasReport !== "All") {
+    const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
+    const reports = await (db as any).questionReport.findMany({
+      where: { entityType: "CS" },
+      select: { entityId: true },
+      distinct: ["entityId"],
+    })
+    const reportedIds = reports.map((r: any) => r.entityId)
+    if (isReported) {
+      where.id = { in: reportedIds }
+    } else {
+      where.id = { notIn: reportedIds }
+    }
+  }
+
+  if (input.board && input.board !== "All") {
+    if (input.board === "SCHOOL_ALL") {
+      const questionsWithRef = await (db as any).cS.findMany({
+        where: {
+          NOT: { reference: { equals: [] } },
+          ...(where.subjectId ? { subjectId: where.subjectId } : {}),
+          ...(where.chapterId ? { chapterId: where.chapterId } : {}),
+        },
+        select: { reference: true },
+      })
+      const schoolRefs = new Set<string>()
+      for (const q of questionsWithRef) {
+        for (const ref of q.reference || []) {
+          if (!ref || isIgnoredReference(ref)) continue
+          if (categorizeReference(ref) === "SCHOOL") {
+            schoolRefs.add(ref)
+          }
+        }
+      }
+      if (schoolRefs.size > 0) {
+        where.reference = { hasSome: Array.from(schoolRefs) }
+      } else {
+        where.id = "__NO_MATCHING_SCHOOL_CS__"
+      }
+    } else {
+      where.reference = { has: input.board }
+    }
   }
 
   if (input.query) {
@@ -44,6 +83,17 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
       { source: { contains: input.query, mode: "insensitive" } },
       { session: { contains: input.query, mode: "insensitive" } },
       { reference: { has: input.query } },
+      {
+        attachments: {
+          some: {
+            OR: [
+              { content: { contains: input.query, mode: "insensitive" } },
+              { caption: { contains: input.query, mode: "insensitive" } },
+              { bottomContent: { contains: input.query, mode: "insensitive" } },
+            ],
+          },
+        },
+      },
     ]
   }
 
@@ -106,13 +156,39 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
             mark: true,
           },
         },
+        attachments: {
+          orderBy: {
+            position: "asc",
+          },
+        },
       },
     }),
     (db as any).cS.count({ where }),
   ])
 
+  const itemIds = items.map((it: any) => it.id)
+  const itemReports =
+    itemIds.length > 0
+      ? await (db as any).questionReport.findMany({
+          where: { entityType: "CS", entityId: { in: itemIds } },
+          select: { entityId: true, status: true, reportType: true, description: true },
+        })
+      : []
+
+  const reportMap = new Map<string, typeof itemReports>()
+  for (const rep of itemReports) {
+    if (!reportMap.has(rep.entityId)) reportMap.set(rep.entityId, [])
+    reportMap.get(rep.entityId)!.push(rep)
+  }
+
+  const enhancedItems = items.map((item: any) => ({
+    ...item,
+    hasReport: reportMap.has(item.id),
+    reports: reportMap.get(item.id) || [],
+  }))
+
   return {
-    items,
+    items: enhancedItems,
     totalItems,
     totalPages: Math.ceil(totalItems / limit) || 1,
     page,
@@ -135,6 +211,11 @@ export async function getCsById(db: PrismaClient, input: GetCsInput) {
       },
       chapter: true,
       questionType: true,
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 
@@ -149,7 +230,27 @@ export async function getCsById(db: PrismaClient, input: GetCsInput) {
 }
 
 export async function createCs(db: PrismaClient, input: CreateCsInput) {
-  const { ...data } = input
+  const { attachments, context, contextCaption, contextBottomContent, ...data } = input
+
+  const allAttachments = Array.isArray(attachments) ? [...attachments] : []
+
+  // If top-level context or captions are provided, ensure they are stored in QuestionAttachment
+  const contextText = context?.trim() || null
+  const captionText = contextCaption?.trim() || null
+  const bottomText = contextBottomContent?.trim() || null
+
+  const hasPassage = allAttachments.some(
+    (a) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+  )
+  if ((contextText || captionText || bottomText) && !hasPassage) {
+    allAttachments.unshift({
+      type: "PASSAGE",
+      content: contextText,
+      caption: captionText,
+      bottomContent: bottomText,
+      position: 0,
+    })
+  }
 
   let resolvedQuestionTypeId = data.questionTypeId
   if (!resolvedQuestionTypeId) {
@@ -207,15 +308,83 @@ export async function createCs(db: PrismaClient, input: CreateCsInput) {
       session: data.session ?? null,
       questionTypeId: resolvedQuestionTypeId || undefined,
       isActive: data.isActive,
+      attachments: allAttachments.length > 0
+        ? {
+            create: allAttachments.map((att, idx) => ({
+              type: att.type ?? "image",
+              caption: att.caption ?? null,
+              content: att.content ?? null,
+              url: att.url ?? null,
+              table: att.table ?? undefined,
+              bottomContent: att.bottomContent ?? null,
+              tableBorder: att.tableBorder ?? false,
+              position: att.position !== undefined && att.position !== null ? att.position : idx,
+            })),
+          }
+        : undefined,
+    },
+    include: {
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
 
 export async function updateCs(db: PrismaClient, input: UpdateCsInput) {
-  const { id, ...data } = input
+  const { id, attachments, context, contextCaption, contextBottomContent, ...data } = input
 
-  // Verify existence
-  await getCsById(db, { id })
+  // Verify existence and load existing attachments
+  const existingCs = await getCsById(db, { id })
+
+  // Synchronize context and captions with QuestionAttachment when attachments is not explicitly provided
+  if (attachments === undefined && (context !== undefined || contextCaption !== undefined || contextBottomContent !== undefined)) {
+    const textAtt = existingCs.attachments?.find(
+      (a: any) => (a.type === "PASSAGE" || a.type === "text") && Boolean(a.content?.trim())
+    ) || existingCs.attachments?.find(
+      (a: any) => a.type === "PASSAGE" || (a.type === "text" && !a.url) || a.url === "text-context"
+    )
+
+    const trimmedContext = context !== undefined ? (context?.trim() || null) : (textAtt?.content || null)
+    const trimmedCaption = contextCaption !== undefined ? (contextCaption?.trim() || null) : (textAtt?.caption || null)
+    const trimmedBottom = contextBottomContent !== undefined ? (contextBottomContent?.trim() || null) : (textAtt?.bottomContent || null)
+
+    if (trimmedContext || trimmedCaption || trimmedBottom) {
+      if (textAtt) {
+        await (db as any).questionAttachment.update({
+          where: { id: textAtt.id },
+          data: {
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            type: "PASSAGE",
+            url: null,
+          },
+        })
+      } else {
+        await (db as any).questionAttachment.create({
+          data: {
+            csId: id,
+            type: "PASSAGE",
+            content: trimmedContext,
+            caption: trimmedCaption,
+            bottomContent: trimmedBottom,
+            url: null,
+            position: 0,
+          },
+        })
+      }
+    } else {
+      // Context and captions were cleared by the user
+      if (textAtt) {
+        await (db as any).questionAttachment.delete({
+          where: { id: textAtt.id },
+        })
+      }
+    }
+  }
 
   let resolvedQuestionTypeId = data.questionTypeId
   if (!resolvedQuestionTypeId && data.subjectId) {
@@ -243,19 +412,47 @@ export async function updateCs(db: PrismaClient, input: UpdateCsInput) {
     }
   }
 
+  const updateData: any = {
+    subjectId: data.subjectId,
+    chapterId: data.chapterId,
+    questionA: data.questionA,
+    questionB: data.questionB,
+    reference: data.reference,
+    difficulty: data.difficulty,
+    source: data.source !== undefined ? data.source : undefined,
+    session: data.session !== undefined ? data.session : undefined,
+    questionTypeId: resolvedQuestionTypeId || undefined,
+    isActive: data.isActive,
+  }
+
+  if (attachments !== undefined) {
+    const allAttachments = Array.isArray(attachments) ? [...attachments] : []
+    updateData.attachments = allAttachments.length > 0
+      ? {
+          deleteMany: {},
+          create: allAttachments.map((att, idx) => ({
+            type: att.type ?? "image",
+            caption: att.caption ?? null,
+            content: att.content ?? null,
+            url: att.url ?? null,
+            table: att.table ?? undefined,
+            bottomContent: att.bottomContent ?? null,
+            tableBorder: att.tableBorder ?? false,
+            position: att.position !== undefined && att.position !== null ? att.position : idx,
+          })),
+        }
+      : { deleteMany: {} }
+  }
+
   return (db as any).cS.update({
     where: { id },
-    data: {
-      subjectId: data.subjectId,
-      chapterId: data.chapterId,
-      questionA: data.questionA,
-      questionB: data.questionB,
-      reference: data.reference,
-      difficulty: data.difficulty,
-      source: data.source !== undefined ? data.source : undefined,
-      session: data.session !== undefined ? data.session : undefined,
-      questionTypeId: resolvedQuestionTypeId || undefined,
-      isActive: data.isActive,
+    data: updateData,
+    include: {
+      attachments: {
+        orderBy: {
+          position: "asc",
+        },
+      },
     },
   })
 }
@@ -398,16 +595,16 @@ export async function getCsStats(db: PrismaClient, input: CsStatsInput = {}) {
 
 export async function getBoardYears(
   db: PrismaClient,
-  input: { subjectId: string; chapterId?: string }
+  input: { subjectId?: string; chapterId?: string } = {}
 ) {
   const where: any = {
-    subjectId: input.subjectId,
     OR: [
       { NOT: { reference: { equals: [] } } },
       { AND: [{ source: { not: null } }, { session: { not: null } }] },
     ],
   }
-  if (input.chapterId) where.chapterId = input.chapterId
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.chapterId = input.chapterId
 
   const questions = await (db as any).cS.findMany({
     where,
@@ -418,25 +615,44 @@ export async function getBoardYears(
   for (const q of questions) {
     if (q.source && q.session) {
       const key = `${q.source}-${q.session}`
-      countMap.set(key, (countMap.get(key) || 0) + 1)
+      if (!isIgnoredReference(key)) {
+        countMap.set(key, (countMap.get(key) || 0) + 1)
+      }
     }
     for (const ref of q.reference || []) {
-      if (!ref) continue
+      if (!ref || isIgnoredReference(ref)) continue
       if (q.source && q.session && ref === `${q.source}-${q.session}`) continue
       countMap.set(ref, (countMap.get(ref) || 0) + 1)
     }
   }
 
-  return Array.from(countMap.entries()).map(([rawRef, count]) => {
-    const parts = rawRef.split("-")
-    const yearStr = parts[parts.length - 1]
-    const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
-    const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
-    return {
-      rawRef,
-      boardName,
-      year,
-      count,
-    }
-  })
+  const categoryOrder: Record<string, number> = {
+    BOARD: 1,
+    CADET: 2,
+    SCHOOL: 3,
+    TEST_EXAM: 4,
+    TEXTBOOK: 5,
+    OTHER: 6,
+  }
+
+  return Array.from(countMap.entries())
+    .map(([rawRef, count]) => {
+      const parts = rawRef.split("-")
+      const yearStr = parts[parts.length - 1]
+      const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+      const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+      const category = categorizeReference(rawRef)
+      return {
+        rawRef,
+        boardName,
+        year,
+        category,
+        count,
+      }
+    })
+    .sort((a, b) => {
+      const diff = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99)
+      if (diff !== 0) return diff
+      return b.count - a.count
+    })
 }

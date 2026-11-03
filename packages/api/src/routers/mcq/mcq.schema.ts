@@ -42,6 +42,8 @@ export const createMcqSchema = z.object({
   explanation: z.string().optional().nullable(),
   questionUrl: z.string().optional().nullable(),
   context: z.string().optional().nullable(),
+  contextCaption: z.string().optional().nullable(),
+  contextBottomContent: z.string().optional().nullable(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   year: z.number().int().optional().nullable(),
   source: z.string().optional().nullable(),

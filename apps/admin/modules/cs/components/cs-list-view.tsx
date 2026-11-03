@@ -32,6 +32,8 @@ export function CsListView() {
       subjectId: selectedSubjectId,
       chapterId: selectedChapterId,
       board: selectedBoard,
+      isActive: selectedIsActive,
+      hasReport: selectedHasReport,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -45,6 +47,8 @@ export function CsListView() {
       subjectId: "All",
       chapterId: "All",
       board: "All",
+      isActive: "All",
+      hasReport: "All",
       page: 1,
     })
   }
@@ -78,21 +82,6 @@ export function CsListView() {
     }
   }
 
-  // Parse board / source filters
-  let boardSource: string | undefined = undefined
-  let boardYear: number | undefined = undefined
-  if (selectedBoard && selectedBoard !== "All") {
-    const parts = selectedBoard.split("-")
-    const yearPart = parts[parts.length - 1]
-    const sourcePart = parts.slice(0, parts.length - 1).join("-")
-    if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
-      boardSource = sourcePart
-      boardYear = Number(yearPart)
-    } else {
-      boardSource = selectedBoard
-    }
-  }
-
   // Query CS list with search & filters
   const { data: csData, isLoading, isError } = useCsList({
     limit,
@@ -101,19 +90,16 @@ export function CsListView() {
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
-    source: boardSource,
-    year: boardYear,
+    isActive: selectedIsActive !== "All" ? selectedIsActive : undefined,
+    hasReport: selectedHasReport !== "All" ? selectedHasReport : undefined,
     sort: selectedSort,
   })
 
-  // Fetch Board + Year combinations for this subject / chapter if selected
-  const { data: boardYearsData } = useCsBoardYears(
-    {
-      subjectId: selectedSubjectId,
-      chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-    },
-    selectedSubjectId !== "All"
-  )
+  // Fetch Board + Reference combinations (scoped by subject / chapter if selected)
+  const { data: boardYearsData } = useCsBoardYears({
+    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
+    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+  })
   const boardYears = boardYearsData ?? []
 
   // Query CS stats
@@ -189,8 +175,24 @@ export function CsListView() {
         selectedBoard={selectedBoard}
         onBoardChange={(board) => setSearchParams({ board, page: 1 })}
         boardYears={boardYears}
+        selectedIsActive={selectedIsActive}
+        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
+        selectedHasReport={selectedHasReport}
+        onHasReportChange={(hasReport) => setSearchParams({ hasReport, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
+        onResetAll={() =>
+          setSearchParams({
+            subjectId: "All",
+            chapterId: "All",
+            board: "All",
+            isActive: "All",
+            hasReport: "All",
+            sort: "All",
+            query: "",
+            page: 1,
+          })
+        }
       />
 
       {/* Data Table / Question Cards */}

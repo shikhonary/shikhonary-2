@@ -32,11 +32,11 @@ export const csRouter = createTRPCRouter({
   boardYears: superAdminProcedure
     .input(
       z.object({
-        subjectId: z.string(),
+        subjectId: z.string().optional(),
         chapterId: z.string().optional(),
-      })
+      }).optional()
     )
-    .query(({ ctx, input }) => getBoardYears(ctx.db, input)),
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   stats: superAdminProcedure
     .input(csStatsSchema.optional())

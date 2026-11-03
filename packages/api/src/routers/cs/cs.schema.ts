@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { idSchema, paginationSchema } from "../../schemas/common"
+import { idSchema, paginationSchema, questionAttachmentSchema } from "../../schemas/common"
 import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listCsSchema = paginationSchema.extend({
@@ -8,6 +8,8 @@ export const listCsSchema = paginationSchema.extend({
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
+  isActive: z.union([z.boolean(), z.string()]).optional(),
+  hasReport: z.union([z.boolean(), z.string()]).optional(),
   year: z.number().optional(),
   board: z.string().optional(),
   sort: z.string().optional(),
@@ -32,12 +34,16 @@ export const createCsSchema = z.object({
   chapterId: z.string().min(1, "Chapter is required"),
   questionA: z.string().min(1, "Question A text is required"),
   questionB: z.string().min(1, "Question B text is required"),
+  context: z.string().optional().nullable(),
+  contextCaption: z.string().optional().nullable(),
+  contextBottomContent: z.string().optional().nullable(),
   reference: z.array(z.string()).optional().default([]),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY).default(QUESTION_DIFFICULTY.MEDIUM),
   source: z.string().optional().nullable(),
   session: z.string().optional().nullable(),
   questionTypeId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
+  attachments: z.array(questionAttachmentSchema).optional().default([]),
 })
 
 export type CreateCsInput = z.infer<typeof createCsSchema>
