@@ -4,7 +4,8 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 export const listAcademicSubjectsSchema = paginationSchema.extend({
   academicYearId: z.string().optional(),
   classId: z.string().optional(),
-  isActive: z.boolean().optional(),
+  group: z.string().optional(),
+  isActive: z.union([z.boolean(), z.string()]).optional(),
   query: z.string().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
@@ -15,6 +16,13 @@ export type ListAcademicSubjectsInput = z.infer<typeof listAcademicSubjectsSchem
 export const getAcademicSubjectSchema = idSchema
 
 export type GetAcademicSubjectInput = z.infer<typeof getAcademicSubjectSchema>
+
+export const subjectStatsSchema = z.object({
+  academicYearId: z.string().optional(),
+  classId: z.string().optional(),
+})
+
+export type SubjectStatsInput = z.infer<typeof subjectStatsSchema>
 
 export const createAcademicSubjectSchema = z.object({
   nameBn: z.string().min(1),
@@ -62,4 +70,3 @@ export const saveSubjectQuestionTypesSchema = z.object({
 })
 
 export type SaveSubjectQuestionTypesInput = z.infer<typeof saveSubjectQuestionTypesSchema>
-

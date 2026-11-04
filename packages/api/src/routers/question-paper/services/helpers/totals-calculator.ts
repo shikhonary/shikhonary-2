@@ -37,14 +37,43 @@ export function syncMarkDistribution(
   rawMarkDist?: any,
   sqTypeMarkDist?: any
 ): any {
-  let dist = rawMarkDist ?? sqTypeMarkDist
+  let parsedSqTypeDist = sqTypeMarkDist
+  if (typeof parsedSqTypeDist === "string") {
+    try {
+      parsedSqTypeDist = JSON.parse(parsedSqTypeDist)
+    } catch {
+      parsedSqTypeDist = null
+    }
+  }
 
+  let dist = rawMarkDist
   if (typeof dist === "string") {
     try {
       dist = JSON.parse(dist)
     } catch {
       dist = null
     }
+  }
+
+  // If rawMarkDist is missing or has only 1 generic single key (e.g. { a: 10 }),
+  // but the subject question type has a detailed sub-question distribution (e.g. { a: 1, b: 2, c: 3, d: 4 }),
+  // prefer the subject's configured sub-question distribution!
+  const hasMultipleSqKeys =
+    parsedSqTypeDist &&
+    typeof parsedSqTypeDist === "object" &&
+    !Array.isArray(parsedSqTypeDist) &&
+    Object.keys(parsedSqTypeDist).length > 1
+
+  const hasGenericRawKey =
+    dist &&
+    typeof dist === "object" &&
+    !Array.isArray(dist) &&
+    Object.keys(dist).length <= 1
+
+  if ((!dist || hasGenericRawKey) && hasMultipleSqKeys) {
+    dist = parsedSqTypeDist
+  } else if (!dist) {
+    dist = parsedSqTypeDist
   }
 
   if (dist && typeof dist === "object" && !Array.isArray(dist)) {
@@ -54,9 +83,6 @@ export function syncMarkDistribution(
       const key = keys[0]!
       return { [key]: marksPerQuestion }
     } else if (keys.length > 1) {
-      if (rawMarkDist) {
-        return dist
-      }
       const sum = Object.values(dist).reduce((acc: number, val: any) => acc + (Number(val) || 0), 0)
       if (sum === marksPerQuestion || sum === 0) {
         return dist

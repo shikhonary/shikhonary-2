@@ -50,7 +50,7 @@ import { CorrectAnswerBlock } from "../blocks/correct-answer-block";
 import { HeaderBlock } from "../blocks/header-block";
 import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
-import { useDeleteSubSection, useDeleteSection } from "@/modules/question-paper/services/use-question-paper";
+import { useDeleteSubSection } from "@/modules/question-paper/services/use-question-paper";
 import { toast } from "sonner";
 
 const toBengaliDigits = (num: number | string): string => {
@@ -68,7 +68,6 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
-  const dismissSection = useBuilderStore((state) => state.dismissSection);
 
   const isActive = !isSectionFilled && activeSectionId === secId && !activeSubSectionId;
 
@@ -98,19 +97,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
           <span className="text-[10px] text-primary flex items-center gap-1 font-medium">
             <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য বিভাগ
           </span>
-          {!hasQuestions && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (secId) dismissSection(secId);
-              }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded"
-              title="বিভাগ বন্ধ করুন"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
+          <div className="w-6" />
         </div>
       );
     }
@@ -136,19 +123,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
               </span>
             )}
           </div>
-          {!hasQuestions && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (secId) dismissSection(secId);
-              }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-              title="বিভাগ বন্ধ করুন"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          )}
+          <div className="w-6"></div>
         </div>
       </div>
     );
@@ -172,19 +147,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
             </span>
           )}
         </h3>
-        {!hasQuestions && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (secId) dismissSection(secId);
-            }}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-            title="বিভাগ বন্ধ করুন"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        )}
+        <div className="w-6"></div>
       </div>
       {formattedInst && (
         <p className="text-xs text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
@@ -194,17 +157,38 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const SubSectionTitleBlock = ({ data }: { data: any }) => {
-  const { id, subSectionId, sectionId, title, titleBn, instructions, nextSubSectionId, nextSubSectionTitle, hasQuestions, hideTitle, isSectionFilled, isFirstSubSection, marksPerQuestion, attemptCount, showMarkDistribution } = data || {};
+  const {
+    id,
+    subSectionId,
+    sectionId,
+    title,
+    titleBn,
+    instructions,
+    prevSubSectionId,
+    nextSubSectionId,
+    nextSubSectionTitle,
+    hasQuestions,
+    hideTitle,
+    isSectionFilled,
+    isFirstSubSection,
+    marksPerQuestion,
+    attemptCount,
+    showMarkDistribution,
+    distName,
+    isSharedQuestionType,
+  } = data || {};
   const subId = id || subSectionId;
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
   const { mutateAsync: deleteSubSection } = useDeleteSubSection();
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
+  const canDeleteSubSection = !hasQuestions && Boolean(isSharedQuestionType);
 
   const rawSubTitle = (titleBn || title)?.trim() || "";
-  const isGenericSub = rawSubTitle.toLowerCase() === "sub-section" || rawSubTitle.toLowerCase() === "subsection";
-  const hasSubTitle = Boolean(rawSubTitle && !isGenericSub && !hideTitle);
+  const isGenericSub = !rawSubTitle || rawSubTitle.toLowerCase() === "sub-section" || rawSubTitle.toLowerCase() === "subsection";
+  const displayTitle = !isGenericSub ? rawSubTitle : (distName?.trim() || "");
+  const hasSubTitle = Boolean(displayTitle && !hideTitle);
 
   const formattedInst = instructions
     ? instructions.trim().startsWith("(") && instructions.trim().endsWith(")")
@@ -231,14 +215,14 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
         <div className="flex items-center justify-between w-full">
           <div className="w-6"></div>
           <h4 className="font-semibold text-sm text-center flex-1">
-            {rawSubTitle}
+            {displayTitle}
             {isActive && (
               <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
                 <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
               </span>
             )}
           </h4>
-          {!hasQuestions && (
+          {canDeleteSubSection ? (
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -250,6 +234,8 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                       toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
                       if (nextSubSectionId) {
                         setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
+                      } else if (prevSubSectionId) {
+                        setActiveTarget({ sectionId: sectionId || null, subSectionId: prevSubSectionId });
                       } else {
                         setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
                       }
@@ -264,6 +250,8 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
+          ) : (
+            <div className="w-6" />
           )}
         </div>
       ) : isActive ? (
@@ -272,7 +260,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
           <span className="text-[10px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 mx-auto">
             <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য উপ-বিভাগ
           </span>
-          {!hasQuestions && (
+          {canDeleteSubSection ? (
             <button
               type="button"
               onClick={async (e) => {
@@ -281,6 +269,13 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                   try {
                     await deleteSubSection({ sectionId, id: subId });
                     toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                    if (nextSubSectionId) {
+                      setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
+                    } else if (prevSubSectionId) {
+                      setActiveTarget({ sectionId: sectionId || null, subSectionId: prevSubSectionId });
+                    } else {
+                      setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
+                    }
                   } catch (err: any) {
                     toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
                   }
@@ -291,6 +286,8 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
             >
               <X className="h-3.5 w-3.5" />
             </button>
+          ) : (
+            <div className="w-6" />
           )}
         </div>
       ) : null}
@@ -311,8 +308,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const DistTitleBlock = ({ data }: { data: any }) => {
-  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs } = data || {};
-  if (dist?.questionTypeLabel && dist.questionTypeLabel.trim() !== "") return null;
+  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs, subTitle } = data || {};
 
   const isCS = isCs
     || dist?.questionType?.code === "CS"
@@ -340,23 +336,34 @@ const DistTitleBlock = ({ data }: { data: any }) => {
       : null;
   }
 
-  const titleText = dist.questionType?.nameBn || dist.questionTypeNameBn || dist.questionTypeName || (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist.questionType?.nameEn);
+  const titleText =
+    dist?.questionTypeLabel?.trim() ||
+    dist?.questionTypeNameBn ||
+    dist?.questionTypeName ||
+    dist?.questionType?.nameBn ||
+    (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist?.questionType?.nameEn);
+
+  const shouldRenderTitle = Boolean(
+    titleText && titleText.toLowerCase() !== subTitle?.trim()?.toLowerCase()
+  );
 
   return (
     <div className="flex flex-col items-stretch w-full mb-1">
       {isMcq ? (
         <div className="flex justify-between items-center w-full">
           <div className="flex-1"></div>
-          <div className="font-semibold text-center flex-[2]">{titleText}</div>
+          <div className="font-semibold text-center flex-[2]">{shouldRenderTitle ? titleText : ""}</div>
           <div className="flex-1 text-right font-bold whitespace-nowrap text-[12px] shrink-0">
-            {toBengaliDigits(dist.marksPerQuestion || 1)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist.marksPerQuestion || 1) * (attemptCount || 1))}
+            {toBengaliDigits(dist?.marksPerQuestion || 1)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 1) * (attemptCount || 1))}
           </div>
         </div>
       ) : (
         <>
-          <div className="font-semibold text-center">
-            {titleText}
-          </div>
+          {shouldRenderTitle && (
+            <div className="font-semibold text-center">
+              {titleText}
+            </div>
+          )}
           {(instructionText || isCq) && (
             <div className="flex justify-between items-center text-[12px]">
               <div className="flex-1"></div>
@@ -364,7 +371,7 @@ const DistTitleBlock = ({ data }: { data: any }) => {
                 {instructionText}
               </div>
               <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
-                {toBengaliDigits(dist.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist.marksPerQuestion || 10) * (attemptCount || 1))}
+                {toBengaliDigits(dist?.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 10) * (attemptCount || 1))}
               </div>
             </div>
           )}

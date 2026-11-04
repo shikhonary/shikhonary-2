@@ -245,7 +245,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
       const renderedDistIds = new Set<string>();
 
-      const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
+      const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; subTitle?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
         renderedDistIds.add(dist.id);
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
         const questions = subjectQuestions
@@ -278,7 +278,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const isCq = (!nameEn.includes("mcq") && (nameEn.includes("cq") || nameEn.includes("cs") || nameEn.includes("creative"))) || dist.questionType?.nameBn?.includes("সৃজনশীল");
         const isMcq = nameEn.includes("mcq") || nameEn.includes("multiple choice") || dist.questionType?.nameBn?.includes("বহুনির্বাচনি");
         const hasQuestionTypeLabel = Boolean(dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "");
-        const shouldHideDistTitle = extraOptions?.hideDistTitle || hasQuestionTypeLabel;
+        const shouldHideDistTitle = extraOptions?.hideDistTitle ?? false;
 
         const subPrefix = extraOptions?.subSectionId ? `-sub-${extraOptions.subSectionId}` : (extraOptions?.sectionId ? `-sec-${extraOptions.sectionId}` : "");
 
@@ -288,6 +288,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             type: "dist-title",
             data: {
               dist,
+              subTitle: extraOptions?.subTitle,
               statusInfo,
               attemptCount,
               totalProvided,
@@ -2221,26 +2222,16 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           let finalSecInstruction = (sec.instructions && sec.instructions.trim() !== "") ? sec.instructions : null;
           const prefix = "[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।";
 
-          if (validSubSections.length > 0) {
+          const subSectionsWithAttempts = validSubSections.filter(
+            (s: any) => s.questionsToAttempt && Number(s.questionsToAttempt) > 0
+          );
+          const hasExplicitSubAttempts = subSectionsWithAttempts.length > 0;
+
+          if (validSubSections.length > 0 && hasExplicitSubAttempts) {
             if (!finalSecInstruction) {
-              const secReqSum = secDists.reduce((sum: number, d: any) => {
-                const st = statuses?.find((s: any) => s.distributionId === d.id);
-                return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
-              }, 0);
-              const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
-
-              const subClauses = validSubSections.map((s: any) => {
+              const subClauses = subSectionsWithAttempts.map((s: any) => {
                 const name = (s.titleBn || s.title || "").trim();
-                const matchedDist = subToDistMap.get(s.id) || secDists[0];
-                const distQuestionCount = Number(matchedDist?.questionCount || 0);
-                const distQuestionsToAttempt = (matchedDist?.questionsToAttempt !== undefined && matchedDist?.questionsToAttempt !== null && Number(matchedDist.questionsToAttempt) > 0)
-                  ? Number(matchedDist.questionsToAttempt)
-                  : distQuestionCount;
-
-                const subAttempt = (s.questionsToAttempt && Number(s.questionsToAttempt) > 0)
-                  ? Number(s.questionsToAttempt)
-                  : (distQuestionsToAttempt > 0 ? distQuestionsToAttempt : (reqCount > 0 ? reqCount : 0));
-
+                const subAttempt = Number(s.questionsToAttempt);
                 const countBn = toBengaliDigits(subAttempt || 0);
                 return name ? `${name} থেকে যেকোনো ${countBn}টি` : `যেকোনো ${countBn}টি`;
               });
@@ -2339,6 +2330,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
               const subLinkedDists = secDists.filter((d: any) => 
                 d.subSections?.some((rel: any) => rel.subSectionId === sub.id) ||
+                sub.distributions?.some((rel: any) => rel.distributionId === d.id) ||
                 subjectQuestions.some((q: any) => q.subSectionId === sub.id && q.distributionId === d.id)
               );
               const fallbackDist = subToDistMap.get(sub.id) || secDists[0];
@@ -2346,6 +2338,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               const targetDists = subLinkedDists.length > 0
                 ? subLinkedDists
                 : (fallbackDist ? [fallbackDist] : []);
+
+              const distName = targetDist?.questionTypeLabel || targetDist?.questionTypeNameBn || targetDist?.questionTypeName || "";
 
               const siblingSubSectionIds = validSubSections
                 .filter((s: any) => {
@@ -2423,11 +2417,15 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                 }
               } else {
                 // Scenario 2: Sub-section does not share question type
-                const distQuestionsToAttempt = (targetDist?.questionsToAttempt !== undefined && targetDist?.questionsToAttempt !== null)
-                  ? Number(targetDist.questionsToAttempt)
-                  : distQuestionCount;
+                const explicitSubAttempt = (sub.questionsToAttempt !== undefined && sub.questionsToAttempt !== null && Number(sub.questionsToAttempt) > 0)
+                  ? Number(sub.questionsToAttempt)
+                  : null;
 
-                const explicitAttempt = distQuestionsToAttempt > 0 ? distQuestionsToAttempt : distQuestionCount;
+                const distQuestionsToAttempt = (targetDist?.questionsToAttempt !== undefined && targetDist?.questionsToAttempt !== null && Number(targetDist.questionsToAttempt) > 0)
+                  ? Number(targetDist.questionsToAttempt)
+                  : null;
+
+                const explicitAttempt = explicitSubAttempt ?? distQuestionsToAttempt ?? distQuestionCount;
                 attemptCount = explicitAttempt;
                 showMarkDistribution = true;
 
@@ -2447,16 +2445,20 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   sectionId: sec.id, 
                   title: sub.title, 
                   titleBn: sub.titleBn, 
+                  distName,
                   instructions: finalSubInstruction,
+                  prevSubSectionId: prevSub?.id,
+                  prevSubSectionTitle: prevSub?.titleBn || prevSub?.title,
                   nextSubSectionId: nextSub?.id,
                   nextSubSectionTitle: nextSub?.titleBn || nextSub?.title,
                   hasQuestions: subQuestionsCount > 0,
-                  hideTitle: hasQuestionTypeLabel,
+                  hideTitle: false,
                   isSectionFilled,
                   isFirstSubSection: subIndex === 0,
                   marksPerQuestion: showMarkDistribution ? marksPerQuestion : null,
                   attemptCount,
                   showMarkDistribution,
+                  isSharedQuestionType,
                 },
                 gap: 0
               });
@@ -2468,7 +2470,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                 nextSubSectionTitle: nextSub?.titleBn || nextSub?.title,
                 sectionId: sec.id,
                 subSectionId: sub.id,
-                showAction: isSubActive && !isSectionFilled,
+                subTitle: sub.titleBn || sub.title,
+                showAction: !isSectionFilled,
                 maxAllowedTarget,
                 secTotalProvided,
                 secTotalRequired,

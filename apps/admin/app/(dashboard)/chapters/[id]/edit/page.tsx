@@ -12,6 +12,7 @@ export default async function EditChapterRoute({ params }: EditChapterRouteProps
 
   // Prefetch details and selector lists
   void queryClient.prefetchQuery(trpc.academicChapter.byId.queryOptions({ id }))
+  void queryClient.prefetchQuery(trpc.academicClass.list.queryOptions({ limit: 100 }))
   void queryClient.prefetchQuery(trpc.academicSubject.list.queryOptions({ limit: 100 }))
   void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
 

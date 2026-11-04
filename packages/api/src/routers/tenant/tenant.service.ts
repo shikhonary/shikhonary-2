@@ -9,6 +9,7 @@ import type {
   GetTenantBySlugInput,
   GetTenantInput,
   ListTenantsInput,
+  TenantStatsInput,
   ToggleTenantStatusInput,
   UpdateTenantInput,
   SendInvitationInput,
@@ -23,7 +24,7 @@ import type {
 // ---------------------------------------------------------------------------
 
 // Helper to flatten geographic relations into flat string attributes on Tenant
-function flattenTenantGeographics<T extends { division?: any; district?: any; upazila?: any; union?: any }>(tenant: T) {
+function flattenTenantGeographics(tenant: any) {
   if (!tenant) return tenant
   const { division, district, upazila, union, ...rest } = tenant
   return {
@@ -323,6 +324,9 @@ export async function listTenants(
     tenants: tenants.map(flattenTenantGeographics),
     nextCursor,
     totalItems,
+    totalPages: Math.ceil(totalItems / limit) || 1,
+    page,
+    limit,
   }
 }
 
@@ -372,13 +376,14 @@ export async function getTenantBySlug(
   return flattenTenantGeographics(tenant)
 }
 
-export async function getTenantStats(db: PrismaClient) {
-  const [total, active, suspended] = await Promise.all([
+export async function getTenantStats(db: PrismaClient, _input?: TenantStatsInput) {
+  const [total, active, suspended, inactive] = await Promise.all([
     db.tenant.count(),
     db.tenant.count({ where: { isActive: true, isSuspended: false } }),
     db.tenant.count({ where: { isSuspended: true } }),
+    db.tenant.count({ where: { isActive: false } }),
   ])
-  return { total, active, suspended }
+  return { total, active, suspended, inactive }
 }
 
 // ---------------------------------------------------------------------------

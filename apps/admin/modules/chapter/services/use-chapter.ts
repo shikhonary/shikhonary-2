@@ -11,6 +11,19 @@ export function useChaptersList(input: ListAcademicChaptersInput) {
 }
 
 /**
+ * Hook to fetch academic chapter stats.
+ */
+export function useChapterStats(input?: { academicYearId?: string; classId?: string; subjectId?: string }) {
+  return useQuery(
+    trpc.academicChapter.stats.queryOptions({
+      academicYearId: input?.academicYearId === "All" ? undefined : input?.academicYearId,
+      classId: input?.classId === "All" ? undefined : input?.classId,
+      subjectId: input?.subjectId === "All" ? undefined : input?.subjectId,
+    })
+  )
+}
+
+/**
  * Hook to fetch a single academic chapter by ID.
  */
 export function useChapterById(id: string, enabled = true) {
@@ -105,6 +118,20 @@ export function useDeleteChapter() {
 }
 
 /**
+ * Hook to bulk delete academic chapters.
+ */
+export function useBulkDeleteChapters() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.academicChapter.bulkDelete.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.academicChapter.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to toggle active status of a chapter.
  */
 export function useToggleChapterStatus() {
@@ -114,8 +141,8 @@ export function useToggleChapterStatus() {
     ...trpc.academicChapter.toggleStatus.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.academicChapter.pathFilter())
-      toast.success("Academic Chapter status updated.")
+      toast.success("অধ্যায়ের স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে।")
     },
-    onError: (err: any) => toast.error(err.message || "Failed to update status"),
+    onError: (err: any) => toast.error(err.message || "স্ট্যাটাস পরিবর্তন ব্যর্থ হয়েছে"),
   })
 }

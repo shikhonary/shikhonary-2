@@ -4,8 +4,9 @@ import { AcademicYearListPage } from "@/modules/academic-year/pages/academic-yea
 
 export default async function AcademicYearsPage() {
   const queryClient = getQueryClient()
-  // Prefetch academic years list
-  void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
+  // Prefetch academic years list and stats
+  void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 10 }))
+  void queryClient.prefetchQuery(trpc.academicYear.stats.queryOptions())
 
   return (
     <HydrateClient>

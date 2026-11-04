@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -16,7 +16,7 @@ import type { StepProps, WizardSubject, WizardDistribution, AcademicSubjectRef, 
 
 interface StepSubjectsDistributionProps extends StepProps {
   subjects: AcademicSubjectRef[]
-  questionTypes: QuestionTypeRef[]
+  questionTypes?: QuestionTypeRef[]
   isLoading: boolean
 }
 
@@ -25,7 +25,7 @@ export function StepSubjectsDistribution({
   onChange,
   errors,
   subjects,
-  questionTypes,
+  questionTypes = [],
   isLoading,
 }: StepSubjectsDistributionProps) {
   const [selectedSubjectId, setSelectedSubjectId] = useState("")
@@ -58,9 +58,111 @@ export function StepSubjectsDistribution({
     }
   }, [data.subjects, expandedSubject])
 
+  // Get currently expanded subject's subjectId
+  const expandedSubjectObj = data.subjects.find((s) => s.tempId === expandedSubject)
+  const expandedSubjectId = expandedSubjectObj?.subjectId || ""
+  const currentExpandedSubject = subjects.find((s) => s.id === expandedSubjectId)
+
+  // Query question types strictly based on the expanded subject
+  const { data: subjectTypesData, isLoading: isTypesLoading } = useQuery({
+    ...trpc.questionType.list.queryOptions({
+      subjectId: expandedSubjectId || undefined,
+      limit: 100,
+    }),
+    enabled: !!expandedSubjectId,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+  const subjectQuestionTypes = (subjectTypesData?.questionTypes ?? []) as Array<{
+    id: string
+    nameBn: string
+    nameEn: string
+    label?: string | null
+    mark: number
+    position?: number
+  }>
+
+  // Query for the expanded subject's details (to get subjectQuestionTypes configurations and presets)
+  const { data: subjectDetail, isLoading: isDetailLoading } = useQuery({
+    ...trpc.academicSubject.byId.queryOptions({ id: expandedSubjectId }),
+    enabled: !!expandedSubjectId,
+    retry: false,
+    refetchOnWindowFocus: false,
+  })
+
+  const isExpandedSubjectEnglish = isResourceEnglish({
+    subjectName: expandedSubjectObj?.subjectName,
+    subjectNameEn: currentExpandedSubject?.nameEn || subjectDetail?.nameEn,
+    subjectNameBn: currentExpandedSubject?.nameBn || subjectDetail?.nameBn,
+  }) || (subjectDetail?.code?.toUpperCase() === "ENG" || subjectDetail?.code?.toUpperCase() === "ENGLISH");
+
+  // Build deduplicated question types strictly for the expanded subject
+  // Each questionTypeId appears at most ONCE, preventing duplicate keys and Select value clashes
+  const filteredQuestionTypes = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        id: string
+        nameBn: string
+        nameEn: string
+        mark: number
+        label?: string | null
+        position: number
+        preset?: any
+      }
+    >()
+
+    // 1. From subjectDetail presets (sorted by position)
+    if (subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0) {
+      const sortedPresets = [...subjectDetail.subjectQuestionTypes].sort(
+        (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)
+      )
+      for (let i = 0; i < sortedPresets.length; i++) {
+        const sqt = sortedPresets[i]
+        if (!sqt) continue
+        const qTypeId = sqt.questionTypeId
+        if (!qTypeId) continue
+        if (!map.has(qTypeId)) {
+          map.set(qTypeId, {
+            id: qTypeId,
+            nameBn: sqt.questionType?.nameBn || "",
+            nameEn: sqt.questionType?.nameEn || "",
+            mark: sqt.mark || sqt.questionType?.mark || 1,
+            label: sqt.customLabel || sqt.questionType?.label || sqt.questionType?.nameEn,
+            position: typeof sqt.position === "number" ? sqt.position : i,
+            preset: sqt,
+          })
+        }
+      }
+    }
+
+    // 2. From subject-scoped question types query (trpc.questionType.list with subjectId)
+    for (let i = 0; i < subjectQuestionTypes.length; i++) {
+      const qt = subjectQuestionTypes[i]!
+      if (!map.has(qt.id)) {
+        map.set(qt.id, {
+          id: qt.id,
+          nameBn: qt.nameBn || "",
+          nameEn: qt.nameEn || "",
+          mark: qt.mark || 1,
+          label: qt.label || qt.nameEn,
+          position: typeof qt.position === "number" ? qt.position : i,
+          preset: null,
+        })
+      } else {
+        const existing = map.get(qt.id)!
+        if (!existing.nameBn && qt.nameBn) existing.nameBn = qt.nameBn
+        if (!existing.nameEn && qt.nameEn) existing.nameEn = qt.nameEn
+        if (!existing.label && (qt.label || qt.nameEn)) existing.label = qt.label || qt.nameEn
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) => a.position - b.position)
+  }, [subjectDetail, subjectQuestionTypes])
+
   // Sync English subject names and distributions
   useEffect(() => {
-    if (subjects.length > 0 && questionTypes.length > 0 && data.subjects.length > 0) {
+    if (subjects.length > 0 && data.subjects.length > 0) {
       let changed = false
       const updated = data.subjects.map((s) => {
         const matched = subjects.find((sub) => sub.id === s.subjectId)
@@ -78,7 +180,7 @@ export function StepSubjectsDistribution({
         let distsChanged = false
         const updatedDists = s.distributions.map((d) => {
           if (isEng) {
-            const qType = questionTypes.find((q) => q.id === d.questionTypeId)
+            const qType = filteredQuestionTypes.find((q) => q.id === d.questionTypeId) || questionTypes.find((q) => q.id === d.questionTypeId)
             const engName = qType?.nameEn || d.questionTypeName
             const isNameBn = /[\u0980-\u09FF]/.test(d.questionTypeName || "")
             const isLabelBn = /[\u0980-\u09FF]/.test(d.questionTypeLabel || "")
@@ -109,51 +211,95 @@ export function StepSubjectsDistribution({
         onChange({ subjects: updated })
       }
     }
-  }, [subjects, questionTypes, data.subjects, onChange])
+  }, [subjects, filteredQuestionTypes, questionTypes, data.subjects, onChange])
 
-  // Get currently expanded subject's subjectId
-  const expandedSubjectObj = data.subjects.find((s) => s.tempId === expandedSubject)
-  const expandedSubjectId = expandedSubjectObj?.subjectId || ""
-  const currentExpandedSubject = subjects.find((s) => s.id === expandedSubjectId)
+  // Auto-populate distributions from subject structure if subject has none
+  const autoPopulatedSubjectsRef = useRef<Set<string>>(new Set())
 
-  // Query for the expanded subject's details (to get subjectQuestionTypes)
-  const { data: subjectDetail, isLoading: isDetailLoading } = useQuery({
-    ...trpc.academicSubject.byId.queryOptions({ id: expandedSubjectId }),
-    enabled: !!expandedSubjectId,
-    retry: false,
-    refetchOnWindowFocus: false,
-  })
+  const buildStructureDistributions = (targetFilteredTypes: typeof filteredQuestionTypes): WizardDistribution[] => {
+    return targetFilteredTypes.map((item) => {
+      const sqt = item.preset
+      const isEng = isExpandedSubjectEnglish
+      const customLabel = sqt?.customLabel || item.label
+      const isCustomEng = customLabel && !/[\u0980-\u09FF]/.test(customLabel)
 
-  const isExpandedSubjectEnglish = isResourceEnglish({
-    subjectName: expandedSubjectObj?.subjectName,
-    subjectNameEn: currentExpandedSubject?.nameEn || subjectDetail?.nameEn,
-    subjectNameBn: currentExpandedSubject?.nameBn || subjectDetail?.nameBn,
-  }) || (subjectDetail?.code?.toUpperCase() === "ENG" || subjectDetail?.code?.toUpperCase() === "ENGLISH");
+      const resolvedName = isEng
+        ? (item.nameEn || item.nameBn)
+        : (item.nameBn || item.nameEn)
 
-  const allowedQuestionTypeIds = subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0
-    ? new Set(subjectDetail.subjectQuestionTypes.map((sqt: any) => sqt.questionTypeId))
-    : null;
+      const resolvedLabel = isEng
+        ? (isCustomEng ? customLabel : (item.nameEn || item.nameBn))
+        : (customLabel || item.nameBn || item.nameEn)
 
-  const filteredQuestionTypes = subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0
-    ? [...subjectDetail.subjectQuestionTypes]
-        .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
-        .map((sqt: any, idx: number) => {
-          const fromGlobal = questionTypes.find((t) => t.id === sqt.questionTypeId)
-          return {
-            id: sqt.questionTypeId,
-            nameBn: sqt.questionType?.nameBn || fromGlobal?.nameBn || "",
-            nameEn: sqt.questionType?.nameEn || fromGlobal?.nameEn || "",
-            mark: sqt.mark || sqt.questionType?.mark || fromGlobal?.mark || 1,
-            label: sqt.customLabel || sqt.questionType?.label || fromGlobal?.nameEn,
-            position: typeof sqt.position === "number" ? sqt.position : idx,
-            preset: sqt,
-          }
-        })
-    : (allowedQuestionTypeIds
-        ? questionTypes.filter((t) => allowedQuestionTypeIds.has(t.id))
-        : questionTypes);
+      let markDist = sqt?.markDistribution
+      if (typeof markDist === "string") {
+        try {
+          markDist = JSON.parse(markDist)
+        } catch {
+          markDist = null
+        }
+      }
+      const marksPerQ = sqt?.mark || item.mark || 1
+      if (!markDist) markDist = { a: marksPerQ }
 
-  // Add subject manually (starts with empty distributions)
+      return {
+        tempId: crypto.randomUUID(),
+        questionTypeId: item.id,
+        questionTypeName: resolvedName,
+        questionTypeNameBn: item.nameBn || null,
+        questionTypeLabel: resolvedLabel,
+        marksPerQuestion: marksPerQ,
+        markDistribution: markDist,
+        renderMethod: sqt?.renderMethod ?? 1,
+        questionCount: sqt?.totalQuestions || 0,
+        questionsToAttempt: sqt?.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null,
+        orderIndex: item.position,
+      }
+    })
+  }
+
+  useEffect(() => {
+    if (!expandedSubjectId || !subjectDetail) return
+    if (autoPopulatedSubjectsRef.current.has(expandedSubjectId)) return
+
+    const currentSub = data.subjects.find((s) => s.tempId === expandedSubject)
+    if (!currentSub || currentSub.distributions.length > 0) return
+
+    if (filteredQuestionTypes.length > 0) {
+      autoPopulatedSubjectsRef.current.add(expandedSubjectId)
+      const defaultDists = buildStructureDistributions(filteredQuestionTypes)
+      if (defaultDists.length > 0) {
+        const updated = data.subjects.map((s) =>
+          s.tempId === expandedSubject ? { ...s, distributions: defaultDists } : s
+        )
+        onChange({ subjects: updated })
+      }
+    }
+  }, [expandedSubjectId, subjectDetail, filteredQuestionTypes, expandedSubject, data.subjects, isExpandedSubjectEnglish, onChange])
+
+  const handleLoadStructureDistributions = (subjectTempId: string) => {
+    if (filteredQuestionTypes.length === 0) {
+      toast.info(
+        isExpandedSubjectEnglish
+          ? "No pre-configured question types found for this subject."
+          : "এই বিষয়ের জন্য কোনো পূর্বনির্ধারিত প্রশ্নের কাঠামো পাওয়া যায়নি।"
+      )
+      return
+    }
+
+    const defaultDists = buildStructureDistributions(filteredQuestionTypes)
+    const updated = data.subjects.map((s) =>
+      s.tempId === subjectTempId ? { ...s, distributions: defaultDists } : s
+    )
+    onChange({ subjects: updated })
+    toast.success(
+      isExpandedSubjectEnglish
+        ? "Distributions loaded from subject structure."
+        : "বিষয় কাঠামো অনুযায়ী প্রশ্ন ও নম্বর বণ্টন লোড করা হয়েছে।"
+    )
+  }
+
+  // Add subject manually
   const handleAddSubject = () => {
     if (!selectedSubjectId) return
     if (data.subjects.some((s) => s.subjectId === selectedSubjectId)) return
@@ -180,17 +326,21 @@ export function StepSubjectsDistribution({
 
   // Remove subject
   const handleRemoveSubject = (tempId: string) => {
-    onChange({ subjects: data.subjects.filter((s) => s.tempId !== tempId) })
-    if (expandedSubject === tempId) setExpandedSubject(null)
+    const remaining = data.subjects.filter((s) => s.tempId !== tempId)
+    onChange({ subjects: remaining })
+    if (expandedSubject === tempId) {
+      setExpandedSubject(remaining.length > 0 ? remaining[0]!.tempId : null)
+      resetDistForm()
+    }
   }
 
   // Handle question type selection & autofill distribution inputs
   const handleQuestionTypeChange = (qTypeId: string) => {
-    const matched = (filteredQuestionTypes as any[]).find((t) => t.id === qTypeId) || questionTypes.find((t) => t.id === qTypeId)
+    const matched = filteredQuestionTypes.find((t) => t.id === qTypeId)
     if (!matched) return
 
     // Find if there is a custom preset in subjectDetail.subjectQuestionTypes
-    const preset = (matched as any)?.preset || subjectDetail?.subjectQuestionTypes?.find(
+    const preset = matched.preset || subjectDetail?.subjectQuestionTypes?.find(
       (sqt: any) => sqt.questionTypeId === qTypeId
     )
 
@@ -227,7 +377,7 @@ export function StepSubjectsDistribution({
   const handleAddDistribution = (subjectTempId: string) => {
     if (!distForm.questionTypeId || !distForm.marksPerQuestion || !distForm.questionCount) return
 
-    const matched = (filteredQuestionTypes as any[]).find((t) => t.id === distForm.questionTypeId) || questionTypes.find((t) => t.id === distForm.questionTypeId)
+    const matched = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
     if (!matched) return
 
     let finalQuestionCount = parseInt(distForm.questionCount, 10)
@@ -245,7 +395,7 @@ export function StepSubjectsDistribution({
     const marksNum = parseFloat(distForm.marksPerQuestion)
 
     // Check if preset exists in subjectDetail
-    const preset = (matched as any)?.preset || subjectDetail?.subjectQuestionTypes?.find(
+    const preset = matched.preset || subjectDetail?.subjectQuestionTypes?.find(
       (sqt: any) => sqt.questionTypeId === distForm.questionTypeId
     )
 
@@ -298,8 +448,8 @@ export function StepSubjectsDistribution({
 
     const currentSub = data.subjects.find((s) => s.tempId === subjectTempId)
     const sDistLength = currentSub?.distributions.length || 0
-    const orderIndex = typeof (matched as any)?.position === "number"
-      ? (matched as any).position
+    const orderIndex = typeof matched.position === "number"
+      ? matched.position
       : (typeof preset?.position === "number" ? preset.position : sDistLength)
 
     const distribution: WizardDistribution = {
@@ -319,7 +469,7 @@ export function StepSubjectsDistribution({
     const updatedSubjects = data.subjects.map((s) => {
       if (s.tempId !== subjectTempId) return s
       // Avoid duplicate distribution question types within the same subject
-      const filteredDists = s.distributions.filter(d => d.questionTypeId !== matched.id)
+      const filteredDists = s.distributions.filter((d) => d.questionTypeId !== matched.id)
       const newDists = [...filteredDists, distribution].sort((a, b) => a.orderIndex - b.orderIndex)
       return { ...s, distributions: newDists }
     })
@@ -485,6 +635,27 @@ export function StepSubjectsDistribution({
                         <p className="text-xs text-rose-600 dark:text-rose-400 font-body">{distError}</p>
                       )}
 
+                      {/* Empty distributions prompt with quick-load */}
+                      {subject.distributions.length === 0 && filteredQuestionTypes.length > 0 && (
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-indigo-200/80 dark:border-indigo-800/40 bg-indigo-50/50 dark:bg-indigo-950/20 text-xs font-body">
+                          <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
+                            <Sparkles className="h-4 w-4 shrink-0 text-indigo-600" />
+                            <span>
+                              {isExpandedSubjectEnglish
+                                ? "This subject has a pre-configured question structure. Would you like to load it?"
+                                : "এই বিষয়ের জন্য পূর্বনির্ধারিত কাঠামো রয়েছে। আপনি কি তা লোড করতে চান?"}
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={() => handleLoadStructureDistributions(subject.tempId)}
+                            className="h-8 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs font-headline"
+                          >
+                            {isExpandedSubjectEnglish ? "Load Structure" : "কাঠামো অনুযায়ী লোড করুন"}
+                          </Button>
+                        </div>
+                      )}
+
                       {/* Distributions list - Responsive Card list on mobile & Table on sm+ */}
                       {(() => {
                         const matchedSub = subjects.find((s) => s.id === subject.subjectId)
@@ -600,10 +771,21 @@ export function StepSubjectsDistribution({
                           <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 font-headline">
                             {isExpandedSubjectEnglish ? "Add New Question Type & Marks Distribution" : "নতুন প্রশ্নের ধরণ ও নম্বর বণ্টন যোগ করুন"}
                           </p>
-                          {isDetailLoading && (
+                          {(isDetailLoading || isTypesLoading) && (
                             <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600 shrink-0" />
                           )}
                         </div>
+
+                        {!isDetailLoading && !isTypesLoading && filteredQuestionTypes.length === 0 && (
+                          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-200 text-xs font-body">
+                            <Info className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                            <span>
+                              {isExpandedSubjectEnglish
+                                ? "No question types configured for this subject yet."
+                                : "এই বিষয়ের জন্য কোনো প্রশ্নের ধরণ কনফিগার করা হয়নি।"}
+                            </span>
+                          </div>
+                        )}
 
                         {showAutoFillToast && (
                           <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 text-xs font-body animate-in fade-in duration-300">
@@ -626,24 +808,35 @@ export function StepSubjectsDistribution({
                                 <SelectValue placeholder={isExpandedSubjectEnglish ? "Select Type" : "ধরণ নির্বাচন করুন"} />
                               </SelectTrigger>
                               <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
-                                {filteredQuestionTypes.map((t: any) => {
-                                  const preset = t.preset || subjectDetail?.subjectQuestionTypes?.find(
-                                    (sqt: any) => sqt.questionTypeId === t.id
-                                  )
-                                  const isCustomEnglish = preset?.customLabel && !/[\u0980-\u09FF]/.test(preset.customLabel)
-                                  const englishName = t.nameEn || questionTypes.find((q) => q.id === t.id)?.nameEn || ""
-                                  const bengaliName = t.nameBn || questionTypes.find((q) => q.id === t.id)?.nameBn || ""
+                                {(isDetailLoading || isTypesLoading) && filteredQuestionTypes.length === 0 ? (
+                                  <div className="flex items-center justify-center p-3 text-xs text-muted-foreground gap-2 font-body">
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
+                                    <span>{isExpandedSubjectEnglish ? "Loading question types..." : "প্রশ্নের ধরণ লোড হচ্ছে..."}</span>
+                                  </div>
+                                ) : filteredQuestionTypes.length === 0 ? (
+                                  <div className="px-3 py-2 text-xs text-muted-foreground font-body">
+                                    {isExpandedSubjectEnglish ? "No question types configured" : "কোনো প্রশ্নের ধরণ পাওয়া যায়নি"}
+                                  </div>
+                                ) : (
+                                  filteredQuestionTypes.map((t) => {
+                                    const preset = t.preset || subjectDetail?.subjectQuestionTypes?.find(
+                                      (sqt: any) => sqt.questionTypeId === t.id
+                                    )
+                                    const isCustomEnglish = preset?.customLabel && !/[\u0980-\u09FF]/.test(preset.customLabel)
+                                    const englishName = t.nameEn || ""
+                                    const bengaliName = t.nameBn || ""
 
-                                  const displayLabel = isExpandedSubjectEnglish
-                                    ? (englishName || (isCustomEnglish ? preset.customLabel : "") || t.label || bengaliName)
-                                    : (preset?.customLabel || bengaliName || englishName)
+                                    const displayLabel = isExpandedSubjectEnglish
+                                      ? (englishName || (isCustomEnglish ? preset.customLabel : "") || t.label || bengaliName)
+                                      : (preset?.customLabel || bengaliName || englishName)
 
-                                  return (
-                                    <SelectItem key={t.id} value={t.id}>
-                                      {displayLabel}
-                                    </SelectItem>
-                                  )
-                                })}
+                                    return (
+                                      <SelectItem key={t.id} value={t.id}>
+                                        {displayLabel}
+                                      </SelectItem>
+                                    )
+                                  })
+                                )}
                               </SelectContent>
                             </Select>
                           </div>
@@ -727,7 +920,18 @@ export function StepSubjectsDistribution({
                       </div>
 
                       {/* Subject actions */}
-                      <div className="flex justify-end pt-1">
+                      <div className="flex items-center justify-between pt-1">
+                        {filteredQuestionTypes.length > 0 ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleLoadStructureDistributions(subject.tempId)}
+                            className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl px-3 py-1.5 cursor-pointer h-auto font-headline font-semibold"
+                          >
+                            <Sparkles className="h-3.5 w-3.5" />
+                            <span>{isExpandedSubjectEnglish ? "Reload Subject Structure" : "কাঠামো অনুযায়ী বণ্টন রিলোড"}</span>
+                          </Button>
+                        ) : <div />}
                         <Button
                           type="button"
                           variant="ghost"
@@ -735,7 +939,7 @@ export function StepSubjectsDistribution({
                           className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs rounded-xl px-3 py-1.5 cursor-pointer h-auto font-headline font-semibold"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          <span>বিষয় ডিলিট করুন</span>
+                          <span>{isExpandedSubjectEnglish ? "Delete Subject" : "বিষয় ডিলিট করুন"}</span>
                         </Button>
                       </div>
                     </div>

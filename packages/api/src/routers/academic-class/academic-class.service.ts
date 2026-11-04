@@ -6,6 +6,7 @@ import type {
   GetAcademicClassInput,
   ListAcademicClassesInput,
   UpdateAcademicClassInput,
+  ClassStatsInput,
 } from "./academic-class.schema"
 
 export async function listAcademicClasses(
@@ -13,7 +14,16 @@ export async function listAcademicClasses(
   input: ListAcademicClassesInput,
 ) {
   const where: any = {}
-  if (typeof input.isActive === "boolean") where.isActive = input.isActive
+
+  if (typeof input.isActive === "boolean") {
+    where.isActive = input.isActive
+  } else if (typeof input.isActive === "string") {
+    if (input.isActive.toUpperCase() === "ACTIVE") {
+      where.isActive = true
+    } else if (input.isActive.toUpperCase() === "INACTIVE") {
+      where.isActive = false
+    }
+  }
 
   if (input.academicYearId) {
     where.classSubjects = {
@@ -41,6 +51,10 @@ export async function listAcademicClasses(
     orderBy = { position: "asc" }
   } else if (input.sort === "position_desc") {
     orderBy = { position: "desc" }
+  } else if (input.sort === "newest") {
+    orderBy = { createdAt: "desc" }
+  } else if (input.sort === "oldest") {
+    orderBy = { createdAt: "asc" }
   }
 
   const page = input.page ?? 1
@@ -54,6 +68,13 @@ export async function listAcademicClasses(
       skip,
       cursor: input.cursor ? { id: input.cursor } : undefined,
       orderBy,
+      include: {
+        _count: {
+          select: {
+            classSubjects: true,
+          },
+        },
+      },
     }),
     db.academicClass.count({ where }),
   ])
@@ -70,6 +91,36 @@ export async function listAcademicClasses(
     page,
     limit,
     nextCursor,
+  }
+}
+
+export async function getAcademicClassStats(
+  db: PrismaClient,
+  input?: ClassStatsInput,
+) {
+  const where: any = {}
+  if (input?.academicYearId) {
+    where.classSubjects = {
+      some: {
+        academicSubject: {
+          academicYearId: input.academicYearId,
+        },
+      },
+    }
+  }
+
+  const [totalCount, activeCount, inactiveCount, subjectCount] = await Promise.all([
+    db.academicClass.count({ where }),
+    db.academicClass.count({ where: { ...where, isActive: true } }),
+    db.academicClass.count({ where: { ...where, isActive: false } }),
+    db.academicSubject.count(),
+  ])
+
+  return {
+    totalCount,
+    activeCount,
+    inactiveCount,
+    subjectCount,
   }
 }
 

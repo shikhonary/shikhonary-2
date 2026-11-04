@@ -17,6 +17,9 @@ export const listTenantsSchema = paginationSchema.extend({
 
 export type ListTenantsInput = z.infer<typeof listTenantsSchema>
 
+export const tenantStatsSchema = z.object({}).optional()
+export type TenantStatsInput = z.infer<typeof tenantStatsSchema>
+
 export const getTenantSchema = idSchema
 
 export type GetTenantInput = z.infer<typeof getTenantSchema>

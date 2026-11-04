@@ -5,8 +5,10 @@ import { SubjectManagementPage } from "@/modules/subject/pages/subject-managemen
 export default async function SubjectsPage() {
   const queryClient = getQueryClient()
 
-  // Prefetch subjects and academic years lists
+  // Prefetch subjects, stats, classes and academic years lists
   void queryClient.prefetchQuery(trpc.academicSubject.list.queryOptions({ limit: 10 }))
+  void queryClient.prefetchQuery(trpc.academicSubject.stats.queryOptions({}))
+  void queryClient.prefetchQuery(trpc.academicClass.list.queryOptions({ limit: 100 }))
   void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
 
   return (

@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
-import { notFound } from "../../../utils/errors"
+import { notFound, badRequest } from "../../../utils/errors"
 import type {
   UpsertQuestionPaperSectionInput,
   DeleteQuestionPaperSectionInput,
@@ -67,23 +67,7 @@ export async function deleteQuestionPaperSection(
   input: DeleteQuestionPaperSectionInput,
   actorId?: string
 ) {
-  const existing = await tenantDb.questionPaperSection.findFirst({
-    where: { id: input.id, questionPaperId: input.questionPaperId },
-  })
-  if (!existing) throw notFound("QuestionPaperSection")
-
-  await tenantDb.questionPaperSection.delete({
-    where: { id: input.id },
-  })
-
-  await logHistory(tenantDb, {
-    questionPaperId: input.questionPaperId,
-    action: "SECTION_REMOVED",
-    actorId,
-    changes: { sectionId: input.id, title: existing.title },
-  })
-
-  return { success: true }
+  throw badRequest("Deleting question paper sections is not allowed.")
 }
 
 export async function upsertQuestionPaperSubSection(
@@ -129,12 +113,58 @@ export async function deleteQuestionPaperSubSection(
 ) {
   const existing = await tenantDb.questionPaperSubSection.findUnique({
     where: { id: input.id },
+    include: {
+      distributions: true,
+      questions: { select: { id: true } },
+    },
   })
   if (!existing) throw notFound("QuestionPaperSubSection")
 
+  if (existing.questions && existing.questions.length > 0) {
+    throw badRequest("Cannot delete a sub-section that contains questions.")
+  }
+
+  // Check if this sub-section shares a question type with other sub-sections
+  const distIds = existing.distributions.map((d) => d.distributionId)
+  if (distIds.length > 0) {
+    const siblingRelations = await tenantDb.questionPaperSubSectionDistribution.findMany({
+      where: {
+        distributionId: { in: distIds },
+        subSectionId: { not: input.id },
+      },
+    })
+    if (siblingRelations.length === 0) {
+      throw badRequest("Cannot delete a sub-section that holds a unique question type.")
+    }
+  } else {
+    const siblingCount = await tenantDb.questionPaperSubSection.count({
+      where: {
+        sectionId: existing.sectionId,
+        id: { not: input.id },
+      },
+    })
+    if (siblingCount === 0) {
+      throw badRequest("Cannot delete a sub-section that holds a unique question type.")
+    }
+  }
+
+  const sectionId = existing.sectionId
   await tenantDb.questionPaperSubSection.delete({
     where: { id: input.id },
   })
+
+  // Recalculate section's questionsToAttempt if any
+  const remainingSubs = await tenantDb.questionPaperSubSection.findMany({
+    where: { sectionId },
+    select: { questionsToAttempt: true },
+  })
+  const attemptSum = remainingSubs.reduce((sum, s) => sum + (s.questionsToAttempt || 0), 0)
+  if (attemptSum > 0) {
+    await tenantDb.questionPaperSection.update({
+      where: { id: sectionId },
+      data: { questionsToAttempt: attemptSum },
+    }).catch(() => {})
+  }
 
   return { success: true }
 }

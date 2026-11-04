@@ -2,7 +2,7 @@ import { z } from "zod"
 import { idSchema, paginationSchema } from "../../schemas/common"
 
 export const listAcademicClassesSchema = paginationSchema.extend({
-  isActive: z.boolean().optional(),
+  isActive: z.union([z.boolean(), z.string()]).optional(),
   query: z.string().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
@@ -10,6 +10,12 @@ export const listAcademicClassesSchema = paginationSchema.extend({
 })
 
 export type ListAcademicClassesInput = z.infer<typeof listAcademicClassesSchema>
+
+export const classStatsSchema = z.object({
+  academicYearId: z.string().optional(),
+})
+
+export type ClassStatsInput = z.infer<typeof classStatsSchema>
 
 export const getAcademicClassSchema = idSchema
 
@@ -37,4 +43,3 @@ export type UpdateAcademicClassInput = z.infer<typeof updateAcademicClassSchema>
 export const deleteAcademicClassSchema = idSchema
 
 export type DeleteAcademicClassInput = z.infer<typeof deleteAcademicClassSchema>
-

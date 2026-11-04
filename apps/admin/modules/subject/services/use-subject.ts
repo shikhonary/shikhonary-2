@@ -11,6 +11,18 @@ export function useSubjectsList(input: ListAcademicSubjectsInput) {
 }
 
 /**
+ * Hook to fetch academic subject stats.
+ */
+export function useSubjectStats(input?: { academicYearId?: string; classId?: string }) {
+  return useQuery(
+    trpc.academicSubject.stats.queryOptions({
+      academicYearId: input?.academicYearId === "All" ? undefined : input?.academicYearId,
+      classId: input?.classId === "All" ? undefined : input?.classId,
+    })
+  )
+}
+
+/**
  * Hook to fetch a single academic subject by ID.
  */
 export function useSubjectById(id: string, enabled = true) {
@@ -86,9 +98,9 @@ export function useToggleSubjectStatus() {
     ...trpc.academicSubject.toggleStatus.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
-      toast.success("Academic Subject status updated.")
+      toast.success("বিষয়ের সক্রিয় অবস্থা সফলভাবে পরিবর্তন করা হয়েছে।")
     },
-    onError: (err: any) => toast.error(err.message || "Failed to update status"),
+    onError: (err: any) => toast.error(err.message || "অবস্থা পরিবর্তন ব্যর্থ হয়েছে"),
   })
 }
 
@@ -119,4 +131,3 @@ export function useSaveSubjectStructure() {
     },
   })
 }
-

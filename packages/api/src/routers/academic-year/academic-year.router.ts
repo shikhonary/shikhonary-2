@@ -5,11 +5,13 @@ import {
   getAcademicYearSchema,
   listAcademicYearsSchema,
   updateAcademicYearSchema,
+  yearStatsSchema,
 } from "./academic-year.schema"
 import {
   createAcademicYear,
   deleteAcademicYear,
   getAcademicYearById,
+  getAcademicYearStats,
   listAcademicYears,
   updateAcademicYear,
   toggleAcademicYearStatus,
@@ -19,6 +21,10 @@ export const academicYearRouter = createTRPCRouter({
   list: superAdminProcedure
     .input(listAcademicYearsSchema)
     .query(({ ctx, input }) => listAcademicYears(ctx.db, input)),
+
+  stats: superAdminProcedure
+    .input(yearStatsSchema)
+    .query(({ ctx, input }) => getAcademicYearStats(ctx.db, input)),
 
   byId: superAdminProcedure
     .input(getAcademicYearSchema)

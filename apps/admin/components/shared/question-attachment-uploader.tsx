@@ -24,6 +24,9 @@ export interface AttachmentItem {
   type: string
   url?: string | null
   caption?: string | null
+  content?: string | null
+  table?: any
+  tableBorder?: boolean | null
   bottomContent?: string | null
   position?: number
 }
@@ -91,15 +94,17 @@ export function QuestionAttachmentUploader({
         // Replacing existing attachment image (e.g. fixing a missing image)
         const updated = [...attachments]
         const first = res[0]
-        const uploadedUrl = first.ufsUrl || first.url
-        updated[replacingIndex] = {
-          ...updated[replacingIndex],
-          url: uploadedUrl,
-          type: "image",
+        if (first) {
+          const uploadedUrl = first.ufsUrl || first.url
+          updated[replacingIndex] = {
+            ...updated[replacingIndex],
+            url: uploadedUrl,
+            type: "image",
+          }
+          onChange(updated)
+          setReplacingIndex(null)
+          toast.success("ছবি সফলভাবে হালনাগাদ করা হয়েছে!")
         }
-        onChange(updated)
-        setReplacingIndex(null)
-        toast.success("ছবি সফলভাবে হালনাগাদ করা হয়েছে!")
       } else {
         // Appending newly uploaded images
         const newItems: AttachmentItem[] = res.map((fileRes, i) => ({
@@ -158,9 +163,13 @@ export function QuestionAttachmentUploader({
   }
 
   const handleRemove = (indexToRemove: number) => {
-    const updated = attachments
+    const updated: AttachmentItem[] = attachments
       .filter((_, idx) => idx !== indexToRemove)
-      .map((item, idx) => ({ ...item, position: idx }))
+      .map((item, idx) => ({
+        ...item,
+        type: item.type || "image",
+        position: idx,
+      }))
     onChange(updated)
     toast.info("সংযুক্তি মুছে ফেলা হয়েছে")
   }
@@ -170,9 +179,12 @@ export function QuestionAttachmentUploader({
     field: "caption" | "bottomContent",
     value: string
   ) => {
-    const updated = [...attachments]
+    const current = attachments[index]
+    if (!current) return
+    const updated: AttachmentItem[] = [...attachments]
     updated[index] = {
-      ...updated[index],
+      ...current,
+      type: current.type || "image",
       [field]: value,
     }
     onChange(updated)

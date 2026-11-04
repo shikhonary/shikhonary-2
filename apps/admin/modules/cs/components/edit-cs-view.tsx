@@ -31,6 +31,7 @@ import {
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { CS_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 import { PageHeader } from "@/components/shared/page-header"
+import { QuestionAttachmentUploader, type AttachmentItem } from "@/components/shared"
 import {
   HelpCircle,
   ArrowLeft,
@@ -180,11 +181,6 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
     resetOptions: {
       keepDirtyValues: true,
     },
-  })
-
-  const { fields: mediaFields } = useFieldArray({
-    control,
-    name: "mediaAttachments",
   })
 
   const watchContext = watch("context")
@@ -606,89 +602,25 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
             </div>
 
             {/* Other Media Attachments (Images, Tables, Diagrams, etc.) */}
-            {mediaFields.length > 0 && (
-              <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
-                <div>
-                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
-                    সংযুক্ত উপাদান (Media Attachments - ছবি, ছক ইত্যাদি)
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
-                    প্রশ্নে সংযুক্ত ছবি বা ছকের ক্যাপশন এবং নিচের বিবরণ হালনাগাদ করুন
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  {mediaFields.map((field, idx) => {
-                    const currentAtt = watchMediaAttachments?.[idx] || field
-                    return (
-                      <div
-                        key={field.id}
-                        className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/40 dark:bg-white/[0.01] p-4 sm:p-5 space-y-3"
-                      >
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-white/[0.06]">
-                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary font-headline">
-                            সংযুক্তি #{idx + 1} ({field.type.toUpperCase()})
-                          </span>
-                        </div>
-
-                        {/* Thumbnail / Preview if Image */}
-                        {field.url && (
-                          <div className="py-2">
-                            <img
-                              src={field.url}
-                              alt={currentAtt.caption || "Attachment Preview"}
-                              className="max-h-36 rounded-xl border border-slate-200 dark:border-white/[0.08] object-contain bg-white dark:bg-black/20 p-1"
-                            />
-                          </div>
-                        )}
-
-                        {/* Top Caption Input */}
-                        <div className="space-y-1">
-                          <Label className="block text-[11px] font-semibold text-muted-foreground">
-                            ক্যাপশন (Top Caption)
-                          </Label>
-                          <Input
-                            disabled={isSubmitting}
-                            placeholder="ছবির বা ছকের শিরোনাম/ক্যাপশন লিখুন..."
-                            {...register(`mediaAttachments.${idx}.caption`)}
-                            className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
-                          />
-                        </div>
-
-                        {/* Bottom Caption Content Input */}
-                        <div className="space-y-1">
-                          <Label className="block text-[11px] font-semibold text-muted-foreground">
-                            নিচের ক্যাপশন / বিবরণ (Bottom Caption Content)
-                          </Label>
-                          <Input
-                            disabled={isSubmitting}
-                            placeholder="নিচের বিবরণ বা উৎস লিখুন..."
-                            {...register(`mediaAttachments.${idx}.bottomContent`)}
-                            className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
-                          />
-                        </div>
-
-                        {/* Real-time Math Preview for this attachment */}
-                        {(currentAtt.caption?.trim() || currentAtt.bottomContent?.trim()) && (
-                          <div className="rounded-xl border border-slate-200/60 dark:border-white/[0.06] bg-slate-50/60 dark:bg-white/[0.02] p-3 text-xs space-y-1">
-                            {currentAtt.caption?.trim() && (
-                              <div className="font-semibold text-foreground">
-                                <RenderMath text={currentAtt.caption.trim()} isMath={true} />
-                              </div>
-                            )}
-                            {currentAtt.bottomContent?.trim() && (
-                              <div className="text-muted-foreground italic">
-                                <RenderMath text={currentAtt.bottomContent.trim()} isMath={true} />
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
+            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  সংযুক্ত ছবি ও চিত্র (Question Attachments)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রশ্নে সংযুক্ত ছবি আপলোড করুন অথবা ক্যাপশন ও বিবরণ হালনাগাদ করুন
+                </p>
               </div>
-            )}
+
+              <QuestionAttachmentUploader
+                resourceId={targetId}
+                resourceType="CS"
+                attachments={(watchMediaAttachments || []) as AttachmentItem[]}
+                onChange={(updated) => setValue("mediaAttachments", updated, { shouldDirty: true })}
+                disabled={isSubmitting}
+                isMath={true}
+              />
+            </div>
 
             {/* Sub-Questions A & B Stems */}
             <div className="space-y-5 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">

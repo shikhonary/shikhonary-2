@@ -11,6 +11,7 @@
     "db:generate": "turbo generate --filter=@workspace/db",
     "seed:mcq": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-mcq-json.ts",
     "seed:cq": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-cq-json.ts",
+    "seed:cs": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-cs-json.ts",
     "sync:mcq-attachment-refs": "pnpm --filter @workspace/db exec tsx scripts/sync-mcq-attachment-references.ts"
   },
   "devDependencies": {

@@ -9,11 +9,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@workspace/ui/components/dialog"
-import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { BookOpen, CheckSquare, Loader2, Save, Hash } from "lucide-react"
+import { Switch } from "@workspace/ui/components/switch"
+import { GraduationCap, Loader2, Save, AlertCircle } from "lucide-react"
 
 import { useCreateAcademicClass } from "../services/use-academic-class"
 import { useCreateAcademicClassModalStore } from "../store/use-create-academic-class-modal-store"
@@ -51,23 +51,23 @@ export function CreateAcademicClassModal() {
     setErrorMessage(null)
 
     if (!nameEn.trim() || !nameBn.trim()) {
-      setErrorMessage("Please fill in all required fields.")
+      setErrorMessage("অনুগ্রহ করে শ্রেণির বাংলা ও ইংরেজি উভয় নাম পূরণ করুন।")
       return
     }
 
     try {
       await createMutation.mutateAsync({
-        nameEn,
-        nameBn,
-        position,
+        nameEn: nameEn.trim(),
+        nameBn: nameBn.trim(),
+        position: Number(position) || 0,
         isActive,
       })
 
-      toast.success("Academic class created successfully.")
+      toast.success("নতুন শ্রেণিটি সফলভাবে তৈরি করা হয়েছে।")
       resetForm()
       closeModal()
     } catch (err: any) {
-      const msg = err.message || "Failed to create class"
+      const msg = err.message || "শ্রেণি তৈরিতে সমস্যা হয়েছে"
       setErrorMessage(msg)
       toast.error(msg)
     }
@@ -75,141 +75,130 @@ export function CreateAcademicClassModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        style={{ minWidth: "320px", maxWidth: "600px", width: "calc(100vw - 2rem)" }}
-        className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white p-0 shadow-xl text-left gap-0"
-      >
-        <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-6 flex flex-row items-center gap-4">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-            <BookOpen className="h-6 w-6" />
+      <DialogContent className="sm:max-w-md rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-0 shadow-2xl overflow-hidden">
+        {/* Modal Header */}
+        <DialogHeader className="border-b border-slate-200/60 dark:border-white/[0.06] p-5 sm:p-6 bg-slate-50/50 dark:bg-white/[0.02]">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-primary flex items-center justify-center shrink-0">
+              <GraduationCap className="size-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-base sm:text-lg font-bold text-foreground font-headline">
+                নতুন শ্রেণি যোগ করুন
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5 font-body">
+                শ্রেণির বাংলা ও ইংরেজি নাম এবং প্রদর্শন ক্রম নির্ধারণ করুন
+              </DialogDescription>
+            </div>
           </div>
-          <div>
-            <CardTitle className="font-headline-md text-xl font-extrabold text-on-surface normal-case tracking-normal">
-              Academic Class Details
-            </CardTitle>
-            <p className="text-xs font-body-md text-on-surface-variant mt-0.5">
-              Configure class labels, hierarchy position, and status.
-            </p>
-          </div>
-        </CardHeader>
+        </DialogHeader>
 
-        <CardContent className="p-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5">
           {/* Error Alert */}
           {errorMessage && (
-            <div className="flex items-center gap-3 rounded-xl border border-error/30 bg-error-container/20 p-3 mb-4 text-error">
-              <span className="material-symbols-outlined text-lg">error</span>
-              <span className="font-body-md text-xs font-medium">{errorMessage}</span>
+            <div className="flex items-center gap-2.5 rounded-xl border border-rose-200/80 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/20 p-3 text-rose-600 dark:text-rose-400 text-xs font-medium">
+              <AlertCircle className="size-4 shrink-0" />
+              <span>{errorMessage}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Academic Class Names (English & Bangla) */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Name EN */}
-              <div className="space-y-2">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Class Name (English) *
-                </Label>
-                <Input
-                  value={nameEn}
-                  onChange={(e) => setNameEn(e.target.value)}
-                  placeholder="e.g. Class One"
-                  disabled={isSubmitting}
-                  required
-                  className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary h-auto disabled:opacity-50"
-                />
-              </div>
+          {/* Name BN */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              শ্রেণির নাম (বাংলা) <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              disabled={isSubmitting}
+              placeholder="যেমন: ষষ্ঠ শ্রেণি বা নবম শ্রেণি"
+              value={nameBn}
+              onChange={(e) => setNameBn(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+            />
+          </div>
 
-              {/* Name BN */}
-              <div className="space-y-2">
-                <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                  Class Name (Bangla) *
-                </Label>
-                <Input
-                  value={nameBn}
-                  onChange={(e) => setNameBn(e.target.value)}
-                  placeholder="e.g. প্রথম শ্রেণী"
-                  disabled={isSubmitting}
-                  required
-                  className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary h-auto disabled:opacity-50"
-                />
-              </div>
-            </div>
+          {/* Name EN */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              শ্রেণির নাম (ইংরেজি) <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              type="text"
+              disabled={isSubmitting}
+              placeholder="e.g. Class 6 or Class 9"
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-mono"
+            />
+          </div>
 
-            {/* Position */}
-            <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Display Order Position
+          {/* Position */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              ক্রমিক নম্বর (Position / Order)
+            </Label>
+            <Input
+              type="number"
+              min={0}
+              disabled={isSubmitting}
+              value={position}
+              onChange={(e) => setPosition(parseInt(e.target.value) || 0)}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-mono"
+            />
+          </div>
+
+          {/* Is Active Toggle */}
+          <div className="flex items-center justify-between rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5">
+            <div className="space-y-0.5">
+              <Label
+                htmlFor="create-class-active"
+                className="text-xs font-bold text-foreground cursor-pointer"
+              >
+                শ্রেণিটি সক্রিয় রাখুন
               </Label>
-              <div className="group relative">
-                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
-                <Input
-                  type="number"
-                  value={position}
-                  onChange={(e) => setPosition(Number(e.target.value) || 0)}
-                  placeholder="e.g. 1"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-outline-variant py-2.5 pl-10 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto disabled:opacity-50"
-                />
-              </div>
+              <p className="text-[11px] text-muted-foreground">
+                সক্রিয় থাকলে শিক্ষার্থীরা এই শ্রেণির পাঠ্যবিষয় ও প্রশ্নপত্র দেখতে পাবে।
+              </p>
             </div>
+            <Switch
+              id="create-class-active"
+              checked={isActive}
+              onCheckedChange={setIsActive}
+              disabled={isSubmitting}
+            />
+          </div>
 
-            {/* Is Active Checkbox */}
-            <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-3 bg-surface-container-low">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={isActive}
-                disabled={isSubmitting}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
-              />
-              <div className="grid gap-0.5 leading-none">
-                <label
-                  htmlFor="isActive"
-                  className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5"
-                >
-                  <CheckSquare className="h-3.5 w-3.5 text-primary" />
-                  Enable/Activate Academic Class
-                </label>
-                <p className="text-[11px] text-on-surface-variant">
-                  Allows subjects and students to be assigned to this class template.
-                </p>
-              </div>
-            </div>
-
-            {/* Actions Footer */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isSubmitting}
-                onClick={() => handleOpenChange(false)}
-                className="rounded-lg border border-outline px-6 py-2.5 font-bold text-primary hover:bg-surface-container-low transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || !nameEn.trim() || !nameBn.trim()}
-                className="rounded-lg bg-primary-container px-8 py-2.5 font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Saving...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5">
-                    <Save className="h-4 w-4" />
-                    <span>Save Class</span>
-                  </div>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
+          {/* Action Buttons */}
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200/60 dark:border-white/[0.06]">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => handleOpenChange(false)}
+              className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs"
+            >
+              বাতিল
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="h-10 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs gap-1.5 shadow-sm shadow-indigo-200 dark:shadow-none"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>সংরক্ষণ হচ্ছে...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="size-3.5" />
+                  <span>শ্রেণি সংরক্ষণ করুন</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )

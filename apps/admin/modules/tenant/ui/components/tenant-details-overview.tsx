@@ -324,7 +324,7 @@ export const TenantDetailsOverview = ({ tenant }: TenantDetailsOverviewProps) =>
           ) : (
             <div className="text-center py-8 bg-muted/10 border border-dashed border-border/60 rounded-2xl">
               <User className="size-8 text-muted-foreground/30 mx-auto mb-2" />
-              <p className="text-xs text-muted-foreground">No creator/owner assigned to this Union Porishod.</p>
+              <p className="text-xs text-muted-foreground">No creator/owner assigned to this institution.</p>
             </div>
           )}
         </CardContent>

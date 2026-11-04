@@ -6,6 +6,8 @@ import type {
   GetAcademicChapterInput,
   ListAcademicChaptersInput,
   UpdateAcademicChapterInput,
+  ChapterStatsInput,
+  BulkDeleteAcademicChaptersInput,
 } from "./academic-chapter.schema"
 
 export async function listAcademicChapters(
@@ -13,30 +15,53 @@ export async function listAcademicChapters(
   input: ListAcademicChaptersInput,
 ) {
   const where: any = {}
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (input.academicYearId) where.academicYearId = input.academicYearId
-  if (typeof input.isActive === "boolean") where.isActive = input.isActive
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.academicYearId && input.academicYearId !== "All") where.academicYearId = input.academicYearId
 
-  if (input.query) {
+  if (input.classId && input.classId !== "All") {
+    where.subject = {
+      classSubjects: {
+        some: {
+          classId: input.classId,
+        },
+      },
+    }
+  }
+
+  if (input.isActive !== undefined && input.isActive !== "All") {
+    if (typeof input.isActive === "boolean") {
+      where.isActive = input.isActive
+    } else if (input.isActive === "ACTIVE" || input.isActive === "true") {
+      where.isActive = true
+    } else if (input.isActive === "INACTIVE" || input.isActive === "false") {
+      where.isActive = false
+    }
+  }
+
+  if (input.query && input.query.trim()) {
     where.OR = [
-      { nameEn: { contains: input.query, mode: "insensitive" } },
-      { nameBn: { contains: input.query, mode: "insensitive" } },
+      { nameEn: { contains: input.query.trim(), mode: "insensitive" } },
+      { nameBn: { contains: input.query.trim(), mode: "insensitive" } },
     ]
   }
 
-  let orderBy: any = { position: "asc" }
-  if (input.sort === "name_asc") {
+  let orderBy: any = [{ position: "asc" }, { createdAt: "desc" }]
+  if (input.sort === "newest") {
+    orderBy = { createdAt: "desc" }
+  } else if (input.sort === "oldest") {
+    orderBy = { createdAt: "asc" }
+  } else if (input.sort === "name_asc") {
     orderBy = { nameEn: "asc" }
   } else if (input.sort === "name_desc") {
     orderBy = { nameEn: "desc" }
   } else if (input.sort === "position_asc") {
-    orderBy = { position: "asc" }
+    orderBy = [{ position: "asc" }, { createdAt: "desc" }]
   } else if (input.sort === "position_desc") {
-    orderBy = { position: "desc" }
+    orderBy = [{ position: "desc" }, { createdAt: "desc" }]
   }
 
   const page = input.page ?? 1
-  const limit = input.limit ?? 20
+  const limit = input.limit ?? 10
   const skip = input.cursor ? 1 : (page - 1) * limit
 
   const [academicChapters, totalItems] = await Promise.all([
@@ -52,6 +77,18 @@ export async function listAcademicChapters(
             id: true,
             nameEn: true,
             nameBn: true,
+            code: true,
+            classSubjects: {
+              include: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicYear: {
@@ -81,12 +118,76 @@ export async function listAcademicChapters(
   }
 }
 
+export async function getAcademicChapterStats(
+  db: PrismaClient,
+  input: ChapterStatsInput,
+) {
+  const where: any = {}
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.academicYearId && input.academicYearId !== "All") where.academicYearId = input.academicYearId
+  if (input.classId && input.classId !== "All") {
+    where.subject = {
+      classSubjects: {
+        some: {
+          classId: input.classId,
+        },
+      },
+    }
+  }
+
+  const [totalCount, activeCount, inactiveCount, distinctSubjects] = await Promise.all([
+    db.academicChapter.count({ where }),
+    db.academicChapter.count({ where: { ...where, isActive: true } }),
+    db.academicChapter.count({ where: { ...where, isActive: false } }),
+    db.academicChapter.findMany({
+      where,
+      distinct: ["subjectId"],
+      select: { subjectId: true },
+    }),
+  ])
+
+  return {
+    totalCount,
+    activeCount,
+    inactiveCount,
+    subjectCount: distinctSubjects.length,
+  }
+}
+
 export async function getAcademicChapterById(
   db: PrismaClient,
   input: GetAcademicChapterInput,
 ) {
   const academicChapter = await db.academicChapter.findUnique({
     where: { id: input.id },
+    include: {
+      subject: {
+        select: {
+          id: true,
+          nameEn: true,
+          nameBn: true,
+          code: true,
+          classSubjects: {
+            include: {
+              academicClass: {
+                select: {
+                  id: true,
+                  nameEn: true,
+                  nameBn: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      academicYear: {
+        select: {
+          id: true,
+          nameEn: true,
+          nameBn: true,
+        },
+      },
+    },
   })
   if (!academicChapter) throw notFound("AcademicChapter")
   return academicChapter
@@ -125,6 +226,16 @@ export async function deleteAcademicChapter(
 
   await db.academicChapter.delete({ where: { id: input.id } })
   return { success: true }
+}
+
+export async function bulkDeleteAcademicChapters(
+  db: PrismaClient,
+  input: BulkDeleteAcademicChaptersInput,
+) {
+  const res = await db.academicChapter.deleteMany({
+    where: { id: { in: input.ids } },
+  })
+  return { deletedCount: res.count }
 }
 
 export async function toggleAcademicChapterStatus(

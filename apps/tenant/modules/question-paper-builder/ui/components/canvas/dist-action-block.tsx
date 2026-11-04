@@ -18,6 +18,7 @@ const toBengaliDigits = (num: number | string): string => {
 
 export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => {
   const isExporting = useBuilderStore((state) => state.isExporting);
+  const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
   const { mutateAsync: upsertSubSection } = useUpsertSubSection();
 
@@ -187,9 +188,13 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
   const subTargetCount = blockData?.subPickLimit || dist.questionCount || statusInfo?.targetCount || 1;
 
   // ── Compute dropdown validation: accumulate questionsToAttempt of sub-sections sharing same question type and compare to section questionsToAttempt ──
+  const fallbackLimit = (dist.questionsToAttempt && dist.questionsToAttempt > 0)
+    ? dist.questionsToAttempt
+    : (dist.questionCount && dist.questionCount > 0 ? dist.questionCount : 0);
+
   const sectionQuestionsToAttempt = (sec?.questionsToAttempt && sec.questionsToAttempt > 0)
     ? sec.questionsToAttempt
-    : (dist.questionsToAttempt && dist.questionsToAttempt > 0 ? dist.questionsToAttempt : 0);
+    : fallbackLimit;
 
   let otherSubAttemptForDropdown = 0;
   if (sec && sec.subSections && sec.subSections.length > 1) {
@@ -203,7 +208,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const maxAllowedRequired = sectionQuestionsToAttempt > 0
     ? Math.max(0, sectionQuestionsToAttempt - otherSubAttemptForDropdown)
-    : (dist.questionsToAttempt && dist.questionsToAttempt > 0 ? dist.questionsToAttempt : 0);
+    : fallbackLimit;
 
   const dropdownMaxOptions = maxAllowedRequired;
 
@@ -213,11 +218,22 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
   const currentAttempt = (rawAttempt > 0) ? String(Math.min(rawAttempt, Math.max(1, dropdownMaxOptions))) : "";
 
   if (status !== "COMPLETED") {
+    const isCurrentActive = !subSectionId || activeSubSectionId === subSectionId;
+
     return (
-      <div className="border-2 border-dashed border-indigo-500/30 dark:border-indigo-400/30 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center gap-3 text-center transition-all hover:bg-indigo-50/80 dark:hover:bg-indigo-950/40 my-2 print:hidden">
+      <div 
+        onClick={() => {
+          if (subSectionId) setActiveTarget({ sectionId: sectionId || null, subSectionId });
+        }}
+        className={`border-2 border-dashed ${
+          isCurrentActive
+            ? "border-indigo-500/40 bg-indigo-50/50 dark:bg-indigo-950/20"
+            : "border-slate-300 dark:border-white/10 hover:border-indigo-400/40 bg-slate-50/40 dark:bg-white/[0.02]"
+        } rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center gap-3 text-center transition-all hover:bg-indigo-50/80 dark:hover:bg-indigo-950/40 my-2 print:hidden cursor-pointer`}
+      >
         <div className="flex items-center gap-2">
           <span className="text-xs sm:text-sm font-headline font-bold text-indigo-950 dark:text-indigo-200">
-            {dist.questionTypeNameBn || dist.questionTypeName || dist.questionType?.nameBn || dist.questionTypeLabel || dist.questionType?.nameEn}
+            {dist.questionTypeLabel || dist.questionTypeNameBn || dist.questionTypeName || dist.questionType?.nameBn || dist.questionType?.nameEn}
           </span>
           <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-solaiman">
             {toBengaliDigits(subAddedCount)} / {toBengaliDigits(subTargetCount)}টি যুক্ত

@@ -6,6 +6,7 @@ import {
   getTenantBySlugSchema,
   getTenantSchema,
   listTenantsSchema,
+  tenantStatsSchema,
   toggleTenantStatusSchema,
   updateTenantSchema,
   sendInvitationSchema,
@@ -42,7 +43,8 @@ export const tenantRouter = createTRPCRouter({
 
   /** Fetch tenant stats (total, active, suspended) */
   stats: superAdminProcedure
-    .query(({ ctx }) => getTenantStats(ctx.db)),
+    .input(tenantStatsSchema)
+    .query(({ ctx, input }) => getTenantStats(ctx.db, input)),
 
   /** Fetch tenant by ID */
   byId: superAdminProcedure

@@ -7,6 +7,7 @@ import type {
   ListAcademicSubjectsInput,
   UpdateAcademicSubjectInput,
   SaveSubjectQuestionTypesInput,
+  SubjectStatsInput,
 } from "./academic-subject.schema"
 
 export async function listAcademicSubjects(
@@ -22,7 +23,20 @@ export async function listAcademicSubjects(
       },
     }
   }
-  if (typeof input.isActive === "boolean") where.isActive = input.isActive
+
+  if (typeof input.isActive === "boolean") {
+    where.isActive = input.isActive
+  } else if (typeof input.isActive === "string") {
+    if (input.isActive.toUpperCase() === "ACTIVE") {
+      where.isActive = true
+    } else if (input.isActive.toUpperCase() === "INACTIVE") {
+      where.isActive = false
+    }
+  }
+
+  if (input.group && input.group !== "All") {
+    where.group = input.group
+  }
 
   if (input.query) {
     where.OR = [
@@ -42,6 +56,10 @@ export async function listAcademicSubjects(
     orderBy = { code: "asc" }
   } else if (input.sort === "code_desc") {
     orderBy = { code: "desc" }
+  } else if (input.sort === "newest") {
+    orderBy = { createdAt: "desc" }
+  } else if (input.sort === "oldest") {
+    orderBy = { createdAt: "asc" }
   }
 
   const page = input.page ?? 1
@@ -61,6 +79,17 @@ export async function listAcademicSubjects(
             id: true,
             nameEn: true,
             nameBn: true,
+          },
+        },
+        classSubjects: {
+          include: {
+            academicClass: {
+              select: {
+                id: true,
+                nameEn: true,
+                nameBn: true,
+              },
+            },
           },
         },
         _count: {
@@ -85,6 +114,35 @@ export async function listAcademicSubjects(
     page,
     limit,
     nextCursor,
+  }
+}
+
+export async function getAcademicSubjectStats(
+  db: PrismaClient,
+  input?: SubjectStatsInput,
+) {
+  const where: any = {}
+  if (input?.academicYearId) where.academicYearId = input.academicYearId
+  if (input?.classId) {
+    where.classSubjects = {
+      some: {
+        classId: input.classId,
+      },
+    }
+  }
+
+  const [totalCount, activeCount, inactiveCount, classesCount] = await Promise.all([
+    db.academicSubject.count({ where }),
+    db.academicSubject.count({ where: { ...where, isActive: true } }),
+    db.academicSubject.count({ where: { ...where, isActive: false } }),
+    db.academicClass.count(),
+  ])
+
+  return {
+    totalCount,
+    activeCount,
+    inactiveCount,
+    classesCount,
   }
 }
 
@@ -254,4 +312,3 @@ export async function saveSubjectQuestionTypes(
     return { success: true }
   })
 }
-

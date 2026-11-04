@@ -30,6 +30,7 @@ import {
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { CS_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
 import { PageHeader } from "@/components/shared/page-header"
+import { QuestionAttachmentUploader, type AttachmentItem } from "@/components/shared"
 import {
   Plus,
   ArrowLeft,
@@ -48,6 +49,21 @@ const createCsFormSchema = z.object({
   context: z.string().optional(),
   contextCaption: z.string().optional(),
   contextBottomContent: z.string().optional(),
+  mediaAttachments: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        type: z.string(),
+        caption: z.string().nullable().optional(),
+        content: z.string().nullable().optional(),
+        url: z.string().nullable().optional(),
+        table: z.any().nullable().optional(),
+        bottomContent: z.string().nullable().optional(),
+        tableBorder: z.boolean().nullable().optional(),
+        position: z.number().optional(),
+      })
+    )
+    .optional(),
   questionA: z.string().min(1, "ক প্রশ্ন লেখা আবশ্যক"),
   questionB: z.string().min(1, "খ প্রশ্ন লেখা আবশ্যক"),
   referenceText: z.string().optional(),
@@ -84,6 +100,7 @@ export function CreateCsView() {
       context: "",
       contextCaption: "",
       contextBottomContent: "",
+      mediaAttachments: [],
       questionA: "",
       questionB: "",
       referenceText: "",
@@ -97,6 +114,7 @@ export function CreateCsView() {
   const watchContext = watch("context")
   const watchContextCaption = watch("contextCaption")
   const watchContextBottomContent = watch("contextBottomContent")
+  const watchMediaAttachments = watch("mediaAttachments")
 
   const selectedClassId = watch("classId")
   const { data: subjects = [] } = useSubjectsForSelection(
@@ -132,6 +150,23 @@ export function CreateCsView() {
           bottomContent: data.contextBottomContent?.trim() || null,
           position: 0,
         })
+      }
+
+      // 2. Media attachments (images, etc.)
+      if (Array.isArray(data.mediaAttachments)) {
+        for (const mAtt of data.mediaAttachments) {
+          compiledAttachments.push({
+            id: mAtt.id,
+            type: mAtt.type || "image",
+            url: mAtt.url || null,
+            caption: mAtt.caption?.trim() || null,
+            content: mAtt.content?.trim() || null,
+            bottomContent: mAtt.bottomContent?.trim() || null,
+            table: mAtt.table || null,
+            tableBorder: mAtt.tableBorder ?? false,
+            position: compiledAttachments.length,
+          })
+        }
       }
 
       await createMutation.mutateAsync({
@@ -409,6 +444,26 @@ export function CreateCsView() {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* Other Media Attachments (Images, Diagrams, etc.) */}
+            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div>
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
+                  সংযুক্ত ছবি ও চিত্র (Question Attachments)
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                  প্রশ্নে সংযুক্ত ছবি আপলোড করুন অথবা ক্যাপশন ও বিবরণ যুক্ত করুন
+                </p>
+              </div>
+
+              <QuestionAttachmentUploader
+                resourceType="CS"
+                attachments={(watchMediaAttachments || []) as AttachmentItem[]}
+                onChange={(updated) => setValue("mediaAttachments", updated, { shouldDirty: true })}
+                disabled={isSubmitting}
+                isMath={true}
+              />
             </div>
 
             {/* Sub-Questions A & B Stems */}

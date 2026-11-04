@@ -5,6 +5,7 @@ import {
   getAcademicClassSchema,
   listAcademicClassesSchema,
   updateAcademicClassSchema,
+  classStatsSchema,
 } from "./academic-class.schema"
 import {
   createAcademicClass,
@@ -13,12 +14,17 @@ import {
   listAcademicClasses,
   updateAcademicClass,
   toggleAcademicClassStatus,
+  getAcademicClassStats,
 } from "./academic-class.service"
 
 export const academicClassRouter = createTRPCRouter({
   list: superAdminProcedure
     .input(listAcademicClassesSchema)
     .query(({ ctx, input }) => listAcademicClasses(ctx.db, input)),
+
+  stats: superAdminProcedure
+    .input(classStatsSchema.optional())
+    .query(({ ctx, input }) => getAcademicClassStats(ctx.db, input)),
 
   byId: superAdminProcedure
     .input(getAcademicClassSchema)

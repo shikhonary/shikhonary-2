@@ -7,20 +7,32 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useCreateChapter, useSubjectsForSelection, useAcademicYearsForSelection, useAcademicClassesForSelection } from "../services/use-chapter"
+import {
+  useCreateChapter,
+  useSubjectsForSelection,
+  useAcademicYearsForSelection,
+  useAcademicClassesForSelection,
+} from "../services/use-chapter"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { BookOpen, Calendar, Layers, Loader2, Save, ArrowUpDown } from "lucide-react"
+import { Switch } from "@workspace/ui/components/switch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import { Layers, Loader2, Save, BookOpen, AlertCircle, ChevronRight } from "lucide-react"
 
 const createChapterFormSchema = z.object({
-  nameEn: z.string().min(1, "English Name is required"),
-  nameBn: z.string().min(1, "Bangla Name is required"),
-  position: z.coerce.number().int().min(0, "Position must be a positive integer"),
+  nameBn: z.string().min(1, "অধ্যায়ের বাংলা নাম আবশ্যক"),
+  nameEn: z.string().min(1, "অধ্যায়ের ইংরেজি নাম আবশ্যক"),
+  position: z.coerce.number().int().min(0, "ক্রম অবশ্যই শূন্য বা ধনাত্মক সংখ্যা হতে হবে"),
   isActive: z.boolean(),
-  subjectId: z.string().min(1, "Academic Subject is required"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করা আবশ্যক"),
   academicYearId: z.string().optional().nullable(),
 })
 
@@ -37,13 +49,12 @@ export function CreateChapterView() {
     handleSubmit,
     control,
     watch,
-    setValue,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<CreateChapterFormData>({
     resolver: zodResolver(createChapterFormSchema),
     defaultValues: {
-      nameEn: "",
       nameBn: "",
+      nameEn: "",
       position: 0,
       isActive: true,
       subjectId: "",
@@ -51,7 +62,6 @@ export function CreateChapterView() {
     },
   })
 
-  const isActive = watch("isActive")
   const selectedYear = watch("academicYearId")
   const isSubmitting = createMutation.isPending || isFormSubmitting
 
@@ -74,29 +84,29 @@ export function CreateChapterView() {
 
     try {
       await createMutation.mutateAsync({
-        nameEn: data.nameEn.trim(),
         nameBn: data.nameBn.trim(),
+        nameEn: data.nameEn.trim(),
         position: data.position,
         subjectId: data.subjectId,
         academicYearId: data.academicYearId || null,
         isActive: data.isActive,
       })
 
-      toast.success("Academic Chapter created successfully.")
+      toast.success("নতুন অধ্যায়টি সফলভাবে তৈরি করা হয়েছে।")
       setTimeout(() => {
         router.push("/chapters")
-      }, 1000)
+      }, 700)
     } catch (err: any) {
-      const msg = err.message || "Failed to create academic chapter"
+      const msg = err.message || "অধ্যায় তৈরিতে সমস্যা হয়েছে"
       setErrorMessage(msg)
       toast.error(msg)
     }
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header Section */}
-      <div className="mb-6 sm:mb-10 flex flex-col gap-4 md:flex-row md:items-end justify-between">
+    <div className="w-full min-w-0 max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Header Section matching Subject module */}
+      <div className="mb-6 sm:mb-8 flex flex-col gap-4 md:flex-row md:items-end justify-between">
         <div className="max-w-2xl">
           <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
             <Link
@@ -105,277 +115,239 @@ export function CreateChapterView() {
             >
               Chapters
             </Link>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
+            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-label-sm text-xs font-bold text-primary">Create New</span>
           </nav>
           <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
             New Academic Chapter
           </h2>
           <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Create chapters, define positions/serial values, and associate them with subject syllabus structures.
+            Configure academic chapters, index serial numbers, and associate with subjects.
           </p>
         </div>
       </div>
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="mb-6 flex items-center gap-3 rounded-xl border border-error/30 bg-error-container/20 p-4 text-error">
-          <span className="material-symbols-outlined text-lg">error</span>
-          <span className="font-body-md text-xs sm:text-sm font-medium">{errorMessage}</span>
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200/80 dark:border-rose-900/40 bg-rose-50/60 dark:bg-rose-950/20 p-4 text-rose-600 dark:text-rose-400">
+          <AlertCircle className="size-5 shrink-0" />
+          <span className="text-xs sm:text-sm font-medium">{errorMessage}</span>
         </div>
       )}
 
-      {/* Form Card */}
-      <Card className="mx-auto max-w-4xl overflow-hidden rounded-xl border border-outline-variant bg-white p-0 shadow-xs ring-0">
-        <CardHeader className="border-b border-outline-variant/40 bg-surface-container-lowest p-4 sm:p-8 flex flex-row items-center gap-3 sm:gap-4">
-          <div className="flex size-10 sm:size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-            <Layers className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
-          <div>
-            <CardTitle className="font-headline-md text-base sm:text-[20px] font-extrabold text-on-surface normal-case tracking-normal">
-              Chapter Specifications
-            </CardTitle>
-            <p className="text-[11px] sm:text-xs font-body-md text-on-surface-variant mt-0.5">
-              Enter chapter titles, numeric positions, and select parent syllabus attributes.
-            </p>
+      {/* Form Card matching MCQ */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs">
+        <CardHeader className="border-b border-slate-200/60 dark:border-white/[0.06] p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-primary flex items-center justify-center shrink-0">
+              <BookOpen className="size-5" />
+            </div>
+            <div>
+              <CardTitle className="text-base sm:text-lg font-bold text-foreground font-headline">
+                অধ্যায়ের তথ্য ও বিবরণ
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5 font-body">
+                অধ্যায়ের বাংলা ও ইংরেজি শিরোনাম, ক্রম এবং শ্রেণি/বিষয় সম্পর্ক নির্ধারণ করুন
+              </p>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4 sm:p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
-            <div className="space-y-6">
-              {/* Row 1: Academic Year (form field) + Class filter (UI only, not saved) */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Academic Year — stored on chapter */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Academic Year
-                  </Label>
-                  <div className="group relative">
-                    <Controller
-                      control={control}
-                      name="academicYearId"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value || "None"}
-                          disabled={isSubmitting || isYearsLoading}
-                          onValueChange={(val) => {
-                            field.onChange(val === "None" ? null : val)
-                            setSelectedClass("None")
-                            setValue("subjectId", "")
-                          }}
-                        >
-                          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50">
-                            <SelectValue placeholder={isYearsLoading ? "Loading..." : "Select Academic Year"} />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-[200px] overflow-y-auto">
-                            <SelectItem value="None">Select Academic Year</SelectItem>
-                            {years.map((y) => (
-                              <SelectItem key={y.id} value={y.id}>
-                                {y.nameEn} ({y.nameBn})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                  {errors.academicYearId && (
-                    <p className="text-xs text-error">{errors.academicYearId.message}</p>
-                  )}
-                </div>
 
-                {/* Academic Class — UI filter only, NOT stored on chapter */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Filter by Class
-                    <span className="ml-1.5 normal-case text-[10px] font-normal text-on-surface-variant/60">(not saved)</span>
-                  </Label>
-                  <div className="group relative">
+        <CardContent className="p-5 sm:p-7">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Row 1: Academic Year + Academic Class */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* Academic Year */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শিক্ষাবর্ষ (Academic Year)
+                </Label>
+                <Controller
+                  control={control}
+                  name="academicYearId"
+                  render={({ field }) => (
                     <Select
-                      value={selectedClass}
-                      disabled={isSubmitting || isClassesLoading}
-                      onValueChange={(val) => {
-                        setSelectedClass(val)
-                        setValue("subjectId", "")
-                      }}
+                      value={field.value ?? ""}
+                      onValueChange={(val) => field.onChange(val === "none" ? null : val)}
+                      disabled={isSubmitting || isYearsLoading}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50">
-                        <SelectValue placeholder={isClassesLoading ? "Loading..." : "Select class to filter subjects"} />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5">
+                        <SelectValue placeholder="শিক্ষাবর্ষ নির্বাচন করুন (ঐচ্ছিক)" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-[200px] overflow-y-auto">
-                        <SelectItem value="None">All Classes</SelectItem>
-                        {classes.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            {c.nameEn} ({c.nameBn})
+                      <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
+                        <SelectItem value="none">কোনো নির্দিষ্ট বছর নয়</SelectItem>
+                        {years.map((y) => (
+                          <SelectItem key={y.id} value={y.id}>
+                            {y.nameBn || y.nameEn}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Subject | Position */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Subject — stored on chapter (required) */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Subject *
-                  </Label>
-                  <div className="group relative">
-                    <Controller
-                      control={control}
-                      name="subjectId"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value || "None"}
-                          disabled={isSubmitting || isSubjectsLoading}
-                          onValueChange={(val) => field.onChange(val === "None" ? "" : val)}
-                        >
-                          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50">
-                            <SelectValue placeholder={
-                              isSubjectsLoading
-                                ? "Loading Subjects..."
-                                : selectedClass === "None"
-                                ? "Select Subject (or pick a class to filter)"
-                                : "Select Subject"
-                            } />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg max-h-[200px] overflow-y-auto">
-                            <SelectItem value="None">Select Subject</SelectItem>
-                            {subjects.map((s) => (
-                              <SelectItem key={s.id} value={s.id}>
-                                {s.nameEn} ({s.nameBn})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                  {errors.subjectId && (
-                    <p className="text-xs text-error">{errors.subjectId.message}</p>
                   )}
-                </div>
-
-                {/* Position — stored on chapter */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Serial Position / Order *
-                  </Label>
-                  <div className="group relative">
-                    <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
-                    <Input
-                      type="number"
-                      disabled={isSubmitting}
-                      placeholder="e.g. 1"
-                      {...register("position")}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.position && (
-                    <p className="text-xs text-error">{errors.position.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Row 3: Chapter Names (English & Bangla) */}
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Name EN */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Chapter Name (English) *
-                  </Label>
-                  <div className="group relative">
-                    <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="e.g. Linear Equations"
-                      {...register("nameEn")}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.nameEn && (
-                    <p className="text-xs text-error">{errors.nameEn.message}</p>
-                  )}
-                </div>
-
-                {/* Name BN */}
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Chapter Name (Bangla) *
-                  </Label>
-                  <div className="group relative">
-                    <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors h-4.5 w-4.5" />
-                    <Input
-                      type="text"
-                      disabled={isSubmitting}
-                      placeholder="যেমন: সরল সমীকরণ"
-                      {...register("nameBn")}
-                      className="w-full rounded-lg border border-outline-variant py-2.5 sm:py-3 pl-10 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-auto"
-                    />
-                  </div>
-                  {errors.nameBn && (
-                    <p className="text-xs text-error">{errors.nameBn.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Is Active Toggle */}
-              <div className="flex items-center space-x-3 rounded-lg border border-outline-variant/40 p-4 bg-surface-container-low">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={isActive}
-                  disabled={isSubmitting}
-                  onChange={(e) => {
-                    const { onChange } = register("isActive")
-                    onChange(e)
-                  }}
-                  className="size-4 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer disabled:opacity-50"
                 />
-                <div className="select-none">
-                  <label
-                    htmlFor="isActive"
-                    className="text-xs font-bold text-on-surface cursor-pointer flex items-center gap-1.5"
-                  >
-                    Enable/Activate Chapter
-                  </label>
-                  <p className="text-[11px] text-on-surface-variant mt-0.5">
-                    Allows this chapter to be linked to curriculum content and examinations.
-                  </p>
-                </div>
+              </div>
+
+              {/* Class Filter (helps filter subjects) */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Class Filter)
+                </Label>
+                <Select
+                  value={selectedClass}
+                  onValueChange={(val) => setSelectedClass(val ?? "None")}
+                  disabled={isSubmitting || isClassesLoading}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5">
+                    <SelectValue placeholder="শ্রেণি দিয়ে বিষয় ফিল্টার করুন" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] rounded-xl shadow-lg font-body">
+                    <SelectItem value="None">সকল শ্রেণি</SelectItem>
+                    {classes.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nameBn || c.nameEn}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {/* Actions Footer */}
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-outline-variant/40">
-              <Link href="/chapters">
-                <Button
-                  type="button"
-                  variant="outline"
+            {/* Row 2: Subject + Position */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* Subject */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  control={control}
+                  name="subjectId"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={(val) => field.onChange(val)}
+                      disabled={isSubmitting || isSubjectsLoading}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5">
+                        <SelectValue placeholder="বিষয় নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] rounded-xl shadow-lg max-h-60 font-body">
+                        {subjects.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.nameBn || s.nameEn} {s.code ? `(${s.code})` : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.subjectId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.subjectId.message}</p>
+                )}
+              </div>
+
+              {/* Position / Serial Number */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায়ের ক্রম (Position / Serial Number) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  type="number"
+                  min="0"
                   disabled={isSubmitting}
-                  className="rounded-lg border border-outline px-6 py-2.5 font-bold text-primary hover:bg-surface-container-low transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
-                >
-                  Cancel
-                </Button>
-              </Link>
+                  placeholder="যেমন: ১, ২, ৩..."
+                  {...register("position")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-mono"
+                />
+                {errors.position && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.position.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 3: Bangla Name + English Name */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {/* Bangla Name */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায়ের নাম (বাংলা) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="যেমন: প্রথম অধ্যায়: আমাদের পরিবেশ"
+                  {...register("nameBn")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-headline"
+                />
+                {errors.nameBn && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.nameBn.message}</p>
+                )}
+              </div>
+
+              {/* English Name */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায়ের নাম (English) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  disabled={isSubmitting}
+                  placeholder="e.g. Chapter 1: Our Environment"
+                  {...register("nameEn")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5"
+                />
+                {errors.nameEn && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.nameEn.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Row 4: Status Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02]">
+              <div className="space-y-0.5">
+                <Label className="text-sm font-semibold text-foreground cursor-pointer">
+                  অধ্যায় সক্রিয় থাকবে (Active Status)
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  সক্রিয় থাকলে শিক্ষক ও শিক্ষার্থীরা এই অধ্যায়টি প্রশ্ন ব্যাংক ও সিলেবাসে দেখতে পাবে
+                </p>
+              </div>
+              <Controller
+                control={control}
+                name="isActive"
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Form Actions Footer matching MCQ */}
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-slate-200/60 dark:border-white/[0.06]">
+              <Button
+                type="button"
+                variant="outline"
+                asChild
+                className="w-full sm:w-auto h-11 px-5 rounded-xl border-slate-200 dark:border-white/[0.08] text-muted-foreground hover:text-foreground"
+              >
+                <Link href="/chapters">বাতিল করুন</Link>
+              </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded-lg bg-primary-container px-8 py-2.5 font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white transition-all cursor-pointer h-auto text-sm disabled:opacity-50"
+                className="w-full sm:w-auto h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm gap-2"
               >
                 {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Saving...</span>
-                  </div>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>সংরক্ষণ হচ্ছে...</span>
+                  </>
                 ) : (
-                  <div className="flex items-center gap-1.5">
-                    <Save className="h-4 w-4" />
-                    <span>Save Chapter</span>
-                  </div>
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>অধ্যায় সংরক্ষণ করুন</span>
+                  </>
                 )}
               </Button>
             </div>

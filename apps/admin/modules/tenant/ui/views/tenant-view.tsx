@@ -20,7 +20,6 @@ import { TenantDetailsSubscription } from "../components/tenant-details-subscrip
 import { TenantDetailsDatabase } from "../components/tenant-details-database"
 import { TenantDetailsInvitations } from "../components/tenant-details-invitations"
 import { InviteAdminModal } from "../components/invite-admin-modal"
-import { DeleteTenantModal } from "../components/delete-tenant-modal"
 
 interface TenantViewProps {
   tenantId: string
@@ -28,14 +27,15 @@ interface TenantViewProps {
 
 export const TenantView = ({ tenantId }: TenantViewProps) => {
   const router = useRouter()
-  const { data: tenant, isLoading } = useQuery(
+  const { data: rawTenant, isLoading } = useQuery(
     trpc.tenant.byId.queryOptions({ id: tenantId })
   )
+  const tenant = rawTenant as any
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8 text-on-surface-variant">
-        Loading Union Porishod details...
+      <div className="min-h-screen flex items-center justify-center p-8 text-slate-500">
+        প্রতিষ্ঠানের বিস্তারিত তথ্য লোড হচ্ছে...
       </div>
     )
   }
@@ -48,9 +48,9 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
             <XCircle className="size-8 text-muted-foreground/50" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-on-surface">Tenant not found</h2>
+            <h2 className="text-xl font-bold text-on-surface">প্রতিষ্ঠানটি পাওয়া যায়নি</h2>
             <p className="text-sm text-on-surface-variant">
-              The tenant you are looking for does not exist or has been removed.
+              আপনি যে প্রতিষ্ঠানটি খুঁজছেন তা মুছে ফেলা হয়েছে অথবা বিদ্যমান নেই।
             </p>
           </div>
           <Button
@@ -60,7 +60,7 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
             onClick={() => router.push("/tenants")}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Tenants
+            প্রতিষ্ঠান তালিকায় ফিরুন
           </Button>
         </div>
       </div>
@@ -158,9 +158,6 @@ export const TenantView = ({ tenantId }: TenantViewProps) => {
 
       {/* Invite Admin Modal */}
       <InviteAdminModal />
-
-      {/* Delete Tenant Modal */}
-      <DeleteTenantModal />
     </div>
   )
 }

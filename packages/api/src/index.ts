@@ -33,6 +33,7 @@ export type {
 
 export type {
   ListTenantsInput,
+  TenantStatsInput,
   GetTenantInput,
   GetTenantBySlugInput,
   CreateTenantInput,
@@ -125,6 +126,7 @@ export type {
 
 export type {
   ListAcademicYearsInput,
+  YearStatsInput,
   GetAcademicYearInput,
   CreateAcademicYearInput,
   UpdateAcademicYearInput,

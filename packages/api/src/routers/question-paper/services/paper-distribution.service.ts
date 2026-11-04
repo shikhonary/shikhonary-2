@@ -343,6 +343,9 @@ export async function getQuestionPaperDistributionStatuses(
         include: {
           distributions: {
             orderBy: { orderIndex: "asc" },
+            include: {
+              subSections: true,
+            },
           },
         },
       },

@@ -1194,6 +1194,14 @@ export async function createQuestionPaperFull(
       ? new Set(subjectInput.questionTypeIds)
       : null
 
+    const sectionMap = new Map<string, any>() // mSec.id -> pSection
+    const subSectionMap = new Map<string, any>() // mSub.id -> pSub
+    const createdSubSections: Array<{
+      pSub: any
+      mSub: any
+      pSection: any
+    }> = []
+
     for (const mSec of mainSections) {
       let shouldCreateSection = true
       let validSubSectionsToCreate = mSec.subSections
@@ -1230,72 +1238,75 @@ export async function createQuestionPaperFull(
           questionsToAttempt: null,
         },
       })
+      sectionMap.set(mSec.id, pSection)
 
-      // Batch-create sub-sections
-      if (validSubSectionsToCreate.length > 0) {
-        const typeCounts = new Map<string, number>()
-        if (subjectInput.questionTypeIds) {
-          for (const tid of subjectInput.questionTypeIds) {
-            typeCounts.set(tid, (typeCounts.get(tid) || 0) + 1)
-          }
-        }
-
-        const subSectionsToCreate: Array<{
-          sectionId: string
-          title: string
-          titleBn: string | null
-          orderIndex: number
-          instructions: string | null
-          questionsToAttempt: number
-        }> = []
-
-        for (const mSub of validSubSectionsToCreate) {
-          const subTypeIds = mSub.subjectQuestionTypes.map((sqt) => sqt.questionTypeId)
-          let requiredInstances = 1
-          if (subjectInput.questionTypeIds && subTypeIds.length > 0) {
-            const matchingCounts = subTypeIds.map((tid) => typeCounts.get(tid) || 0)
-            const maxCount = Math.max(...matchingCounts)
-            if (maxCount > 0) requiredInstances = maxCount
-          }
-
-          for (let idx = 0; idx < requiredInstances; idx++) {
-            subSectionsToCreate.push({
-              sectionId: pSection.id,
-              title: mSub.nameEn || mSub.nameBn || "Sub-section",
-              titleBn: mSub.nameBn,
-              orderIndex: mSub.position + idx,
-              instructions: mSub.instructions ?? null,
-              questionsToAttempt: 0,
-            })
-          }
-        }
-
-        if (subSectionsToCreate.length > 0) {
-          await tenantDb.questionPaperSubSection.createMany({
-            data: subSectionsToCreate,
-          })
-        }
+      // Create each sub-section and retain direct mapping
+      for (const mSub of validSubSectionsToCreate) {
+        const pSub = await tenantDb.questionPaperSubSection.create({
+          data: {
+            sectionId: pSection.id,
+            title: mSub.nameEn || mSub.nameBn || "Sub-section",
+            titleBn: mSub.nameBn,
+            orderIndex: mSub.position,
+            instructions: mSub.instructions ?? null,
+            questionsToAttempt: 0,
+          },
+        })
+        subSectionMap.set(mSub.id, pSub)
+        createdSubSections.push({ pSub, mSub, pSection })
       }
+    }
+
+    // Determine distributions to process (if empty, auto-populate from subject's configured question types)
+    let distributionsToProcess = subjectInput.distributions
+    if (distributionsToProcess.length === 0) {
+      const dbSubjectQuestionTypes = await db.subjectQuestionType.findMany({
+        where: { subjectId: subjectInput.subjectId },
+        orderBy: { position: "asc" },
+        include: { questionType: true },
+      })
+
+      const seenQTypes = new Set<string>()
+      const autoDists: any[] = []
+      for (const sqt of dbSubjectQuestionTypes) {
+        if (!sqt.questionTypeId || seenQTypes.has(sqt.questionTypeId)) continue
+        seenQTypes.add(sqt.questionTypeId)
+        autoDists.push({
+          questionTypeId: sqt.questionTypeId,
+          questionTypeName: sqt.questionType?.nameBn || sqt.questionType?.nameEn || "",
+          questionTypeNameBn: sqt.questionType?.nameBn || null,
+          questionTypeLabel: sqt.customLabel || sqt.questionType?.label || null,
+          marksPerQuestion: sqt.mark || sqt.questionType?.mark || 1,
+          markDistribution: sqt.markDistribution ?? undefined,
+          renderMethod: sqt.renderMethod ?? 1,
+          questionCount: sqt.totalQuestions || 0,
+          questionsToAttempt: sqt.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null,
+          orderIndex: sqt.position,
+        })
+      }
+      distributionsToProcess = autoDists
     }
 
     // Create distributions for this subject
     let subjectTotal = 0
 
-    for (const distInput of subjectInput.distributions) {
-      const sqType = await db.subjectQuestionType.findFirst({
+    for (const distInput of distributionsToProcess) {
+      const matchingSqTypes = await db.subjectQuestionType.findMany({
         where: {
           subjectId: subjectInput.subjectId,
           questionTypeId: distInput.questionTypeId,
         },
         include: { section: true, subSection: true },
+        orderBy: { position: "asc" },
       })
+      const primarySqType = matchingSqTypes[0]
 
       const qType = qTypeMap.get(distInput.questionTypeId)
       const isEnglishSubject = /english|ইংরেজি/i.test(subjectInput.subjectName || "")
 
       const isInputNameEng = distInput.questionTypeName && !/[\u0980-\u09FF]/.test(distInput.questionTypeName)
       const isInputLabelEng = distInput.questionTypeLabel && !/[\u0980-\u09FF]/.test(distInput.questionTypeLabel)
-      const isCustomLabelEng = sqType?.customLabel && !/[\u0980-\u09FF]/.test(sqType.customLabel)
+      const isCustomLabelEng = primarySqType?.customLabel && !/[\u0980-\u09FF]/.test(primarySqType.customLabel)
 
       const questionTypeName = isEnglishSubject
         ? ((isInputNameEng ? distInput.questionTypeName : null) || qType?.nameEn || qType?.nameBn || "")
@@ -1305,12 +1316,12 @@ export async function createQuestionPaperFull(
 
       const questionTypeLabel = isEnglishSubject
         ? ((isInputLabelEng ? distInput.questionTypeLabel : null) ||
-           (isCustomLabelEng ? sqType?.customLabel : null) ||
+           (isCustomLabelEng ? primarySqType?.customLabel : null) ||
            qType?.nameEn ||
            qType?.label ||
            null)
         : ((distInput.questionTypeLabel && /[\u0980-\u09FF]/.test(distInput.questionTypeLabel) ? distInput.questionTypeLabel : null) ||
-           sqType?.customLabel ||
+           primarySqType?.customLabel ||
            (qType?.label && /[\u0980-\u09FF]/.test(qType.label) ? qType.label : null) ||
            qType?.nameBn ||
            distInput.questionTypeLabel ||
@@ -1321,19 +1332,33 @@ export async function createQuestionPaperFull(
       const markDistribution = syncMarkDistribution(
         distInput.marksPerQuestion,
         distInput.markDistribution,
-        sqType?.markDistribution
+        primarySqType?.markDistribution
       )
 
       const attemptCount = distInput.questionsToAttempt ?? distInput.questionCount
       const totalMarks = distInput.marksPerQuestion * attemptCount
 
       let sectionId: string | null = null
-      if (sqType?.section) {
+      for (const sq of matchingSqTypes) {
+        if (sq.sectionId && sectionMap.has(sq.sectionId)) {
+          sectionId = sectionMap.get(sq.sectionId).id
+          break
+        }
+      }
+      if (!sectionId) {
+        for (const sq of matchingSqTypes) {
+          if (sq.subSectionId && subSectionMap.has(sq.subSectionId)) {
+            sectionId = subSectionMap.get(sq.subSectionId).sectionId
+            break
+          }
+        }
+      }
+      if (!sectionId && primarySqType?.section) {
         const pSec = await tenantDb.questionPaperSection.findFirst({
           where: {
             questionPaperId: paper.id,
-            title: sqType.section.nameEn || sqType.section.nameBn || "",
-            titleBn: sqType.section.nameBn,
+            title: primarySqType.section.nameEn || primarySqType.section.nameBn || "",
+            titleBn: primarySqType.section.nameBn,
           },
         })
         if (pSec) sectionId = pSec.id
@@ -1348,7 +1373,7 @@ export async function createQuestionPaperFull(
           questionTypeLabel,
           marksPerQuestion: distInput.marksPerQuestion,
           markDistribution: markDistribution as any,
-          renderMethod: sqType?.renderMethod ?? distInput.renderMethod ?? 1,
+          renderMethod: primarySqType?.renderMethod ?? distInput.renderMethod ?? 1,
           questionCount: distInput.questionCount,
           totalMarks,
           questionsToAttempt: distInput.questionsToAttempt ?? distInput.questionCount,
@@ -1357,42 +1382,57 @@ export async function createQuestionPaperFull(
         },
       })
 
-      if (sectionId && sqType?.subSection) {
-        const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
-          where: {
-            sectionId,
-            title: sqType.subSection.nameEn || sqType.subSection.nameBn || "",
-            titleBn: sqType.subSection.nameBn,
-          },
-          orderBy: { orderIndex: "asc" },
-        })
+      // Link to all relevant sub-sections based on subject question structure
+      const targetSubSectionIds = new Set<string>()
 
-        for (const sub of candidateSubs) {
-          await tenantDb.questionPaperSubSectionDistribution.upsert({
-            where: {
-              subSectionId_distributionId: {
-                subSectionId: sub.id,
-                distributionId: dist.id,
-              },
-            },
-            create: { subSectionId: sub.id, distributionId: dist.id },
-            update: {},
-          }).catch(() => { })
+      // 1. Direct match by subSectionId from matchingSqTypes
+      for (const sq of matchingSqTypes) {
+        if (sq.subSectionId && subSectionMap.has(sq.subSectionId)) {
+          targetSubSectionIds.add(subSectionMap.get(sq.subSectionId).id)
         }
       }
 
-      if (sectionId) {
-        const secSubs = await tenantDb.questionPaperSubSection.findMany({
-          where: { sectionId },
-          select: { questionsToAttempt: true },
-        })
-        const secAttemptSum = secSubs.reduce((sum, s) => sum + (s.questionsToAttempt || 0), 0)
-        if (secAttemptSum > 0) {
-          await tenantDb.questionPaperSection.update({
-            where: { id: sectionId },
-            data: { questionsToAttempt: secAttemptSum },
-          }).catch(() => { })
+      // 2. Match from createdSubSections where mSub includes this questionTypeId
+      for (const entry of createdSubSections) {
+        const subTypeIds = entry.mSub.subjectQuestionTypes?.map((sqt: any) => sqt.questionTypeId) || []
+        if (subTypeIds.includes(distInput.questionTypeId)) {
+          targetSubSectionIds.add(entry.pSub.id)
         }
+      }
+
+      // 3. Fallback: match by title / titleBn in candidateSubs if sectionId exists
+      if (targetSubSectionIds.size === 0 && sectionId) {
+        for (const sq of matchingSqTypes) {
+          if (sq.subSection) {
+            const candidateSubs = await tenantDb.questionPaperSubSection.findMany({
+              where: {
+                sectionId,
+                title: sq.subSection.nameEn || sq.subSection.nameBn || "",
+                titleBn: sq.subSection.nameBn,
+              },
+            })
+            for (const cSub of candidateSubs) {
+              targetSubSectionIds.add(cSub.id)
+            }
+          }
+        }
+      }
+
+      // Create QuestionPaperSubSectionDistribution for EVERY matching sub-section
+      for (const subId of targetSubSectionIds) {
+        await tenantDb.questionPaperSubSectionDistribution.upsert({
+          where: {
+            subSectionId_distributionId: {
+              subSectionId: subId,
+              distributionId: dist.id,
+            },
+          },
+          create: {
+            subSectionId: subId,
+            distributionId: dist.id,
+          },
+          update: {},
+        }).catch(() => { })
       }
 
       subjectTotal += totalMarks

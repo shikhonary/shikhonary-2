@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import type { ListAcademicClassesInput } from "@workspace/api"
-
 import { toast } from "@workspace/ui/components/sonner"
 
 /**
@@ -11,6 +10,24 @@ export function useAcademicClassesList(
   input: ListAcademicClassesInput = { limit: 100 }
 ) {
   return useQuery(trpc.academicClass.list.queryOptions(input))
+}
+
+/**
+ * Hook to fetch academic class stats.
+ */
+export function useAcademicClassStats(input?: { academicYearId?: string }) {
+  return useQuery(
+    trpc.academicClass.stats.queryOptions({
+      academicYearId: input?.academicYearId === "All" ? undefined : input?.academicYearId,
+    })
+  )
+}
+
+/**
+ * Hook to fetch academic years for filter dropdown.
+ */
+export function useAcademicYearsForSelection() {
+  return useQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
 }
 
 /**
@@ -75,8 +92,8 @@ export function useToggleAcademicClassStatus() {
     ...trpc.academicClass.toggleStatus.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.academicClass.pathFilter())
-      toast.success("Academic Class status updated.")
+      toast.success("শ্রেণির সক্রিয় অবস্থা সফলভাবে পরিবর্তন করা হয়েছে।")
     },
-    onError: (err: any) => toast.error(err.message || "Failed to update status"),
+    onError: (err: any) => toast.error(err.message || "অবস্থা পরিবর্তন ব্যর্থ হয়েছে"),
   })
 }

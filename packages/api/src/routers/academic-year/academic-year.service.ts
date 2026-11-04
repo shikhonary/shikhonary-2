@@ -6,6 +6,7 @@ import type {
   GetAcademicYearInput,
   ListAcademicYearsInput,
   UpdateAcademicYearInput,
+  YearStatsInput,
 } from "./academic-year.schema"
 
 export async function listAcademicYears(
@@ -13,8 +14,27 @@ export async function listAcademicYears(
   input: ListAcademicYearsInput,
 ) {
   const where: any = {}
-  if (typeof input.isActive === "boolean") where.isActive = input.isActive
-  
+
+  if (typeof input.isActive === "boolean") {
+    where.isActive = input.isActive
+  } else if (typeof input.isActive === "string") {
+    if (input.isActive === "ACTIVE" || input.isActive === "true") {
+      where.isActive = true
+    } else if (input.isActive === "INACTIVE" || input.isActive === "false") {
+      where.isActive = false
+    }
+  }
+
+  if (typeof input.isCurrent === "boolean") {
+    where.isCurrent = input.isCurrent
+  } else if (typeof input.isCurrent === "string") {
+    if (input.isCurrent === "CURRENT" || input.isCurrent === "true") {
+      where.isCurrent = true
+    } else if (input.isCurrent === "NOT_CURRENT" || input.isCurrent === "false") {
+      where.isCurrent = false
+    }
+  }
+
   if (input.query) {
     where.OR = [
       { nameEn: { contains: input.query, mode: "insensitive" } },
@@ -44,6 +64,14 @@ export async function listAcademicYears(
       skip,
       cursor: input.cursor ? { id: input.cursor } : undefined,
       orderBy,
+      include: {
+        _count: {
+          select: {
+            subjects: true,
+            chapters: true,
+          },
+        },
+      },
     }),
     db.academicYear.count({ where }),
   ])
@@ -60,6 +88,28 @@ export async function listAcademicYears(
     page,
     limit,
     nextCursor,
+  }
+}
+
+export async function getAcademicYearStats(
+  db: PrismaClient,
+  _input?: YearStatsInput,
+) {
+  const [totalCount, activeCount, inactiveCount, currentYear] = await Promise.all([
+    db.academicYear.count(),
+    db.academicYear.count({ where: { isActive: true } }),
+    db.academicYear.count({ where: { isActive: false } }),
+    db.academicYear.findFirst({
+      where: { isCurrent: true },
+      select: { nameBn: true, nameEn: true },
+    }),
+  ])
+
+  return {
+    totalCount,
+    activeCount,
+    inactiveCount,
+    currentYearName: currentYear ? (currentYear.nameBn || currentYear.nameEn) : null,
   }
 }
 

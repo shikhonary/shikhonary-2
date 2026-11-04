@@ -5,6 +5,8 @@ import {
   getAcademicChapterSchema,
   listAcademicChaptersSchema,
   updateAcademicChapterSchema,
+  chapterStatsSchema,
+  bulkDeleteAcademicChaptersSchema,
 } from "./academic-chapter.schema"
 import {
   createAcademicChapter,
@@ -13,12 +15,18 @@ import {
   listAcademicChapters,
   updateAcademicChapter,
   toggleAcademicChapterStatus,
+  getAcademicChapterStats,
+  bulkDeleteAcademicChapters,
 } from "./academic-chapter.service"
 
 export const academicChapterRouter = createTRPCRouter({
   list: superAdminProcedure
     .input(listAcademicChaptersSchema)
     .query(({ ctx, input }) => listAcademicChapters(ctx.db, input)),
+
+  stats: superAdminProcedure
+    .input(chapterStatsSchema)
+    .query(({ ctx, input }) => getAcademicChapterStats(ctx.db, input)),
 
   byId: superAdminProcedure
     .input(getAcademicChapterSchema)
@@ -39,4 +47,8 @@ export const academicChapterRouter = createTRPCRouter({
   delete: superAdminProcedure
     .input(deleteAcademicChapterSchema)
     .mutation(({ ctx, input }) => deleteAcademicChapter(ctx.db, input)),
+
+  bulkDelete: superAdminProcedure
+    .input(bulkDeleteAcademicChaptersSchema)
+    .mutation(({ ctx, input }) => bulkDeleteAcademicChapters(ctx.db, input)),
 })

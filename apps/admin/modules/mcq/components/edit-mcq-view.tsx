@@ -692,7 +692,7 @@ export function EditMcqView({ id }: EditMcqViewProps) {
               </div>
 
               <QuestionAttachmentUploader
-                resourceId={mcqId}
+                resourceId={id}
                 resourceType="MCQ"
                 attachments={(watchMediaAttachments || []) as AttachmentItem[]}
                 onChange={(updated) => setValue("mediaAttachments", updated, { shouldDirty: true })}

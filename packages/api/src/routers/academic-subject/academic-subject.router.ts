@@ -6,6 +6,7 @@ import {
   listAcademicSubjectsSchema,
   updateAcademicSubjectSchema,
   saveSubjectQuestionTypesSchema,
+  subjectStatsSchema,
 } from "./academic-subject.schema"
 import {
   createAcademicSubject,
@@ -15,12 +16,17 @@ import {
   updateAcademicSubject,
   toggleAcademicSubjectStatus,
   saveSubjectQuestionTypes,
+  getAcademicSubjectStats,
 } from "./academic-subject.service"
 
 export const academicSubjectRouter = createTRPCRouter({
   list: superAdminProcedure
     .input(listAcademicSubjectsSchema)
     .query(({ ctx, input }) => listAcademicSubjects(ctx.db, input)),
+
+  stats: superAdminProcedure
+    .input(subjectStatsSchema.optional())
+    .query(({ ctx, input }) => getAcademicSubjectStats(ctx.db, input)),
 
   byId: superAdminProcedure
     .input(getAcademicSubjectSchema)

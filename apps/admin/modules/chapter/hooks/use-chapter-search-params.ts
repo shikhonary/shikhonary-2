@@ -6,7 +6,10 @@ export const chapterSortOptions = [
   "position_desc",
   "name_asc",
   "name_desc",
+  "newest",
+  "oldest",
 ] as const
+
 export type ChapterSortOption = (typeof chapterSortOptions)[number]
 
 export const chapterSearchParamsParsers = {
@@ -14,9 +17,10 @@ export const chapterSearchParamsParsers = {
   sort: parseAsStringEnum<ChapterSortOption>(Array.from(chapterSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),
-  subjectId: parseAsString.withDefault("All"),
   academicYearId: parseAsString.withDefault("All"),
   classId: parseAsString.withDefault("All"),
+  subjectId: parseAsString.withDefault("All"),
+  isActive: parseAsString.withDefault("All"),
 }
 
 export function useChapterSearchParams() {

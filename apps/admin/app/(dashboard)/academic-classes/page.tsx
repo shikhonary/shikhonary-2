@@ -4,8 +4,11 @@ import { AcademicClassListPage } from "@/modules/academic-class/pages/academic-c
 
 export default async function AcademicClassesPage() {
   const queryClient = getQueryClient()
-  // Prefetch academic classes list
-  void queryClient.prefetchQuery(trpc.academicClass.list.queryOptions({ limit: 100 }))
+
+  // Prefetch academic classes list, stats, and academic years for filters
+  void queryClient.prefetchQuery(trpc.academicClass.list.queryOptions({ limit: 10 }))
+  void queryClient.prefetchQuery(trpc.academicClass.stats.queryOptions({}))
+  void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
 
   return (
     <HydrateClient>

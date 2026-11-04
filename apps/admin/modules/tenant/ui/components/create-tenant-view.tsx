@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
@@ -12,7 +12,8 @@ import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@workspace/ui/components/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { TENANT_TYPE_OPTIONS } from "@workspace/utils"
+import { PageHeader } from "@/components/shared/page-header"
+import { TENANT_TYPE_OPTIONS, toBengaliDigits } from "@workspace/utils"
 import {
   Building2,
   Globe,
@@ -23,7 +24,6 @@ import {
   Check,
   Loader2,
   UserCheck,
-  CheckCircle2,
   ShieldCheck,
   Database,
   Server,
@@ -33,34 +33,38 @@ import {
   RefreshCw,
   LucideIcon,
   Save,
+  CheckCircle2,
+  Phone,
+  Mail,
+  GraduationCap,
 } from "lucide-react"
 
 type ProvisionStatus = "idle" | "pending" | "success" | "error"
 
 const steps = [
-  { id: 1, title: "Basic Info", icon: Building2, description: "Portal slug & school details" },
-  { id: 2, title: "Location & Contact", icon: MapPin, description: "Geographical hierarchy & contact" },
-  { id: 3, title: "Administration", icon: UserCheck, description: "Principal & Vice Principal details" },
-  { id: 4, title: "Subscription & Limits", icon: CreditCard, description: "SaaS plan & custom resource limits" },
+  { id: 1, title: "মৌলিক তথ্য", titleEn: "Basic Info", icon: Building2, description: "পোর্টাল স্লাগ ও প্রতিষ্ঠানের প্রাথমিক বিবরণ" },
+  { id: 2, title: "অবস্থান ও যোগাযোগ", titleEn: "Location & Contact", icon: MapPin, description: "ভৌগোলিক তথ্য, ঠিকানা ও অফিসিয়াল যোগাযোগ" },
+  { id: 3, title: "প্রশাসন", titleEn: "Administration", icon: UserCheck, description: "প্রতিষ্ঠান প্রধান ও স্বাক্ষর কনফিগারেশন" },
+  { id: 4, title: "সাবস্ক্রিপশন ও সীমা", titleEn: "Subscription & Limits", icon: CreditCard, description: "প্ল্যান নির্ধারণ ও কাস্টম রিসোর্স কোটা" },
 ]
 
 const provisionSteps = [
   {
     id: 1,
-    label: "Creating tenant record",
-    description: "Saving institution metadata and subscription to master database",
+    label: "প্রতিষ্ঠান রেকর্ড ও মেটাডেটা তৈরি",
+    description: "মাস্টার ডেটাবেসে প্রতিষ্ঠানের তথ্য ও সাবস্ক্রিপশন রেকর্ড সংরক্ষণ করা হচ্ছে",
     icon: Server,
   },
   {
     id: 2,
-    label: "Provisioning database",
-    description: "Creating a dedicated PostgreSQL database instance for this institution",
+    label: "ক্লাউড ডেটাবেস প্রভিশনিং",
+    description: "এই প্রতিষ্ঠানের জন্য একটি স্বতন্ত্র PostgreSQL ডেটাবেস তৈরি করা হচ্ছে",
     icon: Database,
   },
   {
     id: 3,
-    label: "Applying schema & protocols",
-    description: "Pushing tenant schema and initializing security access",
+    label: "স্কিমা ও নিরাপত্তা প্রোটোকল প্রয়োগ",
+    description: "স্কিমা মাইগ্রেশন সম্পন্ন ও অ্যাক্সেস প্রিভিলেজ ইনিশিয়ালাইজ করা হচ্ছে",
     icon: ShieldCheck,
   },
 ]
@@ -86,7 +90,7 @@ export function CreateTenantView() {
   const [board, setBoard] = useState("")
   const [address, setAddress] = useState("")
 
-  // Step 2: Geography & Contact (Cascading Dropdowns)
+  // Step 2: Geography & Contact
   const [divisionId, setDivisionId] = useState("")
   const [divisionName, setDivisionName] = useState("")
   const [districtId, setDistrictId] = useState("")
@@ -115,9 +119,7 @@ export function CreateTenantView() {
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
 
   // Cascading location queries
-  const { data: divisions = [] } = useQuery(
-    trpc.location.divisions.queryOptions()
-  )
+  const { data: divisions = [] } = useQuery(trpc.location.divisions.queryOptions())
   const { data: districts = [] } = useQuery(
     trpc.location.districts.queryOptions({ divisionId }, { enabled: !!divisionId })
   )
@@ -128,12 +130,27 @@ export function CreateTenantView() {
     trpc.location.unions.queryOptions({ upazilaId }, { enabled: !!upazilaId })
   )
 
+  // Subscription plans
+  const { data: plansData } = useQuery(trpc.subscriptionPlan.forSelection.queryOptions())
+
+  // Create mutation
+  const createMutation = trpc.tenant.create.mutationOptions()
+  const createTenantMutation = (data: any, options: any) => {
+    return queryClient
+      .getMutationCache()
+      .build(queryClient, {
+        ...createMutation,
+        mutationFn: createMutation.mutationFn,
+      })
+      .execute(data)
+      .then(options.onSuccess)
+      .catch(options.onError)
+  }
+
   const handleDivisionChange = (val: string) => {
     setDivisionId(val)
     const selected = divisions.find((d: any) => d.id === val)
     setDivisionName(selected ? selected.name : "")
-
-    // Reset downstream
     setDistrictId("")
     setDistrictName("")
     setUpazilaId("")
@@ -146,8 +163,6 @@ export function CreateTenantView() {
     setDistrictId(val)
     const selected = districts.find((d: any) => d.id === val)
     setDistrictName(selected ? selected.name : "")
-
-    // Reset downstream
     setUpazilaId("")
     setUpazilaName("")
     setUnionId("")
@@ -158,8 +173,6 @@ export function CreateTenantView() {
     setUpazilaId(val)
     const selected = upazilas.find((u: any) => u.id === val)
     setUpazilaName(selected ? selected.name : "")
-
-    // Reset downstream
     setUnionId("")
     setUnionName("")
   }
@@ -169,34 +182,6 @@ export function CreateTenantView() {
     const selected = unions.find((u: any) => u.id === val)
     setUnionName(selected ? selected.name : "")
   }
-
-  const { data: plansData } = useQuery(
-    trpc.subscriptionPlan.forSelection.queryOptions()
-  )
-
-  // Auto-select first/free plan by default if non-selected
-  useEffect(() => {
-    if (!planId && plansData && plansData.length > 0 && plansData[0]?.id) {
-      setPlanId(plansData[0].id)
-    }
-  }, [plansData, planId])
-
-  // Auto-fill Step 4 quota limits based on selected plan tier
-  useEffect(() => {
-    if (planId && plansData) {
-      const selectedPlan = plansData.find((p: any) => p.id === planId)
-      if (selectedPlan) {
-        setCustomStudentLimit(selectedPlan.defaultStudentLimit)
-        setCustomTeacherLimit(selectedPlan.defaultTeacherLimit)
-        setCustomExamLimit(selectedPlan.defaultExamLimit)
-        setCustomStorageLimit(selectedPlan.defaultStorageLimit)
-      }
-    }
-  }, [planId, plansData])
-
-  const createMutation = useMutation(
-    trpc.tenant.create.mutationOptions()
-  )
 
   const isStep1Valid = slug.trim().length > 0 && name.trim().length > 0
   const isStep2Valid =
@@ -209,16 +194,16 @@ export function CreateTenantView() {
 
   const handleNext = () => {
     if (currentStep === 1 && !isStep1Valid) {
-      toast.error("Please enter a valid URL slug and English Name.")
+      toast.error("অনুগ্রহ করে একটি সঠিক পোর্টাল স্লাগ এবং ইংরেজি নাম প্রদান করুন।")
       return
     }
     if (currentStep === 2) {
       if (!isStep2Valid) {
-        toast.error("Please select a Division, District, Upazila, and Union.")
+        toast.error("অনুগ্রহ করে বিভাগ, জেলা, উপজেলা এবং ইউনিয়ন নির্বাচন করুন।")
         return
       }
       if (!isEmailValid || !isPhoneValid) {
-        toast.error("Please enter a valid email address and phone number.")
+        toast.error("অনুগ্রহ করে সঠিক ইমেইল ও ফোন নম্বর প্রদান করুন।")
         return
       }
     }
@@ -245,7 +230,7 @@ export function CreateTenantView() {
 
   const handleFinalSubmit = () => {
     if (!isStep1Valid || !isStep2Valid) {
-      toast.error("Please complete required basic info and geography fields.")
+      toast.error("প্রয়োজনীয় ফিল্ডসমূহ যথাযথভাবে পূরণ করুন।")
       return
     }
 
@@ -255,7 +240,7 @@ export function CreateTenantView() {
     setTimeout(() => setActiveProvisionStep(2), 1500)
     setTimeout(() => setActiveProvisionStep(3), 6000)
 
-    createMutation.mutate(
+    createTenantMutation(
       {
         slug,
         name,
@@ -295,10 +280,12 @@ export function CreateTenantView() {
           setProvisionStatus("success")
           setActiveProvisionStep(4)
           queryClient.invalidateQueries(trpc.tenant.pathFilter())
+          toast.success("প্রতিষ্ঠান সফলভাবে নিবন্ধিত ও প্রভিশন করা হয়েছে।")
         },
         onError: (err: any) => {
           setProvisionStatus("error")
-          setProvisionError(err?.message || "Failed to provision database.")
+          setProvisionError(err?.message || "ডেটাবেস প্রভিশন করতে সমস্যা হয়েছে।")
+          toast.error(err?.message || "প্রতিষ্ঠান তৈরি ব্যর্থ হয়েছে")
         },
       }
     )
@@ -319,62 +306,67 @@ export function CreateTenantView() {
   // ── Provisioning Progress Screen ──────────────────────────────────────────
   if (provisionStatus !== "idle") {
     return (
-      <div className="w-full max-w-3xl mx-auto space-y-8 py-8 animate-in fade-in duration-500">
-        <Card className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white p-5 sm:p-6 shadow-xl text-left gap-4 relative">
-          <CardHeader className="p-0 pb-4 border-b border-outline-variant/30">
-            <div className="flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-                <Database className="h-5 w-5" />
+      <div className="w-full max-w-2xl mx-auto space-y-6 py-10 animate-in fade-in duration-300">
+        <Card className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm">
+          <CardHeader className="p-0 pb-5 border-b border-slate-100 dark:border-slate-800/80">
+            <div className="flex items-center gap-3.5">
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 shrink-0">
+                <Database className="h-6 w-6" />
               </div>
               <div>
-                <CardTitle className="font-headline-md text-lg font-bold tracking-tight text-on-surface">
+                <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                   {provisionStatus === "success"
-                    ? "Institution Live!"
+                    ? "প্রতিষ্ঠান পোর্টাল প্রস্তুত ও সক্রিয়!"
                     : provisionStatus === "error"
-                    ? "Provisioning Error"
-                    : "Setting Up Institution Portal"}
+                    ? "প্রভিশনিং ব্যর্থ হয়েছে"
+                    : "প্রতিষ্ঠান ক্লাউড পোর্টাল তৈরি হচ্ছে"}
                 </CardTitle>
-                <CardDescription className="text-xs text-outline mt-0.5">
+                <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   {provisionStatus === "success"
-                    ? `"${name}" has been registered and its PostgreSQL database is live.`
+                    ? `"${name}" সফলভাবে নিবন্ধিত হয়েছে এবং স্বতন্ত্র ক্লাউড ডেটাবেস সক্রিয় রয়েছে।`
                     : provisionStatus === "error"
-                    ? "An error occurred during database provisioning."
-                    : `Provisioning "${name || slug}" — creating PostgreSQL database & schema.`}
+                    ? "ডেটাবেস ইনস্ট্যান্স প্রস্তুত করার সময় একটি সমস্যা দেখা দিয়েছে।"
+                    : `"${name || slug}"-এর জন্য নতুন PostgreSQL ডেটাবেস ও সিকিউরিটি প্রোটোকল কনফিগার হচ্ছে।`}
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="p-0 pt-6 space-y-6">
-            <div className="space-y-4">
+          <CardContent className="p-0 pt-6 space-y-5">
+            <div className="space-y-3.5">
               {provisionSteps.map((step) => {
-                const isDone = provisionStatus === "success" || (provisionStatus !== "error" && activeProvisionStep > step.id)
-                const isActiveStep = provisionStatus !== "success" && provisionStatus !== "error" && activeProvisionStep === step.id
+                const isDone =
+                  provisionStatus === "success" ||
+                  (provisionStatus !== "error" && activeProvisionStep > step.id)
+                const isActiveStep =
+                  provisionStatus !== "success" &&
+                  provisionStatus !== "error" &&
+                  activeProvisionStep === step.id
                 const isFailed = provisionStatus === "error" && activeProvisionStep === step.id
                 const StepIcon = step.icon
 
                 return (
                   <div
                     key={step.id}
-                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all duration-300 ${
+                    className={`flex items-start gap-3.5 p-4 rounded-xl border transition-all duration-300 ${
                       isDone
-                        ? "border-emerald-500/20 bg-emerald-500/5"
+                        ? "border-emerald-200/80 bg-emerald-50/50 dark:border-emerald-900/40 dark:bg-emerald-950/20"
                         : isActiveStep
-                        ? "border-primary/40 bg-primary/10"
+                        ? "border-indigo-300 bg-indigo-50/50 dark:border-indigo-800 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                         : isFailed
-                        ? "border-red-500/30 bg-red-500/5"
-                        : "border-outline-variant/30 bg-surface-container-low opacity-50"
+                        ? "border-rose-200 bg-rose-50/50 dark:border-rose-900/40 dark:bg-rose-950/20"
+                        : "border-slate-200/60 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-950/20 opacity-50"
                     }`}
                   >
                     <div
                       className={`size-10 rounded-xl flex items-center justify-center border shrink-0 ${
                         isDone
-                          ? "bg-emerald-500 text-white border-emerald-500"
+                          ? "bg-emerald-600 text-white border-emerald-600"
                           : isActiveStep
-                          ? "bg-primary text-white border-primary"
+                          ? "bg-indigo-600 text-white border-indigo-600"
                           : isFailed
-                          ? "bg-red-500 text-white border-red-500"
-                          : "bg-surface-variant text-outline border-outline-variant"
+                          ? "bg-rose-600 text-white border-rose-600"
+                          : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800"
                       }`}
                     >
                       {isDone ? (
@@ -389,46 +381,64 @@ export function CreateTenantView() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-bold ${isDone ? "text-emerald-700" : isActiveStep ? "text-primary" : "text-on-surface"}`}>
+                      <p
+                        className={`text-sm font-bold ${
+                          isDone
+                            ? "text-emerald-700 dark:text-emerald-400"
+                            : isActiveStep
+                            ? "text-indigo-600 dark:text-indigo-400"
+                            : isFailed
+                            ? "text-rose-600 dark:text-rose-400"
+                            : "text-slate-800 dark:text-slate-200"
+                        }`}
+                      >
                         {step.label}
                       </p>
-                      <p className="text-xs text-on-surface-variant mt-0.5">{step.description}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{step.description}</p>
                     </div>
 
-                    {isDone && <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-lg">Done</span>}
-                    {isActiveStep && <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-lg animate-pulse">Running</span>}
+                    {isDone && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 rounded-lg">
+                        সম্পন্ন
+                      </span>
+                    )}
+                    {isActiveStep && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 px-2.5 py-1 rounded-lg animate-pulse">
+                        চলমান
+                      </span>
+                    )}
                   </div>
                 )
               })}
             </div>
 
             {provisionStatus === "error" && provisionError && (
-              <div className="p-4 rounded-xl border border-error/30 bg-error-container/20 text-xs text-error font-medium">
-                <span className="font-bold">Error: </span>
+              <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 dark:border-rose-900/50 dark:bg-rose-950/30 text-xs text-rose-700 dark:text-rose-400 font-medium">
+                <span className="font-bold">ত্রুটি: </span>
                 {provisionError}
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant/30">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
               {provisionStatus === "error" && (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setProvisionStatus("idle")}
-                  className="rounded-lg border border-outline-variant px-5 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container-high cursor-pointer h-10"
+                  className="rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 h-10"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Retry Setup
+                  পুনরায় চেষ্টা করুন
                 </Button>
               )}
               {provisionStatus === "success" && (
                 <Button
                   type="button"
                   onClick={() => router.push("/tenants")}
-                  className="rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 shadow-sm"
+                  className="rounded-xl bg-indigo-600 hover:bg-indigo-700 px-5 py-2 text-xs font-bold text-white h-10 shadow-sm"
                 >
                   <Check className="mr-2 h-4 w-4" />
-                  View All Institutions
+                  প্রতিষ্ঠান তালিকায় যান
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
@@ -441,33 +451,36 @@ export function CreateTenantView() {
 
   // ── Multi-Step Form View ──────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 sm:space-y-8 pb-12 relative">
-      {/* Back Button & Page Header */}
-      <div className="flex flex-col gap-4">
-        <Link
-          href="/tenants"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-outline hover:text-primary transition-colors w-fit"
+    <div className="w-full min-w-0 max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-16">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="নতুন প্রতিষ্ঠান তৈরি (Register Institution)"
+        description="শিক্ষা প্রতিষ্ঠানের বিবরণ, প্রশাসনিক তথ্য, ভৌগোলিক অবস্থান ও ক্লাউড ডেটাবেস কনফিগার করুন।"
+        icon={Building2}
+        badge={{ label: "টেন্যান্ট মডিউল", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "প্রতিষ্ঠান তালিকা", href: "/tenants" },
+          { label: "নতুন প্রতিষ্ঠান তৈরি" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-medium text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Institution List</span>
-        </Link>
+          <Link href="/tenants" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
-        <div>
-          <h2 className="font-headline-md text-2xl sm:text-3xl font-extrabold text-primary md:text-4xl">
-            Register Institution
-          </h2>
-          <p className="max-w-2xl font-body-md text-xs sm:text-sm md:text-base leading-relaxed text-on-surface-variant mt-1">
-            Setup a dedicated multi-tenant digital portal for an educational institution.
-          </p>
-        </div>
-      </div>
-
-      {/* 5-Step Desktop Step Indicator */}
-      <div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-xs relative">
+      {/* 4-Step Indicator */}
+      <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-xs relative">
         <div className="hidden sm:flex justify-between items-center relative">
-          <div className="absolute top-5 left-0 w-full h-0.5 bg-outline-variant/30 -z-0" />
+          <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-100 dark:bg-slate-800 -z-0" />
           <div
-            className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500 -z-0"
+            className="absolute top-5 left-0 h-0.5 bg-indigo-600 transition-all duration-500 -z-0"
             style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
           />
 
@@ -483,21 +496,29 @@ export function CreateTenantView() {
                 className="flex-1 flex flex-col items-center cursor-pointer z-10 group"
               >
                 <div
-                  className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 border-2 bg-white ${
+                  className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 border-2 bg-white dark:bg-slate-900 ${
                     isActiveStep
-                      ? "bg-primary text-white border-primary shadow-md scale-110"
+                      ? "bg-indigo-600 text-white border-indigo-600 shadow-md ring-4 ring-indigo-500/20 scale-110"
                       : isCompletedStep
                       ? "bg-emerald-500 text-white border-emerald-500"
-                      : "text-outline border-outline-variant hover:border-primary/40"
+                      : "text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-400"
                   }`}
                 >
                   {isCompletedStep ? <Check className="h-5 w-5" /> : <StepIcon className="h-5 w-5" />}
                 </div>
                 <div className="mt-2 text-center hidden md:block">
-                  <span className={`text-[9px] font-bold uppercase tracking-wider ${isActiveStep ? "text-primary" : "text-outline"}`}>
-                    Step {step.id}
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider ${
+                      isActiveStep ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400"
+                    }`}
+                  >
+                    ধাপ {toBengaliDigits(step.id)}
                   </span>
-                  <p className={`text-xs font-bold ${isActiveStep ? "text-on-surface" : "text-outline"}`}>
+                  <p
+                    className={`text-xs font-bold ${
+                      isActiveStep ? "text-slate-900 dark:text-slate-100" : "text-slate-500"
+                    }`}
+                  >
                     {step.title}
                   </p>
                 </div>
@@ -509,101 +530,103 @@ export function CreateTenantView() {
         {/* Mobile Step Indicator */}
         <div className="sm:hidden space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold uppercase text-primary">Step {currentStep} of {steps.length}</span>
-            <span className="font-bold text-on-surface">{steps[currentStep - 1]?.title}</span>
+            <span className="font-bold uppercase text-indigo-600 dark:text-indigo-400">
+              ধাপ {toBengaliDigits(currentStep)} / {toBengaliDigits(steps.length)}
+            </span>
+            <span className="font-bold text-slate-800 dark:text-slate-200">{steps[currentStep - 1]?.title}</span>
           </div>
-          <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-            <div className="bg-primary h-full transition-all duration-300" style={{ width: `${(currentStep / steps.length) * 100}%` }} />
+          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-indigo-600 h-full transition-all duration-300"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Main Multi-Step Form Card — Matched with Role Modal Form UI */}
-      <Card className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white p-5 sm:p-6 shadow-xl text-left gap-4">
-        <CardHeader className="p-0 pb-4 border-b border-outline-variant/30 flex flex-row items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+      {/* Main Multi-Step Form Card */}
+      <Card className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
+        <CardHeader className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 p-5 sm:p-6 flex flex-row items-center gap-3.5">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 shrink-0">
             {(() => {
               const StepIcon = steps[currentStep - 1]?.icon as LucideIcon
               return <StepIcon className="h-5 w-5" />
             })()}
           </div>
           <div>
-            <CardTitle className="font-headline-md text-lg font-bold tracking-tight text-on-surface normal-case">
-              Step {currentStep}: {steps[currentStep - 1]?.title}
+            <CardTitle className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+              ধাপ {toBengaliDigits(currentStep)}: {steps[currentStep - 1]?.title} ({steps[currentStep - 1]?.titleEn})
             </CardTitle>
-            <p className="text-xs text-outline mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               {steps[currentStep - 1]?.description}
             </p>
           </div>
         </CardHeader>
 
-        <CardContent className="p-0 pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="p-5 sm:p-7">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Step 1: Basic Info */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Portal Slug (URL Subdomain) *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      পোর্টাল স্লাগ (Subdomain Slug) <span className="text-rose-500">*</span>
                     </Label>
                     <div className="relative">
-                      <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                       <Input
                         value={slug}
                         onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                        placeholder="savar-up"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        placeholder="savar-school"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 pl-10 pr-4 font-mono text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
                     {slug && (
-                      <p className="text-[11px] text-primary font-mono flex items-center gap-1">
-                        <Globe className="h-3 w-3" /> https://{slug}.shikhonary.com
+                      <p className="text-xs text-indigo-600 dark:text-indigo-400 font-mono flex items-center gap-1 mt-1">
+                        <Globe className="h-3.5 w-3.5" /> https://{slug}.shikhonary.com
                       </p>
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      English Name *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      প্রতিষ্ঠানের নাম (ইংরেজি) <span className="text-rose-500">*</span>
                     </Label>
                     <div className="relative">
-                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
+                      <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                       <Input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Savar High School"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        placeholder="e.g. Savar High School"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 pl-10 pr-4 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Custom Domain
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      প্রতিষ্ঠানের বাংলা নাম (ঐচ্ছিক)
                     </Label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-outline h-4 w-4" />
-                      <Input
-                        value={customDomain}
-                        onChange={(e) => setCustomDomain(e.target.value)}
-                        placeholder="e.g. savarup.gov.bd"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 pl-9 pr-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                      />
-                    </div>
+                    <Input
+                      value={nameBn}
+                      onChange={(e) => setNameBn(e.target.value)}
+                      placeholder="যেমন: সাভার পাইলট উচ্চ বিদ্যালয়"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
+                    />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Institution Type *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      প্রতিষ্ঠানের ধরন <span className="text-rose-500">*</span>
                     </Label>
                     <Select value={type} onValueChange={setType}>
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                        <SelectValue placeholder="Select Institution Type" />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11">
+                        <SelectValue placeholder="ধরন বাছাই করুন" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant">
+                      <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
                         {TENANT_TYPE_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
                             {opt.label}
@@ -614,65 +637,69 @@ export function CreateTenantView() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    বাংলা নাম (Official Bangla Title)
-                  </Label>
-                  <Input
-                    value={nameBn}
-                    onChange={(e) => setNameBn(e.target.value)}
-                    placeholder="যেমনঃ সাভার হাই স্কুল"
-                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      School EIIN Code
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      EIIN নম্বর (ঐচ্ছিক)
                     </Label>
                     <Input
                       value={eiin}
                       onChange={(e) => setEiin(e.target.value)}
-                      placeholder="e.g. 130456"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="যেমন: 130456"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Education Board
+
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      শিক্ষা বোর্ড (Board)
                     </Label>
                     <Input
                       value={board}
                       onChange={(e) => setBoard(e.target.value)}
-                      placeholder="e.g. Dhaka"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="যেমন: ঢাকা বা কারিগরি"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    School Physical Address
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    কাস্টম ডোমেন (Custom Domain - ঐচ্ছিক)
+                  </Label>
+                  <div className="relative">
+                    <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+                    <Input
+                      value={customDomain}
+                      onChange={(e) => setCustomDomain(e.target.value)}
+                      placeholder="যেমন: schoolname.edu.bd"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 pl-10 pr-4 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    ঠিকানা (Physical Address)
                   </Label>
                   <Input
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="e.g. Majidpur, Savar, Dhaka"
-                    className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                    placeholder="যেমন: মজিদপুর, সাভার, ঢাকা"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Description
+                <div className="space-y-1.5">
+                  <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    প্রতিষ্ঠানের বিবরণ (Description)
                   </Label>
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="A leading educational institution in Savar area..."
+                    placeholder="প্রতিষ্ঠানের পরিচিতি বা সংক্ষিপ্ত পটভূমি..."
                     rows={3}
-                    className="w-full rounded-lg border border-outline-variant py-2 px-3 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden min-h-[80px]"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 min-h-[75px]"
                   />
                 </div>
               </div>
@@ -682,15 +709,15 @@ export function CreateTenantView() {
             {currentStep === 2 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Division (বিভাগ) *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      বিভাগ (Division) <span className="text-rose-500">*</span>
                     </Label>
                     <Select value={divisionId} onValueChange={handleDivisionChange}>
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                        <SelectValue placeholder="Select Division" />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11">
+                        <SelectValue placeholder="বিভাগ নির্বাচন করুন" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant">
+                      <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
                         {divisions.map((d: any) => (
                           <SelectItem key={d.id} value={d.id}>
                             {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
@@ -700,19 +727,19 @@ export function CreateTenantView() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      District (জেলা) *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      জেলা (District) <span className="text-rose-500">*</span>
                     </Label>
                     <Select
                       value={districtId}
                       onValueChange={handleDistrictChange}
                       disabled={!divisionId}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
-                        <SelectValue placeholder={divisionId ? "Select District" : "Select Division first"} />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11 disabled:opacity-50">
+                        <SelectValue placeholder={divisionId ? "জেলা নির্বাচন করুন" : "আগে বিভাগ নির্বাচন করুন"} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant">
+                      <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
                         {districts.map((d: any) => (
                           <SelectItem key={d.id} value={d.id}>
                             {d.nameBn ? `${d.name} (${d.nameBn})` : d.name}
@@ -724,19 +751,19 @@ export function CreateTenantView() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Upazila (উপজেলা) *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      উপজেলা (Upazila) <span className="text-rose-500">*</span>
                     </Label>
                     <Select
                       value={upazilaId}
                       onValueChange={handleUpazilaChange}
                       disabled={!districtId}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
-                        <SelectValue placeholder={districtId ? "Select Upazila" : "Select District first"} />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11 disabled:opacity-50">
+                        <SelectValue placeholder={districtId ? "উপজেলা নির্বাচন করুন" : "আগে জেলা নির্বাচন করুন"} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant">
+                      <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
                         {upazilas.map((u: any) => (
                           <SelectItem key={u.id} value={u.id}>
                             {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
@@ -746,19 +773,19 @@ export function CreateTenantView() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Union Name (ইউনিয়ন) *
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      ইউনিয়ন / ওয়ার্ড (Union) <span className="text-rose-500">*</span>
                     </Label>
                     <Select
                       value={unionId}
                       onValueChange={handleUnionChange}
                       disabled={!upazilaId}
                     >
-                      <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer disabled:opacity-50">
-                        <SelectValue placeholder={upazilaId ? "Select Union" : "Select Upazila first"} />
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11 disabled:opacity-50">
+                        <SelectValue placeholder={upazilaId ? "ইউনিয়ন নির্বাচন করুন" : "আগে উপজেলা নির্বাচন করুন"} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white border border-outline-variant">
+                      <SelectContent className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
                         {unions.map((u: any) => (
                           <SelectItem key={u.id} value={u.id}>
                             {u.nameBn ? `${u.name} (${u.nameBn})` : u.name}
@@ -770,67 +797,75 @@ export function CreateTenantView() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Postal Code (ডাক কোড)
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      পোস্ট কোড (Postal Code)
                     </Label>
                     <Input
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="e.g. 1230"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="যেমন: 1340"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Website
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      ওয়েবসাইট লিঙ্ক (Website URL)
                     </Label>
                     <Input
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://school.example.com"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="https://institution.edu.bd"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Phone
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      যোগাযোগের ফোন নম্বর
                     </Label>
-                    <Input
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+880 1700-000000"
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isPhoneValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
-                    />
+                    <div className="relative">
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+                      <Input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+880 1700-000000"
+                        className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm bg-white dark:bg-slate-950 h-10 sm:h-11 ${
+                          !isPhoneValid
+                            ? "border-rose-400 focus-visible:ring-rose-400"
+                            : "border-slate-200 dark:border-slate-800 focus-visible:ring-indigo-500"
+                        }`}
+                      />
+                    </div>
                     {!isPhoneValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid phone number (e.g. +880 1700-000000)</p>
+                      <p className="text-xs text-rose-500 font-medium">সঠিক ফোন নম্বর ফরম্যাট প্রদান করুন</p>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Official Contact Email
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      অফিসিয়াল ইমেইল
                     </Label>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="info@school.shikhonary.com"
-                      className={`w-full rounded-lg border py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 ${
-                        !isEmailValid ? "border-error focus:border-error focus-visible:ring-error/20" : "border-outline-variant"
-                      }`}
-                    />
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="info@school.shikhonary.com"
+                        className={`w-full rounded-xl border py-2.5 pl-10 pr-4 text-sm bg-white dark:bg-slate-950 h-10 sm:h-11 ${
+                          !isEmailValid
+                            ? "border-rose-400 focus-visible:ring-rose-400"
+                            : "border-slate-200 dark:border-slate-800 focus-visible:ring-indigo-500"
+                        }`}
+                      />
+                    </div>
                     {!isEmailValid && (
-                      <p className="text-xs text-error font-medium">Please enter a valid email address (e.g. info@school.shikhonary.com)</p>
+                      <p className="text-xs text-rose-500 font-medium">সঠিক ইমেইল ফরম্যাট প্রদান করুন</p>
                     )}
                   </div>
                 </div>
-
-
               </div>
             )}
 
@@ -838,51 +873,51 @@ export function CreateTenantView() {
             {currentStep === 3 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Principal Name
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      প্রতিষ্ঠান প্রধানের নাম (Principal / Headmaster)
                     </Label>
                     <Input
                       value={principalName}
                       onChange={(e) => setPrincipalName(e.target.value)}
-                      placeholder="Principal Name"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="যেমন: ড. মুহাম্মদ রফিকুল ইসলাম"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Vice Principal Name
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      সহকারী প্রধানের নাম (Vice Principal)
                     </Label>
                     <Input
                       value={vicePrincipalName}
                       onChange={(e) => setVicePrincipalName(e.target.value)}
-                      placeholder="Vice Principal Name"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="যেমন: মোছা: নাজমুন নাহার"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Principal Signature Image URL
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      প্রধানের ডিজিটাল স্বাক্ষর ইমেজ URL
                     </Label>
                     <Input
                       value={principalSignature}
                       onChange={(e) => setPrincipalSignature(e.target.value)}
                       placeholder="https://example.com/signatures/principal.png"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                      Vice Principal Signature Image URL
+                  <div className="space-y-1.5">
+                    <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      সহকারী প্রধানের স্বাক্ষর ইমেজ URL
                     </Label>
                     <Input
                       value={vicePrincipalSignature}
                       onChange={(e) => setVicePrincipalSignature(e.target.value)}
-                      placeholder="https://example.com/signatures/vp.png"
-                      className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                      placeholder="https://example.com/signatures/vice_principal.png"
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                     />
                   </div>
                 </div>
@@ -892,11 +927,11 @@ export function CreateTenantView() {
             {/* Step 4: Subscription & Limits */}
             {currentStep === 4 && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                <div className="space-y-4">
-                  <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                    Select Subscription Plan *
+                <div className="space-y-3">
+                  <Label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    সাবস্ক্রিপশন প্ল্যান নির্বাচন করুন
                   </Label>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {plans.map((p: any) => {
                       const isSelected = planId === p.id
                       return (
@@ -904,37 +939,45 @@ export function CreateTenantView() {
                           key={p.id}
                           type="button"
                           onClick={() => setPlanId(p.id)}
-                          className={`w-full p-4 rounded-xl border border-outline-variant text-left transition-all duration-200 relative group flex items-start gap-4 cursor-pointer ${
+                          className={`p-4 rounded-2xl border text-left transition-all duration-200 relative flex items-start gap-3.5 cursor-pointer ${
                             isSelected
-                              ? "border-primary bg-primary/5 shadow-xs"
-                              : "bg-white hover:border-primary/40 hover:bg-surface-container-low"
+                              ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 shadow-xs ring-1 ring-indigo-500/30"
+                              : "border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/40"
                           }`}
                         >
                           <div
                             className={`size-5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0 transition-all ${
-                              isSelected ? "border-primary bg-primary text-white" : "border-outline-variant"
+                              isSelected
+                                ? "border-indigo-600 bg-indigo-600 text-white"
+                                : "border-slate-300 dark:border-slate-700"
                             }`}
                           >
                             {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-bold text-on-surface text-sm">{p.displayName}</h3>
-                              <div className="text-right">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                                {p.displayName}
+                              </h3>
+                              <div className="text-right shrink-0">
                                 {p.yearlyPriceBDT === 0 ? (
-                                  <span className="text-sm font-extrabold text-primary">Free</span>
+                                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                    ফ্রি
+                                  </span>
                                 ) : (
                                   <div>
-                                    <span className="text-sm font-extrabold text-on-surface">
-                                      ৳{p.yearlyPriceBDT?.toLocaleString()}
+                                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                                      ৳{toBengaliDigits(p.yearlyPriceBDT?.toLocaleString())}
                                     </span>
-                                    <span className="text-[10px] text-outline font-medium">/year</span>
+                                    <span className="text-[10px] text-slate-400">/বছর</span>
                                   </div>
                                 )}
                               </div>
                             </div>
                             {p.description && (
-                              <p className="text-xs text-on-surface-variant mt-0.5 font-medium">{p.description}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                                {p.description}
+                              </p>
                             )}
                           </div>
                         </button>
@@ -943,103 +986,113 @@ export function CreateTenantView() {
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-outline-variant/30">
+                <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                   <div>
-                    <h4 className="text-sm font-bold text-on-surface">Custom Resource Quota Overrides</h4>
-                    <p className="text-xs text-outline mt-0.5">
-                      Optionally override default plan quotas specifically for this institution. Leave empty to use plan defaults.
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                      কাস্টম রিসোর্স কোটা ওভাররাইড (ঐচ্ছিক)
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      প্ল্যানের ডিফল্ট কোটার পরিবর্তে এই প্রতিষ্ঠানের জন্য নির্দিষ্ট সীমা নির্ধারণ করুন। খালি রাখলে প্ল্যানের ডিফল্ট সীমা কার্যকর হবে।
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Student Limit
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                        শিক্ষার্থী সীমা (Student Limit)
                       </Label>
                       <Input
                         type="number"
                         value={customStudentLimit ?? ""}
-                        onChange={(e) => setCustomStudentLimit(e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder="Default plan limit"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        onChange={(e) =>
+                          setCustomStudentLimit(e.target.value ? Number(e.target.value) : undefined)
+                        }
+                        placeholder="প্ল্যানের ডিফল্ট সীমা"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Teacher Seats
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                        শিক্ষক আসন (Teacher Seats)
                       </Label>
                       <Input
                         type="number"
                         value={customTeacherLimit ?? ""}
-                        onChange={(e) => setCustomTeacherLimit(e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder="Default plan seats"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        onChange={(e) =>
+                          setCustomTeacherLimit(e.target.value ? Number(e.target.value) : undefined)
+                        }
+                        placeholder="প্ল্যানের ডিফল্ট আসন"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Exam Quota
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                        পরীক্ষা কোটা (Exam Quota)
                       </Label>
                       <Input
                         type="number"
                         value={customExamLimit ?? ""}
-                        onChange={(e) => setCustomExamLimit(e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder="Default plan quota"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        onChange={(e) =>
+                          setCustomExamLimit(e.target.value ? Number(e.target.value) : undefined)
+                        }
+                        placeholder="প্ল্যানের ডিফল্ট কোটা"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                        Custom Storage Quota (MB)
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                        স্টোরেজ কোটা (Storage in MB)
                       </Label>
                       <Input
                         type="number"
                         value={customStorageLimit ?? ""}
-                        onChange={(e) => setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)}
-                        placeholder="Default storage MB"
-                        className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-mono text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10"
+                        onChange={(e) =>
+                          setCustomStorageLimit(e.target.value ? Number(e.target.value) : undefined)
+                        }
+                        placeholder="যেমন: 5120 (MB)"
+                        className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 h-10 sm:h-11"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3 rounded-lg border border-outline-variant p-4 bg-surface-container-low">
+                <div className="flex items-center space-x-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-950/40">
                   <input
                     type="checkbox"
                     id="isActive"
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
-                    className="size-4 rounded text-primary cursor-pointer"
+                    className="size-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                   />
-                  <label htmlFor="isActive" className="text-xs font-bold text-on-surface cursor-pointer">
-                    Enable Institution Portal Access Immediately
+                  <label htmlFor="isActive" className="text-xs font-semibold text-slate-800 dark:text-slate-200 cursor-pointer">
+                    নিবন্ধনের সাথে সাথে প্রতিষ্ঠান পোর্টাল সক্রিয় (Active) রাখুন
                   </label>
                 </div>
               </div>
             )}
 
-            {/* Actions Footer — Matched with Role Modal Footer */}
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4 border-t border-outline-variant/30">
+            {/* Actions Footer */}
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-5 border-t border-slate-100 dark:border-slate-800/80">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handlePrevious}
-                className="w-full sm:w-auto rounded-lg border border-outline-variant px-5 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container-high cursor-pointer h-10 normal-case tracking-normal"
+                className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 h-10"
               >
                 <ArrowLeft className="h-4 w-4 mr-1.5" />
-                {currentStep === 1 ? "Cancel" : "Previous Step"}
+                {currentStep === 1 ? "বাতিল" : "পূর্ববর্তী ধাপ"}
               </Button>
 
               {currentStep < 4 ? (
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 normal-case tracking-normal shadow-sm"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-5 py-2 text-xs font-semibold text-white h-10 shadow-xs"
                 >
-                  <span>Next Step</span>
+                  <span>পরবর্তী ধাপ</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
@@ -1047,10 +1100,10 @@ export function CreateTenantView() {
                   type="button"
                   onClick={handleFinalSubmit}
                   disabled={!isStep1Valid || !isStep2Valid}
-                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2 text-xs font-bold text-white hover:bg-primary/90 cursor-pointer h-10 normal-case tracking-normal shadow-sm disabled:opacity-50"
+                  className="w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 py-2 text-xs font-semibold text-white h-10 shadow-sm disabled:opacity-50"
                 >
                   <Save className="h-4 w-4" />
-                  <span>Register & Provision Institution</span>
+                  <span>প্রতিষ্ঠান নিবন্ধন ও ক্লাউড প্রভিশনিং সম্পন্ন করুন</span>
                 </Button>
               )}
             </div>

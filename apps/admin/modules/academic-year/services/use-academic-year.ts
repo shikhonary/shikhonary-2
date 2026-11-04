@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
-import type { ListAcademicYearsInput } from "@workspace/api"
-
+import type { ListAcademicYearsInput, YearStatsInput } from "@workspace/api"
 import { toast } from "@workspace/ui/components/sonner"
 
 /**
@@ -14,6 +13,13 @@ export function useAcademicYearsList(
 }
 
 /**
+ * Hook to fetch academic year statistics.
+ */
+export function useAcademicYearStats(input?: YearStatsInput) {
+  return useQuery(trpc.academicYear.stats.queryOptions(input))
+}
+
+/**
  * Hook to fetch a single academic year by ID.
  */
 export function useAcademicYearById(id: string, enabled = true) {
@@ -22,7 +28,6 @@ export function useAcademicYearById(id: string, enabled = true) {
     enabled: Boolean(id) && enabled,
   })
 }
-
 
 /**
  * Hook to create a new academic year.
@@ -76,8 +81,8 @@ export function useToggleAcademicYearStatus() {
     ...trpc.academicYear.toggleStatus.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.academicYear.pathFilter())
-      toast.success("Academic Year status updated.")
+      toast.success("শিক্ষাবর্ষের স্ট্যাটাস সফলভাবে পরিবর্তন করা হয়েছে।")
     },
-    onError: (err: any) => toast.error(err.message || "Failed to update status"),
+    onError: (err: any) => toast.error(err.message || "স্ট্যাটাস পরিবর্তন ব্যর্থ হয়েছে"),
   })
 }

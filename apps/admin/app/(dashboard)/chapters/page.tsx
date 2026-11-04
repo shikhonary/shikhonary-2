@@ -7,6 +7,7 @@ export default async function ChaptersPage() {
 
   // Prefetch lists
   void queryClient.prefetchQuery(trpc.academicChapter.list.queryOptions({ limit: 10 }))
+  void queryClient.prefetchQuery(trpc.academicClass.list.queryOptions({ limit: 100 }))
   void queryClient.prefetchQuery(trpc.academicSubject.list.queryOptions({ limit: 100 }))
   void queryClient.prefetchQuery(trpc.academicYear.list.queryOptions({ limit: 100 }))
 

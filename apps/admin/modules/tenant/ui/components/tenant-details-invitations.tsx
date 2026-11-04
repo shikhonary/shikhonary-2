@@ -61,7 +61,7 @@ export function TenantDetailsInvitations({
               No Active Team Invitations
             </h3>
             <p className="font-body-md text-xs text-on-surface-variant mb-6 max-w-sm">
-              Grant administrative management access to local Union Porishod officials by sending an invitation.
+              Grant administrative management access to institution officials by sending an invitation.
             </p>
             <Button
               variant="outline"

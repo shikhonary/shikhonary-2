@@ -42,13 +42,6 @@ export function CreateQuestionPaperStepper() {
   })
   const subjects = (subjectsData?.academicSubjects ?? []) as Array<{ id: string; nameBn: string; nameEn: string }>
 
-  const { data: typesData, isLoading: isTypesLoading } = useQuery({
-    ...trpc.questionType.list.queryOptions({ limit: 100 }),
-    retry: false,
-    refetchOnWindowFocus: false,
-  })
-  const questionTypes = (typesData?.questionTypes ?? []) as Array<{ id: string; nameBn: string; nameEn: string; mark: number }>
-
   // ── Handlers ───────────────────────────────────────────────────
 
   const handleChange = (updates: Partial<WizardData>) => {
@@ -263,8 +256,7 @@ export function CreateQuestionPaperStepper() {
             onChange={handleChange}
             errors={errors}
             subjects={subjects}
-            questionTypes={questionTypes}
-            isLoading={isSubjectsLoading || isTypesLoading}
+            isLoading={isSubjectsLoading}
           />
         )}
         {currentStep === 2 && (
