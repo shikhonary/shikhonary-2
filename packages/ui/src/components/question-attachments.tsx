@@ -34,7 +34,7 @@ export interface QuestionAttachmentsProps {
 /**
  * Normalizes table data from JSON or object into a standard { headers, rows } structure.
  */
-function normalizeTableData(rawTable: any): {
+export function normalizeTableData(rawTable: any): {
   headers: string[]
   rows: string[][]
 } | null {

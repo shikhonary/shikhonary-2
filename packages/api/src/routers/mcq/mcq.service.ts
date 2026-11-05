@@ -11,6 +11,7 @@ import type {
   ToggleMcqActiveInput,
   ImportMcqsInput,
   McqStatsInput,
+  ResolveMcqReportInput,
 } from "./mcq.schema"
 
 export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
@@ -36,7 +37,7 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   if (input.hasReport !== undefined && input.hasReport !== "All") {
     const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
     const reports = await db.questionReport.findMany({
-      where: { entityType: "MCQ" },
+      where: { entityType: "MCQ", status: "PENDING" },
       select: { entityId: true },
       distinct: ["entityId"],
     })
@@ -159,7 +160,24 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
     itemIds.length > 0
       ? await db.questionReport.findMany({
           where: { entityType: "MCQ", entityId: { in: itemIds } },
-          select: { entityId: true, status: true, reportType: true, description: true },
+          select: {
+            id: true,
+            entityId: true,
+            status: true,
+            reportType: true,
+            description: true,
+            resolvedNote: true,
+            resolvedAt: true,
+            createdAt: true,
+            resolver: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
         })
       : []
 
@@ -169,11 +187,15 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
     reportMap.get(rep.entityId)!.push(rep)
   }
 
-  const enhancedItems = items.map((item) => ({
-    ...item,
-    hasReport: reportMap.has(item.id),
-    reports: reportMap.get(item.id) || [],
-  }))
+  const enhancedItems = items.map((item) => {
+    const repList = reportMap.get(item.id) || []
+    const hasPendingReport = repList.some((r) => r.status === "PENDING")
+    return {
+      ...item,
+      hasReport: hasPendingReport,
+      reports: repList,
+    }
+  })
 
   return {
     items: enhancedItems,
@@ -702,3 +724,59 @@ export async function getBoardYears(
       return b.count - a.count
     })
 }
+
+export async function resolveMcqReport(
+  db: PrismaClient,
+  input: ResolveMcqReportInput,
+  userId?: string | null
+) {
+  const { mcqId, reportId, resolvedNote } = input
+
+  const mcq = await db.mcq.findUnique({
+    where: { id: mcqId },
+    select: { id: true },
+  })
+
+  if (!mcq) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `MCQ with ID ${mcqId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "MCQ",
+    entityId: mcqId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await db.questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "No report found for this MCQ question",
+    })
+  }
+
+  const result = await db.questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "RESOLVED",
+      resolvedNote: resolvedNote?.trim() || "Resolved by admin",
+      resolvedById: userId ?? null,
+      resolvedAt: new Date(),
+    },
+  })
+
+  return {
+    success: true,
+    resolvedCount: result.count,
+  }
+}
+

@@ -1,37 +1,16 @@
 {
-  "chapterTitle": "বোশেখ",
+  "chapterTitle": "শব্দজোড়",
   "questions": [
     {
       "type": "SINGLE",
-      "question": "'বোশেখ' কবিতাটি কে লিখেছেন?",
+      "question": "দুটি শব্দের উচ্চারণ এক বা প্রায় এক কিন্তু অর্থ আলাদা, সেগুলোকে কী বলে?",
       "options": [
-        "আল মাহমুদ",
-        "শামসুর রাহমান",
-        "ফররুখ আহমদ",
-        "গোলাম মোস্তফা"
+        "বর্গ",
+        "প্রবাদ",
+        "শব্দজোড়",
+        "শব্দদ্বৈত"
       ],
-      "answer": "আল মাহমুদ",
-      "explanation": null,
-      "reference": [
-        "উত্তরা হাই স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবি আল মাহমুদের প্রকৃত নাম কী?",
-      "options": [
-        "মীর আবদুস মামুন",
-        "মীর আবদুল শুকুর",
-        "মীর শুকুর",
-        "মীর আবদুস শুকুর"
-      ],
-      "answer": "মীর আবদুস শুকুর",
+      "answer": "শব্দজোড়",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -43,17 +22,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কবি আল মাহমুদ কোন পত্রিকার সম্পাদক ছিলেন?",
+      "question": "শব্দজোড়ে শব্দের অর্থের পার্থক্য বোঝা যায় কীভাবে?",
       "options": [
-        "দৈনিক প্রথম আলো",
-        "দৈনিক জনকণ্ঠ",
-        "দৈনিক গণকণ্ঠ",
-        "দৈনিক গণসংবাদ"
+        "প্রসঙ্গ বিবেচনায়",
+        "সমাজ বিবেচনায়",
+        "স্থান বিবেচনায়",
+        "কাল বিবেচনায়"
       ],
-      "answer": "দৈনিক গণকণ্ঠ",
+      "answer": "প্রসঙ্গ বিবেচনায়",
       "explanation": null,
       "reference": [
-        "নাছিমা কাদির মোল্লা হাই স্কুল এন্ড হোমস, নরসিংদী; নি. প. ২০২৫"
+        "ঢা. বো. ২৩; দিনাজপুর সরকারি বালিকা উচ্চ বিদ্যালয়; লালমনিরহাট সরকারি উচ্চ বিদ্যালয়; সেন্ট যোসেফ উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; পাবনা জিলা স্কুল"
       ],
       "statements": [],
       "context": null,
@@ -64,14 +43,329 @@
     },
     {
       "type": "SINGLE",
-      "question": "কবি আল মাহমুদের কবিতায় কোন ধরনের শব্দের সুনিপুণ প্রয়োগ লক্ষণীয়?",
+      "question": "'অণু' এবং 'অনু' - এই শব্দ দুটির মধ্যে তফাত কোন ক্ষেত্রে?",
       "options": [
-        "লোকজ শব্দ",
-        "দেশি শব্দ",
-        "বিদেশি শব্দ",
-        "তৎসম শব্দ"
+        "বানানে",
+        "উচ্চারণে",
+        "অর্থে",
+        "বানানে ও অর্থে"
       ],
-      "answer": "লোকজ শব্দ",
+      "answer": "বানানে ও অর্থে",
+      "explanation": null,
+      "reference": [
+        "বরিশাল জিলা স্কুল"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'নিবৃত' ও 'নিভৃত' - শব্দজোড়ের মধ্যে মিল কোথায়?",
+      "options": [
+        "উচ্চারণে",
+        "বানানে",
+        "অর্থে",
+        "শব্দশ্রেণিতে"
+      ],
+      "answer": "উচ্চারণে",
+      "explanation": null,
+      "reference": [
+        "ময়মনসিংহ গার্লস ক্যাডেট কলেজ; মাইলস্টোন কলেজ, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'শ্মশ্রু' শব্দের অর্থ হলো-",
+      "options": [
+        "শ্বশুর",
+        "দাড়ি",
+        "শাশুড়ি",
+        "অশ্রু"
+      ],
+      "answer": "দাড়ি",
+      "explanation": null,
+      "reference": [
+        "শেরপুর সরকারি বালিকা উচ্চ বিদ্যালয়"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'শিল' ও 'শীল' শব্দজোড়ে 'শীল' শব্দের অর্থ কী?",
+      "options": [
+        "পাথর",
+        "চরিত্র",
+        "সুন্দর",
+        "পদবিবিশেষ"
+      ],
+      "answer": "চরিত্র",
+      "explanation": null,
+      "reference": [
+        "মাধ্যমিক ও উচ্চ মাধ্যমিক শিক্ষা বোর্ড, যশোর (কর্মশালা)"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'শিল' ও 'শীল' শব্দের অর্থ যথাক্রমে কী কী হবে?",
+      "options": [
+        "পাথর ও ক্ষরণ",
+        "পবিত্র ও চরিত্র",
+        "বদন ও চরিত্র",
+        "পাথর ও চরিত্র"
+      ],
+      "answer": "পাথর ও চরিত্র",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'অশক্ত' ও 'অসক্ত' শব্দ জোড়ের অর্থ যথাক্রমে-",
+      "options": [
+        "অন্যায় ও কথিত",
+        "অক্ষম ও নির্লিপ্ত",
+        "কীর্তি ও মনোযোগ",
+        "অনবরত ও সুন্দর"
+      ],
+      "answer": "অক্ষম ও নির্লিপ্ত",
+      "explanation": null,
+      "reference": [
+        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'অণু' শব্দের অর্থ কোনটি?",
+      "options": [
+        "পশ্চাৎ",
+        "ক্ষুদ্রতম অংশ",
+        "ভিতর",
+        "একব"
+      ],
+      "answer": "ক্ষুদ্রতম অংশ",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'বাইস' অর্থ কী?",
+      "options": [
+        "ত্যাগ",
+        "ধারালো যন্ত্র",
+        "দাঁত-বিষয়ক",
+        "বটের শিকড়"
+      ],
+      "answer": "ধারালো যন্ত্র",
+      "explanation": null,
+      "reference": [
+        "কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'দিন' শব্দের অর্থ 'দিবস' হলে শব্দজোড় হিসেবে 'দীন' শব্দের অর্থ কী?",
+      "options": [
+        "ইসলাম",
+        "দিয়ে",
+        "দরিদ্র",
+        "রোজ"
+      ],
+      "answer": "দরিদ্র",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "শব্দজোড় 'অপথ্য' ও 'অপত্য' এর মধ্যে 'অপত্য' শব্দের অর্থ কী?",
+      "options": [
+        "যা পথ্য নয়",
+        "যা খাওয়ার নয়",
+        "স্নেহ",
+        "সন্তান"
+      ],
+      "answer": "সন্তান",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'শ্বশ্রু' শব্দের অর্থ কী?",
+      "options": [
+        "শাশুড়ি",
+        "দাড়ি",
+        "শ্বশুর",
+        "শুচি"
+      ],
+      "answer": "শাশুড়ি",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'উপাধান' শব্দটির অর্থ কী?",
+      "options": [
+        "বালিশ",
+        "উপকরণ",
+        "আবরণ",
+        "মনোযোগ"
+      ],
+      "answer": "বালিশ",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'ধাতৃ' শব্দের অর্থ 'বিধাতা' হলে, 'ধাত্রী' শব্দের অর্থ কী?",
+      "options": [
+        "পৃথিবী",
+        "ধারণ",
+        "দাই",
+        "ধন্য"
+      ],
+      "answer": "দাই",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'চুর' ও 'চূর্ণ'-এর অর্থ যথাক্রমে কী হবে?",
+      "options": [
+        "নেশাগ্রস্ত, স্খলিত",
+        "দ্রুত, চূর্ণ",
+        "ঘূর্ণন, জেগে ওঠা",
+        "নেশাগ্রস্ত, চূর্ণ"
+      ],
+      "answer": "নেশাগ্রস্ত, চূর্ণ",
+      "explanation": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'সাক্ষর' ও 'স্বাক্ষর' শব্দজোড়ের মধ্যে মিল কোথায়?",
+      "options": [
+        "উচ্চারণে",
+        "বানানে",
+        "শব্দ শ্রেণিতে",
+        "অর্থে"
+      ],
+      "answer": "উচ্চারণে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৩; বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'সর্গ' ও 'স্বর্গ' এই শব্দ দুটির মধ্যে তফাত কোন ক্ষেত্রে?",
+      "options": [
+        "বানানে",
+        "উচ্চারণে",
+        "অর্থে",
+        "বানানে ও অর্থে"
+      ],
+      "answer": "বানানে ও অর্থে",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -83,14 +377,35 @@
     },
     {
       "type": "SINGLE",
-      "question": "'লোক লোকান্তর' আল মাহমুদের কোন জাতীয় রচনা?",
+      "question": "'শাদী' অর্থ বিয়ে আর 'সাদী' অর্থ-",
       "options": [
-        "প্রবন্ধ",
-        "কাব্য",
-        "উপন্যাস",
-        "ভ্রমণকাহিনি"
+        "ইচ্ছা",
+        "অশ্বত্থ",
+        "অশ্বারোহী",
+        "ইচ্ছুক"
       ],
-      "answer": "কাব্য",
+      "answer": "অশ্বারোহী",
+      "explanation": null,
+      "reference": [
+        "নাসিরাবাদ সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'তত্ত্ব' ও 'তথ্য' শব্দজোড়ের অর্থ যথাক্রমে-",
+      "options": [
+        "পারদ ও কথা",
+        "কথা ও পারদ",
+        "জ্ঞাতব্য বিষয় ও গূঢ় অর্থ",
+        "গূঢ় অর্থ ও জ্ঞাতব্য বিষয়"
+      ],
+      "answer": "গূঢ় অর্থ ও জ্ঞাতব্য বিষয়",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -102,134 +417,14 @@
     },
     {
       "type": "SINGLE",
-      "question": "'কালের কলস' কাব্যের রচয়িতা কে?",
+      "question": "'চির' ও 'চীর' শব্দজোড়ের অর্থ যথাক্রমে-",
       "options": [
-        "জহির রায়হান",
-        "ফররুখ আহমদ",
-        "শামসুর রাহমান",
-        "আল মাহমুদ"
+        "চূর্ণ ও নেশাগ্রস্ত",
+        "ছুরি ও স্বাভাবিক",
+        "দীর্ঘ ও ছিন্নবস্ত্র",
+        "ছিন্নবস্ত্র ও দীর্ঘ"
       ],
-      "answer": "আল মাহমুদ",
-      "explanation": null,
-      "reference": [
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবি আল মাহমুদ কোন প্রতিষ্ঠানের পরিচালক ছিলেন?",
-      "options": [
-        "বাংলাদেশ চলচ্চিত্র একাডেমি",
-        "বাংলাদেশ শিল্পকলা একাডেমি",
-        "বাংলাদেশ নাট্য একাডেমি",
-        "বাংলাদেশ সাহিত্য একাডেমি"
-      ],
-      "answer": "বাংলাদেশ শিল্পকলা একাডেমি",
-      "explanation": "বাংলাদেশ শিল্পকলা একাডেমি ১৯৭৪ সালে প্রতিষ্ঠিত হয়।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'পানকৌড়ির রক্ত' কোন জাতীয় রচনা?",
-      "options": [
-        "কথাসাহিত্য",
-        "কাব্যসাহিত্য",
-        "উপন্যাস",
-        "গীতিনাট্য"
-      ],
-      "answer": "কথাসাহিত্য",
-      "explanation": "আল মাহমুদ বাংলা সাহিত্যের অন্যতম শ্রেষ্ঠ কবি। কবিতার পাশাপাশি তিনি কথাসাহিত্যেও অনুকরণীয় ভূমিকা রেখেছেন। তাঁর বিখ্যাত কথাসাহিত্যগুলোর মধ্যে 'পানকৌড়ির রক্ত' অন্যতম।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় বৈশাখের বাতাসে কোন পাখির ঝাঁক ভাঙার কথা বলা হয়েছে?",
-      "options": [
-        "টুনটুনির",
-        "বুনোহাঁসের",
-        "বাবুই পাখির",
-        "সাদা বকের"
-      ],
-      "answer": "বুনোহাঁসের",
-      "explanation": null,
-      "reference": [
-        "চ. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বুনোহাঁসের ঝাঁক ভেঙে যায় কী কারণে?",
-      "options": [
-        "বৈশাখী বাতাসে",
-        "ঝড়ো বাতাসে",
-        "শীতের বাতাসে",
-        "দমকা হাওয়ায়"
-      ],
-      "answer": "বৈশাখী বাতাসে",
-      "explanation": null,
-      "reference": [
-        "সেন্ট স্কলাসটিকাস গার্লস স্কুল এন্ড কলেজ, চট্টগ্রাম; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবিতায় 'জেটের পাখা দুমড়ে শেষে আছাড় মারে'— বলতে কী বোঝানো হয়েছে?",
-      "options": [
-        "ঝড়ে নদীতে নৌকা ডুবে যাওয়া",
-        "ঝড়ে গাড়ি দুর্ঘটনা",
-        "ঝড়ে বিমান দুর্ঘটনা",
-        "ঝড়ে গাছপালা উপড়ে যাওয়া"
-      ],
-      "answer": "ঝড়ে বিমান দুর্ঘটনা",
-      "explanation": "বৈশাখ মাসের কালবৈশাখি ঝড় সমস্ত কিছু লণ্ডভণ্ড করে দেয়। এই হাওয়া এতটাই বিধ্বংসী যে আকাশে উড়ন্ত বিমানকেও আছাড় মেরে মাটিতে ফেলে দেয়। এতে বৈশাখী ঝড়ের ভয়াবহ রূপ প্রকাশ পেয়েছে।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'নদীর পানি শূন্যে তুলে দেয় ছড়িয়ে'— বাক্যটি দ্বারা কী বোঝায়?",
-      "options": [
-        "ঝড়ো বাতাসে পানির ছলকে ওঠা",
-        "নদীর পানি স্রোতময়",
-        "নদীর উত্তাল হয়ে ওঠা",
-        "নদীর পানিতে ঢেউ ওঠা"
-      ],
-      "answer": "ঝড়ো বাতাসে পানির ছলকে ওঠা",
+      "answer": "দীর্ঘ ও ছিন্নবস্ত্র",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -241,14 +436,77 @@
     },
     {
       "type": "SINGLE",
-      "question": "টেলিগ্রাফের খামগুলো কী কারণে নুয়ে যায়?",
+      "question": "'বাদি' শব্দটি দ্বারা ফরিয়াদি বোঝালেও 'বাদী' শব্দটি দ্বারা কী বোঝানো হয়?",
       "options": [
-        "ভূমিকম্পের কারণে",
-        "বৈশাখী ঝড়ো বাতাসের কারণে",
-        "বজ্রপাতের কারণে",
-        "ভারী বৃষ্টির কারণে"
+        "চাকরানি",
+        "মতাদর্শী",
+        "যথার্থ",
+        "দেওয়াল"
       ],
-      "answer": "বৈশাখী ঝড়ো বাতাসের কারণে",
+      "answer": "মতাদর্শী",
+      "explanation": null,
+      "reference": [
+        "মানিকগঞ্জ সরকারি উচ্চ বিদ্যালয়"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'সন' অর্থ 'বছর' কিন্তু 'স্বন' অর্থ কী?",
+      "options": [
+        "স্বপ্ন",
+        "কথা",
+        "শব্দ",
+        "বাণী"
+      ],
+      "answer": "শব্দ",
+      "explanation": null,
+      "reference": [
+        "আল-আমিন একাডেমি স্কুল এন্ড কলেজ, চাঁদপুর"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'চুন' যদি চূর্ণ হয়, তাহলে 'চুর' অর্থ-",
+      "options": [
+        "নেশাগ্রস্ত",
+        "ভাঙা",
+        "গুঁড়া করা",
+        "কলিচুন"
+      ],
+      "answer": "নেশাগ্রস্ত",
+      "explanation": null,
+      "reference": [
+        "হাজীগঞ্জ পাইলট বালিকা উচ্চ বিদ্যালয়, চাঁদপুর"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'বীণা' ও 'বীণা' শব্দ দুটির তফাত কোন ক্ষেত্রে?",
+      "options": [
+        "বানানে",
+        "উচ্চারণে",
+        "অর্থে",
+        "বানানে ও অর্থে"
+      ],
+      "answer": "বানানে ও অর্থে",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -260,35 +518,14 @@
     },
     {
       "type": "SINGLE",
-      "question": "'বোশেখ' কবিতার প্রথম স্তবকে কী প্রকাশ পেয়েছে?",
+      "question": "'বাণী' ও 'বানি' শব্দজোড়ের 'বানি' অর্থ কী?",
       "options": [
-        "বৈশাখের বিধ্বংসী রূপ",
-        "অত্যাচারীর অবসান কামনা",
-        "বাতাসের কল্যাণকর গুণ",
-        "বাতাসের ক্ষমতার সীমাবদ্ধতা"
+        "কথা",
+        "বাদ্যযন্ত্র",
+        "বড়ো কলসি",
+        "গয়নার মজুরি"
       ],
-      "answer": "বৈশাখের বিধ্বংসী রূপ",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কার কাছে মিনতি জানায়?",
-      "options": [
-        "গরিব মাঝির কাছে",
-        "বুনোহাঁসের কাছে",
-        "পবনের কাছে",
-        "ঝড়ের কাছে"
-      ],
-      "answer": "পবনের কাছে",
+      "answer": "গয়নার মজুরি",
       "explanation": null,
       "reference": [],
       "statements": [],
@@ -300,1801 +537,20 @@
     },
     {
       "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি পবনের কাছে কী মিনতি করেছেন?",
+      "question": "'চির' শব্দের অর্থ দীর্ঘ হলে, 'চীর' অর্থ কী?",
       "options": [
-        "শান্ত হতে",
-        "ধ্বংস করতে",
-        "গড়িয়ে দিতে",
-        "উড়িয়ে দিতে"
+        "চূর্ণ",
+        "স্খলিত",
+        "ছুরি",
+        "ছিন্নবস্ত্র"
       ],
-      "answer": "শান্ত হতে",
+      "answer": "ছিন্নবস্ত্র",
       "explanation": null,
       "reference": [
-        "সি. বো. ২৬"
+        "মানিকগঞ্জ সরকারি উচ্চ বিদ্যালয়"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কাকে মহাপ্রতাপশালী বলে সম্বোধন করেছেন?",
-      "options": [
-        "বৈশাখকে",
-        "প্রকৃতিকে",
-        "বৈশাখী ঝড়ো বাতাসকে",
-        "বাতাসকে"
-      ],
-      "answer": "বৈশাখী ঝড়ো বাতাসকে",
-      "explanation": "বৈশাখের ঝড়ো বাতাসে ঘর বাড়ি, গাছপালা ভেঙে উড়িয়ে নিয়ে যায় তাই এই বাতাসকে মহাপ্রতাপশালী বলা হয়েছে।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'গরিব মাঝির পালের দড়ি ছিঁড়ে কী লাভ?'— বাক্যে কবি প্রকাশ করতে চেয়েছেন—",
-      "options": [
-        "মাঝির অসহায়ত্ব",
-        "প্রকৃতির বিধ্বংসী রূপ",
-        "শক্তিশালী বাতাসের প্রতি অভিযোগ",
-        "নদীর প্রতি অভিযোগ"
-      ],
-      "answer": "মাঝির অসহায়ত্ব",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "দুঃখী মায়ের ভাতের হাঁড়ি উলটে ফেলার জন্য কবি কাকে দায়ী করেছেন?",
-      "options": [
-        "শাসকদের",
-        "দমকা হাওয়াকে",
-        "বৈশাখী ঝড়ো হাওয়াকে",
-        "ক্ষমতাশীল ব্যক্তিদের"
-      ],
-      "answer": "বৈশাখী ঝড়ো হাওয়াকে",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কোনটিকে গুঁড়িয়ে দেওয়ার কথা উল্লেখ রয়েছে?",
-      "options": [
-        "জেটের পাখা",
-        "টেলিগ্রাফের খাম",
-        "চাষির ভিটে",
-        "টুনটুনির বাসা"
-      ],
-      "answer": "চাষির ভিটে",
-      "explanation": "বৈশাখের বাতাসে জেটের পাখা দুমড়ে শেষে আছাড় মারে, নুইয়ে দেয় টেলিগ্রাফের খাম, চাষির ভিটে গুঁড়িয়ে দেয়, বেগুন পাতার বাসা ছিঁড়ে টুনটুনিদের।",
-      "reference": [
-        "য. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় 'বেগুন পাতার বাসা' কথাটি কাদের সম্পর্কে বলা হয়েছে?",
-      "options": [
-        "গরিব চাষি",
-        "বাবুই পাখি",
-        "টুনটুনি",
-        "গরিব মাঝি"
-      ],
-      "answer": "টুনটুনি",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় 'হে দেবতা!' বলে কবি কাকে সম্বোধন করেছেন?",
-      "options": [
-        "বোশেখের ঝড়কে",
-        "পবনকে",
-        "ঘূর্ণিঝড়কে",
-        "জলোচ্ছ্বাসকে"
-      ],
-      "answer": "পবনকে",
-      "explanation": null,
-      "reference": [
-        "সফিউদ্দিন সরকার একাডেমি এন্ড কলেজ, টঙ্গী, গাজীপুর; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবি 'বোশেখ' কবিতায় কাকে স্থির হওয়ার অনুরোধ জানায়?",
-      "options": [
-        "প্রকৃতিকে",
-        "নদীকে",
-        "বর্ষাকে",
-        "বাতাসকে"
-      ],
-      "answer": "বাতাসকে",
-      "explanation": "বৈশাখের নিষ্ঠুর ও আগ্রাসি থাবায় গরিব মানুষের জীবন বিপর্যস্ত হয়ে পড়ে। গরিব মানুষকে ক্ষয়ক্ষতির থেকে বাঁচাতে বাতাসকে স্থির হওয়ার অনুরোধ জানায় কবি।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় ঝড়ো হাওয়া কার ঘর উড়িয়ে নিয়ে যায়?",
-      "options": [
-        "চাষির",
-        "দুঃখী মায়ের",
-        "টুনটুনি পাখির",
-        "বাবুই পাখির"
-      ],
-      "answer": "চাষির",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৬; আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কোন মহাকাব্যের কথা উল্লেখ রয়েছে?",
-      "options": [
-        "রামায়ণ",
-        "মহাভারত",
-        "শাহনামা",
-        "মহাশ্মশান"
-      ],
-      "answer": "রামায়ণ",
-      "explanation": "পৃথিবীতে রচিত চারটি জাত মহাকাব্যের অন্যতম। যেখানে ফুটে উঠেছে মহাবীর হনুমানের বীরত্বপূর্ণ বহু কর্মের কথা।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কোন মহাকাব্যের কথা উল্লেখ রয়েছে?",
-      "options": [
-        "রামায়ণ",
-        "মহাভারত",
-        "শাহনামা",
-        "মহাশ্মশান"
-      ],
-      "answer": "রামায়ণ",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কালবোশেখির কাছ থেকে কবির প্রত্যাশিত আচরণ হলো—",
-      "options": [
-        "রাজা সোলেমানের পাগড়ির মতো",
-        "রাজা সোলেমানের লাঠির মতো",
-        "রাজা সোলেমানের তলোয়ারের মতো",
-        "রাজা সোলেমানের সিংহাসনের মতো"
-      ],
-      "answer": "রাজা সোলেমানের তলোয়ারের মতো",
-      "explanation": "রাজা সোলেমান ডেভিডের পুত্র ও ইসরাইলের তৃতীয় রাজা। তিনি ছিলেন বীর ও দক্ষ যোদ্ধা। তাঁর বিচারকার্য ছিল সাম্যের ভিত্তিতে। অত্যাচারীকে তিনি সর্বদা কঠোর শাস্তি দিতেন।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বৈশাখের কীর্তিগাঁথা কোথায় আছে?",
-      "options": [
-        "মহাভারতে",
-        "মেঘদূতে",
-        "রামায়ণে",
-        "কালের প্রবাহে"
-      ],
-      "answer": "রামায়ণে",
-      "explanation": null,
-      "reference": [
-        "সরকারি প্রমথনাথ বালিকা উচ্চ বিদ্যালয়, রাজশাহী; বরিশাল জিলা স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বুনোহাঁস' শব্দটি নিচের কোনটি নির্দেশ করে?",
-      "options": [
-        "যে হাঁস গৃহপালিত নয়",
-        "যে হাঁস গৃহপালিত",
-        "যে হাঁস নদীতে থাকে",
-        "যে হাঁস হাওড়ে থাকে"
-      ],
-      "answer": "যে হাঁস গৃহপালিত নয়",
-      "explanation": "বুনোহাঁস বনে-বাদাড়ে বিচরণ করে।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় বিখ্যাত কোন কাব্যের কথা উল্লেখ করা হয়েছে?",
-      "options": [
-        "মেঘদূত",
-        "রামায়ণ",
-        "মহাভারত",
-        "অভিজ্ঞান শকুন্তলম"
-      ],
-      "answer": "মেঘদূত",
-      "explanation": null,
-      "reference": [
-        "সেন্ট স্কলাসটিকাস গার্লস স্কুল এন্ড কলেজ, চট্টগ্রাম; চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি রামায়ণে কার কীর্তিগাঁথা পড়েছেন?",
-      "options": [
-        "রাবণ",
-        "পবন",
-        "রাম",
-        "হনুমান"
-      ],
-      "answer": "হনুমান",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'মেঘদূত' কার রচনা?",
-      "options": [
-        "বাণভট্ট",
-        "জয়দেব",
-        "কালিদাস",
-        "রবীন্দ্রনাথ"
-      ],
-      "answer": "কালিদাস",
-      "explanation": null,
-      "reference": [
-        "সিলেট ক্যাডেট কলেজ"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'সেই মহাবীর হনুমানের পিতা তুমি?'— এখানে 'পিতা' বলতে বোঝানো হয়েছে—",
-      "options": [
-        "মেঘকে",
-        "ইন্দ্রকে",
-        "ঊর্মিকে",
-        "বাতাসকে"
-      ],
-      "answer": "বাতাসকে",
-      "explanation": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নাছিমা কাদির মোল্লা হাই স্কুল এন্ড হোমস, নরসিংদী; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় বাতাসকে কার পিতা আখ্যা দেওয়া হয়েছে?",
-      "options": [
-        "সোলেমানের",
-        "রবীন্দ্রনাথের",
-        "হনুমানের",
-        "কালিদাসের"
-      ],
-      "answer": "হনুমানের",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মহাবীর হনুমানের পিতা কে?",
-      "options": [
-        "বায়ু",
-        "ইন্দ্র",
-        "রাম",
-        "রাবণ"
-      ],
-      "answer": "বায়ু",
-      "explanation": null,
-      "reference": [
-        "এস ও এস হারম্যান মেইনার কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'দয়ালু মেঘের সাথী' বলতে কবি কাকে বুঝিয়েছেন?",
-      "options": [
-        "বুনোহাঁস",
-        "ইন্দ্রদেব",
-        "বায়ুদেব",
-        "সূর্যদেব"
-      ],
-      "answer": "বায়ুদেব",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কাকে নিষ্ঠুর বলেছেন?",
-      "options": [
-        "বাতাসকে",
-        "সূর্যকে",
-        "মেঘকে",
-        "পানিকে"
-      ],
-      "answer": "বাতাসকে",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বাতাস কার ঘরের খুঁটি উড়িয়ে নিল?",
-      "options": [
-        "দুঃখী মায়ের",
-        "মাঝির",
-        "চাষির",
-        "বাবুই পাখির"
-      ],
-      "answer": "দুঃখী মায়ের",
-      "explanation": null,
-      "reference": [
-        "কাজীপুর আদর্শ সমাজ সরকারি উচ্চ বিদ্যালয়; বীরশ্রেষ্ঠ মুন্সী আব্দুর রউফ পাবলিক কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় পবন গরিব চাষির ঘরের খুঁটি কী করেছে?",
-      "options": [
-        "উড়িয়ে নিয়েছে",
-        "ছিঁড়ে ফেলেছে",
-        "উলটে ফেলেছে",
-        "গুঁড়িয়ে ফেলেছে"
-      ],
-      "answer": "উড়িয়ে নিয়েছে",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি লোক ঠকিয়ে কী গড়ার কথা বলেছেন?",
-      "options": [
-        "বাড়ি",
-        "সম্পদ",
-        "অট্টালিকা",
-        "প্রাসাদ"
-      ],
-      "answer": "প্রাসাদ",
-      "explanation": "ধনীরা গরিবকে শোষণ করে অর্থসম্পদ লুঠবার ঘর তৈরি করে। কবি আহ্বান করেছে সেই ঘর লুট করতে।",
-      "reference": [
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'লোক ঠকিয়ে প্রাসাদ গড়ে'— বলতে কবি কাদের ইঙ্গিত করেছেন?",
-      "options": [
-        "দুঃখীদের",
-        "অত্যাচারীদের",
-        "শ্রমজীবীদের",
-        "ধনীদের"
-      ],
-      "answer": "ধনীদের",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'কিন্তু যারা লোক ঠকিয়ে প্রাসাদ গড়ে তাদের কোনো ইট খসাতে পারলে না তো।' চরণদ্বয়ে প্রকাশ পেয়েছে কবির—",
-      "options": [
-        "অভিযোগ",
-        "আক্ষেপ",
-        "অনুরোধ",
-        "বিস্ময়"
-      ],
-      "answer": "আক্ষেপ",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কীসের গল্প শোনার কথা বলেছেন?",
-      "options": [
-        "রূপকথার",
-        "সুবিচারের",
-        "নিপীড়নের",
-        "অবিচারের"
-      ],
-      "answer": "সুবিচারের",
-      "explanation": null,
-      "reference": [
-        "ইস্পাহানি পাবলিক স্কুল এন্ড কলেজ, চট্টগ্রাম; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কীসের গল্প শোনার কথা বলেছেন?",
-      "options": [
-        "অবিচারের",
-        "সুবিচারের",
-        "রূপকথার",
-        "প্রাসাদের"
-      ],
-      "answer": "সুবিচারের",
-      "explanation": null,
-      "reference": [
-        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কোন ন্যায়বিচারক রাজার কথা বলা হয়েছে?",
-      "options": [
-        "শামসুদ্দিন ইলিয়াস শাহ",
-        "খলিফা মামুন",
-        "বাদশা জুলকারনাইন",
-        "রাজা সোলেমান"
-      ],
-      "answer": "রাজা সোলেমান",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় উল্লিখিত বাতাস কার বাহন?",
-      "options": [
-        "সোলেমানের",
-        "রবীন্দ্রনাথ ঠাকুরের",
-        "কালিদাসের",
-        "সুয়াইবের"
-      ],
-      "answer": "সোলেমানের",
-      "explanation": null,
-      "reference": [
-        "সাভার ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতার রাজা সোলেমানের বাহন বলতে কাকে নির্দেশ করা হয়েছে?",
-      "options": [
-        "বাতাসকে",
-        "পাখিকে",
-        "পানিকে",
-        "সিংহাসনকে"
-      ],
-      "answer": "বাতাসকে",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ জিলা স্কুল; নির্ভর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "অত্যাচারীদের মাথা কাটত কার তলোয়ার?",
-      "options": [
-        "শাসকের",
-        "রাজা সোলেমানের",
-        "বাদশাহ জুলকারনাইনের",
-        "বাদশা আলমগীরের"
-      ],
-      "answer": "রাজা সোলেমানের",
-      "explanation": "রাজা সোলেমান ছিলেন মিশরের একজন ন্যায়পরায়ণ শাসক।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "অহমিকার অট্টালিকা গুঁড়িয়ে দিত কে?",
-      "options": [
-        "সোলেমান",
-        "কালিদাস",
-        "পবন",
-        "কবি"
-      ],
-      "answer": "পবন",
-      "explanation": null,
-      "reference": [
-        "নোয়াখালী জিলা স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি 'অহমিকার অট্টালিকা' বলতে কী বুঝিয়েছেন?",
-      "options": [
-        "সুবিচারের দম্ভ",
-        "মানুষের স্বপ্ন",
-        "অহংকারীদের বাড়ি",
-        "অত্যাচারীদের দম্ভ"
-      ],
-      "answer": "অত্যাচারীদের দম্ভ",
-      "explanation": null,
-      "reference": [
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; ব্রাহ্মী কামিনী কিশোর মৌলিক সরকারি উচ্চ বিদ্যালয়, নরসিংদী; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবিদের মহারাজা কাকে বলা হয়েছে?",
-      "options": [
-        "রবীন্দ্রনাথ ঠাকুরকে",
-        "কাজী নজরুল ইসলামকে",
-        "কায়কোবাদকে",
-        "কালিদাসকে"
-      ],
-      "answer": "রবীন্দ্রনাথ ঠাকুরকে",
-      "explanation": null,
-      "reference": [
-        "ইস্পাহানী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, কুমিল্লা সেনানিবাস; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবিতায় রবীন্দ্রনাথকে কীভাবে সম্বোধন করা হয়েছে?",
-      "options": [
-        "কবিগুরু",
-        "মহান কবি",
-        "মহান রাজা",
-        "বিশ্বকবি"
-      ],
-      "answer": "মহান রাজা",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রবীন্দ্রনাথ করজোড়ে কার কাছে দাঁড়িয়েছিলেন?",
-      "options": [
-        "প্রকৃতির কাছে",
-        "কালবোশেখের কাছে",
-        "মানুষের কাছে",
-        "কবিদের কাছে"
-      ],
-      "answer": "কালবোশেখের কাছে",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'.... যা পুরানো শুষ্ক মরা, অদরকারি কালবোশেখের একটি ফুঁয়ে উড়িয়ে দিতে'— এখানে 'বোশেখ' কীসের প্রতীক?",
-      "options": [
-        "ধ্বংসের",
-        "পরিশুদ্ধতার",
-        "অহংকারের",
-        "শুষ্কতার"
-      ],
-      "answer": "পরিশুদ্ধতার",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'তাপস নিশ্বাস বায়ে মুমূর্ষুরে দাও উড়ায়ে।' এ চরণ দুইটি 'বোশেখ' কবিতায় বর্ণিত কার কথা মনে করিয়ে দেয়?",
-      "options": [
-        "রবীন্দ্রনাথ ঠাকুর",
-        "কবি কালিদাস",
-        "রাজা সোলেমান",
-        "মহাবীর হনুমান"
-      ],
-      "answer": "রবীন্দ্রনাথ ঠাকুর",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবি কালবোশেখকে কী ধ্বংস করার আহ্বান জানিয়েছেন?",
-      "options": [
-        "অত্যাচারীদের প্রাসাদ",
-        "গরিবের কুটির",
-        "অহমিকার অট্টালিকা",
-        "বিভেদকারী পরগাছাদের"
-      ],
-      "answer": "বিভেদকারী পরগাছাদের",
-      "explanation": null,
-      "reference": [
-        "নির্ঝর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি রবীন্দ্রনাথ কী কামনা করেছেন?",
-      "options": [
-        "ধ্বংসলীলা",
-        "পরিশুদ্ধতা",
-        "শোষণহীনতা",
-        "সাম্যবাদিতা"
-      ],
-      "answer": "পরিশুদ্ধতা",
-      "explanation": "'বোশেখ' কবিতায় কবি আল মাহমুদ লিখেছেন, 'কবিদের এক মহান রাজা রবীন্দ্রনাথ/ তোমার কাছে দাঁড়িয়েছিলেন করজোড়ে/ যা পুরানো শুষ্ক মরা, অদরকারি/ কালবোশেখের একটি ফুঁয়ে উড়িয়ে দিতে।' এর মাধ্যমে কবি পরিশুদ্ধতা কামনা করেছেন।",
-      "reference": [
-        "চ. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় 'পরগাছা' শব্দ দিয়ে কবি কাকে ইঙ্গিত করেছেন?",
-      "options": [
-        "শ্রমজীবী শ্রেণির শোষককে",
-        "অন্য গাছের ওপর জন্মায় ও বেড়ে ওঠে যে গাছ",
-        "প্রকৃতির নিষ্ঠুরতাকে",
-        "সকল ধনী ব্যক্তিকে"
-      ],
-      "answer": "শ্রমজীবী শ্রেণির শোষককে",
-      "explanation": null,
-      "reference": [
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় 'বিভেদকারী পরগাছা' বলতে বোঝানো হয়েছে সমাজের—",
-      "options": [
-        "শ্রমজীবীদের",
-        "শোষকদের",
-        "মধ্যবিত্তদের",
-        "বিত্তশালীদের"
-      ],
-      "answer": "শোষকদের",
-      "explanation": "কবি 'বিভেদকারী পরগাছা' বলতে সমাজের সেই শ্রেণিকে বুঝিয়েছেন যারা শ্রমজীবী মানুষদের শোষণ করে ধনসম্পদের পাহাড় গড়ে। তারা সমাজে বৈষম্য তৈরি করে এবং সাধারণ শ্রমজীবী মানুষের সম্পদ আত্মসাৎ করে নিজেদের বিলাসিতার অট্টালিকা গড়ে তোলে বলেই কবি তাদের বিভেদকারী পরগাছার সাথে তুলনা করেছেন।",
-      "reference": [
-        "দি. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বিভেদকারীরা পরের শ্রমে কী গড়ে?",
-      "options": [
-        "মস্ত দালান",
-        "অট্টালিকা",
-        "প্রাসাদ",
-        "কারখানা"
-      ],
-      "answer": "মস্ত দালান",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় 'জেট' শব্দটি কী নির্দেশ করে?",
-      "options": [
-        "পাখি",
-        "নৌকা",
-        "দ্রুতগতিসম্পন্ন উড়োজাহাজ",
-        "যানবাহন"
-      ],
-      "answer": "দ্রুতগতিসম্পন্ন উড়োজাহাজ",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সংকেতের মাধ্যমে দূরে বক্তব্য প্রেরণের জন্য ব্যবহৃত যন্ত্রকে কী বলা হয়?",
-      "options": [
-        "টেলিগ্রাম",
-        "টেলিগ্রাফ",
-        "মোবাইল",
-        "কম্পিউটার"
-      ],
-      "answer": "টেলিগ্রাফ",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মহাকাব্য 'রামায়ণের' রচয়িতা কে?",
-      "options": [
-        "কায়কোবাদ",
-        "বাল্মীকি",
-        "হোমার",
-        "ফেরদৌসী"
-      ],
-      "answer": "বাল্মীকি",
-      "explanation": null,
-      "reference": [
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কালিদাসের 'মেঘদূত' কোন ভাষায় লেখা?",
-      "options": [
-        "মৈথিলী",
-        "সংস্কৃত",
-        "প্রাচীন বাংলা",
-        "ব্রজবুলি"
-      ],
-      "answer": "সংস্কৃত",
-      "explanation": null,
-      "reference": [
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সংস্কৃত ভাষার অমর রচনা কোনটি?",
-      "options": [
-        "মেঘদূতম্ কাব্য",
-        "বেদ",
-        "রামায়ণ",
-        "মহাভারত"
-      ],
-      "answer": "মেঘদূতম্ কাব্য",
-      "explanation": "সংস্কৃত ভাষার অন্যতম শ্রেষ্ঠ কবি কালিদাস। তিনি রচনা করেন সংস্কৃত ভাষার অমর সাহিত্য 'মেঘ দূতম্'。",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রাজা সোলেমানের পিতার নাম কী?",
-      "options": [
-        "রাজা ওসমান",
-        "ডেভিড",
-        "মাইকেল",
-        "দাউদ"
-      ],
-      "answer": "ডেভিড",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কে বীর ও দক্ষ যোদ্ধা ছিলেন?",
-      "options": [
-        "রাম",
-        "মহাবীর হনুমান",
-        "রাজা সোলেমান",
-        "রাবণ"
-      ],
-      "answer": "রাজা সোলেমান",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতাটি কোন কাব্য হতে সংকলিত?",
-      "options": [
-        "পাখির কাছে ফুলের কাছে",
-        "লোক লোকান্তর",
-        "সোনালি কাবিন",
-        "কালের কলস"
-      ],
-      "answer": "পাখির কাছে ফুলের কাছে",
-      "explanation": null,
-      "reference": [
-        "ফরিদপুর জিলা স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বৈশাখের নিষ্ঠুর করাল গ্রাস ও আগ্রাসি থাবায় কোনটি লণ্ডভণ্ড হয়?",
-      "options": [
-        "উপকূলীয় বসতি",
-        "জনপদ",
-        "বাংলাদেশের দক্ষিণাঞ্চল",
-        "সমগ্র বাংলাদেশ"
-      ],
-      "answer": "জনপদ",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম কলেজিয়েট স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় বৈশাখের রুদ্র রূপের সাথে কবি কোন বিষয়টির ইঙ্গিত করেছেন?",
-      "options": [
-        "অত্যাচারীদের অত্যাচার",
-        "দুর্ধর্ষ শ্রেণির নিপীড়ন",
-        "জাগতিক চিন্তা-চেতনা",
-        "ধ্বংসাত্মক অবস্থা"
-      ],
-      "answer": "অত্যাচারীদের অত্যাচার",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গরিবের বিরুদ্ধে কী নিয়ে কবি আক্ষেপ প্রকাশ করেছেন?",
-      "options": [
-        "নির্মমতা",
-        "অত্যাচার",
-        "প্রকৃতির নিষ্ঠুরতা",
-        "মানুষের নিষ্ঠুরতা"
-      ],
-      "answer": "প্রকৃতির নিষ্ঠুরতা",
-      "explanation": "কালবৈশাখির ভয়াল তাণ্ডবে প্রকৃতির পাশাপাশি নিম্নবর্ণের মানুষের ব্যাপক ক্ষয়ক্ষতি হয় কিন্তু ধনীদের বিন্দু পরিমাণ বাহাদুরি কমে না। তাই কবি আক্ষেপ প্রকাশ করেছেন।",
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় বাড়তি বাহাদুরি গুঁড়িয়ে ফেলার আহ্বান করা হয়েছে কেন?",
-      "options": [
-        "শান্তির জন্য",
-        "প্রাসাদ ভাঙার জন্য",
-        "প্রকৃতির স্থিরতার জন্য",
-        "শোষণ থেকে মুক্তির জন্য"
-      ],
-      "answer": "শোষণ থেকে মুক্তির জন্য",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি আল মাহমুদের কী প্রকাশ পেয়েছে?",
-      "options": [
-        "আশঙ্কা",
-        "আক্ষেপ",
-        "অনুরাগ",
-        "অনুযোগ"
-      ],
-      "answer": "আক্ষেপ",
-      "explanation": null,
-      "reference": [
-        "ঢাকা কলেজিয়েট স্কুল; লক্ষ্মীপুর আদর্শ সামাদ সরকারি উচ্চ বিদ্যালয়; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "শ্রমজীবী সাধারণ মানুষকে শোষণ করে কারা?",
-      "options": [
-        "অত্যাচারীরা",
-        "ধনীরা",
-        "বাদশাহরা",
-        "ক্ষমতাশালীরা"
-      ],
-      "answer": "ধনীরা",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি বৈশাখের বিধ্বংসী প্রতীকের মধ্যে কাদের অবসান কামনা করেছেন?",
-      "options": [
-        "শ্রমজীবীদের",
-        "গরিবদের",
-        "মাঝিদের",
-        "অত্যাচারীদের"
-      ],
-      "answer": "অত্যাচারীদের",
-      "explanation": null,
-      "reference": [
-        "ক্যামব্রিয়ান স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বোশেখ' কবিতায় কবি কী প্রার্থনা করেছেন?",
-      "options": [
-        "সোনালি ভবিষ্যৎ",
-        "অত্যাচারের অবসান",
-        "পরাধীনতার অবসান",
-        "মানুষের অধিকার"
-      ],
-      "answer": "অত্যাচারের অবসান",
-      "explanation": null,
-      "reference": [
-        "ঝিনাইদহ ক্যাডেট কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বোশেখ' কবিতায় বৈশাখী ঝড়ো বাতাসে যা ঘটে তার সাথে সম্পর্ক রয়েছে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "বুনোহাঁসের ঝাঁক ভেঙে যাওয়ার",
-        "জেটের পাখা ভেঙে যাওয়ার",
-        "নদীর পানি ছড়িয়ে দেওয়ার"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বৈশাখী বাতাসের কাছে কবি মিনতি জানিয়ে বলেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "ব্রাহ্মণী কামিনী কিশোর মৌলিক সরকারি উচ্চ বিদ্যালয়, নরসিংদী; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "শান্ত হও",
-        "শান্ত হও মহাপ্রতাপশালী",
-        "অস্থির হও"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বোশেখ' কবিতায় তুফানের কাছে কবির আহ্বান—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২৬"
-      ],
-      "statements": [
-        "অত্যাচারীদের দমন",
-        "শোষকশ্রেণির পতন",
-        "দুর্নীতিবাজদের ধ্বংস"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বৈশাখী ঝড়ো বাতাসের প্রতি কবির অভিযোগ কারণ—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": "বৈশাখের ধনী শোষকের কোন ক্ষতি না হয়ে গরীব চাষির ঘর-বাড়ি ভেঙে দেওয়ায় বাতাসের প্রতি কবির ক্ষোভ জন্মায়।",
-      "reference": [],
-      "statements": [
-        "মাঝির পালের দড়ি ছেঁড়া",
-        "মাঝির নৌকা ভাঙার",
-        "চাষির ভিটে গুঁড়িয়ে দেওয়া"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বোশেখ' কবিতায় কবি বৈশাখী বাতাসকে সম্বোধন করেছেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "মাতৃপীঠ সরকারি বালিকা উচ্চ বিদ্যালয়, চাঁদপুর; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "মহাপ্রতাপশালী",
-        "দেবতা",
-        "নিষ্ঠুর"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "কবির মত অনুযায়ী বোশেখের বাতাসে যাদের ঘরের ইট খসানো উচিত—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "লোক ঠকানোদের",
-        "গরিব-দুঃখীদের",
-        "অত্যাচারীদের"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বোশেখ' কবিতায় উল্লিখিত রাজা সোলেমান ছিলেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "দিনাজপুর সরকারি বালিকা উচ্চ বিদ্যালয়; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "অত্যাচারী শাসক",
-        "ইসরাইলের তৃতীয় রাজা",
-        "বীর ও দক্ষ যোদ্ধা"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বোশেখ' কবিতায় কবি ধ্বংস কামনা করেছেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "সফিউদ্দিন সরকার একাডেমি এন্ড কলেজ, টঙ্গী, গাজীপুর; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "বিভেদকারীদের",
-        "পরগাছাদের",
-        "মাস্তানদের"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "গরিবের বিরুদ্ধে কালবোশেখের যে আচরণে কবি মর্মাহত হয়েছেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "নিষ্ঠুরতা",
-        "নির্মমতা",
-        "বিধ্বংসী রূপ"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বাড়তি তাদের বাহাদুরি গুঁড়িয়ে ফেলো।'— বাক্যের মধ্যে দিয়ে কী প্রকাশ পেয়েছে?",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "সরকারি প্রমথনাথ বালিকা উচ্চ বিদ্যালয়, রাজশাহী; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "অত্যাচারীদের ধ্বংস কামনা",
-        "বিভেদকারী পরগাছাদের ধ্বংস কামনা",
-        "কালবোশেখের ধ্বংস কামনা"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "'বাড়তি তাদের বাহাদুরি গুঁড়িয়ে ফেলো'— বাক্যের মধ্য দিয়ে প্রকাশ পেয়েছে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": "যারা এ সমাজে অত্যাচার জুলুম করে নিজেদেরকে উঁচু শ্রেণির বলে দাবি করে, মস্ত দালান নির্মাণ করে বাহাদুরি করে কবি তাদের বাহাদুরি গুঁড়িয়ে ফেলতে মিনতি করে বাতাসের কাছে।",
-      "reference": [],
-      "statements": [
-        "অত্যাচারীদের ধ্বংস কামনা",
-        "বিভেদকারী পরগাছাদের ধ্বংস কামনা",
-        "মিথ্যা অহংকার গুঁড়িয়ে দেওয়ার আকাঙ্ক্ষা"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'ঝড়ো হাওয়া ভেঙে দিয়ো/মিথ্যা তাসের ঘর।'— উদ্দীপকের ভাবার্থ 'বোশেখ' কবিতার যে দিক ধারণ করেছে তা হলো—",
-      "options": [
-        "অপ্রয়োজনীয়",
-        "অবসান",
-        "বিদ্বেষ",
-        "ধ্বংস"
-      ],
-      "answer": "অবসান",
-      "explanation": null,
-      "reference": [
-        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বৈশাখের করাল গ্রাসের শিকার হয়—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "এক-একটা জনপদ",
-        "দুঃখী-দরিদ্র মানুষ",
-        "অসহায় প্রাণীরা"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে 'বোশেখ' কবিতার কোন দিক উন্মোচিত হয়েছে?",
-      "options": [
-        "ধ্বংসাত্মক রূপ",
-        "সৃজনশীল রূপ",
-        "পরিশুদ্ধ রূপ",
-        "প্রখর রূপ"
-      ],
-      "answer": "পরিশুদ্ধ রূপ",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম সরকারি বালিকা উচ্চ বিদ্যালয়; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "এসো, এসো, এসো হে বৈশাখ।\nতাপসনিশ্বাসবায়ে মুমূর্ষুরে দাও উড়ায়ে,\nবৎসরের আবর্জনা দূর হয়ে যাক।\nযাক পুরাতন স্মৃতি, যাক ভুলে-যাওয়া গীতি,\nঅশ্রুবাষ্প সুদূরে মিলাক॥",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের অনুভূতি 'বোশেখ' কবিতার কোন পঙ্‌ক্তির সঙ্গে সংগতিপূর্ণ?",
-      "options": [
-        "যে বাতাসে বুনোহাঁসের ঝাঁক ভেঙে যায়",
-        "উড়িয়ে নিলে গরিব চাষির ঘরের খুঁটি",
-        "তুমিই নাকি বাহন রাজা সোলেমানের",
-        "শোনো তুফান ধ্বংস করো বিভেদকারী পরগাছাদের"
-      ],
-      "answer": "শোনো তুফান ধ্বংস করো বিভেদকারী পরগাছাদের",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": "এসো, এসো, এসো হে বৈশাখ।\nতাপসনিশ্বাসবায়ে মুমূর্ষুরে দাও উড়ায়ে,\nবৎসরের আবর্জনা দূর হয়ে যাক।\nযাক পুরাতন স্মৃতি, যাক ভুলে-যাওয়া গীতি,\nঅশ্রুবাষ্প সুদূরে মিলাক॥",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে 'বোশেখ' কবিতার কোন আহ্বান প্রতিফলিত হয়েছে?",
-      "options": [
-        "অত্যাচারীর অবসান",
-        "দুঃখের অবসান",
-        "শ্রমজীবীদের অবসান",
-        "পুরোনোর অবসান"
-      ],
-      "answer": "পুরোনোর অবসান",
-      "explanation": null,
-      "reference": [
-        "কাজী নজরুল ইসলাম; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "ঐ নূতনের কেতন ওড়ে কাল-বোশেখির ঝড়,\nধ্বংস দেখে ভয় কেন তোর, প্রলয় নূতন সৃজন বেদন।\nআসছে নবীন জীবন ধারা অসুন্দরে করতে ছেদন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপক ও আলোচ্য কবিতায় কালবোশেখের কাছে কবি আশা করেন—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "সৃষ্টিশীল নতুন শক্তি হতে",
-        "নবজাগরণের প্রতীক হতে",
-        "সব অত্যাচার ও অসুন্দরকে দূর করে দিতে"
-      ],
-      "context": "ঐ নূতনের কেতন ওড়ে কাল-বোশেখির ঝড়,\nধ্বংস দেখে ভয় কেন তোর, প্রলয় নূতন সৃজন বেদন।\nআসছে নবীন জীবন ধারা অসুন্দরে করতে ছেদন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের ঘূর্ণিঝড় 'মোখার' রূপ বোর্ড বইয়ের কোন কবিতার সঙ্গে সংগতিপূর্ণ?",
-      "options": [
-        "বোশেখ",
-        "বৃষ্টি",
-        "বঙ্গবাণী",
-        "কপোতাক্ষ নদ"
-      ],
-      "answer": "বোশেখ",
-      "explanation": null,
-      "reference": [
-        "সূত্র: কালেরকণ্ঠ, ঢাকা নিউজ ২৪; ১৫ই মে, ২০২৩; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "ঘূর্ণিঝড় 'মোখা' পাথরঘাটা উপজেলায় আঘাত এনে মুহূর্তের মধ্যেই লণ্ডভণ্ড করে দেয় কয়েকশ ঘরবাড়ি ও গাছপালা। বিদ্যুৎ সংযোগ বিচ্ছিন্ন করে দেয়। অর্ধ শতাধিক পরিবারের ক্ষয়ক্ষতি হয় এই ঝড়ে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের বর্ণনায় আলোচ্য কবিতার যে বিষয়টি ফুটে উঠেছে তা হলো—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "কালবৈশাখের তাণ্ডব",
-        "বৈশাখের বিধ্বংসী রূপ",
-        "বৈশাখের শান্ত রূপ"
-      ],
-      "context": "ঘূর্ণিঝড় 'মোখা' পাথরঘাটা উপজেলায় আঘাত এনে মুহূর্তের মধ্যেই লণ্ডভণ্ড করে দেয় কয়েকশ ঘরবাড়ি ও গাছপালা। বিদ্যুৎ সংযোগ বিচ্ছিন্ন করে দেয়। অর্ধ শতাধিক পরিবারের ক্ষয়ক্ষতি হয় এই ঝড়ে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের সকিনা বিবি 'বোশেখ' কবিতায় আলোচ্য কোন চরিত্রের প্রতিচ্ছবি?",
-      "options": [
-        "অত্যাচারীর",
-        "অসহায় মানুষের",
-        "গরিব-দুঃখী মায়ের",
-        "গরিব মাঝির"
-      ],
-      "answer": "গরিব-দুঃখী মায়ের",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": "স্বামীহারা সকিনা বিবি। খড়ের বেড়ায় ঘর বানিয়ে কোনো রকম দিন কাটে তার। হঠাৎ-ই বৈশাখের তীব্র ঝড়ে তার ঘরখানা উড়িয়ে নিয়ে যায়। ছোট্ট শিশু সন্তানকে নিয়ে সে কোথায় যাবে দিশাহারা হয়ে পড়ে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে আলোচ্য কবিতার যে দিক ফুটে উঠেছে তা হলো—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "কালবৈশাখের বিধ্বংসী রূপ",
-        "প্রকৃতির নিষ্ঠুরতা",
-        "ঝড়ের কাছে গরিব মানুষের অসহায়ত্ব"
-      ],
-      "context": "স্বামীহারা সকিনা বিবি। খড়ের বেড়ায় ঘর বানিয়ে কোনো রকম দিন কাটে তার। হঠাৎ-ই বৈশাখের তীব্র ঝড়ে তার ঘরখানা উড়িয়ে নিয়ে যায়। ছোট্ট শিশু সন্তানকে নিয়ে সে কোথায় যাবে দিশাহারা হয়ে পড়ে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে 'বোশেখ' কবিতার আলোচ্য কোন চরিত্রের প্রতিচ্ছবি ফুটে উঠেছে?",
-      "options": [
-        "রাজা সোলেমান",
-        "মহাবীর হনুমান",
-        "গরিব চাষি",
-        "গরিব মাঝি"
-      ],
-      "answer": "রাজা সোলেমান",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": "ইনসাফ ও ন্যায়ের মূর্ত প্রতীক ছিলেন হজরত উমর (রা.)। সৎ ও সাহসিকতার উজ্জ্বল দৃষ্টান্ত স্থাপন করে গিয়েছেন। ছিলেন ইসলামের শ্রেষ্ঠ বীর ও যোদ্ধা।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে আলোচ্য কবিতার যে বিষয়টি ফুটে উঠেছে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "ন্যায়বিচারকের রূপ",
-        "দক্ষ ও বীর যোদ্ধার রূপ",
-        "অবিবেচক মানুষের রূপ"
-      ],
-      "context": "ইনসাফ ও ন্যায়ের মূর্ত প্রতীক ছিলেন হজরত উমর (রা.)। সৎ ও সাহসিকতার উজ্জ্বল দৃষ্টান্ত স্থাপন করে গিয়েছেন। ছিলেন ইসলামের শ্রেষ্ঠ বীর ও যোদ্ধা।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের মূলভাব তোমার বোর্ড বইয়ের কোন কবিতার আলোচ্য বিষয়?",
-      "options": [
-        "বৃষ্টি",
-        "বোশেখ",
-        "উমর ফারুক",
-        "জীবন বিনিময়"
-      ],
-      "answer": "বোশেখ",
-      "explanation": null,
-      "reference": [
-        "বিদ্যাময়ী সরকারি বালিকা উচ্চ বিদ্যালয়, ময়মনসিংহ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "দুঃখী-দরিদ্র মানুষ ও অসহায় প্রাণীরাই কেবল প্রকৃতির নিষ্ঠুরতার শিকার হয়। প্রকৃতি কেন সেইসব অট্টালিকা ধ্বংস করে দেয় না যেসব অসহায় মানুষদেরকে শোষণ করে গড়ে তোলা হয়েছে। শোষক ও অত্যাচারিতদের প্রাসাদ কেন ভেঙে দেয় না প্রলয়ংকরী ঝড়ো হাওয়া।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে আলোচ্য কবিতার সাদৃশ্যপূর্ণ বিষয় হলো—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "অসহায় মানুষদের বিরুদ্ধে প্রকৃতির নিষ্ঠুরতা",
-        "অত্যাচারীদের ধ্বংস কামনা",
-        "শোষকশ্রেণির প্রতি বৈশাখকে সদয় হওয়ার আহ্বান"
-      ],
-      "context": "দুঃখী-দরিদ্র মানুষ ও অসহায় প্রাণীরাই কেবল প্রকৃতির নিষ্ঠুরতার শিকার হয়। প্রকৃতি কেন সেইসব অট্টালিকা ধ্বংস করে দেয় না যেসব অসহায় মানুষদেরকে শোষণ করে গড়ে তোলা হয়েছে। শোষক ও অত্যাচারিতদের প্রাসাদ কেন ভেঙে দেয় না প্রলয়ংকরী ঝড়ো হাওয়া।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,

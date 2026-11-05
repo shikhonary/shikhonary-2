@@ -1271,6 +1271,9 @@ export async function createQuestionPaperFull(
       for (const sqt of dbSubjectQuestionTypes) {
         if (!sqt.questionTypeId || seenQTypes.has(sqt.questionTypeId)) continue
         seenQTypes.add(sqt.questionTypeId)
+        const allMatching = dbSubjectQuestionTypes.filter((x) => x.questionTypeId === sqt.questionTypeId)
+        const totalQSum = allMatching.reduce((sum, x) => sum + (x.totalQuestions || 0), 0)
+        const totalReqSum = allMatching.reduce((sum, x) => sum + (x.requiredCount || 0), 0)
         autoDists.push({
           questionTypeId: sqt.questionTypeId,
           questionTypeName: sqt.questionType?.nameBn || sqt.questionType?.nameEn || "",
@@ -1279,8 +1282,8 @@ export async function createQuestionPaperFull(
           marksPerQuestion: sqt.mark || sqt.questionType?.mark || 1,
           markDistribution: sqt.markDistribution ?? undefined,
           renderMethod: sqt.renderMethod ?? 1,
-          questionCount: sqt.totalQuestions || 0,
-          questionsToAttempt: sqt.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null,
+          questionCount: totalQSum > 0 ? totalQSum : (sqt.totalQuestions || 0),
+          questionsToAttempt: totalReqSum > 0 ? totalReqSum : (sqt.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null),
           orderIndex: sqt.position,
         })
       }

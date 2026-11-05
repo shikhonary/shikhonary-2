@@ -75,3 +75,11 @@ export const importCsSchema = z.object({
 })
 
 export type ImportCsInput = z.infer<typeof importCsSchema>
+
+export const resolveCsReportSchema = z.object({
+  csId: z.string().min(1, "CS ID is required"),
+  reportId: z.string().optional(),
+  resolvedNote: z.string().optional(),
+})
+
+export type ResolveCsReportInput = z.infer<typeof resolveCsReportSchema>

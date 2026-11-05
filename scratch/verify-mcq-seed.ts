@@ -26,27 +26,46 @@ function getBengaliVariants(str: string): string[] {
   return [...new Set([trimmed, canon, decomp, vowelNorm])];
 }
 
-async function verify(chapterName: string) {
-  const variants = getBengaliVariants(chapterName);
-  const searchConditions = variants.flatMap((v) => [
-    { nameBn: v },
-    { nameEn: { equals: v, mode: "insensitive" as const } },
-  ]);
-
-  let chapter = await prisma.academicChapter.findFirst({
-    where: { OR: searchConditions, isActive: true },
+async function verify(chapterNameOrId: string) {
+  let chapter = await prisma.academicChapter.findUnique({
+    where: { id: chapterNameOrId },
     include: { subject: true },
   });
 
   if (!chapter) {
-    const partialConditions = variants.flatMap((v) => [
-      { nameBn: { contains: v, mode: "insensitive" as const } },
-      { nameEn: { contains: v, mode: "insensitive" as const } },
+    const variants = getBengaliVariants(chapterNameOrId);
+    const searchConditions = variants.flatMap((v) => [
+      { nameBn: v },
+      { nameEn: { equals: v, mode: "insensitive" as const } },
     ]);
+
     chapter = await prisma.academicChapter.findFirst({
-      where: { OR: partialConditions, isActive: true },
+      where: {
+        subject: { nameBn: { contains: "বাংলা ২য় পত্র" } },
+        OR: searchConditions,
+        isActive: true,
+      },
       include: { subject: true },
+      orderBy: { position: "desc" },
     });
+
+    if (!chapter) {
+      chapter = await prisma.academicChapter.findFirst({
+        where: { OR: searchConditions, isActive: true },
+        include: { subject: true },
+      });
+    }
+
+    if (!chapter) {
+      const partialConditions = variants.flatMap((v) => [
+        { nameBn: { contains: v, mode: "insensitive" as const } },
+        { nameEn: { contains: v, mode: "insensitive" as const } },
+      ]);
+      chapter = await prisma.academicChapter.findFirst({
+        where: { OR: partialConditions, isActive: true },
+        include: { subject: true },
+      });
+    }
   }
 
   if (!chapter) {

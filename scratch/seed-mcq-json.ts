@@ -250,8 +250,16 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     { nameEn: { equals: v, mode: "insensitive" as const } },
   ]);
 
+  const subjectIdArg = (data as any).subjectId;
+  const subjectCondition = subjectIdArg
+    ? { subjectId: subjectIdArg }
+    : ((data as any).subjectName
+      ? { subject: { nameBn: { contains: (data as any).subjectName } } }
+      : {});
+
   let matchedChapter = await prisma.academicChapter.findFirst({
     where: {
+      ...subjectCondition,
       OR: searchConditions,
       isActive: true,
     },
@@ -260,6 +268,19 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     },
   });
 
+  if (!matchedChapter && subjectIdArg) {
+    // If not found with subject condition, try without it
+    matchedChapter = await prisma.academicChapter.findFirst({
+      where: {
+        OR: searchConditions,
+        isActive: true,
+      },
+      include: {
+        subject: true,
+      },
+    });
+  }
+
   if (!matchedChapter) {
     const partialConditions = variants.flatMap((v) => [
       { nameBn: { contains: v, mode: "insensitive" as const } },
@@ -267,6 +288,7 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     ]);
     matchedChapter = await prisma.academicChapter.findFirst({
       where: {
+        ...subjectCondition,
         OR: partialConditions,
         isActive: true,
       },

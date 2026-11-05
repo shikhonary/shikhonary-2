@@ -130,8 +130,18 @@ export function StepSubjectsDistribution({
             mark: sqt.mark || sqt.questionType?.mark || 1,
             label: sqt.customLabel || sqt.questionType?.label || sqt.questionType?.nameEn,
             position: typeof sqt.position === "number" ? sqt.position : i,
-            preset: sqt,
+            preset: {
+              ...sqt,
+              totalQuestions: sqt.totalQuestions || 0,
+              requiredCount: sqt.requiredCount || 0,
+            },
           })
+        } else {
+          const existing = map.get(qTypeId)!
+          if (existing?.preset) {
+            existing.preset.totalQuestions = (existing.preset.totalQuestions || 0) + (sqt.totalQuestions || 0)
+            existing.preset.requiredCount = (existing.preset.requiredCount || 0) + (sqt.requiredCount || 0)
+          }
         }
       }
     }

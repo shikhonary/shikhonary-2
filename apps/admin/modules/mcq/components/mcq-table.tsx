@@ -12,6 +12,7 @@ import {
   QuestionCardHeader,
   QuestionCardFooter,
   QuestionCardActions,
+  type QuestionReportItem,
 } from "@/components/shared"
 import { toBengaliDigits, MCQ_TYPE_OPTIONS } from "@workspace/utils"
 import {
@@ -22,8 +23,11 @@ import {
   Tag,
   BookOpen,
   Check,
+  CheckCircle2,
   AlertTriangle,
 } from "lucide-react"
+
+export type { QuestionReportItem }
 
 export interface McqItem {
   id: string
@@ -42,7 +46,7 @@ export interface McqItem {
   chapterId: string
   isActive: boolean
   hasReport?: boolean
-  reports?: any[]
+  reports?: QuestionReportItem[]
   createdAt: Date | string
   updatedAt: Date | string
   difficulty?: string | null
@@ -78,6 +82,7 @@ interface McqTableProps {
   isError: boolean
   onDelete: (id: string, question: string) => void
   onBulkDelete: (selectedIds: string[]) => void
+  onResolveReport?: (item: McqItem) => void
   currentPage: number
   itemsPerPage: number
   totalItems: number
@@ -92,6 +97,7 @@ export function McqTable({
   isError,
   onDelete,
   onBulkDelete,
+  onResolveReport,
   currentPage,
   itemsPerPage,
   totalItems,
@@ -227,6 +233,12 @@ export function McqTable({
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+
+            const itemReports = Array.isArray(item.reports) ? item.reports : []
+            const pendingReports = itemReports.filter((r) => r.status === "PENDING")
+            const resolvedReports = itemReports.filter((r) => r.status === "RESOLVED")
+            const hasPending = pendingReports.length > 0 || Boolean(item.hasReport)
+
             const classNames = item.subject?.classSubjects
               ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
               .filter(Boolean)
@@ -273,11 +285,28 @@ export function McqTable({
                           </span>
                         )}
 
-                        {item.hasReport && (
-                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body">
+                        {hasPending && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="রিপোর্ট দেখুন ও সমাধান করুন (Resolve Report)"
+                          >
                             <AlertTriangle className="w-3 h-3 text-rose-500" />
-                            <span>রিপোর্ট ({toBengaliDigits(item.reports?.length || 1)})</span>
-                          </span>
+                            <span>রিপোর্ট ({toBengaliDigits(pendingReports.length || itemReports.length || 1)})</span>
+                          </button>
+                        )}
+
+                        {!hasPending && resolvedReports.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-lg text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="সমাধানকৃত রিপোর্ট হিস্ট্রি দেখুন"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>সমাধানকৃত ({toBengaliDigits(resolvedReports.length)})</span>
+                          </button>
                         )}
                       </QuestionCardHeader>
 
@@ -391,7 +420,24 @@ export function McqTable({
                     onDelete={() => onDelete(item.id, item.question)}
                     editTitle="MCQ সম্পাদনা করুন"
                     deleteTitle="MCQ মুছুন"
-                  />
+                  >
+                    {onResolveReport && (itemReports.length > 0 || item.hasReport) && (
+                      <button
+                        type="button"
+                        onClick={() => onResolveReport(item)}
+                        className={cn(
+                          "inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer border shadow-xs flex-1 md:flex-initial md:w-24 font-headline",
+                          hasPending
+                            ? "bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/60 text-amber-700 dark:text-amber-400 border-amber-200/80 dark:border-amber-800/40 hover:border-amber-300"
+                            : "bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-300"
+                        )}
+                        title={hasPending ? "রিপোর্ট সমাধান করুন (Resolve Report)" : "রিপোর্ট হিস্ট্রি দেখুন"}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>{hasPending ? "সমাধান" : "রিপোর্ট"}</span>
+                      </button>
+                    )}
+                  </QuestionCardActions>
                 </div>
               </div>
             )

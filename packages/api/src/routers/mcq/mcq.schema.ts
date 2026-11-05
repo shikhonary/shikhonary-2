@@ -85,3 +85,11 @@ export const importMcqsSchema = z.object({
 })
 
 export type ImportMcqsInput = z.infer<typeof importMcqsSchema>
+
+export const resolveMcqReportSchema = z.object({
+  mcqId: z.string().min(1, "MCQ ID is required"),
+  reportId: z.string().optional(),
+  resolvedNote: z.string().optional(),
+})
+
+export type ResolveMcqReportInput = z.infer<typeof resolveMcqReportSchema>

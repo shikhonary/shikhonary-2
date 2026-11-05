@@ -114,6 +114,20 @@ export function useImportCs() {
 }
 
 /**
+ * Hook to resolve a CS question report.
+ */
+export function useResolveCsReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.cs.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.cs.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

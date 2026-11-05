@@ -114,6 +114,20 @@ export function useImportMcqs() {
 }
 
 /**
+ * Hook to resolve an MCQ report.
+ */
+export function useResolveMcqReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.mcq.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.mcq.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

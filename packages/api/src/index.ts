@@ -158,6 +158,7 @@ export type {
   BulkDeleteMcqsInput,
   ToggleMcqActiveInput,
   ImportMcqsInput,
+  ResolveMcqReportInput,
 } from "./routers/mcq/mcq.schema"
 
 export type {
@@ -169,6 +170,7 @@ export type {
   BulkDeleteCqsInput,
   ToggleCqActiveInput,
   ImportCqsInput,
+  ResolveCqReportInput,
 } from "./routers/cq/cq.schema"
 
 export type {
@@ -180,6 +182,7 @@ export type {
   BulkDeleteCsInput,
   ToggleCsActiveInput,
   ImportCsInput,
+  ResolveCsReportInput,
 } from "./routers/cs/cs.schema"
 
 export type {

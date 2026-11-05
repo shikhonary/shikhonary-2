@@ -124,30 +124,6 @@ export async function deleteQuestionPaperSubSection(
     throw badRequest("Cannot delete a sub-section that contains questions.")
   }
 
-  // Check if this sub-section shares a question type with other sub-sections
-  const distIds = existing.distributions.map((d) => d.distributionId)
-  if (distIds.length > 0) {
-    const siblingRelations = await tenantDb.questionPaperSubSectionDistribution.findMany({
-      where: {
-        distributionId: { in: distIds },
-        subSectionId: { not: input.id },
-      },
-    })
-    if (siblingRelations.length === 0) {
-      throw badRequest("Cannot delete a sub-section that holds a unique question type.")
-    }
-  } else {
-    const siblingCount = await tenantDb.questionPaperSubSection.count({
-      where: {
-        sectionId: existing.sectionId,
-        id: { not: input.id },
-      },
-    })
-    if (siblingCount === 0) {
-      throw badRequest("Cannot delete a sub-section that holds a unique question type.")
-    }
-  }
-
   const sectionId = existing.sectionId
   await tenantDb.questionPaperSubSection.delete({
     where: { id: input.id },

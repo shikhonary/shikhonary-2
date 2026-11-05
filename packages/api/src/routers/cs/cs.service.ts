@@ -11,6 +11,7 @@ import type {
   ToggleCsActiveInput,
   ImportCsInput,
   CsStatsInput,
+  ResolveCsReportInput,
 } from "./cs.schema"
 
 export async function listCs(db: PrismaClient, input: ListCsInput) {
@@ -35,7 +36,7 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
   if (input.hasReport !== undefined && input.hasReport !== "All") {
     const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
     const reports = await (db as any).questionReport.findMany({
-      where: { entityType: "CS" },
+      where: { entityType: "CS", status: "PENDING" },
       select: { entityId: true },
       distinct: ["entityId"],
     })
@@ -171,7 +172,24 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
     itemIds.length > 0
       ? await (db as any).questionReport.findMany({
           where: { entityType: "CS", entityId: { in: itemIds } },
-          select: { entityId: true, status: true, reportType: true, description: true },
+          select: {
+            id: true,
+            entityId: true,
+            status: true,
+            reportType: true,
+            description: true,
+            resolvedNote: true,
+            resolvedAt: true,
+            createdAt: true,
+            resolver: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
         })
       : []
 
@@ -181,11 +199,15 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
     reportMap.get(rep.entityId)!.push(rep)
   }
 
-  const enhancedItems = items.map((item: any) => ({
-    ...item,
-    hasReport: reportMap.has(item.id),
-    reports: reportMap.get(item.id) || [],
-  }))
+  const enhancedItems = items.map((item: any) => {
+    const repList = reportMap.get(item.id) || []
+    const hasPendingReport = repList.some((r: any) => r.status === "PENDING")
+    return {
+      ...item,
+      hasReport: hasPendingReport,
+      reports: repList,
+    }
+  })
 
   return {
     items: enhancedItems,
@@ -656,3 +678,59 @@ export async function getBoardYears(
       return b.count - a.count
     })
 }
+
+export async function resolveCsReport(
+  db: PrismaClient,
+  input: ResolveCsReportInput,
+  userId?: string | null
+) {
+  const { csId, reportId, resolvedNote } = input
+
+  const cs = await (db as any).cS.findUnique({
+    where: { id: csId },
+    select: { id: true },
+  })
+
+  if (!cs) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `CS with ID ${csId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "CS",
+    entityId: csId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await (db as any).questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "No report found for this CS question",
+    })
+  }
+
+  const result = await (db as any).questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "RESOLVED",
+      resolvedNote: resolvedNote?.trim() || "Resolved by admin",
+      resolvedById: userId ?? null,
+      resolvedAt: new Date(),
+    },
+  })
+
+  return {
+    success: true,
+    resolvedCount: result.count,
+  }
+}
+

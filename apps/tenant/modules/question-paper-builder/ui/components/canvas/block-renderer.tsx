@@ -183,11 +183,11 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const { mutateAsync: deleteSubSection } = useDeleteSubSection();
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
-  const canDeleteSubSection = !hasQuestions && Boolean(isSharedQuestionType);
+  const canDeleteSubSection = !hasQuestions;
 
   const rawSubTitle = (titleBn || title)?.trim() || "";
   const isGenericSub = !rawSubTitle || rawSubTitle.toLowerCase() === "sub-section" || rawSubTitle.toLowerCase() === "subsection";
-  const displayTitle = !isGenericSub ? rawSubTitle : (distName?.trim() || "");
+  const displayTitle = !isGenericSub ? rawSubTitle : (isSharedQuestionType ? "" : (distName?.trim() || ""));
   const hasSubTitle = Boolean(displayTitle && !hideTitle);
 
   const formattedInst = instructions
@@ -201,7 +201,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const marks = marksPerQuestion ? Number(marksPerQuestion) : 0;
   const attempts = attemptCount ? Number(attemptCount) : 0;
   const totalMarks = marks * attempts;
-  const canShowMarkFormula = showMarkDistribution !== false && marks > 0 && attempts > 0;
+  const canShowMarkFormula = !isSharedQuestionType && showMarkDistribution !== false && marks > 0 && attempts > 0;
   const canShowBottomRow = Boolean(formattedInst || canShowMarkFormula);
 
   return (
@@ -308,7 +308,9 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const DistTitleBlock = ({ data }: { data: any }) => {
-  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs, subTitle } = data || {};
+  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs, subTitle, isSharedQuestionType } = data || {};
+
+  if (isSharedQuestionType || isMcq) return null;
 
   const isCS = isCs
     || dist?.questionType?.code === "CS"

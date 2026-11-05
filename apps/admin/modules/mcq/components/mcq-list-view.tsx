@@ -12,15 +12,17 @@ import {
   useChaptersForSelection,
   useDeleteMcq,
   useBulkDeleteMcqs,
+  useResolveMcqReport,
 } from "../services/use-mcq"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { HelpCircle, Plus, Upload } from "lucide-react"
 import { McqStatsCards } from "./mcq-stats-cards"
 import { McqFilters } from "./mcq-filters"
-import { McqTable } from "./mcq-table"
+import { McqTable, type McqItem } from "./mcq-table"
 import { useMcqSearchParams } from "../hooks/use-mcq-search-params"
 
 export function McqListView() {
@@ -56,9 +58,25 @@ export function McqListView() {
   // Local state for delete dialogs (replaces Zustand delete modal store)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+  const [resolveTarget, setResolveTarget] = useState<McqItem | null>(null)
 
   const deleteMutation = useDeleteMcq()
   const bulkDeleteMutation = useBulkDeleteMcqs()
+  const resolveMcqMutation = useResolveMcqReport()
+
+  const handleConfirmResolve = async (resolvedNote?: string) => {
+    if (!resolveTarget) return
+    try {
+      await resolveMcqMutation.mutateAsync({
+        mcqId: resolveTarget.id,
+        resolvedNote,
+      })
+      toast.success("MCQ রিপোর্টটি সফলভাবে সমাধান করা হয়েছে।")
+      setResolveTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
 
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return
@@ -196,12 +214,34 @@ export function McqListView() {
         isError={isError}
         onDelete={(id, question) => setDeleteTarget({ id, question })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
+        onResolveReport={(item) => setResolveTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+      />
+
+      {/* Reusable Resolve MCQ Report Dialog */}
+      <ResolveReportDialog
+        isOpen={Boolean(resolveTarget)}
+        onClose={() => setResolveTarget(null)}
+        entityName="MCQ প্রশ্ন"
+        entityDetails={
+          resolveTarget
+            ? {
+                subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
+                chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
+                clueText: resolveTarget.question,
+                editHref: `/mcqs/${resolveTarget.id}/edit`,
+                editLabel: "MCQ এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={resolveTarget?.reports}
+        onConfirmResolve={handleConfirmResolve}
+        isLoading={resolveMcqMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}

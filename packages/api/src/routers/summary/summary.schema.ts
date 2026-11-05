@@ -4,6 +4,7 @@ import { QUESTION_DIFFICULTY } from "@workspace/utils"
 
 export const listSummariesSchema = paginationSchema.extend({
   subjectId: z.string().optional(),
+  academicClassId: z.string().optional(),
   difficulty: z.string().optional(),
   sort: z.string().optional(),
   page: z.number().int().min(1).optional(),
@@ -14,6 +15,7 @@ export type ListSummariesInput = z.infer<typeof listSummariesSchema>
 
 export const summaryStatsSchema = z.object({
   subjectId: z.string().optional(),
+  academicClassId: z.string().optional(),
 })
 
 export type SummaryStatsInput = z.infer<typeof summaryStatsSchema>

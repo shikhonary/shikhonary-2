@@ -53,15 +53,25 @@ async function resolveSummaryQuestionTypeId(db: any) {
 }
 
 export async function listSummaries(db: PrismaClient, input: ListSummariesInput) {
-  const { page, limit, query, subjectId, difficulty, sort } = input
+  const { page, limit, query, subjectId, academicClassId, difficulty, sort } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
 
-  if (subjectId) where.subjectId = subjectId
-  if (difficulty) where.difficulty = difficulty
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+
+  if (academicClassId && academicClassId !== "All") {
+    where.subject = {
+      classSubjects: {
+        some: {
+          academicClassId,
+        },
+      },
+    }
+  }
 
   if (query) {
     where.OR = [
@@ -95,6 +105,13 @@ export async function listSummaries(db: PrismaClient, input: ListSummariesInput)
             id: true,
             nameEn: true,
             nameBn: true,
+            code: true,
+            group: true,
+            classSubjects: {
+              include: {
+                academicClass: true,
+              },
+            },
           },
         },
         questionType: {
@@ -237,7 +254,16 @@ export async function importSummaries(db: PrismaClient, input: ImportSummariesIn
 
 export async function getSummaryStats(db: PrismaClient, input: SummaryStatsInput = {}) {
   const where: any = {}
-  if (input.subjectId) where.subjectId = input.subjectId
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.academicClassId && input.academicClassId !== "All") {
+    where.subject = {
+      classSubjects: {
+        some: {
+          academicClassId: input.academicClassId,
+        },
+      },
+    }
+  }
 
   const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
     db.summary.count({ where }),

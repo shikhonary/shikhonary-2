@@ -10,6 +10,7 @@ import {
   toggleMcqActiveSchema,
   importMcqsSchema,
   mcqStatsSchema,
+  resolveMcqReportSchema,
 } from "./mcq.schema"
 import {
   createMcq,
@@ -22,6 +23,7 @@ import {
   importMcqs,
   getMcqStats,
   getBoardYears,
+  resolveMcqReport,
 } from "./mcq.service"
 
 export const mcqRouter = createTRPCRouter({
@@ -71,4 +73,10 @@ export const mcqRouter = createTRPCRouter({
   import: superAdminProcedure
     .input(importMcqsSchema)
     .mutation(({ ctx, input }) => importMcqs(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveMcqReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveMcqReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

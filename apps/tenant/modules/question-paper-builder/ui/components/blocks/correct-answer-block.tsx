@@ -163,6 +163,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
 
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
+  const isCombined = (data.type || "").toUpperCase() === "COMBINED";
 
   const renderOptionLabel = (label: string) => {
     switch (settings.optionStyle) {
@@ -219,7 +220,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
       </div>
 
       {/* Section Header: rendered on the first question of the distribution */}
-      {item.isFirstCorrectAnswer && (
+      {item.isFirstCorrectAnswer && item.type !== "MCQ" && (
         <div className="flex justify-between items-start w-full mb-1">
           <div 
             className="font-bold ml-[0px] flex items-baseline gap-2" 
@@ -262,7 +263,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
       )}
 
       {/* Top Banner & Stimulus: ONLY for COMBINED questions */}
-      {data.type === "COMBINED" && !hideContext && (
+      {isCombined && !hideContext && (
         <div className="flex items-start gap-2 w-full pt-1.5 mb-0.5 ml-[1.8em] pl-2">
           <span
             className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
@@ -280,17 +281,17 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                 {contextInstruction}
               </div>
             )}
-            {data.questionContext?.text && (
+            {(data.questionContext?.text || data.context) && (
               <div className="italic opacity-80 whitespace-pre-wrap w-full mb-0.5">
                 <EditableItem 
-                  content={<RenderMath text={data.questionContext.text} />}
+                  content={<RenderMath text={data.questionContext?.text || data.context} />}
                   itemKey={`${item.id}-context`}
                   defaultStyle={contextStyle}
                 />
               </div>
             )}
             {/* Shared Attachments for COMBINED questions */}
-            <QuestionAttachments attachments={data.attachments} />
+            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
           </div>
         </div>
       )}
@@ -315,8 +316,8 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
           </div>
 
           {/* Attachments for SINGLE and MULTIPLE questions rendered directly below question */}
-          {data.type !== "COMBINED" && Array.isArray(data.attachments) && data.attachments.length > 0 && (
-            <QuestionAttachments attachments={data.attachments} />
+          {!isCombined && Array.isArray(data.attachments) && data.attachments.length > 0 && (
+            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
           )}
               
           {data.statements && data.statements.length > 0 && (

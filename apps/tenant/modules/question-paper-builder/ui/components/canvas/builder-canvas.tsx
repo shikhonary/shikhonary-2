@@ -5,6 +5,7 @@ import { OMRBlock } from "../blocks/omr-block";
 import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { LayoutList, FileText, ZoomIn, Eye, Sparkles } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { normalizeTableData } from "@workspace/ui/components/question-attachments";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
@@ -21,6 +22,95 @@ const toBengaliDigits = (num: number | string): string => {
     .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
     .join("");
 };
+
+/**
+ * Normalizes an attachment into a canonical signature for grouping shared stimuli in COMBINED MCQs.
+ * Handles text, image, and table attachment types uniformly.
+ */
+function getAttachmentSignature(a: any): string | null {
+  if (!a || typeof a !== "object") return null;
+
+  const rawType = (a.type || "").toLowerCase();
+  const url = a.url && a.url !== "text-context" ? String(a.url).trim() : null;
+
+  const isImage =
+    rawType === "image" ||
+    Boolean(url && /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(url));
+
+  const tableData = a.table ? normalizeTableData(a.table) : null;
+  const isTable = rawType === "table" || (Boolean(tableData) && !isImage);
+  const isText = rawType === "text" || rawType === "context" || (!isImage && !isTable);
+
+  if (isImage) {
+    if (url) {
+      let cleanUrl = url;
+      try {
+        const parsed = new URL(url);
+        cleanUrl = `${parsed.origin.toLowerCase()}${parsed.pathname}`.replace(/\/+$/, "");
+      } catch {
+        cleanUrl = url.toLowerCase().replace(/\/+$/, "");
+      }
+      return `img:${cleanUrl}`;
+    }
+    const desc = (a.caption || a.content || "").trim().replace(/\s+/g, " ");
+    return desc ? `img_desc:${desc}` : null;
+  }
+
+  if (isTable) {
+    if (tableData && (tableData.headers.length > 0 || tableData.rows.length > 0)) {
+      const norm = (s: any) => String(s ?? "").trim().replace(/\s+/g, " ");
+      const hStr = tableData.headers.map(norm).join("|");
+      const rStr = tableData.rows
+        .map((row: string[]) => row.map(norm).join(","))
+        .join(";");
+      return `tbl:h[${hStr}]r[${rStr}]`;
+    }
+    const content = (a.content || "").trim().replace(/\s+/g, " ");
+    if (content) return `tbl_content:${content}`;
+    const caption = (a.caption || "").trim().replace(/\s+/g, " ");
+    if (caption) return `tbl_caption:${caption}`;
+    return null;
+  }
+
+  if (isText) {
+    const text = (a.content || a.caption || "").trim().replace(/\s+/g, " ");
+    return text ? `txt:${text}` : null;
+  }
+
+  return null;
+}
+
+/**
+ * Computes a composite stimulus key for a COMBINED MCQ.
+ */
+function getMcqStimulusKey(mcqItem: any): string | null {
+  if (!mcqItem) return null;
+
+  const directContext = (mcqItem.questionContext?.text || mcqItem.context || "").trim().replace(/\s+/g, " ");
+
+  const attSignatures: string[] = [];
+  if (Array.isArray(mcqItem.attachments) && mcqItem.attachments.length > 0) {
+    for (const a of mcqItem.attachments) {
+      const sig = getAttachmentSignature(a);
+      if (sig) {
+        attSignatures.push(sig);
+      }
+    }
+    attSignatures.sort();
+  }
+
+  if (attSignatures.length > 0 && directContext) {
+    return `ctx:${directContext}&&att:${attSignatures.join("||")}`;
+  }
+  if (attSignatures.length > 0) {
+    return `att:${attSignatures.join("||")}`;
+  }
+  if (directContext) {
+    return `ctx:${directContext}`;
+  }
+
+  return null;
+}
 
 import { PaperBlock } from "../../../types";
 
@@ -278,7 +368,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const isCq = (!nameEn.includes("mcq") && (nameEn.includes("cq") || nameEn.includes("cs") || nameEn.includes("creative"))) || dist.questionType?.nameBn?.includes("সৃজনশীল");
         const isMcq = nameEn.includes("mcq") || nameEn.includes("multiple choice") || dist.questionType?.nameBn?.includes("বহুনির্বাচনি");
         const hasQuestionTypeLabel = Boolean(dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "");
-        const shouldHideDistTitle = extraOptions?.hideDistTitle ?? false;
+        const shouldHideDistTitle = isMcq || (extraOptions?.hideDistTitle ?? extraOptions?.isSharedQuestionType ?? false);
 
         const subPrefix = extraOptions?.subSectionId ? `-sub-${extraOptions.subSectionId}` : (extraOptions?.sectionId ? `-sec-${extraOptions.sectionId}` : "");
 
@@ -296,6 +386,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               isCq,
               isMcq,
               isCs,
+              isSharedQuestionType: extraOptions?.isSharedQuestionType,
             },
             gap: 0
           });
@@ -399,43 +490,30 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             let contextInstruction = "";
 
             const currMcq = q.mcq as any;
-            const isCombined = currMcq?.type === "COMBINED";
+            const isCombined = (currMcq?.type || "").toUpperCase() === "COMBINED";
+            const currStimulusKey = isCombined ? getMcqStimulusKey(currMcq) : null;
 
-            const getStimulusKey = (mcqItem: any) => {
-              if (!mcqItem) return null;
-              if (mcqItem.questionContext?.text) return `ctx:${mcqItem.questionContext.text.trim()}`;
-              if (mcqItem.context) return `ctx:${mcqItem.context.trim()}`;
-              if (Array.isArray(mcqItem.attachments) && mcqItem.attachments.length > 0) {
-                const attSig = mcqItem.attachments.map((a: any) => 
-                  `${a.type || ""}_${a.url || ""}_${a.caption || ""}_${a.content || ""}_${JSON.stringify(a.table || "")}`
-                ).join("|");
-                return `att:${attSig}`;
-              }
-              return null;
-            };
-
-            const currStimulusKey = isCombined ? getStimulusKey(currMcq) : null;
-
-            if (isCombined && idx > 0 && questions[idx - 1]?.mcq?.type === "COMBINED") {
+            if (isCombined && idx > 0) {
               const prevMcq = questions[idx - 1]?.mcq as any;
-              const prevStimulusKey = getStimulusKey(prevMcq);
-              if (currStimulusKey && prevStimulusKey === currStimulusKey) {
-                hideContext = true;
+              const isPrevCombined = (prevMcq?.type || "").toUpperCase() === "COMBINED";
+              if (isPrevCombined) {
+                const prevStimulusKey = getMcqStimulusKey(prevMcq);
+                if (currStimulusKey && prevStimulusKey === currStimulusKey) {
+                  hideContext = true;
+                }
               }
             }
 
-            if (isCombined && !hideContext) {
+            if (isCombined && !hideContext && currStimulusKey) {
               let sharedCount = 1;
-              if (currStimulusKey) {
-                for (let j = idx + 1; j < questions.length; j++) {
-                  const nextMcq = questions[j]?.mcq as any;
-                  if (nextMcq?.type !== "COMBINED") break;
-                  const nextStimulusKey = getStimulusKey(nextMcq);
-                  if (nextStimulusKey && nextStimulusKey === currStimulusKey) {
-                    sharedCount++;
-                  } else {
-                    break;
-                  }
+              for (let j = idx + 1; j < questions.length; j++) {
+                const nextMcq = questions[j]?.mcq as any;
+                if ((nextMcq?.type || "").toUpperCase() !== "COMBINED") break;
+                const nextStimulusKey = getMcqStimulusKey(nextMcq);
+                if (nextStimulusKey && nextStimulusKey === currStimulusKey) {
+                  sharedCount++;
+                } else {
+                  break;
                 }
               }
 
@@ -451,67 +529,27 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               }
             }
 
-            const hasQuestionTypeLabel = Boolean(
-              (dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "") ||
-              q.distribution?.questionTypeLabel ||
-              statusInfo?.questionTypeLabel
-            );
-
-            if (hasQuestionTypeLabel) {
-              if (mcqIdx === 0) {
-                globalWrittenNumber++;
-              }
-              newBlocks.push({
-                id: `q-${q.id}`,
-                type: "question-correct-answer",
-                data: {
-                  item: {
-                    id: q.id,
-                    type: "MCQ",
-                    data: q.mcq,
-                    orderIndex: mcqIdx,
-                    masterNumber: globalWrittenNumber,
-                    canMoveUp,
-                    canMoveDown,
-                    siblingQuestions,
-                    isFirstCorrectAnswer: mcqIdx === 0,
-                    totalQuestions: totalMcqs,
-                    attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
-                    marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
-                    questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "সঠিক উত্তরটি উত্তরপত্রে লেখো:",
-                    distributionId: dist.id,
-                    distribution: dist,
-                    markDistribution: dist.markDistribution ?? statusInfo?.markDistribution,
-                    paperId,
-                  },
-                  hideContext,
-                  contextInstruction
+            newBlocks.push({
+              id: `q-${q.id}`,
+              type: "question-mcq",
+              data: {
+                item: {
+                  id: q.id,
+                  type: "MCQ",
+                  data: q.mcq,
+                  orderIndex: idx,
+                  canMoveUp,
+                  canMoveDown,
+                  siblingQuestions,
+                  distributionId: dist.id,
+                  paperId,
                 },
-                gap: 0
-              });
-              mcqIdx++;
-            } else {
-              newBlocks.push({
-                id: `q-${q.id}`,
-                type: "question-mcq",
-                data: {
-                  item: {
-                    id: q.id,
-                    type: "MCQ",
-                    data: q.mcq,
-                    orderIndex: idx,
-                    canMoveUp,
-                    canMoveDown,
-                    siblingQuestions,
-                    distributionId: dist.id,
-                    paperId,
-                  },
-                  hideContext,
-                  contextInstruction
-                },
-                gap: 0
-              });
-            }
+                hideContext,
+                contextInstruction
+              },
+              gap: 0
+            });
+            mcqIdx++;
           }
           if (q.cq) {
             globalWrittenNumber++;
@@ -2222,29 +2260,54 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           let finalSecInstruction = (sec.instructions && sec.instructions.trim() !== "") ? sec.instructions : null;
           const prefix = "[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।";
 
-          const subSectionsWithAttempts = validSubSections.filter(
-            (s: any) => s.questionsToAttempt && Number(s.questionsToAttempt) > 0
-          );
-          const hasExplicitSubAttempts = subSectionsWithAttempts.length > 0;
+          const subTypeCountMap = new Map<string, number>();
+          validSubSections.forEach((s: any) => {
+            const d = subToDistMap.get(s.id);
+            const typeKey = d?.questionTypeId || d?.id;
+            if (typeKey) {
+              subTypeCountMap.set(typeKey, (subTypeCountMap.get(typeKey) || 0) + 1);
+            }
+          });
 
-          if (validSubSections.length > 0 && hasExplicitSubAttempts) {
+          // Only accumulate attempts of sub-sections which share the same question type
+          const sharedSubSectionsWithAttempts = validSubSections.filter((s: any) => {
+            if (!s.questionsToAttempt || Number(s.questionsToAttempt) <= 0) return false;
+            const d = subToDistMap.get(s.id);
+            const typeKey = d?.questionTypeId || d?.id;
+            return typeKey && (subTypeCountMap.get(typeKey) || 0) > 1;
+          });
+
+          if (sharedSubSectionsWithAttempts.length > 0) {
             if (!finalSecInstruction) {
-              const subClauses = subSectionsWithAttempts.map((s: any) => {
+              const subClauses = sharedSubSectionsWithAttempts.map((s: any) => {
                 const name = (s.titleBn || s.title || "").trim();
                 const subAttempt = Number(s.questionsToAttempt);
                 const countBn = toBengaliDigits(subAttempt || 0);
                 return name ? `${name} থেকে যেকোনো ${countBn}টি` : `যেকোনো ${countBn}টি`;
               });
 
+              // Accumulate ONLY the attempts of the sub-sections which share the same question type
+              const sharedAttemptSum = sharedSubSectionsWithAttempts.reduce(
+                (sum: number, s: any) => sum + Number(s.questionsToAttempt || 0),
+                0
+              );
+
+              const firstSharedDist = subToDistMap.get(sharedSubSectionsWithAttempts[0].id);
+              const distAttemptTarget = firstSharedDist?.questionsToAttempt && Number(firstSharedDist.questionsToAttempt) > 0
+                ? Number(firstSharedDist.questionsToAttempt)
+                : 0;
+
+              const totalSectionToAnswer = distAttemptTarget > 0 ? distAttemptTarget : sharedAttemptSum;
+
               let subBreakdownStr = "";
               if (subClauses.length === 1) {
-                subBreakdownStr = `${subClauses[0]} প্রশ্নের উত্তর দিতে হবে`;
+                subBreakdownStr = `${subClauses[0]} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
               } else if (subClauses.length === 2) {
-                subBreakdownStr = `${subClauses[0]} এবং ${subClauses[1]} প্রশ্নের উত্তর দিতে হবে`;
+                subBreakdownStr = `${subClauses[0]} এবং ${subClauses[1]} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
               } else if (subClauses.length > 2) {
                 const allExceptLast = subClauses.slice(0, -1).join(", ");
                 const last = subClauses[subClauses.length - 1];
-                subBreakdownStr = `${allExceptLast} এবং ${last} প্রশ্নের উত্তর দিতে হবে`;
+                subBreakdownStr = `${allExceptLast} এবং ${last} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
               }
 
               finalSecInstruction = `${prefix} ${subBreakdownStr}।]`;
@@ -2371,7 +2434,13 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   return sum + Math.max(qCount, sReq);
                 }, 0);
 
-              const secRequiredTarget = totalSectionTarget > 0 ? totalSectionTarget : secTotalRequired;
+              const sharedTarget = (targetDist?.questionsToAttempt && targetDist.questionsToAttempt > 0)
+                ? targetDist.questionsToAttempt
+                : (targetDist?.questionCount || 0);
+
+              const secRequiredTarget = isSharedQuestionType
+                ? sharedTarget
+                : (totalSectionTarget > 0 ? totalSectionTarget : secTotalRequired);
 
               const maxAllowedTarget = secRequiredTarget > 0 
                 ? Math.max(1, secRequiredTarget - otherSubAttemptSum)
@@ -2379,14 +2448,22 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
               const subDist = targetDist;
               const subDistCount = subDist?.questionCount || 0;
+              const matchingTypeDists = secDists.filter(
+                (d: any) => d.id === targetDist?.id || (targetDist?.questionTypeId && d.questionTypeId === targetDist.questionTypeId)
+              );
+              const sharedTypeTotalProvided = matchingTypeDists.reduce(
+                (sum: number, d: any) => sum + (d.questionCount || 0),
+                0
+              );
+              const totalPool = sharedTypeTotalProvided > 0 ? sharedTypeTotalProvided : (subDistCount || 0);
 
-              const secRemainingQuota = secTotalProvided > 0 
-                ? Math.max(1, secTotalProvided - otherSubOccupied)
+              const secRemainingQuota = totalPool > 0 
+                ? Math.max(1, totalPool - otherSubOccupied)
                 : (subDistCount || 1);
 
-              const subPickLimit = subDistCount > 0 
-                ? Math.min(subDistCount, secRemainingQuota)
-                : secRemainingQuota;
+              const subPickLimit = isSharedQuestionType
+                ? secRemainingQuota
+                : (subDistCount > 0 ? Math.min(subDistCount, secRemainingQuota) : secRemainingQuota);
 
               const distQuestionCount = Number(targetDist?.questionCount || 0);
               const marksPerQuestion = targetDist?.marksPerQuestion || 10;
@@ -2404,7 +2481,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
                 if (explicitSubAttempt !== null && explicitSubAttempt > 0) {
                   attemptCount = explicitSubAttempt;
-                  showMarkDistribution = true;
+                  showMarkDistribution = false;
                   if (subProv > 0 && explicitSubAttempt < subProv) {
                     finalSubInstruction = `(যেকোনো ${toBengaliDigits(explicitSubAttempt)}টি প্রশ্নের উত্তর দিতে হবে)`;
                   } else {
@@ -2445,7 +2522,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   sectionId: sec.id, 
                   title: sub.title, 
                   titleBn: sub.titleBn, 
-                  distName,
+                  distName: isSharedQuestionType ? "" : distName,
                   instructions: finalSubInstruction,
                   prevSubSectionId: prevSub?.id,
                   prevSubSectionTitle: prevSub?.titleBn || prevSub?.title,
@@ -2455,9 +2532,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   hideTitle: false,
                   isSectionFilled,
                   isFirstSubSection: subIndex === 0,
-                  marksPerQuestion: showMarkDistribution ? marksPerQuestion : null,
-                  attemptCount,
-                  showMarkDistribution,
+                  marksPerQuestion: (!isSharedQuestionType && showMarkDistribution) ? marksPerQuestion : null,
+                  attemptCount: isSharedQuestionType ? null : attemptCount,
+                  showMarkDistribution: isSharedQuestionType ? false : showMarkDistribution,
                   isSharedQuestionType,
                 },
                 gap: 0
@@ -2472,6 +2549,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                 subSectionId: sub.id,
                 subTitle: sub.titleBn || sub.title,
                 showAction: !isSectionFilled,
+                hideDistTitle: isSharedQuestionType,
                 maxAllowedTarget,
                 secTotalProvided,
                 secTotalRequired,

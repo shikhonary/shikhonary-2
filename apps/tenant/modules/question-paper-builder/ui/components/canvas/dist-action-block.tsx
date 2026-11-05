@@ -56,6 +56,10 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     }
   }
 
+  if (blockData?.subPickLimit && blockData.subPickLimit > 0) {
+    targetLimit = blockData.subPickLimit;
+  }
+
   const nameEn = (dist.questionTypeName || dist.questionType?.nameEn || "").toLowerCase();
   const nameBn = (dist.questionTypeNameBn || dist.questionType?.nameBn || "").toLowerCase();
   const label = (dist.questionTypeLabel || dist.questionType?.label || "").toLowerCase();
@@ -187,14 +191,10 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
 
   const subTargetCount = blockData?.subPickLimit || dist.questionCount || statusInfo?.targetCount || 1;
 
-  // ── Compute dropdown validation: accumulate questionsToAttempt of sub-sections sharing same question type and compare to section questionsToAttempt ──
-  const fallbackLimit = (dist.questionsToAttempt && dist.questionsToAttempt > 0)
+  // ── Compute dropdown validation: accumulate questionsToAttempt of sub-sections sharing same question type and compare to shared question type questionsToAttempt ──
+  const sharedQuestionTypeAttempt = (dist.questionsToAttempt && dist.questionsToAttempt > 0)
     ? dist.questionsToAttempt
     : (dist.questionCount && dist.questionCount > 0 ? dist.questionCount : 0);
-
-  const sectionQuestionsToAttempt = (sec?.questionsToAttempt && sec.questionsToAttempt > 0)
-    ? sec.questionsToAttempt
-    : fallbackLimit;
 
   let otherSubAttemptForDropdown = 0;
   if (sec && sec.subSections && sec.subSections.length > 1) {
@@ -206,9 +206,9 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
       }, 0);
   }
 
-  const maxAllowedRequired = sectionQuestionsToAttempt > 0
-    ? Math.max(0, sectionQuestionsToAttempt - otherSubAttemptForDropdown)
-    : fallbackLimit;
+  const maxAllowedRequired = sharedQuestionTypeAttempt > 0
+    ? Math.max(0, sharedQuestionTypeAttempt - otherSubAttemptForDropdown)
+    : sharedQuestionTypeAttempt;
 
   const dropdownMaxOptions = maxAllowedRequired;
 
@@ -248,7 +248,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
               onMouseDown={(e) => {
                 if (maxAllowedRequired <= 0 && (!currentAttempt || currentAttempt === "0")) {
                   e.preventDefault();
-                  toast.error(`সেকশনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sectionQuestionsToAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`);
+                  toast.error(`এই প্রশ্নের ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedQuestionTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`);
                 }
               }}
               onChange={async (e) => {
@@ -267,12 +267,12 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
                 }
 
                 if (maxAllowedRequired <= 0) {
-                  toast.error(`সেকশনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sectionQuestionsToAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`);
+                  toast.error(`এই প্রশ্নের ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedQuestionTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`);
                   return;
                 }
 
-                if (sectionQuestionsToAttempt > 0 && val > maxAllowedRequired) {
-                  toast.error(`ভুল মান: সেকশনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sectionQuestionsToAttempt)}টি) অতিক্রম করা যাবে না। এই উপ-বিভাগে সর্বোচ্চ ${toBengaliDigits(maxAllowedRequired)}টি উত্তর নির্ধারণ করতে পারবেন।`);
+                if (sharedQuestionTypeAttempt > 0 && val > maxAllowedRequired) {
+                  toast.error(`ভুল মান: এই ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedQuestionTypeAttempt)}টি) অতিক্রম করা যাবে না। এই উপ-বিভাগে সর্বোচ্চ ${toBengaliDigits(maxAllowedRequired)}টি উত্তর নির্ধারণ করতে পারবেন।`);
                   return;
                 }
 

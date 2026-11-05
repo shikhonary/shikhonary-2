@@ -1,13 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { useSummariesList, useSummaryStats, useAcademicClassesForSelection, useSubjectsForSelection } from "../services/use-summary"
-import { useDeleteSummaryModalStore } from "../store/use-delete-summary-modal-store"
-import { SummaryListHeader } from "./summary-list-header"
+import Link from "next/link"
+import {
+  useSummariesList,
+  useSummaryStats,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useDeleteSummary,
+  useBulkDeleteSummaries,
+} from "../services/use-summary"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { Button } from "@workspace/ui/components/button"
+import { toast } from "@workspace/ui/components/sonner"
+import { FileText, Plus, Upload } from "lucide-react"
 import { SummaryStatsCards } from "./summary-stats-cards"
 import { SummaryFilters } from "./summary-filters"
 import { SummaryTable } from "./summary-table"
-import { DeleteSummaryModal } from "./delete-summary-modal"
 import { useSummarySearchParams } from "../hooks/use-summary-search-params"
 
 export function SummaryListView() {
@@ -34,14 +44,41 @@ export function SummaryListView() {
     })
   }
 
-  const openDeleteModal = useDeleteSummaryModalStore((state) => state.openModal)
-  const openBulkDeleteModal = useDeleteSummaryModalStore((state) => state.openBulkModal)
+  // Local state for delete dialogs
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; snippet: string } | null>(null)
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+
+  const deleteMutation = useDeleteSummary()
+  const bulkDeleteMutation = useBulkDeleteSummaries()
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await deleteMutation.mutateAsync({ id: deleteTarget.id })
+      toast.success("সারাংশটি সফলভাবে মুছে ফেলা হয়েছে।")
+      setDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "সারাংশ ডিলিট করা সম্ভব হয়নি")
+    }
+  }
+
+  const handleConfirmBulkDelete = async () => {
+    if (!bulkDeleteTarget) return
+    try {
+      const res = await bulkDeleteMutation.mutateAsync({ ids: bulkDeleteTarget })
+      toast.success(`সফলভাবে ${res.deletedCount}টি সারাংশ মুছে ফেলা হয়েছে।`)
+      setBulkDeleteTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "সারাংশ ডিলিট করা সম্ভব হয়নি")
+    }
+  }
 
   // Query Summaries list with search & filters
   const { data: summariesData, isLoading, isError } = useSummariesList({
     limit,
     page: currentPage,
     query: searchQuery || undefined,
+    academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
     sort: selectedSort,
@@ -49,8 +86,9 @@ export function SummaryListView() {
 
   // Query Summary stats
   const { data: statsData } = useSummaryStats(
-    selectedSubjectId !== "All"
+    selectedAcademicClassId !== "All" || selectedSubjectId !== "All"
       ? {
+          academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
           subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
         }
       : undefined
@@ -66,9 +104,30 @@ export function SummaryListView() {
   const totalPages = summariesData?.totalPages ?? 1
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <SummaryListHeader />
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="সারাংশ ও সারমর্ম প্রশ্ন ব্যাংক"
+        description="শ্রেণি ও বিষয়ভিত্তিক সারাংশ, সারমর্ম ও পাঠ সংক্ষেপ এক জায়গায় পরিচালনা করুন।"
+        icon={FileText}
+        badge={{ label: "সারাংশ মডিউল", variant: "indigo" }}
+        action={{
+          label: "নতুন সারাংশ যোগ করুন",
+          href: "/summaries/create",
+          icon: Plus,
+        }}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border-slate-200 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-white/[0.04] text-foreground font-semibold text-xs sm:text-sm gap-2"
+        >
+          <Link href="/summaries/import" prefetch={true}>
+            <Upload className="w-4 h-4" />
+            <span>JSON ইমপোর্ট</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* Stats Cards */}
       <SummaryStatsCards
@@ -93,13 +152,13 @@ export function SummaryListView() {
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />
 
-      {/* Data Table */}
+      {/* Data Table / Question Cards */}
       <SummaryTable
         items={items as any}
         isLoading={isLoading}
         isError={isError}
-        onDelete={(id, titleSnippet) => openDeleteModal(id, titleSnippet)}
-        onBulkDelete={(ids) => openBulkDeleteModal(ids)}
+        onDelete={(id, titleSnippet) => setDeleteTarget({ id, snippet: titleSnippet })}
+        onBulkDelete={(ids) => setBulkDeleteTarget(ids)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
@@ -108,8 +167,27 @@ export function SummaryListView() {
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
       />
 
-      {/* Delete Confirmation Modal */}
-      <DeleteSummaryModal />
+      {/* Shared Single Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="সারাংশ ডিলিট করতে চান?"
+        itemName={deleteTarget?.snippet}
+        warningText="এই সারাংশটি ডিলিট করলে এর সমস্ত সমাধান ও সংশ্লিষ্ট রেকর্ড প্রভাবিত হতে পারে।"
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Shared Bulk Delete Modal */}
+      <ConfirmDeleteDialog
+        isOpen={Boolean(bulkDeleteTarget && bulkDeleteTarget.length > 0)}
+        onClose={() => setBulkDeleteTarget(null)}
+        onConfirm={handleConfirmBulkDelete}
+        title={`${bulkDeleteTarget?.length ?? 0}টি সারাংশ ডিলিট নিশ্চিত করুন`}
+        itemName={`${bulkDeleteTarget?.length ?? 0}টি নির্বাচিত সারাংশ`}
+        warningText="নির্বাচিত সকল সারাংশ স্থায়ীভাবে মুছে যাবে। এটি আর ফেরানো সম্ভব নয়।"
+        isLoading={bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }

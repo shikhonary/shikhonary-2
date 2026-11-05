@@ -11,15 +11,17 @@ import {
   useCsBoardYears,
   useDeleteCs,
   useBulkDeleteCs,
+  useResolveCsReport,
 } from "../services/use-cs"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { BookOpen, Plus, Upload } from "lucide-react"
 import { CsStatsCards } from "./cs-stats-cards"
 import { CsFilters } from "./cs-filters"
-import { CsTable } from "./cs-table"
+import { CsTable, type CsItem } from "./cs-table"
 import { useCsSearchParams } from "../hooks/use-cs-search-params"
 
 export function CsListView() {
@@ -56,9 +58,25 @@ export function CsListView() {
   // Local state for single & bulk delete
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+  const [resolveTarget, setResolveTarget] = useState<CsItem | null>(null)
 
   const deleteMutation = useDeleteCs()
   const bulkDeleteMutation = useBulkDeleteCs()
+  const resolveCsMutation = useResolveCsReport()
+
+  const handleConfirmResolve = async (resolvedNote?: string) => {
+    if (!resolveTarget) return
+    try {
+      await resolveCsMutation.mutateAsync({
+        csId: resolveTarget.id,
+        resolvedNote,
+      })
+      toast.success("CS রিপোর্টটি সফলভাবে সমাধান করা হয়েছে।")
+      setResolveTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
 
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return
@@ -202,12 +220,34 @@ export function CsListView() {
         isError={isError}
         onDelete={(id, snippet) => setDeleteTarget({ id, question: snippet })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
+        onResolveReport={(item) => setResolveTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+      />
+
+      {/* Reusable Resolve CS Report Dialog */}
+      <ResolveReportDialog
+        isOpen={Boolean(resolveTarget)}
+        onClose={() => setResolveTarget(null)}
+        entityName="CS প্রশ্ন"
+        entityDetails={
+          resolveTarget
+            ? {
+                subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
+                chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
+                clueText: resolveTarget.questionA,
+                editHref: `/cs/${resolveTarget.id}/edit`,
+                editLabel: "CS এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={resolveTarget?.reports}
+        onConfirmResolve={handleConfirmResolve}
+        isLoading={resolveCsMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}

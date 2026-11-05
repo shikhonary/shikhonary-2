@@ -5,15 +5,14 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
+import { toBengaliDigits, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { Trash2, FileText, Plus } from "lucide-react"
 
 export interface SummaryItem {
   id: string
@@ -27,6 +26,13 @@ export interface SummaryItem {
     id: string
     nameEn: string
     nameBn: string
+    classSubjects?: {
+      academicClass?: {
+        id: string
+        nameEn: string
+        nameBn: string
+      } | null
+    }[]
   }
 }
 
@@ -57,8 +63,6 @@ export function SummaryTable({
   onPageChange,
   onLimitChange,
 }: SummaryTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const handleSelectAll = (checked: boolean) => {
@@ -82,189 +86,193 @@ export function SummaryTable({
 
   return (
     <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
+      {/* Selection Toolbar */}
+      {items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card p-3 sm:p-4 shadow-xs">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-foreground font-headline">
+                সবগুলো নির্বাচন করুন ({toBengaliDigits(items.length)}টি)
               </span>
-              <Button
-                type="button"
-                onClick={() => {
-                  onBulkDelete(selectedIds)
-                  setSelectedIds([])
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Delete Selected</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+            </label>
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="animate-spin text-primary text-sm font-bold">
-              Loading...
-            </span>
-            <span className="font-body-md text-sm font-medium">Loading Summaries...</span>
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-white/[0.08]">
+                <span className="text-xs font-semibold text-indigo-600 dark:text-primary font-body">
+                  {toBengaliDigits(selectedIds.length)}টি নির্বাচিত
+                </span>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    onBulkDelete(selectedIds)
+                    setSelectedIds([])
+                  }}
+                  className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>নির্বাচিতগুলো মুছুন</span>
+                </Button>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Loading Skeleton State */}
+      {isLoading && (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-6 shadow-xs animate-pulse space-y-4"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-white/10" />
+                <div className="h-5 w-24 bg-slate-200 dark:bg-white/10 rounded-lg" />
+                <div className="h-5 w-32 bg-slate-200 dark:bg-white/10 rounded-lg" />
+              </div>
+              <div className="h-16 w-full bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200/60" />
+            </div>
+          ))}
         </div>
       )}
 
       {/* Error State */}
       {isError && !isLoading && (
-        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-xl font-bold">⚠️ Error</span>
-            <span className="font-body-md text-sm font-medium">
-              Error loading Summaries. Please try refreshing.
-            </span>
-          </div>
+        <div className="overflow-hidden rounded-2xl border border-red-200 dark:border-red-900/30 bg-red-50/20 dark:bg-red-950/10 shadow-xs p-12 text-center text-red-600 font-headline">
+          <FileText className="h-10 w-10 mx-auto text-red-500 mb-3" />
+          <p className="text-base font-bold">সারাংশ লোড করা সম্ভব হয়নি।</p>
+          <p className="text-xs text-muted-foreground mt-1 font-body">
+            অনুগ্রহ করে পৃষ্ঠাটি রিলোড দিন অথবা কিছুক্ষণ পর চেষ্টা করুন।
+          </p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !isError && items.length === 0 && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-2xl">📝</span>
-            <p className="font-headline-md text-xl font-bold text-on-surface">
-              No Summaries Found
-            </p>
-            <p className="font-body-md text-sm text-outline max-w-md">
-              Try adjusting filters or add a new summary/précis to the question bank.
-            </p>
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs py-16 px-6 text-center select-none">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center mb-4 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <FileText className="w-8 h-8 stroke-[1.8]" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+            কোনো সারাংশ বা সারমর্ম পাওয়া যায়নি
+          </h3>
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
+            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন সারাংশ যুক্ত করুন।
+          </p>
+          <div className="mt-6">
+            <Button
+              asChild
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
+            >
+              <Link href="/summaries/create" prefetch={true}>
+                <Plus className="w-4 h-4" />
+                <span>নতুন সারাংশ যোগ করুন</span>
+              </Link>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* CARD VIEW LAYOUT */}
+      {/* Populated Question Cards List */}
       {!isLoading && !isError && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const snippet = item.title.length > 80 ? item.title.substring(0, 80) + "..." : item.title
+            const snippet =
+              item.title.length > 80 ? item.title.substring(0, 80) + "..." : item.title
+
+            const classNames = item.subject?.classSubjects
+              ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+              .filter(Boolean)
+            const className = classNames && classNames.length > 0 ? classNames.join(", ") : null
 
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
-                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+                  "bg-card border rounded-2xl p-5 sm:p-6 transition-all duration-200 relative group shadow-xs hover:shadow-md",
+                  isSelected
+                    ? "border-indigo-600 ring-2 ring-indigo-500/20 bg-indigo-50/15"
+                    : "border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300"
                 )}
               >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4 sm:gap-6">
                   {/* Selection Checkbox & Main Info */}
                   <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                          #{globalIndex}
+                      {/* Shared Header Badges Row */}
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        academicClassName={className}
+                        subjectName={item.subject?.nameBn || item.subject?.nameEn}
+                        isMath={true}
+                      >
+                        <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-semibold border border-blue-200/60 dark:border-blue-800/40 font-body">
+                          সারাংশ / সারমর্ম
                         </span>
 
-                        {/* Subject Badge */}
-                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                          {item.subject.nameBn || item.subject.nameEn}
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded-lg text-[11px] font-semibold border font-body",
+                            item.difficulty === "EASY" &&
+                              "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60 dark:border-emerald-800/40",
+                            item.difficulty === "MEDIUM" &&
+                              "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/60 dark:border-amber-800/40",
+                            item.difficulty === "HARD" &&
+                              "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/60 dark:border-rose-800/40"
+                          )}
+                        >
+                          {QUESTION_DIFFICULTY_OPTIONS.find((d) => d.value === item.difficulty)?.label ||
+                            item.difficulty}
                         </span>
 
-                        {/* Popularity Badge */}
-                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
-                          👁️ {item.popularityCount} Views
-                        </span>
+                        {item.popularityCount > 0 && (
+                          <span className="px-2 py-0.5 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 rounded-lg text-[11px] font-semibold border border-purple-200/60 dark:border-purple-800/40 font-body">
+                            👁️ {toBengaliDigits(item.popularityCount)} বার দেখা হয়েছে
+                          </span>
+                        )}
+                      </QuestionCardHeader>
 
-                        {/* Difficulty Badge */}
-                        <span className={cn(
-                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                        )}>
-                          {item.difficulty}
-                        </span>
-                      </div>
-
-                      {/* Summary Passage / Title Box */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
-                        <div className={cn(
-                          "whitespace-pre-wrap font-medium",
-                          /[\u0980-\u09FF]/.test(item.title) && "font-solaiman text-base"
-                        )}>
+                      {/* Summary Passage / Text Content */}
+                      <Link
+                        href={`/summaries/${item.id}/edit`}
+                        prefetch={true}
+                        className="block rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 text-slate-900 dark:text-foreground hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-colors"
+                      >
+                        <div className="font-body text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
                           <RenderMath text={item.title} isMath={true} />
                         </div>
-                      </div>
+                      </Link>
 
-                      {/* Reference Tags & ID Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                              >
-                                🏷️ {ref}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                          )}
-                        </div>
-
-                        <span className="text-[11px] font-mono text-outline/60">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                      {/* Shared Footer with Reference Tags */}
+                      <QuestionCardFooter references={item.reference} />
                     </div>
                   </div>
 
                   {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/summaries/${item.id}/edit`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-                      title="Edit Summary"
-                    >
-                      <Edit3 className="size-5 mx-auto" />
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, snippet)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-                      title="Delete Summary"
-                    >
-                      <Trash2 className="size-5 mx-auto" />
-                    </button>
-                  </div>
+                  <QuestionCardActions
+                    editHref={`/summaries/${item.id}/edit`}
+                    onDelete={() => onDelete(item.id, snippet)}
+                    editTitle="সারাংশ সম্পাদনা করুন"
+                    deleteTitle="সারাংশ মুছুন"
+                  />
                 </div>
               </div>
             )
@@ -272,69 +280,18 @@ export function SummaryTable({
         </div>
       )}
 
-      {/* Pagination Footer */}
+      {/* Reusable Data Table Pagination */}
       {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> summaries
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? "default" : "ghost"}
-                onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary"
-                    : "hover:bg-surface-container-high text-on-surface"
-                }`}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <DataTablePagination
+          page={currentPage}
+          limit={itemsPerPage}
+          totalItems={totalItems}
+          entityName="টি সারাংশ / সারমর্ম"
+          isLoading={isLoading}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+          pageSizeOptions={[10, 20, 50, 100]}
+        />
       )}
     </div>
   )

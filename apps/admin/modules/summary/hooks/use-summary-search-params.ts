@@ -12,6 +12,7 @@ export type SummarySortOption = (typeof summarySortOptions)[number]
 
 export const summarySearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  academicClassId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<SummarySortOption>(Array.from(summarySortOptions)).withDefault("All"),
