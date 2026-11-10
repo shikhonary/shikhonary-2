@@ -100,6 +100,48 @@ export function useImportSummaries() {
 }
 
 /**
+ * Hook to toggle Summary active state.
+ */
+export function useToggleSummaryActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.summary.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.summary.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve a Summary report.
+ */
+export function useResolveSummaryReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.summary.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.summary.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a Summary report to a user.
+ */
+export function useAssignSummaryReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.summary.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.summary.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

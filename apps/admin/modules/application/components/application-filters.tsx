@@ -1,28 +1,23 @@
 "use client"
 
-import { Input } from "@workspace/ui/components/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
+import * as React from "react"
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@workspace/ui/components/drawer"
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select"
+import { DataTableFilterBar, type ActiveFilterChip } from "@/components/shared/data-table-filter-bar"
 import {
-  X,
-  RotateCcw,
-  SlidersHorizontal,
-  ArrowUpDown,
-  BookOpen,
-  Layers,
-  GraduationCap,
-} from "lucide-react"
+  toBengaliDigits,
+  toEnglishDigits,
+  extractReferenceYear,
+  categorizeReference,
+  isIgnoredReference,
+} from "@workspace/utils"
 
 interface SubjectOption {
   id: string
@@ -45,10 +40,16 @@ interface ApplicationFiltersProps {
   selectedSubjectId: string
   onSubjectChange: (value: string) => void
   subjects?: SubjectOption[]
-  selectedDifficulty: string
-  onDifficultyChange: (value: string) => void
+  selectedBoard: string
+  onBoardChange: (value: string) => void
+  boardYears?: any[]
+  selectedIsActive: string
+  onIsActiveChange: (value: string) => void
+  selectedHasReport: string
+  onHasReportChange: (value: string) => void
   selectedSort: string
   onSortChange: (value: string) => void
+  onResetAll?: () => void
 }
 
 export function ApplicationFilters({
@@ -60,362 +61,316 @@ export function ApplicationFilters({
   selectedSubjectId,
   onSubjectChange,
   subjects = [],
-  selectedDifficulty,
-  onDifficultyChange,
+  selectedBoard,
+  onBoardChange,
+  boardYears = [],
+  selectedIsActive,
+  onIsActiveChange,
+  selectedHasReport,
+  onHasReportChange,
   selectedSort,
   onSortChange,
+  onResetAll,
 }: ApplicationFiltersProps) {
-  const hasActiveQuery = Boolean(searchQuery && searchQuery.trim() !== "")
-  const hasActiveSubject = Boolean(selectedSubjectId && selectedSubjectId !== "All")
-  const hasActiveDifficulty = Boolean(selectedDifficulty && selectedDifficulty !== "All")
-  const hasActiveSort = Boolean(selectedSort && selectedSort !== "All")
+  const isBoardDisabled = boardYears.length === 0
 
-  const hasAnyFilter =
-    hasActiveQuery ||
-    hasActiveSubject ||
-    hasActiveDifficulty ||
-    hasActiveSort ||
-    selectedAcademicClassId !== "All"
+  const { groupedReferences, totalSchoolCount } = React.useMemo(() => {
+    const yearMap = new Map<string, Array<{ rawRef: string; count: number }>>()
+    const noYearList: Array<{ rawRef: string; count: number }> = []
+    let schoolCount = 0
 
-  const activeFilterCount =
-    (hasActiveSubject ? 1 : 0) +
-    (hasActiveDifficulty ? 1 : 0) +
-    (hasActiveSort ? 1 : 0)
+    for (const b of boardYears) {
+      const rawRef = typeof b === "string" ? b : b.rawRef || b.boardName || b.board || ""
+      if (!rawRef || isIgnoredReference(rawRef)) continue
+      const count = typeof b === "object" && typeof b.count === "number" ? b.count : 1
 
-  const handleResetAll = () => {
-    onSearchChange("")
-    onAcademicClassChange("All")
-    onSubjectChange("All")
-    onDifficultyChange("All")
-    onSortChange("All")
-  }
+      const category = typeof b === "object" && b.category ? b.category : categorizeReference(rawRef)
+
+      if (category === "SCHOOL") {
+        schoolCount += count
+        continue
+      }
+
+      const year = extractReferenceYear(rawRef)
+      if (year) {
+        if (!yearMap.has(year)) {
+          yearMap.set(year, [])
+        }
+        yearMap.get(year)!.push({ rawRef, count })
+      } else {
+        noYearList.push({ rawRef, count })
+      }
+    }
+
+    // Sort years descending (e.g. ২০২৬, ২০২৫, ২০২৪, ২০২৩...)
+    const sortedYears = Array.from(yearMap.keys()).sort((a, b) => {
+      const numA = Number(toEnglishDigits(a)) || 0
+      const numB = Number(toEnglishDigits(b)) || 0
+      return numB - numA
+    })
+
+    return {
+      groupedReferences: {
+        years: sortedYears.map((yr) => ({
+          year: yr,
+          items: yearMap.get(yr)!.sort((a, b) => b.count - a.count),
+        })),
+        noYear: noYearList.sort((a, b) => b.count - a.count),
+      },
+      totalSchoolCount: schoolCount,
+    }
+  }, [boardYears])
 
   const getSortLabel = (sort: string) => {
     switch (sort) {
       case "newest":
-        return "Newest First"
+        return "নতুন যুক্ত"
       case "oldest":
-        return "Oldest First"
+        return "পুরাতন যুক্ত"
       case "title_asc":
-      case "name_asc":
-        return "Title (A to Z)"
+        return "শিরোনাম (A থেকে Z)"
       case "title_desc":
-      case "name_desc":
-        return "Title (Z to A)"
+        return "শিরোনাম (Z থেকে A)"
       case "popularity":
-        return "Popularity"
+        return "জনপ্রিয়তা অনুযায়ী"
       default:
-        return "Default Sort"
+        return "ডিফল্ট ক্রম"
     }
   }
 
-  const renderSelectFilters = (isMobile = false) => (
-    <>
-      {/* Class Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[150px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <GraduationCap className="h-3.5 w-3.5 text-primary" />
-            Class
-          </label>
-        )}
+  // Construct Bengali active filter chips
+  const activeFilterChips: ActiveFilterChip[] = []
+
+  if (selectedAcademicClassId && selectedAcademicClassId !== "All") {
+    const cls = academicClasses.find((c) => c.id === selectedAcademicClassId)
+    const label = cls ? (cls.nameBn || cls.nameEn) : selectedAcademicClassId
+    activeFilterChips.push({
+      id: "class",
+      label: `শ্রেণি: ${label}`,
+      onRemove: () => {
+        onAcademicClassChange("All")
+        onSubjectChange("All")
+        onBoardChange("All")
+      },
+    })
+  }
+
+  if (selectedSubjectId && selectedSubjectId !== "All") {
+    const subj = subjects.find((s) => s.id === selectedSubjectId)
+    const label = subj ? (subj.nameBn || subj.nameEn) : selectedSubjectId
+    activeFilterChips.push({
+      id: "subject",
+      label: `বিষয়: ${label}`,
+      onRemove: () => {
+        onSubjectChange("All")
+        onBoardChange("All")
+      },
+    })
+  }
+
+  if (selectedBoard && selectedBoard !== "All") {
+    const label =
+      selectedBoard === "SCHOOL_ALL"
+        ? "শীর্ষস্থানীয় সকল বিদ্যালয় ও কলেজ"
+        : selectedBoard
+    activeFilterChips.push({
+      id: "board",
+      label: `বোর্ড / রেফারেন্স: ${label}`,
+      onRemove: () => onBoardChange("All"),
+    })
+  }
+
+  if (selectedIsActive && selectedIsActive !== "All") {
+    const label = selectedIsActive === "ACTIVE" ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"
+    activeFilterChips.push({
+      id: "isActive",
+      label: `স্ট্যাটাস: ${label}`,
+      onRemove: () => onIsActiveChange("All"),
+    })
+  }
+
+  if (selectedHasReport && selectedHasReport !== "All") {
+    const label = selectedHasReport === "YES" ? "রিপোর্ট আছে" : "রিপোর্ট ছাড়া"
+    activeFilterChips.push({
+      id: "hasReport",
+      label: `রিপোর্ট: ${label}`,
+      onRemove: () => onHasReportChange("All"),
+    })
+  }
+
+  if (selectedSort && selectedSort !== "All") {
+    activeFilterChips.push({
+      id: "sort",
+      label: `সাজানো: ${getSortLabel(selectedSort)}`,
+      onRemove: () => onSortChange("All"),
+    })
+  }
+
+  const handleReset = () => {
+    onSearchChange("")
+    onAcademicClassChange("All")
+    onSubjectChange("All")
+    onBoardChange("All")
+    onIsActiveChange("All")
+    onHasReportChange("All")
+    onSortChange("All")
+    onResetAll?.()
+  }
+
+  return (
+    <DataTableFilterBar
+      searchQuery={searchQuery}
+      onSearchChange={onSearchChange}
+      searchPlaceholder="আবেদনপত্রের বিষয়, প্রাপক বা কিওয়ার্ড দিয়ে অনুসন্ধান করুন..."
+      activeFilters={activeFilterChips}
+      onResetAll={handleReset}
+      filterButtonLabel="ফিল্টার"
+      filtersHeading="আবেদনপত্র ফিল্টারসমূহ"
+      activeFiltersLabel="অ্যাক্টিভ ফিল্টারসমূহ:"
+      resetLabel="রিসেট"
+      resetAllLabel="সব রিসেট"
+      applyFiltersLabel="ফিল্টার প্রয়োগ করুন"
+      refineDisplayLabel="নির্দিষ্ট শ্রেণি, বিষয় বা রেফারেন্সের আবেদনপত্র খুঁজুন"
+    >
+      {/* 1. Academic Class Select */}
+      <div className="min-w-[130px]">
         <Select
           value={selectedAcademicClassId}
           onValueChange={(val) => {
             onAcademicClassChange(val ?? "All")
             onSubjectChange("All")
+            onBoardChange("All")
           }}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Classes" />
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সকল শ্রেণি" />
           </SelectTrigger>
-          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All" className="text-neutral-900">All Classes</SelectItem>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-60 font-body">
+            <SelectItem value="All">সকল শ্রেণি</SelectItem>
             {academicClasses.map((cls) => (
-              <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
-                {cls.nameEn}
+              <SelectItem key={cls.id} value={cls.id}>
+                {cls.nameBn || cls.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {/* Subject Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[180px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <BookOpen className="h-3.5 w-3.5 text-primary" />
-            Subject
-          </label>
-        )}
+      {/* 2. Subject Select */}
+      <div className="min-w-[140px]">
         <Select
           value={selectedSubjectId}
           onValueChange={(val) => {
             onSubjectChange(val ?? "All")
+            onBoardChange("All")
           }}
-          disabled={selectedAcademicClassId === "All"}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between disabled:opacity-50 disabled:cursor-not-allowed">
-            <SelectValue placeholder={selectedAcademicClassId === "All" ? "Select Class First" : "All Subjects"} />
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সকল বিষয়" />
           </SelectTrigger>
-          <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-            <SelectItem value="All" className="text-neutral-900">All Subjects</SelectItem>
-            {subjects.map((sub) => (
-              <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                {sub.nameEn}
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-60 font-body">
+            <SelectItem value="All">সকল বিষয়</SelectItem>
+            {subjects.map((subj) => (
+              <SelectItem key={subj.id} value={subj.id}>
+                {subj.nameBn || subj.nameEn}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {/* Difficulty Filter */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[140px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <Layers className="h-3.5 w-3.5 text-primary" />
-            Difficulty
-          </label>
-        )}
+      {/* 3. Board / Reference Select */}
+      <div className="min-w-[155px]">
         <Select
-          value={selectedDifficulty}
-          onValueChange={(val) => onDifficultyChange(val ?? "All")}
+          value={selectedBoard}
+          onValueChange={(val) => onBoardChange(val ?? "All")}
+          disabled={isBoardDisabled}
         >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="All Difficulties" />
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer disabled:opacity-50">
+            <SelectValue placeholder="বোর্ড / রেফারেন্স" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-            <SelectItem value="All">All Difficulties</SelectItem>
-            <SelectItem value="EASY">EASY</SelectItem>
-            <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-            <SelectItem value="HARD">HARD</SelectItem>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-72 font-body">
+            <SelectItem value="All">সকল আবেদনপত্র / রেফারেন্স</SelectItem>
+
+            {(totalSchoolCount > 0 || selectedBoard === "SCHOOL_ALL") && (
+              <SelectItem value="SCHOOL_ALL" className="font-medium text-primary">
+                🏫 শীর্ষস্থানীয় সকল বিদ্যালয় ও কলেজ ({toBengaliDigits(totalSchoolCount)})
+              </SelectItem>
+            )}
+
+            {groupedReferences.years.map((yearGroup) => (
+              <SelectGroup key={yearGroup.year}>
+                <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
+                  📅 {yearGroup.year} সাল
+                </SelectLabel>
+                {yearGroup.items.map((item) => (
+                  <SelectItem key={item.rawRef} value={item.rawRef}>
+                    {item.rawRef} ({toBengaliDigits(item.count)})
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+
+            {groupedReferences.noYear.length > 0 && (
+              <SelectGroup>
+                <SelectLabel className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-slate-50/70 dark:bg-white/[0.04] rounded-md my-0.5">
+                  📌 অন্যান্য রেফারেন্স
+                </SelectLabel>
+                {groupedReferences.noYear.map((item) => (
+                  <SelectItem key={item.rawRef} value={item.rawRef}>
+                    {item.rawRef} ({toBengaliDigits(item.count)})
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            )}
           </SelectContent>
         </Select>
       </div>
 
-      {/* Sort Select */}
-      <div className={isMobile ? "space-y-1.5" : "min-w-[160px] flex-1 md:flex-none"}>
-        {isMobile && (
-          <label className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-            <ArrowUpDown className="h-3.5 w-3.5 text-primary" />
-            Sort Order
-          </label>
-        )}
-        <Select
-          value={selectedSort}
-          onValueChange={(val) => onSortChange(val ?? "All")}
-        >
-          <SelectTrigger className="w-full rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto justify-between">
-            <SelectValue placeholder="Default Sort" />
+      {/* 4. Active/Inactive Status Select */}
+      <div className="min-w-[120px]">
+        <Select value={selectedIsActive} onValueChange={(val) => onIsActiveChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সকল স্ট্যাটাস" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-            <SelectItem value="All">Default Sort</SelectItem>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="title_asc">Title (A to Z)</SelectItem>
-            <SelectItem value="title_desc">Title (Z to A)</SelectItem>
-            <SelectItem value="popularity">Popularity</SelectItem>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">সকল স্ট্যাটাস</SelectItem>
+            <SelectItem value="ACTIVE">অ্যাক্টিভ</SelectItem>
+            <SelectItem value="INACTIVE">ইনঅ্যাক্টিভ</SelectItem>
           </SelectContent>
         </Select>
       </div>
-    </>
-  )
 
-  return (
-    <div className="mb-6 space-y-3">
-      {/* Main Filter Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-low p-3 sm:p-4">
-        {/* Search Input with Clear Button */}
-        <div className="relative flex-1">
-          <Input
-            placeholder="Search applications by title or reference citation..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-white py-2.5 pl-4 pr-10 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-high transition-colors"
-              aria-label="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Desktop Selects */}
-        <div className="hidden md:flex flex-wrap items-center gap-3">
-          {renderSelectFilters(false)}
-        </div>
-
-        {/* Mobile Filter Button (Drawer Trigger) */}
-        <div className="flex md:hidden items-center gap-2">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex-1 rounded-lg border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm font-bold text-on-surface hover:bg-surface-container-high h-auto justify-center gap-2"
-              >
-                <SlidersHorizontal className="h-4 w-4 text-primary" />
-                <span>Filters & Sorting</span>
-                {activeFilterCount > 0 && (
-                  <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px] bg-primary text-white">
-                    {activeFilterCount}
-                  </Badge>
-                )}
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="px-4 pb-8 max-h-[85vh]">
-              <DrawerHeader className="text-left px-0 pb-4 border-b border-outline-variant/30">
-                <div className="flex items-center justify-between">
-                  <DrawerTitle className="font-headline-sm text-lg font-bold text-on-surface">
-                    Filters & Sorting
-                  </DrawerTitle>
-                  {hasAnyFilter && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleResetAll}
-                      className="h-8 px-2 text-xs font-bold text-primary hover:bg-primary/10"
-                    >
-                      <RotateCcw className="h-3 w-3 mr-1" />
-                      Reset All
-                    </Button>
-                  )}
-                </div>
-                <DrawerDescription className="text-xs text-on-surface-variant">
-                  Refine the application list by class, subject, difficulty, and order.
-                </DrawerDescription>
-              </DrawerHeader>
-
-              <div className="py-4 space-y-4 overflow-y-auto">
-                {renderSelectFilters(true)}
-              </div>
-
-              <DrawerFooter className="px-0 pt-4 border-t border-outline-variant/30">
-                <DrawerClose asChild>
-                  <Button className="w-full bg-primary text-white font-bold rounded-lg py-2.5">
-                    Apply Filters
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-
-          {hasAnyFilter && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleResetAll}
-              className="h-10 w-10 shrink-0 text-on-surface-variant hover:text-primary rounded-lg border border-outline-variant bg-white"
-              title="Reset all filters"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+      {/* 5. Has Report Select */}
+      <div className="min-w-[125px]">
+        <Select value={selectedHasReport} onValueChange={(val) => onHasReportChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="রিপোর্ট স্ট্যাটাস" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">সকল আবেদনপত্র</SelectItem>
+            <SelectItem value="YES">⚠️ রিপোর্ট আছে</SelectItem>
+            <SelectItem value="NO">✅ রিপোর্ট ছাড়া</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Active Filter Chips */}
-      {hasAnyFilter && (
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-xs font-bold text-on-surface-variant mr-1">
-            Active Filters:
-          </span>
-
-          {selectedAcademicClassId !== "All" && (
-            <Badge
-              variant="secondary"
-              className="rounded-md border border-outline-variant/40 bg-white py-1 pl-2.5 pr-1.5 text-xs font-bold text-on-surface flex items-center gap-1.5 shadow-2xs"
-            >
-              <span>
-                Class: {academicClasses.find((c) => c.id === selectedAcademicClassId)?.nameEn || selectedAcademicClassId}
-              </span>
-              <button
-                onClick={() => {
-                  onAcademicClassChange("All")
-                  onSubjectChange("All")
-                }}
-                className="rounded-full p-0.5 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          {selectedSubjectId !== "All" && (
-            <Badge
-              variant="secondary"
-              className="rounded-md border border-outline-variant/40 bg-white py-1 pl-2.5 pr-1.5 text-xs font-bold text-on-surface flex items-center gap-1.5 shadow-2xs"
-            >
-              <span>
-                Subject: {subjects.find((s) => s.id === selectedSubjectId)?.nameEn || selectedSubjectId}
-              </span>
-              <button
-                onClick={() => onSubjectChange("All")}
-                className="rounded-full p-0.5 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          {selectedDifficulty !== "All" && (
-            <Badge
-              variant="secondary"
-              className="rounded-md border border-outline-variant/40 bg-white py-1 pl-2.5 pr-1.5 text-xs font-bold text-on-surface flex items-center gap-1.5 shadow-2xs"
-            >
-              <span>Difficulty: {selectedDifficulty}</span>
-              <button
-                onClick={() => onDifficultyChange("All")}
-                className="rounded-full p-0.5 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          {selectedSort !== "All" && (
-            <Badge
-              variant="secondary"
-              className="rounded-md border border-outline-variant/40 bg-white py-1 pl-2.5 pr-1.5 text-xs font-bold text-on-surface flex items-center gap-1.5 shadow-2xs"
-            >
-              <span>Sort: {getSortLabel(selectedSort)}</span>
-              <button
-                onClick={() => onSortChange("All")}
-                className="rounded-full p-0.5 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          {hasActiveQuery && (
-            <Badge
-              variant="secondary"
-              className="rounded-md border border-outline-variant/40 bg-white py-1 pl-2.5 pr-1.5 text-xs font-bold text-on-surface flex items-center gap-1.5 shadow-2xs"
-            >
-              <span className="truncate max-w-[150px]">Query: {searchQuery}</span>
-              <button
-                onClick={() => onSearchChange("")}
-                className="rounded-full p-0.5 hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          )}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleResetAll}
-            className="h-6 px-2 text-xs font-bold text-primary hover:bg-primary/10 ml-auto"
-          >
-            Clear All
-          </Button>
-        </div>
-      )}
-    </div>
+      {/* 6. Sort Select */}
+      <div className="min-w-[130px]">
+        <Select value={selectedSort} onValueChange={(val) => onSortChange(val ?? "All")}>
+          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3 text-xs font-medium h-10 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors cursor-pointer">
+            <SelectValue placeholder="সাজানো" />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
+            <SelectItem value="All">ডিফল্ট ক্রম</SelectItem>
+            <SelectItem value="newest">নতুন যুক্ত</SelectItem>
+            <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
+            <SelectItem value="title_asc">শিরোনাম (A থেকে Z)</SelectItem>
+            <SelectItem value="title_desc">শিরোনাম (Z থেকে A)</SelectItem>
+            <SelectItem value="popularity">জনপ্রিয়তা অনুযায়ী</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </DataTableFilterBar>
   )
 }

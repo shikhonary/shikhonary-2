@@ -100,6 +100,48 @@ export function useImportEssays() {
 }
 
 /**
+ * Hook to toggle Essay active state.
+ */
+export function useToggleEssayActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essay.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essay.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve an Essay report.
+ */
+export function useResolveEssayReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essay.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essay.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign an Essay report to a user.
+ */
+export function useAssignEssayReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essay.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essay.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

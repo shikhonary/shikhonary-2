@@ -332,7 +332,6 @@ export async function getQuestionPaperById(
       ? (db as any).summary.findMany({
         where: { id: { in: summaryIds } },
         include: {
-          academicChapter: true,
           questionType: true,
         },
       })
@@ -341,7 +340,6 @@ export async function getQuestionPaperById(
       ? (db as any).essence.findMany({
         where: { id: { in: essenceIds } },
         include: {
-          academicChapter: true,
           questionType: true,
         },
       })
@@ -410,7 +408,6 @@ export async function getQuestionPaperById(
       ? (db as any).changingSentence.findMany({
         where: { id: { in: changingSentenceIds } },
         include: {
-          academicChapter: true,
           questionType: true,
         },
       })

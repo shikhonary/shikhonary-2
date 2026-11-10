@@ -100,6 +100,48 @@ export function useImportApplications() {
 }
 
 /**
+ * Hook to toggle Application active state.
+ */
+export function useToggleApplicationActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.application.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.application.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve an Application report.
+ */
+export function useResolveApplicationReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.application.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.application.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign an Application report to a user.
+ */
+export function useAssignApplicationReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.application.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.application.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

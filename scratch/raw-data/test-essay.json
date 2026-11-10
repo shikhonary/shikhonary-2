@@ -1,0 +1,622 @@
+[
+  {
+    "title": "বাংলাদেশের পর্যটন শিল্প",
+    "reference": [
+      "য. বো. ২৫",
+      "রা. বো. ২৪",
+      "ব. বো. ২৪",
+      "সরকারি জুবিলী উচ্চ বিদ্যালয়, সুনামগঞ্জ",
+      "চট্টগ্রাম কলেজিয়েট স্কুল",
+      "বগুড়া জিলা স্কুল",
+      "খাগড়াছড়ি ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
+      "কুমিল্লা ক্যাডেট কলেজ"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 8
+  },
+  {
+    "title": "বাংলাদেশের উৎসব",
+    "reference": [
+      "ঢা. বো. ২৫",
+      "ম. বো. ২৩",
+      "কু. বো. ২৪, ২৩",
+      "চ. বো. ২৫",
+      "য. বো. ২৪, ২৩",
+      "সি. বো. ২৪",
+      "ফরিদপুর জিলা স্কুল",
+      "চট্টগ্রাম সরকারি বালিকা উচ্চ বিদ্যালয়",
+      "ইস্পাহানি পাবলিক স্কুল এন্ড কলেজ, চট্টগ্রাম"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 9
+  },
+  {
+    "title": "জগদীশচন্দ্র বসু",
+    "reference": [
+      "কু. বো. ২৩",
+      "হলিক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 2
+  },
+  {
+    "title": "রোকেয়া সাখাওয়াত হোসেন\nঅথবা, মুসলিম নারীজাগরণের অগ্রদূত",
+    "reference": [
+      "রা. বো. ২৪",
+      "দি. বো. ২৪, ২৩"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 2
+  },
+  {
+    "title": "লঞ্চ ভ্রমণের অভিজ্ঞতা",
+    "reference": [
+      "ময়মনসিংহ গার্লস ক্যাডেট কলেজ"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 1
+  },
+  {
+    "title": "একটি ঝড়ের রাত",
+    "reference": [
+      "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+      "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
+      "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
+      "জামালপুর জিলা স্কুল",
+      "রংপুর ক্যাডেট কলেজ"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 5
+  },
+  {
+    "title": "কৃষি উদ্যোক্তা",
+    "reference": [
+      "ঢা. বো. ২৪",
+      "দি. বো. ২৩",
+      "কু. বো. ২৪",
+      "সরকারি প্রমথনাথ বালিকা উচ্চ বিদ্যালয়, রাজশাহী",
+      "লায়ন্স স্কুল এন্ড কলেজ, রংপুর"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 5
+  },
+  {
+    "title": "ভাষা আন্দোলন",
+    "reference": [
+      "ম. বো. ২৪",
+      "চ. বো. ২৫",
+      "ব. বো. ২৩",
+      "কুমিল্লা ক্যাডেট কলেজ",
+      "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম",
+      "যশোর জিলা স্কুল"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 6
+  },
+  {
+    "title": "বাংলাদেশের মুক্তিযুদ্ধ\nঅথবা, আমাদের স্বাধীনতা সংগ্রাম",
+    "reference": [
+      "ঢা. বো. ২৪",
+      "দি. বো. ২৪, ২০",
+      "চ. বো. ২৩",
+      "য. বো. ২৪",
+      "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
+      "রংপুর ক্যাডেট কলেজ",
+      "ফরিদপুর জিলা স্কুল",
+      "কু. বো. ১৯",
+      "রা. বো. ১৫"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 9
+  },
+  {
+    "title": "সময়ানুবর্তিতা",
+    "reference": [
+      "ঢা. বো. ২৫",
+      "ম. বো. ২৫",
+      "দি. বো. ২৫",
+      "রা. বো. ২৫, ২৩",
+      "ব. বো. ২৫, ২৩",
+      "মির্জাপুর ক্যাডেট কলেজ, টাঙ্গাইল",
+      "ঝিনাইদহ ক্যাডেট কলেজ"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 7
+  },
+  {
+    "title": "ক্রিকেট বাংলাদেশ\nঅথবা, বিশ্ব ক্রিকেটে বাংলাদেশ",
+    "reference": [
+      "কুমিল্লা জিলা স্কুল",
+      "মোহাম্মদপুর প্রিপারেটরি স্কুল এন্ড কলেজ, ঢাকা",
+      "য. বো. ২০, ১৬"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 3
+  },
+  {
+    "title": "বাংলাদেশের ফুটবল",
+    "reference": [
+      "ক্যান্টনমেন্ট বোর্ড আন্তঃ স্কুল, কুমিল্লা",
+      "পিরোজপুর সরকারি উচ্চ বিদ্যালয়"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 2
+  },
+  {
+    "title": "কৃষিকাজে বিজ্ঞান\nঅথবা, কৃষিক্ষেত্রে বিজ্ঞান ও বাংলাদেশ",
+    "reference": [
+      "ঢা. বো. ২৩",
+      "ম. বো. ২৫, ২৩",
+      "কু. বো. ২৫",
+      "সি. বো. ২৫, ২৩, ২০",
+      "য. বো. ২৫",
+      "ব. বো. ২৫, ২৪, ২৩",
+      "ঝিনাইদহ ক্যাডেট কলেজ",
+      "সিলেট ক্যাডেট কলেজ",
+      "খুলনা জিলা স্কুল"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 9
+  },
+  {
+    "title": "মাদকাসক্তি ও এর প্রতিকার\nঅথবা, মাদকাসক্তির পরিণাম ও প্রতিকার",
+    "reference": [
+      "ঢা. বো. ২৪, ২৩",
+      "ম. বো. ২৪, ২৩",
+      "রা. বো. ২৫, ২৩",
+      "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম",
+      "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+      "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
+      "কু. বো. ১৫, ১৬"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 7
+  },
+  {
+    "title": "বাংলাদেশের প্রাকৃতিক দুর্যোগ\nঅথবা, প্রাকৃতিক দুর্যোগ ও বাংলাদেশ",
+    "reference": [
+      "ঢা. বো. ২৫, ২৩",
+      "দি. বো. ২৫, ২৩, ২০",
+      "ব. বো. ২৫",
+      "ফেনী গার্লস ক্যাডেট কলেজ",
+      "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 5
+  },
+  {
+    "title": "বিশ্বকোষ",
+    "reference": [
+      "ময়মনসিংহ জিলা স্কুল"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 1
+  },
+  {
+    "title": "বাংলাদেশের প্রাকৃতিক সৌন্দর্য",
+    "reference": [
+      "সি. বো. ১৬",
+      "কু. বো. ১৬"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 2
+  },
+  {
+    "title": "বর্ষাকাল\nঅথবা, বর্ষায় বাংলাদেশ",
+    "reference": [
+      "রা. বো. ১৬",
+      "ব. বো. ২০",
+      "ইস্পাহানি পাবলিক স্কুল এন্ড কলেজ, চট্টগ্রাম"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 3
+  },
+  {
+    "title": "নদীমাতৃক বাংলাদেশ",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের ঋতুবৈচিত্র্য",
+    "reference": [
+      "দি. বো. ১৭, ১৬",
+      "চ. বো. ১৯, ২০, ১৫"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 2
+  },
+  {
+    "title": "অধ্যবসায়",
+    "reference": [
+      "ঢা. বো. ১৭",
+      "দি. বো. ২০, ১৭, ১৬",
+      "য. বো. ১৫",
+      "ব. বো. ১৫",
+      "সকল বোর্ড ১৮",
+      "রংপুর ক্যাডেট কলেজ"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 6
+  },
+  {
+    "title": "স্বদেশপ্রেম\nঅথবা, দেশপ্রেম\nঅথবা, স্বদেশপ্রেম ইমানের অঙ্গ",
+    "reference": [
+      "ঢা. বো. ২০",
+      "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম, ঢাকা",
+      "ঢা. বো. ২০, ১৯",
+      "রা. বো. ১৭",
+      "ব. বো. ১৭, ১৬"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 5
+  },
+  {
+    "title": "শ্রমের মর্যাদা",
+    "reference": [
+      "ঢা. বো. ১৬, ১৫, ১৪",
+      "চট্টগ্রাম ক্যান্টনমেন্ট বোর্ড আন্তঃ উচ্চ বিদ্যালয়"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 2
+  },
+  {
+    "title": "চরিত্র",
+    "reference": [
+      "কু. বো. ২০"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 1
+  },
+  {
+    "title": "মাতা-পিতার প্রতি কর্তব্য",
+    "reference": [
+      "য. বো. ১৬"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 1
+  },
+  {
+    "title": "শিষ্টাচার",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "শৃঙ্খলাবোধ",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "সত্যবাদিতা\nঅথবা, সততা",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "ছাত্রজীবনের দায়িত্ব ও কর্তব্য",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "দেশগঠনে ছাত্রসমাজের ভূমিকা",
+    "reference": [
+      "ঢা. বো. ১৯",
+      "রা. বো. ১৭, ১৬",
+      "দি. বো. ১৯, ১৫",
+      "ব. বো. ১৬"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 4
+  },
+  {
+    "title": "হজরত মুহাম্মদ (স.)",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "কবিগুরু রবীন্দ্রনাথ ঠাকুর",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "জাতীয় কবি কাজী নজরুল ইসলাম",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের জাতীয় খেলা হা-ডু-ডু",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "জাতীয় জীবনে খেলাধুলার প্রয়োজনীয়তা",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "দেশভ্রমণ",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "বই পড়ার আনন্দ",
+    "reference": [
+      "কু. বো. ১৭"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 1
+  },
+  {
+    "title": "শীতের একটি সকাল",
+    "reference": [
+      "সি. বো. ১০, ০৬",
+      "য. বো. ১২, ১০",
+      "রা. বো. ১০",
+      "ঢা. বো. ১১, ০৯, ০৬, ০৭",
+      "চ. বো. ১৩, ০৬",
+      "ব. বো. ১৩, ০৮",
+      "দি. বো. ১৩, ১১"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 7
+  },
+  {
+    "title": "আমার শৈশবস্মৃতি",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "নৌকা ভ্রমণের একটি অভিজ্ঞতা",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "আন্তর্জাতিক মাতৃভাষা দিবস\nঅথবা, একুশে ফেব্রুয়ারি ও বিশ্ব মাতৃভাষা দিবস",
+    "reference": [
+      "ঢা. বো. ১৭",
+      "ম. বো. ২০",
+      "কু. বো. ২০",
+      "সেন্ট যোসেফ উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 4
+  },
+  {
+    "title": "স্বাধীনতা দিবস",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "বিজয় দিবস",
+    "reference": [],
+    "difficulty": "EASY",
+    "popularityCount": 0
+  },
+  {
+    "title": "মুক্তিযুদ্ধের চেতনা",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "একুশের চেতনা",
+    "reference": [
+      "ঢা. বো. ১৬"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 1
+  },
+  {
+    "title": "বৃত্তিমূলক বা কর্মমুখী শিক্ষা\nঅথবা, কারিগরি শিক্ষা",
+    "reference": [
+      "ম. বো. ২০",
+      "য. বো. ১৭",
+      "ঢা. বো. ১৫"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 3
+  },
+  {
+    "title": "বিজ্ঞান শিক্ষার গুরুত্ব",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "কৃষিশিক্ষার গুরুত্ব",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "নারীশিক্ষা\nঅথবা, নারীশিক্ষা ও জাতীয় উন্নয়ন\nঅথবা, জাতি গঠনে নারীশিক্ষার গুরুত্ব",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "কম্পিউটার\nঅথবা, আধুনিক জীবনে কম্পিউটার শিক্ষার প্রয়োজনীয়তা",
+    "reference": [
+      "ঢা. বো. ২০",
+      "ব. বো. ২০",
+      "দি. বো. ১৭",
+      "চ. বো. ১৭, ১৫",
+      "সি. বো. ১৫",
+      "দি. বো. ১৬"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 6
+  },
+  {
+    "title": "সভ্যতায় বিদ্যুতের অবদান\nঅথবা, দৈনন্দিন জীবনে বিদ্যুৎ",
+    "reference": [
+      "য. বো. ১৫"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 1
+  },
+  {
+    "title": "চিকিৎসাক্ষেত্রে বিজ্ঞানের অবদান\nঅথবা, চিকিৎসাক্ষেত্রে বিজ্ঞান",
+    "reference": [
+      "দি. বো. ১৭",
+      "কু. বো. ১৫"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 2
+  },
+  {
+    "title": "বিজ্ঞান ও আধুনিক জীবন\nঅথবা, মানবকল্যাণে বিজ্ঞান\nঅথবা, দৈনন্দিন জীবনে বিজ্ঞান",
+    "reference": [
+      "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম",
+      "সেন্ট যোসেফ উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা",
+      "ঢা. বো. ১৯, ১৭",
+      "দি. বো. ১৯"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 4
+  },
+  {
+    "title": "কৃত্রিম বুদ্ধিমত্তা ও আগামীর পৃথিবী\nঅথবা, নতুন প্রযুক্তি ও কৃত্রিম বুদ্ধিমত্তা",
+    "reference": [],
+    "difficulty": "HARD",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের কৃষক",
+    "reference": [
+      "কু. বো. ২০"
+    ],
+    "difficulty": "EASY",
+    "popularityCount": 1
+  },
+  {
+    "title": "কুটিরশিল্প",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের পোশাকশিল্প",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের মৎস্য সম্পদ",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের বেকার সমস্যা ও সমাধান\nঅথবা, বাংলাদেশের বেকার সমস্যা ও তার প্রতিকার",
+    "reference": [
+      "সি. বো. ১৯",
+      "ঢা. বো. ১৬"
+    ],
+    "difficulty": "HARD",
+    "popularityCount": 2
+  },
+  {
+    "title": "বাংলাদেশের খাদ্য সমস্যা ও এর প্রতিকার",
+    "reference": [
+      "চ. বো. ১৬"
+    ],
+    "difficulty": "HARD",
+    "popularityCount": 1
+  },
+  {
+    "title": "বাংলাদেশের জনসংখ্যা সমস্যা",
+    "reference": [],
+    "difficulty": "HARD",
+    "popularityCount": 0
+  },
+  {
+    "title": "বাংলাদেশের বন্যা ও তার প্রতিকার",
+    "reference": [
+      "য. বো. ১৭",
+      "রাজশাহী ক্যাডেট কলেজ"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 2
+  },
+  {
+    "title": "পরিবেশ দূষণ ও তার প্রতিকার\nঅথবা, পরিবেশ দূষণের পরিণাম",
+    "reference": [
+      "ম. বো. ২০",
+      "ক্যান্টনমেন্ট বোর্ড আন্তঃ উচ্চ বিদ্যালয়",
+      "দি. বো. ১৯",
+      "কু. বো. ১৯",
+      "চ. বো. ১৯, ১৭",
+      "কু. বো. ১৭",
+      "সি. বো. ১৭",
+      "ব. বো. ১৭",
+      "য. বো. ১৯, ১৫"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 10
+  },
+  {
+    "title": "বৃক্ষরোপণ অভিযান\nঅথবা, বৃক্ষরোপণ ও বনায়ন\nঅথবা, পরিবেশ সংরক্ষণে বৃক্ষরোপণ",
+    "reference": [
+      "রা. বো. ২০",
+      "ব. বো. ১৯",
+      "সি. বো. ১৯"
+    ],
+    "difficulty": "MEDIUM",
+    "popularityCount": 3
+  },
+  {
+    "title": "বৈশ্বিক প্রেক্ষাপটে পরিবেশ বিপর্যয়",
+    "reference": [],
+    "difficulty": "HARD",
+    "popularityCount": 0
+  },
+  {
+    "title": "পানিদূষণ ও এর প্রতিকার",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  },
+  {
+    "title": "অদম্য অগ্রযাত্রায় বাংলাদেশ",
+    "reference": [
+      "কু. বো. ২৩",
+      "সি. বো. ২৫, ২৪",
+      "সরকারি সতীশ চন্দ্র বালিকা উচ্চ বিদ্যালয়, সুনামগঞ্জ"
+    ],
+    "difficulty": "HARD",
+    "popularityCount": 3
+  },
+  {
+    "title": "বৈষম্যবিরোধী ছাত্র আন্দোলন",
+    "reference": [
+      "রাজশাহী সরকারি বালিকা উচ্চ বিদ্যালয়"
+    ],
+    "difficulty": "HARD",
+    "popularityCount": 1
+  },
+  {
+    "title": "কোটা সংস্কার আন্দোলন",
+    "reference": [],
+    "difficulty": "HARD",
+    "popularityCount": 0
+  },
+  {
+    "title": "গ্রাফিতি",
+    "reference": [],
+    "difficulty": "MEDIUM",
+    "popularityCount": 0
+  }
+]

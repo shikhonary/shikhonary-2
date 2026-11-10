@@ -100,6 +100,48 @@ export function useImportParagraphs() {
 }
 
 /**
+ * Hook to toggle Paragraph active state.
+ */
+export function useToggleParagraphActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.paragraph.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.paragraph.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve a Paragraph report.
+ */
+export function useResolveParagraphReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.paragraph.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.paragraph.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a Paragraph report.
+ */
+export function useAssignParagraphReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.paragraph.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.paragraph.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

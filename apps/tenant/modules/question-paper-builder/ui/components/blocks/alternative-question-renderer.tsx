@@ -520,24 +520,26 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1.1 EXACT ESSENCE BLOCK REPRESENTATION */}
               {essence && (() => {
+                const parentQ = paper?.questions?.find((q: any) => q.id === parentQuestionId);
                 const essenceDist =
                   allDistributions.find(
                     (d: any) =>
                       d.questionTypeId === essence.questionTypeId ||
                       d.questionTypeName?.includes("সারমর্ম") ||
                       d.questionTypeName?.toLowerCase().includes("essence")
-                  ) || alt.distribution;
+                  ) || alt.distribution || parentQ?.distribution;
 
                 const altRenderMethod = Number(
                   essenceDist?.renderMethod ??
                   alt.distribution?.renderMethod ??
+                  parentQ?.distribution?.renderMethod ??
                   1
                 );
 
                 const rawTitle = essence.title || essence.name || "";
                 const isEnglish = isResourceEnglish({
-                  subjectName: essenceDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: essenceDist?.questionTypeLabel,
+                  subjectName: essenceDist?.subjectName || alt.distribution?.subjectName || parentQ?.distribution?.subjectName,
+                  questionTypeLabel: essenceDist?.questionTypeLabel || parentQ?.distribution?.questionTypeLabel,
                   content: rawTitle,
                 });
 
@@ -546,7 +548,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                     if (!title || !title.trim()) return "";
                     const cleanTitle = title.trim();
                     if (english) {
-                      if (/write\s+(the\s+)?essence/i.test(cleanTitle)) {
+                      if (/write\s+(the\s+)?essence/i.test(cleanTitle) || /substance|gist/i.test(cleanTitle)) {
                         return cleanTitle;
                       }
                       const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
@@ -583,38 +585,48 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   );
                 }
 
-                const rawLabel = essenceDist?.questionTypeLabel || essence.questionType?.label;
+                const rawLabel =
+                  essenceDist?.questionTypeLabel ||
+                  alt.distribution?.questionTypeLabel ||
+                  essence.questionType?.label;
                 const eLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                  : (isEnglish ? "Write the essence of the following:" : "সারমর্ম লেখো:");
 
                 return (
-                  <div className="flex justify-between items-start gap-2 w-full">
-                    <div className="flex gap-2 items-start flex-1 min-w-0">
-                      {renderNumberSpacer()}
-                      {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
-                      <div className="flex-1 w-full min-w-0">
-                        {eLabel && (
-                          <span
-                            className="font-bold mr-1.5"
-                            style={{
-                              fontSize: questionStyle.fontSize,
-                              fontFamily: questionStyle.fontFamily,
-                            }}
-                          >
-                            {eLabel}
-                          </span>
-                        )}
-                        <span
-                          className="font-medium text-foreground whitespace-pre-wrap"
+                  <div className="w-full flex flex-col">
+                    {/* Header row: Question label without global numbering and mark distribution */}
+                    {eLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
-                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={rawTitle} />
-                        </span>
+                          {renderNumberSpacer()}
+                          <span>{eLabel}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Question Content Row: Aligned with number spacer */}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={rawTitle} />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -658,24 +670,26 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1.2 EXACT SUMMARY BLOCK REPRESENTATION */}
               {summary && (() => {
+                const parentQ = paper?.questions?.find((q: any) => q.id === parentQuestionId);
                 const summaryDist =
                   allDistributions.find(
                     (d: any) =>
                       d.questionTypeId === summary.questionTypeId ||
                       d.questionTypeName?.includes("সারাংশ") ||
                       d.questionTypeName?.toLowerCase().includes("summary")
-                  ) || alt.distribution;
+                  ) || alt.distribution || parentQ?.distribution;
 
                 const altRenderMethod = Number(
                   summaryDist?.renderMethod ??
                   alt.distribution?.renderMethod ??
+                  parentQ?.distribution?.renderMethod ??
                   1
                 );
 
                 const rawTitle = summary.title || summary.name || "";
                 const isEnglish = isResourceEnglish({
-                  subjectName: summaryDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: summaryDist?.questionTypeLabel,
+                  subjectName: summaryDist?.subjectName || alt.distribution?.subjectName || parentQ?.distribution?.subjectName,
+                  questionTypeLabel: summaryDist?.questionTypeLabel || parentQ?.distribution?.questionTypeLabel,
                   content: rawTitle,
                 });
 
@@ -721,38 +735,48 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   );
                 }
 
-                const rawLabel = summaryDist?.questionTypeLabel || summary.questionType?.label;
+                const rawLabel =
+                  summaryDist?.questionTypeLabel ||
+                  alt.distribution?.questionTypeLabel ||
+                  summary.questionType?.label;
                 const sLabel = rawLabel?.trim()
                   ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                  : (isEnglish ? "Write a summary of the following:" : "সারাংশ লেখো:");
 
                 return (
-                  <div className="flex justify-between items-start gap-2 w-full">
-                    <div className="flex gap-2 items-start flex-1 min-w-0">
-                      {renderNumberSpacer()}
-                      {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
-                      <div className="flex-1 w-full min-w-0">
-                        {sLabel && (
-                          <span
-                            className="font-bold mr-1.5"
-                            style={{
-                              fontSize: questionStyle.fontSize,
-                              fontFamily: questionStyle.fontFamily,
-                            }}
-                          >
-                            {sLabel}
-                          </span>
-                        )}
-                        <span
-                          className="font-medium text-foreground whitespace-pre-wrap"
+                  <div className="w-full flex flex-col">
+                    {/* Header row: Question label without global numbering and mark distribution */}
+                    {sLabel && (
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <div
+                          className="font-bold ml-[0px] flex items-baseline gap-2"
                           style={{
                             fontSize: questionStyle.fontSize,
                             fontFamily: questionStyle.fontFamily,
-                            lineHeight: questionStyle.lineHeight,
                           }}
                         >
-                          <RenderMath text={rawTitle} />
-                        </span>
+                          {renderNumberSpacer()}
+                          <span>{sLabel}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Question Content Row: Aligned with number spacer */}
+                    <div className="flex justify-between items-start gap-2 w-full">
+                      <div className="flex gap-2 items-start flex-1 min-w-0">
+                        {renderNumberSpacer()}
+                        <div className="flex-1 w-full min-w-0">
+                          <div
+                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            style={{
+                              fontSize: questionStyle.fontSize,
+                              fontFamily: questionStyle.fontFamily,
+                              lineHeight: questionStyle.lineHeight,
+                            }}
+                          >
+                            <RenderMath text={rawTitle} />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

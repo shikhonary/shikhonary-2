@@ -100,6 +100,48 @@ export function useImportThoughtExpansions() {
 }
 
 /**
+ * Hook to toggle Thought Expansion active state.
+ */
+export function useToggleThoughtExpansionActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.thoughtExpansion.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.thoughtExpansion.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve a Thought Expansion report.
+ */
+export function useResolveThoughtExpansionReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.thoughtExpansion.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.thoughtExpansion.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a Thought Expansion report to a user.
+ */
+export function useAssignThoughtExpansionReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.thoughtExpansion.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.thoughtExpansion.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

@@ -26,7 +26,7 @@ export default async function EditParagraphRoute({ params }: EditParagraphRouteP
 
   return (
     <HydrateClient>
-      <EditParagraphPage />
+      <EditParagraphPage id={id} />
     </HydrateClient>
   )
 }

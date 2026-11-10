@@ -8,6 +8,10 @@ import {
   bulkDeleteSummariesSchema,
   importSummariesSchema,
   summaryStatsSchema,
+  summaryBoardYearsSchema,
+  toggleSummaryActiveSchema,
+  resolveSummaryReportSchema,
+  assignSummaryReportSchema,
 } from "./summary.schema"
 import {
   createSummary,
@@ -18,6 +22,10 @@ import {
   bulkDeleteSummaries,
   importSummaries,
   getSummaryStats,
+  getBoardYears,
+  toggleSummaryActive,
+  resolveSummaryReport,
+  assignSummaryReport,
 } from "./summary.service"
 
 export const summaryRouter = createTRPCRouter({
@@ -32,6 +40,10 @@ export const summaryRouter = createTRPCRouter({
   byId: superAdminProcedure
     .input(getSummarySchema)
     .query(({ ctx, input }) => getSummaryById(ctx.db, input)),
+
+  boardYears: superAdminProcedure
+    .input(summaryBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   create: superAdminProcedure
     .input(createSummarySchema)
@@ -49,7 +61,23 @@ export const summaryRouter = createTRPCRouter({
     .input(bulkDeleteSummariesSchema)
     .mutation(({ ctx, input }) => bulkDeleteSummaries(ctx.db, input)),
 
+  toggleActive: superAdminProcedure
+    .input(toggleSummaryActiveSchema)
+    .mutation(({ ctx, input }) => toggleSummaryActive(ctx.db, input)),
+
   import: superAdminProcedure
     .input(importSummariesSchema)
     .mutation(({ ctx, input }) => importSummaries(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveSummaryReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveSummaryReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignSummaryReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignSummaryReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

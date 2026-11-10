@@ -12,6 +12,7 @@ import type {
   ImportMcqsInput,
   McqStatsInput,
   ResolveMcqReportInput,
+  AssignMcqReportInput,
 } from "./mcq.schema"
 
 export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
@@ -37,7 +38,7 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
   if (input.hasReport !== undefined && input.hasReport !== "All") {
     const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
     const reports = await db.questionReport.findMany({
-      where: { entityType: "MCQ", status: "PENDING" },
+      where: { entityType: "MCQ", status: { in: ["PENDING", "ASSIGNED"] } },
       select: { entityId: true },
       distinct: ["entityId"],
     })
@@ -189,10 +190,10 @@ export async function listMcqs(db: PrismaClient, input: ListMcqsInput) {
 
   const enhancedItems = items.map((item) => {
     const repList = reportMap.get(item.id) || []
-    const hasPendingReport = repList.some((r) => r.status === "PENDING")
+    const hasActiveReport = repList.some((r) => r.status === "PENDING" || r.status === "ASSIGNED")
     return {
       ...item,
-      hasReport: hasPendingReport,
+      hasReport: hasActiveReport,
       reports: repList,
     }
   })
@@ -777,6 +778,90 @@ export async function resolveMcqReport(
   return {
     success: true,
     resolvedCount: result.count,
+  }
+}
+
+export async function assignMcqReport(
+  db: PrismaClient,
+  input: AssignMcqReportInput,
+  currentUserId?: string | null
+) {
+  const { mcqId, reportId, assignedToId, note } = input
+
+  const mcq = await db.mcq.findUnique({
+    where: { id: mcqId },
+    select: { id: true },
+  })
+
+  if (!mcq) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `MCQ with ID ${mcqId} not found`,
+    })
+  }
+
+  const assignee = await db.user.findUnique({
+    where: { id: assignedToId },
+    select: { id: true, name: true, email: true },
+  })
+
+  if (!assignee) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Assignee user with ID ${assignedToId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "MCQ",
+    entityId: mcqId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await db.questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    const newReport = await db.questionReport.create({
+      data: {
+        entityType: "MCQ",
+        entityId: mcqId,
+        reportType: "OTHER",
+        description: note?.trim() || "প্রশ্ন পর্যালোচনা ও যাচাইয়ের জন্য দায়িত্ব অর্পণ করা হয়েছে",
+        status: "ASSIGNED",
+        reportedById: currentUserId ?? null,
+        resolvedById: assignedToId,
+        resolvedNote: note?.trim() || null,
+        resolvedAt: null,
+      },
+    })
+
+    return {
+      success: true,
+      assignedCount: 1,
+      assignee,
+      createdReportId: newReport.id,
+    }
+  }
+
+  const result = await db.questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "ASSIGNED",
+      resolvedById: assignedToId,
+      resolvedNote: note?.trim() || null,
+      resolvedAt: null,
+    },
+  })
+
+  return {
+    success: true,
+    assignedCount: result.count,
+    assignee,
   }
 }
 

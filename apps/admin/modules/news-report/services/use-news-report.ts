@@ -100,6 +100,48 @@ export function useImportNewsReports() {
 }
 
 /**
+ * Hook to toggle News Report active state.
+ */
+export function useToggleNewsReportActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.newsReport.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.newsReport.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve a News Report report.
+ */
+export function useResolveNewsReportReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.newsReport.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.newsReport.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a News Report report to a user.
+ */
+export function useAssignNewsReportReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.newsReport.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.newsReport.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

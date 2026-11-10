@@ -100,6 +100,48 @@ export function useImportLetters() {
 }
 
 /**
+ * Hook to toggle Letter active state.
+ */
+export function useToggleLetterActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.letter.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.letter.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve a Letter report.
+ */
+export function useResolveLetterReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.letter.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.letter.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a Letter report to a user.
+ */
+export function useAssignLetterReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.letter.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.letter.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list.
  */
 export function useAcademicClassesForSelection() {

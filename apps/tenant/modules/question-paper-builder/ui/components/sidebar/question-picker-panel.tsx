@@ -17,7 +17,7 @@ import {
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, normalizeQuestionTypeName, isResourceEnglish, type QuestionTypeCode } from "@workspace/utils";
+import { isResourceEnglish, resolveDistCategory, resolvePaperSlots, type QuestionTypeCode } from "@workspace/utils";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import { formatNumberInWords, translateTag } from "../distribution-picker/number-in-words-picker-card";
@@ -57,204 +57,43 @@ export const QuestionPickerPanel: React.FC = () => {
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
 
-  const activeDist = statuses?.find((s: any) => {
-    if (selectedDistId) return s.distributionId === selectedDistId;
-    if (activeSubSectionId) return s.subSectionId === activeSubSectionId;
-    if (activeSectionId) return s.sectionId === activeSectionId;
+  const topology = React.useMemo(
+    () => (paperQuery ? resolvePaperSlots(paperQuery, statuses ?? []) : null),
+    [paperQuery, statuses]
+  );
+
+  const activeSlot = React.useMemo(() => {
+    if (!topology) return null;
+    if (selectedDistId) {
+      return topology.findSlot({
+        distributionId: selectedDistId,
+        subSectionId: activeSubSectionId,
+        sectionId: activeSectionId,
+      });
+    }
+    for (const subj of topology.subjects) {
+      if (activeSubSectionId) {
+        const match = subj.allSlots.find((sl) => sl.subSectionId === activeSubSectionId);
+        if (match) return match;
+      }
+      if (activeSectionId) {
+        const match = subj.allSlots.find((sl) => sl.sectionId === activeSectionId);
+        if (match) return match;
+      }
+    }
+    return topology.subjects[0]?.allSlots[0] ?? null;
+  }, [topology, selectedDistId, activeSubSectionId, activeSectionId]);
+
+  const activeDist = statuses?.find((st: any) => {
+    if (selectedDistId) return st.distributionId === selectedDistId;
+    if (activeSlot) return st.distributionId === activeSlot.distributionId;
+    if (activeSubSectionId) return st.subSectionId === activeSubSectionId || st.subSectionIds?.includes(activeSubSectionId);
+    if (activeSectionId) return st.sectionId === activeSectionId;
     return false;
-  }) || statuses?.find((s: any) => s.distributionId === selectedDistId) || statuses?.[0];
+  }) || statuses?.find((st: any) => st.distributionId === selectedDistId) || statuses?.[0];
   const activeDistId = activeDist?.distributionId || "";
 
-  const qTypeNameEn = (activeDist?.questionType?.nameEn || activeDist?.questionTypeName || "").toLowerCase();
-  const qTypeNameBn = (activeDist?.questionType?.nameBn || activeDist?.questionTypeNameBn || "").toLowerCase();
-  const qTypeCode = (activeDist?.questionType?.code || "").toLowerCase();
-  const qTypeLabel = (activeDist?.questionTypeLabel || "").toLowerCase();
-  const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
-
-  const rawName = activeDist?.questionTypeNameBn || activeDist?.questionTypeName || activeDist?.questionType?.nameEn || activeDist?.questionType?.nameBn || activeDist?.questionTypeLabel || "";
-  const normalized = normalizeQuestionTypeName(rawName) || normalizeQuestionTypeName(activeDist?.questionType?.nameEn) || normalizeQuestionTypeName(activeDist?.questionType?.nameBn);
-
-  let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
-  if (normalized === QUESTION_TYPES.CS) {
-    category = QUESTION_TYPE_CODES.CS;
-  } else if (normalized === QUESTION_TYPES.CQ) {
-    category = QUESTION_TYPE_CODES.CQ;
-  } else if (normalized === QUESTION_TYPES.PBQ) {
-    category = QUESTION_TYPE_CODES.PBQ;
-  } else if (normalized === QUESTION_TYPES.SEEN_COMPREHENSION_1) {
-    category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
-  } else if (normalized === QUESTION_TYPES.SEEN_COMPREHENSION_2) {
-    category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2;
-  } else if (normalized === QUESTION_TYPES.SA) {
-    category = QUESTION_TYPE_CODES.SA;
-  } else if (normalized === QUESTION_TYPES.PARAGRAPH) {
-    category = QUESTION_TYPE_CODES.PARAGRAPH;
-  } else if (normalized === QUESTION_TYPES.SUMMARY) {
-    category = QUESTION_TYPE_CODES.SUMMARY;
-  } else if (normalized === QUESTION_TYPES.ESSENCE) {
-    category = QUESTION_TYPE_CODES.ESSENCE;
-  } else if (normalized === QUESTION_TYPES.POEM_ESSENCE) {
-    category = QUESTION_TYPE_CODES.POEM_ESSENCE;
-  } else if (normalized === QUESTION_TYPES.PROSE_ESSENCE) {
-    category = QUESTION_TYPE_CODES.PROSE_ESSENCE;
-  } else if (normalized === QUESTION_TYPES.POEM) {
-    category = QUESTION_TYPE_CODES.POEM;
-  } else if (normalized === QUESTION_TYPES.THOUGHT_EXPANSION) {
-    category = QUESTION_TYPE_CODES.AMPLIFICATION;
-  } else if (normalized === QUESTION_TYPES.LETTER) {
-    category = QUESTION_TYPE_CODES.LETTER;
-  } else if (normalized === QUESTION_TYPES.APPLICATION) {
-    category = QUESTION_TYPE_CODES.APPLICATION;
-  } else if (normalized === QUESTION_TYPES.NEWS_REPORT) {
-    category = QUESTION_TYPE_CODES.NEWS_REPORT;
-  } else if (normalized === QUESTION_TYPES.ESSAY) {
-    category = QUESTION_TYPE_CODES.ESSAY;
-  } else if (normalized === QUESTION_TYPES.NUMBER_IN_WORDS) {
-    category = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
-  } else if (normalized === QUESTION_TYPES.WORD_MEANING) {
-    category = QUESTION_TYPE_CODES.WORD_MEANING;
-  } else if (normalized === QUESTION_TYPES.MAKE_SENTENCES) {
-    category = QUESTION_TYPE_CODES.MAKE_SENTENCES;
-  } else if (normalized === QUESTION_TYPES.OPPOSITE_WORD) {
-    category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
-  } else if (normalized === QUESTION_TYPES.GENDER_CHANGE) {
-    category = QUESTION_TYPE_CODES.GENDER_CHANGE;
-  } else if (normalized === QUESTION_TYPES.JUKTOBORNO) {
-    category = QUESTION_TYPE_CODES.JUKTOBORNO;
-  } else if (normalized === QUESTION_TYPES.EK_KOTHAY_PROKASH) {
-    category = QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH;
-  } else if (normalized === QUESTION_TYPES.SYNONYM) {
-    category = QUESTION_TYPE_CODES.SYNONYM;
-  } else if (normalized === QUESTION_TYPES.SADHU_TO_CHOLITO) {
-    category = QUESTION_TYPE_CODES.SADHU_TO_CHOLITO;
-  } else if (normalized === QUESTION_TYPES.POD_NIRNOY) {
-    category = QUESTION_TYPE_CODES.POD_NIRNOY;
-  } else if (normalized === QUESTION_TYPES.VERB_TENSE) {
-    category = QUESTION_TYPE_CODES.VERB_TENSE;
-  } else if (normalized === QUESTION_TYPES.SHORT_COMPOSITION) {
-    category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
-  } else if (normalized === QUESTION_TYPES.DESCRIPTIVE_QUESTION) {
-    category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
-  } else if (normalized === QUESTION_TYPES.SHORT_QUESTION) {
-    category = QUESTION_TYPE_CODES.SHORT_QUESTION;
-  } else if (normalized === QUESTION_TYPES.PARTS_OF_SPEECH) {
-    category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
-  } else if (normalized === QUESTION_TYPES.PUNCTUATION) {
-    category = QUESTION_TYPE_CODES.PUNCTUATION;
-  } else if (normalized === QUESTION_TYPES.RIGHT_FORM_OF_VERBS) {
-    category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
-  } else if (normalized === QUESTION_TYPES.CHANGING_SENTENCES) {
-    category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
-  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITH_CLUES) {
-    category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
-  } else if (normalized === QUESTION_TYPES.FILL_IN_THE_BLANKS_WITHOUT_CLUES) {
-    category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES;
-  } else if (normalized === QUESTION_TYPES.MAKE_QUESTION) {
-    category = QUESTION_TYPE_CODES.MAKE_QUESTION;
-  } else if (normalized === QUESTION_TYPES.SUBSTITUTION_TABLE) {
-    category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
-  } else if (normalized === QUESTION_TYPES.SHUDDHO_ASHUDDHO) {
-    category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
-  } else if (normalized === QUESTION_TYPES.DAN_BAM_MILKORON) {
-    category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
-  } else if (normalized === QUESTION_TYPES.REARRANGE) {
-    category = QUESTION_TYPE_CODES.REARRANGE;
-  } else if (normalized === QUESTION_TYPES.GRAMMAR_QUESTION) {
-    category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
-  } else if (normalized === QUESTION_TYPES.FORM_FILLUP || normalized === QUESTION_TYPES.FORM_FILLING) {
-    category = QUESTION_TYPE_CODES.FORM_FILLUP;
-  } else if (normalized === QUESTION_TYPES.MCQ) {
-    category = QUESTION_TYPE_CODES.MCQ;
-  } else {
-    const lower = rawName.toLowerCase();
-    if (lower.includes("form fillup") || lower.includes("form filling") || lower.includes("form fill up") || lower.includes("ফরম পূরণ") || lower.includes("ফরমপুরণ")) {
-      category = QUESTION_TYPE_CODES.FORM_FILLUP;
-    } else if (lower.includes("substitution table") || lower.includes("সাবস্টিটিউশন টেবিল")) {
-      category = QUESTION_TYPE_CODES.SUBSTITUTION_TABLE;
-    } else if (lower.includes("changing sentence") || lower.includes("transformation of sentence") || lower.includes("বাক্য রূপান্তর") || lower.includes("changing sentences")) {
-      category = QUESTION_TYPE_CODES.CHANGING_SENTENCES;
-    } else if (lower.includes("right form") || lower.includes("verbs in brackets") || lower.includes("correct form of verb") || lower.includes("ভার্ব")) {
-      category = QUESTION_TYPE_CODES.RIGHT_FORM_OF_VERBS;
-    } else if (lower.includes("without clues") || lower.includes("without clue") || lower.includes("ক্লু ছাড়া") || lower.includes("ক্লু ছাড়া") || lower.includes("ক্লু ব্যতিরেকে") || lower.includes("cloze test without")) {
-      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITHOUT_CLUES;
-    } else if (lower.includes("fill in the blanks") || lower.includes("with clues") || lower.includes("ক্লুসহ")) {
-      category = QUESTION_TYPE_CODES.FILL_IN_THE_BLANKS_WITH_CLUES;
-    } else if (lower.includes("parts of speech") || lower.includes("part of speech") || lower.includes("পদ প্রকরণ")) {
-      category = QUESTION_TYPE_CODES.PARTS_OF_SPEECH;
-    } else if (lower.includes("punctuation") || lower.includes("capitalization") || lower.includes("বিরাম চিহ্ন") || lower.includes("যতিচিহ্ন")) {
-      category = QUESTION_TYPE_CODES.PUNCTUATION;
-    } else if (lower.includes("seen comprehension 1") || lower.includes("seen passage 1") || lower.includes("সিন প্যাসেজ ১") || lower.includes("পঠিত অনুচ্ছেদ ১")) {
-      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
-    } else if (lower.includes("seen comprehension 2") || lower.includes("seen passage 2") || lower.includes("সিন প্যাসেজ ২") || lower.includes("পঠিত অনুচ্ছেদ ২")) {
-      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_2;
-    } else if (lower.includes("seen comprehension") || lower.includes("seen passage") || lower.includes("পঠিত অনুচ্ছেদ")) {
-      category = QUESTION_TYPE_CODES.SEEN_COMPREHENSION_1;
-    } else if (lower.includes("pbq") || lower.includes("passage") || lower.includes("অনুচ্ছেদভিত্তিক") || lower.includes("বোধ পরীক্ষণ")) {
-      category = QUESTION_TYPE_CODES.PBQ;
-    } else if (lower.includes("essence") || lower.includes("সারমর্ম")) {
-      category = QUESTION_TYPE_CODES.ESSENCE;
-    } else if (lower.includes("poem essence") || lower.includes("poem_essence") || lower.includes("কবিতার মূলভাব")) {
-      category = QUESTION_TYPE_CODES.POEM_ESSENCE;
-    } else if (lower.includes("prose essence") || lower.includes("prose_essence") || lower.includes("গদ্য অনুচ্ছেদের মূলভাব") || lower.includes("গদ্যের মূলভাব")) {
-      category = QUESTION_TYPE_CODES.PROSE_ESSENCE;
-    } else if (lower.includes("poem") || lower.includes("কবিতা")) {
-      category = QUESTION_TYPE_CODES.POEM;
-    } else if (lower.includes("summary") || lower.includes("সারাংশ")) {
-      category = QUESTION_TYPE_CODES.SUMMARY;
-    } else if (lower.includes("paragraph") || lower.includes("অনুচ্ছেদ")) {
-      category = QUESTION_TYPE_CODES.PARAGRAPH;
-    } else if (lower.includes("expansion") || lower.includes("amplification") || lower.includes("ভাব")) {
-      category = QUESTION_TYPE_CODES.AMPLIFICATION;
-    } else if (lower.includes("letter") || lower.includes("চিঠি") || lower.includes("পত্র")) {
-      category = QUESTION_TYPE_CODES.LETTER;
-    } else if (lower.includes("application") || lower.includes("আবেদন") || lower.includes("দরখাস্ত")) {
-      category = QUESTION_TYPE_CODES.APPLICATION;
-    } else if (lower.includes("report") || lower.includes("প্রতিবেদন")) {
-      category = QUESTION_TYPE_CODES.NEWS_REPORT;
-    } else if (lower.includes("essay") || lower.includes("রচনা") || lower.includes("প্রবন্ধ")) {
-      category = QUESTION_TYPE_CODES.ESSAY;
-    } else if (lower.includes("opposite word") || lower.includes("opposite_word") || lower.includes("বিপরীত শব্দ") || lower.includes("বিপরীত")) {
-      category = QUESTION_TYPE_CODES.OPPOSITE_WORD;
-    } else if (lower.includes("gender change") || lower.includes("gender_change") || lower.includes("লিঙ্গ পরিবর্তন") || lower.includes("লিঙ্গান্তর") || lower.includes("লিঙ্গ")) {
-      category = QUESTION_TYPE_CODES.GENDER_CHANGE;
-    } else if (lower.includes("juktoborno") || lower.includes("যুক্তবর্ণ")) {
-      category = QUESTION_TYPE_CODES.JUKTOBORNO;
-    } else if (lower.includes("ek kothay") || lower.includes("ek kothai") || lower.includes("এক কথায়") || lower.includes("এক কথায়")) {
-      category = QUESTION_TYPE_CODES.EK_KOTHAY_PROKASH;
-    } else if (lower.includes("synonym") || lower.includes("synonyms") || lower.includes("সমার্থক শব্দ") || lower.includes("সমার্থক") || lower.includes("প্রতিশব্দ")) {
-      category = QUESTION_TYPE_CODES.SYNONYM;
-    } else if (lower.includes("sadhu to cholito") || lower.includes("sadhu") || lower.includes("সাধু") || lower.includes("চলিত")) {
-      category = QUESTION_TYPE_CODES.SADHU_TO_CHOLITO;
-    } else if (lower.includes("pod nirnoy") || lower.includes("pod_nirnoy") || lower.includes("পদ নির্ণয়") || lower.includes("পদ নির্ণয়")) {
-      category = QUESTION_TYPE_CODES.POD_NIRNOY;
-    } else if (lower.includes("verb tense") || lower.includes("verb_tense") || lower.includes("ক্রিয়াপদ") || lower.includes("ক্রিয়াপদ") || lower.includes("ক্রিয়ার কাল") || lower.includes("ক্রিয়ার কাল")) {
-      category = QUESTION_TYPE_CODES.VERB_TENSE;
-    } else if (lower.includes("number in word") || lower.includes("numbers in word") || lower.includes("কথায় লেখ") || lower.includes("কথায় লেখা") || lower.includes("সংখ্যা কথায়") || lower.includes("সংখ্যা কথায়")) {
-      category = QUESTION_TYPE_CODES.NUMBER_IN_WORDS;
-    } else if (lower.includes("word meaning") || lower.includes("word_meaning") || lower.includes("শব্দার্থ")) {
-      category = QUESTION_TYPE_CODES.WORD_MEANING;
-    } else if (lower.includes("make sentence") || lower.includes("make_sentence") || lower.includes("sentence making") || lower.includes("বাক্য রচনা") || lower.includes("বাক্য তৈরি") || lower.includes("বাক্য গঠন")) {
-      category = QUESTION_TYPE_CODES.MAKE_SENTENCES;
-    } else if (lower.includes("make question") || lower.includes("make_question") || lower.includes("wh question") || lower.includes("wh_question") || lower.includes("question making") || lower.includes("প্রশ্ন তৈরি") || lower.includes("প্রশ্ন গঠন")) {
-      category = QUESTION_TYPE_CODES.MAKE_QUESTION;
-    } else if (lower.includes("descriptive question") || lower.includes("descriptive_question") || lower.includes("dq") || lower.includes("রচনামূলক প্রশ্ন")) {
-      category = QUESTION_TYPE_CODES.DESCRIPTIVE_QUESTION;
-    } else if (lower.includes("shuddho") || lower.includes("shudho") || lower.includes("ashuddho") || lower.includes("শুদ্ধ") || lower.includes("অশুদ্ধ")) {
-      category = QUESTION_TYPE_CODES.SHUDDHO_ASHUDDHO;
-    } else if (lower.includes("dan bam") || lower.includes("dan_bam") || lower.includes("বাম-ডান") || lower.includes("ডান-বাম") || lower.includes("মিলকরণ") || lower.includes("matching")) {
-      category = QUESTION_TYPE_CODES.DAN_BAM_MILKORON;
-    } else if (lower.includes("rearrange") || lower.includes("পুনর্বিন্যাস") || lower.includes("সাজিয়ে লেখ") || lower.includes("সাজিয়ে লেখ")) {
-      category = QUESTION_TYPE_CODES.REARRANGE;
-    } else if (lower.includes("short question") || lower.includes("short_question") || lower.includes("sq") || lower.includes("সংক্ষিপ্ত প্রশ্ন")) {
-      category = QUESTION_TYPE_CODES.SHORT_QUESTION;
-    } else if (lower.includes("math question") || lower.includes("math_question") || lower.includes("গণিত প্রশ্ন") || lower.includes("গণিত") || lower.includes("math")) {
-      category = QUESTION_TYPE_CODES.MATH_QUESTION;
-    } else if (lower.includes("grammar question") || lower.includes("grammar_question") || lower.includes("ব্যাকরণ প্রশ্ন") || lower.includes("ব্যাকরণ")) {
-      category = QUESTION_TYPE_CODES.GRAMMAR_QUESTION;
-    } else if (lower.includes("composition") || lower.includes("কম্পোজিশন")) {
-      category = QUESTION_TYPE_CODES.SHORT_COMPOSITION;
-    }
-  }
+  const category: QuestionTypeCode = activeSlot?.category ?? resolveDistCategory(activeDist);
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
     {
@@ -307,8 +146,8 @@ export const QuestionPickerPanel: React.FC = () => {
       const payloadBase = {
         questionPaperId: paperId,
         distributionId: activeDistId,
-        sectionId: activeSectionId || (activeDist as any)?.sectionId || undefined,
-        subSectionId: activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
+        sectionId: activeSlot?.sectionId || activeSectionId || (activeDist as any)?.sectionId || undefined,
+        subSectionId: activeSlot?.subSectionId || activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
       };
 
       if (category === "SA") {
@@ -415,8 +254,8 @@ export const QuestionPickerPanel: React.FC = () => {
       const payloadBase = {
         questionPaperId: paperId,
         distributionId: activeDistId,
-        sectionId: activeSectionId || (activeDist as any)?.sectionId || undefined,
-        subSectionId: activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
+        sectionId: activeSlot?.sectionId || activeSectionId || (activeDist as any)?.sectionId || undefined,
+        subSectionId: activeSlot?.subSectionId || activeSubSectionId || (activeDist as any)?.subSectionId || undefined,
       };
       await assignQuestion({
         ...payloadBase,
@@ -460,7 +299,16 @@ export const QuestionPickerPanel: React.FC = () => {
             </button>
             {paperId && activeDistId && (
               <Link
-                href={`/question-papers/${paperId}/distributions/${activeDistId}/pick`}
+                href={(() => {
+                  const params = new URLSearchParams({ category });
+                  const secId = activeSlot?.sectionId || activeSectionId || (activeDist as any)?.sectionId;
+                  const subId = activeSlot?.subSectionId || activeSubSectionId || (activeDist as any)?.subSectionId;
+                  if (secId) params.set("sectionId", secId);
+                  if (subId) params.set("subSectionId", subId);
+                  if (activeDist?.questionTypeId) params.set("questionTypeId", activeDist.questionTypeId);
+                  if (activeSlot?.slotPickLimit) params.set("limit", String(activeSlot.slotPickLimit));
+                  return `/question-papers/${paperId}/distributions/${activeDistId}/pick?${params}`;
+                })()}
                 className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
               >
                 <span>গ্রিড ভিউ</span>

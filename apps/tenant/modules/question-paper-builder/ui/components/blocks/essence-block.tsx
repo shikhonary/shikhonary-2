@@ -195,9 +195,9 @@ export const EssenceBlock = ({ item }: { item: any }) => {
   };
 
   const rawLabel = 
-    item.questionTypeLabel ||
     distStatus?.questionTypeLabel ||
     item.distribution?.questionTypeLabel ||
+    item.questionTypeLabel ||
     distStatus?.questionTypeName ||
     item.distribution?.questionTypeName;
 
@@ -238,7 +238,7 @@ export const EssenceBlock = ({ item }: { item: any }) => {
     if (!title || !title.trim()) return "";
     const cleanTitle = title.trim();
     if (english) {
-      if (/write\s+(the\s+)?essence/i.test(cleanTitle)) {
+      if (/write\s+(the\s+)?essence/i.test(cleanTitle) || /substance|gist/i.test(cleanTitle)) {
         return cleanTitle;
       }
       const unquoted = cleanTitle.replace(/^['"‘’“]+|['"‘’”]+$/g, "").trim();
@@ -275,31 +275,33 @@ export const EssenceBlock = ({ item }: { item: any }) => {
   const [showAddAlternative, setShowAddAlternative] = useState(false);
 
   return (
-    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
-      {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-        <button
-          type="button"
-          onClick={() => setShowAddAlternative(true)}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
-        >
-          <Split className="w-3 h-3" />
-          {isEnglish ? "Or" : "অথবা"}
-        </button>
-        <button 
-          onClick={handleRemove}
-          disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
-        >
-          {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
-        </button>
-      </div>
-
+    <div className={`flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {renderMethod === 1 ? (
-        <div className="flex justify-between items-start gap-2 w-full">
+        <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2 w-full">
+          {/* Hover Controls */}
+          <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+            {isFirst && (
+              <button
+                type="button"
+                onClick={() => setShowAddAlternative(true)}
+                className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
+                title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
+              >
+                <Split className="w-3 h-3" />
+                {isEnglish ? "Or" : "অথবা"}
+              </button>
+            )}
+            <button 
+              onClick={handleRemove}
+              disabled={isRemoving}
+              className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+              title="Remove Question"
+            >
+              {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              Remove
+            </button>
+          </div>
+
           <div className="flex gap-1 flex-1 relative flex-col">
             <div className="flex gap-2 items-start w-full">
               <span
@@ -311,7 +313,6 @@ export const EssenceBlock = ({ item }: { item: any }) => {
               >
                 {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
               </span>
-              {totalQuestions > 1 && renderSubQuestionLabel(label)}
               <div className="flex-1 w-full min-w-0">
                 <EssenceEditableText 
                   text={directPromptText}
@@ -345,7 +346,20 @@ export const EssenceBlock = ({ item }: { item: any }) => {
       ) : (
         <>
           {isFirst && (
-            <div className="flex justify-between items-start w-full">
+            <div className="group/label relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start w-full">
+              {/* Question Label Hover Controls: Alternative trigger only */}
+              <div className="absolute top-0 right-4 opacity-0 group-hover/label:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+                <button
+                  type="button"
+                  onClick={() => setShowAddAlternative(true)}
+                  className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 cursor-pointer"
+                  title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
+                >
+                  <Split className="w-3 h-3" />
+                  {isEnglish ? "Or" : "অথবা"}
+                </button>
+              </div>
+
               <div 
                 className="font-bold ml-[0px] flex items-baseline gap-2" 
                 style={{
@@ -363,7 +377,7 @@ export const EssenceBlock = ({ item }: { item: any }) => {
                   {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
                 </span>
                 <EditableSectionLabel
-                  distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+                  readOnly
                   initialLabel={rawLabel}
                   fallbackLabel={isEnglish ? "Write the essence of any one of the following:" : "যেকোনো একটি বিষয়ে সারমর্ম লেখো:"}
                   questionType="ESSENCE"
@@ -380,15 +394,26 @@ export const EssenceBlock = ({ item }: { item: any }) => {
                 fontFamily: questionStyle.fontFamily,
               }}>
                 {isEnglish
-                  ? (marksPerQuestion * (attemptCount || 1))
-                  : (attemptCount > 1
-                    ? `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount)} = ${toBengaliDigits(marksPerQuestion * attemptCount)}`
-                    : toBengaliDigits(marksPerQuestion * (attemptCount || 1)))}
+                  ? `${marksPerQuestion} × ${attemptCount || 1} = ${marksPerQuestion * (attemptCount || 1)}`
+                  : `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount || 1)} = ${toBengaliDigits(marksPerQuestion * (attemptCount || 1))}`}
               </div>
             </div>
           )}
 
-          <div className="flex justify-between items-start gap-2 w-full">
+          <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2 w-full">
+            {/* Question Hover Controls: Remove question only */}
+            <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+              <button 
+                onClick={handleRemove}
+                disabled={isRemoving}
+                className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+                title="Remove Question"
+              >
+                {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                Remove
+              </button>
+            </div>
+
             <div className="flex gap-1 flex-1 relative flex-col">
               <div className="flex gap-2 items-start w-full">
                 <span
@@ -401,7 +426,6 @@ export const EssenceBlock = ({ item }: { item: any }) => {
                 >
                   {isEnglish ? `${masterNum}.` : `${toBengaliDigits(masterNum)}।`}
                 </span>
-                {renderSubQuestionLabel(label)}
                 <div className="flex-1 w-full min-w-0">
                   <EssenceEditableText 
                     text={rawTitle}
@@ -436,7 +460,11 @@ export const EssenceBlock = ({ item }: { item: any }) => {
         primaryQuestionContentId={data.id}
         primaryQuestionType="ESSENCE"
         subjectId={item.subjectId || distStatus?.subjectId || ""}
-        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
+        primaryMarks={
+          renderMethod === 1 
+            ? (item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion)
+            : (item.assignedMarks ?? (marksPerQuestion * (attemptCount || 1)))
+        }
         masterNumber={masterNum}
         distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
       />

@@ -87,7 +87,7 @@ export async function listGrammarQuestion(db: PrismaClient, input: ListGrammarQu
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -396,7 +396,7 @@ export async function getGrammarQuestionStats(db: PrismaClient, input: GrammarQu
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

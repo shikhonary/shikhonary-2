@@ -83,3 +83,12 @@ export const resolveCsReportSchema = z.object({
 })
 
 export type ResolveCsReportInput = z.infer<typeof resolveCsReportSchema>
+
+export const assignCsReportSchema = z.object({
+  csId: z.string().min(1, "CS ID is required"),
+  reportId: z.string().optional(),
+  assignedToId: z.string().min(1, "Assignee user ID is required"),
+  note: z.string().optional(),
+})
+
+export type AssignCsReportInput = z.infer<typeof assignCsReportSchema>

@@ -8,6 +8,10 @@ import {
   bulkDeleteEssaysSchema,
   importEssaysSchema,
   essayStatsSchema,
+  essayBoardYearsSchema,
+  toggleEssayActiveSchema,
+  resolveEssayReportSchema,
+  assignEssayReportSchema,
 } from "./essay.schema"
 import {
   createEssay,
@@ -18,6 +22,10 @@ import {
   bulkDeleteEssays,
   importEssays,
   getEssayStats,
+  getBoardYears,
+  toggleEssayActive,
+  resolveEssayReport,
+  assignEssayReport,
 } from "./essay.service"
 
 export const essayRouter = createTRPCRouter({
@@ -28,6 +36,10 @@ export const essayRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(essayStatsSchema.optional())
     .query(({ ctx, input }) => getEssayStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(essayBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   byId: superAdminProcedure
     .input(getEssaySchema)
@@ -49,7 +61,23 @@ export const essayRouter = createTRPCRouter({
     .input(bulkDeleteEssaysSchema)
     .mutation(({ ctx, input }) => bulkDeleteEssays(ctx.db, input)),
 
+  toggleActive: superAdminProcedure
+    .input(toggleEssayActiveSchema)
+    .mutation(({ ctx, input }) => toggleEssayActive(ctx.db, input)),
+
   import: superAdminProcedure
     .input(importEssaysSchema)
     .mutation(({ ctx, input }) => importEssays(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveEssayReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveEssayReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignEssayReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignEssayReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

@@ -128,6 +128,20 @@ export function useResolveMcqReport() {
 }
 
 /**
+ * Hook to assign an MCQ report to a user.
+ */
+export function useAssignMcqReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.mcq.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.mcq.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

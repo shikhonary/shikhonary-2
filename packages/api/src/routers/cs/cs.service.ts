@@ -12,6 +12,7 @@ import type {
   ImportCsInput,
   CsStatsInput,
   ResolveCsReportInput,
+  AssignCsReportInput,
 } from "./cs.schema"
 
 export async function listCs(db: PrismaClient, input: ListCsInput) {
@@ -36,7 +37,7 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
   if (input.hasReport !== undefined && input.hasReport !== "All") {
     const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
     const reports = await (db as any).questionReport.findMany({
-      where: { entityType: "CS", status: "PENDING" },
+      where: { entityType: "CS", status: { in: ["PENDING", "ASSIGNED"] } },
       select: { entityId: true },
       distinct: ["entityId"],
     })
@@ -201,10 +202,10 @@ export async function listCs(db: PrismaClient, input: ListCsInput) {
 
   const enhancedItems = items.map((item: any) => {
     const repList = reportMap.get(item.id) || []
-    const hasPendingReport = repList.some((r: any) => r.status === "PENDING")
+    const hasActiveReport = repList.some((r: any) => r.status === "PENDING" || r.status === "ASSIGNED")
     return {
       ...item,
-      hasReport: hasPendingReport,
+      hasReport: hasActiveReport,
       reports: repList,
     }
   })
@@ -731,6 +732,90 @@ export async function resolveCsReport(
   return {
     success: true,
     resolvedCount: result.count,
+  }
+}
+
+export async function assignCsReport(
+  db: PrismaClient,
+  input: AssignCsReportInput,
+  currentUserId?: string | null
+) {
+  const { csId, reportId, assignedToId, note } = input
+
+  const cs = await (db as any).cS.findUnique({
+    where: { id: csId },
+    select: { id: true },
+  })
+
+  if (!cs) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `CS with ID ${csId} not found`,
+    })
+  }
+
+  const assignee = await db.user.findUnique({
+    where: { id: assignedToId },
+    select: { id: true, name: true, email: true },
+  })
+
+  if (!assignee) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Assignee user with ID ${assignedToId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "CS",
+    entityId: csId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await (db as any).questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    const newReport = await (db as any).questionReport.create({
+      data: {
+        entityType: "CS",
+        entityId: csId,
+        reportType: "OTHER",
+        description: note?.trim() || "প্রশ্ন পর্যালোচনা ও যাচাইয়ের জন্য দায়িত্ব অর্পণ করা হয়েছে",
+        status: "ASSIGNED",
+        reportedById: currentUserId ?? null,
+        resolvedById: assignedToId,
+        resolvedNote: note?.trim() || null,
+        resolvedAt: null,
+      },
+    })
+
+    return {
+      success: true,
+      assignedCount: 1,
+      assignee,
+      createdReportId: newReport.id,
+    }
+  }
+
+  const result = await (db as any).questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "ASSIGNED",
+      resolvedById: assignedToId,
+      resolvedNote: note?.trim() || null,
+      resolvedAt: null,
+    },
+  })
+
+  return {
+    success: true,
+    assignedCount: result.count,
+    assignee,
   }
 }
 

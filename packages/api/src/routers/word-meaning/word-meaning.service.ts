@@ -80,7 +80,7 @@ export async function listWordMeaning(db: PrismaClient, input: ListWordMeaningIn
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -403,7 +403,7 @@ export async function getWordMeaningStats(db: PrismaClient, input: WordMeaningSt
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }

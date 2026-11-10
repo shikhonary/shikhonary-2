@@ -8,6 +8,10 @@ import {
   bulkDeleteEssencesSchema,
   importEssencesSchema,
   essenceStatsSchema,
+  essenceBoardYearsSchema,
+  toggleEssenceActiveSchema,
+  resolveEssenceReportSchema,
+  assignEssenceReportSchema,
 } from "./essence.schema"
 import {
   createEssence,
@@ -18,6 +22,10 @@ import {
   bulkDeleteEssences,
   importEssences,
   getEssenceStats,
+  getBoardYears,
+  toggleEssenceActive,
+  resolveEssenceReport,
+  assignEssenceReport,
 } from "./essence.service"
 
 export const essenceRouter = createTRPCRouter({
@@ -28,6 +36,10 @@ export const essenceRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(essenceStatsSchema.optional())
     .query(({ ctx, input }) => getEssenceStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(essenceBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   byId: superAdminProcedure
     .input(getEssenceSchema)
@@ -48,6 +60,18 @@ export const essenceRouter = createTRPCRouter({
   bulkDelete: superAdminProcedure
     .input(bulkDeleteEssencesSchema)
     .mutation(({ ctx, input }) => bulkDeleteEssences(ctx.db, input)),
+
+  toggleActive: superAdminProcedure
+    .input(toggleEssenceActiveSchema)
+    .mutation(({ ctx, input }) => toggleEssenceActive(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveEssenceReportSchema)
+    .mutation(({ ctx, input }) => resolveEssenceReport(ctx.db, input, ctx.session?.user?.id)),
+
+  assignReport: superAdminProcedure
+    .input(assignEssenceReportSchema)
+    .mutation(({ ctx, input }) => assignEssenceReport(ctx.db, input, ctx.session?.user?.id)),
 
   import: superAdminProcedure
     .input(importEssencesSchema)

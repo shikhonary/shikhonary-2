@@ -5,6 +5,11 @@ import { QUESTION_DIFFICULTY } from "@workspace/utils"
 export const listParagraphsSchema = paginationSchema.extend({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
+  academicClassId: z.string().optional(),
+  board: z.string().optional(),
+  reference: z.string().optional(),
+  isActive: z.union([z.boolean(), z.string()]).optional(),
+  hasReport: z.union([z.boolean(), z.string()]).optional(),
   difficulty: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
@@ -18,9 +23,18 @@ export type ListParagraphsInput = z.infer<typeof listParagraphsSchema>
 export const paragraphStatsSchema = z.object({
   subjectId: z.string().optional(),
   chapterId: z.string().optional(),
+  academicClassId: z.string().optional(),
 })
 
 export type ParagraphStatsInput = z.infer<typeof paragraphStatsSchema>
+
+export const paragraphBoardYearsSchema = z.object({
+  subjectId: z.string().optional(),
+  chapterId: z.string().optional(),
+  academicClassId: z.string().optional(),
+})
+
+export type ParagraphBoardYearsInput = z.infer<typeof paragraphBoardYearsSchema>
 
 export const getParagraphSchema = idSchema
 export type GetParagraphInput = z.infer<typeof getParagraphSchema>
@@ -34,6 +48,7 @@ export const createParagraphSchema = z.object({
   popularityCount: z.number().int().optional().default(0),
   subjectId: z.string().min(1, "Subject is required"),
   chapterId: z.string().optional().nullable(),
+  isActive: z.boolean().default(true),
 })
 
 export type CreateParagraphInput = z.infer<typeof createParagraphSchema>
@@ -52,6 +67,30 @@ export const bulkDeleteParagraphsSchema = z.object({
 })
 
 export type BulkDeleteParagraphsInput = z.infer<typeof bulkDeleteParagraphsSchema>
+
+export const toggleParagraphActiveSchema = z.object({
+  id: z.string().min(1),
+  isActive: z.boolean(),
+})
+
+export type ToggleParagraphActiveInput = z.infer<typeof toggleParagraphActiveSchema>
+
+export const resolveParagraphReportSchema = z.object({
+  paragraphId: z.string().min(1, "Paragraph ID is required"),
+  reportId: z.string().optional(),
+  resolvedNote: z.string().optional(),
+})
+
+export type ResolveParagraphReportInput = z.infer<typeof resolveParagraphReportSchema>
+
+export const assignParagraphReportSchema = z.object({
+  paragraphId: z.string().min(1, "Paragraph ID is required"),
+  reportId: z.string().optional(),
+  assignedToId: z.string().min(1, "Assigned user is required"),
+  note: z.string().optional(),
+})
+
+export type AssignParagraphReportInput = z.infer<typeof assignParagraphReportSchema>
 
 export const importParagraphsSchema = z.object({
   paragraphs: z.array(createParagraphSchema).min(1, "At least one Paragraph is required"),

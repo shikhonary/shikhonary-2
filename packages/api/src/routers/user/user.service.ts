@@ -163,6 +163,13 @@ export async function getUsersForSelection(
       name: true,
       email: true,
       phoneNumber: true,
+      image: true,
+      roles: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: { name: "asc" },
   })

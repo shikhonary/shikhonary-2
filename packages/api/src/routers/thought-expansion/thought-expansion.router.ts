@@ -8,6 +8,10 @@ import {
   bulkDeleteThoughtExpansionsSchema,
   importThoughtExpansionsSchema,
   thoughtExpansionStatsSchema,
+  thoughtExpansionBoardYearsSchema,
+  toggleThoughtExpansionActiveSchema,
+  resolveThoughtExpansionReportSchema,
+  assignThoughtExpansionReportSchema,
 } from "./thought-expansion.schema"
 import {
   createThoughtExpansion,
@@ -18,6 +22,10 @@ import {
   bulkDeleteThoughtExpansions,
   importThoughtExpansions,
   getThoughtExpansionStats,
+  getBoardYears,
+  toggleThoughtExpansionActive,
+  resolveThoughtExpansionReport,
+  assignThoughtExpansionReport,
 } from "./thought-expansion.service"
 
 export const thoughtExpansionRouter = createTRPCRouter({
@@ -28,6 +36,10 @@ export const thoughtExpansionRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(thoughtExpansionStatsSchema.optional())
     .query(({ ctx, input }) => getThoughtExpansionStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(thoughtExpansionBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   byId: superAdminProcedure
     .input(getThoughtExpansionSchema)
@@ -49,7 +61,23 @@ export const thoughtExpansionRouter = createTRPCRouter({
     .input(bulkDeleteThoughtExpansionsSchema)
     .mutation(({ ctx, input }) => bulkDeleteThoughtExpansions(ctx.db, input)),
 
+  toggleActive: superAdminProcedure
+    .input(toggleThoughtExpansionActiveSchema)
+    .mutation(({ ctx, input }) => toggleThoughtExpansionActive(ctx.db, input)),
+
   import: superAdminProcedure
     .input(importThoughtExpansionsSchema)
     .mutation(({ ctx, input }) => importThoughtExpansions(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveThoughtExpansionReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveThoughtExpansionReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignThoughtExpansionReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignThoughtExpansionReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

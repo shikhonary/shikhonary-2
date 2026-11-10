@@ -2,6 +2,10 @@
 
 import { EditParagraphView } from "../components/edit-paragraph-view"
 
-export function EditParagraphPage() {
-  return <EditParagraphView />
+interface EditParagraphPageProps {
+  id: string
+}
+
+export function EditParagraphPage({ id }: EditParagraphPageProps) {
+  return <EditParagraphView id={id} />
 }

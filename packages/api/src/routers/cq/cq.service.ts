@@ -12,6 +12,7 @@ import type {
   ImportCqsInput,
   CqStatsInput,
   ResolveCqReportInput,
+  AssignCqReportInput,
 } from "./cq.schema"
 
 export async function listCqs(db: PrismaClient, input: ListCqsInput) {
@@ -36,7 +37,7 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
   if (input.hasReport !== undefined && input.hasReport !== "All") {
     const isReported = input.hasReport === true || input.hasReport === "YES" || input.hasReport === "true"
     const reports = await db.questionReport.findMany({
-      where: { entityType: "CQ", status: "PENDING" },
+      where: { entityType: "CQ", status: { in: ["PENDING", "ASSIGNED"] } },
       select: { entityId: true },
       distinct: ["entityId"],
     })
@@ -188,10 +189,10 @@ export async function listCqs(db: PrismaClient, input: ListCqsInput) {
 
   const enhancedItems = items.map((item) => {
     const repList = reportMap.get(item.id) || []
-    const hasPendingReport = repList.some((r) => r.status === "PENDING")
+    const hasActiveReport = repList.some((r) => r.status === "PENDING" || r.status === "ASSIGNED")
     return {
       ...item,
-      hasReport: hasPendingReport,
+      hasReport: hasActiveReport,
       reports: repList,
     }
   })
@@ -858,6 +859,90 @@ export async function resolveCqReport(
   return {
     success: true,
     resolvedCount: result.count,
+  }
+}
+
+export async function assignCqReport(
+  db: PrismaClient,
+  input: AssignCqReportInput,
+  currentUserId?: string | null
+) {
+  const { cqId, reportId, assignedToId, note } = input
+
+  const cq = await db.cq.findUnique({
+    where: { id: cqId },
+    select: { id: true },
+  })
+
+  if (!cq) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `CQ with ID ${cqId} not found`,
+    })
+  }
+
+  const assignee = await db.user.findUnique({
+    where: { id: assignedToId },
+    select: { id: true, name: true, email: true },
+  })
+
+  if (!assignee) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Assignee user with ID ${assignedToId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "CQ",
+    entityId: cqId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await db.questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    const newReport = await db.questionReport.create({
+      data: {
+        entityType: "CQ",
+        entityId: cqId,
+        reportType: "OTHER",
+        description: note?.trim() || "প্রশ্ন পর্যালোচনা ও যাচাইয়ের জন্য দায়িত্ব অর্পণ করা হয়েছে",
+        status: "ASSIGNED",
+        reportedById: currentUserId ?? null,
+        resolvedById: assignedToId,
+        resolvedNote: note?.trim() || null,
+        resolvedAt: null,
+      },
+    })
+
+    return {
+      success: true,
+      assignedCount: 1,
+      assignee,
+      createdReportId: newReport.id,
+    }
+  }
+
+  const result = await db.questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "ASSIGNED",
+      resolvedById: assignedToId,
+      resolvedNote: note?.trim() || null,
+      resolvedAt: null,
+    },
+  })
+
+  return {
+    success: true,
+    assignedCount: result.count,
+    assignee,
   }
 }
 

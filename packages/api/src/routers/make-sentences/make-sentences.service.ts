@@ -82,7 +82,7 @@ export async function listMakeSentences(db: PrismaClient, input: ListMakeSentenc
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -389,7 +389,7 @@ export async function getMakeSentencesStats(db: PrismaClient, input: MakeSentenc
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

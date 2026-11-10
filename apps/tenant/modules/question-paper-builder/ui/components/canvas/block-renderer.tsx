@@ -1,6 +1,7 @@
 import React from "react";
 import { PaperBlock } from "../../../types";
 import { useBuilderStore } from "../../../store/use-builder-store";
+import { QUESTION_TYPE_CODES, resolveDistCategory, toBengaliDigits } from "@workspace/utils";
 import { MCQBlock } from "../blocks/mcq-block";
 import { CQBlock } from "../blocks/cq-block";
 import { CSBlock } from "../blocks/cs-block";
@@ -52,15 +53,6 @@ import { DistActionBlock } from "./dist-action-block";
 import { X, Target } from "lucide-react";
 import { useDeleteSubSection } from "@/modules/question-paper/services/use-question-paper";
 import { toast } from "sonner";
-
-const toBengaliDigits = (num: number | string): string => {
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
-    .join("");
-};
 
 const SectionTitleBlock = ({ data }: { data: any }) => {
   const { id, sectionId, title, titleBn, instructions, hasQuestions, isSectionFilled, isFirstSection } = data || {};
@@ -308,9 +300,18 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
 };
 
 const DistTitleBlock = ({ data }: { data: any }) => {
-  const { dist, attemptCount, totalProvided, isCq, isMcq, isCs, subTitle, isSharedQuestionType } = data || {};
-
-  if (isSharedQuestionType || isMcq) return null;
+  const {
+    dist,
+    attemptCount,
+    totalProvided,
+    isCq,
+    isMcq,
+    isCs,
+    subTitle,
+    isSharedQuestionType,
+    showMarks = true,
+    instructionText: preResolvedInstruction,
+  } = data || {};
 
   const isCS = isCs
     || dist?.questionType?.code === "CS"
@@ -318,24 +319,31 @@ const DistTitleBlock = ({ data }: { data: any }) => {
     || dist?.questionType?.nameEn?.toLowerCase().includes("scenario")
     || dist?.questionType?.nameBn?.includes("সৃজনশীল (CS)");
 
+  const resolvedCat = resolveDistCategory(dist);
+  const allowsDistTitle = isCq || resolvedCat === QUESTION_TYPE_CODES.CQ || resolvedCat === QUESTION_TYPE_CODES.SA;
+
+  if (isSharedQuestionType || isMcq || isCS || !allowsDistTitle) return null;
+
   const distQuestionCount = Number(dist?.questionCount ?? totalProvided ?? 0);
   const distQuestionsToAttempt = (dist?.questionsToAttempt !== undefined && dist?.questionsToAttempt !== null)
     ? Number(dist.questionsToAttempt)
     : Number(attemptCount ?? distQuestionCount);
 
-  let instructionText: string | null = null;
-  if (isCS) {
-    if (distQuestionCount > 0 && distQuestionsToAttempt > 0 && distQuestionsToAttempt < distQuestionCount) {
-      instructionText = `[যেকোনো ${toBengaliDigits(distQuestionsToAttempt)}টি প্রশ্নের উত্তর দিতে হবে]`;
+  let instructionText: string | null = preResolvedInstruction !== undefined ? preResolvedInstruction : null;
+  if (preResolvedInstruction === undefined) {
+    if (isCS) {
+      if (distQuestionCount > 0 && distQuestionsToAttempt > 0 && distQuestionsToAttempt < distQuestionCount) {
+        instructionText = `[যেকোনো ${toBengaliDigits(distQuestionsToAttempt)}টি প্রশ্নের উত্তর দিতে হবে]`;
+      } else {
+        instructionText = `[সবগুলো প্রশ্নের উত্তর দিতে হবে]`;
+      }
     } else {
-      instructionText = `[সবগুলো প্রশ্নের উত্তর দিতে হবে]`;
+      instructionText = (isCq || !isMcq) && attemptCount < totalProvided && attemptCount > 0
+        ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
+        : (isCq || !isMcq) && attemptCount > 0
+        ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
+        : null;
     }
-  } else {
-    instructionText = (isCq || !isMcq) && attemptCount < totalProvided && attemptCount > 0 
-      ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-      : (isCq || !isMcq) && attemptCount > 0 
-      ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-      : null;
   }
 
   const titleText =
@@ -349,35 +357,29 @@ const DistTitleBlock = ({ data }: { data: any }) => {
     titleText && titleText.toLowerCase() !== subTitle?.trim()?.toLowerCase()
   );
 
+  if (!shouldRenderTitle && !instructionText && !isCq && !showMarks) return null;
+
   return (
     <div className="flex flex-col items-stretch w-full mb-1">
-      {isMcq ? (
-        <div className="flex justify-between items-center w-full">
+      {shouldRenderTitle && (
+        <div className="font-semibold text-center">
+          {titleText}
+        </div>
+      )}
+      {(instructionText || isCq || showMarks) && (
+        <div className="flex justify-between items-center text-[12px]">
           <div className="flex-1"></div>
-          <div className="font-semibold text-center flex-[2]">{shouldRenderTitle ? titleText : ""}</div>
-          <div className="flex-1 text-right font-bold whitespace-nowrap text-[12px] shrink-0">
-            {toBengaliDigits(dist?.marksPerQuestion || 1)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 1) * (attemptCount || 1))}
+          <div className="text-center font-normal flex-[2]">
+            {instructionText}
+          </div>
+          <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
+            {showMarks && (
+              <>
+                {toBengaliDigits(dist?.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 10) * (attemptCount || 1))}
+              </> 
+            )}
           </div>
         </div>
-      ) : (
-        <>
-          {shouldRenderTitle && (
-            <div className="font-semibold text-center">
-              {titleText}
-            </div>
-          )}
-          {(instructionText || isCq) && (
-            <div className="flex justify-between items-center text-[12px]">
-              <div className="flex-1"></div>
-              <div className="text-center font-normal flex-[2]">
-                {instructionText}
-              </div>
-              <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
-                {toBengaliDigits(dist?.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 10) * (attemptCount || 1))}
-              </div>
-            </div>
-          )}
-        </>
       )}
     </div>
   );

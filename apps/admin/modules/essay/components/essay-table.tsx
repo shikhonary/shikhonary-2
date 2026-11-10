@@ -5,47 +5,67 @@ import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MoreHorizontal, Edit3, Trash2 } from "lucide-react"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+  type QuestionReportItem,
+} from "@/components/shared"
+import { toBengaliDigits } from "@workspace/utils"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu"
+import {
+  Trash2,
+  ScrollText,
+  Plus,
+  AlertTriangle,
+  CheckCircle2,
+  UserPlus,
+  UserCheck,
+  Flag,
+  ChevronDown,
+} from "lucide-react"
 
-function getPaginationItems(currentPage: number, totalPages: number): (number | "ellipsis-start" | "ellipsis-end")[] {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1)
-  }
-
-  if (currentPage <= 4) {
-    return [1, 2, 3, 4, 5, "ellipsis-end", totalPages]
-  }
-
-  if (currentPage >= totalPages - 3) {
-    return [1, "ellipsis-start", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
-  }
-
-  return [1, "ellipsis-start", currentPage - 1, currentPage, currentPage + 1, "ellipsis-end", totalPages]
-}
+export type { QuestionReportItem }
 
 export interface EssayItem {
   id: string
   title: string
+  reference: string[]
   source?: string | null
   session?: string | null
-  reference: string[]
-  difficulty: string
-  popularityCount: number
+  difficulty?: string | null
+  popularityCount?: number
+  isActive: boolean
+  hasReport?: boolean
+  reports?: QuestionReportItem[]
   createdAt: Date | string
   updatedAt: Date | string
   subject: {
     id: string
     nameEn: string
     nameBn: string
+    classSubjects?: {
+      academicClass?: {
+        id: string
+        nameEn: string
+        nameBn: string
+      } | null
+    }[]
   }
+  questionType?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    label?: string | null
+    mark?: number | null
+  } | null
 }
 
 interface EssayTableProps {
@@ -54,6 +74,8 @@ interface EssayTableProps {
   isError: boolean
   onDelete: (id: string, titleSnippet: string) => void
   onBulkDelete: (selectedIds: string[]) => void
+  onResolveReport?: (item: EssayItem) => void
+  onAssignReport?: (item: EssayItem) => void
   currentPage: number
   itemsPerPage: number
   totalItems: number
@@ -68,15 +90,14 @@ export function EssayTable({
   isError,
   onDelete,
   onBulkDelete,
+  onResolveReport,
+  onAssignReport,
   currentPage,
   itemsPerPage,
   totalItems,
-  totalPages,
   onPageChange,
   onLimitChange,
 }: EssayTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const handleSelectAll = (checked: boolean) => {
@@ -100,192 +121,320 @@ export function EssayTable({
 
   return (
     <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
+      {/* Selection Toolbar */}
+      {items.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card p-3 sm:p-4 shadow-xs">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => handleSelectAll(e.target.checked)}
+                className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-foreground font-headline">
+                সবগুলো নির্বাচন করুন ({toBengaliDigits(items.length)}টি)
               </span>
-              <Button
-                type="button"
-                onClick={() => {
-                  onBulkDelete(selectedIds)
-                  setSelectedIds([])
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Delete Selected</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+            </label>
 
-      {/* Table / Cards View */}
-      {isLoading ? (
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-white/[0.08]">
+                <span className="text-xs font-semibold text-indigo-600 dark:text-primary font-body">
+                  {toBengaliDigits(selectedIds.length)}টি নির্বাচিত
+                </span>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    onBulkDelete(selectedIds)
+                    setSelectedIds([])
+                  }}
+                  className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>নির্বাচিতগুলো মুছুন</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Loading Skeleton State */}
+      {isLoading && (
         <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-40 w-full animate-pulse rounded-2xl border border-outline-variant/40 bg-surface-container-low/50"
-            />
+              className="bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-6 shadow-xs animate-pulse space-y-4"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-white/10" />
+                <div className="h-5 w-24 bg-slate-200 dark:bg-white/10 rounded-lg" />
+                <div className="h-5 w-32 bg-slate-200 dark:bg-white/10 rounded-lg" />
+              </div>
+              <div className="h-16 w-full bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200/60" />
+            </div>
           ))}
         </div>
-      ) : isError ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-error/40 p-12 text-center bg-error/5">
-          <p className="font-headline-sm text-base font-bold text-error">
-            Failed to load Essays
-          </p>
-          <p className="mt-1 font-body-md text-xs text-outline">
-            There was an error communicating with the server. Please try refreshing.
+      )}
+
+      {/* Error State */}
+      {isError && !isLoading && (
+        <div className="overflow-hidden rounded-2xl border border-red-200 dark:border-red-900/30 bg-red-50/20 dark:bg-red-950/10 shadow-xs p-12 text-center text-red-600 font-headline">
+          <ScrollText className="h-10 w-10 mx-auto text-red-500 mb-3" />
+          <p className="text-base font-bold">প্রবন্ধ ও রচনা লোড করা সম্ভব হয়নি।</p>
+          <p className="text-xs text-muted-foreground mt-1 font-body">
+            অনুগ্রহ করে পৃষ্ঠাটি রিলোড দিন অথবা কিছুক্ষণ পর চেষ্টা করুন।
           </p>
         </div>
-      ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-outline-variant p-12 text-center bg-surface-container-lowest">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-surface-container-high text-outline mb-3">
-            <Trash2 className="size-6 opacity-40" />
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !isError && items.length === 0 && (
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs py-16 px-6 text-center select-none">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center mb-4 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <ScrollText className="w-8 h-8 stroke-[1.8]" />
           </div>
-          <p className="font-headline-sm text-base font-bold text-on-surface">
-            No Essays Found
+          <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+            কোনো প্রবন্ধ বা রচনা পাওয়া যায়নি
+          </h3>
+          <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
+            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন প্রবন্ধ ও রচনা যুক্ত করুন।
           </p>
-          <p className="mt-1 max-w-sm font-body-md text-xs text-outline">
-            No essay questions match the chosen search criteria. Try modifying your filters or create a new essay prompt.
-          </p>
-          <div className="mt-4">
-            <Button asChild size="sm" className="rounded-xl font-bold bg-primary text-white">
-              <Link href="/essays/create">Add First Essay</Link>
+          <div className="mt-6">
+            <Button
+              asChild
+              className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
+            >
+              <Link href="/essays/create" prefetch={true}>
+                <Plus className="w-4 h-4" />
+                <span>নতুন প্রবন্ধ যোগ করুন</span>
+              </Link>
             </Button>
           </div>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {items.map((item, index) => {
+      )}
+
+      {/* Populated Question Cards List */}
+      {!isLoading && !isError && items.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
+          {items.map((item, idx) => {
             const isSelected = selectedIds.includes(item.id)
-            const globalIndex = (currentPage - 1) * itemsPerPage + index + 1
-            const snippet = item.title.slice(0, 100) + (item.title.length > 100 ? "..." : "")
+            const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+            const snippet =
+              item.title.length > 80 ? item.title.substring(0, 80) + "..." : item.title
+
+            const itemReports = Array.isArray(item.reports) ? item.reports : []
+            const pendingReports = itemReports.filter((r) => r.status === "PENDING")
+            const assignedReports = itemReports.filter((r) => r.status === "ASSIGNED")
+            const resolvedReports = itemReports.filter((r) => r.status === "RESOLVED")
+            const hasPending =
+              pendingReports.length > 0 ||
+              (Boolean(item.hasReport) && assignedReports.length === 0)
+            const isAssigned = assignedReports.length > 0
+            const assignedName =
+              assignedReports[0]?.resolver?.name || assignedReports[0]?.resolver?.email
+
+            const classNames = item.subject?.classSubjects
+              ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+              .filter(Boolean)
+            const className = classNames && classNames.length > 0 ? classNames.join(", ") : null
 
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
-                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+                  "bg-card border rounded-2xl p-5 sm:p-6 transition-all duration-200 relative group shadow-xs hover:shadow-md",
+                  isSelected
+                    ? "border-indigo-600 ring-2 ring-indigo-500/20 bg-indigo-50/15"
+                    : "border-slate-200/80 dark:border-white/[0.08] hover:border-indigo-300"
                 )}
               >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4 sm:gap-6">
                   {/* Selection Checkbox & Main Info */}
                   <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                          #{globalIndex}
+                      {/* Shared Header Badges Row */}
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        academicClassName={className}
+                        subjectName={item.subject?.nameBn || item.subject?.nameEn}
+                      >
+                        <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-semibold border border-blue-200/60 dark:border-blue-800/40 font-body">
+                          {item.questionType?.nameBn ||
+                            item.questionType?.nameEn ||
+                            "প্রবন্ধ রচনা"}
                         </span>
 
-                        {/* Subject Badge */}
-                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                          {item.subject.nameBn || item.subject.nameEn}
-                        </span>
+                        {!item.isActive && (
+                          <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold border border-amber-200/60 dark:border-amber-800/40 font-body">
+                            ইনঅ্যাক্টিভ
+                          </span>
+                        )}
 
-                        {/* Popularity Badge */}
-                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
-                          👁️ {item.popularityCount} Views
-                        </span>
-
-                        {/* Difficulty Badge */}
-                        <span className={cn(
-                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                        )}>
-                          {item.difficulty}
-                        </span>
-                      </div>
-
-                      {/* Essay Prompt / Title Box */}
-                      <div className="rounded-xl border border-secondary/20 bg-secondary-container/10 p-4 text-sm text-on-surface leading-relaxed">
-                        <div className={cn(
-                          "whitespace-pre-wrap font-medium",
-                          /[\u0980-\u09FF]/.test(item.title) && "font-solaiman text-base"
-                        )}>
-                          <RenderMath text={item.title} isMath={true} />
-                        </div>
-                      </div>
-
-                      {/* Reference Tags & ID Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {(item.source || item.session) && (
-                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                              📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+                        {hasPending && !isAssigned && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="রিপোর্ট দেখুন ও সমাধান করুন (Resolve Report)"
+                          >
+                            <AlertTriangle className="w-3 h-3 text-rose-500" />
+                            <span>
+                              রিপোর্ট ({toBengaliDigits(pendingReports.length || itemReports.length || 1)})
                             </span>
-                          )}
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                              >
-                                🏷️ {ref}
-                              </span>
-                            ))
-                          ) : (
-                            !(item.source || item.session) && (
-                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                            )
-                          )}
-                        </div>
+                          </button>
+                        )}
 
-                        <span className="text-[11px] font-mono text-outline/60">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                        {isAssigned && (
+                          <button
+                            type="button"
+                            onClick={() => onAssignReport?.(item)}
+                            className="px-2 py-0.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="অ্যাসাইন দেখুন বা পরিবর্তন করুন"
+                          >
+                            <UserCheck className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                            <span>
+                              অ্যাসাইনকৃত
+                              {assignedName
+                                ? ` (${assignedName})`
+                                : ` (${toBengaliDigits(assignedReports.length)})`}
+                            </span>
+                          </button>
+                        )}
+
+                        {!hasPending && !isAssigned && resolvedReports.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-lg text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="সমাধানকৃত রিপোর্ট হিস্ট্রি দেখুন"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>সমাধানকৃত ({toBengaliDigits(resolvedReports.length)})</span>
+                          </button>
+                        )}
+                      </QuestionCardHeader>
+
+                      {/* Essay Prompt Content */}
+                      <Link
+                        href={`/essays/${item.id}/edit`}
+                        prefetch={true}
+                        className="block rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 text-slate-900 dark:text-foreground hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-colors"
+                      >
+                        <div className="font-body text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                          <RenderMath
+                            text={item.title?.replace(/\\n/g, "\n")}
+                            isMath={true}
+                          />
+                        </div>
+                      </Link>
+
+                      {/* Shared Footer */}
+                      <QuestionCardFooter
+                        source={item.source}
+                        session={item.session}
+                        references={item.reference}
+                      />
                     </div>
                   </div>
 
                   {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/essays/${item.id}/edit`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-                      title="Edit Essay"
-                    >
-                      <Edit3 className="size-5 mx-auto" />
-                    </Link>
+                  <QuestionCardActions
+                    editHref={`/essays/${item.id}/edit`}
+                    onDelete={() => onDelete(item.id, snippet)}
+                    editTitle="প্রবন্ধ সম্পাদনা করুন"
+                    deleteTitle="প্রবন্ধ মুছুন"
+                  >
+                    {(onAssignReport || onResolveReport) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className={cn(
+                              "inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer border shadow-xs flex-1 md:flex-initial md:w-24 font-headline",
+                              hasPending
+                                ? "bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/40 hover:border-rose-300"
+                                : isAssigned
+                                  ? "bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/40 hover:border-blue-300"
+                                  : resolvedReports.length > 0
+                                    ? "bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-300"
+                                    : "bg-slate-50 hover:bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-white/[0.08] hover:border-slate-300"
+                            )}
+                            title="রিপোর্ট ও অ্যাসাইনমেন্ট অপশনসমূহ"
+                          >
+                            <Flag className="w-3.5 h-3.5 shrink-0" />
+                            <span>রিপোর্ট</span>
+                            <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
+                          </button>
+                        </DropdownMenuTrigger>
 
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, snippet)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-                      title="Delete Essay"
-                    >
-                      <Trash2 className="size-5 mx-auto" />
-                    </button>
-                  </div>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-56 rounded-2xl p-1.5 shadow-xl border border-slate-200/80 dark:border-white/[0.08] bg-card text-foreground"
+                        >
+                          {onAssignReport && (
+                            <DropdownMenuItem
+                              onClick={() => onAssignReport(item)}
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer normal-case tracking-normal hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950/50 dark:hover:text-blue-300 transition-colors"
+                            >
+                              <UserPlus className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                              <div className="flex flex-col text-left">
+                                <span className="font-headline font-bold">
+                                  {isAssigned ? "রিপোর্ট রি-অ্যাসাইন করুন" : "রিপোর্ট অ্যাসাইন করুন"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground font-normal font-body">
+                                  {isAssigned
+                                    ? assignedName
+                                      ? `বর্তমান: ${assignedName}`
+                                      : "দায়িত্বপ্রাপ্ত সদস্য পরিবর্তন"
+                                    : "পর্যালোচনার দায়িত্ব অর্পণ"}
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          )}
+
+                          {onAssignReport && onResolveReport && (
+                            <DropdownMenuSeparator className="my-1 border-slate-100 dark:border-white/[0.06]" />
+                          )}
+
+                          {onResolveReport && (
+                            <DropdownMenuItem
+                              onClick={() => onResolveReport(item)}
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer normal-case tracking-normal hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/50 dark:hover:text-emerald-300 transition-colors"
+                            >
+                              {hasPending ? (
+                                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                              ) : (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              )}
+                              <div className="flex flex-col text-left">
+                                <span className="font-headline font-bold">
+                                  {hasPending ? "রিপোর্ট সমাধান করুন" : "রিপোর্ট হিস্ট্রি দেখুন"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground font-normal font-body">
+                                  {hasPending
+                                    ? `${toBengaliDigits(pendingReports.length || 1)}টি অমীমাংসিত রিপোর্ট`
+                                    : resolvedReports.length > 0
+                                      ? `${toBengaliDigits(resolvedReports.length)}টি সমাধানকৃত রিপোর্ট`
+                                      : "কোনো রিপোর্ট হিস্ট্রি নেই"}
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </QuestionCardActions>
                 </div>
               </div>
             )
@@ -293,120 +442,18 @@ export function EssayTable({
         </div>
       )}
 
-      {/* Pagination Footer */}
+      {/* Reusable Data Table Pagination */}
       {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> essays
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* First Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(1)}
-              title="First page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronsLeft className="size-4" />
-            </Button>
-
-            {/* Previous Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              title="Previous page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-
-            {/* Numbered Page Buttons & Ellipses */}
-            <div className="flex items-center gap-1 flex-wrap justify-center">
-              {getPaginationItems(currentPage, totalPages).map((pItem, i) => {
-                if (pItem === "ellipsis-start" || pItem === "ellipsis-end") {
-                  return (
-                    <span
-                      key={`${pItem}-${i}`}
-                      className="flex size-8 sm:size-9 items-center justify-center text-xs text-muted-foreground select-none"
-                    >
-                      <MoreHorizontal className="size-4" />
-                    </span>
-                  )
-                }
-
-                const pageNum = pItem as number
-                const isCurrent = currentPage === pageNum
-
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={isCurrent ? "default" : "outline"}
-                    size="icon"
-                    onClick={() => onPageChange(pageNum)}
-                    className={cn(
-                      "size-8 sm:size-9 rounded-lg text-xs font-semibold transition-all cursor-pointer",
-                      isCurrent
-                        ? "bg-primary font-bold text-white hover:bg-primary shadow-xs"
-                        : "border-outline-variant/60 bg-white hover:bg-surface-container-high text-on-surface hover:text-primary"
-                    )}
-                  >
-                    {pageNum}
-                  </Button>
-                )
-              })}
-            </div>
-
-            {/* Next Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              title="Next page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-
-            {/* Last Page Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(totalPages)}
-              title="Last page"
-              className="size-8 sm:size-9 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronsRight className="size-4" />
-            </Button>
-          </div>
-        </div>
+        <DataTablePagination
+          page={currentPage}
+          limit={itemsPerPage}
+          totalItems={totalItems}
+          entityName="টি প্রবন্ধ ও রচনা"
+          isLoading={isLoading}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+          pageSizeOptions={[10, 20, 50, 100]}
+        />
       )}
     </div>
   )

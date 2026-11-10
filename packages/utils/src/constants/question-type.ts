@@ -546,8 +546,33 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   if (lower === "news report" || lower.includes("সংবাদ প্রতিবেদন")) {
     return QUESTION_TYPES.NEWS_REPORT
   }
+  if (
+    lower === "paragraph" ||
+    (lower.includes("paragraph") && !lower.includes("based")) ||
+    (lower.includes("অনুচ্ছেদ") &&
+      !lower.includes("ভিত্তিক") &&
+      !lower.includes("মূলভাব") &&
+      !lower.includes("পঠিত"))
+  ) {
+    return QUESTION_TYPES.PARAGRAPH
+  }
   if (lower === "essay" || lower.includes("রচনা")) {
     return QUESTION_TYPES.ESSAY
+  }
+  if (lower === "summary" || lower.includes("summary") || lower.includes("সারাংশ")) {
+    return QUESTION_TYPES.SUMMARY
+  }
+  if (lower === "essence" || lower.includes("essence") || lower.includes("সারমর্ম")) {
+    return QUESTION_TYPES.ESSENCE
+  }
+  if (lower === "letter" || lower.includes("letter") || lower.includes("চিঠি") || lower.includes("পত্র")) {
+    return QUESTION_TYPES.LETTER
+  }
+  if (lower === "application" || lower.includes("application") || lower.includes("দরখাস্ত") || lower.includes("আবেদন")) {
+    return QUESTION_TYPES.APPLICATION
+  }
+  if (lower === "poem" || lower.includes("poem") || lower.includes("কবিতা")) {
+    return QUESTION_TYPES.POEM
   }
   if (lower === "parts of speech" || lower === "parts_of_speech" || lower.includes("parts of speech") || lower.includes("পদ নির্ণয়") || lower.includes("পদ নির্নয়")) {
     return QUESTION_TYPES.PARTS_OF_SPEECH
@@ -925,4 +950,90 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   }
 
   return null
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   QUESTION TYPE SELECTION & ALTERNATIVE POLICIES
+   ────────────────────────────────────────────────────────────────────────── */
+
+export type QuestionSelectionMode = "SINGLE" | "MULTIPLE"
+
+export interface QuestionTypePolicy {
+  selectionMode: QuestionSelectionMode
+  allowAlternative: boolean
+  defaultTotalQuestions: number
+  defaultRequiredCount: number
+  descriptionBn: string
+}
+
+/**
+ * Question types that represent a singular question slot on an exam paper
+ * (e.g. Summary, Essay, Letter) where the user should not select multiple items,
+ * but can optionally attach an alternative ("অথবা").
+ */
+export const SINGLE_QUESTION_TYPE_CODES = new Set<QuestionTypeCode>([
+  QUESTION_TYPE_CODES.SUMMARY,
+  QUESTION_TYPE_CODES.ESSENCE,
+  QUESTION_TYPE_CODES.POEM_ESSENCE,
+  QUESTION_TYPE_CODES.PROSE_ESSENCE,
+  QUESTION_TYPE_CODES.AMPLIFICATION,
+  QUESTION_TYPE_CODES.ESSAY,
+  QUESTION_TYPE_CODES.SHORT_COMPOSITION,
+  QUESTION_TYPE_CODES.LETTER,
+  QUESTION_TYPE_CODES.APPLICATION,
+  QUESTION_TYPE_CODES.NEWS_REPORT,
+  QUESTION_TYPE_CODES.FORM_FILLUP,
+  QUESTION_TYPE_CODES.FORM_FILLING,
+])
+
+export function getQuestionTypePolicy(raw?: string | null): QuestionTypePolicy {
+  if (!raw) {
+    return {
+      selectionMode: "MULTIPLE",
+      allowAlternative: false,
+      defaultTotalQuestions: 1,
+      defaultRequiredCount: 1,
+      descriptionBn: "একাধিক প্রশ্ন নির্বাচনযোগ্য।",
+    }
+  }
+
+  const normalized = normalizeQuestionTypeName(raw)
+  const upperRaw = raw.trim().toUpperCase()
+  const code = normalized
+    ? QUESTION_TYPE_MAP[normalized]?.code
+    : Object.values(QUESTION_TYPE_CODES).includes(upperRaw as QuestionTypeCode)
+    ? (upperRaw as QuestionTypeCode)
+    : null
+
+  const isSingle = code
+    ? SINGLE_QUESTION_TYPE_CODES.has(code)
+    : Boolean(
+        raw &&
+          /summary|সারাংশ|সারসংক্ষেপ|essence|সারমর্ম|amplification|ভাব-সম্প্রসারণ|ভাবসম্প্রসারণ|essay|রচনা|composition|letter|চিঠি|পত্র|application|আবেদন|দরখাস্ত|news report|প্রতিবেদন|form fill|ফরম পূরণ/i.test(
+            raw
+          )
+      )
+
+  if (isSingle) {
+    return {
+      selectionMode: "SINGLE",
+      allowAlternative: true,
+      defaultTotalQuestions: 1,
+      defaultRequiredCount: 1,
+      descriptionBn: "একক প্রশ্ন হিসেবে যুক্ত হবে (বিকল্প/অথবা যোগ করা যাবে)।",
+    }
+  }
+
+  return {
+    selectionMode: "MULTIPLE",
+    allowAlternative: false,
+    defaultTotalQuestions: 1,
+    defaultRequiredCount: 1,
+    descriptionBn: "একাধিক প্রশ্ন নির্বাচনযোগ্য।",
+  }
+}
+
+export function isSingleQuestionType(raw?: string | null): boolean {
+  return getQuestionTypePolicy(raw).selectionMode === "SINGLE"
 }

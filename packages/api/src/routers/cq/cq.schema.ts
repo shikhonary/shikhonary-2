@@ -94,3 +94,12 @@ export const resolveCqReportSchema = z.object({
 })
 
 export type ResolveCqReportInput = z.infer<typeof resolveCqReportSchema>
+
+export const assignCqReportSchema = z.object({
+  cqId: z.string().min(1, "CQ ID is required"),
+  reportId: z.string().optional(),
+  assignedToId: z.string().min(1, "Assignee user ID is required"),
+  note: z.string().optional(),
+})
+
+export type AssignCqReportInput = z.infer<typeof assignCqReportSchema>

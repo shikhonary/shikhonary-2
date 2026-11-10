@@ -1,19 +1,24 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useEssenceById, useUpdateEssence, useSubjectsForSelection, useAcademicClassesForSelection } from "../services/use-essence"
+import {
+  useEssenceById,
+  useUpdateEssence,
+  useSubjectsForSelection,
+  useAcademicClassesForSelection,
+} from "../services/use-essence"
+import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { Feather, ArrowLeft, Loader2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -22,16 +27,34 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { ESSENCE_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { RenderMath } from "@workspace/ui/components/render-math"
+import { PageHeader } from "@/components/shared/page-header"
+import {
+  Feather,
+  ArrowLeft,
+  Clock,
+  Loader2,
+  Save,
+  AlertCircle,
+  BookOpen,
+  Sparkles,
+} from "lucide-react"
 
 const editEssenceFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  title: z.string().min(1, "Essence poem / text prompt is required"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  title: z.string().min(1, "সারমর্ম বা মূলভাব অনুচ্ছেদ আবশ্যক"),
+  isMath: z.boolean(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
+  source: z.string().optional(),
+  session: z.string().optional(),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Popularity count must be a number",
+    message: "ভিউ সংখ্যা অবশ্যই সংখ্যা হতে হবে",
   }),
+  questionTypeId: z.string().optional(),
+  isActive: z.boolean(),
 })
 
 type EditEssenceFormData = z.infer<typeof editEssenceFormSchema>
@@ -46,6 +69,39 @@ export function EditEssenceView() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
+  const questionTypes = questionTypesData?.questionTypes ?? []
+
+  // Resolve initial classId robustly from subject relationships
+  const initialClassId = useMemo(() => {
+    if (!essenceData) return ""
+    return (
+      (essenceData as any).subject?.classSubjects?.[0]?.classId ||
+      (essenceData as any).subject?.classSubjects?.[0]?.academicClass?.id ||
+      (essenceData as any).subject?.classSubjects?.[0]?.academicClassId ||
+      (essenceData as any).classId ||
+      ""
+    )
+  }, [essenceData])
+
+  // Synchronize form values directly with loaded Essence data
+  const formValues = useMemo<EditEssenceFormData | undefined>(() => {
+    if (!essenceData) return undefined
+
+    return {
+      classId: initialClassId,
+      subjectId: essenceData.subjectId || "",
+      title: essenceData.title || "",
+      isMath: true,
+      referenceText: essenceData.reference?.join(", ") || "",
+      difficulty: (essenceData.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
+      source: essenceData.source ? String(essenceData.source).trim() : DEFAULT_SOURCE,
+      session: essenceData.session || new Date().getFullYear().toString(),
+      popularityCount: String(essenceData.popularityCount ?? 0),
+      questionTypeId: essenceData.questionTypeId || "",
+      isActive: essenceData.isActive !== undefined ? essenceData.isActive : true,
+    }
+  }, [essenceData, initialClassId])
 
   const {
     register,
@@ -53,7 +109,6 @@ export function EditEssenceView() {
     control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditEssenceFormData>({
     resolver: zodResolver(editEssenceFormSchema),
@@ -61,30 +116,63 @@ export function EditEssenceView() {
       classId: "",
       subjectId: "",
       title: "",
+      isMath: true,
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       popularityCount: "0",
+      questionTypeId: "",
+      isActive: true,
+    },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
     },
   })
 
-  // Load existing data
-  useEffect(() => {
-    if (essenceData) {
-      reset({
-        classId: (essenceData as any).subject?.classSubjects?.[0]?.classId || "",
-        subjectId: essenceData.subjectId,
-        title: essenceData.title,
-        referenceText: essenceData.reference?.join(", ") || "",
-        difficulty: essenceData.difficulty as any,
-        popularityCount: String(essenceData.popularityCount),
-      })
-    }
-  }, [essenceData, reset])
-
   const selectedClassId = watch("classId")
+  const activeClassId = selectedClassId || initialClassId
+  const watchTitle = watch("title")
+  const watchIsMath = watch("isMath")
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
+
+  // Ensure academic class for this Essence is always present in selection list
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const subjectClass = (essenceData as any)?.subject?.classSubjects?.[0]?.academicClass
+    if (subjectClass) {
+      map.set(subjectClass.id, subjectClass)
+    }
+    for (const cls of academicClasses) {
+      map.set(cls.id, cls)
+    }
+    return Array.from(map.values())
+  }, [academicClasses, essenceData])
+
+  // Ensure subject from Essence is immediately present in options even before async query finishes
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if (essenceData?.subject && (!activeClassId || activeClassId === initialClassId)) {
+      map.set(essenceData.subject.id, essenceData.subject)
+    }
+    for (const sub of subjects) {
+      map.set(sub.id, sub)
+    }
+    return Array.from(map.values())
+  }, [subjects, essenceData?.subject, activeClassId, initialClassId])
+
+  // Ensure source from Essence is immediately present in source options list
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...ESSENCE_SOURCE_OPTIONS]
+    const currentSource = (essenceData as any)?.source ? String((essenceData as any).source).trim() : null
+    if (currentSource && !list.some((s) => s.value === currentSource)) {
+      list.unshift({ value: currentSource, label: currentSource })
+    }
+    return list
+  }, [essenceData])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -104,219 +192,319 @@ export function EditEssenceView() {
         subjectId: data.subjectId,
         title: data.title.trim(),
         difficulty: data.difficulty,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: data.session?.trim() || new Date().getFullYear().toString(),
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
+        questionTypeId: data.questionTypeId || null,
+        isActive: data.isActive,
       })
 
-      toast.success("Essence updated successfully.")
+      toast.success("সারমর্মটি সফলভাবে হালনাগাদ করা হয়েছে।")
       setTimeout(() => {
         router.push("/essences")
       }, 500)
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update Essence")
-      toast.error(err.message || "Failed to update Essence")
+      const msg = err.message || "সারমর্ম হালনাগাদে সমস্যা হয়েছে"
+      setErrorMessage(msg)
+      toast.error(msg)
     }
   }
 
   if (isEssenceLoading) {
     return (
       <div className="py-24 text-center">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="mt-3 font-body-md text-sm text-outline">Loading essence details...</p>
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-600" />
+        <p className="mt-3 text-sm text-muted-foreground font-body">সারমর্মের তথ্য লোড হচ্ছে...</p>
       </div>
     )
   }
 
   if (isError || !essenceData) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto space-y-4">
-        <p className="text-xl font-bold text-error">Essence Not Found</p>
-        <p className="text-sm text-outline">
-          The requested essence could not be loaded or may have been deleted.
+      <div className="py-16 text-center max-w-lg mx-auto space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 mx-auto flex items-center justify-center">
+          <AlertCircle className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
+          সারমর্ম খুঁজে পাওয়া যায়নি
+        </h3>
+        <p className="text-xs text-muted-foreground font-body">
+          অনুরোধকৃত সারমর্মটি মুছে ফেলা হয়েছে অথবা সিস্টেম থেকে পাওয়া যাচ্ছে না।
         </p>
-        <Button asChild variant="outline">
-          <Link href="/essences">Back to Essences</Link>
+        <Button asChild variant="outline" className="rounded-xl">
+          <Link href="/essences" prefetch={true}>
+            তালিকায় ফিরে যান
+          </Link>
         </Button>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Back Link */}
-      <div className="flex items-center gap-2">
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header */}
+      <PageHeader
+        title="সারমর্ম ও মূলভাব সম্পাদনা"
+        description="শ্রেণি, বিষয়, অনুচ্ছেদ বা পদ্যাংশ ও সংশ্লিষ্ট তথ্যাদি পরিবর্তন বা সংশোধন করুন।"
+        icon={Feather}
+        badge={{ label: "সম্পাদনা", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "সারমর্ম তালিকা", href: "/essences" },
+          { label: "সারমর্ম সম্পাদনা" },
+        ]}
+      >
         <Button
           asChild
-          variant="ghost"
-          size="sm"
-          className="text-on-surface-variant hover:text-on-surface gap-1.5"
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <Link href="/essences">
-            <ArrowLeft className="size-4" />
-            <span>Back to Essences</span>
+          <Link href="/essences" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-sm overflow-hidden">
-        <CardHeader className="bg-surface-container-low/50 border-b border-outline-variant/30 p-6">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-              <Feather className="size-5" />
-            </div>
-            <div>
-              <CardTitle className="font-headline-md text-xl font-bold text-on-surface">
-                Edit Essence / Substance
-              </CardTitle>
-              <p className="font-body-md text-xs sm:text-sm text-on-surface-variant mt-0.5">
-                Update poem verses, reference tags, or metadata for Essence ID: <span className="font-mono text-outline">{essenceId}</span>
-              </p>
-            </div>
+      {/* Error Alert */}
+      {errorMessage && (
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMessage}</p>
+        </div>
+      )}
+
+      {/* Main Edit Form Card */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              সারমর্মের বিবরণ ও কনফিগারেশন সংশোধন
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              শ্রেণি, বিষয়, সারমর্ম অনুচ্ছেদ ও মেটাডাটা আপডেট করুন।
+            </p>
           </div>
         </CardHeader>
 
-        <CardContent className="p-6">
-          {errorMessage && (
-            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
-              {errorMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Academic Classification */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Academic Association
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Academic Class */}
-                <div className="space-y-2">
-                  <Label htmlFor="classId" className="text-sm font-bold text-on-surface">
-                    Academic Class <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="classId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={(val) => {
-                          field.onChange(val)
-                          setValue("subjectId", "")
-                        }}
-                      >
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Select Academic Class" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {academicClasses.map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-neutral-900">
-                              {c.nameEn} {c.nameBn ? `(${c.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.classId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.classId.message}</p>
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Academic Classification Hierarchy */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Academic Class */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="classId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`class-select-${field.value || "empty"}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem
+                            key={cls.id}
+                            value={cls.id}
+                          >
+                            {cls.nameBn || cls.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
+                />
+                {errors.classId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.classId.message}</p>
+                )}
+              </div>
 
-                {/* Academic Subject */}
-                <div className="space-y-2">
-                  <Label htmlFor="subjectId" className="text-sm font-bold text-on-surface">
-                    Academic Subject <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="subjectId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!selectedClassId}
-                      >
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto disabled:opacity-50 disabled:cursor-not-allowed">
-                          <SelectValue placeholder={selectedClassId ? "Select Subject" : "Select Class First"} />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {subjects.map((s) => (
-                            <SelectItem key={s.id} value={s.id} className="text-neutral-900">
-                              {s.nameEn} {s.nameBn ? `(${s.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.subjectId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.subjectId.message}</p>
+              {/* Academic Subject */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Academic Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="subjectId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`subject-select-${field.value || "empty"}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || !activeClassId}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue
+                          placeholder={
+                            activeClassId ? "বিষয় নির্বাচন করুন..." : "প্রথমে শ্রেণি নির্বাচন করুন"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedSubjects.map((sub) => (
+                          <SelectItem
+                            key={sub.id}
+                            value={sub.id}
+                          >
+                            {sub.nameBn || sub.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
+                />
+                {errors.subjectId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.subjectId.message}</p>
+                )}
               </div>
             </div>
 
-            {/* Essence Poem / Text Prompt */}
-            <div className="space-y-2">
+            {/* Essence Passage / Stem */}
+            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
               <div className="flex items-center justify-between">
-                <Label htmlFor="title" className="text-sm font-bold text-on-surface">
-                  Poem / Passage Lines for Essence Writing <span className="text-red-500">*</span>
+                <Label htmlFor="title" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  সারমর্ম বা মূলভাব অনুচ্ছেদ (Passage / Poem) <span className="text-rose-500">*</span>
                 </Label>
-                <span className="text-[11px] text-muted-foreground italic">
-                  Press Enter between lines to preserve poem verses & stanzas
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                  LaTeX ও Math সমর্থিত
                 </span>
               </div>
               <Textarea
                 id="title"
-                rows={7}
-                placeholder="Paste poem verses with line breaks..."
+                rows={6}
+                disabled={isSubmitting}
+                placeholder="যে কবিতাংশ বা অনুচ্ছেদের সারমর্ম/মূলভাব লিখতে হবে তা এখানে লিখুন বা পেস্ট করুন..."
                 {...register("title")}
-                className="w-full rounded-xl border border-outline-variant bg-white p-3.5 font-solaiman text-base leading-relaxed outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
               />
               {errors.title && (
-                <p className="text-xs font-semibold text-red-500">{errors.title.message}</p>
+                <p className="text-xs text-rose-500 font-medium">{errors.title.message}</p>
+              )}
+
+              {/* KaTeX Live Math Preview */}
+              {watchIsMath && watchTitle && watchTitle.trim().length > 0 && (
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-xs text-foreground space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">
+                    LaTeX ম্যাথ প্রিভিউ:
+                  </span>
+                  <div className="text-sm sm:text-base leading-relaxed text-foreground font-body whitespace-pre-wrap">
+                    <RenderMath text={watchTitle} isMath={true} />
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Reference Tags & Metadata */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Metadata & Classification
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Reference Citations */}
-                <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="referenceText" className="text-sm font-bold text-on-surface">
-                    Reference Tags / Exam Citations
-                  </Label>
-                  <Input
-                    id="referenceText"
-                    placeholder="e.g. Dhaka Board 2024, Rajshahi Board 2023, SSC 2022"
-                    {...register("referenceText")}
-                    className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                  />
-                  <p className="text-xs text-outline">
-                    Separate multiple citations with commas.
+            {/* Toggle Flags: Math Formula & Active State */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              {/* Is Math */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground">
+                    গণিত / LaTeX সমীকরণ
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    সারমর্ম ও অনুচ্ছেদে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে অ্যাক্টিভ করুন।
                   </p>
                 </div>
+                <Controller
+                  name="isMath"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(field.value)}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
 
+              {/* Is Active */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground">
+                    অ্যাক্টিভ সারমর্মের অবস্থা
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                  </p>
+                </div>
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(field.value)}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Reference */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div className="space-y-2">
+                <Label htmlFor="referenceText" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  রেফারেন্স / উৎস (কমা দিয়ে একাধিক উল্লেখ করুন)
+                </Label>
+                <Input
+                  id="referenceText"
+                  type="text"
+                  disabled={isSubmitting}
+                  placeholder="যেমন: ঢাকা বোর্ড ২০২৪, পাঠ্যবই পৃষ্ঠা ৪২..."
+                  {...register("referenceText")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
+            </div>
+
+            {/* Context & Metadata Settings */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                মেটাডাটা ও অতিরিক্ত সেটিংস
+              </h3>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Difficulty */}
                 <div className="space-y-2">
-                  <Label htmlFor="difficulty" className="text-sm font-bold text-on-surface">
-                    Difficulty Level
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
                   </Label>
                   <Controller
                     name="difficulty"
                     control={control}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Difficulty" />
+                      <Select
+                        key={`difficulty-select-${field.value || "empty"}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
                           {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
@@ -327,54 +515,150 @@ export function EditEssenceView() {
                     )}
                   />
                   {errors.difficulty && (
-                    <p className="text-xs font-semibold text-red-500">{errors.difficulty.message}</p>
+                    <p className="text-xs text-rose-500 font-medium">{errors.difficulty.message}</p>
+                  )}
+                </div>
+
+                {/* Question Type Template */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্ন কাঠামো টেমপ্লেট (ঐচ্ছিক)
+                  </Label>
+                  <Controller
+                    name="questionTypeId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`question-type-select-${field.value || "none"}-${questionTypes.length}`}
+                        disabled={isSubmitting}
+                        value={field.value || "none"}
+                        onValueChange={(val) =>
+                          field.onChange(val === "none" ? "" : val)
+                        }
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="টেমপ্লেট নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                          <SelectItem value="none">কোনোটি নয় (None)</SelectItem>
+                          {questionTypes.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.nameEn} ({t.label} - {t.mark} নম্বর)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.questionTypeId && (
+                    <p className="text-xs text-rose-500 font-medium">
+                      {errors.questionTypeId.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Source */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্নের উৎস (Source)
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`source-select-${field.value || "empty"}-${combinedSources.length}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {combinedSources.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.source && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.source.message}</p>
+                  )}
+                </div>
+
+                {/* Session */}
+                <div className="space-y-2">
+                  <Label htmlFor="session" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    সেশন (Session)
+                  </Label>
+                  <Input
+                    id="session"
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৬"
+                    {...register("session")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.session && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.session.message}</p>
+                  )}
+                </div>
+
+                {/* Popularity Count */}
+                <div className="space-y-2">
+                  <Label htmlFor="popularityCount" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    ভিউ সংখ্যা (Popularity Count)
+                  </Label>
+                  <Input
+                    id="popularityCount"
+                    type="number"
+                    min="0"
+                    disabled={isSubmitting}
+                    placeholder="0"
+                    {...register("popularityCount")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.popularityCount && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.popularityCount.message}</p>
                   )}
                 </div>
               </div>
-
-              {/* Popularity Count */}
-              <div className="w-full sm:w-1/3 space-y-2">
-                <Label htmlFor="popularityCount" className="text-sm font-bold text-on-surface">
-                  Popularity / Views
-                </Label>
-                <Input
-                  id="popularityCount"
-                  type="number"
-                  min="0"
-                  {...register("popularityCount")}
-                  className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                />
-                {errors.popularityCount && (
-                  <p className="text-xs font-semibold text-red-500">{errors.popularityCount.message}</p>
-                )}
-              </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant/30">
-              <Button
-                asChild
-                type="button"
-                variant="outline"
-                className="rounded-xl border-outline-variant font-bold text-on-surface hover:bg-surface-container-high px-5 h-11"
-              >
-                <Link href="/essences">Cancel</Link>
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold px-6 h-11 gap-2 shadow-sm"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    <span>Saving Changes...</span>
-                  </>
-                ) : (
-                  <span>Save Changes</span>
-                )}
-              </Button>
+            {/* Form Actions Footer */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span>পরিবর্তনসমূহ সাথে সাথেই কার্যকর হবে</span>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
+                <Button
+                  asChild
+                  variant="outline"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  <Link href="/essences" prefetch={true}>
+                    বাতিল
+                  </Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  ) : (
+                    <Save className="w-4 h-4 shrink-0" />
+                  )}
+                  <span>{isSubmitting ? "হালনাগাদ করা হচ্ছে..." : "পরিবর্তন সংরক্ষণ করুন"}</span>
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

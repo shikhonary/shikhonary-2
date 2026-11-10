@@ -8,6 +8,10 @@ import {
   bulkDeleteApplicationsSchema,
   importApplicationsSchema,
   applicationStatsSchema,
+  applicationBoardYearsSchema,
+  toggleApplicationActiveSchema,
+  resolveApplicationReportSchema,
+  assignApplicationReportSchema,
 } from "./application.schema"
 import {
   createApplication,
@@ -18,6 +22,10 @@ import {
   bulkDeleteApplications,
   importApplications,
   getApplicationStats,
+  getBoardYears,
+  toggleApplicationActive,
+  resolveApplicationReport,
+  assignApplicationReport,
 } from "./application.service"
 
 export const applicationRouter = createTRPCRouter({
@@ -28,6 +36,10 @@ export const applicationRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(applicationStatsSchema.optional())
     .query(({ ctx, input }) => getApplicationStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(applicationBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   byId: superAdminProcedure
     .input(getApplicationSchema)
@@ -49,7 +61,23 @@ export const applicationRouter = createTRPCRouter({
     .input(bulkDeleteApplicationsSchema)
     .mutation(({ ctx, input }) => bulkDeleteApplications(ctx.db, input)),
 
+  toggleActive: superAdminProcedure
+    .input(toggleApplicationActiveSchema)
+    .mutation(({ ctx, input }) => toggleApplicationActive(ctx.db, input)),
+
   import: superAdminProcedure
     .input(importApplicationsSchema)
     .mutation(({ ctx, input }) => importApplications(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveApplicationReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveApplicationReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignApplicationReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignApplicationReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

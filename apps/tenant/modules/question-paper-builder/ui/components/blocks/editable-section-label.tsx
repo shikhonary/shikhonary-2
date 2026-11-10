@@ -24,6 +24,7 @@ interface EditableSectionLabelProps {
   hideTrailingColon?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  readOnly?: boolean;
 }
 
 const isMismatchedLabel = (label: string | null | undefined, questionType?: string): boolean => {
@@ -87,6 +88,7 @@ export const EditableSectionLabel = ({
   hideTrailingColon = false,
   className = "",
   style = {},
+  readOnly = false,
 }: EditableSectionLabelProps) => {
   const paperId = useBuilderStore((state) => state.paperId);
   const { mutateAsync: updateLabel, isPending } = useUpdateDistributionLabel();
@@ -218,6 +220,14 @@ export const EditableSectionLabel = ({
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
+    );
+  }
+
+  if (readOnly || !distributionId) {
+    return (
+      <span className={className} style={style}>
+        <span>{formattedDisplay}</span>
+      </span>
     );
   }
 

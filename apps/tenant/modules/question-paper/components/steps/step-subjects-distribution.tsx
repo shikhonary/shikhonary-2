@@ -11,7 +11,7 @@ import { BookOpen, Plus, Trash2, ChevronDown, ChevronUp, Loader2, Calculator, Sp
 import { trpc } from "@/trpc/client"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "@workspace/ui/components/sonner"
-import { isResourceEnglish } from "@workspace/utils"
+import { isResourceEnglish, getQuestionTypePolicy, isSingleQuestionType } from "@workspace/utils"
 import type { StepProps, WizardSubject, WizardDistribution, AcademicSubjectRef, QuestionTypeRef } from "../../types/create-wizard"
 
 interface StepSubjectsDistributionProps extends StepProps {
@@ -112,9 +112,44 @@ export function StepSubjectsDistribution({
       }
     >()
 
-    // 1. From subjectDetail presets (sorted by position)
+    // 1. Collect all presets from subjectDetail (deduplicated by SQT id to prevent double-counting between top-level subjectQuestionTypes and section/subSection relations)
+    const seenPresetIds = new Set<string>()
+    const allPresets: any[] = []
+
+    const addPreset = (sqt: any) => {
+      if (!sqt || !sqt.questionTypeId) return
+      const key = sqt.id || `${sqt.subjectId || ""}_${sqt.questionTypeId}_${sqt.sectionId || ""}_${sqt.subSectionId || ""}`
+      if (seenPresetIds.has(key)) return
+      seenPresetIds.add(key)
+      allPresets.push(sqt)
+    }
+
     if (subjectDetail?.subjectQuestionTypes && subjectDetail.subjectQuestionTypes.length > 0) {
-      const sortedPresets = [...subjectDetail.subjectQuestionTypes].sort(
+      for (const sqt of subjectDetail.subjectQuestionTypes) {
+        addPreset(sqt)
+      }
+    }
+    if (subjectDetail?.sections && subjectDetail.sections.length > 0) {
+      for (const sec of subjectDetail.sections) {
+        if (sec.subjectQuestionTypes && sec.subjectQuestionTypes.length > 0) {
+          for (const sqt of sec.subjectQuestionTypes) {
+            addPreset(sqt)
+          }
+        }
+        if (sec.subSections && sec.subSections.length > 0) {
+          for (const sub of sec.subSections) {
+            if (sub.subjectQuestionTypes && sub.subjectQuestionTypes.length > 0) {
+              for (const sqt of sub.subjectQuestionTypes) {
+                addPreset(sqt)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (allPresets.length > 0) {
+      const sortedPresets = [...allPresets].sort(
         (a: any, b: any) => (a.position ?? 0) - (b.position ?? 0)
       )
       for (let i = 0; i < sortedPresets.length; i++) {
@@ -122,6 +157,7 @@ export function StepSubjectsDistribution({
         if (!sqt) continue
         const qTypeId = sqt.questionTypeId
         if (!qTypeId) continue
+        const isSingle = isSingleQuestionType(sqt.questionType?.nameEn || sqt.questionType?.nameBn || sqt.customLabel) || sqt.totalQuestions === 1
         if (!map.has(qTypeId)) {
           map.set(qTypeId, {
             id: qTypeId,
@@ -132,15 +168,22 @@ export function StepSubjectsDistribution({
             position: typeof sqt.position === "number" ? sqt.position : i,
             preset: {
               ...sqt,
-              totalQuestions: sqt.totalQuestions || 0,
-              requiredCount: sqt.requiredCount || 0,
+              totalQuestions: isSingle ? 1 : (sqt.totalQuestions || 0),
+              requiredCount: isSingle ? 1 : (sqt.requiredCount || 0),
+              renderMethod: sqt.renderMethod ?? 1,
             },
           })
         } else {
           const existing = map.get(qTypeId)!
           if (existing?.preset) {
-            existing.preset.totalQuestions = (existing.preset.totalQuestions || 0) + (sqt.totalQuestions || 0)
-            existing.preset.requiredCount = (existing.preset.requiredCount || 0) + (sqt.requiredCount || 0)
+            if (isSingle) {
+              existing.preset.totalQuestions = 1
+              existing.preset.requiredCount = 1
+              existing.preset.renderMethod = sqt.renderMethod ?? existing.preset.renderMethod ?? 1
+            } else {
+              existing.preset.totalQuestions = (existing.preset.totalQuestions || 0) + (sqt.totalQuestions || 0)
+              existing.preset.requiredCount = (existing.preset.requiredCount || 0) + (sqt.requiredCount || 0)
+            }
           }
         }
       }
@@ -252,6 +295,9 @@ export function StepSubjectsDistribution({
       const marksPerQ = sqt?.mark || item.mark || 1
       if (!markDist) markDist = { a: marksPerQ }
 
+      const typePolicy = getQuestionTypePolicy(item.nameEn || item.nameBn || (item as any).code || customLabel)
+      const isSingle = typePolicy.selectionMode === "SINGLE" || sqt?.totalQuestions === 1
+
       return {
         tempId: crypto.randomUUID(),
         questionTypeId: item.id,
@@ -261,8 +307,8 @@ export function StepSubjectsDistribution({
         marksPerQuestion: marksPerQ,
         markDistribution: markDist,
         renderMethod: sqt?.renderMethod ?? 1,
-        questionCount: sqt?.totalQuestions || 0,
-        questionsToAttempt: sqt?.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null,
+        questionCount: isSingle ? 1 : (sqt?.totalQuestions || 0),
+        questionsToAttempt: isSingle ? 1 : (sqt?.requiredCount && sqt.requiredCount > 0 ? sqt.requiredCount : null),
         orderIndex: item.position,
       }
     })
@@ -354,11 +400,14 @@ export function StepSubjectsDistribution({
       (sqt: any) => sqt.questionTypeId === qTypeId
     )
 
+    const typePolicy = getQuestionTypePolicy(matched.nameEn || matched.nameBn || (matched as any).code || preset?.customLabel)
+    const isSingle = typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1
+
     setDistForm({
       questionTypeId: qTypeId,
       marksPerQuestion: preset ? String(preset.mark) : String(matched.mark || 1),
-      questionCount: preset ? String(preset.totalQuestions || 0) : "",
-      questionsToAttempt: preset && preset.requiredCount > 0 ? String(preset.requiredCount) : "",
+      questionCount: isSingle ? "1" : (preset ? String(preset.totalQuestions || 0) : ""),
+      questionsToAttempt: isSingle ? "1" : (preset && preset.requiredCount > 0 ? String(preset.requiredCount) : ""),
     })
 
     if (preset) {
@@ -462,6 +511,12 @@ export function StepSubjectsDistribution({
       ? matched.position
       : (typeof preset?.position === "number" ? preset.position : sDistLength)
 
+    const typePolicy = getQuestionTypePolicy(matched.nameEn || matched.nameBn || (matched as any).code || preset?.customLabel)
+    const isSingle = typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1
+    if (isSingle) {
+      finalQuestionCount = 1
+    }
+
     const distribution: WizardDistribution = {
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
@@ -471,8 +526,8 @@ export function StepSubjectsDistribution({
       marksPerQuestion: marksNum,
       markDistribution: markDist,
       renderMethod: preset?.renderMethod ?? 1,
-      questionCount: finalQuestionCount,
-      questionsToAttempt: finalQuestionsToAttempt,
+      questionCount: isSingle ? 1 : finalQuestionCount,
+      questionsToAttempt: isSingle ? 1 : finalQuestionsToAttempt,
       orderIndex,
     }
 
@@ -869,29 +924,43 @@ export function StepSubjectsDistribution({
                               <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
                                 {isExpandedSubjectEnglish ? "Question Count *" : "প্রশ্ন সংখ্যা *"}
                               </label>
-                              <Input
-                                type="number"
-                                value={distForm.questionCount}
-                                onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
-                                onBlur={handleQuestionCountBlur}
-                                placeholder={isExpandedSubjectEnglish ? "10" : "১০"}
-                                min={0}
-                                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
-                              />
+                              {(() => {
+                                const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                                const isCurrentSingle = isSingleQuestionType(selectedTypeObj?.nameEn || selectedTypeObj?.nameBn || (selectedTypeObj as any)?.code)
+                                return (
+                                  <Input
+                                    type="number"
+                                    disabled={isCurrentSingle}
+                                    value={isCurrentSingle ? "1" : distForm.questionCount}
+                                    onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
+                                    onBlur={handleQuestionCountBlur}
+                                    placeholder={isExpandedSubjectEnglish ? "10" : "১০"}
+                                    min={0}
+                                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
+                                  />
+                                )
+                              })()}
                             </div>
                             <div>
                               <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
                                 {isExpandedSubjectEnglish ? "To Attempt (Optional)" : "চেষ্টা (ঐচ্ছিক)"}
                               </label>
-                              <Input
-                                type="number"
-                                value={distForm.questionsToAttempt}
-                                onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
-                                onBlur={handleQuestionsToAttemptBlur}
-                                placeholder={isExpandedSubjectEnglish ? "All" : "সব"}
-                                min={1}
-                                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
-                              />
+                              {(() => {
+                                const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                                const isCurrentSingle = isSingleQuestionType(selectedTypeObj?.nameEn || selectedTypeObj?.nameBn || (selectedTypeObj as any)?.code) || selectedTypeObj?.preset?.totalQuestions === 1
+                                return (
+                                  <Input
+                                    type="number"
+                                    disabled={isCurrentSingle}
+                                    value={isCurrentSingle ? "1" : distForm.questionsToAttempt}
+                                    onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
+                                    onBlur={handleQuestionsToAttemptBlur}
+                                    placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "All" : "সব")}
+                                    min={1}
+                                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
+                                  />
+                                )
+                              })()}
                             </div>
                           </div>
                         </div>

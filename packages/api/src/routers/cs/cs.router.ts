@@ -11,6 +11,7 @@ import {
   importCsSchema,
   csStatsSchema,
   resolveCsReportSchema,
+  assignCsReportSchema,
 } from "./cs.schema"
 import {
   createCs,
@@ -24,6 +25,7 @@ import {
   getCsStats,
   getBoardYears,
   resolveCsReport,
+  assignCsReport,
 } from "./cs.service"
 
 export const csRouter = createTRPCRouter({
@@ -76,5 +78,11 @@ export const csRouter = createTRPCRouter({
     .input(resolveCsReportSchema)
     .mutation(({ ctx, input }) =>
       resolveCsReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignCsReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignCsReport(ctx.db, input, ctx.session?.user?.id)
     ),
 })

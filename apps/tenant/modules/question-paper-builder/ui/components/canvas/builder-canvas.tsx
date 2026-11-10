@@ -6,21 +6,13 @@ import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/mo
 import { LayoutList, FileText, ZoomIn, Eye, Sparkles } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { normalizeTableData } from "@workspace/ui/components/question-attachments";
+import { toBengaliDigits, resolvePaperSlots, type ResolvedSlot } from "@workspace/utils";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
   Letter: { w: 216, h: 279 },
   Legal: { w: 216, h: 356 },
   A5: { w: 148, h: 210 },
-};
-
-const toBengaliDigits = (num: number | string): string => {
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((digit) => (/\d/.test(digit) ? bengaliDigits[parseInt(digit)] : digit))
-    .join("");
 };
 
 /**
@@ -304,7 +296,13 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       newBlocks.push({ id: "empty", type: "empty", data: null, gap: 0 });
     }
 
-    paperQuery.subjects?.forEach((subject: any) => {
+    const topology = resolvePaperSlots(paperQuery, statuses ?? [], {
+      dismissedSectionIds,
+      dismissedSubSectionIds,
+    });
+
+    topology.subjects.forEach((resolvedSubject) => {
+      const subject = resolvedSubject.subject;
       if (paperQuery.subjects.length > 1) {
         newBlocks.push({
           id: `subj-${subject.id}`,
@@ -331,24 +329,22 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         return false;
       });
 
-      const hasSections = paperQuery.sections && paperQuery.sections.length > 0;
-
-      const renderedDistIds = new Set<string>();
-
-      const renderDistribution = (dist: any, extraOptions?: { prevSubSectionId?: string; prevSubSectionTitle?: string; nextSubSectionId?: string; nextSubSectionTitle?: string; sectionId?: string; subSectionId?: string; subTitle?: string; showAction?: boolean; hideDistTitle?: boolean; maxAllowedTarget?: number; secTotalProvided?: number; secTotalRequired?: number; subPickLimit?: number; otherSubAttemptSum?: number; subQuestionsToAttempt?: number; otherSubOccupied?: number; isSharedQuestionType?: boolean; siblingSubSectionIds?: string[] }) => {
-        renderedDistIds.add(dist.id);
+      const renderSlot = (slot: ResolvedSlot, nav?: { prevSub?: any; nextSub?: any; subTitle?: string; showAction?: boolean }) => {
+        const dist = slot.dist;
         const statusInfo = statuses?.find((s: any) => s.distributionId === dist.id);
         const questions = subjectQuestions
           .filter((q: any) => {
             if (renderedQuestionIds.has(q.id)) return false;
-            // Every question MUST strictly belong to this distribution
             if (q.distributionId !== dist.id) return false;
 
-            if (extraOptions?.subSectionId) {
-              return q.subSectionId === extraOptions.subSectionId || !q.subSectionId;
+            if (slot.mode === "SUBSECTION_SHARED" && slot.subSectionId) {
+              return q.subSectionId === slot.subSectionId;
             }
-            if (extraOptions?.sectionId) {
-              return (q.sectionId === extraOptions.sectionId && !q.subSectionId) || (!q.sectionId && !q.subSectionId);
+            if (slot.mode === "SUBSECTION_DEDICATED" && slot.subSectionId) {
+              return q.subSectionId === slot.subSectionId || (!q.subSectionId && (!slot.sectionId || q.sectionId === slot.sectionId || !q.sectionId));
+            }
+            if (slot.sectionId) {
+              return (q.sectionId === slot.sectionId && !q.subSectionId) || (!q.sectionId && !q.subSectionId);
             }
             return true;
           })
@@ -359,26 +355,21 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           orderIndex: q.orderIndex ?? i,
         }));
 
-        const totalProvided = Number(dist.questionCount || 0);
-        const attemptCount = dist.questionsToAttempt !== undefined && dist.questionsToAttempt !== null
-          ? Number(dist.questionsToAttempt)
-          : totalProvided;
-        const nameEn = dist.questionType?.nameEn?.toLowerCase() || "";
-        const isCs = dist.questionType?.code === "CS" || nameEn.includes("cs") || nameEn.includes("scenario") || dist.questionTypeName?.toLowerCase().includes("scenario") || dist.questionType?.nameBn?.includes("সৃজনশীল (CS)");
-        const isCq = (!nameEn.includes("mcq") && (nameEn.includes("cq") || nameEn.includes("cs") || nameEn.includes("creative"))) || dist.questionType?.nameBn?.includes("সৃজনশীল");
-        const isMcq = nameEn.includes("mcq") || nameEn.includes("multiple choice") || dist.questionType?.nameBn?.includes("বহুনির্বাচনি");
-        const hasQuestionTypeLabel = Boolean(dist.questionTypeLabel && dist.questionTypeLabel.trim() !== "");
-        const shouldHideDistTitle = isMcq || (extraOptions?.hideDistTitle ?? extraOptions?.isSharedQuestionType ?? false);
+        const totalProvided = slot.distTotalQuestions;
+        const attemptCount = slot.slotAttemptCount;
+        const isCs = slot.isCs;
+        const isCq = slot.isCq;
+        const isMcq = slot.isMcq;
 
-        const subPrefix = extraOptions?.subSectionId ? `-sub-${extraOptions.subSectionId}` : (extraOptions?.sectionId ? `-sec-${extraOptions.sectionId}` : "");
+        const subPrefix = slot.subSectionId ? `-sub-${slot.subSectionId}` : (slot.sectionId ? `-sec-${slot.sectionId}` : "");
 
-        if (!shouldHideDistTitle && questions.length > 0) {
+        if (slot.showDistTitle && questions.length > 0) {
           newBlocks.push({
             id: `dist-${dist.id}${subPrefix}`,
             type: "dist-title",
             data: {
               dist,
-              subTitle: extraOptions?.subTitle,
+              subTitle: nav?.subTitle,
               statusInfo,
               attemptCount,
               totalProvided,
@@ -386,7 +377,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               isCq,
               isMcq,
               isCs,
-              isSharedQuestionType: extraOptions?.isSharedQuestionType,
+              isSharedQuestionType: slot.mode === "SUBSECTION_SHARED",
+              showMarks: slot.marksPlacement === "DISTRIBUTION",
+              instructionText: slot.distInstruction,
             },
             gap: 0
           });
@@ -888,7 +881,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   totalQuestions: totalEssences,
                   attemptCount: attemptCount ?? (statusInfo as any)?.questionsToAttempt ?? statusInfo?.targetCount,
                   marksPerQuestion: dist.marksPerQuestion ?? statusInfo?.marksPerQuestion,
-                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "",
+                  questionTypeLabel: dist.questionTypeLabel || q.distribution?.questionTypeLabel || statusInfo?.questionTypeLabel || dist.questionType?.label || dist.questionType?.nameBn || dist.questionType?.nameEn || "সারমর্ম লেখো:",
                   distributionId: dist.id,
                   distribution: dist,
                   renderMethod: dist.renderMethod ?? (statusInfo as any)?.renderMethod ?? 1,
@@ -2144,448 +2137,117 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           }
         });
 
-        const targetCount = statusInfo?.targetCount || dist.questionCount || 0;
-        const addedCount = statusInfo?.addedCount !== undefined ? statusInfo.addedCount : questions.length;
-        const isDistCompleted = statusInfo?.status === "COMPLETED" || (targetCount > 0 && addedCount >= targetCount);
-
-        const shouldShowAction = extraOptions?.showAction !== false && !isDistCompleted;
+        const shouldShowAction = nav?.showAction !== false && !slot.isSlotCompleted;
         if (shouldShowAction) {
           newBlocks.push({
-            id: `action-${dist.id}${subPrefix}`,
+            id: `action-${slot.key}`,
             type: "dist-action",
-            data: { 
-              dist, 
-              status: isDistCompleted ? "COMPLETED" : "ACTIVE", 
-              statusInfo, 
+            data: {
+              slot,
+              dist,
+              status: slot.isSlotCompleted ? "COMPLETED" : "ACTIVE",
+              statusInfo,
               paperId,
-              prevSubSectionId: extraOptions?.prevSubSectionId,
-              prevSubSectionTitle: extraOptions?.prevSubSectionTitle,
-              nextSubSectionId: extraOptions?.nextSubSectionId,
-              sectionId: extraOptions?.sectionId || dist.sectionId,
-              subSectionId: extraOptions?.subSectionId || dist.subSectionId,
-              maxAllowedTarget: extraOptions?.maxAllowedTarget,
-              secTotalProvided: extraOptions?.secTotalProvided,
-              secTotalRequired: extraOptions?.secTotalRequired,
-              subPickLimit: extraOptions?.subPickLimit,
-              otherSubAttemptSum: extraOptions?.otherSubAttemptSum,
-              subQuestionsToAttempt: extraOptions?.subQuestionsToAttempt,
-              otherSubOccupied: extraOptions?.otherSubOccupied,
-              isSharedQuestionType: extraOptions?.isSharedQuestionType,
-              siblingSubSectionIds: extraOptions?.siblingSubSectionIds,
+              sectionId: slot.sectionId,
+              subSectionId: slot.subSectionId,
+              prevSubSectionId: nav?.prevSub?.id,
+              prevSubSectionTitle: nav?.prevSub?.titleBn || nav?.prevSub?.title,
+              nextSubSectionId: nav?.nextSub?.id,
+              nextSubSectionTitle: nav?.nextSub?.titleBn || nav?.nextSub?.title,
             },
             gap: 0
           });
         }
       };
 
-      if (hasSections) {
-        const subjectSections = (paperQuery.sections || []).filter((sec: any) => {
-          if ((dismissedSectionIds || []).includes(sec.id)) return false;
+      // ── Render resolved sections (DIRECT, SUBSECTION_DEDICATED, SUBSECTION_SHARED) ──
+      resolvedSubject.sections.forEach((resolvedSec) => {
+        const sec = resolvedSec.section;
+        const isFirstSection = globalSectionIndex === 0;
+        globalSectionIndex++;
 
-          const belongsToSubject = subject.distributions?.some(
-            (d: any) => d.sectionId === sec.id || d.subSections?.some((s: any) => sec.subSections?.some((sub: any) => sub.id === s.subSectionId))
-          );
-          const hasQuestionsInSec = subjectQuestions.some(
-            (q: any) => q.sectionId === sec.id || sec.subSections?.some((sub: any) => sub.id === q.subSectionId)
-          );
-
-          if (!belongsToSubject && !hasQuestionsInSec) {
-            return false;
-          }
-
-          return true;
+        newBlocks.push({
+          id: `subj-${subject.id}-sec-${sec.id}`,
+          type: "section-title",
+          data: {
+            id: sec.id,
+            sectionId: sec.id,
+            title: sec.title,
+            titleBn: sec.titleBn,
+            instructions: resolvedSec.instructions,
+            hasQuestions: resolvedSec.hasQuestions,
+            isSectionFilled: resolvedSec.isSectionFilled,
+            isFirstSection,
+          },
+          gap: 0,
         });
 
-        subjectSections.forEach((sec: any) => {
-          const secQuestionsCount = subjectQuestions.filter((q: any) => {
-            if (q.sectionId === sec.id) return true;
-            return sec.subSections?.some((sub: any) => sub.id === q.subSectionId);
-          }).length;
+        if (resolvedSec.subSections.length > 0) {
+          resolvedSec.subSections.forEach((resolvedSub, subIndex) => {
+            const sub = resolvedSub.subSection;
+            const prevSub = subIndex > 0 ? resolvedSec.subSections[subIndex - 1]?.subSection : null;
+            const nextSub = subIndex < resolvedSec.subSections.length - 1 ? resolvedSec.subSections[subIndex + 1]?.subSection : null;
 
-          const secDists = subject.distributions?.filter(
-            (d: any) => d.sectionId === sec.id || d.subSections?.some((s: any) => sec.subSections?.some((sub: any) => sub.id === s.subSectionId))
-          ) || [];
-
-          const distsProvidedSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
-          const secTotalProvided = distsProvidedSum;
-          const totalSectionTarget = secDists.reduce((sum: number, d: any) => {
-            const st = statuses?.find((s: any) => s.distributionId === d.id);
-            return sum + (st?.targetCount || d.questionCount || 0);
-          }, 0);
-          const secTotalRequired = sec.questionsToAttempt ?? (totalSectionTarget > 0 ? totalSectionTarget : secTotalProvided);
-
-          const totalSectionAdded = secDists.reduce((sum: number, d: any) => {
-            const st = statuses?.find((s: any) => s.distributionId === d.id);
-            return sum + (st?.addedCount || 0);
-          }, 0);
-
-          const isSectionFilled = totalSectionTarget > 0 && totalSectionAdded >= totalSectionTarget;
-
-          const validSubSections = (sec.subSections || []).filter((sub: any) => {
-            if ((dismissedSubSectionIds || []).includes(sub.id)) return false;
-            return true;
-          });
-
-          const topicKeywords = [
-            "সহপাঠ", "গদ্য", "কবিতা", "ব্যাকরণ", "নির্মিতি", 
-            "পাটিগণিত", "বীজগণিত", "জ্যামিতি", "ত্রিকোণমিতি", "পরিসংখ্যান", 
-            "পদার্থ", "রসায়ন", "জীববিজ্ঞান", "পৌরনীতি", "অর্থনীতি", "ইতিহাস", "ভূগোল"
-          ];
-
-          // Resolve which distribution matches each sub-section
-          const subToDistMap = new Map<string, any>();
-          if (validSubSections.length > 0) {
-            validSubSections.forEach((s: any) => {
-              const sSubStr = `${s.title || ""} ${s.titleBn || ""} ${s.instructions || ""}`.toLowerCase();
-              const scored = secDists.map((d: any) => {
-                let score = 10;
-                const distStr = `${d.questionTypeLabel || ""} ${d.questionTypeName || ""} ${d.questionType?.nameBn || ""} ${d.questionType?.nameEn || ""}`.toLowerCase();
-                for (const kw of topicKeywords) {
-                  const distHasKw = distStr.includes(kw);
-                  const subHasKw = sSubStr.includes(kw);
-                  if (distHasKw && subHasKw) score += 150;
-                  else if (distHasKw && !subHasKw) score -= 300;
-                }
-                if (d.subSections?.some((subRel: any) => subRel.subSectionId === s.id)) score += 1000;
-                const hasAddedQ = subjectQuestions.some((q: any) => q.subSectionId === s.id && q.distributionId === d.id);
-                if (hasAddedQ) score += 500;
-                return { dist: d, score };
-              });
-              scored.sort((a: any, b: any) => b.score - a.score);
-              const matchedDist = scored.length > 0 && scored[0].score > 0 ? scored[0].dist : (secDists[0] || null);
-              subToDistMap.set(s.id, matchedDist);
-            });
-          }
-
-          let finalSecInstruction = (sec.instructions && sec.instructions.trim() !== "") ? sec.instructions : null;
-          const prefix = "[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক।";
-
-          const subTypeCountMap = new Map<string, number>();
-          validSubSections.forEach((s: any) => {
-            const d = subToDistMap.get(s.id);
-            const typeKey = d?.questionTypeId || d?.id;
-            if (typeKey) {
-              subTypeCountMap.set(typeKey, (subTypeCountMap.get(typeKey) || 0) + 1);
-            }
-          });
-
-          // Only accumulate attempts of sub-sections which share the same question type
-          const sharedSubSectionsWithAttempts = validSubSections.filter((s: any) => {
-            if (!s.questionsToAttempt || Number(s.questionsToAttempt) <= 0) return false;
-            const d = subToDistMap.get(s.id);
-            const typeKey = d?.questionTypeId || d?.id;
-            return typeKey && (subTypeCountMap.get(typeKey) || 0) > 1;
-          });
-
-          if (sharedSubSectionsWithAttempts.length > 0) {
-            if (!finalSecInstruction) {
-              const subClauses = sharedSubSectionsWithAttempts.map((s: any) => {
-                const name = (s.titleBn || s.title || "").trim();
-                const subAttempt = Number(s.questionsToAttempt);
-                const countBn = toBengaliDigits(subAttempt || 0);
-                return name ? `${name} থেকে যেকোনো ${countBn}টি` : `যেকোনো ${countBn}টি`;
-              });
-
-              // Accumulate ONLY the attempts of the sub-sections which share the same question type
-              const sharedAttemptSum = sharedSubSectionsWithAttempts.reduce(
-                (sum: number, s: any) => sum + Number(s.questionsToAttempt || 0),
-                0
-              );
-
-              const firstSharedDist = subToDistMap.get(sharedSubSectionsWithAttempts[0].id);
-              const distAttemptTarget = firstSharedDist?.questionsToAttempt && Number(firstSharedDist.questionsToAttempt) > 0
-                ? Number(firstSharedDist.questionsToAttempt)
-                : 0;
-
-              const totalSectionToAnswer = distAttemptTarget > 0 ? distAttemptTarget : sharedAttemptSum;
-
-              let subBreakdownStr = "";
-              if (subClauses.length === 1) {
-                subBreakdownStr = `${subClauses[0]} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
-              } else if (subClauses.length === 2) {
-                subBreakdownStr = `${subClauses[0]} এবং ${subClauses[1]} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
-              } else if (subClauses.length > 2) {
-                const allExceptLast = subClauses.slice(0, -1).join(", ");
-                const last = subClauses[subClauses.length - 1];
-                subBreakdownStr = `${allExceptLast} এবং ${last} সহ মোট ${toBengaliDigits(totalSectionToAnswer)}টি প্রশ্নের উত্তর দিতে হবে`;
-              }
-
-              finalSecInstruction = `${prefix} ${subBreakdownStr}।]`;
-            }
-          } else if (finalSecInstruction) {
-            const secReqSum = secDists.reduce((sum: number, d: any) => {
-              const st = statuses?.find((s: any) => s.distributionId === d.id);
-              return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
-            }, 0);
-            const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
-
-            const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
-            const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
-
-            let updatedInst = finalSecInstruction;
-            if (provCount > 0 && reqCount > 0 && (updatedInst.includes("প্রশ্ন থেকে") || updatedInst.includes("প্রশ্নের উত্তর"))) {
-              updatedInst = updatedInst.replace(/([০-৯\d]+)টি প্রশ্ন থেকে\s*(যে কোনো|যেকোনো)?\s*([০-৯\d]+)টি/, `${toBengaliDigits(provCount)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(reqCount)}টি`);
-            } else if (reqCount > 0 && (updatedInst.includes("যে কোনো") || updatedInst.includes("যেকোনো"))) {
-              updatedInst = updatedInst.replace(/(যে কোনো|যেকোনো)\s*([০-৯\d]+)টি/, `যে কোনো ${toBengaliDigits(reqCount)}টি`);
-            }
-            finalSecInstruction = updatedInst;
-          } else {
-            const rawSecTitle = (sec.titleBn || sec.title)?.trim() || "";
-            const isGenericSec = rawSecTitle.toLowerCase() === "section";
-            const secHasTitle = Boolean(rawSecTitle && !isGenericSec);
-
-            if (secHasTitle) {
-              const secReqSum = secDists.reduce((sum: number, d: any) => {
-                const st = statuses?.find((s: any) => s.distributionId === d.id);
-                return sum + (d.questionsToAttempt ?? st?.targetCount ?? d.questionCount ?? 0);
-              }, 0);
-              const secProvSum = secDists.reduce((sum: number, d: any) => sum + (d.questionCount || 0), 0);
-              const reqCount = secReqSum > 0 ? secReqSum : secTotalRequired;
-              const provCount = secProvSum > 0 ? secProvSum : secTotalProvided;
-
-              if (provCount > 0 && reqCount >= provCount) {
-                finalSecInstruction = `${prefix} সবগুলো প্রশ্নের উত্তর দিতে হবে।]`;
-              } else if (reqCount > 0) {
-                finalSecInstruction = `${prefix} যেকোনো ${toBengaliDigits(reqCount)}টি প্রশ্নের উত্তর দিতে হবে।]`;
-              }
-            } else {
-              finalSecInstruction = null;
-            }
-          }
-
-          const isFirstSection = globalSectionIndex === 0;
-          globalSectionIndex++;
-
-          newBlocks.push({
-            id: `subj-${subject.id}-sec-${sec.id}`,
-            type: "section-title",
-            data: { 
-              id: sec.id, 
-              sectionId: sec.id, 
-              title: sec.title, 
-              titleBn: sec.titleBn, 
-              instructions: finalSecInstruction,
-              hasQuestions: secQuestionsCount > 0,
-              isSectionFilled,
-              isFirstSection,
-            },
-            gap: 0
-          });
-
-          if (validSubSections.length > 0) {
-            const activeSub = (activeSubSectionId && validSubSections.find((s: any) => s.id === activeSubSectionId))
-              || validSubSections[0];
-
-            // Group sub-sections by unique title/structure so repeated sub-sections share their corresponding distribution
-            const uniqueSubTitles: string[] = [];
-            validSubSections.forEach((s: any) => {
-              const key = (s.title || s.titleBn || s.id).trim().toLowerCase();
-              if (!uniqueSubTitles.includes(key)) {
-                uniqueSubTitles.push(key);
-              }
-            });
-
-            validSubSections.forEach((sub: any, subIndex: number) => {
-              const prevSub = subIndex > 0 ? validSubSections[subIndex - 1] : null;
-              const nextSub = subIndex < validSubSections.length - 1 ? validSubSections[subIndex + 1] : null;
-              const isSubActive = sub.id === activeSub.id;
-              const subQuestionsCount = subjectQuestions.filter((q: any) => q.subSectionId === sub.id).length;
-
-              const subLinkedDists = secDists.filter((d: any) => 
-                d.subSections?.some((rel: any) => rel.subSectionId === sub.id) ||
-                sub.distributions?.some((rel: any) => rel.distributionId === d.id) ||
-                subjectQuestions.some((q: any) => q.subSectionId === sub.id && q.distributionId === d.id)
-              );
-              const fallbackDist = subToDistMap.get(sub.id) || secDists[0];
-              const targetDist = fallbackDist;
-              const targetDists = subLinkedDists.length > 0
-                ? subLinkedDists
-                : (fallbackDist ? [fallbackDist] : []);
-
-              const distName = targetDist?.questionTypeLabel || targetDist?.questionTypeNameBn || targetDist?.questionTypeName || "";
-
-              const siblingSubSectionIds = validSubSections
-                .filter((s: any) => {
-                  const sDist = subToDistMap.get(s.id);
-                  return sDist && targetDist && (sDist.id === targetDist.id || sDist.questionTypeId === targetDist.questionTypeId);
-                })
-                .map((s: any) => s.id);
-
-              const isSharedQuestionType = siblingSubSectionIds.length > 1;
-
-              const hasQuestionTypeLabel = targetDists.some(
-                (d: any) => Boolean(d.questionTypeLabel && d.questionTypeLabel.trim() !== "")
-              );
-
-              const currDistTypeId = targetDist?.questionTypeId;
-
-              const otherSubAttemptSum = validSubSections
-                .filter((s: any) => s.id !== sub.id && siblingSubSectionIds.includes(s.id))
-                .reduce((sum: number, s: any) => {
-                  const explicitAttempt = (s.questionsToAttempt && s.questionsToAttempt > 0) ? s.questionsToAttempt : 0;
-                  return sum + explicitAttempt;
-                }, 0);
-
-              const otherSubOccupied = validSubSections
-                .filter((s: any) => s.id !== sub.id && siblingSubSectionIds.includes(s.id))
-                .reduce((sum: number, s: any) => {
-                  const qCount = subjectQuestions.filter((q: any) => q.subSectionId === s.id).length;
-                  const sReq = (s.questionsToAttempt && s.questionsToAttempt > 0) ? s.questionsToAttempt : 0;
-                  return sum + Math.max(qCount, sReq);
-                }, 0);
-
-              const sharedTarget = (targetDist?.questionsToAttempt && targetDist.questionsToAttempt > 0)
-                ? targetDist.questionsToAttempt
-                : (targetDist?.questionCount || 0);
-
-              const secRequiredTarget = isSharedQuestionType
-                ? sharedTarget
-                : (totalSectionTarget > 0 ? totalSectionTarget : secTotalRequired);
-
-              const maxAllowedTarget = secRequiredTarget > 0 
-                ? Math.max(1, secRequiredTarget - otherSubAttemptSum)
-                : undefined;
-
-              const subDist = targetDist;
-              const subDistCount = subDist?.questionCount || 0;
-              const matchingTypeDists = secDists.filter(
-                (d: any) => d.id === targetDist?.id || (targetDist?.questionTypeId && d.questionTypeId === targetDist.questionTypeId)
-              );
-              const sharedTypeTotalProvided = matchingTypeDists.reduce(
-                (sum: number, d: any) => sum + (d.questionCount || 0),
-                0
-              );
-              const totalPool = sharedTypeTotalProvided > 0 ? sharedTypeTotalProvided : (subDistCount || 0);
-
-              const secRemainingQuota = totalPool > 0 
-                ? Math.max(1, totalPool - otherSubOccupied)
-                : (subDistCount || 1);
-
-              const subPickLimit = isSharedQuestionType
-                ? secRemainingQuota
-                : (subDistCount > 0 ? Math.min(subDistCount, secRemainingQuota) : secRemainingQuota);
-
-              const distQuestionCount = Number(targetDist?.questionCount || 0);
-              const marksPerQuestion = targetDist?.marksPerQuestion || 10;
-              const subProv = distQuestionCount;
-
-              let finalSubInstruction: string | null = null;
-              let attemptCount: number | null = null;
-              let showMarkDistribution = false;
-
-              if (isSharedQuestionType) {
-                // Scenario 1: Sub-sections share the same question type
-                const explicitSubAttempt = (sub.questionsToAttempt !== undefined && sub.questionsToAttempt !== null && Number(sub.questionsToAttempt) > 0)
-                  ? Number(sub.questionsToAttempt)
-                  : null;
-
-                if (explicitSubAttempt !== null && explicitSubAttempt > 0) {
-                  attemptCount = explicitSubAttempt;
-                  showMarkDistribution = false;
-                  if (subProv > 0 && explicitSubAttempt < subProv) {
-                    finalSubInstruction = `(যেকোনো ${toBengaliDigits(explicitSubAttempt)}টি প্রশ্নের উত্তর দিতে হবে)`;
-                  } else {
-                    finalSubInstruction = "(সবগুলো প্রশ্নের উত্তর দিতে হবে)";
-                  }
-                } else {
-                  finalSubInstruction = null;
-                  attemptCount = null;
-                  showMarkDistribution = false;
-                }
-              } else {
-                // Scenario 2: Sub-section does not share question type
-                const explicitSubAttempt = (sub.questionsToAttempt !== undefined && sub.questionsToAttempt !== null && Number(sub.questionsToAttempt) > 0)
-                  ? Number(sub.questionsToAttempt)
-                  : null;
-
-                const distQuestionsToAttempt = (targetDist?.questionsToAttempt !== undefined && targetDist?.questionsToAttempt !== null && Number(targetDist.questionsToAttempt) > 0)
-                  ? Number(targetDist.questionsToAttempt)
-                  : null;
-
-                const explicitAttempt = explicitSubAttempt ?? distQuestionsToAttempt ?? distQuestionCount;
-                attemptCount = explicitAttempt;
-                showMarkDistribution = true;
-
-                if (subProv > 0 && explicitAttempt > 0 && explicitAttempt < subProv) {
-                  finalSubInstruction = `(যেকোনো ${toBengaliDigits(explicitAttempt)}টি প্রশ্নের উত্তর দিতে হবে)`;
-                } else {
-                  finalSubInstruction = "(সবগুলো প্রশ্নের উত্তর দিতে হবে)";
-                }
-              }
-
+            if (!resolvedSub.hideSubSection) {
               newBlocks.push({
                 id: `subj-${subject.id}-sub-${sub.id}`,
                 type: "sub-section-title",
-                data: { 
-                  id: sub.id, 
-                  subSectionId: sub.id, 
-                  sectionId: sec.id, 
-                  title: sub.title, 
-                  titleBn: sub.titleBn, 
-                  distName: isSharedQuestionType ? "" : distName,
-                  instructions: finalSubInstruction,
+                data: {
+                  id: sub.id,
+                  subSectionId: sub.id,
+                  sectionId: sec.id,
+                  title: sub.title,
+                  titleBn: sub.titleBn,
+                  distName: resolvedSub.distName,
+                  instructions: resolvedSub.instructions,
                   prevSubSectionId: prevSub?.id,
                   prevSubSectionTitle: prevSub?.titleBn || prevSub?.title,
                   nextSubSectionId: nextSub?.id,
                   nextSubSectionTitle: nextSub?.titleBn || nextSub?.title,
-                  hasQuestions: subQuestionsCount > 0,
+                  hasQuestions: resolvedSub.hasQuestions,
                   hideTitle: false,
-                  isSectionFilled,
+                  isSectionFilled: resolvedSec.isSectionFilled,
                   isFirstSubSection: subIndex === 0,
-                  marksPerQuestion: (!isSharedQuestionType && showMarkDistribution) ? marksPerQuestion : null,
-                  attemptCount: isSharedQuestionType ? null : attemptCount,
-                  showMarkDistribution: isSharedQuestionType ? false : showMarkDistribution,
-                  isSharedQuestionType,
+                  marksPerQuestion: resolvedSub.marksPerQuestion,
+                  attemptCount: resolvedSub.attemptCount,
+                  showMarkDistribution: resolvedSub.showMarkDistribution,
+                  isSharedQuestionType: resolvedSub.mode === "SUBSECTION_SHARED",
                 },
-                gap: 0
+                gap: 0,
               });
+            }
 
-              targetDists.forEach((d: any) => renderDistribution(d, {
-                prevSubSectionId: prevSub?.id,
-                prevSubSectionTitle: prevSub?.titleBn || prevSub?.title,
-                nextSubSectionId: nextSub?.id,
-                nextSubSectionTitle: nextSub?.titleBn || nextSub?.title,
-                sectionId: sec.id,
-                subSectionId: sub.id,
+            resolvedSub.slots.forEach((slot) => {
+              renderSlot(slot, {
+                prevSub,
+                nextSub,
                 subTitle: sub.titleBn || sub.title,
-                showAction: !isSectionFilled,
-                hideDistTitle: isSharedQuestionType,
-                maxAllowedTarget,
-                secTotalProvided,
-                secTotalRequired,
-                subPickLimit,
-                otherSubAttemptSum,
-                subQuestionsToAttempt: sub.questionsToAttempt,
-                otherSubOccupied,
-                isSharedQuestionType,
-                siblingSubSectionIds,
-              }));
+                showAction: !resolvedSec.isSectionFilled,
+              });
             });
-          } else {
-            const secDists = subject.distributions?.filter((d: any) => d.sectionId === sec.id && !d.subSectionId) || [];
-            secDists.forEach((d: any) => renderDistribution(d, {
-              sectionId: sec.id,
-              showAction: !isSectionFilled,
-              hideDistTitle: true,
-            }));
-          }
-        });
-
-        const unassignedDists = subject.distributions?.filter((d: any) => !d.sectionId && !d.subSectionId) || [];
-        if (unassignedDists.length > 0) {
-          unassignedDists.forEach(renderDistribution);
+          });
         }
 
-        // Catch-all: Render any distributions with questions that haven't been rendered yet
-        subject.distributions?.forEach((d: any) => {
-          const hasUnrenderedQ = subjectQuestions.some((q: any) => q.distributionId === d.id && !renderedQuestionIds.has(q.id));
-          if (hasUnrenderedQ) {
-            renderDistribution(d);
-          }
+        resolvedSec.directSlots.forEach((slot) => {
+          renderSlot(slot, { showAction: !resolvedSec.isSectionFilled });
         });
-      } else {
-        subject.distributions?.forEach(renderDistribution);
-      }
+      });
+
+      // ── Render unassigned / paper-level distributions ──
+      resolvedSubject.unassignedSlots.forEach((slot) => {
+        renderSlot(slot);
+      });
+
+      // ── Catch-all for any distributions with unrendered orphan questions ──
+      subject.distributions?.forEach((d: any) => {
+        const hasUnrenderedQ = subjectQuestions.some((q: any) => q.distributionId === d.id && !renderedQuestionIds.has(q.id));
+        if (hasUnrenderedQ) {
+          const fallbackSlot = topology.findSlot({ distributionId: d.id });
+          if (fallbackSlot) {
+            renderSlot({ ...fallbackSlot, mode: "DIRECT", sectionId: null, subSectionId: null });
+          }
+        }
+      });
     });
 
     return newBlocks;

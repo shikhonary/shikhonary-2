@@ -12,10 +12,12 @@ import {
   useDeleteCs,
   useBulkDeleteCs,
   useResolveCsReport,
+  useAssignCsReport,
 } from "../services/use-cs"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
+import { AssignReportDialog } from "@/components/shared/assign-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { BookOpen, Plus, Upload } from "lucide-react"
@@ -59,10 +61,27 @@ export function CsListView() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
   const [resolveTarget, setResolveTarget] = useState<CsItem | null>(null)
+  const [assignTarget, setAssignTarget] = useState<CsItem | null>(null)
 
   const deleteMutation = useDeleteCs()
   const bulkDeleteMutation = useBulkDeleteCs()
   const resolveCsMutation = useResolveCsReport()
+  const assignCsMutation = useAssignCsReport()
+
+  const handleConfirmAssign = async (assignedToId: string, note?: string) => {
+    if (!assignTarget) return
+    try {
+      await assignCsMutation.mutateAsync({
+        csId: assignTarget.id,
+        assignedToId,
+        note,
+      })
+      toast.success("CS প্রশ্নের দায়িত্ব সফলভাবে অর্পণ করা হয়েছে।")
+      setAssignTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "দায়িত্ব অর্পণ করতে সমস্যা হয়েছে")
+    }
+  }
 
   const handleConfirmResolve = async (resolvedNote?: string) => {
     if (!resolveTarget) return
@@ -221,12 +240,34 @@ export function CsListView() {
         onDelete={(id, snippet) => setDeleteTarget({ id, question: snippet })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
         onResolveReport={(item) => setResolveTarget(item)}
+        onAssignReport={(item) => setAssignTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+      />
+
+      {/* Reusable Assign CS Report Dialog */}
+      <AssignReportDialog
+        isOpen={Boolean(assignTarget)}
+        onClose={() => setAssignTarget(null)}
+        entityName="CS প্রশ্ন"
+        entityDetails={
+          assignTarget
+            ? {
+                subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
+                chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
+                clueText: assignTarget.questionA,
+                editHref: `/cs/${assignTarget.id}/edit`,
+                editLabel: "CS এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={assignTarget?.reports}
+        onConfirmAssign={handleConfirmAssign}
+        isLoading={assignCsMutation.isPending}
       />
 
       {/* Reusable Resolve CS Report Dialog */}

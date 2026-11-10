@@ -3,6 +3,7 @@ import { trpc } from "@/trpc/client"
 import type {
   ListEssencesInput,
   EssenceStatsInput,
+  EssenceBoardYearsInput,
 } from "@workspace/api"
 
 /**
@@ -17,6 +18,13 @@ export function useEssencesList(input: ListEssencesInput = { limit: 20 }) {
  */
 export function useEssenceStats(input?: EssenceStatsInput) {
   return useSuspenseQuery(trpc.essence.stats.queryOptions(input))
+}
+
+/**
+ * Hook to fetch Board + Reference combinations for Essences.
+ */
+export function useEssenceBoardYears(input?: EssenceBoardYearsInput) {
+  return useQuery(trpc.essence.boardYears.queryOptions(input))
 }
 
 /**
@@ -93,6 +101,48 @@ export function useImportEssences() {
 
   return useMutation({
     ...trpc.essence.import.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essence.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to toggle Essence active state.
+ */
+export function useToggleEssenceActive() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essence.toggleActive.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essence.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to resolve an Essence report.
+ */
+export function useResolveEssenceReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essence.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.essence.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign an Essence report to a user.
+ */
+export function useAssignEssenceReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.essence.assignReport.mutationOptions(),
     onSuccess: () => {
       queryClient.invalidateQueries(trpc.essence.pathFilter())
     },

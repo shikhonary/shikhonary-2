@@ -13,10 +13,12 @@ import {
   useDeleteCq,
   useBulkDeleteCqs,
   useResolveCqReport,
+  useAssignCqReport,
 } from "../services/use-cq"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
+import { AssignReportDialog } from "@/components/shared/assign-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { BookOpen, Plus, Upload } from "lucide-react"
@@ -58,10 +60,12 @@ export function CqListView() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
   const [resolveTarget, setResolveTarget] = useState<CqItem | null>(null)
+  const [assignTarget, setAssignTarget] = useState<CqItem | null>(null)
 
   const deleteMutation = useDeleteCq()
   const bulkDeleteMutation = useBulkDeleteCqs()
   const resolveCqMutation = useResolveCqReport()
+  const assignCqMutation = useAssignCqReport()
 
   const handleConfirmResolve = async (resolvedNote?: string) => {
     if (!resolveTarget) return
@@ -74,6 +78,30 @@ export function CqListView() {
       setResolveTarget(null)
     } catch (err: any) {
       toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
+
+  const handleConfirmAssign = async ({
+    assigneeId,
+    note,
+    reportId,
+  }: {
+    assigneeId: string
+    note?: string
+    reportId?: string
+  }) => {
+    if (!assignTarget) return
+    try {
+      await assignCqMutation.mutateAsync({
+        cqId: assignTarget.id,
+        assignedToId: assigneeId,
+        reportId,
+        note,
+      })
+      toast.success("রিপোর্টের দায়িত্ব সফলভাবে অর্পণ (Assign) করা হয়েছে।")
+      setAssignTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট অ্যাসাইন করতে সমস্যা হয়েছে")
     }
   }
 
@@ -210,6 +238,7 @@ export function CqListView() {
         onDelete={(id, question) => setDeleteTarget({ id, question })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
         onResolveReport={(item) => setResolveTarget(item)}
+        onAssignReport={(item) => setAssignTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
@@ -237,6 +266,27 @@ export function CqListView() {
         reports={resolveTarget?.reports}
         onConfirmResolve={handleConfirmResolve}
         isLoading={resolveCqMutation.isPending}
+      />
+
+      {/* Reusable Assign CQ Report Dialog */}
+      <AssignReportDialog
+        isOpen={Boolean(assignTarget)}
+        onClose={() => setAssignTarget(null)}
+        entityName="CQ প্রশ্ন"
+        entityDetails={
+          assignTarget
+            ? {
+                subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
+                chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
+                clueText: assignTarget.context ? `উদ্দীপক: ${assignTarget.context}` : `ক: ${assignTarget.questionA}`,
+                editHref: `/cqs/${assignTarget.id}/edit`,
+                editLabel: "CQ এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={assignTarget?.reports}
+        onConfirmAssign={handleConfirmAssign}
+        isLoading={assignCqMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}

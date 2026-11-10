@@ -128,6 +128,20 @@ export function useResolveCqReport() {
 }
 
 /**
+ * Hook to assign a CQ report to a user.
+ */
+export function useAssignCqReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.cq.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.cq.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

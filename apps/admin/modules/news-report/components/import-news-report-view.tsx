@@ -1,10 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "@workspace/ui/components/sonner"
-import { useImportNewsReports, useAcademicClassesForSelection, useSubjectsForSelection } from "../services/use-news-report"
+import {
+  useImportNewsReports,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+} from "../services/use-news-report"
+import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
@@ -20,32 +25,51 @@ import {
 } from "@workspace/ui/components/select"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
 import {
-  PlusIcon,
-  Trash2Icon,
-  CopyIcon,
-  CheckCircle2Icon,
-  Wand2Icon,
-  AlertTriangleIcon,
-  ChevronRightIcon,
-  CodeIcon,
-  FileCodeIcon,
-  UploadIcon,
+  Plus,
+  Trash2,
+  Copy,
+  CheckCircle2,
+  Wand2,
+  AlertTriangle,
+  ChevronUp,
+  ChevronDown,
+  Code,
+  FileCode,
+  Upload,
+  ArrowLeft,
+  Sparkles,
+  Layers,
+  AlertCircle,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  BookOpen,
 } from "lucide-react"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS, toBengaliDigits } from "@workspace/utils"
+import { NEWS_REPORT_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
 
 const sampleJsonTemplate = `[
   {
-    "title": "নিত্যপ্রয়োজনীয় দ্রব্যের অস্বাভাবিক মূল্যবৃদ্ধি জনজীবনকে দুর্বিষহ করে তুলেছে—এ বিষয়ে সংবাদপত্রে প্রকাশের উপযোগী একটি প্রতিবেদন প্রস্তুত করো।",
-    "reference": ["Dhaka Board 2024", "Rajshahi Board 2023"],
-    "difficulty": "MEDIUM",
-    "popularityCount": 5
+    "title": "যানজট নিরসন ও নিরাপদ সড়ক সম্পর্কে একটি সংবাদ প্রতিবেদন রচনা করো।",
+    "isMath": true,
+    "reference": ["ঢাকা বোর্ড ২০২৪", "রাজশাহী বোর্ড ২০২৩"],
+    "difficulty": "EASY",
+    "source": "গাইড বুক",
+    "session": "2026",
+    "popularityCount": 12,
+    "isActive": true
   },
   {
-    "title": "তোমার কলেজে উদযাপিত বার্ষিক ক্রীড়া ও সাংস্কৃতিক প্রতিযোগিতার বিবরণ দিয়ে অধ্যক্ষ বরাবর একটি প্রাতিষ্ঠানিক প্রতিবেদন প্রণয়ন করো।",
-    "reference": ["Chattogram Board 2024"],
-    "difficulty": "EASY",
-    "popularityCount": 10
+    "title": "দ্রব্যমূল্যের ঊর্ধ্বগতি ও প্রতিকার বিষয়ে একটি সংবাদ প্রতিবেদন তৈরি করো।",
+    "isMath": true,
+    "reference": ["চট্টগ্রাম বোর্ড ২০২৪"],
+    "difficulty": "MEDIUM",
+    "source": "পাঠ্যবই",
+    "session": "2026",
+    "popularityCount": 8,
+    "isActive": true
   }
 ]`
 
@@ -56,6 +80,11 @@ export function repairJsonSyntax(raw: string): string {
   // 1. Strip markdown code fencing (```json ... ``` or ``` ...)
   cleaned = cleaned.replace(/^```(?:json)?\s*/gi, "").replace(/\s*```$/g, "").trim()
 
+  // Remove trailing comma at the end of the input (e.g. }, -> })
+  if (cleaned.endsWith(",")) {
+    cleaned = cleaned.slice(0, -1).trim()
+  }
+
   // 2. Normalize smart quotes to standard quotes
   cleaned = cleaned
     .replace(/[“”]/g, '"')
@@ -64,10 +93,19 @@ export function repairJsonSyntax(raw: string): string {
   // 3. Strip single-line comments (// comment)
   cleaned = cleaned.replace(/^\s*\/\/.*$/gm, "")
 
-  // 4. Remove trailing commas in objects & arrays (e.g. , ] -> ] and , } -> })
+  // 4. Fix known LaTeX commands starting with characters that are valid JSON escapes
+  cleaned = cleaned.replace(
+    /(?<!\\)\\(rightarrow|right|rho|rangle|Rightarrow|roots|rceil|rfloor|times|theta|text|tan|tau|tilde|to|therefore|triangle|tanh|top|tiny|textbf|textit|texttt|tfrac|tag|frac|forall|flat|beta|begin|bar|mathbf|binom|big|Big|bullet|bot|boldsymbol|bmatrix|bmod|neq|nabla|nu|not|null|neg|natural|ni|norm)\b/g,
+    "\\\\$1"
+  )
+
+  // 5. Fix unescaped backslashes not part of valid JSON escapes
+  cleaned = cleaned.replace(/(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\")
+
+  // 6. Remove trailing commas in objects & arrays
   cleaned = cleaned.replace(/,\s*([\]}])/g, "$1")
 
-  // 5. Wrap single object in array if not already an array
+  // 7. Wrap single object in array if needed
   if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
     cleaned = `[\n${cleaned}\n]`
   }
@@ -78,6 +116,7 @@ export function repairJsonSyntax(raw: string): string {
 // Line & Column Position Diagnostic Extractor
 export function findJsonErrorPosition(raw: string, errMessage: string) {
   const lines = raw.split("\n")
+
   const posMatch = errMessage.match(/position\s+(\d+)/i)
   let charPos = -1
   if (posMatch && posMatch[1]) {
@@ -93,9 +132,7 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   if (charPos >= 0 && errorLine === -1) {
     let count = 0
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-      if (line === undefined) continue
-      const lineLen = line.length + 1 // +1 for newline
+      const lineLen = (lines[i]?.length || 0) + 1
       if (count + lineLen >= charPos) {
         errorLine = i + 1
         errorCol = charPos - count + 1
@@ -113,10 +150,9 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
 
   const linesContext = []
   for (let i = startIdx; i <= endIdx; i++) {
-    const line = lines[i]
     linesContext.push({
       num: i + 1,
-      content: line || "",
+      content: lines[i] || "",
       isError: i === targetLineIdx,
     })
   }
@@ -128,256 +164,341 @@ export function findJsonErrorPosition(raw: string, errMessage: string) {
   }
 }
 
-interface EditableFieldProps {
-  label?: string
-  value: string
-  placeholder?: string
-  multiline?: boolean
-  onSave: (newValue: string) => void
-  className?: string
-  textClassName?: string
-  badge?: React.ReactNode
-  isMath?: boolean
-}
-
-function EditableField({
-  label,
-  value,
-  placeholder = "Click to edit...",
-  multiline = false,
-  onSave,
-  className = "",
-  textClassName = "",
-  badge,
-  isMath = true,
-}: EditableFieldProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(value || "")
-
-  useEffect(() => {
-    setEditValue(value || "")
-  }, [value])
-
-  const handleBlur = () => {
-    setIsEditing(false)
-    if (editValue.trim() !== (value || "")) {
-      onSave(editValue.trim())
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (!multiline || e.ctrlKey || e.metaKey)) {
-      e.preventDefault()
-      handleBlur()
-    } else if (e.key === "Escape") {
-      setEditValue(value || "")
-      setIsEditing(false)
-    }
-  }
-
-  return (
-    <div className={cn("group relative transition-colors", className)}>
-      {label && (
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline flex items-center gap-1">
-            {label}
-          </span>
-          {badge}
-        </div>
-      )}
-      {isEditing ? (
-        <div className="space-y-1.5">
-          {multiline ? (
-            <Textarea
-              autoFocus
-              rows={4}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white p-2.5 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          ) : (
-            <Input
-              autoFocus
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full rounded-lg border-2 border-primary bg-white px-3 py-2 text-sm font-medium focus:outline-hidden",
-                editValue && /[\u0980-\u09FF]/.test(editValue) && "font-solaiman"
-              )}
-            />
-          )}
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
-            <span>Press Enter (or Ctrl+Enter) to save, Esc to cancel</span>
-            <button
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                handleBlur()
-              }}
-              className="text-xs font-semibold text-primary hover:underline cursor-pointer"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div
-          onDoubleClick={() => setIsEditing(true)}
-          title="Double click to edit"
-          className={cn(
-            "group/edit min-h-9 cursor-pointer rounded-lg border border-transparent bg-surface-container-lowest/50 p-2.5 transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-xs",
-            !value && "italic text-outline-variant",
-            textClassName
-          )}
-        >
-          <div className="flex items-start justify-between gap-2">
-            <span className={cn(
-              "flex-1 whitespace-pre-wrap font-medium text-on-surface text-sm leading-relaxed",
-              value && /[\u0980-\u09FF]/.test(value) && "font-solaiman"
-            )}>
-              <RenderMath text={value || placeholder} isMath={isMath} />
-            </span>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsEditing(true)
-              }}
-              className="opacity-100 md:opacity-0 md:group-hover/edit:opacity-100 transition-opacity text-[10px] uppercase font-bold text-primary shrink-0 bg-primary-container/80 hover:bg-primary/20 px-2 py-0.5 rounded-full select-none cursor-pointer border-0 outline-hidden animate-fade-in"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-interface EditableNewsReportCardProps {
+interface ParsedNewsReportCardProps {
   index: number
   item: any
-  onChange: (updated: any) => void
+  questionTypes: any[]
+  isExpanded: boolean
+  onToggleExpand: () => void
+  onChange: (updatedItem: any) => void
   onDelete: () => void
   onDuplicate: () => void
 }
 
-function EditableNewsReportCard({
+/**
+ * Parsed News Report Card matching the exact visual design concept of MCQ module
+ */
+function ParsedNewsReportCard({
   index,
   item,
+  questionTypes,
+  isExpanded,
+  onToggleExpand,
   onChange,
   onDelete,
   onDuplicate,
-}: EditableNewsReportCardProps) {
-  const handleToggleDifficulty = () => {
-    const difficulties = ["EASY", "MEDIUM", "HARD"]
-    const nextIdx = (difficulties.indexOf(item.difficulty || "MEDIUM") + 1) % difficulties.length
-    onChange({
-      ...item,
-      difficulty: difficulties[nextIdx],
-    })
-  }
-
-  const handleSaveReferences = (val: string) => {
-    const refs = val
-      .split(",")
-      .map((r) => r.trim())
-      .filter(Boolean)
-    onChange({
-      ...item,
-      reference: refs,
-    })
-  }
-
-  const referenceString = Array.isArray(item.reference) ? item.reference.join(", ") : ""
+}: ParsedNewsReportCardProps) {
+  const isTitleMissing = !item.title || !String(item.title).trim()
 
   return (
-    <Card className="overflow-hidden rounded-xl border border-outline-variant/60 bg-white shadow-xs transition-shadow hover:shadow-md">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex size-7 items-center justify-center rounded-lg bg-primary-container font-headline text-xs font-bold text-on-primary-container">
-            #{index + 1}
-          </span>
-          <span className="text-xs font-semibold uppercase tracking-wider text-outline">
-            News Report / Journalistic Prompt Preview
-          </span>
+    <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden transition-all hover:shadow-md">
+      {/* Header Bar matching MCQ Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 sm:p-5">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary font-bold text-xs sm:text-sm border border-indigo-100 dark:border-primary/20 shrink-0">
+            #{toBengaliDigits(index + 1)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm sm:text-base font-bold font-headline text-foreground truncate">
+              {item.title ? item.title : `প্রতিবেদন #${toBengaliDigits(index + 1)} (বিবরণ নেই)`}
+            </h4>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="text-[11px] text-muted-foreground">
+                উৎস: {item.source || DEFAULT_SOURCE} {item.session ? `(${item.session})` : ""}
+                {item.reference && item.reference.length > 0
+                  ? ` | রেফারেন্স: ${toBengaliDigits(item.reference.length)}টি`
+                  : ""}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Difficulty Toggle */}
-          <button type="button" onClick={handleToggleDifficulty} className="cursor-pointer">
+        {/* Quick Toggles & Actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          {/* Difficulty Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-lg",
+              item.difficulty === "EASY" &&
+                "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/60",
+              (item.difficulty === "MEDIUM" || !item.difficulty) &&
+                "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200/60",
+              item.difficulty === "HARD" &&
+                "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/60"
+            )}
+          >
+            {item.difficulty || "MEDIUM"}
+          </Badge>
+
+          {/* Math Mode Badge */}
+          {item.isMath && (
             <Badge
               variant="outline"
-              className={cn(
-                "px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                item.difficulty === "EASY" && "border-emerald-500 text-emerald-700 bg-emerald-50",
-                item.difficulty === "MEDIUM" && "border-amber-500 text-amber-700 bg-amber-50",
-                item.difficulty === "HARD" && "border-red-500 text-red-700 bg-red-50"
-              )}
+              className="px-2 py-0.5 text-[11px] font-bold rounded-lg border-indigo-200 text-indigo-700 bg-indigo-50 dark:bg-primary/10 dark:text-primary"
             >
-              {item.difficulty || "MEDIUM"}
+              ∑ ম্যাথ
             </Badge>
-          </button>
+          )}
 
-          {/* Duplicate & Delete Buttons */}
-          <div className="flex items-center gap-1 ml-2 border-l border-outline-variant/60 pl-2">
+          {/* Active Status Badge */}
+          <Badge
+            variant="outline"
+            className={cn(
+              "px-2 py-0.5 text-[11px] font-bold rounded-lg",
+              item.isActive !== false
+                ? "border-emerald-200 text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400"
+                : "border-slate-300 text-slate-500 bg-slate-50"
+            )}
+          >
+            {item.isActive !== false ? "অ্যাক্টিভ" : "ইনঅ্যাক্টিভ"}
+          </Badge>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 ml-1 pl-1 border-l border-slate-200 dark:border-white/[0.08]">
             <Button
               type="button"
               variant="ghost"
-              size="icon-xs"
+              size="icon"
               onClick={onDuplicate}
-              title="Duplicate News Report"
-              className="text-on-surface-variant hover:bg-surface-container-high cursor-pointer"
+              title="সংবাদ প্রতিবেদন ডুপ্লিকেট করুন"
+              className="size-8 text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-primary/10 rounded-xl cursor-pointer"
             >
-              <CopyIcon className="size-4" />
+              <Copy className="size-3.5" />
             </Button>
             <Button
               type="button"
               variant="ghost"
-              size="icon-xs"
+              size="icon"
               onClick={onDelete}
-              title="Delete News Report from import"
-              className="text-destructive hover:bg-destructive/10 cursor-pointer"
+              title="সংবাদ প্রতিবেদন মুছে ফেলুন"
+              className="size-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl cursor-pointer"
             >
-              <Trash2Icon className="size-4" />
+              <Trash2 className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={onToggleExpand}
+              title={isExpanded ? "সংকুচিত করুন" : "প্রসারিত করে সম্পাদনা করুন"}
+              className="size-8 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-foreground cursor-pointer shadow-none"
+            >
+              {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="p-5 space-y-4">
-        {/* Title / Report Prompt Text */}
-        <EditableField
-          label="Report Topic / Stimulus Prompt"
-          value={item.title || ""}
-          multiline
-          placeholder="Enter report prompt / assignment topic..."
-          onSave={(newVal) => onChange({ ...item, title: newVal })}
-        />
-
-        {/* References & Popularity */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-outline-variant/30 pt-3">
-          <EditableField
-            label="References (Comma-separated)"
-            value={referenceString}
-            placeholder="e.g. Board 2024..."
-            onSave={handleSaveReferences}
-          />
-          <EditableField
-            label="Popularity Count"
-            value={item.popularityCount !== undefined ? String(item.popularityCount) : "0"}
-            placeholder="e.g. 0..."
-            onSave={(newVal) => onChange({ ...item, popularityCount: newVal && !isNaN(Number(newVal)) ? Number(newVal) : 0 })}
-          />
+      {/* Validation Warning Banner */}
+      {isTitleMissing && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200/60 dark:border-amber-800/40 px-5 py-2.5 text-xs text-amber-800 dark:text-amber-400 flex items-center gap-2 font-medium">
+          <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+          <span>সংবাদ প্রতিবেদনের বিষয়বস্তু ফাঁকা রয়েছে।</span>
         </div>
-      </div>
+      )}
+
+      {/* Card Content - Visible when expanded matching MCQ structure */}
+      {isExpanded && (
+        <CardContent className="p-6 sm:p-7 space-y-7 animate-in fade-in duration-150">
+          {/* Prompt / Title Textarea */}
+          <div className="space-y-2">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              সংবাদ প্রতিবেদনের বিষয়বস্তু (Report Prompt) <span className="text-rose-500">*</span>
+            </Label>
+            <Textarea
+              rows={4}
+              placeholder="সংবাদ প্রতিবেদন বা প্রাতিষ্ঠানিক প্রতিবেদনের প্রশ্ন লিখুন বা পেস্ট করুন..."
+              value={item.title || ""}
+              onChange={(e) => onChange({ ...item, title: e.target.value })}
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
+            />
+            {item.isMath && item.title && (
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-xs text-foreground">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">
+                  LaTeX ম্যাথ প্রিভিউ:
+                </span>
+                <RenderMath text={item.title} isMath={true} />
+              </div>
+            )}
+          </div>
+
+          {/* Math & Active Flags matching MCQ 2-column grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+              <div>
+                <p className="text-sm font-bold text-foreground">গণিত / LaTeX সমীকরণ</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  KaTeX দিয়ে গাণিতিক সমীকরণ রেন্ডার করতে অ্যাক্টিভ করুন।
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={Boolean(item.isMath)}
+                onChange={(e) => onChange({ ...item, isMath: e.target.checked })}
+                className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+              <div>
+                <p className="text-sm font-bold text-foreground">অ্যাক্টিভ প্রতিবেদনের অবস্থা</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={item.isActive !== false}
+                onChange={(e) => onChange({ ...item, isActive: e.target.checked })}
+                className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Reference */}
+          <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                রেফারেন্স / উৎস (কমা দিয়ে একাধিক উল্লেখ করুন)
+              </Label>
+              <Input
+                type="text"
+                placeholder="যেমন: ঢাকা বোর্ড ২০২৩, রাজশাহী বোর্ড ২০২৪..."
+                value={Array.isArray(item.reference) ? item.reference.join(", ") : ""}
+                onChange={(e) => {
+                  const refs = e.target.value
+                    .split(",")
+                    .map((r) => r.trim())
+                    .filter(Boolean)
+                  onChange({ ...item, reference: refs })
+                }}
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+              />
+            </div>
+          </div>
+
+          {/* Metadata Settings matching MCQ 2-column grid */}
+          <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              মেটাডাটা ও অতিরিক্ত সেটিংস
+            </h5>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Difficulty */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
+                </Label>
+                <Select
+                  value={item.difficulty || "MEDIUM"}
+                  onValueChange={(val) => onChange({ ...item, difficulty: val as any })}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                    <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Question Type Template */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  প্রশ্ন কাঠামো টেমপ্লেট (ঐচ্ছিক)
+                </Label>
+                <Select
+                  value={item.questionTypeId || "none"}
+                  onValueChange={(val) =>
+                    onChange({ ...item, questionTypeId: val === "none" ? null : val })
+                  }
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                    <SelectValue placeholder="টেমপ্লেট নির্বাচন করুন..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                    <SelectItem value="none">কোনোটি নয় (None)</SelectItem>
+                    {questionTypes.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.nameEn} ({t.label} - {t.mark} নম্বর)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Source */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  প্রশ্নের উৎস (Source)
+                </Label>
+                <Select
+                  value={item.source || DEFAULT_SOURCE}
+                  onValueChange={(val) => onChange({ ...item, source: val })}
+                >
+                  <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                    <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                    {NEWS_REPORT_SOURCE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Session */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  সেশন (Session)
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="যেমন: ২০২৬"
+                  value={item.session || ""}
+                  onChange={(e) => onChange({ ...item, session: e.target.value })}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
+
+              {/* Popularity Count */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  ভিউ সংখ্যা (Popularity)
+                </Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={
+                    item.popularityCount !== undefined && item.popularityCount !== null
+                      ? String(item.popularityCount)
+                      : "0"
+                  }
+                  onChange={(e) =>
+                    onChange({
+                      ...item,
+                      popularityCount:
+                        e.target.value && !isNaN(Number(e.target.value))
+                          ? Number(e.target.value)
+                          : 0,
+                    })
+                  }
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      )}
     </Card>
   )
 }
@@ -389,12 +510,18 @@ export function ImportNewsReportView() {
   const [jsonText, setJsonText] = useState<string>("")
   const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("")
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("")
+  const [selectedSource, setSelectedSource] = useState<string>(DEFAULT_SOURCE)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>(QUESTION_DIFFICULTY.MEDIUM)
   const [showSample, setShowSample] = useState<boolean>(false)
   const [parsedItems, setParsedItems] = useState<any[]>([])
+  const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>({ 0: true })
   const [parseError, setParseError] = useState<string | null>(null)
   const [errorContext, setErrorContext] = useState<ReturnType<typeof findJsonErrorPosition>>(null)
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
+  const questionTypes = questionTypesData?.questionTypes ?? []
+
   const { data: subjects = [] } = useSubjectsForSelection(
     selectedAcademicClassId ? { academicClassId: selectedAcademicClassId } : undefined
   )
@@ -408,7 +535,13 @@ export function ImportNewsReportView() {
       const content = event.target?.result as string
       if (content) {
         setJsonText(content)
-        validateAndParseJson(content, selectedAcademicClassId, selectedSubjectId)
+        validateAndParseJson(
+          content,
+          selectedAcademicClassId,
+          selectedSubjectId,
+          selectedSource,
+          selectedDifficulty
+        )
       }
     }
     reader.readAsText(file)
@@ -417,7 +550,9 @@ export function ImportNewsReportView() {
   const validateAndParseJson = (
     text: string,
     overrideClassId: string,
-    overrideSubjectId: string
+    overrideSubjectId: string,
+    overrideSource?: string,
+    overrideDifficulty?: string
   ) => {
     setParseError(null)
     setErrorContext(null)
@@ -431,22 +566,21 @@ export function ImportNewsReportView() {
     try {
       rawData = JSON.parse(textToParse)
     } catch (err: any) {
-      // Attempt silent auto-repair for common AI paste artifacts
       const repaired = repairJsonSyntax(text)
       if (repaired && repaired !== text) {
         try {
           rawData = JSON.parse(repaired)
           textToParse = repaired
           setJsonText(repaired)
-          toast.success("Auto-repaired JSON formatting (smart quotes / trailing commas)!")
+          toast.success("JSON ফরম্যাট ও সিনট্যাক্স স্বয়ংক্রিয়ভাবে সংশোধন করা হয়েছে!")
         } catch {
           // Both failed
         }
       }
 
       if (!rawData) {
-        const errMsg = err.message || "Invalid JSON syntax"
-        setParseError(`Syntax Error: ${errMsg}`)
+        const errMsg = err.message || "ভুল JSON সিনট্যাক্স"
+        setParseError(`সিনট্যাক্স ত্রুটি: ${errMsg}`)
         const errLoc = findJsonErrorPosition(text, errMsg)
         setErrorContext(errLoc)
         return
@@ -457,12 +591,17 @@ export function ImportNewsReportView() {
       const itemsArray = Array.isArray(rawData) ? rawData : [rawData]
 
       if (itemsArray.length === 0) {
-        setParseError("JSON array is empty.")
+        setParseError("JSON অ্যারেটি খালি।")
         return
       }
 
       const validated: any[] = []
       const errors: string[] = []
+
+      const fallbackSource = overrideSource || selectedSource || DEFAULT_SOURCE
+      const fallbackSession = new Date().getFullYear().toString()
+      const fallbackDifficulty =
+        overrideDifficulty || selectedDifficulty || QUESTION_DIFFICULTY.MEDIUM
 
       itemsArray.forEach((item: any, idx: number) => {
         const itemNum = idx + 1
@@ -470,37 +609,104 @@ export function ImportNewsReportView() {
         const title = item.title || item.name
 
         if (!title || typeof title !== "string" || !title.trim()) {
-          errors.push(`Item #${itemNum}: Missing or invalid 'title' text.`)
+          errors.push(`প্রতিবেদন #${itemNum}: সংবাদ প্রতিবেদনের বিষয়বস্তু ফাঁকা রাখা যাবে না।`)
         }
         if (!subjectId) {
-          errors.push(`Item #${itemNum}: Missing 'subjectId'. Select default Subject or add to JSON.`)
+          errors.push(
+            `প্রতিবেদন #${itemNum}: 'subjectId' পাওয়া যায়নি। উপরের ড্রপডাউন থেকে বিষয় নির্বাচন করুন।`
+          )
         }
+
+        const rawDiffStr = (
+          item.difficulty ||
+          item.difficultyLevel ||
+          item.level ||
+          item.diff ||
+          ""
+        )
+          .toString()
+          .trim()
+
+        let itemDifficulty = fallbackDifficulty
+
+        if (rawDiffStr) {
+          const upper = rawDiffStr.toUpperCase()
+          if (upper === "EASY" || upper === "সহজ" || upper.includes("EASY") || upper === "1") {
+            itemDifficulty = "EASY"
+          } else if (
+            upper === "HARD" ||
+            upper === "কঠিন" ||
+            upper.includes("HARD") ||
+            upper === "3"
+          ) {
+            itemDifficulty = "HARD"
+          } else if (
+            upper === "MEDIUM" ||
+            upper === "মধ্যম" ||
+            upper === "সাধারণ" ||
+            upper.includes("MED") ||
+            upper === "2"
+          ) {
+            itemDifficulty = "MEDIUM"
+          } else if (["EASY", "MEDIUM", "HARD"].includes(upper)) {
+            itemDifficulty = upper as any
+          }
+        }
+
+        const itemSource = item.source || fallbackSource
+        const itemSession = item.session ? String(item.session).trim() : fallbackSession
 
         validated.push({
           subjectId,
-          title: String(title || "").trim(),
-          difficulty: item.difficulty || "MEDIUM",
-          popularityCount: item.popularityCount !== undefined && item.popularityCount !== null ? Number(item.popularityCount) : 0,
-          reference: Array.isArray(item.reference) ? item.reference : [],
+          title: String(title || "").replace(/\\n/g, "\n").trim(),
+          isMath: item.isMath !== undefined ? Boolean(item.isMath) : true,
+          difficulty: itemDifficulty as any,
+          source: itemSource,
+          session: itemSession,
+          popularityCount:
+            item.popularityCount !== undefined && item.popularityCount !== null
+              ? Number(item.popularityCount)
+              : 0,
+          reference: Array.isArray(item.reference)
+            ? item.reference.map(String)
+            : typeof item.reference === "string" && item.reference.trim()
+              ? item.reference
+                  .split(",")
+                  .map((r: string) => r.trim())
+                  .filter(Boolean)
+              : [],
+          questionTypeId: item.questionTypeId || null,
+          isActive: item.isActive !== undefined ? Boolean(item.isActive) : true,
         })
       })
 
       if (errors.length > 0) {
-        setParseError(errors.slice(0, 5).join(" | ") + (errors.length > 5 ? ` (+${errors.length - 5} more errors)` : ""))
+        setParseError(
+          errors.slice(0, 5).join(" | ") +
+            (errors.length > 5 ? ` (+${errors.length - 5}টি অতিরিক্ত ত্রুটি)` : "")
+        )
+        return
       }
 
       setParsedItems(validated)
+      setExpandedCards({ 0: true })
     } catch (err: any) {
-      setParseError(`Validation Error: ${err.message || "Could not validate News Report items."}`)
+      setParseError(err.message || "JSON যাচাইয়ে ত্রুটি ঘটেছে")
     }
   }
 
   const handleAutoFixJson = () => {
     if (!jsonText.trim()) return
-    const repaired = repairJsonSyntax(jsonText)
-    setJsonText(repaired)
-    validateAndParseJson(repaired, selectedAcademicClassId, selectedSubjectId)
-    toast.success("Attempted JSON syntax repair & formatting!")
+    const fixed = repairJsonSyntax(jsonText)
+    setJsonText(fixed)
+    validateAndParseJson(
+      fixed,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedSource,
+      selectedDifficulty
+    )
+    toast.success("JSON ফরম্যাট ও সিনট্যাক্স স্বয়ংক্রিয়ভাবে ঠিক করা হয়েছে!")
   }
 
   const syncParsedItemsToText = (newItems: any[]) => {
@@ -512,7 +718,13 @@ export function ImportNewsReportView() {
 
   const handleJsonChange = (val: string) => {
     setJsonText(val)
-    validateAndParseJson(val, selectedAcademicClassId, selectedSubjectId)
+    validateAndParseJson(
+      val,
+      selectedAcademicClassId,
+      selectedSubjectId,
+      selectedSource,
+      selectedDifficulty
+    )
   }
 
   const handleAcademicClassChange = (val: string) => {
@@ -520,7 +732,7 @@ export function ImportNewsReportView() {
     setSelectedAcademicClassId(value)
     setSelectedSubjectId("")
     if (jsonText) {
-      validateAndParseJson(jsonText, value, "")
+      validateAndParseJson(jsonText, value, "", selectedSource, selectedDifficulty)
     }
   }
 
@@ -528,7 +740,13 @@ export function ImportNewsReportView() {
     const value = val ?? ""
     setSelectedSubjectId(value)
     if (jsonText) {
-      validateAndParseJson(jsonText, selectedAcademicClassId, value)
+      validateAndParseJson(
+        jsonText,
+        selectedAcademicClassId,
+        value,
+        selectedSource,
+        selectedDifficulty
+      )
     }
   }
 
@@ -541,7 +759,7 @@ export function ImportNewsReportView() {
   const handleDeleteParsedItem = (idx: number) => {
     const next = parsedItems.filter((_, i) => i !== idx)
     syncParsedItemsToText(next)
-    toast.info(`Removed news report #${idx + 1} from import list.`)
+    toast.info(`প্রতিবেদন #${toBengaliDigits(idx + 1)} তালিকা থেকে সরানো হয়েছে।`)
   }
 
   const handleDuplicateParsedItem = (idx: number) => {
@@ -550,141 +768,177 @@ export function ImportNewsReportView() {
     const next = [...parsedItems]
     next.splice(idx + 1, 0, {
       ...itemToCopy,
-      title: `${itemToCopy.title} (Copy)`,
+      title: `${itemToCopy.title} (কপি)`,
     })
     syncParsedItemsToText(next)
-    toast.success(`Duplicated news report #${idx + 1}.`)
+    toast.success(`প্রতিবেদন #${toBengaliDigits(idx + 1)} সফলভাবে ডুপ্লিকেট করা হয়েছে।`)
   }
 
   const handleAddNewQuestionCard = () => {
-    const newReport = {
-      title: "নতুন প্রতিবেদন প্রম্পট বা বিবরণ...",
-      difficulty: "MEDIUM",
-      popularityCount: 0,
+    const newItem = {
+      title: "",
+      isMath: true,
       reference: [],
+      difficulty: selectedDifficulty || "MEDIUM",
+      source: selectedSource || DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
+      popularityCount: 0,
+      questionTypeId: null,
+      isActive: true,
+      subjectId: selectedSubjectId || "",
     }
-    const next = [...parsedItems, newReport]
+    const next = [...parsedItems, newItem]
     syncParsedItemsToText(next)
+    setExpandedCards((prev) => ({ ...prev, [next.length - 1]: true }))
+  }
+
+  const toggleAllExpanded = (expand: boolean) => {
+    const newMap: Record<number, boolean> = {}
+    parsedItems.forEach((_, idx) => {
+      newMap[idx] = expand
+    })
+    setExpandedCards(newMap)
   }
 
   const handleCopyTemplate = () => {
     navigator.clipboard.writeText(sampleJsonTemplate)
-    toast.success("Sample JSON template copied to clipboard!")
+    toast.success("নমুনা JSON টেমপ্লেট ক্লিপবোর্ডে কপি করা হয়েছে!")
   }
 
   const handleImport = async () => {
     if (parsedItems.length === 0 || parseError) {
-      toast.error("Please fix JSON errors before importing.")
+      toast.error("ইম্পোর্ট করার পূর্বে ত্রুটিসমূহ সংশোধন করুন।")
       return
     }
 
     try {
       const payload = parsedItems.map((item) => ({
-        subjectId: selectedSubjectId,
+        subjectId: item.subjectId || selectedSubjectId,
         title: item.title.trim(),
-        difficulty: item.difficulty as any,
-        popularityCount: Number(item.popularityCount) || 0,
         reference: Array.isArray(item.reference) ? item.reference : [],
+        difficulty: item.difficulty || selectedDifficulty || "MEDIUM",
+        source: item.source || selectedSource || DEFAULT_SOURCE,
+        session: item.session || new Date().getFullYear().toString(),
+        popularityCount: Number(item.popularityCount) || 0,
+        questionTypeId: item.questionTypeId || null,
+        isActive: item.isActive !== false,
       }))
 
-      const res = await importMutation.mutateAsync({ newsReports: payload })
-      toast.success(`Successfully imported ${res.importedCount} News Reports!`)
+      const result = await importMutation.mutateAsync({
+        newsReports: payload,
+        source: selectedSource || DEFAULT_SOURCE,
+        session: new Date().getFullYear().toString(),
+        difficulty: selectedDifficulty as any,
+      })
+
+      toast.success(
+        `সফলভাবে ${toBengaliDigits(result.importedCount)}টি সংবাদ প্রতিবেদন ইম্পোর্ট করা হয়েছে!`
+      )
       setTimeout(() => {
         router.push("/news-reports")
-      }, 1000)
+      }, 800)
     } catch (err: any) {
-      toast.error(err.message || "Failed to bulk import news reports.")
+      toast.error(err.message || "বাল্ক ইম্পোর্ট ব্যর্থ হয়েছে")
     }
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto pb-12">
-      {/* Header Section */}
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end justify-between">
-        <div>
-          <nav className="mb-3 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/news-reports"
-              className="font-label-sm text-xs hover:text-primary transition-colors cursor-pointer"
-            >
-              News Reports
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm text-xs font-bold text-primary">Import JSON</span>
-          </nav>
-          <h2 className="mb-1.5 font-headline-md text-2xl sm:text-3xl font-extrabold text-primary">
-            Import News Reports from JSON
-          </h2>
-          <p className="font-body-md text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Bulk upload news reports or edit individual cards before importing into the question bank.
-          </p>
-        </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200 pb-12">
+      {/* Shared Page Header matching MCQ Import */}
+      <PageHeader
+        title="JSON থেকে সংবাদ প্রতিবেদন ইম্পোর্ট"
+        description="JSON ফাইল আপলোড বা সরাসরি টেক্সট পেস্ট করে একসাথে একাধিক সংবাদ প্রতিবেদন যাচাই, সম্পাদনা ও ইম্পোর্ট করুন।"
+        icon={Upload}
+        badge={{ label: "বাল্ক ইম্পোর্ট", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "সংবাদ প্রতিবেদন তালিকা", href: "/news-reports" },
+          { label: "JSON ইম্পোর্ট" },
+        ]}
+      >
+        <div className="flex items-center gap-2.5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowSample(!showSample)}
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Code className="w-4 h-4" />
+            <span>{showSample ? "টেমপ্লেট লুকান" : "নমুনা JSON দেখুন"}</span>
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowSample(!showSample)}
-          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-outline px-4 py-2 text-sm font-semibold text-primary hover:bg-surface-container-low cursor-pointer h-auto"
-        >
-          <CodeIcon className="size-4" />
-          <span>{showSample ? "Hide Template" : "View Sample JSON"}</span>
-        </Button>
-      </div>
+          <Button
+            asChild
+            variant="outline"
+            className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Link href="/news-reports" prefetch={true}>
+              <ArrowLeft className="w-4 h-4" />
+              <span>তালিকায় ফিরে যান</span>
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* Sample JSON Template Card */}
       {showSample && (
-        <Card className="mb-8 overflow-hidden rounded-xl border border-primary/20 bg-primary-container/10 p-4 sm:p-6 animate-fade-in">
+        <Card className="rounded-2xl border border-indigo-200/70 dark:border-primary/20 bg-indigo-50/30 dark:bg-primary/5 p-5 sm:p-6 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <h4 className="font-headline-md text-base font-bold text-primary flex items-center gap-2">
-              <FileCodeIcon className="size-5" />
-              Expected JSON Structure
+            <h4 className="text-sm font-bold font-headline text-indigo-700 dark:text-primary flex items-center gap-2">
+              <FileCode className="size-4" />
+              প্রত্যাশিত JSON ফরম্যাট ও কাঠামো
             </h4>
             <Button
               type="button"
-              size="xs"
+              size="sm"
               variant="outline"
               onClick={handleCopyTemplate}
-              className="w-full sm:w-auto font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer justify-center"
+              className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer"
             >
-              Copy Template
+              টেমপ্লেট কপি করুন
             </Button>
           </div>
-          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-lg bg-surface-container-lowest p-3 sm:p-4 font-mono text-xs text-on-surface leading-relaxed border border-outline-variant/50">
+          <pre className="whitespace-pre-wrap break-all sm:break-normal overflow-x-auto rounded-xl bg-card p-4 font-mono text-xs text-foreground leading-relaxed border border-slate-200/80 dark:border-white/[0.08]">
             {sampleJsonTemplate}
           </pre>
         </Card>
       )}
 
-      {/* Main Hierarchy & Input Section */}
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-xs">
-        <CardHeader className="border-b border-outline-variant/30 p-6 bg-surface-container-low/30">
-          <CardTitle className="font-headline-md text-lg font-semibold text-on-surface">
-            Class & Subject Hierarchy (Default Assignee)
-          </CardTitle>
-          <p className="font-body-md text-xs text-on-surface-variant mt-1">
-            Select Academic Class and Subject. News report items will be assigned subject from the selection below.
-          </p>
+      {/* Step 1 Card: Data Source & Hierarchy Setup */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <Layers className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              ১. শ্রেণি, বিষয় ও ডেটা সোর্স কনফিগারেশন
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              যেসব প্রতিবেদনে বিষয় আইডি নেই, সেগুলোর জন্য ডিফল্ট তথ্য ও সোর্স নির্বাচন করে ফাইল আপলোড বা পেস্ট করুন।
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-6">
-          {/* Academic Class & Subject dropdowns */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+        <CardContent className="p-6 sm:p-8 space-y-6">
+          {/* Hierarchy Dropdowns matching MCQ */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Academic Class */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Academic Class
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                শ্রেণি (Academic Class)
               </Label>
               <Select
                 value={selectedAcademicClassId || "all"}
                 onValueChange={handleAcademicClassChange}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Class (All Classes)..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="সব শ্রেণি..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  <SelectItem value="all" className="text-neutral-900">All Classes</SelectItem>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  <SelectItem value="all">সব শ্রেণি (All Classes)</SelectItem>
                   {academicClasses.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id} className="text-neutral-900">
-                      {cls.nameEn}
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -693,20 +947,83 @@ export function ImportNewsReportView() {
 
             {/* Default Subject */}
             <div className="space-y-2">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Default Subject
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট বিষয় (Subject)
+              </Label>
+              <Select value={selectedSubjectId} onValueChange={handleSubjectChange}>
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="ডিফল্ট বিষয় নির্বাচন করুন..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  {subjects.map((sub) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Source */}
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট উৎস (Source)
               </Label>
               <Select
-                value={selectedSubjectId}
-                onValueChange={handleSubjectChange}
+                value={selectedSource}
+                onValueChange={(val) => {
+                  setSelectedSource(val)
+                  if (jsonText) {
+                    validateAndParseJson(
+                      jsonText,
+                      selectedAcademicClassId,
+                      selectedSubjectId,
+                      val,
+                      selectedDifficulty
+                    )
+                  }
+                }}
               >
-                <SelectTrigger className="w-full rounded-lg border border-outline-variant py-2.5 px-4 font-body-md text-sm text-on-surface transition-all bg-white focus:border-primary focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:outline-hidden h-10 cursor-pointer">
-                  <SelectValue placeholder="Select Default Subject..." />
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white text-neutral-900 border border-outline-variant">
-                  {subjects.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id} className="text-neutral-900">
-                      {sub.nameEn}
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  {NEWS_REPORT_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Default Difficulty */}
+            <div className="space-y-2">
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                ডিফল্ট কাঠিন্য (Difficulty)
+              </Label>
+              <Select
+                value={selectedDifficulty}
+                onValueChange={(val) => {
+                  setSelectedDifficulty(val)
+                  if (jsonText) {
+                    validateAndParseJson(
+                      jsonText,
+                      selectedAcademicClassId,
+                      selectedSubjectId,
+                      selectedSource,
+                      val
+                    )
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                  <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                  {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -714,107 +1031,109 @@ export function ImportNewsReportView() {
             </div>
           </div>
 
-          {/* Helper Warning if Class & Subject are not selected */}
+          {/* Warning Banner if Class or Subject not chosen */}
           {(!selectedAcademicClassId || !selectedSubjectId) && (
-            <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-xs font-semibold">
-              <AlertTriangleIcon className="size-4 text-amber-600 shrink-0" />
-              <span>Please select a Default Class and Default Subject above to unlock JSON file upload and text input.</span>
+            <div className="flex items-center gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/70 dark:bg-amber-950/20 p-4 text-amber-800 dark:text-amber-400 text-xs font-medium">
+              <AlertTriangle className="size-4 text-amber-600 shrink-0" />
+              <span>
+                JSON ফাইল আপলোড বা টেক্সট ইনপুট আনলক করতে অনুগ্রহ করে উপরে ডিফল্ট শ্রেণি ও বিষয় নির্বাচন করুন।
+              </span>
             </div>
           )}
 
-          {/* JSON File Uploader */}
-          <div className="border-t border-outline-variant/30 pt-6">
-            <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
-              Upload JSON File
+          {/* File Upload Section */}
+          <div className="border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+            <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              JSON ফাইল আপলোড করুন
             </Label>
             <input
               type="file"
               accept=".json,application/json"
               disabled={!selectedAcademicClassId || !selectedSubjectId}
               onChange={handleFileUpload}
-              className="block w-full text-sm text-on-surface file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-container file:text-on-primary-container hover:file:bg-primary hover:file:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
+              className="block w-full text-sm text-foreground file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 dark:file:bg-primary/10 file:text-indigo-700 dark:file:text-primary hover:file:bg-indigo-100 dark:hover:file:bg-primary/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:disabled:pointer-events-none"
             />
           </div>
 
           {/* Or Paste JSON Textarea */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label className="block font-label-sm text-xs font-medium uppercase tracking-wider text-on-surface-variant">
-                Or Paste JSON Content Below
+              <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                অথবা সরাসরি JSON টেক্সট পেস্ট করুন
               </Label>
               {jsonText.trim() && (
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   variant="outline"
                   onClick={handleAutoFixJson}
-                  className="text-xs font-bold text-primary border-primary/30 hover:bg-primary-container cursor-pointer"
+                  className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary text-xs font-bold h-8 px-3 cursor-pointer"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  ⚡ Auto-Fix & Format JSON
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় সিনট্যাক্স ফিক্স ও ফরম্যাট
                 </Button>
               )}
             </div>
             <Textarea
-              rows={6}
+              rows={5}
               disabled={!selectedAcademicClassId || !selectedSubjectId}
               placeholder={
                 !selectedAcademicClassId || !selectedSubjectId
-                  ? "Select Class and Subject above first to enable JSON input..."
-                  : "Paste JSON array here..."
+                  ? "প্রথমে উপরে শ্রেণি ও বিষয় নির্বাচন করুন..."
+                  : "এখানে JSON অ্যারে পেস্ট করুন..."
               }
               value={jsonText}
               onChange={(e) => handleJsonChange(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-white p-3 font-mono text-xs text-on-surface focus:ring-2 focus:ring-primary/20 disabled:bg-surface-container-low disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-card p-3.5 font-mono text-xs text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
-          {/* Validation Status / Diagnostics */}
+          {/* Validation Diagnostics / Error Locator */}
           {parseError && (
-            <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-destructive">
+            <div className="space-y-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-5 text-rose-700 dark:text-rose-400">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <AlertTriangleIcon className="size-5 text-destructive shrink-0" />
-                  <p className="font-bold text-sm">JSON Parsing Diagnostic Error</p>
+                  <AlertCircle className="size-5 text-rose-600 shrink-0" />
+                  <p className="font-bold text-sm">JSON সিনট্যাক্স ডায়াগনস্টিক ত্রুটি</p>
                 </div>
                 <Button
                   type="button"
-                  size="xs"
+                  size="sm"
                   onClick={handleAutoFixJson}
-                  className="bg-destructive text-white hover:bg-destructive/90 font-bold text-xs cursor-pointer shadow-xs w-full sm:w-auto justify-center"
+                  className="rounded-xl bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs h-8 px-3 cursor-pointer shadow-xs w-full sm:w-auto justify-center"
                 >
-                  <Wand2Icon className="size-3.5 mr-1" />
-                  Auto-Fix JSON Syntax
+                  <Wand2 className="size-3.5 mr-1" />
+                  স্বয়ংক্রিয় ফিক্স প্রয়োগ করুন
                 </Button>
               </div>
 
-              <p className="font-mono text-xs leading-relaxed bg-white/80 p-2.5 rounded-lg border border-destructive/20 text-destructive">
+              <p className="font-mono text-xs leading-relaxed bg-white/90 dark:bg-card p-3 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-400">
                 {parseError}
               </p>
 
               {/* Code Snippet Error Pointer */}
               {errorContext && errorContext.linesContext.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-destructive/80">
-                    Syntax Error Location (Line {errorContext.line}
-                    {errorContext.col > 0 ? `, Column ${errorContext.col}` : ""}):
+                <div className="space-y-1.5 pt-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-rose-700/80">
+                    ত্রুটির সম্ভাব্য অবস্থান (লাইন {toBengaliDigits(errorContext.line)}
+                    {errorContext.col > 0 ? `, কলাম ${toBengaliDigits(errorContext.col)}` : ""}):
                   </p>
-                  <div className="overflow-x-auto rounded-lg bg-gray-900 p-3 font-mono text-xs text-gray-200">
+                  <div className="overflow-x-auto rounded-xl bg-slate-900 p-3.5 font-mono text-xs text-slate-200">
                     {errorContext.linesContext.map((l) => (
                       <div
                         key={l.num}
                         className={cn(
-                          "flex items-center gap-3 px-2 py-0.5 rounded",
-                          l.isError && "bg-red-900/80 text-white font-bold border-l-4 border-red-500"
+                          "flex items-center gap-3 px-2 py-0.5 rounded-lg",
+                          l.isError && "bg-rose-950/80 text-white font-bold border-l-4 border-rose-500"
                         )}
                       >
-                        <span className="w-8 shrink-0 text-right text-gray-500 select-none">
-                          {l.num}
+                        <span className="w-8 shrink-0 text-right text-slate-500 select-none">
+                          {toBengaliDigits(l.num)}
                         </span>
                         <span className="whitespace-pre">{l.content}</span>
                         {l.isError && (
-                          <span className="ml-auto text-[10px] uppercase tracking-wider bg-red-600 text-white px-1.5 py-0.5 rounded shrink-0">
-                            Error Here
+                          <span className="ml-auto text-[10px] uppercase font-bold tracking-wider bg-rose-600 text-white px-2 py-0.5 rounded-md shrink-0">
+                            এখানে ত্রুটি
                           </span>
                         )}
                       </div>
@@ -825,14 +1144,15 @@ export function ImportNewsReportView() {
             </div>
           )}
 
+          {/* Validation Success Banner */}
           {!parseError && parsedItems.length > 0 && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-emerald-800 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 dark:bg-emerald-950/20 p-4 text-emerald-800 dark:text-emerald-300 text-sm">
               <div className="flex items-center gap-3">
-                <CheckCircle2Icon className="size-5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                 <div>
-                  <p className="font-bold">JSON Parsed & Valid!</p>
-                  <p className="text-xs">
-                    {parsedItems.length} news report item(s) parsed successfully.
+                  <p className="font-bold">JSON যাচাইকরণ সফল হয়েছে!</p>
+                  <p className="text-xs text-emerald-700/80 dark:text-emerald-400">
+                    মোট {toBengaliDigits(parsedItems.length)}টি সংবাদ প্রতিবেদন সফলভাবে পার্স করা হয়েছে। নিচের প্রিভিউ কার্ডে পর্যালোচনা ও সম্পাদনা করুন।
                   </p>
                 </div>
               </div>
@@ -841,83 +1161,132 @@ export function ImportNewsReportView() {
                 variant="outline"
                 size="sm"
                 onClick={handleAddNewQuestionCard}
-                className="bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100 font-bold text-xs cursor-pointer shrink-0 w-full sm:w-auto justify-center"
+                className="rounded-xl bg-white dark:bg-card border-emerald-300 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 font-bold text-xs h-9 px-4 cursor-pointer shrink-0 w-full sm:w-auto justify-center"
               >
-                <PlusIcon className="size-3.5 mr-1" />
-                Add News Report Card
+                <Plus className="size-3.5 mr-1" />
+                নতুন প্রতিবেদন কার্ড যোগ করুন
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
 
-          {/* Parsed Items Card-based Preview */}
-          {parsedItems.length > 0 && (
-            <div className="border-t border-outline-variant/30 pt-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                    <CodeIcon className="size-4 text-primary shrink-0" />
-                    Card Preview ({parsedItems.length} News Reports)
-                  </h4>
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddNewQuestionCard}
-                  className="font-bold text-xs text-primary border-primary/30 hover:bg-primary-container cursor-pointer w-full sm:w-auto justify-center"
-                >
-                  <PlusIcon className="size-3.5 mr-1" />
-                  Add News Report
-                </Button>
+      {/* Step 2 Section: Parsed News Reports Review & Edit Cards */}
+      {parsedItems.length > 0 && (
+        <div className="space-y-6 pt-2">
+          {/* Section Header Controls matching MCQ */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 shrink-0">
+                <BookOpen className="h-5 w-5" />
               </div>
-
-              {/* Grid of News Report Preview Cards */}
-              <div className="space-y-6">
-                {parsedItems.map((item, idx) => (
-                  <EditableNewsReportCard
-                    key={idx}
-                    index={idx}
-                    item={item}
-                    onChange={(updated) => handleUpdateParsedItem(idx, updated)}
-                    onDelete={() => handleDeleteParsedItem(idx)}
-                    onDuplicate={() => handleDuplicateParsedItem(idx)}
-                  />
-                ))}
+              <div>
+                <h3 className="text-lg font-bold font-headline text-foreground flex items-center gap-2">
+                  <span>২. সংবাদ প্রতিবেদন প্রিভিউ ও সম্পাদনা</span>
+                  <Badge
+                    variant="secondary"
+                    className="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono"
+                  >
+                    {toBengaliDigits(parsedItems.length)}টি প্রতিবেদন
+                  </Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  প্রতিটি সংবাদ প্রতিবেদনের বিবরণ ও মেটাডাটা চেক করুন এবং প্রয়োজনে সরাসরি সংশোধন করুন।
+                </p>
               </div>
             </div>
-          )}
 
-          {/* Submit Actions */}
-          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-outline-variant pt-6">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(true)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer"
+              >
+                <Maximize2 className="size-3.5 mr-1" />
+                সব প্রসারিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleAllExpanded(false)}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 text-xs font-semibold h-9 px-3 cursor-pointer"
+              >
+                <Minimize2 className="size-3.5 mr-1" />
+                সব সংকুচিত করুন
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddNewQuestionCard}
+                className="rounded-xl border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-primary/20 dark:text-primary font-bold text-xs h-9 px-3.5 cursor-pointer"
+              >
+                <Plus className="size-3.5 mr-1" />
+                প্রতিবেদন যোগ করুন
+              </Button>
+            </div>
+          </div>
+
+          {/* List of Parsed News Report Cards */}
+          <div className="space-y-6">
+            {parsedItems.map((item, idx) => (
+              <ParsedNewsReportCard
+                key={idx}
+                index={idx}
+                item={item}
+                questionTypes={questionTypes}
+                isExpanded={Boolean(expandedCards[idx])}
+                onToggleExpand={() =>
+                  setExpandedCards((prev) => ({
+                    ...prev,
+                    [idx]: !prev[idx],
+                  }))
+                }
+                onChange={(updated) => handleUpdateParsedItem(idx, updated)}
+                onDelete={() => handleDeleteParsedItem(idx)}
+                onDuplicate={() => handleDuplicateParsedItem(idx)}
+              />
+            ))}
+          </div>
+
+          {/* Form Actions Footer */}
+          <div className="flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
             <Button
-              type="button"
+              asChild
               variant="outline"
-              onClick={() => router.push("/news-reports")}
-              className="w-full sm:w-auto rounded-lg border border-outline px-6 py-2.5 text-sm font-bold text-primary hover:bg-surface-container-low cursor-pointer h-auto justify-center"
+              className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer justify-center"
             >
-              Cancel
+              <Link href="/news-reports" prefetch={true}>
+                বাতিল
+              </Link>
             </Button>
             <Button
               type="button"
-              disabled={parsedItems.length === 0 || Boolean(parseError) || importMutation.isPending}
+              disabled={
+                parsedItems.length === 0 ||
+                Boolean(parseError) ||
+                importMutation.isPending
+              }
               onClick={handleImport}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg bg-primary-container px-8 py-2.5 text-sm font-bold text-on-primary-container shadow-md hover:bg-primary hover:text-white disabled:opacity-50 cursor-pointer h-auto"
+              className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {importMutation.isPending ? (
-                <Wand2Icon className="size-4 animate-spin shrink-0" />
+                <Loader2 className="size-4 animate-spin shrink-0" />
               ) : (
-                <UploadIcon className="size-4 shrink-0" />
+                <Upload className="size-4 shrink-0" />
               )}
               <span>
                 {importMutation.isPending
-                  ? "Importing..."
-                  : `Import ${parsedItems.length} News Reports`}
+                  ? "ইম্পোর্ট করা হচ্ছে..."
+                  : `মোট ${toBengaliDigits(parsedItems.length)}টি প্রতিবেদন ইম্পোর্ট করুন`}
               </span>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   )
 }

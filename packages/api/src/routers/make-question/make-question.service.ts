@@ -82,7 +82,7 @@ export async function listMakeQuestion(db: PrismaClient, input: ListMakeQuestion
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -415,7 +415,7 @@ export async function getMakeQuestionStats(db: PrismaClient, input: MakeQuestion
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

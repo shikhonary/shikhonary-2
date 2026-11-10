@@ -8,6 +8,10 @@ import {
   bulkDeleteLettersSchema,
   importLettersSchema,
   letterStatsSchema,
+  letterBoardYearsSchema,
+  toggleLetterActiveSchema,
+  resolveLetterReportSchema,
+  assignLetterReportSchema,
 } from "./letter.schema"
 import {
   createLetter,
@@ -18,6 +22,10 @@ import {
   bulkDeleteLetters,
   importLetters,
   getLetterStats,
+  getBoardYears,
+  toggleLetterActive,
+  resolveLetterReport,
+  assignLetterReport,
 } from "./letter.service"
 
 export const letterRouter = createTRPCRouter({
@@ -28,6 +36,10 @@ export const letterRouter = createTRPCRouter({
   stats: superAdminProcedure
     .input(letterStatsSchema.optional())
     .query(({ ctx, input }) => getLetterStats(ctx.db, input ?? {})),
+
+  boardYears: superAdminProcedure
+    .input(letterBoardYearsSchema.optional())
+    .query(({ ctx, input }) => getBoardYears(ctx.db, input ?? {})),
 
   byId: superAdminProcedure
     .input(getLetterSchema)
@@ -49,7 +61,23 @@ export const letterRouter = createTRPCRouter({
     .input(bulkDeleteLettersSchema)
     .mutation(({ ctx, input }) => bulkDeleteLetters(ctx.db, input)),
 
+  toggleActive: superAdminProcedure
+    .input(toggleLetterActiveSchema)
+    .mutation(({ ctx, input }) => toggleLetterActive(ctx.db, input)),
+
   import: superAdminProcedure
     .input(importLettersSchema)
     .mutation(({ ctx, input }) => importLetters(ctx.db, input)),
+
+  resolveReport: superAdminProcedure
+    .input(resolveLetterReportSchema)
+    .mutation(({ ctx, input }) =>
+      resolveLetterReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignLetterReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignLetterReport(ctx.db, input, ctx.session?.user?.id)
+    ),
 })

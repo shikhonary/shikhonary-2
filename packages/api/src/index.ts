@@ -159,6 +159,7 @@ export type {
   ToggleMcqActiveInput,
   ImportMcqsInput,
   ResolveMcqReportInput,
+  AssignMcqReportInput,
 } from "./routers/mcq/mcq.schema"
 
 export type {
@@ -171,6 +172,7 @@ export type {
   ToggleCqActiveInput,
   ImportCqsInput,
   ResolveCqReportInput,
+  AssignCqReportInput,
 } from "./routers/cq/cq.schema"
 
 export type {
@@ -183,6 +185,7 @@ export type {
   ToggleCsActiveInput,
   ImportCsInput,
   ResolveCsReportInput,
+  AssignCsReportInput,
 } from "./routers/cs/cs.schema"
 
 export type {
@@ -198,10 +201,14 @@ export type {
 export type {
   ListParagraphsInput,
   ParagraphStatsInput,
+  ParagraphBoardYearsInput,
   CreateParagraphInput,
   UpdateParagraphInput,
   DeleteParagraphInput,
   BulkDeleteParagraphsInput,
+  ToggleParagraphActiveInput,
+  ResolveParagraphReportInput,
+  AssignParagraphReportInput,
   ImportParagraphsInput,
 } from "./routers/paragraph/paragraph.schema"
 
@@ -238,6 +245,10 @@ export type {
 export type {
   ListSummariesInput,
   SummaryStatsInput,
+  SummaryBoardYearsInput,
+  ToggleSummaryActiveInput,
+  ResolveSummaryReportInput,
+  AssignSummaryReportInput,
   CreateSummaryInput,
   UpdateSummaryInput,
   DeleteSummaryInput,
@@ -248,6 +259,10 @@ export type {
 export type {
   ListEssencesInput,
   EssenceStatsInput,
+  EssenceBoardYearsInput,
+  ToggleEssenceActiveInput,
+  ResolveEssenceReportInput,
+  AssignEssenceReportInput,
   CreateEssenceInput,
   UpdateEssenceInput,
   DeleteEssenceInput,

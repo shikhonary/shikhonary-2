@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useForm, useFieldArray, Controller } from "react-hook-form"
+import { useForm, useFieldArray, Controller, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
@@ -15,7 +15,8 @@ import { Textarea } from "@workspace/ui/components/textarea"
 import { Badge } from "@workspace/ui/components/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import { PageHeader } from "@/components/shared/page-header"
-import { toBengaliDigits } from "@workspace/utils"
+import { cn } from "@workspace/ui/lib/utils"
+import { toBengaliDigits, getQuestionTypePolicy, isSingleQuestionType } from "@workspace/utils"
 import {
   Loader2,
   Save,
@@ -872,6 +873,7 @@ interface SubSectionCardProps {
   subIndex: number
   removeSubSection: (index: number) => void
   questionTypesList: any[]
+  setValue?: any
 }
 
 function SubSectionCard({
@@ -880,6 +882,7 @@ function SubSectionCard({
   subIndex,
   removeSubSection,
   questionTypesList,
+  setValue,
 }: SubSectionCardProps) {
   const {
     fields: subQtFields,
@@ -1030,6 +1033,7 @@ interface QuestionTypeRowProps {
   namePrefix: string
   removeRow: () => void
   questionTypesList: any[]
+  setValue?: any
 }
 
 function QuestionTypeRow({
@@ -1039,6 +1043,7 @@ function QuestionTypeRow({
   namePrefix,
   removeRow,
   questionTypesList,
+  setValue,
 }: QuestionTypeRowProps) {
   const {
     attributes,
@@ -1055,6 +1060,21 @@ function QuestionTypeRow({
     zIndex: isDragging ? 50 : undefined,
     opacity: isDragging ? 0.6 : 1,
   }
+
+  const currentQTypeId = useWatch({ control, name: `${namePrefix}.questionTypeId` })
+  const currentTotal = useWatch({ control, name: `${namePrefix}.totalQuestions` })
+  const currentSelMode = useWatch({ control, name: `${namePrefix}.selectionMode` })
+
+  const selectedTypeObj = questionTypesList.find((t) => t.id === currentQTypeId)
+  const policy = getQuestionTypePolicy((selectedTypeObj as any)?.code || selectedTypeObj?.nameEn || selectedTypeObj?.nameBn)
+
+  const effectiveMode = currentSelMode || (
+    (currentTotal === 1 || policy.selectionMode === "SINGLE")
+      ? "SINGLE_WITH_ALT"
+      : "MULTIPLE"
+  )
+
+  const isSingle = effectiveMode === "SINGLE_WITH_ALT" || effectiveMode === "SINGLE_NO_ALT"
 
   return (
     <div
@@ -1163,43 +1183,89 @@ function QuestionTypeRow({
       </div>
 
       {/* Required Count */}
-      <div className="w-[80px] shrink-0 space-y-1">
-        <Label className="text-[10px] text-slate-500 font-semibold uppercase">উত্তর দিতে হবে</Label>
+      <div className="w-[75px] shrink-0 space-y-1">
+        <Label className="text-[10px] text-slate-500 font-semibold uppercase">উত্তর আবশ্যক</Label>
         <Controller
           control={control}
           name={`${namePrefix}.requiredCount`}
           render={({ field }) => (
             <Input
               type="number"
-              placeholder="0"
-              value={field.value ?? ""}
+              placeholder={isSingle ? "১" : "০"}
+              disabled={isSingle}
+              value={isSingle ? 1 : (field.value ?? "")}
               onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-              className="h-9 px-2 text-center text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
+              className={cn(
+                "h-9 px-2 text-center text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors",
+                isSingle && "bg-slate-100 dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-bold cursor-not-allowed opacity-90"
+              )}
+              title={isSingle ? "একক প্রশ্ন ফরম্যাটে উত্তর আবশ্যক ১টি" : undefined}
             />
           )}
         />
       </div>
 
       {/* Total Questions */}
-      <div className="w-[80px] shrink-0 space-y-1">
-        <Label className="text-[10px] text-slate-500 font-semibold uppercase">মোট প্রশ্ন থাকবে</Label>
+      <div className="w-[75px] shrink-0 space-y-1">
+        <Label className="text-[10px] text-slate-500 font-semibold uppercase">মোট প্রশ্ন</Label>
         <Controller
           control={control}
           name={`${namePrefix}.totalQuestions`}
           render={({ field }) => (
             <Input
               type="number"
-              placeholder="0"
-              value={field.value ?? ""}
+              placeholder={isSingle ? "১" : "০"}
+              disabled={isSingle}
+              value={isSingle ? 1 : (field.value ?? "")}
               onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value, 10))}
-              className="h-9 px-2 text-center text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
+              className={cn(
+                "h-9 px-2 text-center text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors",
+                isSingle && "bg-slate-100 dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 font-bold cursor-not-allowed opacity-90"
+              )}
+              title={isSingle ? "একক প্রশ্ন ফরম্যাটে সর্বোচ্চ ১টি মূল প্রশ্ন নির্ধারিত থাকে (বিকল্প প্রশ্ন আলাদা যোগ করা যায়)" : undefined}
             />
           )}
         />
       </div>
 
-      {/* Render Style */}
-      <div className="w-[125px] shrink-0 space-y-1">
+      {/* 1. Single / Multiple Control Dropdown */}
+      <div className="w-full sm:w-[155px] shrink-0 space-y-1">
+        <Label className="text-[10px] text-slate-500 font-semibold uppercase">সিলেকশন মোড</Label>
+        <Controller
+          control={control}
+          name={`${namePrefix}.selectionMode`}
+          render={({ field }) => (
+            <Select
+              value={field.value || effectiveMode}
+              onValueChange={(val) => {
+                field.onChange(val)
+                if (val === "SINGLE_WITH_ALT" || val === "SINGLE_NO_ALT") {
+                  setValue?.(`${namePrefix}.totalQuestions`, 1, { shouldDirty: true, shouldValidate: true })
+                  setValue?.(`${namePrefix}.requiredCount`, 1, { shouldDirty: true, shouldValidate: true })
+                }
+              }}
+            >
+              <SelectTrigger className="h-9 text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                <SelectValue placeholder="সিলেকশন মোড" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl font-body">
+                <SelectItem value="SINGLE_WITH_ALT" className="text-xs">
+                  একক প্রশ্ন + বিকল্প (অথবা)
+                </SelectItem>
+                <SelectItem value="SINGLE_NO_ALT" className="text-xs">
+                  একক প্রশ্ন (বিকল্পহীন)
+                </SelectItem>
+                <SelectItem value="MULTIPLE" className="text-xs">
+                  একাধিক প্রশ্ন (তালিকা)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </div>
+
+      {/* 2. Render Style / Method Dropdown */}
+      <div className="w-full sm:w-[130px] shrink-0 space-y-1">
         <Label className="text-[10px] text-slate-500 font-semibold uppercase">ডিসপ্লে স্টাইল</Label>
         <Controller
           control={control}
@@ -1212,7 +1278,7 @@ function QuestionTypeRow({
               <SelectTrigger className="h-9 text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
                 <SelectValue placeholder="স্টাইল" />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl">
+              <SelectContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl font-body">
                 <SelectItem value="1" className="text-xs">
                   ১: সাধারণ শিরোনাম
                 </SelectItem>

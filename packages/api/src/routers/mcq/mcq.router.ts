@@ -11,6 +11,7 @@ import {
   importMcqsSchema,
   mcqStatsSchema,
   resolveMcqReportSchema,
+  assignMcqReportSchema,
 } from "./mcq.schema"
 import {
   createMcq,
@@ -24,6 +25,7 @@ import {
   getMcqStats,
   getBoardYears,
   resolveMcqReport,
+  assignMcqReport,
 } from "./mcq.service"
 
 export const mcqRouter = createTRPCRouter({
@@ -78,5 +80,11 @@ export const mcqRouter = createTRPCRouter({
     .input(resolveMcqReportSchema)
     .mutation(({ ctx, input }) =>
       resolveMcqReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignMcqReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignMcqReport(ctx.db, input, ctx.session?.user?.id)
     ),
 })

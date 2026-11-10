@@ -16,7 +16,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, type QuestionTypeCode } from "@workspace/utils";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, getQuestionTypePolicy, isSingleQuestionType, resolvePaperSlots, type QuestionTypeCode } from "@workspace/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import {
   Sheet,
@@ -295,14 +295,34 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   });
   const sources = sourcesData ?? [];
 
-  const subSectionQuestionsCount = urlSubSectionId
-    ? (paperQuery?.questions || []).filter((q: any) => q.subSectionId === urlSubSectionId && q.distributionId === distributionId).length
-    : (urlSectionId
-      ? (paperQuery?.questions || []).filter((q: any) => q.sectionId === urlSectionId && q.distributionId === distributionId).length
-      : (distStatus?.addedCount || 0));
+  const resolvedSlot = React.useMemo(() => {
+    if (!paperQuery) return null;
+    const topology = resolvePaperSlots(paperQuery, statuses ?? []);
+    return topology.findSlot({
+      distributionId,
+      subSectionId: urlSubSectionId ?? (distStatus as any)?.subSectionId ?? null,
+      sectionId: urlSectionId ?? (distStatus as any)?.sectionId ?? null,
+    });
+  }, [paperQuery, statuses, distributionId, urlSubSectionId, urlSectionId, distStatus]);
 
-  const effectiveTargetCount = isAlternativeMode ? 1 : (urlLimit ?? distStatus?.targetCount ?? 0);
-  const maxSelectable = isAlternativeMode ? 1 : Math.max(0, effectiveTargetCount - subSectionQuestionsCount);
+  const subSectionQuestionsCount = resolvedSlot
+    ? resolvedSlot.slotAddedCount
+    : (urlSubSectionId
+        ? (paperQuery?.questions || []).filter((q: any) => q.subSectionId === urlSubSectionId && q.distributionId === distributionId).length
+        : (urlSectionId
+          ? (paperQuery?.questions || []).filter((q: any) => q.sectionId === urlSectionId && q.distributionId === distributionId).length
+          : (distStatus?.addedCount || 0)));
+
+  const policy = getQuestionTypePolicy(category || distStatus?.questionType?.code || distStatus?.questionTypeName);
+  const resolvedLimit = resolvedSlot?.slotPickLimit ?? urlLimit ?? distStatus?.targetCount ?? 1;
+  const isSingleType = policy.selectionMode === "SINGLE" && resolvedLimit <= 1;
+
+  const effectiveTargetCount = isAlternativeMode ? 1 : (isSingleType ? 1 : (resolvedSlot?.slotPickLimit ?? urlLimit ?? distStatus?.targetCount ?? 0));
+  const maxSelectable = isAlternativeMode
+    ? 1
+    : (isSingleType
+        ? Math.max(0, 1 - subSectionQuestionsCount)
+        : Math.max(0, effectiveTargetCount - subSectionQuestionsCount));
 
   const { data: availableData, isLoading: questionsLoading } = useAvailableQuestions(
     {
@@ -346,6 +366,21 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     if (questionsLoading) return;
 
     if (isAlternativeMode) {
+      if (availableUnassigned.length === 0) {
+        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * availableUnassigned.length);
+      setSelectedIds([availableUnassigned[randomIndex].id]);
+      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      return;
+    }
+
+    if (isSingleType) {
+      if (subSectionQuestionsCount >= 1) {
+        toast.info("এই অংশে ১টি মূল প্রশ্ন ইতিমধ্যে নির্ধারিত। বিকল্প প্রশ্ন যোগ করতে বিল্ডারের অথবা বিকল্প ব্যবহার করুন।");
+        return;
+      }
       if (availableUnassigned.length === 0) {
         toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
         return;
@@ -1327,6 +1362,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 if (isAlternativeMode) {
                   return [id];
                 }
+                if (isSingleType) {
+                  if (subSectionQuestionsCount >= 1) {
+                    toast.error("এই অংশে ১টি মূল প্রশ্ন ইতিমধ্যে যুক্ত আছে। বিকল্প প্রশ্ন যোগ করতে বিল্ডারে গিয়ে 'বিকল্প (অথবা) যোগ করুন' ব্যবহার করুন।");
+                    return prev;
+                  }
+                  return [id];
+                }
                 if (effectiveTargetCount > 0 && prev.length >= maxSelectable) {
                   if (maxSelectable === 0) {
                     toast.error("এই অংশের প্রশ্নের লক্ষ্য ইতিমধ্যে পূরণ হয়ে গেছে।");
@@ -1348,7 +1390,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         <div className="fixed bottom-4 left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl md:rounded-full p-2.5 md:px-6 md:py-2.5 flex flex-col md:flex-row items-center gap-2 md:gap-5 z-50 animate-in slide-in-from-bottom-5 select-none">
           <div className="text-xs md:text-sm font-bold text-foreground flex items-center justify-between w-full md:w-auto px-1 md:px-0">
             <span>
-              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> প্রশ্ন নির্বাচিত
+              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> {isSingleType && !isAlternativeMode ? "মূল প্রশ্ন নির্বাচিত" : "প্রশ্ন নির্বাচিত"}
             </span>
             <span className="text-muted-foreground md:ml-2 font-normal text-[11px] md:text-xs">
               (প্রয়োজন: {toBengaliDigits(maxSelectable)}টি)

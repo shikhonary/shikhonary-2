@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import { TRPCError } from "@trpc/server"
+import { categorizeReference, isIgnoredReference } from "@workspace/utils"
 import type {
   CreateParagraphInput,
   DeleteParagraphInput,
@@ -9,6 +10,10 @@ import type {
   BulkDeleteParagraphsInput,
   ImportParagraphsInput,
   ParagraphStatsInput,
+  ParagraphBoardYearsInput,
+  ToggleParagraphActiveInput,
+  ResolveParagraphReportInput,
+  AssignParagraphReportInput,
 } from "./paragraph.schema"
 
 // Helper function to resolve 'Paragraph' question type ID
@@ -34,18 +39,98 @@ async function resolveParagraphQuestionTypeId(db: any) {
 }
 
 export async function listParagraphs(db: PrismaClient, input: ListParagraphsInput) {
-  const { page, limit, query, subjectId, chapterId, difficulty, source, session, sort } = input
+  const {
+    page,
+    limit,
+    query,
+    academicClassId,
+    subjectId,
+    chapterId,
+    board,
+    reference,
+    isActive,
+    hasReport,
+    difficulty,
+    source,
+    session,
+    sort,
+  } = input
   const resolvedPage = page ?? 1
   const resolvedLimit = limit ?? 20
   const skip = (resolvedPage - 1) * resolvedLimit
 
   const where: any = {}
 
-  if (subjectId) where.subjectId = subjectId
-  if (chapterId) where.academicChapterId = chapterId
-  if (difficulty) where.difficulty = difficulty
-  if (source) where.source = source
-  if (session) where.session = session
+  if (academicClassId && !subjectId) {
+    where.subject = {
+      classSubjects: {
+        some: {
+          classId: academicClassId,
+        },
+      },
+    }
+  }
+
+  if (subjectId && subjectId !== "All") where.subjectId = subjectId
+  if (chapterId && chapterId !== "All") where.academicChapterId = chapterId
+  if (difficulty && difficulty !== "All") where.difficulty = difficulty
+  if (source && source !== "All") where.source = source
+  if (session && session !== "All") where.session = session
+
+  if (isActive !== undefined && isActive !== "All") {
+    if (typeof isActive === "boolean") {
+      where.isActive = isActive
+    } else if (isActive === "true" || isActive === "ACTIVE") {
+      where.isActive = true
+    } else if (isActive === "false" || isActive === "INACTIVE") {
+      where.isActive = false
+    }
+  }
+
+  if (hasReport !== undefined && hasReport !== "All") {
+    const isReported = hasReport === true || hasReport === "YES" || hasReport === "true"
+    const reports = await db.questionReport.findMany({
+      where: { entityType: "PARAGRAPH", status: { in: ["PENDING", "ASSIGNED"] } },
+      select: { entityId: true },
+      distinct: ["entityId"],
+    })
+    const reportedIds = reports.map((r) => r.entityId)
+    if (isReported) {
+      where.id = { in: reportedIds }
+    } else {
+      where.id = { notIn: reportedIds }
+    }
+  }
+
+  const boardFilter = board || reference
+  if (boardFilter && boardFilter !== "All") {
+    if (boardFilter === "SCHOOL_ALL") {
+      const itemsWithRef = await db.paragraph.findMany({
+        where: {
+          NOT: { reference: { equals: [] } },
+          ...(where.subjectId ? { subjectId: where.subjectId } : {}),
+          ...(where.academicChapterId ? { academicChapterId: where.academicChapterId } : {}),
+        },
+        select: { reference: true },
+      })
+      const schoolRefs = new Set<string>()
+      for (const item of itemsWithRef) {
+        for (const ref of item.reference || []) {
+          if (!ref || isIgnoredReference(ref)) continue
+          if (categorizeReference(ref) === "SCHOOL") {
+            schoolRefs.add(ref)
+          }
+        }
+      }
+      if (schoolRefs.size > 0) {
+        where.reference = { hasSome: Array.from(schoolRefs) }
+      } else {
+        where.id = "__NO_MATCHING_SCHOOL_PARAGRAPH__"
+      }
+    } else {
+      where.reference = { has: boardFilter }
+    }
+  }
 
   if (query) {
     where.OR = [
@@ -79,6 +164,17 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
             id: true,
             nameEn: true,
             nameBn: true,
+            classSubjects: {
+              select: {
+                academicClass: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameBn: true,
+                  },
+                },
+              },
+            },
           },
         },
         academicChapter: {
@@ -102,12 +198,52 @@ export async function listParagraphs(db: PrismaClient, input: ListParagraphsInpu
     db.paragraph.count({ where }),
   ])
 
-  return {
-    items: items.map((p) => ({
+  const itemIds = items.map((it) => it.id)
+  const itemReports =
+    itemIds.length > 0
+      ? await db.questionReport.findMany({
+          where: { entityType: "PARAGRAPH", entityId: { in: itemIds } },
+          select: {
+            id: true,
+            entityId: true,
+            status: true,
+            reportType: true,
+            description: true,
+            resolvedNote: true,
+            resolvedAt: true,
+            createdAt: true,
+            resolver: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : []
+
+  const reportMap = new Map<string, typeof itemReports>()
+  for (const rep of itemReports) {
+    if (!reportMap.has(rep.entityId)) reportMap.set(rep.entityId, [])
+    reportMap.get(rep.entityId)!.push(rep)
+  }
+
+  const enhancedItems = items.map((p) => {
+    const repList = reportMap.get(p.id) || []
+    const hasPendingReport = repList.some((r) => r.status === "PENDING" || r.status === "ASSIGNED")
+    return {
       ...p,
       chapter: p.academicChapter,
       chapterId: p.academicChapterId,
-    })),
+      hasReport: hasPendingReport,
+      reports: repList,
+    }
+  })
+
+  return {
+    items: enhancedItems,
     totalItems,
     totalPages: Math.ceil(totalItems / resolvedLimit) || 1,
     page: resolvedPage,
@@ -158,6 +294,7 @@ export async function createParagraph(db: PrismaClient, input: CreateParagraphIn
       subjectId: data.subjectId,
       academicChapterId: data.chapterId || null,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive ?? true,
     },
     include: {
       subject: true,
@@ -192,6 +329,7 @@ export async function updateParagraph(db: PrismaClient, input: UpdateParagraphIn
       subjectId: data.subjectId,
       academicChapterId: data.chapterId !== undefined ? data.chapterId : undefined,
       questionTypeId: resolvedQuestionTypeId,
+      isActive: data.isActive !== undefined ? data.isActive : undefined,
     },
     include: {
       subject: true,
@@ -244,6 +382,7 @@ export async function importParagraphs(db: PrismaClient, input: ImportParagraphs
             subjectId: data.subjectId,
             academicChapterId: data.chapterId || null,
             questionTypeId: resolvedQuestionTypeId,
+            isActive: data.isActive ?? true,
           },
         })
         results.push(createdParagraph)
@@ -260,22 +399,239 @@ export async function importParagraphs(db: PrismaClient, input: ImportParagraphs
 
 export async function getParagraphStats(db: PrismaClient, input: ParagraphStatsInput = {}) {
   const where: any = {}
-  if (input.subjectId) where.subjectId = input.subjectId
-  if (input.chapterId) where.academicChapterId = input.chapterId
+  if (input.academicClassId && !input.subjectId) {
+    where.subject = {
+      classSubjects: {
+        some: {
+          classId: input.academicClassId,
+        },
+      },
+    }
+  }
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.academicChapterId = input.chapterId
 
-  const [totalCount, easyCount, mediumCount, hardCount] = await Promise.all([
+  const [totalCount, activeCount, inactiveCount, referenceCount] = await Promise.all([
     db.paragraph.count({ where }),
-    db.paragraph.count({ where: { ...where, difficulty: "EASY" } }),
-    db.paragraph.count({ where: { ...where, difficulty: "MEDIUM" } }),
-    db.paragraph.count({ where: { ...where, difficulty: "HARD" } }),
+    db.paragraph.count({ where: { ...where, isActive: true } }),
+    db.paragraph.count({ where: { ...where, isActive: false } }),
+    db.paragraph.count({ where: { ...where, NOT: { reference: { equals: [] } } } }),
   ])
 
   return {
     totalCount,
-    difficultyCounts: {
-      EASY: easyCount,
-      MEDIUM: mediumCount,
-      HARD: hardCount,
+    activeCount,
+    inactiveCount,
+    referenceCount,
+  }
+}
+
+export async function getBoardYears(
+  db: PrismaClient,
+  input: ParagraphBoardYearsInput = {}
+) {
+  const where: any = {
+    NOT: { reference: { equals: [] } },
+  }
+  if (input.subjectId && input.subjectId !== "All") where.subjectId = input.subjectId
+  if (input.chapterId && input.chapterId !== "All") where.academicChapterId = input.chapterId
+  if (input.academicClassId && input.academicClassId !== "All" && (!input.subjectId || input.subjectId === "All")) {
+    where.subject = {
+      classSubjects: {
+        some: {
+          classId: input.academicClassId,
+        },
+      },
+    }
+  }
+
+  const paragraphs = await db.paragraph.findMany({
+    where,
+    select: { reference: true },
+  })
+
+  const countMap = new Map<string, number>()
+  for (const p of paragraphs) {
+    for (const ref of p.reference || []) {
+      if (!ref || isIgnoredReference(ref)) continue
+      countMap.set(ref, (countMap.get(ref) || 0) + 1)
+    }
+  }
+
+  const categoryOrder: Record<string, number> = {
+    BOARD: 1,
+    CADET: 2,
+    SCHOOL: 3,
+    TEST_EXAM: 4,
+    TEXTBOOK: 5,
+    OTHER: 6,
+  }
+
+  return Array.from(countMap.entries())
+    .map(([rawRef, count]) => {
+      const parts = rawRef.split("-")
+      const yearStr = parts[parts.length - 1]
+      const year = !isNaN(Number(yearStr)) ? Number(yearStr) : 0
+      const boardName = parts.length > 1 ? parts.slice(0, parts.length - 1).join("-") : rawRef
+      const category = categorizeReference(rawRef)
+      return {
+        rawRef,
+        boardName,
+        year,
+        category,
+        count,
+      }
+    })
+    .sort((a, b) => {
+      const diff = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99)
+      if (diff !== 0) return diff
+      return b.count - a.count
+    })
+}
+
+export async function toggleParagraphActive(
+  db: PrismaClient,
+  input: ToggleParagraphActiveInput
+) {
+  const { id, isActive } = input
+  return db.paragraph.update({
+    where: { id },
+    data: { isActive },
+  })
+}
+
+export async function resolveParagraphReport(
+  db: PrismaClient,
+  input: ResolveParagraphReportInput,
+  userId?: string | null
+) {
+  const { paragraphId, reportId, resolvedNote } = input
+
+  const paragraph = await db.paragraph.findUnique({
+    where: { id: paragraphId },
+    select: { id: true },
+  })
+
+  if (!paragraph) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Paragraph with ID ${paragraphId} not found`,
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "PARAGRAPH",
+    entityId: paragraphId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await db.questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "No report found for this paragraph",
+    })
+  }
+
+  const result = await db.questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "RESOLVED",
+      resolvedNote: resolvedNote?.trim() || "Resolved by admin",
+      resolvedById: userId ?? null,
+      resolvedAt: new Date(),
     },
+  })
+
+  return {
+    success: true,
+    resolvedCount: result.count,
+  }
+}
+
+export async function assignParagraphReport(
+  db: PrismaClient,
+  input: AssignParagraphReportInput,
+  reporterId?: string | null
+) {
+  const { paragraphId, reportId, assignedToId, note } = input
+
+  const paragraph = await db.paragraph.findUnique({
+    where: { id: paragraphId },
+    select: { id: true },
+  })
+
+  if (!paragraph) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Paragraph with ID ${paragraphId} not found`,
+    })
+  }
+
+  const assignedUser = await db.user.findUnique({
+    where: { id: assignedToId },
+    select: { id: true, name: true, email: true },
+  })
+
+  if (!assignedUser) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "অ্যাসাইন করার জন্য ইউজারকে খুঁজে পাওয়া যায়নি।",
+    })
+  }
+
+  const whereClause: any = {
+    entityType: "PARAGRAPH",
+    entityId: paragraphId,
+  }
+
+  if (reportId) {
+    whereClause.id = reportId
+  }
+
+  const existingReports = await db.questionReport.findMany({
+    where: whereClause,
+  })
+
+  if (existingReports.length === 0) {
+    await db.questionReport.create({
+      data: {
+        entityType: "PARAGRAPH",
+        entityId: paragraphId,
+        reportType: "OTHER",
+        description: note?.trim() || "প্রশ্ন পর্যালোচনা ও যাচাইয়ের জন্য দায়িত্ব অর্পণ করা হয়েছে",
+        status: "ASSIGNED",
+        reportedById: reporterId ?? null,
+        resolvedById: assignedToId,
+        resolvedNote: note?.trim() || null,
+        resolvedAt: null,
+      },
+    })
+
+    return {
+      success: true,
+      assignedCount: 1,
+    }
+  }
+
+  const result = await db.questionReport.updateMany({
+    where: whereClause,
+    data: {
+      status: "ASSIGNED",
+      resolvedById: assignedToId,
+      resolvedNote: note?.trim() || null,
+      resolvedAt: null,
+    },
+  })
+
+  return {
+    success: true,
+    assignedCount: result.count,
   }
 }

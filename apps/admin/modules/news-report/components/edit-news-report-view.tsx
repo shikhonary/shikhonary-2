@@ -1,19 +1,24 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "@workspace/ui/components/sonner"
-import { useNewsReportById, useUpdateNewsReport, useSubjectsForSelection, useAcademicClassesForSelection } from "../services/use-news-report"
+import {
+  useNewsReportById,
+  useUpdateNewsReport,
+  useSubjectsForSelection,
+  useAcademicClassesForSelection,
+} from "../services/use-news-report"
+import { useQuestionTypesList } from "@/modules/question-type/services/use-question-type"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { Newspaper, ArrowLeft, Loader2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -22,16 +27,34 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select"
 import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { NEWS_REPORT_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { RenderMath } from "@workspace/ui/components/render-math"
+import { PageHeader } from "@/components/shared/page-header"
+import {
+  Newspaper,
+  ArrowLeft,
+  Clock,
+  Loader2,
+  Save,
+  AlertCircle,
+  BookOpen,
+  Sparkles,
+} from "lucide-react"
 
 const editNewsReportFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  title: z.string().min(1, "Report topic / prompt statement is required"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  title: z.string().min(1, "সংবাদ প্রতিবেদনের বিষয়বস্তু আবশ্যক"),
+  isMath: z.boolean(),
   referenceText: z.string().optional(),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
+  source: z.string().optional(),
+  session: z.string().optional(),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Popularity count must be a number",
+    message: "ভিউ সংখ্যা অবশ্যই সংখ্যা হতে হবে",
   }),
+  questionTypeId: z.string().optional(),
+  isActive: z.boolean(),
 })
 
 type EditNewsReportFormData = z.infer<typeof editNewsReportFormSchema>
@@ -41,18 +64,52 @@ export function EditNewsReportView() {
   const params = useParams()
   const newsReportId = params.id as string
 
-  const { data: newsReportData, isLoading: isNewsReportLoading, isError } = useNewsReportById(newsReportId)
+  const { data: itemData, isLoading: isItemLoading, isError } =
+    useNewsReportById(newsReportId)
   const updateMutation = useUpdateNewsReport()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const { data: questionTypesData } = useQuestionTypesList({ limit: 100 })
+  const questionTypes = questionTypesData?.questionTypes ?? []
+
+  // Resolve initial classId robustly from subject relationships
+  const initialClassId = useMemo(() => {
+    if (!itemData) return ""
+    return (
+      (itemData as any).subject?.classSubjects?.[0]?.classId ||
+      (itemData as any).subject?.classSubjects?.[0]?.academicClass?.id ||
+      (itemData as any).subject?.classSubjects?.[0]?.academicClassId ||
+      (itemData as any).classId ||
+      ""
+    )
+  }, [itemData])
+
+  // Synchronize form values directly with loaded News Report data
+  const formValues = useMemo<EditNewsReportFormData | undefined>(() => {
+    if (!itemData) return undefined
+
+    return {
+      classId: initialClassId,
+      subjectId: itemData.subjectId || "",
+      title: itemData.title || "",
+      isMath: true,
+      referenceText: itemData.reference?.join(", ") || "",
+      difficulty: (itemData.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
+      source: itemData.source ? String(itemData.source).trim() : DEFAULT_SOURCE,
+      session: itemData.session || new Date().getFullYear().toString(),
+      popularityCount: String(itemData.popularityCount ?? 0),
+      questionTypeId: itemData.questionTypeId || "",
+      isActive: itemData.isActive !== undefined ? itemData.isActive : true,
+    }
+  }, [itemData, initialClassId])
 
   const {
     register,
     handleSubmit,
     control,
     watch,
-    reset,
+    setValue,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditNewsReportFormData>({
     resolver: zodResolver(editNewsReportFormSchema),
@@ -60,30 +117,65 @@ export function EditNewsReportView() {
       classId: "",
       subjectId: "",
       title: "",
+      isMath: true,
       referenceText: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       popularityCount: "0",
+      questionTypeId: "",
+      isActive: true,
+    },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
     },
   })
 
-  // Load existing data
-  useEffect(() => {
-    if (newsReportData) {
-      reset({
-        classId: (newsReportData as any).subject?.classSubjects?.[0]?.classId || "",
-        subjectId: newsReportData.subjectId,
-        title: newsReportData.title,
-        referenceText: newsReportData.reference?.join(", ") || "",
-        difficulty: newsReportData.difficulty as any,
-        popularityCount: String(newsReportData.popularityCount),
-      })
-    }
-  }, [newsReportData, reset])
-
   const selectedClassId = watch("classId")
+  const activeClassId = selectedClassId || initialClassId
+  const watchTitle = watch("title")
+  const watchIsMath = watch("isMath")
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
+
+  // Ensure academic class for this News Report is always present in selection list
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const subjectClass = (itemData as any)?.subject?.classSubjects?.[0]?.academicClass
+    if (subjectClass) {
+      map.set(subjectClass.id, subjectClass)
+    }
+    for (const cls of academicClasses) {
+      map.set(cls.id, cls)
+    }
+    return Array.from(map.values())
+  }, [academicClasses, itemData])
+
+  // Ensure subject from News Report is immediately present in options even before async query finishes
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if (itemData?.subject && (!activeClassId || activeClassId === initialClassId)) {
+      map.set(itemData.subject.id, itemData.subject)
+    }
+    for (const sub of subjects) {
+      map.set(sub.id, sub)
+    }
+    return Array.from(map.values())
+  }, [subjects, itemData?.subject, activeClassId, initialClassId])
+
+  // Ensure source from News Report is immediately present in source options list
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...NEWS_REPORT_SOURCE_OPTIONS]
+    const currentSource = (itemData as any)?.source
+      ? String((itemData as any).source).trim()
+      : null
+    if (currentSource && !list.some((s) => s.value === currentSource)) {
+      list.unshift({ value: currentSource, label: currentSource })
+    }
+    return list
+  }, [itemData])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -103,215 +195,308 @@ export function EditNewsReportView() {
         subjectId: data.subjectId,
         title: data.title.trim(),
         difficulty: data.difficulty,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: data.session?.trim() || new Date().getFullYear().toString(),
         popularityCount: Number(data.popularityCount) || 0,
         reference: referenceArray,
+        questionTypeId: data.questionTypeId || null,
+        isActive: data.isActive,
       })
 
-      toast.success("News report updated successfully.")
+      toast.success("সংবাদ প্রতিবেদনটি সফলভাবে হালনাগাদ করা হয়েছে।")
       setTimeout(() => {
         router.push("/news-reports")
       }, 500)
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update News Report")
-      toast.error(err.message || "Failed to update News Report")
+      const msg = err.message || "সংবাদ প্রতিবেদন হালনাগাদে সমস্যা হয়েছে"
+      setErrorMessage(msg)
+      toast.error(msg)
     }
   }
 
-  if (isNewsReportLoading) {
+  if (isItemLoading) {
     return (
-      <div className="mx-auto max-w-4xl space-y-6 pb-12">
-        <div className="h-8 w-48 animate-pulse rounded-lg bg-surface-container-high" />
-        <div className="h-96 w-full animate-pulse rounded-2xl bg-surface-container-low" />
+      <div className="py-24 text-center">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-600" />
+        <p className="mt-3 text-sm text-muted-foreground font-body">সংবাদ প্রতিবেদনের তথ্য লোড হচ্ছে...</p>
       </div>
     )
   }
 
-  if (isError || !newsReportData) {
+  if (isError || !itemData) {
     return (
-      <div className="mx-auto max-w-4xl py-12 text-center">
-        <div className="rounded-2xl border border-dashed border-error/40 bg-error/5 p-12">
-          <h2 className="font-headline-md text-xl font-bold text-error">
-            News Report Not Found
-          </h2>
-          <p className="mt-1 font-body-md text-sm text-outline">
-            The news report you are trying to edit does not exist or has been removed.
-          </p>
-          <div className="mt-6">
-            <Button asChild className="rounded-xl font-bold bg-primary text-white">
-              <Link href="/news-reports">Back to News Reports</Link>
-            </Button>
-          </div>
-        </div>
+      <div className="py-24 text-center max-w-md mx-auto space-y-4">
+        <p className="text-xl font-bold text-rose-600 font-headline">সংবাদ প্রতিবেদনটি পাওয়া যায়নি</p>
+        <p className="text-sm text-muted-foreground font-body">
+          অনুরোধকৃত সংবাদ প্রতিবেদনটি খুঁজে পাওয়া যায়নি অথবা মুছে ফেলা হয়েছে।
+        </p>
+        <Button asChild variant="outline" className="rounded-xl">
+          <Link href="/news-reports">তালিকায় ফিরে যান</Link>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 pb-12">
-      {/* Top Breadcrumb / Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <Link
-            href="/news-reports"
-            className="inline-flex items-center gap-1.5 font-label-md text-xs font-semibold text-outline hover:text-primary transition-colors cursor-pointer mb-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to News Reports</span>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      {/* Shared Page Header matching MCQ Edit Header */}
+      <PageHeader
+        title="সংবাদ প্রতিবেদন সম্পাদনা"
+        description="শ্রেণি, বিষয়, প্রতিবেদনের মূল বিষয়বস্তু ও মেটাডাটা তথ্য হালনাগাদ করুন।"
+        icon={Newspaper}
+        badge={{ label: "সম্পাদনা মোড", variant: "amber" }}
+        breadcrumbs={[
+          { label: "সংবাদ প্রতিবেদন তালিকা", href: "/news-reports" },
+          { label: "প্রতিবেদন সম্পাদনা" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+        >
+          <Link href="/news-reports" prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Newspaper className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="font-headline-md text-xl sm:text-2xl font-extrabold text-on-surface">
-                Edit News Report
-              </h1>
-              <p className="font-body-md text-xs text-on-surface-variant">
-                ID: <span className="font-mono text-[11px] text-outline">{newsReportId}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </Button>
+      </PageHeader>
 
+      {/* Error Alert */}
       {errorMessage && (
-        <div className="rounded-xl border border-error/30 bg-error/10 p-4 text-sm font-semibold text-error">
-          {errorMessage}
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMessage}</p>
         </div>
       )}
 
-      {/* Main Form Card */}
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-sm">
-        <CardHeader className="border-b border-outline-variant/30 pb-4">
-          <CardTitle className="font-headline-sm text-base font-bold text-on-surface">
-            News Report Details
-          </CardTitle>
+      {/* Main Form Card matching MCQ layout */}
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/40 shrink-0">
+            <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              সংবাদ প্রতিবেদনের বিবরণ ও কনফিগারেশন
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              শ্রেণি, বিষয়, প্রতিবেদনের মূল প্রশ্ন ও মেটাডাটা তথ্য সংশোধন করুন।
+            </p>
+          </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Academic Class & Subject Cascading Selectors */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Academic Association
-              </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Academic Class */}
-                <div className="space-y-2">
-                  <Label htmlFor="classId" className="text-sm font-bold text-on-surface">
-                    Academic Class <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="classId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Select Class" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {academicClasses.map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-neutral-900">
-                              {c.nameEn} {c.nameBn ? `(${c.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.classId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.classId.message}</p>
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Academic Classification Hierarchy */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Academic Class */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="classId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`class-select-${field.value || "empty"}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem key={cls.id} value={cls.id}>
+                            {cls.nameBn || cls.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
+                />
+                {errors.classId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.classId.message}</p>
+                )}
+              </div>
 
-                {/* Academic Subject */}
-                <div className="space-y-2">
-                  <Label htmlFor="subjectId" className="text-sm font-bold text-on-surface">
-                    Academic Subject <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="subjectId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!selectedClassId}
-                      >
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto disabled:opacity-50">
-                          <SelectValue placeholder={selectedClassId ? "Select Subject" : "Choose class first"} />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {subjects.map((s) => (
-                            <SelectItem key={s.id} value={s.id} className="text-neutral-900">
-                              {s.nameEn} {s.nameBn ? `(${s.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.subjectId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.subjectId.message}</p>
+              {/* Academic Subject */}
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Academic Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="subjectId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`subject-select-${field.value || "empty"}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || !activeClassId}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue
+                          placeholder={
+                            activeClassId ? "বিষয় নির্বাচন করুন..." : "প্রথমে শ্রেণি নির্বাচন করুন"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                        {combinedSubjects.map((sub) => (
+                          <SelectItem key={sub.id} value={sub.id}>
+                            {sub.nameBn || sub.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
-                </div>
+                />
+                {errors.subjectId && (
+                  <p className="text-xs text-rose-500 font-medium">{errors.subjectId.message}</p>
+                )}
               </div>
             </div>
 
-            {/* News Report Prompt / Assignment Statement */}
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-bold text-on-surface">
-                Report Topic / Stimulus Prompt <span className="text-red-500">*</span>
-              </Label>
+            {/* News Report Prompt / Stem */}
+            <div className="space-y-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="title"
+                  className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                >
+                  সংবাদ প্রতিবেদনের বিষয়বস্তু (Report Prompt) <span className="text-rose-500">*</span>
+                </Label>
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                  LaTeX ও Math সমর্থিত
+                </span>
+              </div>
               <Textarea
                 id="title"
-                rows={5}
-                placeholder="e.g. নিত্যপ্রয়োজনীয় দ্রব্যের অস্বাভাবিক মূল্যবৃদ্ধি জনজীবনকে দুর্বিষহ করে তুলেছে—এ বিষয়ে একটি সংবাদ প্রতিবেদন প্রস্তুত করো।"
+                rows={6}
+                disabled={isSubmitting}
+                placeholder="যেমন: যানজট নিরসন ও নিরাপদ সড়ক সম্পর্কে একটি সংবাদ প্রতিবেদন রচনা করো।"
                 {...register("title")}
-                className="w-full rounded-xl border border-outline-variant bg-white p-3 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
               />
               {errors.title && (
-                <p className="text-xs font-semibold text-red-500">{errors.title.message}</p>
+                <p className="text-xs text-rose-500 font-medium">{errors.title.message}</p>
+              )}
+
+              {/* KaTeX Live Math Preview */}
+              {watchIsMath && watchTitle && watchTitle.trim().length > 0 && (
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.06] text-xs text-foreground space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">
+                    LaTeX ম্যাথ প্রিভিউ:
+                  </span>
+                  <div className="text-sm sm:text-base leading-relaxed text-foreground font-body whitespace-pre-wrap">
+                    <RenderMath text={watchTitle} isMath={true} />
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Reference Tags & Metadata */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Metadata & Classification
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Reference Citations */}
-                <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="referenceText" className="text-sm font-bold text-on-surface">
-                    Reference Tags / Exam Citations
-                  </Label>
-                  <Input
-                    id="referenceText"
-                    placeholder="e.g. Dhaka Board 2024, Rajshahi Board 2023, SSC 2022"
-                    {...register("referenceText")}
-                    className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                  />
-                  <p className="text-xs text-outline">
-                    Separate multiple citations with commas.
+            {/* Toggle Flags: Math Formula & Active State matching MCQ */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              {/* Is Math */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground">গণিত / LaTeX সমীকরণ</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    প্রতিবেদনের প্রশ্নে KaTeX ম্যাথ ফর্মুলা রেন্ডার করতে অ্যাক্টিভ করুন।
                   </p>
                 </div>
+                <Controller
+                  name="isMath"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(field.value)}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
 
+              {/* Is Active */}
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4">
+                <div>
+                  <p className="text-sm font-bold text-foreground">অ্যাক্টিভ প্রতিবেদনের অবস্থা</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    পরীক্ষা ও অনুশীলনে শিক্ষার্থীদের জন্য অবিলম্বে দৃশ্যমান করুন।
+                  </p>
+                </div>
+                <Controller
+                  name="isActive"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(field.value)}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      className="size-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer accent-indigo-600"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Reference */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="referenceText"
+                  className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                >
+                  রেফারেন্স / উৎস (কমা দিয়ে একাধিক উল্লেখ করুন)
+                </Label>
+                <Input
+                  id="referenceText"
+                  type="text"
+                  disabled={isSubmitting}
+                  placeholder="যেমন: ঢাকা বোর্ড ২০২৪, রাজশাহী বোর্ড ২০২৩..."
+                  {...register("referenceText")}
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                />
+              </div>
+            </div>
+
+            {/* Context & Metadata Settings matching MCQ 2-column grid */}
+            <div className="space-y-6 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-primary flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                মেটাডাটা ও অতিরিক্ত সেটিংস
+              </h3>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Difficulty */}
                 <div className="space-y-2">
-                  <Label htmlFor="difficulty" className="text-sm font-bold text-on-surface">
-                    Difficulty Level
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    কাঠিন্যের মাত্রা (Difficulty) <span className="text-rose-500">*</span>
                   </Label>
                   <Controller
                     name="difficulty"
                     control={control}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Difficulty" />
+                      <Select
+                        key={`difficulty-select-${field.value || "empty"}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="কাঠিন্য নির্বাচন করুন..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
                           {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
@@ -322,54 +507,158 @@ export function EditNewsReportView() {
                     )}
                   />
                   {errors.difficulty && (
-                    <p className="text-xs font-semibold text-red-500">{errors.difficulty.message}</p>
+                    <p className="text-xs text-rose-500 font-medium">{errors.difficulty.message}</p>
+                  )}
+                </div>
+
+                {/* Question Type Template */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্ন কাঠামো টেমপ্লেট (ঐচ্ছিক)
+                  </Label>
+                  <Controller
+                    name="questionTypeId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`question-type-select-${field.value || "none"}-${questionTypes.length}`}
+                        disabled={isSubmitting}
+                        value={field.value || "none"}
+                        onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="টেমপ্লেট নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg max-h-64">
+                          <SelectItem value="none">কোনোটি নয় (None)</SelectItem>
+                          {questionTypes.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.nameEn} ({t.label} - {t.mark} নম্বর)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.questionTypeId && (
+                    <p className="text-xs text-rose-500 font-medium">
+                      {errors.questionTypeId.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Source */}
+                <div className="space-y-2">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    প্রশ্নের উৎস (Source)
+                  </Label>
+                  <Controller
+                    name="source"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        key={`source-select-${field.value || "empty"}-${combinedSources.length}`}
+                        disabled={isSubmitting}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4 justify-between">
+                          <SelectValue placeholder="উৎস নির্বাচন করুন..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover text-popover-foreground border border-slate-200/80 dark:border-white/[0.08] rounded-xl shadow-lg">
+                          {combinedSources.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.source && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.source.message}</p>
+                  )}
+                </div>
+
+                {/* Session */}
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="session"
+                    className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
+                    সেশন (Session)
+                  </Label>
+                  <Input
+                    id="session"
+                    type="text"
+                    disabled={isSubmitting}
+                    placeholder="যেমন: ২০২৬"
+                    {...register("session")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.session && (
+                    <p className="text-xs text-rose-500 font-medium">{errors.session.message}</p>
+                  )}
+                </div>
+
+                {/* Popularity Count */}
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="popularityCount"
+                    className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                  >
+                    ভিউ সংখ্যা (Popularity Count)
+                  </Label>
+                  <Input
+                    id="popularityCount"
+                    type="number"
+                    min="0"
+                    disabled={isSubmitting}
+                    placeholder="0"
+                    {...register("popularityCount")}
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-11 px-4"
+                  />
+                  {errors.popularityCount && (
+                    <p className="text-xs text-rose-500 font-medium">
+                      {errors.popularityCount.message}
+                    </p>
                   )}
                 </div>
               </div>
-
-              {/* Popularity Count */}
-              <div className="w-full sm:w-1/3 space-y-2">
-                <Label htmlFor="popularityCount" className="text-sm font-bold text-on-surface">
-                  Popularity / Views
-                </Label>
-                <Input
-                  id="popularityCount"
-                  type="number"
-                  min="0"
-                  {...register("popularityCount")}
-                  className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                />
-                {errors.popularityCount && (
-                  <p className="text-xs font-semibold text-red-500">{errors.popularityCount.message}</p>
-                )}
-              </div>
             </div>
 
-            {/* Submit Buttons */}
-            <div className="flex items-center justify-end gap-3 border-t border-outline-variant/30 pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                asChild
-                className="rounded-xl border-outline-variant font-bold text-on-surface hover:bg-surface-container-high px-5 h-11 cursor-pointer"
-              >
-                <Link href="/news-reports">Cancel</Link>
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold px-6 h-11 gap-2 shadow-sm cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <span>Update News Report</span>
-                )}
-              </Button>
+            {/* Form Actions Footer matching MCQ */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6 sm:pt-8 mt-6">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span>সর্বশেষ সম্পাদিত তথ্য ডেটাবেজে সংরক্ষিত হবে</span>
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
+                <Button
+                  asChild
+                  variant="outline"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer"
+                >
+                  <Link href="/news-reports" prefetch={true}>
+                    বাতিল
+                  </Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 h-11 text-sm shadow-sm shadow-indigo-200 dark:shadow-none transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  ) : (
+                    <Save className="w-4 h-4 shrink-0" />
+                  )}
+                  <span>
+                    {isSubmitting ? "সংরক্ষণ করা হচ্ছে..." : "সংবাদ প্রতিবেদন হালনাগাদ করুন"}
+                  </span>
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

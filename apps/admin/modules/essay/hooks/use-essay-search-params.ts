@@ -12,9 +12,11 @@ export type EssaySortOption = (typeof essaySortOptions)[number]
 
 export const essaySearchParamsParsers = {
   query: parseAsString.withDefault(""),
-  classId: parseAsString.withDefault("All"),
+  academicClassId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
-  difficulty: parseAsString.withDefault("All"),
+  board: parseAsString.withDefault("All"),
+  isActive: parseAsString.withDefault("All"),
+  hasReport: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<EssaySortOption>(Array.from(essaySortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),

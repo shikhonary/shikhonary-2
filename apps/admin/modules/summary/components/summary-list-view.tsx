@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { trpc } from "@/trpc/client"
 import Link from "next/link"
 import {
   useSummariesList,
@@ -9,15 +11,19 @@ import {
   useSubjectsForSelection,
   useDeleteSummary,
   useBulkDeleteSummaries,
+  useResolveSummaryReport,
+  useAssignSummaryReport,
 } from "../services/use-summary"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
+import { AssignReportDialog } from "@/components/shared/assign-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { FileText, Plus, Upload } from "lucide-react"
 import { SummaryStatsCards } from "./summary-stats-cards"
 import { SummaryFilters } from "./summary-filters"
-import { SummaryTable } from "./summary-table"
+import { SummaryTable, type SummaryItem } from "./summary-table"
 import { useSummarySearchParams } from "../hooks/use-summary-search-params"
 
 export function SummaryListView() {
@@ -28,7 +34,9 @@ export function SummaryListView() {
     {
       query: searchQuery,
       subjectId: selectedSubjectId,
-      difficulty: selectedDifficulty,
+      board: selectedBoard,
+      isActive: selectedIsActive,
+      hasReport: selectedHasReport,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -40,16 +48,59 @@ export function SummaryListView() {
     setSelectedAcademicClassId(classId)
     setSearchParams({
       subjectId: "All",
+      board: "All",
       page: 1,
     })
   }
 
-  // Local state for delete dialogs
+  // Local state for delete dialogs & resolve dialog
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; snippet: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+  const [resolveTarget, setResolveTarget] = useState<SummaryItem | null>(null)
+  const [assignTarget, setAssignTarget] = useState<SummaryItem | null>(null)
 
   const deleteMutation = useDeleteSummary()
   const bulkDeleteMutation = useBulkDeleteSummaries()
+  const resolveSummaryMutation = useResolveSummaryReport()
+  const assignSummaryMutation = useAssignSummaryReport()
+
+  const handleConfirmResolve = async (resolvedNote?: string) => {
+    if (!resolveTarget) return
+    try {
+      await resolveSummaryMutation.mutateAsync({
+        summaryId: resolveTarget.id,
+        resolvedNote,
+      })
+      toast.success("সারাংশ রিপোর্টটি সফলভাবে সমাধান করা হয়েছে।")
+      setResolveTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
+
+  const handleConfirmAssign = async ({
+    assigneeId,
+    note,
+    reportId,
+  }: {
+    assigneeId: string
+    note?: string
+    reportId?: string
+  }) => {
+    if (!assignTarget) return
+    try {
+      await assignSummaryMutation.mutateAsync({
+        summaryId: assignTarget.id,
+        assignedToId: assigneeId,
+        reportId,
+        note,
+      })
+      toast.success("রিপোর্টের দায়িত্ব সফলভাবে অর্পণ (Assign) করা হয়েছে।")
+      setAssignTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট অ্যাসাইন করতে সমস্যা হয়েছে")
+    }
+  }
 
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return
@@ -80,9 +131,20 @@ export function SummaryListView() {
     query: searchQuery || undefined,
     academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-    difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
+    board: selectedBoard !== "All" ? selectedBoard : undefined,
+    isActive: selectedIsActive !== "All" ? selectedIsActive : undefined,
+    hasReport: selectedHasReport !== "All" ? selectedHasReport : undefined,
     sort: selectedSort,
   })
+
+  // Fetch Board + Reference combinations (scoped by subject / academicClass if selected)
+  const { data: boardYearsData } = useQuery({
+    ...trpc.summary.boardYears.queryOptions({
+      subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
+      academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
+    }),
+  })
+  const boardYears = boardYearsData ?? []
 
   // Query Summary stats
   const { data: statsData } = useSummaryStats(
@@ -132,6 +194,8 @@ export function SummaryListView() {
       {/* Stats Cards */}
       <SummaryStatsCards
         totalCount={statsData?.totalCount}
+        activeCount={statsData?.activeCount}
+        inactiveCount={statsData?.inactiveCount}
         difficultyCounts={statsData?.difficultyCounts}
         isLoading={isLoading}
       />
@@ -144,10 +208,15 @@ export function SummaryListView() {
         onAcademicClassChange={handleAcademicClassChange}
         academicClasses={academicClasses}
         selectedSubjectId={selectedSubjectId}
-        onSubjectChange={(subjectId) => setSearchParams({ subjectId, page: 1 })}
+        onSubjectChange={(subjectId) => setSearchParams({ subjectId, board: "All", page: 1 })}
         subjects={subjects}
-        selectedDifficulty={selectedDifficulty}
-        onDifficultyChange={(difficulty) => setSearchParams({ difficulty, page: 1 })}
+        selectedBoard={selectedBoard}
+        onBoardChange={(board) => setSearchParams({ board, page: 1 })}
+        boardYears={boardYears}
+        selectedIsActive={selectedIsActive}
+        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
+        selectedHasReport={selectedHasReport}
+        onHasReportChange={(hasReport) => setSearchParams({ hasReport, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />
@@ -159,12 +228,64 @@ export function SummaryListView() {
         isError={isError}
         onDelete={(id, titleSnippet) => setDeleteTarget({ id, snippet: titleSnippet })}
         onBulkDelete={(ids) => setBulkDeleteTarget(ids)}
+        onResolveReport={(item) => setResolveTarget(item)}
+        onAssignReport={(item) => setAssignTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+      />
+
+      {/* Reusable Resolve Summary Report Dialog */}
+      <ResolveReportDialog
+        isOpen={Boolean(resolveTarget)}
+        onClose={() => setResolveTarget(null)}
+        entityName="সারাংশ / সারমর্ম"
+        entityDetails={
+          resolveTarget
+            ? {
+                className:
+                  resolveTarget.subject?.classSubjects
+                    ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+                    .filter(Boolean)
+                    .join(", ") || null,
+                subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
+                clueText: resolveTarget.title,
+                editHref: `/summaries/${resolveTarget.id}/edit`,
+                editLabel: "সারাংশ এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={resolveTarget?.reports}
+        onConfirmResolve={handleConfirmResolve}
+        isLoading={resolveSummaryMutation.isPending}
+      />
+
+      {/* Reusable Assign Summary Report Dialog */}
+      <AssignReportDialog
+        isOpen={Boolean(assignTarget)}
+        onClose={() => setAssignTarget(null)}
+        entityName="সারাংশ / সারমর্ম"
+        entityDetails={
+          assignTarget
+            ? {
+                className:
+                  assignTarget.subject?.classSubjects
+                    ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
+                    .filter(Boolean)
+                    .join(", ") || null,
+                subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
+                clueText: assignTarget.title,
+                editHref: `/summaries/${assignTarget.id}/edit`,
+                editLabel: "সারাংশ এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={assignTarget?.reports}
+        onConfirmAssign={handleConfirmAssign}
+        isLoading={assignSummaryMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}

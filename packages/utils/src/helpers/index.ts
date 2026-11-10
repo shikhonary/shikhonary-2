@@ -255,4 +255,6 @@ export function isResourceEnglish(options?: {
 
 export * from "./bengali"
 export * from "./reference"
+export * from "./resolve-dist-category"
+export * from "./resolve-paper-slots"
 

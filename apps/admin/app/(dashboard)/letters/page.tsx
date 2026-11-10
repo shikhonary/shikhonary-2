@@ -13,7 +13,7 @@ export default async function LettersPage() {
     trpc.academicSubject.list.queryOptions({ limit: 100 })
   )
   void queryClient.prefetchQuery(
-    trpc.letter.list.queryOptions({ limit: 10 })
+    trpc.letter.list.queryOptions({ limit: 10, page: 1 })
   )
   void queryClient.prefetchQuery(
     trpc.letter.stats.queryOptions()

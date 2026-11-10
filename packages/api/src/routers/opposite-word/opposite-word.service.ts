@@ -79,7 +79,7 @@ export async function listOppositeWord(db: PrismaClient, input: ListOppositeWord
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -398,7 +398,7 @@ export async function getOppositeWordStats(db: PrismaClient, input: OppositeWord
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

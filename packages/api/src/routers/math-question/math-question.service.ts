@@ -88,7 +88,7 @@ export async function listMathQuestion(db: PrismaClient, input: ListMathQuestion
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -397,7 +397,7 @@ export async function getMathQuestionStats(db: PrismaClient, input: MathQuestion
     where.subject = {
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

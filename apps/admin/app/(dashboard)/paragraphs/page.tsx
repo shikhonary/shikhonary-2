@@ -21,6 +21,9 @@ export default async function ParagraphsPage() {
   void queryClient.prefetchQuery(
     trpc.paragraph.stats.queryOptions()
   )
+  void queryClient.prefetchQuery(
+    trpc.paragraph.boardYears.queryOptions({})
+  )
 
   return (
     <HydrateClient>

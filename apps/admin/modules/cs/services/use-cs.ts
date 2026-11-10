@@ -128,6 +128,20 @@ export function useResolveCsReport() {
 }
 
 /**
+ * Hook to assign a CS question report.
+ */
+export function useAssignCsReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.cs.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.cs.pathFilter())
+    },
+  })
+}
+
+/**
  * Hook to fetch academic classes for select options list (returns array directly).
  */
 export function useAcademicClassesForSelection() {

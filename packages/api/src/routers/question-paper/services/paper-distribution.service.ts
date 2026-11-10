@@ -216,13 +216,14 @@ export async function upsertQuestionPaperDistribution(
       }).catch(() => { })
     } else {
       const isSharedType = targetSubIds.length > 1
-      const secSubs = targetSecId ? await tenantDb.questionPaperSubSection.findMany({ where: { sectionId: targetSecId } }) : []
-      if (isSharedType || secSubs.length > 1) {
-        for (const subId of targetSubIds) {
-          await tenantDb.questionPaperSubSection.update({
-            where: { id: subId },
-            data: { questionsToAttempt: 0 },
-          }).catch(() => { })
+      if (isSharedType) {
+        if (isNew) {
+          for (const subId of targetSubIds) {
+            await tenantDb.questionPaperSubSection.update({
+              where: { id: subId },
+              data: { questionsToAttempt: 0 },
+            }).catch(() => { })
+          }
         }
       } else {
         const attemptVal = input.questionsToAttempt ?? dist.questionsToAttempt ?? dist.questionCount ?? 0

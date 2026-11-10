@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import { notFound } from "../../../utils/errors"
+import { isSingleQuestionType } from "@workspace/utils"
 import type {
   AddQuestionPaperQuestionInput,
   RemoveQuestionPaperQuestionInput,

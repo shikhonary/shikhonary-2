@@ -79,7 +79,7 @@ export async function listJuktoborno(db: PrismaClient, input: ListJuktobornoInpu
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: targetClassId,
+          classId: targetClassId,
         },
       },
     }
@@ -380,7 +380,7 @@ export async function getJuktobornoStats(db: PrismaClient, input: JuktobornoStat
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

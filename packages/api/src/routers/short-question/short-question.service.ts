@@ -60,7 +60,7 @@ export async function listShortQuestions(db: PrismaClient, input: ListShortQuest
       ...where.subject,
       classSubjects: {
         some: {
-          academicClassId,
+          classId: academicClassId,
         },
       },
     }
@@ -319,7 +319,7 @@ export async function getShortQuestionStats(db: PrismaClient, input: ShortQuesti
     where.subject = {
       classSubjects: {
         some: {
-          academicClassId: input.academicClassId,
+          classId: input.academicClassId,
         },
       },
     }

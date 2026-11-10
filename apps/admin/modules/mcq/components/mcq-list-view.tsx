@@ -13,10 +13,12 @@ import {
   useDeleteMcq,
   useBulkDeleteMcqs,
   useResolveMcqReport,
+  useAssignMcqReport,
 } from "../services/use-mcq"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
+import { AssignReportDialog } from "@/components/shared/assign-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { HelpCircle, Plus, Upload } from "lucide-react"
@@ -59,10 +61,12 @@ export function McqListView() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
   const [resolveTarget, setResolveTarget] = useState<McqItem | null>(null)
+  const [assignTarget, setAssignTarget] = useState<McqItem | null>(null)
 
   const deleteMutation = useDeleteMcq()
   const bulkDeleteMutation = useBulkDeleteMcqs()
   const resolveMcqMutation = useResolveMcqReport()
+  const assignMcqMutation = useAssignMcqReport()
 
   const handleConfirmResolve = async (resolvedNote?: string) => {
     if (!resolveTarget) return
@@ -75,6 +79,30 @@ export function McqListView() {
       setResolveTarget(null)
     } catch (err: any) {
       toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
+
+  const handleConfirmAssign = async ({
+    assigneeId,
+    note,
+    reportId,
+  }: {
+    assigneeId: string
+    note?: string
+    reportId?: string
+  }) => {
+    if (!assignTarget) return
+    try {
+      await assignMcqMutation.mutateAsync({
+        mcqId: assignTarget.id,
+        assignedToId: assigneeId,
+        reportId,
+        note,
+      })
+      toast.success("রিপোর্টের দায়িত্ব সফলভাবে অর্পণ (Assign) করা হয়েছে।")
+      setAssignTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট অ্যাসাইন করতে সমস্যা হয়েছে")
     }
   }
 
@@ -215,6 +243,7 @@ export function McqListView() {
         onDelete={(id, question) => setDeleteTarget({ id, question })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
         onResolveReport={(item) => setResolveTarget(item)}
+        onAssignReport={(item) => setAssignTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
@@ -242,6 +271,27 @@ export function McqListView() {
         reports={resolveTarget?.reports}
         onConfirmResolve={handleConfirmResolve}
         isLoading={resolveMcqMutation.isPending}
+      />
+
+      {/* Reusable Assign MCQ Report Dialog */}
+      <AssignReportDialog
+        isOpen={Boolean(assignTarget)}
+        onClose={() => setAssignTarget(null)}
+        entityName="MCQ প্রশ্ন"
+        entityDetails={
+          assignTarget
+            ? {
+                subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
+                chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
+                clueText: assignTarget.question,
+                editHref: `/mcqs/${assignTarget.id}/edit`,
+                editLabel: "MCQ এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={assignTarget?.reports}
+        onConfirmAssign={handleConfirmAssign}
+        isLoading={assignMcqMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}

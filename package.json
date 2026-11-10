@@ -12,6 +12,9 @@
     "seed:mcq": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-mcq-json.ts",
     "seed:cq": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-cq-json.ts",
     "seed:cs": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-cs-json.ts",
+    "seed:paragraph": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-paragraph-json.ts",
+    "seed:summary": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-summary-json.ts",
+    "seed:essence": "pnpm --filter @workspace/db exec tsx ../../scratch/seed-essence-json.ts",
     "sync:mcq-attachment-refs": "pnpm --filter @workspace/db exec tsx scripts/sync-mcq-attachment-references.ts"
   },
   "devDependencies": {

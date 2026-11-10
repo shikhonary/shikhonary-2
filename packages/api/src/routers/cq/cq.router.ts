@@ -11,6 +11,7 @@ import {
   importCqsSchema,
   cqStatsSchema,
   resolveCqReportSchema,
+  assignCqReportSchema,
 } from "./cq.schema"
 import {
   createCq,
@@ -24,6 +25,7 @@ import {
   getCqStats,
   getBoardYears,
   resolveCqReport,
+  assignCqReport,
 } from "./cq.service"
 
 export const cqRouter = createTRPCRouter({
@@ -76,5 +78,11 @@ export const cqRouter = createTRPCRouter({
     .input(resolveCqReportSchema)
     .mutation(({ ctx, input }) =>
       resolveCqReport(ctx.db, input, ctx.session?.user?.id)
+    ),
+
+  assignReport: superAdminProcedure
+    .input(assignCqReportSchema)
+    .mutation(({ ctx, input }) =>
+      assignCqReport(ctx.db, input, ctx.session?.user?.id)
     ),
 })

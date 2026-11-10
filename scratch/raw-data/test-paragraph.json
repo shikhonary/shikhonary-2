@@ -1,0 +1,641 @@
+{
+  "chapterTitle": "অনুচ্ছেদ রচনা",
+  "paragraphs": [
+    {
+      "name": "আন্তর্জাতিক মাতৃভাষা দিবস বা শহিদ দিবস বা একুশে ফেব্রুয়ারি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "মি. বো. ২৩, ২২",
+        "য. বো. ২৪",
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
+        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা",
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়",
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা",
+        "ফরিদপুর জিলা স্কুল",
+        "শহিদ পুলিশ স্মৃতি কলেজ, ঢাকা",
+        "সি. বো. ১৬",
+        "চট্টগ্রাম ক্যান্টনমেন্ট বোর্ড আন্তঃ উচ্চ বিদ্যালয়",
+        "চ. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বিশ্ববিদ্যালয়",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ২৪",
+        "ঝিনাইদহ ক্যাডেট কলেজ",
+        "বাংলাদেশ বিমান বাহিনী শাহীন কলেজ, যশোর",
+        "নেত্রকোণা সরকারি বালিকা উচ্চ বিদ্যালয়",
+        "সরকারি সতীশ চন্দ্র বালিকা উচ্চ বিদ্যালয়, সুনামগঞ্জ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বৈশাখী মেলা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২৫, ২২",
+        "সকল বোর্ড ১৮",
+        "য. বো. ২৩, ১৬",
+        "দি. বো. ২৫",
+        "কু. বো. ২৩",
+        "চ. বো. ২৪",
+        "সি. বো. ২২",
+        "ব. বো. ২৫",
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+        "ময়মনসিংহ গার্লস ক্যাডেট কলেজ",
+        "রাজউক উত্তরা মডেল কলেজ",
+        "চট্টগ্রাম কলেজিয়েট স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বইমেলা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২৪, ২৩",
+        "ম. বো. ২৫, ২৪",
+        "রা. বো. ২৫, ২৩",
+        "কু. বো. ২৫, ২৪",
+        "চ. বো. ২৩",
+        "সি. বো. ২৫, ২৩",
+        "য. বো. ২৫, ১৫",
+        "ব. বো. ২৪",
+        "ঝিনাইদহ ক্যাডেট কলেজ",
+        "সিলেট ক্যাডেট কলেজ",
+        "নোয়াখালী জিলা স্কুল",
+        "ফেনী সরকারি বালিকা উচ্চ বিদ্যালয়",
+        "ময়মনসিংহ জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "জাদুঘর",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রংপুর ক্যাডেট কলেজ",
+        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা",
+        "যশোর জিলা স্কুল",
+        "উদয়ন উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "সুন্দরবন",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২৩",
+        "ম. বো. ২৫",
+        "রা. বো. ২৫",
+        "দি. বো. ২৩",
+        "কু. বো. ২৫",
+        "সি. বো. ২৪",
+        "য. বো. ২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "রেলগাড়ি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "মির্জাপুর ক্যাডেট কলেজ, টাঙ্গাইল",
+        "কুমিল্লা জিলা স্কুল",
+        "ময়মনসিংহ জিলা স্কুল",
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "স্বাধীনতা দিবস",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২০",
+        "রা. বো. ২২",
+        "দি. বো. ১৬",
+        "য. বো. ১৭",
+        "কু. বো. ২৩",
+        "চ. বো. ২৪, ২৩",
+        "সি. বো. ২৩",
+        "ব. বো. ২৪, ২৩",
+        "সিলেট ক্যাডেট কলেজ",
+        "বাংলাদেশ বিমান বাহিনী শাহীন কলেজ, কুর্মিটোলা, ঢাকা",
+        "বরিশাল ক্যাডেট কলেজ",
+        "শেরপুর সরকারি বালিকা উচ্চ বিদ্যালয়"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "জাতীয় পতাকা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২৪",
+        "রা. বো. ২৪",
+        "দি. বো. ১৭",
+        "কু. বো. ২৪",
+        "সি. বো. ২৫",
+        "মির্জাপুর ক্যাডেট কলেজ, টাঙ্গাইল",
+        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা",
+        "জামালপুর জিলা স্কুল",
+        "পুলিশ লাইন মাধ্যমিক বিদ্যালয়, যশোর"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "জাতীয় সংগীত",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "সরকারি প্রমথনাথ বালিকা উচ্চ বিদ্যালয়, রাজশাহী",
+        "বাংলাদেশ নৌবাহিনী স্কুল ও কলেজ, চট্টগ্রাম",
+        "যশোর জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "কম্পিউটার",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২৫",
+        "দি. বো. ২৫",
+        "চ. বো. ২৫",
+        "য. বো. ২৫, ২৪",
+        "ব. বো. ২৫, ২৩",
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+        "জামালপুর জিলা স্কুল",
+        "খুলনা জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "মোবাইল ফোন",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ২৪, ২৩",
+        "ম. বো. ২৪",
+        "দি. বো. ২৩",
+        "রংপুর ক্যাডেট কলেজ",
+        "মিরপুর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা",
+        "বরিশাল জিলা স্কুল",
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "পদ্মা নদী",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "চট্টগ্রাম কলেজিয়েট স্কুল",
+        "কুমিল্লা শিক্ষাবোর্ড সরকারি মডেল কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "জন্মদিনের সন্ধ্যা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "মি. বো. ২৩",
+        "চ. বো. ২৫",
+        "ময়মনসিংহ গার্লস ক্যাডেট কলেজ",
+        "শেরপুর সরকারি বালিকা উচ্চ বিদ্যালয়",
+        "সীমান্ত পাবলিক উচ্চ বিদ্যালয়, নওগাঁ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+{
+      "name": "জুলাই বিপ্লব: ২০২৪ বা জুলাই অভ্যুত্থান",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
+        "রাজশাহী ক্যাডেট কলেজ",
+        "বাংলাদেশ বিমান বাহিনী শাহীন কলেজ, চট্টগ্রাম"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "শিষ্টাচার",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "সাম্প্রদায়িক সম্প্রীতি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "শীতের সকাল",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "চ. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "দ্রব্যমূল্য বৃদ্ধি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রাঙ্গামাটি সরকারি উচ্চ বিদ্যালয়"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "কৃত্রিম বুদ্ধিমত্তা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রংপুর ক্যাডেট কলেজ",
+        "কুমিল্লা ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বৈষম্যবিরোধী ছাত্র আন্দোলন",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "অতিথি পাখি বা পরিযায়ী পাখি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "য. বো. ২০",
+        "সি. বো. ১৭",
+        "কু. বো. ২০"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "ইন্টারনেট",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ১৬",
+        "ব. বো. ১৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "কর্তব্যনিষ্ঠা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ম. বো. ২০"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "কৃষি উদ্যোক্তা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "বরগুনা জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "খাদ্যে ভেজাল",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ১৭",
+        "য. বো. ১৯, ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "গ্রন্থাগার",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ২০",
+        "কু. বো. ১৯",
+        "য. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "ডিজিটাল বাংলাদেশ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ২২",
+        "সি. বো. ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "ডেঙ্গুজ্বর বা ডেঙ্গু: সতর্কতা ও প্রতিরোধ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "তথ্য-প্রযুক্তি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ১৯",
+        "কু. বো. ১৬",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, সৈয়দপুর, নীলফামারী"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "নারীশিক্ষা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "দি. বো. ২২, ২০",
+        "কু.বো. ১৯, ১৫",
+        "য. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "নিয়মানুবর্তিতা বা শৃঙ্খলাবোধ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ২০",
+        "চট্টগ্রাম ক্যান্টনমেন্ট বোর্ড আন্তঃ উচ্চ বিদ্যালয়"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "পরিবেশ দূষণ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ১৯, ১৭, ১৫",
+        "লায়ন্স স্কুল এন্ড কলেজ, সৈয়দপুর, নীলফামারী",
+        "পাবনা ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বই পড়া",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ১৬",
+        "রা. বো. ২২",
+        "চ. বো. ১৯, ১৭",
+        "ব. বো. ১৫",
+        "ব. বো. ২২",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, সৈয়দপুর, নীলফামারী",
+        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বই পড়ার আনন্দ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ১৬",
+        "চ. বো. ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বাংলা নববর্ষ বা পহেলা বৈশাখ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ১৯, ১৭, ১৫",
+        "রা. বো. ২৩",
+        "দি. বো. ২২",
+        "চ. বো. ১৭, ১৫",
+        "য. বো. ১৭, ১৫",
+        "ব. বো. ২২, ২০",
+        "ফেনী সরকারি পাইলট উচ্চ বিদ্যালয়"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বাংলাদেশের মুক্তিযুদ্ধ বা মুক্তিযুদ্ধ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ১৭",
+        "ব. বো. ১৫",
+        "চ. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বিজয় দিবস",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ২০",
+        "চ. বো. ২০",
+        "সি. বো. ২০",
+        "ব. বো. ১৭, ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বৃক্ষরোপণ অভিযান বা বৃক্ষরোপণ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "সি. বো. ২২",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, সৈয়দপুর, নীলফামারী"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বুদ্ধিজীবী হত্যা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ২২"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "শিশুশ্রম",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ১৯, ১৭",
+        "ব. বো. ২০, ১৯",
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম",
+        "সারদা সুন্দরী বালিকা উচ্চ বিদ্যালয়, ফরিদপুর"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "শীতের একটি সকাল",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ১৭",
+        "ব. বো. ১৭"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "শৈশবস্মৃতি",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "সি. বো. ১৯"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "সত্যবাদিতা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ১৯, ১৬",
+        "সি. বো. ২০, ১৯, ১৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "যানজট",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "রা. বো. ২০",
+        "দি. বো. ২০, ১৫",
+        "ব. বো. ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "যৌতুকপ্রথা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "সকল বোর্ড ১৮",
+        "ঢা. বো. ১৬",
+        "চ. বো. ২০, ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "রাশিয়া-ইউক্রেন যুদ্ধ",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "গ্রাম্যমেলা",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "ঢা. বো. ২০",
+        "রা. বো. ১৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বসন্তকাল",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "চ. বো. ১৯"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "বিশ্বায়ন",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [
+        "কু. বো. ১৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    },
+    {
+      "name": "জেনারেশন জেড (জেন-জি)",
+      "guidingQuestions": [],
+      "content": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isEnglish": false
+    }
+  ]
+}
