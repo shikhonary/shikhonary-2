@@ -249,6 +249,7 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
       case "PARAGRAPH":
         return <ParagraphPickerCard {...cardProps} />
       case "AMPLIFICATION":
+      case "THOUGHT_EXPANSION":
         return <AmplificationPickerCard {...cardProps} />
       case "LETTER":
         return <LetterPickerCard {...cardProps} />

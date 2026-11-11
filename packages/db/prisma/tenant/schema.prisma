@@ -236,6 +236,7 @@ model QuestionPaperQuestion {
   shortAnswerId                 String?
   paragraphId                   String?
   amplificationId               String?
+  thoughtExpansionId            String?
   letterId                      String?
   applicationId                 String?
   summaryId                     String?
@@ -321,6 +322,7 @@ model QuestionPaperQuestion {
   @@unique([questionPaperId, shortAnswerId])
   @@unique([questionPaperId, paragraphId])
   @@unique([questionPaperId, amplificationId])
+  @@unique([questionPaperId, thoughtExpansionId])
   @@unique([questionPaperId, letterId])
   @@unique([questionPaperId, applicationId])
   @@unique([questionPaperId, summaryId])
@@ -369,6 +371,7 @@ model QuestionPaperQuestion {
   @@index([shortAnswerId])
   @@index([paragraphId])
   @@index([amplificationId])
+  @@index([thoughtExpansionId])
   @@index([letterId])
   @@index([applicationId])
   @@index([summaryId])

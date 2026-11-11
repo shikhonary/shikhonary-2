@@ -302,6 +302,7 @@ export async function saveSubjectQuestionTypes(
           mark: qt.mark,
           requiredCount: qt.requiredCount,
           totalQuestions: qt.totalQuestions,
+          selectionMode: qt.selectionMode ?? null,
           renderMethod: qt.renderMethod ?? 1,
           position: typeof qt.position === "number" ? qt.position : idx,
           markDistribution: qt.markDistribution ?? undefined,

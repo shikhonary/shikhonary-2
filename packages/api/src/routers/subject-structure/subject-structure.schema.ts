@@ -6,6 +6,7 @@ const questionTypeConfigSchema = z.object({
   mark: z.number().min(0),
   requiredCount: z.number().int().min(0),
   totalQuestions: z.number().int().min(0),
+  selectionMode: z.enum(["SINGLE_WITH_ALT", "SINGLE_NO_ALT", "MULTIPLE"]).optional().nullable(),
   renderMethod: z.coerce.number().int().default(1).optional(),
   position: z.number().int().default(0).optional(),
   markDistribution: z.record(z.string(), z.number()).optional().nullable(),

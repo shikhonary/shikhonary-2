@@ -4,6 +4,7 @@ import { QuestionAttachments } from "@workspace/ui/components/question-attachmen
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
+import { McqOptionLabel, isCorrectMcqOption } from "./mcq-option-label";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -51,7 +52,7 @@ const EditableItem = ({
   };
   
   const changeSize = (delta: number) => {
-    const currentSize = mergedStyle.fontSize || 12;
+    const currentSize = typeof mergedStyle.fontSize === "number" ? mergedStyle.fontSize : (parseFloat(String(mergedStyle.fontSize || 12)) || 12);
     setItemStyle(itemKey, { fontSize: currentSize + delta });
   };
   
@@ -75,7 +76,7 @@ const EditableItem = ({
           <div className="w-px h-4 bg-border mx-1"></div>
           
           <button onClick={() => changeSize(-1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Decrease Font Size">-</button>
-          <span className="text-[10px] w-4 text-center font-medium">{mergedStyle.fontSize}</span>
+          <span className="text-[10px] w-4 text-center font-medium">{parseFloat(String(mergedStyle.fontSize || 12)) || 12}</span>
           <button onClick={() => changeSize(1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Increase Font Size">+</button>
         </div>
       )}
@@ -85,7 +86,7 @@ const EditableItem = ({
         onClick={() => setIsActive(true)}
         className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} ${className}`}
         style={{
-          fontSize: mergedStyle.fontSize,
+          fontSize: typeof mergedStyle.fontSize === "number" ? `${mergedStyle.fontSize}pt` : mergedStyle.fontSize,
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
@@ -122,7 +123,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
 
   const getQuestionStyle = () => ({
-    fontSize: settings.fontSize,
+    fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
     fontFamily: settings.fontFamily,
     textAlign: "left" as const,
     lineHeight: settings.lineHeight,
@@ -130,7 +131,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   });
 
   const getContextStyle = () => ({
-    fontSize: settings.fontSize,
+    fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
     fontFamily: settings.fontFamily,
     textAlign: "left" as const,
     lineHeight: settings.lineHeight,
@@ -140,26 +141,11 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
   const isCombined = (data.type || "").toUpperCase() === "COMBINED";
-
-  const renderOptionLabel = (label: string) => {
-    switch (settings.optionStyle) {
-      case "dot": return <span className="shrink-0">{label}.</span>;
-      case "parentheses": return <span className="shrink-0">({label})</span>;
-      case "circle":
-        return (
-          <div className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
-               style={{ width: "1.6em", height: "1.6em", fontSize: "calc(100% - 2px)", marginTop: "2px", lineHeight: "1" }}>
-            {label}
-          </div>
-        );
-      case "round": 
-      default: return <span className="shrink-0">{label})</span>;
-    }
-  };
+  const isAnswerMode = Boolean(settings.isAnswerMode);
   
   return (
     <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors ${breakClass}`}
-         style={{ fontSize: settings.fontSize || 12, fontFamily: settings.fontFamily }}>
+         style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}>
          
       {/* Hover Controls */}
       <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
@@ -210,7 +196,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
           </span>
           <div className="flex-1 w-full min-w-0">
             {contextInstruction && (
-              <div className="font-bold text-xs mb-0.5 leading-snug">
+              <div className="font-bold mb-0.5 leading-snug">
                 {contextInstruction}
               </div>
             )}
@@ -276,10 +262,15 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
           <div className={`grid gap-x-2 gap-y-0 ${gridClass}`}>
             {(item.overrides?.shuffledOptions || data.options || []).map((opt: string, i: number) => {
               const label = ["ক", "খ", "গ", "ঘ"][i] || "";
+              const isFilledAnswer = isAnswerMode && isCorrectMcqOption(data, opt, i);
               
               return (
                 <div key={i} className="flex gap-1.5 items-start w-full">
-                  {renderOptionLabel(label)}
+                  <McqOptionLabel
+                    label={label}
+                    optionStyle={settings.optionStyle}
+                    isFilledAnswer={isFilledAnswer}
+                  />
                   <span className="w-full">
                     <EditableItem 
                       content={<RenderMath text={opt} />}

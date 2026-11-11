@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
+import Link from "next/link"
 import {
   useShortAnswersList,
   useShortAnswerStats,
@@ -12,29 +12,33 @@ import {
   useChaptersForSelection,
   useDeleteShortAnswer,
   useBulkDeleteShortAnswers,
+  useResolveShortAnswerReport,
+  useAssignShortAnswerReport,
 } from "../services/use-short-answer"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { ResolveReportDialog } from "@/components/shared/resolve-report-dialog"
+import { AssignReportDialog } from "@/components/shared/assign-report-dialog"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
-import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
 import { HelpCircle, Plus, Upload } from "lucide-react"
 import { ShortAnswerStatsCards } from "./short-answer-stats-cards"
 import { ShortAnswerFilters } from "./short-answer-filters"
-import { ShortAnswerTable } from "./short-answer-table"
+import { ShortAnswerTable, type ShortAnswerItem } from "./short-answer-table"
 import { useShortAnswerSearchParams } from "../hooks/use-short-answer-search-params"
 
 export function ShortAnswerListView() {
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
 
   const [
     {
       query: searchQuery,
+      academicClassId: selectedAcademicClassId,
       subjectId: selectedSubjectId,
       chapterId: selectedChapterId,
       board: selectedBoard,
-      difficulty: selectedDifficulty,
+      isActive: selectedIsActive,
+      hasReport: selectedHasReport,
       sort: selectedSort,
       page: currentPage,
       limit,
@@ -42,9 +46,9 @@ export function ShortAnswerListView() {
     setSearchParams,
   ] = useShortAnswerSearchParams()
 
-  const handleAcademicClassChange = (classId: string) => {
-    setSelectedAcademicClassId(classId)
+  const handleAcademicClassChange = (academicClassId: string) => {
     setSearchParams({
+      academicClassId,
       subjectId: "All",
       chapterId: "All",
       board: "All",
@@ -52,12 +56,54 @@ export function ShortAnswerListView() {
     })
   }
 
-  // Local state for single & bulk delete (Zero Zustand stores)
+  // Local state for delete & report dialogs
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null)
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<string[] | null>(null)
+  const [resolveTarget, setResolveTarget] = useState<ShortAnswerItem | null>(null)
+  const [assignTarget, setAssignTarget] = useState<ShortAnswerItem | null>(null)
 
   const deleteMutation = useDeleteShortAnswer()
   const bulkDeleteMutation = useBulkDeleteShortAnswers()
+  const resolveReportMutation = useResolveShortAnswerReport()
+  const assignReportMutation = useAssignShortAnswerReport()
+
+  const handleConfirmResolve = async (resolvedNote?: string) => {
+    if (!resolveTarget) return
+    try {
+      await resolveReportMutation.mutateAsync({
+        shortAnswerId: resolveTarget.id,
+        resolvedNote,
+      })
+      toast.success("সংক্ষিপ্ত উত্তর রিপোর্টটি সফলভাবে সমাধান করা হয়েছে।")
+      setResolveTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট সমাধান করতে সমস্যা হয়েছে")
+    }
+  }
+
+  const handleConfirmAssign = async ({
+    assigneeId,
+    note,
+    reportId,
+  }: {
+    assigneeId: string
+    note?: string
+    reportId?: string
+  }) => {
+    if (!assignTarget) return
+    try {
+      await assignReportMutation.mutateAsync({
+        shortAnswerId: assignTarget.id,
+        assignedToId: assigneeId,
+        reportId,
+        note,
+      })
+      toast.success("রিপোর্টের দায়িত্ব সফলভাবে অর্পণ (Assign) করা হয়েছে।")
+      setAssignTarget(null)
+    } catch (err: any) {
+      toast.error(err.message || "রিপোর্ট অ্যাসাইন করতে সমস্যা হয়েছে")
+    }
+  }
 
   const handleConfirmDelete = async () => {
     if (!deleteTarget) return
@@ -81,47 +127,36 @@ export function ShortAnswerListView() {
     }
   }
 
-  // Parse filters
-  let boardSource: string | undefined = undefined
-  let boardYear: number | undefined = undefined
-  if (selectedBoard && selectedBoard !== "All") {
-    const parts = selectedBoard.split("-")
-    const lastPart = parts[parts.length - 1]
-    if (lastPart && /^\d+$/.test(lastPart) && parts.length > 1) {
-      boardSource = parts.slice(0, -1).join("-")
-      boardYear = parseInt(lastPart, 10)
-    } else {
-      boardSource = selectedBoard
-    }
-  }
-
+  // Query Short Answers list with search & filters
   const { data: shortAnswersData, isLoading, isError } = useShortAnswersList({
     limit,
     page: currentPage,
     query: searchQuery || undefined,
+    academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
     subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
     chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     board: selectedBoard !== "All" ? selectedBoard : undefined,
-    source: boardSource,
-    year: boardYear,
-    difficulty: selectedDifficulty !== "All" ? (selectedDifficulty as any) : undefined,
-    sort: selectedSort as any,
+    isActive: selectedIsActive !== "All" ? selectedIsActive : undefined,
+    hasReport: selectedHasReport !== "All" ? selectedHasReport : undefined,
+    sort: selectedSort,
   })
 
-  // Fetch Board + Year combinations for this subject / chapter if selected
+  // Fetch Board + Reference combinations (scoped by class / subject / chapter if selected)
   const { data: boardYearsData } = useQuery({
     ...trpc.shortAnswer.boardYears.queryOptions({
+      academicClassId: selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
       subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
       chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
     }),
-    enabled: selectedSubjectId !== "All",
   })
   const boardYears = boardYearsData ?? []
 
-  // Query stats
+  // Query Short Answer stats
   const { data: statsData } = useShortAnswerStats(
-    selectedSubjectId !== "All" || selectedChapterId !== "All"
+    selectedAcademicClassId !== "All" || selectedSubjectId !== "All" || selectedChapterId !== "All"
       ? {
+          academicClassId:
+            selectedAcademicClassId !== "All" ? selectedAcademicClassId : undefined,
           subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
           chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
         }
@@ -144,10 +179,10 @@ export function ShortAnswerListView() {
     <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
       {/* Shared Page Header */}
       <PageHeader
-        title="সংক্ষিপ্ত উত্তর প্রশ্ন ব্যাংক (Short Answer)"
-        description="শ্রেণি, বিষয় ও অধ্যায়ভিত্তিক সংক্ষিপ্ত উত্তর প্রশ্ন, অপশন, সমাধান ও ব্যাখ্যা পরিচালনা করুন।"
+        title="সংক্ষিপ্ত উত্তর প্রশ্ন ব্যাংক"
+        description="শ্রেণি, বিষয় ও অধ্যায়ভিত্তিক সংক্ষিপ্ত উত্তর প্রশ্ন, অপশন, আদর্শ উত্তর ও ব্যাখ্যা পরিচালনা করুন।"
         icon={HelpCircle}
-        badge={{ label: "সংক্ষিপ্ত উত্তর", variant: "indigo" }}
+        badge={{ label: "সংক্ষিপ্ত উত্তর মডিউল", variant: "indigo" }}
         action={{
           label: "নতুন প্রশ্ন যোগ করুন",
           href: "/short-answers/create",
@@ -166,16 +201,16 @@ export function ShortAnswerListView() {
         </Button>
       </PageHeader>
 
-      {/* Summary Counts Cards */}
+      {/* Stats Cards */}
       <ShortAnswerStatsCards
         totalCount={statsData?.totalCount}
         activeCount={statsData?.activeCount}
         inactiveCount={statsData?.inactiveCount}
-        difficultyCounts={statsData?.difficultyCounts}
+        mathCount={statsData?.mathCount}
         isLoading={isLoading}
       />
 
-      {/* Filters Form */}
+      {/* Filters */}
       <ShortAnswerFilters
         searchQuery={searchQuery}
         onSearchChange={(query) => setSearchParams({ query, page: 1 })}
@@ -183,7 +218,9 @@ export function ShortAnswerListView() {
         onAcademicClassChange={handleAcademicClassChange}
         academicClasses={academicClasses}
         selectedSubjectId={selectedSubjectId}
-        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
+        onSubjectChange={(subjectId) =>
+          setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })
+        }
         subjects={subjects}
         selectedChapterId={selectedChapterId}
         onChapterChange={(chapterId) => setSearchParams({ chapterId, board: "All", page: 1 })}
@@ -191,23 +228,71 @@ export function ShortAnswerListView() {
         selectedBoard={selectedBoard}
         onBoardChange={(board) => setSearchParams({ board, page: 1 })}
         boardYears={boardYears}
+        selectedIsActive={selectedIsActive}
+        onIsActiveChange={(isActive) => setSearchParams({ isActive, page: 1 })}
+        selectedHasReport={selectedHasReport}
+        onHasReportChange={(hasReport) => setSearchParams({ hasReport, page: 1 })}
         selectedSort={selectedSort}
         onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
       />
 
-      {/* Questions List Cards & Table */}
+      {/* Data Table / Question Cards */}
       <ShortAnswerTable
         items={items as any}
         isLoading={isLoading}
         isError={isError}
-        onDelete={(id, questionSnippet) => setDeleteTarget({ id, question: questionSnippet })}
+        onDelete={(id, question) => setDeleteTarget({ id, question })}
         onBulkDelete={(selectedIds) => setBulkDeleteTarget(selectedIds)}
+        onResolveReport={(item) => setResolveTarget(item)}
+        onAssignReport={(item) => setAssignTarget(item)}
         currentPage={currentPage}
         itemsPerPage={limit}
         totalItems={totalItems}
         totalPages={totalPages}
         onPageChange={(page) => setSearchParams({ page })}
         onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+      />
+
+      {/* Reusable Resolve Report Dialog */}
+      <ResolveReportDialog
+        isOpen={Boolean(resolveTarget)}
+        onClose={() => setResolveTarget(null)}
+        entityName="সংক্ষিপ্ত উত্তর প্রশ্ন"
+        entityDetails={
+          resolveTarget
+            ? {
+                subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
+                chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
+                clueText: resolveTarget.question,
+                editHref: `/short-answers/${resolveTarget.id}/edit`,
+                editLabel: "প্রশ্ন এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={resolveTarget?.reports}
+        onConfirmResolve={handleConfirmResolve}
+        isLoading={resolveReportMutation.isPending}
+      />
+
+      {/* Reusable Assign Report Dialog */}
+      <AssignReportDialog
+        isOpen={Boolean(assignTarget)}
+        onClose={() => setAssignTarget(null)}
+        entityName="সংক্ষিপ্ত উত্তর প্রশ্ন"
+        entityDetails={
+          assignTarget
+            ? {
+                subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
+                chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
+                clueText: assignTarget.question,
+                editHref: `/short-answers/${assignTarget.id}/edit`,
+                editLabel: "প্রশ্ন এডিট পেজে যান",
+              }
+            : undefined
+        }
+        reports={assignTarget?.reports}
+        onConfirmAssign={handleConfirmAssign}
+        isLoading={assignReportMutation.isPending}
       />
 
       {/* Shared Single Delete Modal */}
@@ -217,7 +302,7 @@ export function ShortAnswerListView() {
         onConfirm={handleConfirmDelete}
         title="সংক্ষিপ্ত উত্তর প্রশ্ন ডিলিট করতে চান?"
         itemName={deleteTarget?.question}
-        warningText="এই সংক্ষিপ্ত উত্তর প্রশ্নটি ডিলিট করলে এটি সম্পূর্ণভাবে মুছে যাবে।"
+        warningText="এই প্রশ্নটি ডিলিট করলে এর সমস্ত সমাধান ও পরীক্ষা সংশ্লিষ্ট রেকর্ড প্রভাবিত হতে পারে।"
         isLoading={deleteMutation.isPending}
       />
 
@@ -226,9 +311,9 @@ export function ShortAnswerListView() {
         isOpen={Boolean(bulkDeleteTarget && bulkDeleteTarget.length > 0)}
         onClose={() => setBulkDeleteTarget(null)}
         onConfirm={handleConfirmBulkDelete}
-        title="নির্বাচিত সংক্ষিপ্ত উত্তর প্রশ্নগুলো ডিলিট করতে চান?"
-        itemName={bulkDeleteTarget ? `${toBengaliDigits(bulkDeleteTarget.length)}টি সংক্ষিপ্ত উত্তর প্রশ্ন` : ""}
-        warningText="নির্বাচিত প্রশ্নসমূহ স্থায়ীভাবে মুছে ফেলা হবে।"
+        title={`${bulkDeleteTarget?.length ?? 0}টি সংক্ষিপ্ত উত্তর ডিলিট নিশ্চিত করুন`}
+        itemName={`${bulkDeleteTarget?.length ?? 0}টি নির্বাচিত প্রশ্ন`}
+        warningText="নির্বাচিত সকল প্রশ্ন স্থায়ীভাবে মুছে যাবে। এটি আর ফেরানো সম্ভব নয়।"
         isLoading={bulkDeleteMutation.isPending}
       />
     </div>

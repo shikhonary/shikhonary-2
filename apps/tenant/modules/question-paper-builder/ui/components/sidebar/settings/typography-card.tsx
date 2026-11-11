@@ -75,7 +75,7 @@ export const TypographyCard: React.FC = () => {
           </Label>
           <div className="flex items-center gap-1.5">
             <span className="font-solaiman font-bold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/40">
-              {toBengaliDigits(settings.fontSize)} px
+              {toBengaliDigits(settings.fontSize)} pt
             </span>
           </div>
         </div>
@@ -83,8 +83,8 @@ export const TypographyCard: React.FC = () => {
         {/* Quick Size Presets */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "ছোট (১২)", size: 12 },
-            { label: "আদর্শ (১৪)", size: 14 },
+            { label: "আদর্শ (১৩)", size: 13 },
+            { label: "মাঝারি (১৪)", size: 14 },
             { label: "বড় (১৬)", size: 16 },
           ].map((preset) => {
             const isSelected = settings.fontSize === preset.size;

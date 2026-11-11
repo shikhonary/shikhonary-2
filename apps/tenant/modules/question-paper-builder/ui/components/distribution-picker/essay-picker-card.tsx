@@ -3,6 +3,7 @@
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { PickerCardWrapper } from "./picker-card-wrapper";
+import { isResourceEnglish } from "@workspace/utils";
 
 interface EssayPickerCardProps {
   question: any;
@@ -32,6 +33,10 @@ export const EssayPickerCard: React.FC<EssayPickerCardProps> = ({
     q.chapter?.nameEn;
 
   const titleText = q.title || q.name || q.question || "";
+  const isEnglish = isResourceEnglish({
+    subjectName: q.academicSubject?.nameEn || q.subject?.nameEn || q.academicSubject?.nameBn || q.subject?.nameBn,
+    content: titleText,
+  });
 
   return (
     <PickerCardWrapper
@@ -41,6 +46,8 @@ export const EssayPickerCard: React.FC<EssayPickerCardProps> = ({
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={q.difficulty}
+      typeLabel={isEnglish ? (q.questionType?.nameEn || "Essay") : (q.questionType?.nameBn || "রচনা")}
+      language={isEnglish ? "en" : "bn"}
     >
       <div className="flex flex-col gap-3 font-body">
         <div className="text-sm font-semibold text-foreground leading-relaxed">

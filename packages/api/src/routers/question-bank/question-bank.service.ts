@@ -430,7 +430,7 @@ export async function getFilterOptions(
     }),
     input.subjectId && input.subjectId !== "all"
       ? db.academicChapter.findMany({
-          where: { subjectId: input.subjectId },
+          where: { subjectId: input.subjectId, isActive: true },
           orderBy: { position: "asc" },
           select: { id: true, nameEn: true, nameBn: true, position: true },
         })

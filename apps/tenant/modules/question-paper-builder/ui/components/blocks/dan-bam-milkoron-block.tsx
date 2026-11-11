@@ -244,7 +244,7 @@ export const DanBamMilkoronBlock = ({ item }: { item: any }) => {
 
   const getQuestionStyle = () => {
     return {
-      fontSize: settings.fontSize,
+      fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,

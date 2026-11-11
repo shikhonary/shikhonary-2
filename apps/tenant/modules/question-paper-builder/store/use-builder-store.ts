@@ -71,14 +71,16 @@ const defaultSettings: PaperSettings = {
   twoPagesPerSheet: false,
   headerTemplate: "modern",
   optionStyle: "circle",
+  isAnswerMode: false,
   fontFamily: "SolaimanLipi",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: "normal",
   lineHeight: 1.5,
   textAlign: "left",
   showLogo: false,
   showAddress: false,
   showWatermark: false,
+  showAppBranding: true,
   showClassName: true,
   showSubjectName: true,
   showChapterName: false,
@@ -378,11 +380,15 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       finalSettings.institutionName = tenantNameBn;
     }
 
+    const savedSettings = dbSettings && typeof dbSettings === 'object' ? (dbSettings as any) : {};
+    const hasSavedExamName = typeof savedSettings.examName === 'string' && savedSettings.examName.trim().length > 0;
+    const hasSavedClassName = typeof savedSettings.className === 'string' && savedSettings.className.trim().length > 0;
+
     if (paperData) {
-      if (paperData.examName || paperData.title) {
+      if (!hasSavedExamName && (paperData.examName || paperData.title)) {
         finalSettings.examName = paperData.examName || paperData.title;
       }
-      if (paperData.academicClass?.nameBn || paperData.academicClass?.nameEn) {
+      if (!hasSavedClassName && (paperData.academicClass?.nameBn || paperData.academicClass?.nameEn)) {
         finalSettings.className = paperData.academicClass.nameBn || paperData.academicClass.nameEn;
       }
       if (paperData.subjects?.length > 0) {

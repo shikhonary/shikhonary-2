@@ -277,7 +277,7 @@ const ComprehensionEditableText = ({
   };
   
   const changeSize = (delta: number) => {
-    const currentSize = mergedStyle.fontSize || 12;
+    const currentSize = typeof mergedStyle.fontSize === "number" ? mergedStyle.fontSize : (parseFloat(String(mergedStyle.fontSize || 12)) || 12);
     setItemStyle(itemKey, { fontSize: currentSize + delta });
   };
   
@@ -460,7 +460,7 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
   };
 
   const questionStyle = {
-    fontSize: settings.fontSize,
+    fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
     fontFamily: settings.fontFamily,
     textAlign: "left" as const,
     lineHeight: settings.lineHeight,
@@ -468,7 +468,7 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
   };
 
   const contextStyle = {
-    fontSize: settings.fontSize,
+    fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
     fontFamily: settings.fontFamily,
     textAlign: "justify" as const,
     textJustify: "inter-word" as const,

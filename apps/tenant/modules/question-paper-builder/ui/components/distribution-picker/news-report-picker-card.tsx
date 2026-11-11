@@ -22,7 +22,7 @@ export const NewsReportPickerCard: React.FC<NewsReportPickerCardProps> = ({
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={q.chapter?.nameBn || q.chapter?.nameEn}
-      typeLabel="????? ?????????"
+      typeLabel={q.questionType?.nameBn || "সংবাদ প্রতিবেদন"}
     >
       <div className="flex flex-col gap-3 font-body">
         <div className="text-sm font-semibold text-on-surface">

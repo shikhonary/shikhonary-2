@@ -60,6 +60,7 @@ const questionTypeConfigSchema = z.object({
   mark: z.coerce.number().min(0, "নম্বর ০ বা তার বেশি হতে হবে"),
   requiredCount: z.coerce.number().int().min(0, "আবশ্যক সংখ্যা ০ বা তার বেশি হতে হবে"),
   totalQuestions: z.coerce.number().int().min(0, "মোট প্রশ্ন সংখ্যা ০ বা তার বেশি হতে হবে"),
+  selectionMode: z.enum(["SINGLE_WITH_ALT", "SINGLE_NO_ALT", "MULTIPLE"]).optional().nullable(),
   renderMethod: z.coerce.number().int().default(1).optional(),
   position: z.number().int().optional(),
   markDistributionStr: z.string().optional(),
@@ -94,6 +95,7 @@ interface QuestionTypeConfig {
   mark: number
   requiredCount: number
   totalQuestions: number
+  selectionMode?: "SINGLE_WITH_ALT" | "SINGLE_NO_ALT" | "MULTIPLE" | null
   renderMethod?: number
   markDistributionStr?: string
 }
@@ -164,6 +166,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { isSubmitting, errors },
   } = useForm<any>({
     resolver: zodResolver(subjectQuestionStructureSchema),
@@ -263,6 +266,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
                   mark: sqt.mark,
                   requiredCount: sqt.requiredCount,
                   totalQuestions: sqt.totalQuestions,
+                  selectionMode: sqt.selectionMode ?? null,
                   renderMethod: sqt.renderMethod ?? 1,
                   position: typeof sqt.position === "number" ? sqt.position : qtIdx,
                   markDistributionStr,
@@ -293,6 +297,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               mark: sqt.mark,
               requiredCount: sqt.requiredCount,
               totalQuestions: sqt.totalQuestions,
+              selectionMode: sqt.selectionMode ?? null,
               renderMethod: sqt.renderMethod ?? 1,
               position: typeof sqt.position === "number" ? sqt.position : qtIdx,
               markDistributionStr,
@@ -345,13 +350,17 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
               }
             }
 
+            const isExplicitSingle =
+              c.selectionMode === "SINGLE_WITH_ALT" || c.selectionMode === "SINGLE_NO_ALT"
+            const parsedRender = Number(c.renderMethod)
             return {
               questionTypeId: c.questionTypeId,
               customLabel: c.customLabel?.trim() || null,
               mark: c.mark,
-              requiredCount: c.requiredCount,
-              totalQuestions: c.totalQuestions,
-              renderMethod: c.renderMethod ?? 1,
+              requiredCount: isExplicitSingle ? 1 : c.requiredCount,
+              totalQuestions: isExplicitSingle ? 1 : c.totalQuestions,
+              selectionMode: c.selectionMode ?? null,
+              renderMethod: Number.isFinite(parsedRender) && parsedRender > 0 ? parsedRender : 1,
               position: qtIdx,
               markDistribution,
             }
@@ -545,6 +554,7 @@ function SubjectQuestionStructureForm({ subject }: SubjectQuestionStructureFormP
                     moveSection={moveSection}
                     removeSection={removeSection}
                     questionTypesList={questionTypesList}
+                    setValue={setValue}
                   />
                 ))}
               </div>
@@ -596,6 +606,7 @@ interface SectionCardProps {
   moveSection: (from: number, to: number) => void
   removeSection: (index: number) => void
   questionTypesList: any[]
+  setValue: any
 }
 
 function SectionCard({
@@ -605,6 +616,7 @@ function SectionCard({
   moveSection,
   removeSection,
   questionTypesList,
+  setValue,
 }: SectionCardProps) {
   const {
     fields: subSections,
@@ -796,6 +808,7 @@ function SectionCard({
                 subIndex={subIndex}
                 removeSubSection={removeSubSection}
                 questionTypesList={questionTypesList}
+                setValue={setValue}
               />
             ))}
           </div>
@@ -819,6 +832,7 @@ function SectionCard({
                       mark: 0,
                       requiredCount: 0,
                       totalQuestions: 0,
+                      renderMethod: 1,
                       markDistributionStr: "",
                     })
                   }
@@ -851,6 +865,7 @@ function SectionCard({
                         namePrefix={`sections.${secIndex}.questionTypes.${qtIndex}`}
                         removeRow={() => removeDirectQt(qtIndex)}
                         questionTypesList={questionTypesList}
+                        setValue={setValue}
                       />
                     ))}
                   </div>
@@ -1013,6 +1028,7 @@ function SubSectionCard({
                   namePrefix={`sections.${secIndex}.subSections.${subIndex}.questionTypes.${qtIndex}`}
                   removeRow={() => removeSubQt(qtIndex)}
                   questionTypesList={questionTypesList}
+                  setValue={setValue}
                 />
               ))}
             </div>
@@ -1238,6 +1254,7 @@ function QuestionTypeRow({
             <Select
               value={field.value || effectiveMode}
               onValueChange={(val) => {
+                if (!val) return
                 field.onChange(val)
                 if (val === "SINGLE_WITH_ALT" || val === "SINGLE_NO_ALT") {
                   setValue?.(`${namePrefix}.totalQuestions`, 1, { shouldDirty: true, shouldValidate: true })
@@ -1272,8 +1289,14 @@ function QuestionTypeRow({
           name={`${namePrefix}.renderMethod`}
           render={({ field }) => (
             <Select
-              onValueChange={(val) => field.onChange(parseInt(val, 10))}
-              value={field.value !== undefined && field.value !== null ? field.value.toString() : "1"}
+              onValueChange={(val) => {
+                if (!val) return
+                const parsed = parseInt(val, 10)
+                if (!Number.isNaN(parsed)) {
+                  field.onChange(parsed)
+                }
+              }}
+              value={field.value !== undefined && field.value !== null && !Number.isNaN(Number(field.value)) ? String(field.value) : "1"}
             >
               <SelectTrigger className="h-9 text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
                 <SelectValue placeholder="স্টাইল" />

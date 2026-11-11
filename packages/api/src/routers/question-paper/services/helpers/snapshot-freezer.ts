@@ -25,6 +25,8 @@ export async function freezeQuestionSnapshots(
       content = await db.paragraph.findUnique({ where: { id: pq.paragraphId } })
     } else if (pq.amplificationId) {
       content = await db.amplification.findUnique({ where: { id: pq.amplificationId } })
+    } else if (pq.thoughtExpansionId) {
+      content = await (db as any).thoughtExpansion.findUnique({ where: { id: pq.thoughtExpansionId } })
     } else if (pq.letterId) {
       content = await (db as any).letter.findUnique({ where: { id: pq.letterId } })
     } else if (pq.applicationId) {

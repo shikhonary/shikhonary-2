@@ -37,7 +37,7 @@ const isMismatchedLabel = (label: string | null | undefined, questionType?: stri
   ) {
     return true;
   }
-  if (questionType === "AMPLIFICATION" && (l.includes("অনুচ্ছেদ") || l.includes("প্রবন্ধ") || l.includes("সারাংশ"))) return true;
+  if ((questionType === "AMPLIFICATION" || questionType === "THOUGHT_EXPANSION") && (l.includes("অনুচ্ছেদ") || l.includes("প্রবন্ধ") || l.includes("সারাংশ"))) return true;
   if (questionType === "ESSAY" && (l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ") || l.includes("সারাংশ"))) return true;
   if (questionType === "PARAGRAPH" && (l.includes("ভাব-সম্প্রসারণ") || l.includes("প্রবন্ধ") || l.includes("সারমর্ম"))) return true;
   if (questionType === "SUMMARY" && (l.includes("সারমর্ম") || l.includes("অনুচ্ছেদ") || l.includes("ভাব-সম্প্রসারণ"))) return true;

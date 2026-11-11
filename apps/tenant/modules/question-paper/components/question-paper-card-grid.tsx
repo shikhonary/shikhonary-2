@@ -11,9 +11,11 @@ import {
   Trash,
   MoreVertical,
   CheckCircle,
+  CheckCircle2,
   AlertTriangle,
   ArrowRight,
   BookOpen,
+  Loader2,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
@@ -54,6 +56,8 @@ interface QuestionPaperCardGridProps {
   isLoading?: boolean
   onEdit?: (item: QuestionPaperItem) => void
   onDuplicate: (id: string, title: string) => void
+  onGenerateAnswer?: (id: string, title: string) => void
+  generatingAnswerId?: string | null
   onDelete: (id: string, title: string) => void
 }
 
@@ -61,6 +65,8 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
   items,
   isLoading,
   onDuplicate,
+  onGenerateAnswer,
+  generatingAnswerId,
   onDelete,
 }) => {
   if (isLoading) {
@@ -201,6 +207,20 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                       <Copy className="h-3.5 w-3.5" />
                       <span>ডুপ্লিকেট করুন</span>
                     </DropdownMenuItem>
+                    {onGenerateAnswer && (
+                      <DropdownMenuItem
+                        disabled={generatingAnswerId === item.id}
+                        onClick={() => onGenerateAnswer(item.id, item.title)}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                      >
+                        {generatingAnswerId === item.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        )}
+                        <span>উত্তরপত্র তৈরি করুন</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       variant="destructive"
                       onClick={() => onDelete(item.id, item.title)}
@@ -243,6 +263,15 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                     className="rounded-lg px-2 py-0.5 border border-teal-200 dark:border-teal-800/40 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 text-xs font-semibold font-headline"
                   >
                     টেমপ্লেট
+                  </Badge>
+                )}
+
+                {Boolean(item.settings?.isAnswerMode) && (
+                  <Badge
+                    variant="outline"
+                    className="rounded-lg px-2 py-0.5 border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold font-headline"
+                  >
+                    উত্তরপত্র
                   </Badge>
                 )}
               </div>

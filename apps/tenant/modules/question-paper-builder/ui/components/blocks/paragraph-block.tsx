@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
-import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { isResourceEnglish } from "@workspace/utils";
 
@@ -55,7 +54,7 @@ const ParagraphEditableText = ({
   };
   
   const changeSize = (delta: number) => {
-    const currentSize = mergedStyle.fontSize || 12;
+    const currentSize = typeof mergedStyle.fontSize === "number" ? mergedStyle.fontSize : (parseFloat(String(mergedStyle.fontSize || 12)) || 12);
     setItemStyle(itemKey, { fontSize: currentSize + delta });
   };
   
@@ -79,7 +78,7 @@ const ParagraphEditableText = ({
           <div className="w-px h-4 bg-border mx-1"></div>
           
           <button onClick={() => changeSize(-1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Decrease Font Size">-</button>
-          <span className="text-[10px] w-4 text-center font-medium">{mergedStyle.fontSize}</span>
+          <span className="text-[10px] w-4 text-center font-medium">{parseFloat(String(mergedStyle.fontSize || 12)) || 12}</span>
           <button onClick={() => changeSize(1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Increase Font Size">+</button>
         </div>
       )}
@@ -89,7 +88,7 @@ const ParagraphEditableText = ({
         onClick={() => setIsActive(true)}
         className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} ${className}`}
         style={{
-          fontSize: mergedStyle.fontSize,
+          fontSize: typeof mergedStyle.fontSize === "number" ? `${mergedStyle.fontSize}pt` : mergedStyle.fontSize,
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
@@ -201,7 +200,7 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
 
   const getQuestionStyle = () => {
     return {
-      fontSize: settings.fontSize,
+      fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,
@@ -267,25 +266,12 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
     );
   };
 
-  const [showAddAlternative, setShowAddAlternative] = useState(false);
-
   return (
     <div className={`flex flex-col break-inside-avoid ${item.isFirstParagraph ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {renderMethod === 1 ? (
-        <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2 w-full">
+        <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
           {/* Hover Controls */}
           <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-            {item.isFirstParagraph && (
-              <button
-                type="button"
-                onClick={() => setShowAddAlternative(true)}
-                className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-                title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
-              >
-                <Split className="w-3 h-3" />
-                {isEnglish ? "Or" : "অথবা"}
-              </button>
-            )}
             <button 
               onClick={handleRemove}
               disabled={isRemoving}
@@ -342,20 +328,7 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
       ) : (
         <>
           {item.isFirstParagraph && (
-            <div className="group/label relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start w-full">
-              {/* Question Label Hover Controls: Alternative trigger only */}
-              <div className="absolute top-0 right-4 opacity-0 group-hover/label:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-                <button
-                  type="button"
-                  onClick={() => setShowAddAlternative(true)}
-                  className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 cursor-pointer"
-                  title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
-                >
-                  <Split className="w-3 h-3" />
-                  {isEnglish ? "Or" : "অথবা"}
-                </button>
-              </div>
-
+            <div className="relative -mx-4 px-4 rounded-lg flex justify-between items-start">
               <div 
                 className="font-bold ml-[0px] flex items-baseline gap-2" 
                 style={{
@@ -396,7 +369,7 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
             </div>
           )}
 
-          <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2 w-full">
+          <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
             {/* Question Hover Controls: Remove question only */}
             <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
               <button 
@@ -449,22 +422,6 @@ export const ParagraphBlock = ({ item }: { item: any }) => {
         </>
       )}
 
-      <AddAlternativeModal
-        open={showAddAlternative}
-        onOpenChange={setShowAddAlternative}
-        paperId={paperId || ""}
-        primaryQuestionId={item.id}
-        primaryQuestionContentId={data.id}
-        primaryQuestionType={item.type === "LETTER" ? "LETTER" : item.type === "APPLICATION" ? "APPLICATION" : "PARAGRAPH"}
-        subjectId={item.subjectId || distStatus?.subjectId || ""}
-        primaryMarks={
-          renderMethod === 1 
-            ? (item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion)
-            : (item.assignedMarks ?? (marksPerQuestion * (attemptCount || 1)))
-        }
-        masterNumber={item.masterNumber || (item.orderIndex + 1)}
-        distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
-      />
     </div>
   );
 };

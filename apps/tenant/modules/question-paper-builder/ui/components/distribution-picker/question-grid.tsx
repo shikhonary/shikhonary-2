@@ -261,6 +261,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       case "SUMMARY":
         return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "AMPLIFICATION":
+      case "THOUGHT_EXPANSION":
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
       case "APPLICATION":
         return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;

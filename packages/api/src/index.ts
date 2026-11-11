@@ -81,6 +81,7 @@ export type {
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
+  GenerateAnswerPaperInput,
   AddQuestionPaperQuestionInput,
   RemoveQuestionPaperQuestionInput,
   ReorderQuestionPaperQuestionsInput,

@@ -6,18 +6,28 @@ export const metadata = {
   title: "Edit Short Answer | Shikhonary",
 }
 
-interface PageProps {
+interface EditShortAnswerRouteProps {
   params: Promise<{
     id: string
   }>
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function EditShortAnswerRoute({ params }: EditShortAnswerRouteProps) {
   const { id } = await params
   const queryClient = getQueryClient()
 
+  // Prefetch details, classes, subjects, and question type templates
   void queryClient.prefetchQuery(
     trpc.shortAnswer.byId.queryOptions({ id })
+  )
+  void queryClient.prefetchQuery(
+    trpc.academicClass.list.queryOptions({ limit: 100 })
+  )
+  void queryClient.prefetchQuery(
+    trpc.academicSubject.list.queryOptions({ limit: 100 })
+  )
+  void queryClient.prefetchQuery(
+    trpc.questionType.list.queryOptions({ limit: 100 })
   )
 
   return (

@@ -6,60 +6,24 @@ export const metadata = {
   title: "Short Answer Questions | Shikhonary",
 }
 
-interface PageProps {
-  searchParams: Promise<{
-    query?: string
-    subjectId?: string
-    chapterId?: string
-    difficulty?: string
-    board?: string
-    sort?: string
-    page?: string
-    limit?: string
-  }>
-}
-
-export default async function Page({ searchParams }: PageProps) {
-  const params = await searchParams
-  const page = params.page ? parseInt(params.page, 10) : 1
-  const limit = params.limit ? parseInt(params.limit, 10) : 10
-
-  let boardSource: string | undefined = undefined
-  let boardYear: number | undefined = undefined
-  if (params.board && params.board !== "All") {
-    const match = params.board.match(/^(.*?)\s*\((\d+)\)$/)
-    if (match) {
-      boardSource = match[1]?.trim()
-      boardYear = parseInt(match[2] || "", 10)
-    } else {
-      boardSource = params.board
-    }
-  }
-
+export default async function ShortAnswersPage() {
   const queryClient = getQueryClient()
 
-  // Prefetch data
+  // Prefetch selectors and list queries matching MCQ
+  void queryClient.prefetchQuery(
+    trpc.academicClass.list.queryOptions({ limit: 100 })
+  )
   void queryClient.prefetchQuery(
     trpc.academicSubject.list.queryOptions({ limit: 100 })
   )
   void queryClient.prefetchQuery(
-    trpc.shortAnswer.list.queryOptions({
-      page,
-      limit,
-      query: params.query || undefined,
-      subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
-      chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
-      difficulty: params.difficulty !== "All" ? (params.difficulty as any) : undefined,
-      source: boardSource,
-      year: boardYear,
-      sort: params.sort as any,
-    })
+    trpc.academicChapter.list.queryOptions({ limit: 100 })
   )
   void queryClient.prefetchQuery(
-    trpc.shortAnswer.stats.queryOptions({
-      subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
-      chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
-    })
+    trpc.shortAnswer.list.queryOptions({ limit: 10 })
+  )
+  void queryClient.prefetchQuery(
+    trpc.shortAnswer.stats.queryOptions()
   )
 
   return (

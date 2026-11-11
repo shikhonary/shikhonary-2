@@ -17,6 +17,7 @@ export const QUESTION_TYPES = {
   DESCRIPTIVE_QUESTION: "Descriptive Question",
   SHORT_QUESTION: "Short Question",
   THOUGHT_EXPANSION: "Thought Expansion",
+  AMPLIFICATION: "Amplification",
   NEWS_REPORT: "News report",
   ESSAY: "Essay",
   PARTS_OF_SPEECH: "Parts of Speech",
@@ -90,6 +91,7 @@ export const QUESTION_TYPE_CODES = {
   POEM: "POEM",
   DESCRIPTIVE_QUESTION: "DESCRIPTIVE_QUESTION",
   SHORT_QUESTION: "SHORT_QUESTION",
+  THOUGHT_EXPANSION: "THOUGHT_EXPANSION",
   AMPLIFICATION: "AMPLIFICATION",
   NEWS_REPORT: "NEWS_REPORT",
   ESSAY: "ESSAY",
@@ -231,6 +233,13 @@ export const QUESTION_TYPE_MAP: Record<QuestionTypeName, QuestionTypeDefinition>
   [QUESTION_TYPES.THOUGHT_EXPANSION]: {
     nameEn: QUESTION_TYPES.THOUGHT_EXPANSION,
     nameBn: "ভাব-সম্প্রসারণ",
+    code: QUESTION_TYPE_CODES.THOUGHT_EXPANSION,
+    defaultMark: 10,
+    defaultPosition: 6,
+  },
+  [QUESTION_TYPES.AMPLIFICATION]: {
+    nameEn: QUESTION_TYPES.AMPLIFICATION,
+    nameBn: "ভাব-সম্প্রসারণ (Amplification)",
     code: QUESTION_TYPE_CODES.AMPLIFICATION,
     defaultMark: 10,
     defaultPosition: 6,
@@ -540,7 +549,10 @@ export function normalizeQuestionTypeName(raw?: string | null): QuestionTypeName
   ) {
     return QUESTION_TYPES.SA
   }
-  if (lower === "thought expansion" || lower === "amplification" || lower.includes("ভাব-সম্প্রসারণ") || lower.includes("ভাবসম্প্রসারণ")) {
+  if (lower === "amplification" || lower.includes("amplification")) {
+    return QUESTION_TYPES.AMPLIFICATION
+  }
+  if (lower === "thought expansion" || lower === "thought_expansion" || lower.includes("thought expansion") || lower.includes("ভাব-সম্প্রসারণ") || lower.includes("ভাবসম্প্রসারণ")) {
     return QUESTION_TYPES.THOUGHT_EXPANSION
   }
   if (lower === "news report" || lower.includes("সংবাদ প্রতিবেদন")) {
@@ -977,6 +989,7 @@ export const SINGLE_QUESTION_TYPE_CODES = new Set<QuestionTypeCode>([
   QUESTION_TYPE_CODES.ESSENCE,
   QUESTION_TYPE_CODES.POEM_ESSENCE,
   QUESTION_TYPE_CODES.PROSE_ESSENCE,
+  QUESTION_TYPE_CODES.THOUGHT_EXPANSION,
   QUESTION_TYPE_CODES.AMPLIFICATION,
   QUESTION_TYPE_CODES.ESSAY,
   QUESTION_TYPE_CODES.SHORT_COMPOSITION,
@@ -1010,7 +1023,7 @@ export function getQuestionTypePolicy(raw?: string | null): QuestionTypePolicy {
     ? SINGLE_QUESTION_TYPE_CODES.has(code)
     : Boolean(
         raw &&
-          /summary|সারাংশ|সারসংক্ষেপ|essence|সারমর্ম|amplification|ভাব-সম্প্রসারণ|ভাবসম্প্রসারণ|essay|রচনা|composition|letter|চিঠি|পত্র|application|আবেদন|দরখাস্ত|news report|প্রতিবেদন|form fill|ফরম পূরণ/i.test(
+          /summary|সারাংশ|সারসংক্ষেপ|essence|সারমর্ম|thought expansion|thought_expansion|amplification|ভাব-সম্প্রসারণ|ভাবসম্প্রসারণ|essay|রচনা|composition|letter|চিঠি|পত্র|application|আবেদন|দরখাস্ত|news report|প্রতিবেদন|form fill|ফরম পূরণ/i.test(
             raw
           )
       )

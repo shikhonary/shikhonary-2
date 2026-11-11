@@ -132,7 +132,7 @@ const FormFillupEditableText = ({
   };
   
   const changeSize = (delta: number) => {
-    const currentSize = mergedStyle.fontSize || 12;
+    const currentSize = typeof mergedStyle.fontSize === "number" ? mergedStyle.fontSize : (parseFloat(String(mergedStyle.fontSize || 12)) || 12);
     setItemStyle(itemKey, { fontSize: currentSize + delta });
   };
   
@@ -156,7 +156,7 @@ const FormFillupEditableText = ({
           <div className="w-px h-4 bg-border mx-1"></div>
           
           <button onClick={() => changeSize(-1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Decrease Font Size">-</button>
-          <span className="text-[10px] w-4 text-center font-medium">{mergedStyle.fontSize}</span>
+          <span className="text-[10px] w-4 text-center font-medium">{parseFloat(String(mergedStyle.fontSize || 12)) || 12}</span>
           <button onClick={() => changeSize(1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Increase Font Size">+</button>
         </div>
       )}
@@ -166,7 +166,7 @@ const FormFillupEditableText = ({
         onClick={() => setIsActive(true)}
         className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} ${className}`}
         style={{
-          fontSize: mergedStyle.fontSize,
+          fontSize: typeof mergedStyle.fontSize === "number" ? `${mergedStyle.fontSize}pt` : mergedStyle.fontSize,
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
@@ -273,7 +273,7 @@ export const FormFillupBlock = ({ item }: { item: any }) => {
 
   const getQuestionStyle = () => {
     return {
-      fontSize: settings.fontSize,
+      fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,

@@ -34,6 +34,26 @@ const toBengaliDigits = (num?: number | string | null): string => {
     .join("");
 };
 
+const findMatchingDistribution = (
+  distributions: any[],
+  questionTypeId?: string | null,
+  nameMatcher?: (d: any) => boolean
+) => {
+  if (!distributions || distributions.length === 0) return undefined;
+  if (questionTypeId) {
+    return distributions.find((d: any) => d.questionTypeId === questionTypeId);
+  }
+  return nameMatcher ? distributions.find(nameMatcher) : undefined;
+};
+
+const formatAltLabel = (rawLabel?: string | null, fallback: string | null = null): string | null => {
+  const trimmed = rawLabel?.trim();
+  if (trimmed) {
+    return trimmed.endsWith(":") || trimmed.endsWith("।") ? trimmed : `${trimmed}:`;
+  }
+  return fallback;
+};
+
 interface AlternativeQuestionRendererProps {
   paperId: string;
   parentQuestionId: string;
@@ -69,7 +89,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
   const activeSettings = settings || storeSettings;
 
   const questionStyle = {
-    fontSize: activeSettings?.fontSize,
+    fontSize: activeSettings?.fontSize ? `${activeSettings.fontSize}pt` : undefined,
     fontFamily: activeSettings?.fontFamily,
     lineHeight: activeSettings?.lineHeight,
     fontWeight: activeSettings?.fontWeight || "normal",
@@ -157,7 +177,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const proseEssence = alt.proseEssence;
         const poem = alt.poem;
         const summary = alt.summary;
-        const amplification = alt.amplification;
+        const amplification = alt.thoughtExpansion || alt.amplification;
         const letter = alt.letter;
         const application = alt.application;
         const newsReport = alt.newsReport;
@@ -260,12 +280,11 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 0.85 EXACT SHORT COMPOSITION BLOCK REPRESENTATION */}
               {shortComposition && (() => {
-                const scDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === shortComposition.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("composition")
-                  ) || alt.distribution;
+                const scDist = findMatchingDistribution(
+                  allDistributions,
+                  shortComposition.questionTypeId,
+                  (d: any) => d.questionTypeName?.toLowerCase().includes("composition")
+                );
 
                 const rawLabel = scDist?.questionTypeLabel || shortComposition.questionType?.label;
                 const formattedPrompt = formatShortCompositionPrompt(
@@ -300,14 +319,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 0.9 EXACT ESSAY BLOCK REPRESENTATION */}
               {essay && (() => {
-                const essayDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === essay.questionTypeId ||
-                      d.questionTypeName?.includes("রচনা") ||
-                      d.questionTypeName?.includes("প্রবন্ধ") ||
-                      d.questionTypeName?.toLowerCase().includes("essay")
-                  ) || alt.distribution;
+                const essayDist = findMatchingDistribution(
+                  allDistributions,
+                  essay.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("রচনা") ||
+                    d.questionTypeName?.includes("প্রবন্ধ") ||
+                    d.questionTypeName?.toLowerCase().includes("essay")
+                );
 
                 const altRenderMethod = Number(
                   essayDist?.renderMethod ??
@@ -318,7 +337,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = essay.title || essay.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: essayDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: essayDist?.questionTypeLabel,
+                  questionTypeLabel: essayDist?.questionTypeLabel || essay.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -365,9 +384,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = essayDist?.questionTypeLabel || essay.questionType?.label;
-                const esLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const esLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write an essay on the following:" : "প্রবন্ধ রচনা করো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -391,7 +411,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                         {renderSubQuestionLabel(isEnglish ? "b" : "খ")}
                         <div className="flex-1 w-full min-w-0">
                           <div
-                            className="m-0 w-full whitespace-pre-wrap font-medium text-foreground"
+                            className="m-0 w-full whitespace-pre-wrap font-bold text-foreground"
                             style={{
                               fontSize: questionStyle.fontSize,
                               fontFamily: questionStyle.fontFamily,
@@ -409,13 +429,13 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1. EXACT PARAGRAPH BLOCK REPRESENTATION */}
               {paragraph && (() => {
-                const paragraphDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === paragraph.questionTypeId ||
-                      d.questionTypeName?.includes("অনুচ্ছেদ") ||
-                      d.questionTypeName?.toLowerCase().includes("paragraph")
-                  ) || alt.distribution;
+                const paragraphDist = findMatchingDistribution(
+                  allDistributions,
+                  paragraph.questionTypeId,
+                  (d: any) =>
+                    (d.questionTypeName?.includes("অনুচ্ছেদ") && !d.questionTypeName?.includes("অনুচ্ছেদভিত্তিক")) ||
+                    d.questionTypeName?.toLowerCase().includes("paragraph")
+                );
 
                 const altRenderMethod = Number(
                   paragraphDist?.renderMethod ??
@@ -426,7 +446,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = paragraph.name || paragraph.title || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: paragraphDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: paragraphDist?.questionTypeLabel,
+                  questionTypeLabel: paragraphDist?.questionTypeLabel || paragraph.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -473,9 +493,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = paragraphDist?.questionTypeLabel || paragraph.questionType?.label;
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const pLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write a paragraph on the following:" : "অনুচ্ছেদ রচনা করো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -521,13 +542,15 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
               {/* 1.1 EXACT ESSENCE BLOCK REPRESENTATION */}
               {essence && (() => {
                 const parentQ = paper?.questions?.find((q: any) => q.id === parentQuestionId);
-                const essenceDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === essence.questionTypeId ||
-                      d.questionTypeName?.includes("সারমর্ম") ||
-                      d.questionTypeName?.toLowerCase().includes("essence")
-                  ) || alt.distribution || parentQ?.distribution;
+                const essenceDist = findMatchingDistribution(
+                  allDistributions,
+                  essence.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("সারমর্ম") ||
+                    (d.questionTypeName?.toLowerCase().includes("essence") &&
+                      !d.questionTypeName?.toLowerCase().includes("poem") &&
+                      !d.questionTypeName?.toLowerCase().includes("prose"))
+                );
 
                 const altRenderMethod = Number(
                   essenceDist?.renderMethod ??
@@ -539,7 +562,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = essence.title || essence.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: essenceDist?.subjectName || alt.distribution?.subjectName || parentQ?.distribution?.subjectName,
-                  questionTypeLabel: essenceDist?.questionTypeLabel || parentQ?.distribution?.questionTypeLabel,
+                  questionTypeLabel: essenceDist?.questionTypeLabel || essence.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -585,13 +608,11 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   );
                 }
 
-                const rawLabel =
-                  essenceDist?.questionTypeLabel ||
-                  alt.distribution?.questionTypeLabel ||
-                  essence.questionType?.label;
-                const eLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : (isEnglish ? "Write the essence of the following:" : "সারমর্ম লেখো:");
+                const rawLabel = essenceDist?.questionTypeLabel || essence.questionType?.label;
+                const eLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write the essence of the following:" : "সারমর্ম লেখো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -635,18 +656,18 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1.1.1 EXACT POEM BLOCK REPRESENTATION */}
               {poem && (() => {
-                const poemDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === poem.questionTypeId ||
-                      d.questionTypeName?.includes("কবিতা") ||
-                      d.questionTypeName?.toLowerCase().includes("poem")
-                  ) || alt.distribution;
+                const poemDist = findMatchingDistribution(
+                  allDistributions,
+                  poem.questionTypeId,
+                  (d: any) =>
+                    !d.questionTypeName?.includes("মূলভাব") &&
+                    (d.questionTypeName?.includes("কবিতা") ||
+                      (d.questionTypeName?.toLowerCase().includes("poem") &&
+                        !d.questionTypeName?.toLowerCase().includes("essence")))
+                );
 
                 const rawLabel = poemDist?.questionTypeLabel || poem.questionType?.label;
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const pLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="flex justify-between items-start gap-2 w-full">
@@ -671,13 +692,13 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
               {/* 1.2 EXACT SUMMARY BLOCK REPRESENTATION */}
               {summary && (() => {
                 const parentQ = paper?.questions?.find((q: any) => q.id === parentQuestionId);
-                const summaryDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === summary.questionTypeId ||
-                      d.questionTypeName?.includes("সারাংশ") ||
-                      d.questionTypeName?.toLowerCase().includes("summary")
-                  ) || alt.distribution || parentQ?.distribution;
+                const summaryDist = findMatchingDistribution(
+                  allDistributions,
+                  summary.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("সারাংশ") ||
+                    d.questionTypeName?.toLowerCase().includes("summary")
+                );
 
                 const altRenderMethod = Number(
                   summaryDist?.renderMethod ??
@@ -689,7 +710,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = summary.title || summary.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: summaryDist?.subjectName || alt.distribution?.subjectName || parentQ?.distribution?.subjectName,
-                  questionTypeLabel: summaryDist?.questionTypeLabel || parentQ?.distribution?.questionTypeLabel,
+                  questionTypeLabel: summaryDist?.questionTypeLabel || summary.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -735,13 +756,11 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   );
                 }
 
-                const rawLabel =
-                  summaryDist?.questionTypeLabel ||
-                  alt.distribution?.questionTypeLabel ||
-                  summary.questionType?.label;
-                const sLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : (isEnglish ? "Write a summary of the following:" : "সারাংশ লেখো:");
+                const rawLabel = summaryDist?.questionTypeLabel || summary.questionType?.label;
+                const sLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write a summary of the following:" : "সারাংশ লেখো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -785,13 +804,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1.3 EXACT POEM ESSENCE BLOCK REPRESENTATION */}
               {poemEssence && (() => {
-                const poemDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === poemEssence.questionTypeId ||
-                      d.questionTypeName?.includes("কবিতা") ||
-                      d.questionTypeName?.toLowerCase().includes("poem")
-                  ) || alt.distribution;
+                const poemDist = findMatchingDistribution(
+                  allDistributions,
+                  poemEssence.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("কবিতার মূলভাব") ||
+                    d.questionTypeName?.toLowerCase().includes("poem essence") ||
+                    d.questionTypeName?.toLowerCase().includes("poem_essence")
+                );
 
                 const altRenderMethod = Number(
                   poemDist?.renderMethod ??
@@ -802,16 +822,17 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const hasStanza = Boolean(poemEssence.poemStanza && poemEssence.poemStanza.trim().length > 0);
                 const poemTitle = poemEssence.title || poemEssence.name || "";
 
-                const rawLabel = poemDist?.questionTypeLabel || poemDist?.questionTypeName || poemEssence.questionType?.label;
+                const rawLabel = poemDist?.questionTypeLabel || poemEssence.questionType?.label || poemDist?.questionTypeName;
                 const isEnglish = isResourceEnglish({
                   subjectName: poemDist?.subjectName || alt.distribution?.subjectName,
                   questionTypeLabel: rawLabel,
                   content: poemTitle || poemEssence.poemStanza || "",
                 });
 
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : isEnglish ? "Write the main theme of the poem:" : "কবিতার মূলভাব লেখো:";
+                const pLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write the main theme of the poem:" : "কবিতার মূলভাব লেখো:"
+                );
 
                 const formatDirectPoemEssencePrompt = (title: string, english: boolean) => {
                   if (!title || !title.trim()) return "";
@@ -879,13 +900,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 1.4 EXACT PROSE ESSENCE BLOCK REPRESENTATION */}
               {proseEssence && (() => {
-                const proseDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === proseEssence.questionTypeId ||
-                      d.questionTypeName?.includes("গদ্য") ||
-                      d.questionTypeName?.toLowerCase().includes("prose")
-                  ) || alt.distribution;
+                const proseDist = findMatchingDistribution(
+                  allDistributions,
+                  proseEssence.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("গদ্য") ||
+                    d.questionTypeName?.toLowerCase().includes("prose essence") ||
+                    d.questionTypeName?.toLowerCase().includes("prose_essence")
+                );
 
                 const altRenderMethod = Number(
                   proseDist?.renderMethod ??
@@ -896,16 +918,17 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const hasPassage = Boolean(proseEssence.prosePassage && proseEssence.prosePassage.trim().length > 0);
                 const proseTitle = proseEssence.title || proseEssence.name || "";
 
-                const rawLabel = proseDist?.questionTypeLabel || proseDist?.questionTypeName || proseEssence.questionType?.label;
+                const rawLabel = proseDist?.questionTypeLabel || proseEssence.questionType?.label || proseDist?.questionTypeName;
                 const isEnglish = isResourceEnglish({
                   subjectName: proseDist?.subjectName || alt.distribution?.subjectName,
                   questionTypeLabel: rawLabel,
                   content: proseTitle || proseEssence.prosePassage || "",
                 });
 
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : isEnglish ? "Write the main theme of the prose:" : "গদ্যাংশের মূলভাব লেখো:";
+                const pLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write the main theme of the prose:" : "গদ্যাংশের মূলভাব লেখো:"
+                );
 
                 const formatDirectProseEssencePrompt = (title: string, english: boolean) => {
                   if (!title || !title.trim()) return "";
@@ -974,20 +997,18 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* EXACT POD NIRNOY BLOCK REPRESENTATION */}
               {podNirnoy && (() => {
-                const podDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === podNirnoy.questionTypeId ||
-                      d.questionTypeName?.includes("পদ নির্ণয়") ||
-                      d.questionTypeName?.includes("পদ নির্ণয়") ||
-                      d.questionTypeName?.toLowerCase().includes("pod nirnoy") ||
-                      d.questionTypeName?.toLowerCase().includes("pod_nirnoy")
-                  ) || alt.distribution;
+                const podDist = findMatchingDistribution(
+                  allDistributions,
+                  podNirnoy.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("পদ নির্ণয়") ||
+                    d.questionTypeName?.includes("পদ নির্ণয়") ||
+                    d.questionTypeName?.toLowerCase().includes("pod nirnoy") ||
+                    d.questionTypeName?.toLowerCase().includes("pod_nirnoy")
+                );
 
-                const rawLabel = podDist?.questionTypeLabel || podDist?.questionTypeName || podNirnoy.questionType?.label;
-                const pLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : "নিচের বাক্যগুলো থেকে পদ নির্ণয় করো:";
+                const rawLabel = podDist?.questionTypeLabel || podNirnoy.questionType?.label || podDist?.questionTypeName;
+                const pLabel = formatAltLabel(rawLabel, "নিচের বাক্যগুলো থেকে পদ নির্ণয় করো:");
 
                 const wordsList = Array.isArray(podNirnoy.words)
                   ? podNirnoy.words.filter(Boolean)
@@ -1056,14 +1077,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 2. EXACT LETTER BLOCK REPRESENTATION */}
               {letter && (() => {
-                const letterDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === letter.questionTypeId ||
-                      d.questionTypeName?.includes("চিঠি") ||
-                      d.questionTypeName?.includes("পত্র") ||
-                      d.questionTypeName?.toLowerCase().includes("letter")
-                  ) || alt.distribution;
+                const letterDist = findMatchingDistribution(
+                  allDistributions,
+                  letter.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("চিঠি") ||
+                    (d.questionTypeName?.includes("পত্র") && !d.questionTypeName?.includes("আবেদনপত্র")) ||
+                    d.questionTypeName?.toLowerCase().includes("letter")
+                );
 
                 const altRenderMethod = Number(
                   letterDist?.renderMethod ??
@@ -1074,7 +1095,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = letter.title || letter.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: letterDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: letterDist?.questionTypeLabel,
+                  questionTypeLabel: letterDist?.questionTypeLabel || letter.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -1121,9 +1142,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = letterDist?.questionTypeLabel || letter.questionType?.label;
-                const lLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const lLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write a letter on the following:" : "পত্র লেখো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1165,14 +1187,14 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 3. EXACT APPLICATION BLOCK REPRESENTATION */}
               {application && (() => {
-                const appDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === application.questionTypeId ||
-                      d.questionTypeName?.includes("দরখাস্ত") ||
-                      d.questionTypeName?.includes("আবেদনপত্র") ||
-                      d.questionTypeName?.toLowerCase().includes("application")
-                  ) || alt.distribution;
+                const appDist = findMatchingDistribution(
+                  allDistributions,
+                  application.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("দরখাস্ত") ||
+                    d.questionTypeName?.includes("আবেদন") ||
+                    d.questionTypeName?.toLowerCase().includes("application")
+                );
 
                 const altRenderMethod = Number(
                   appDist?.renderMethod ??
@@ -1183,7 +1205,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = application.title || application.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: appDist?.subjectName || alt.distribution?.subjectName || (paper as any)?.subject?.name,
-                  questionTypeLabel: appDist?.questionTypeLabel,
+                  questionTypeLabel: appDist?.questionTypeLabel || application.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -1230,9 +1252,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = appDist?.questionTypeLabel || application.questionType?.label;
-                const aLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const aLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write an application on the following:" : "আবেদনপত্র লেখো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1274,13 +1297,13 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 3.1 EXACT NEWS REPORT BLOCK REPRESENTATION */}
               {newsReport && (() => {
-                const newsDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === newsReport.questionTypeId ||
-                      d.questionTypeName?.includes("প্রতিবেদন") ||
-                      d.questionTypeName?.toLowerCase().includes("report")
-                  ) || alt.distribution;
+                const newsDist = findMatchingDistribution(
+                  allDistributions,
+                  newsReport.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("প্রতিবেদন") ||
+                    d.questionTypeName?.toLowerCase().includes("report")
+                );
 
                 const altRenderMethod = Number(
                   newsDist?.renderMethod ??
@@ -1291,7 +1314,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = newsReport.title || newsReport.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: newsDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: newsDist?.questionTypeLabel,
+                  questionTypeLabel: newsDist?.questionTypeLabel || newsReport.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -1338,9 +1361,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = newsDist?.questionTypeLabel || newsReport.questionType?.label;
-                const nrLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const nrLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Write a news report on the following:" : "সংবাদ প্রতিবেদন রচনা করো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1382,13 +1406,15 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 4. EXACT AMPLIFICATION BLOCK REPRESENTATION */}
               {amplification && (() => {
-                const ampDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === amplification.questionTypeId ||
-                      d.questionTypeName?.includes("ভাব-সম্প্রসারণ") ||
-                      d.questionTypeName?.toLowerCase().includes("amplification")
-                  ) || alt.distribution;
+                const ampDist = findMatchingDistribution(
+                  allDistributions,
+                  amplification.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("ভাব-সম্প্রসারণ") ||
+                    d.questionTypeName?.includes("ভাব সম্প্রসারণ") ||
+                    d.questionTypeName?.toLowerCase().includes("thought expansion") ||
+                    d.questionTypeName?.toLowerCase().includes("amplification")
+                );
 
                 const altRenderMethod = Number(
                   ampDist?.renderMethod ??
@@ -1399,7 +1425,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 const rawTitle = amplification.title || amplification.name || "";
                 const isEnglish = isResourceEnglish({
                   subjectName: ampDist?.subjectName || alt.distribution?.subjectName,
-                  questionTypeLabel: ampDist?.questionTypeLabel,
+                  questionTypeLabel: ampDist?.questionTypeLabel || amplification.questionType?.label,
                   content: rawTitle,
                 });
 
@@ -1446,9 +1472,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                 }
 
                 const rawLabel = ampDist?.questionTypeLabel || amplification.questionType?.label;
-                const ampLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const ampLabel = formatAltLabel(
+                  rawLabel,
+                  isEnglish ? "Amplify the following idea:" : "ভাব-সম্প্রসারণ করো:"
+                );
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1490,18 +1517,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 5. EXACT CQ BLOCK REPRESENTATION */}
               {cq && (() => {
-                const cqDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === cq.questionTypeId ||
-                      d.questionTypeName?.includes("সৃজনশীল") ||
-                      d.questionTypeName?.toLowerCase().includes("cq")
-                  ) || alt.distribution;
+                const cqDist = findMatchingDistribution(
+                  allDistributions,
+                  cq.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("সৃজনশীল") ||
+                    d.questionTypeName?.toLowerCase().includes("cq")
+                );
 
                 const rawLabel = cqDist?.questionTypeLabel || cq.questionType?.label;
-                const cqLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const cqLabel = formatAltLabel(rawLabel);
 
                 const subQuestions = [
                   { id: "A", label: "ক", text: cq.questionA, marks: cq.markA || 1 },
@@ -1555,7 +1580,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                                   <RenderMath text={sq.text} />
                                 </div>
                                 <span
-                                  className="font-bold text-sm text-[12px] ml-2 shrink-0"
+                                  className="font-bold ml-2 shrink-0"
                                   style={{
                                     fontSize: questionStyle.fontSize,
                                     fontFamily: questionStyle.fontFamily,
@@ -1575,18 +1600,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 5.1 EXACT PBQ BLOCK REPRESENTATION */}
               {pbq && (() => {
-                const pbqDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === pbq.questionTypeId ||
-                      d.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") ||
-                      d.questionTypeName?.toLowerCase().includes("pbq")
-                  ) || alt.distribution;
+                const pbqDist = findMatchingDistribution(
+                  allDistributions,
+                  pbq.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") ||
+                    d.questionTypeName?.toLowerCase().includes("pbq")
+                );
 
                 const rawLabel = pbqDist?.questionTypeLabel || pbq.questionType?.label;
-                const pbqLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const pbqLabel = formatAltLabel(rawLabel);
 
                 const getSubQuestionMark = (id: string, index: number, defaultMark: number) => {
                   if (pbq.marks && typeof pbq.marks === "object") {
@@ -1654,7 +1677,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                                   <RenderMath text={sq.text} />
                                 </div>
                                 <span
-                                  className="font-bold text-sm text-[12px] ml-2 shrink-0"
+                                  className="font-bold ml-2 shrink-0"
                                   style={{
                                     fontSize: questionStyle.fontSize,
                                     fontFamily: questionStyle.fontFamily,
@@ -1674,18 +1697,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 5.2 EXACT SEEN COMPREHENSION BLOCK REPRESENTATION */}
               {seenComprehension && (() => {
-                const compDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === seenComprehension.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("seen") ||
-                      d.questionTypeName?.includes("পাঠ্যবই")
-                  ) || alt.distribution;
+                const compDist = findMatchingDistribution(
+                  allDistributions,
+                  seenComprehension.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("seen") ||
+                    d.questionTypeName?.includes("পাঠ্যবই")
+                );
 
-                const rawLabel = compDist?.questionTypeLabel || compDist?.questionTypeName || seenComprehension.questionType?.label;
-                const compLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const rawLabel = compDist?.questionTypeLabel || seenComprehension.questionType?.label || compDist?.questionTypeName;
+                const compLabel = formatAltLabel(rawLabel);
 
                 const questions: any[] = Array.isArray(seenComprehension.questions) ? seenComprehension.questions : [];
                 const groupedQuestions = questions.reduce((acc: Record<number, any[]>, q: any) => {
@@ -1817,18 +1838,17 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6. EXACT SHORT ANSWER BLOCK REPRESENTATION */}
               {sa && (() => {
-                const saDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === sa.questionTypeId ||
-                      d.questionTypeName?.includes("সংক্ষিপ্ত") ||
-                      d.questionTypeName?.toLowerCase().includes("short")
-                  ) || alt.distribution;
+                const saDist = findMatchingDistribution(
+                  allDistributions,
+                  sa.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.includes("সংক্ষিপ্ত") ||
+                    (d.questionTypeName?.toLowerCase().includes("short") &&
+                      !d.questionTypeName?.toLowerCase().includes("composition"))
+                );
 
                 const rawLabel = saDist?.questionTypeLabel || sa.questionType?.label;
-                const saLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const saLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1883,18 +1903,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.5 EXACT PARTS OF SPEECH BLOCK REPRESENTATION */}
               {partsOfSpeech && (() => {
-                const posDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === partsOfSpeech.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("parts of speech") ||
-                      d.questionTypeName?.toLowerCase().includes("part of speech")
-                  ) || alt.distribution;
+                const posDist = findMatchingDistribution(
+                  allDistributions,
+                  partsOfSpeech.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("parts of speech") ||
+                    d.questionTypeName?.toLowerCase().includes("part of speech")
+                );
 
                 const rawLabel = posDist?.questionTypeLabel || partsOfSpeech.questionType?.label;
-                const posLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const posLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1936,20 +1954,18 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.51 EXACT PUNCTUATION BLOCK REPRESENTATION */}
               {punctuation && (() => {
-                const puncDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === punctuation.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("punctuation") ||
-                      d.questionTypeName?.toLowerCase().includes("capitalization") ||
-                      d.questionTypeName?.includes("বিরাম চিহ্ন") ||
-                      d.questionTypeName?.includes("যতিচিহ্ন")
-                  ) || alt.distribution;
+                const puncDist = findMatchingDistribution(
+                  allDistributions,
+                  punctuation.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("punctuation") ||
+                    d.questionTypeName?.toLowerCase().includes("capitalization") ||
+                    d.questionTypeName?.includes("বিরাম চিহ্ন") ||
+                    d.questionTypeName?.includes("যতিচিহ্ন")
+                );
 
                 const rawLabel = puncDist?.questionTypeLabel || punctuation.questionType?.label;
-                const puncLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const puncLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -1991,19 +2007,17 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.55 EXACT RIGHT FORM OF VERBS BLOCK REPRESENTATION */}
               {rightFormOfVerb && (() => {
-                const rfvDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === rightFormOfVerb.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("right form") ||
-                      d.questionTypeName?.toLowerCase().includes("verbs in brackets") ||
-                      d.questionTypeName?.includes("ভার্ব")
-                  ) || alt.distribution;
+                const rfvDist = findMatchingDistribution(
+                  allDistributions,
+                  rightFormOfVerb.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("right form") ||
+                    d.questionTypeName?.toLowerCase().includes("verbs in brackets") ||
+                    d.questionTypeName?.includes("ভার্ব")
+                );
 
                 const rawLabel = rfvDist?.questionTypeLabel || rightFormOfVerb.questionType?.label;
-                const rfvLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const rfvLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -2045,19 +2059,20 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.6 EXACT FILL IN THE BLANKS WITH CLUES BLOCK REPRESENTATION */}
               {fillInTheBlanksWithClues && (() => {
-                const fitbDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === fillInTheBlanksWithClues.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("fill in the blanks") ||
-                      d.questionTypeName?.toLowerCase().includes("with clues") ||
-                      d.questionTypeName?.includes("ক্লুসহ")
-                  ) || alt.distribution;
+                const fitbDist = findMatchingDistribution(
+                  allDistributions,
+                  fillInTheBlanksWithClues.questionTypeId,
+                  (d: any) =>
+                    !d.questionTypeName?.toLowerCase().includes("without") &&
+                    !d.questionTypeName?.includes("ছাড়া") &&
+                    !d.questionTypeName?.includes("ছাড়া") &&
+                    (d.questionTypeName?.toLowerCase().includes("with clues") ||
+                      d.questionTypeName?.includes("ক্লুসহ") ||
+                      d.questionTypeName?.toLowerCase().includes("fill in the blanks"))
+                );
 
                 const rawLabel = fitbDist?.questionTypeLabel || fillInTheBlanksWithClues.questionType?.label;
-                const fitbLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const fitbLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -2102,20 +2117,18 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.6b EXACT FILL IN THE BLANKS WITHOUT CLUES BLOCK REPRESENTATION */}
               {fillInTheBlanksWithoutClues && (() => {
-                const fitbDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === fillInTheBlanksWithoutClues.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("without clues") ||
-                      d.questionTypeName?.toLowerCase().includes("without clue") ||
-                      d.questionTypeName?.includes("ক্লু ছাড়া") ||
-                      d.questionTypeName?.includes("ক্লু ছাড়া")
-                  ) || alt.distribution;
+                const fitbDist = findMatchingDistribution(
+                  allDistributions,
+                  fillInTheBlanksWithoutClues.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("without clues") ||
+                    d.questionTypeName?.toLowerCase().includes("without clue") ||
+                    d.questionTypeName?.includes("ক্লু ছাড়া") ||
+                    d.questionTypeName?.includes("ক্লু ছাড়া")
+                );
 
                 const rawLabel = fitbDist?.questionTypeLabel || fillInTheBlanksWithoutClues.questionType?.label;
-                const fitbLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const fitbLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -2160,18 +2173,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.7 EXACT SUBSTITUTION TABLE BLOCK REPRESENTATION */}
               {substitutionTable && (() => {
-                const subTableDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === substitutionTable.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("substitution table") ||
-                      d.questionTypeName?.includes("সাবস্টিটিউশন টেবিল")
-                  ) || alt.distribution;
+                const subTableDist = findMatchingDistribution(
+                  allDistributions,
+                  substitutionTable.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("substitution table") ||
+                    d.questionTypeName?.includes("সাবস্টিটিউশন টেবিল")
+                );
 
                 const rawLabel = subTableDist?.questionTypeLabel || substitutionTable.questionType?.label;
-                const subTableLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const subTableLabel = formatAltLabel(rawLabel);
 
                 return (
                   <div className="w-full flex flex-col">
@@ -2213,18 +2224,16 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
 
               {/* 6.8 EXACT CHANGING SENTENCE BLOCK REPRESENTATION */}
               {changingSentence && (() => {
-                const csDist =
-                  allDistributions.find(
-                    (d: any) =>
-                      d.questionTypeId === changingSentence.questionTypeId ||
-                      d.questionTypeName?.toLowerCase().includes("changing sentence") ||
-                      d.questionTypeName?.includes("বাক্য পরিবর্তন")
-                  ) || alt.distribution;
+                const csDist = findMatchingDistribution(
+                  allDistributions,
+                  changingSentence.questionTypeId,
+                  (d: any) =>
+                    d.questionTypeName?.toLowerCase().includes("changing sentence") ||
+                    d.questionTypeName?.includes("বাক্য পরিবর্তন")
+                );
 
                 const rawLabel = csDist?.questionTypeLabel || changingSentence.questionType?.label;
-                const csLabel = rawLabel?.trim()
-                  ? rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`
-                  : null;
+                const csLabel = formatAltLabel(rawLabel);
 
                 const hasOptions = Array.isArray(changingSentence.options) && changingSentence.options.length > 0;
 

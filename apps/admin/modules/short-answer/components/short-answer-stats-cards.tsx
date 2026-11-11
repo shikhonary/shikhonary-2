@@ -1,21 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { ClipboardList, CheckCircle2, AlertCircle, BarChart2 } from "lucide-react"
+import { ClipboardList, Calculator, CheckCircle2, AlertCircle } from "lucide-react"
 import { StatsCards, type StatCardItem } from "@/components/shared/stats-cards"
 
 interface ShortAnswerStatsCardsProps {
   totalCount?: number
   activeCount?: number
   inactiveCount?: number
-  difficultyCounts?: {
-    easy?: number
-    medium?: number
-    hard?: number
-    EASY?: number
-    MEDIUM?: number
-    HARD?: number
-  }
+  mathCount?: number
   isLoading?: boolean
 }
 
@@ -23,11 +16,9 @@ export function ShortAnswerStatsCards({
   totalCount = 0,
   activeCount = 0,
   inactiveCount = 0,
-  difficultyCounts = { easy: 0, medium: 0, hard: 0 },
+  mathCount = 0,
   isLoading = false,
 }: ShortAnswerStatsCardsProps) {
-  const mediumCount = difficultyCounts?.MEDIUM ?? difficultyCounts?.medium ?? 0
-
   const cards: StatCardItem[] = [
     {
       title: "মোট সংক্ষিপ্ত উত্তর",
@@ -51,11 +42,11 @@ export function ShortAnswerStatsCards({
       iconBg: "bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/40",
     },
     {
-      title: "মাঝারি মানের প্রশ্ন",
-      value: mediumCount,
-      icon: BarChart2,
-      iconColor: "text-blue-600 dark:text-blue-400",
-      iconBg: "bg-blue-50 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/40",
+      title: "গণিত ও ফর্মুলা",
+      value: mathCount,
+      icon: Calculator,
+      iconColor: "text-purple-600 dark:text-purple-400",
+      iconBg: "bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-800/40",
     },
   ]
 
@@ -63,6 +54,7 @@ export function ShortAnswerStatsCards({
     <StatsCards
       cards={cards}
       isLoading={isLoading}
+      ariaLabel="সংক্ষিপ্ত উত্তর পরিসংখ্যান ওভারভিউ"
     />
   )
 }

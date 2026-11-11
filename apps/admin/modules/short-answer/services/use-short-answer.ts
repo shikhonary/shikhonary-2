@@ -3,18 +3,25 @@ import { trpc } from "@/trpc/client"
 import type {
   ListShortAnswersInput,
   ShortAnswerStatsInput,
-  CreateShortAnswerInput,
-  UpdateShortAnswerInput,
 } from "@workspace/api"
 
-export function useShortAnswersList(input: ListShortAnswersInput) {
+/**
+ * Hook to list Short Answers with filtering & pagination.
+ */
+export function useShortAnswersList(input: ListShortAnswersInput = { limit: 20 }) {
   return useQuery(trpc.shortAnswer.list.queryOptions(input))
 }
 
+/**
+ * Hook to fetch summary statistics for Short Answers using suspense.
+ */
 export function useShortAnswerStats(input?: ShortAnswerStatsInput) {
-  return useSuspenseQuery(trpc.shortAnswer.stats.queryOptions(input || {}))
+  return useSuspenseQuery(trpc.shortAnswer.stats.queryOptions(input))
 }
 
+/**
+ * Hook to fetch a single Short Answer by ID.
+ */
 export function useShortAnswerById(id: string, enabled = true) {
   return useQuery({
     ...trpc.shortAnswer.byId.queryOptions({ id }),
@@ -22,8 +29,12 @@ export function useShortAnswerById(id: string, enabled = true) {
   })
 }
 
+/**
+ * Hook to create a new Short Answer record.
+ */
 export function useCreateShortAnswer() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.create.mutationOptions(),
     onSuccess: () => {
@@ -32,8 +43,12 @@ export function useCreateShortAnswer() {
   })
 }
 
+/**
+ * Hook to update an existing Short Answer record.
+ */
 export function useUpdateShortAnswer() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.update.mutationOptions(),
     onSuccess: () => {
@@ -42,8 +57,12 @@ export function useUpdateShortAnswer() {
   })
 }
 
+/**
+ * Hook to delete a single Short Answer record.
+ */
 export function useDeleteShortAnswer() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.delete.mutationOptions(),
     onSuccess: () => {
@@ -52,8 +71,12 @@ export function useDeleteShortAnswer() {
   })
 }
 
+/**
+ * Hook to bulk delete Short Answer records.
+ */
 export function useBulkDeleteShortAnswers() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.bulkDelete.mutationOptions(),
     onSuccess: () => {
@@ -62,8 +85,12 @@ export function useBulkDeleteShortAnswers() {
   })
 }
 
+/**
+ * Hook to toggle Short Answer active state.
+ */
 export function useToggleShortAnswerActive() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.toggleActive.mutationOptions(),
     onSuccess: () => {
@@ -72,8 +99,12 @@ export function useToggleShortAnswerActive() {
   })
 }
 
+/**
+ * Hook to bulk import Short Answer records.
+ */
 export function useImportShortAnswers() {
   const queryClient = useQueryClient()
+
   return useMutation({
     ...trpc.shortAnswer.import.mutationOptions(),
     onSuccess: () => {
@@ -82,6 +113,37 @@ export function useImportShortAnswers() {
   })
 }
 
+/**
+ * Hook to resolve a Short Answer report.
+ */
+export function useResolveShortAnswerReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.shortAnswer.resolveReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.shortAnswer.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to assign a Short Answer report to a user.
+ */
+export function useAssignShortAnswerReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    ...trpc.shortAnswer.assignReport.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.shortAnswer.pathFilter())
+    },
+  })
+}
+
+/**
+ * Hook to fetch academic classes for select options list.
+ */
 export function useAcademicClassesForSelection() {
   return useQuery({
     ...trpc.academicClass.list.queryOptions({ limit: 100 }),
@@ -89,6 +151,9 @@ export function useAcademicClassesForSelection() {
   })
 }
 
+/**
+ * Hook to fetch academic subjects for dropdown select list.
+ */
 export function useSubjectsForSelection(input?: { academicClassId?: string }) {
   const classId = input?.academicClassId === "All" ? undefined : input?.academicClassId
   return useQuery({
@@ -100,6 +165,9 @@ export function useSubjectsForSelection(input?: { academicClassId?: string }) {
   })
 }
 
+/**
+ * Hook to fetch academic chapters for dropdown select list.
+ */
 export function useChaptersForSelection(input?: { subjectId?: string }) {
   const subjectId = input?.subjectId === "All" ? undefined : input?.subjectId
   return useQuery({

@@ -10,6 +10,7 @@ import type {
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
+  GenerateAnswerPaperInput,
   UpdateQuestionPaperSettingsInput,
   PatchQuestionPaperSettingsInput,
 } from "../question-paper.schema"
@@ -151,6 +152,7 @@ export async function getQuestionPaperById(
   const pbqIds = allPaperQuestions.map((q: any) => q.pbqId).filter(Boolean) as string[]
   const paragraphIds = allPaperQuestions.map((q) => q.paragraphId).filter(Boolean) as string[]
   const amplificationIds = allPaperQuestions.map((q) => q.amplificationId).filter(Boolean) as string[]
+  const thoughtExpansionIds = allPaperQuestions.map((q: any) => q.thoughtExpansionId).filter(Boolean) as string[]
   const letterIds = allPaperQuestions.map((q: any) => q.letterId).filter(Boolean) as string[]
   const applicationIds = allPaperQuestions.map((q: any) => q.applicationId).filter(Boolean) as string[]
   const summaryIds = allPaperQuestions.map((q: any) => q.summaryId).filter(Boolean) as string[]
@@ -203,6 +205,7 @@ export async function getQuestionPaperById(
     pbqs,
     paragraphs,
     amplifications,
+    thoughtExpansions,
     letters,
     applications,
     summaries,
@@ -308,6 +311,14 @@ export async function getQuestionPaperById(
         where: { id: { in: amplificationIds } },
         include: {
           academicChapter: true,
+          questionType: true,
+        },
+      })
+      : [],
+    thoughtExpansionIds.length > 0
+      ? (db as any).thoughtExpansion.findMany({
+        where: { id: { in: thoughtExpansionIds } },
+        include: {
           questionType: true,
         },
       })
@@ -663,6 +674,7 @@ export async function getQuestionPaperById(
   const pbqMap = new Map(pbqs.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const paragraphMap = new Map(paragraphs.map((p) => [p.id, { ...p, chapter: p.academicChapter }]))
   const amplificationMap = new Map(amplifications.map((a) => [a.id, { ...a, chapter: a.academicChapter }]))
+  const thoughtExpansionMap = new Map(thoughtExpansions.map((t: any) => [t.id, t]))
   const letterMap = new Map(letters.map((l: any) => [l.id, l]))
   const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
   const summaryMap = new Map(summaries.map((s: any) => [s.id, s]))
@@ -726,6 +738,7 @@ export async function getQuestionPaperById(
     let resolvedPbq = q.pbqId ? pbqMap.get(q.pbqId) || null : null
     let resolvedParagraph = q.paragraphId ? paragraphMap.get(q.paragraphId) || null : null
     let resolvedAmplification = q.amplificationId ? amplificationMap.get(q.amplificationId) || null : null
+    let resolvedThoughtExpansion = q.thoughtExpansionId ? thoughtExpansionMap.get(q.thoughtExpansionId) || null : null
     let resolvedLetter = q.letterId ? letterMap.get(q.letterId) || null : null
     let resolvedApplication = q.applicationId ? applicationMap.get(q.applicationId) || null : null
     let resolvedSummary = q.summaryId ? summaryMap.get(q.summaryId) || null : null
@@ -786,6 +799,9 @@ export async function getQuestionPaperById(
     }
     if (!resolvedAmplification && q.amplificationId && q.contentSnapshot) {
       resolvedAmplification = q.contentSnapshot as any
+    }
+    if (!resolvedThoughtExpansion && q.thoughtExpansionId && q.contentSnapshot) {
+      resolvedThoughtExpansion = q.contentSnapshot as any
     }
     if (!resolvedLetter && q.letterId && q.contentSnapshot) {
       resolvedLetter = q.contentSnapshot as any
@@ -953,6 +969,7 @@ export async function getQuestionPaperById(
       (resolvedParagraph as any)?.questionTypeId ||
       (resolvedLetter as any)?.questionTypeId ||
       (resolvedApplication as any)?.questionTypeId ||
+      (resolvedThoughtExpansion as any)?.questionTypeId ||
       (resolvedAmplification as any)?.questionTypeId ||
       (resolvedPbq as any)?.questionTypeId ||
       (resolvedCq as any)?.questionTypeId ||
@@ -998,6 +1015,7 @@ export async function getQuestionPaperById(
           (resolvedParagraph && (dist.questionTypeName?.includes("অনুচ্ছেদ") || dist.questionTypeName?.toLowerCase().includes("paragraph"))) ||
           (resolvedLetter && (dist.questionTypeName?.includes("চিঠি") || dist.questionTypeName?.includes("পত্র") || dist.questionTypeName?.toLowerCase().includes("letter"))) ||
           (resolvedApplication && (dist.questionTypeName?.includes("আবেদন") || dist.questionTypeName?.includes("দরখাস্ত") || dist.questionTypeName?.toLowerCase().includes("application"))) ||
+          (resolvedThoughtExpansion && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("thought expansion") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
           (resolvedAmplification && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
           (resolvedPbq && (dist.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") || dist.questionTypeName?.toLowerCase().includes("pbq") || dist.questionTypeName?.toLowerCase().includes("passage"))) ||
           (resolvedShort && (dist.questionTypeName?.includes("সংক্ষিপ্ত") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
@@ -1021,6 +1039,7 @@ export async function getQuestionPaperById(
       pbq: resolvedPbq,
       paragraph: resolvedParagraph,
       amplification: resolvedAmplification,
+      thoughtExpansion: resolvedThoughtExpansion,
       letter: resolvedLetter,
       application: resolvedApplication,
       summary: resolvedSummary,
@@ -1557,21 +1576,129 @@ export async function deleteQuestionPaper(
   return { success: true }
 }
 
-export async function duplicateQuestionPaper(
-  db: PrismaClient,
+const QUESTION_BANK_FK_FIELDS = [
+  "mcqId",
+  "cqId",
+  "csId",
+  "pbqId",
+  "shortAnswerId",
+  "paragraphId",
+  "amplificationId",
+  "thoughtExpansionId",
+  "letterId",
+  "applicationId",
+  "summaryId",
+  "essenceId",
+  "poemEssenceId",
+  "proseEssenceId",
+  "sadhuToCholitoId",
+  "poemId",
+  "essayId",
+  "newsReportId",
+  "partsOfSpeechId",
+  "podNirnoyId",
+  "rightFormOfVerbId",
+  "changingSentenceId",
+  "fillInTheBlanksWithCluesId",
+  "fillInTheBlanksWithoutCluesId",
+  "substitutionTableId",
+  "punctuationId",
+  "shortCompositionId",
+  "descriptiveQuestionId",
+  "shortQuestionId",
+  "makeQuestionId",
+  "wordMeaningId",
+  "numberInWordsId",
+  "juktobornoId",
+  "ekKothayProkashId",
+  "makeSentencesId",
+  "oppositeWordId",
+  "genderChangeId",
+  "synonymId",
+  "verbTenseId",
+  "formFillupId",
+  "shuddhoAshuddhoId",
+  "danBamMilkoronId",
+  "mathQuestionId",
+  "grammarQuestionId",
+  "rearrangeId",
+  "seenComprehensionId",
+] as const
+
+function pickQuestionForeignKeys(q: Record<string, any>): Record<string, any> {
+  const fkData: Record<string, any> = {}
+  for (const key of QUESTION_BANK_FK_FIELDS) {
+    fkData[key] = q[key] ?? null
+  }
+  return fkData
+}
+
+function remapSettingsIds(
+  rawSettings: Record<string, any>,
+  idMap: Map<string, string>
+): Record<string, any> {
+  const remapRecordKeys = (obj: any) => {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) return obj
+    const next: Record<string, any> = {}
+    for (const [k, v] of Object.entries(obj)) {
+      let mappedKey = idMap.get(k)
+      if (!mappedKey) {
+        for (const [oldId, newId] of idMap.entries()) {
+          if (k.startsWith(`${oldId}-`)) {
+            mappedKey = `${newId}${k.slice(oldId.length)}`
+            break
+          }
+        }
+      }
+      next[mappedKey || k] = v
+    }
+    return next
+  }
+
+  const remapIdArray = (arr: any) =>
+    Array.isArray(arr) ? arr.map((id) => idMap.get(id) || id) : arr
+
+  const result = { ...rawSettings }
+  if (result.blockBreaks) result.blockBreaks = remapRecordKeys(result.blockBreaks)
+  if (result.mcqOptionLayouts) result.mcqOptionLayouts = remapRecordKeys(result.mcqOptionLayouts)
+  if (result.itemStyles) result.itemStyles = remapRecordKeys(result.itemStyles)
+  if (result.itemTexts) result.itemTexts = remapRecordKeys(result.itemTexts)
+  if (result.dismissedSectionIds) {
+    result.dismissedSectionIds = remapIdArray(result.dismissedSectionIds)
+  }
+  if (result.dismissedSubSectionIds) {
+    result.dismissedSubSectionIds = remapIdArray(result.dismissedSubSectionIds)
+  }
+  return result
+}
+
+async function cloneQuestionPaper(
   tenantDb: TenantPrismaClient,
-  input: DuplicateQuestionPaperInput,
+  sourceId: string,
+  options: {
+    buildTitle: (sourceTitle: string) => string
+    settingsOverrides?: Record<string, any>
+    historyChanges: Record<string, any>
+  },
   actorId?: string
 ) {
   const source = await tenantDb.questionPaper.findUnique({
-    where: { id: input.id },
+    where: { id: sourceId },
     include: {
       subjects: {
         include: {
           distributions: true,
         },
       },
-      sections: true,
+      sections: {
+        include: {
+          subSections: {
+            include: {
+              distributions: true,
+            },
+          },
+        },
+      },
       questions: {
         where: { parentQuestionId: null },
         include: {
@@ -1585,14 +1712,19 @@ export async function duplicateQuestionPaper(
     throw notFound("QuestionPaper")
   }
 
-  const duplicate = await tenantDb.questionPaper.create({
+  const baseSettings = {
+    ...((source.settings as Record<string, any>) || {}),
+    ...(options.settingsOverrides || {}),
+  }
+
+  const cloned = await tenantDb.questionPaper.create({
     data: {
-      title: `${source.title} (Copy)`,
+      title: options.buildTitle(source.title),
       examName: source.examName,
       description: source.description,
       classId: source.classId,
       className: source.className,
-      settings: source.settings ?? {},
+      settings: baseSettings,
       instructions: source.instructions ?? [],
       isTemplate: false,
       status: "Draft",
@@ -1602,25 +1734,45 @@ export async function duplicateQuestionPaper(
     },
   })
 
+  const remappedIds = new Map<string, string>()
   const sectionIdMap = new Map<string, string>()
+  const subSectionIdMap = new Map<string, string>()
+
   for (const section of source.sections) {
     const newSection = await tenantDb.questionPaperSection.create({
       data: {
-        questionPaperId: duplicate.id,
+        questionPaperId: cloned.id,
         title: section.title,
         titleBn: section.titleBn,
         instructions: section.instructions,
+        questionsToAttempt: section.questionsToAttempt,
         orderIndex: section.orderIndex,
       },
     })
     sectionIdMap.set(section.id, newSection.id)
+    remappedIds.set(section.id, newSection.id)
+
+    for (const sub of section.subSections) {
+      const newSub = await tenantDb.questionPaperSubSection.create({
+        data: {
+          sectionId: newSection.id,
+          title: sub.title,
+          titleBn: sub.titleBn,
+          instructions: sub.instructions,
+          questionsToAttempt: sub.questionsToAttempt,
+          orderIndex: sub.orderIndex,
+        },
+      })
+      subSectionIdMap.set(sub.id, newSub.id)
+      remappedIds.set(sub.id, newSub.id)
+    }
   }
 
   const distIdMap = new Map<string, string>()
   for (const subject of source.subjects) {
     const newSubject = await tenantDb.questionPaperSubject.create({
       data: {
-        questionPaperId: duplicate.id,
+        questionPaperId: cloned.id,
         subjectId: subject.subjectId,
         subjectName: subject.subjectName,
         subjectTotal: subject.subjectTotal,
@@ -1631,6 +1783,7 @@ export async function duplicateQuestionPaper(
       const newDist = await tenantDb.questionPaperSubjectMarkDistribution.create({
         data: {
           paperSubjectId: newSubject.id,
+          sectionId: dist.sectionId ? (sectionIdMap.get(dist.sectionId) ?? null) : null,
           questionTypeId: dist.questionTypeId,
           questionTypeName: dist.questionTypeName,
           questionTypeNameBn: (dist as any).questionTypeNameBn ?? null,
@@ -1648,85 +1801,61 @@ export async function duplicateQuestionPaper(
     }
   }
 
+  for (const section of source.sections) {
+    for (const sub of section.subSections) {
+      const newSubId = subSectionIdMap.get(sub.id)
+      if (!newSubId) continue
+      for (const link of sub.distributions) {
+        const newDistId = distIdMap.get(link.distributionId)
+        if (!newDistId) continue
+        await tenantDb.questionPaperSubSectionDistribution.create({
+          data: {
+            subSectionId: newSubId,
+            distributionId: newDistId,
+          },
+        })
+      }
+    }
+  }
+
   for (const question of source.questions) {
     const newDistId = distIdMap.get(question.distributionId)
     if (!newDistId) continue
 
-    const newSectionId = question.sectionId ? sectionIdMap.get(question.sectionId) : null
+    const newSectionId = question.sectionId ? (sectionIdMap.get(question.sectionId) ?? null) : null
+    const newSubSectionId = question.subSectionId ? (subSectionIdMap.get(question.subSectionId) ?? null) : null
 
     const createdPrimary = await tenantDb.questionPaperQuestion.create({
       data: {
-        questionPaperId: duplicate.id,
-        mcqId: question.mcqId,
-        cqId: question.cqId,
-        csId: question.csId,
-        shortAnswerId: question.shortAnswerId,
-        paragraphId: question.paragraphId,
-        amplificationId: question.amplificationId,
-        letterId: question.letterId,
-        applicationId: question.applicationId,
-        summaryId: question.summaryId,
-        essenceId: question.essenceId,
-        poemId: question.poemId,
-        essayId: question.essayId,
-        newsReportId: question.newsReportId,
-        partsOfSpeechId: question.partsOfSpeechId,
-        rightFormOfVerbId: question.rightFormOfVerbId,
-        changingSentenceId: question.changingSentenceId,
-        fillInTheBlanksWithCluesId: question.fillInTheBlanksWithCluesId,
-        fillInTheBlanksWithoutCluesId: question.fillInTheBlanksWithoutCluesId,
-        substitutionTableId: question.substitutionTableId,
-        punctuationId: question.punctuationId,
-        shortCompositionId: question.shortCompositionId,
-        shortQuestionId: question.shortQuestionId,
-        mathQuestionId: question.mathQuestionId,
-        grammarQuestionId: question.grammarQuestionId,
-        seenComprehensionId: question.seenComprehensionId,
+        questionPaperId: cloned.id,
+        ...pickQuestionForeignKeys(question),
         selectedSubQuestionIds: question.selectedSubQuestionIds || [],
         distributionId: newDistId,
         sectionId: newSectionId,
+        subSectionId: newSubSectionId,
         orderIndex: question.orderIndex,
         assignedMarks: question.assignedMarks,
         overrides: question.overrides ?? {},
         contentSnapshot: question.contentSnapshot as any,
       },
     })
+    remappedIds.set(question.id, createdPrimary.id)
 
     if (question.alternatives && question.alternatives.length > 0) {
       for (const alt of question.alternatives) {
         const altDistId = distIdMap.get(alt.distributionId) || newDistId
-        await tenantDb.questionPaperQuestion.create({
+        const altSectionId = alt.sectionId ? (sectionIdMap.get(alt.sectionId) ?? newSectionId) : newSectionId
+        const altSubSectionId = alt.subSectionId ? (subSectionIdMap.get(alt.subSectionId) ?? newSubSectionId) : newSubSectionId
+
+        const createdAlt = await tenantDb.questionPaperQuestion.create({
           data: {
-            questionPaperId: duplicate.id,
+            questionPaperId: cloned.id,
             parentQuestionId: createdPrimary.id,
-            mcqId: alt.mcqId,
-            cqId: alt.cqId,
-            csId: alt.csId,
-            shortAnswerId: alt.shortAnswerId,
-            paragraphId: alt.paragraphId,
-            amplificationId: alt.amplificationId,
-            letterId: alt.letterId,
-            applicationId: alt.applicationId,
-            summaryId: alt.summaryId,
-            essenceId: alt.essenceId,
-            poemId: alt.poemId,
-            essayId: alt.essayId,
-            newsReportId: alt.newsReportId,
-            partsOfSpeechId: alt.partsOfSpeechId,
-            rightFormOfVerbId: alt.rightFormOfVerbId,
-            changingSentenceId: alt.changingSentenceId,
-            fillInTheBlanksWithCluesId: alt.fillInTheBlanksWithCluesId,
-            fillInTheBlanksWithoutCluesId: alt.fillInTheBlanksWithoutCluesId,
-            substitutionTableId: alt.substitutionTableId,
-            punctuationId: alt.punctuationId,
-            shortCompositionId: alt.shortCompositionId,
-            shortQuestionId: alt.shortQuestionId,
-            mathQuestionId: alt.mathQuestionId,
-            grammarQuestionId: alt.grammarQuestionId,
-            seenComprehensionId: alt.seenComprehensionId,
+            ...pickQuestionForeignKeys(alt),
             selectedSubQuestionIds: alt.selectedSubQuestionIds || [],
             distributionId: altDistId,
-            sectionId: newSectionId,
+            sectionId: altSectionId,
+            subSectionId: altSubSectionId,
             orderIndex: alt.orderIndex,
             assignedMarks: alt.assignedMarks,
             orLabel: alt.orLabel || "অথবা",
@@ -1735,18 +1864,61 @@ export async function duplicateQuestionPaper(
             contentSnapshot: alt.contentSnapshot as any,
           },
         })
+        remappedIds.set(alt.id, createdAlt.id)
       }
     }
   }
 
-  await logHistory(tenantDb, {
-    questionPaperId: duplicate.id,
-    action: "CREATED",
-    actorId,
-    changes: { duplicateOf: source.id },
+  const remappedSettings = remapSettingsIds(baseSettings, remappedIds)
+  const finalPaper = await tenantDb.questionPaper.update({
+    where: { id: cloned.id },
+    data: { settings: remappedSettings },
   })
 
-  return duplicate
+  await logHistory(tenantDb, {
+    questionPaperId: cloned.id,
+    action: "CREATED",
+    actorId,
+    changes: options.historyChanges,
+  })
+
+  return finalPaper
+}
+
+export async function duplicateQuestionPaper(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: DuplicateQuestionPaperInput,
+  actorId?: string
+) {
+  return cloneQuestionPaper(
+    tenantDb,
+    input.id,
+    {
+      buildTitle: (title) => `${title} (Copy)`,
+      historyChanges: { duplicateOf: input.id },
+    },
+    actorId
+  )
+}
+
+export async function generateAnswerQuestionPaper(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: GenerateAnswerPaperInput,
+  actorId?: string
+) {
+  return cloneQuestionPaper(
+    tenantDb,
+    input.id,
+    {
+      buildTitle: (title) =>
+        title.endsWith("(উত্তরপত্র)") ? title : `${title} (উত্তরপত্র)`,
+      settingsOverrides: { isAnswerMode: true },
+      historyChanges: { answerPaperOf: input.id },
+    },
+    actorId
+  )
 }
 
 export async function getQuestionPaperHistory(

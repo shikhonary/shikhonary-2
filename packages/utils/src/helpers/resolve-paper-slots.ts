@@ -350,14 +350,9 @@ function buildSlot(params: {
   )
 
   let subSectionInstruction: string | null = null
-  if (mode === "SUBSECTION_SHARED") {
-    if (rawSubAttempt > 0) {
-      subSectionInstruction =
-        distTotalQuestions > 0 && rawSubAttempt < distTotalQuestions
-          ? `(যেকোনো ${toBengaliDigits(rawSubAttempt)}টি প্রশ্নের উত্তর দিতে হবে)`
-          : "(সবগুলো প্রশ্নের উত্তর দিতে হবে)"
-    }
-  } else if (mode === "SUBSECTION_DEDICATED" && isSingleDistInSub) {
+  // Shared question-type sub-sections omit per-subsection attempt instructions because
+  // the breakdown is communicated at the parent section level.
+  if (mode === "SUBSECTION_DEDICATED" && isSingleDistInSub) {
     if (
       distTotalQuestions > 0 &&
       slotAttemptCount > 0 &&
@@ -823,7 +818,8 @@ export function resolvePaperSlots(
                 : null,
             showMarkDistribution:
               Boolean(primarySlot && primarySlot.marksPlacement === "SUBSECTION"),
-            instructions: primarySlot?.subSectionInstruction ?? null,
+            instructions:
+              subMode === "SUBSECTION_SHARED" ? null : (primarySlot?.subSectionInstruction ?? null),
             distName:
               subMode === "SUBSECTION_SHARED" ? "" : (primarySlot?.distTitle ?? ""),
           }

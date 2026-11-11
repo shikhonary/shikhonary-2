@@ -87,6 +87,16 @@ export function useDuplicateQuestionPaper() {
   })
 }
 
+export function useGenerateAnswerPaper() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.generateAnswer.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
 export function useAddQuestion() {
   const queryClient = useQueryClient()
   return useMutation({

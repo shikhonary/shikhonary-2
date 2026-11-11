@@ -50,7 +50,7 @@ const CATEGORY_OPTIONS: { code: QuestionTypeCode; nameBn: string; nameEn: string
   { code: QUESTION_TYPE_CODES.PROSE_ESSENCE, nameBn: "গদ্যের মূলভাব", nameEn: "Prose Essence", desc: "গদ্য বা অনুচ্ছেদের মূলভাব লিখন" },
   { code: QUESTION_TYPE_CODES.POEM, nameBn: "কবিতা", nameEn: "Poem", desc: "কবিতা বা পদ্যাংশ ভিত্তিক প্রশ্ন" },
   { code: QUESTION_TYPE_CODES.SUMMARY, nameBn: "সারাংশ", nameEn: "Summary", desc: "গদ্যাংশের সারাংশ লিখন" },
-  { code: QUESTION_TYPE_CODES.AMPLIFICATION, nameBn: "ভাব-সম্প্রসারণ", nameEn: "Amplification", desc: "উক্তি বা কবিতার ভাব-সম্প্রসারণ" },
+  { code: QUESTION_TYPE_CODES.THOUGHT_EXPANSION, nameBn: "ভাব-সম্প্রসারণ", nameEn: "Thought Expansion", desc: "উক্তি বা কবিতার ভাব-সম্প্রসারণ" },
   { code: QUESTION_TYPE_CODES.NEWS_REPORT, nameBn: "সংবাদ প্রতিবেদন", nameEn: "News Report", desc: "সংবাদপত্র বা অনুষ্ঠানের প্রতিবেদন লিখন" },
   { code: QUESTION_TYPE_CODES.ESSAY, nameBn: "রচনা / প্রবন্ধ", nameEn: "Essay", desc: "প্রবন্ধ বা বিষয়ভিত্তিক রচনা লিখন" },
   { code: QUESTION_TYPE_CODES.CQ, nameBn: "সৃজনশীল", nameEn: "Creative (CQ)", desc: "উদ্দীপক ও ৪টি স্তরের সৃজনশীল প্রশ্ন" },

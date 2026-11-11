@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useQuestionPapersList } from "../services/use-question-paper"
+import { toast } from "@workspace/ui/components/sonner"
+import { useQuestionPapersList, useGenerateAnswerPaper } from "../services/use-question-paper"
 import { useDeleteQuestionPaperModalStore } from "../store/use-delete-question-paper-modal-store"
 import { useDuplicateQuestionPaperModalStore } from "../store/use-duplicate-question-paper-modal-store"
 import { QuestionPaperPageHeader } from "./question-paper-page-header"
@@ -24,6 +26,20 @@ export function QuestionPaperManagementView() {
 
   const openDeleteModal = useDeleteQuestionPaperModalStore((state) => state.openModal)
   const openDuplicateModal = useDuplicateQuestionPaperModalStore((state) => state.openModal)
+  const generateAnswerMutation = useGenerateAnswerPaper()
+  const [generatingAnswerId, setGeneratingAnswerId] = useState<string | null>(null)
+
+  const handleGenerateAnswer = async (id: string, title: string) => {
+    setGeneratingAnswerId(id)
+    try {
+      await generateAnswerMutation.mutateAsync({ id })
+      toast.success(`"${title}"-এর উত্তরপত্র সফলভাবে তৈরি হয়েছে।`)
+    } catch (err: any) {
+      toast.error(err?.message || "উত্তরপত্র তৈরি করতে ব্যর্থ হয়েছে।")
+    } finally {
+      setGeneratingAnswerId(null)
+    }
+  }
 
   // Fetch paginated, sorted, and filtered question papers for the table
   const { data: listData, isLoading, isError } = useQuestionPapersList({
@@ -96,6 +112,8 @@ export function QuestionPaperManagementView() {
         viewMode={viewMode}
         onEdit={(item) => router.push(`/question-papers/${item.id}/edit`)}
         onDuplicate={(id, title) => openDuplicateModal(id, title)}
+        onGenerateAnswer={handleGenerateAnswer}
+        generatingAnswerId={generatingAnswerId}
         onDelete={(id, title) => openDeleteModal(id, title)}
       />
 

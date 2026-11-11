@@ -112,8 +112,8 @@ export function useSaveSubjectQuestionTypes() {
 
   return useMutation({
     ...trpc.academicSubject.saveQuestionTypes.mutationOptions(),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
     },
   })
 }
@@ -126,8 +126,8 @@ export function useSaveSubjectStructure() {
 
   return useMutation({
     ...trpc.subjectStructure.save.mutationOptions(),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(trpc.academicSubject.pathFilter())
     },
   })
 }

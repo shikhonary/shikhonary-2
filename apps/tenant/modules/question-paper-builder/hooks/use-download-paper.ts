@@ -33,60 +33,86 @@ function nextPaint(): Promise<void> {
   );
 }
 
-/** Safe inset (mm) so printers' unprintable edges don't clip content. */
-const SAFE_INSET_MM = 6.5;
-
-/** Places a page image inside the box, scaled uniformly and centered with a safe inset. */
-function placePage(pdf: jsPDF, img: string, x: number, y: number, w: number, h: number) {
-  const scale = Math.min((w - 2 * SAFE_INSET_MM) / w, (h - 2 * SAFE_INSET_MM) / h);
-  const dw = w * scale;
-  const dh = h * scale;
-  pdf.addImage(img, "PNG", x + (w - dw) / 2, y + (h - dh) / 2, dw, dh, undefined, "SLOW");
+interface CapturedPageImage {
+  dataUrl: string;
+  width: number;
+  height: number;
 }
 
-/**
- * Darkens mid-tones (anti-aliased text edges) so printed text isn't faint.
- * White stays white; gamma > 1 pulls grey pixels towards black.
- */
-function hardenImage(dataUrl: string, gamma = 1.8): Promise<string> {
+/** Places a page image inside the target box while strictly preserving its natural aspect ratio. */
+function placePage(pdf: jsPDF, img: CapturedPageImage, x: number, y: number, w: number, h: number) {
+  const imgAspect = img.width > 0 && img.height > 0 ? img.width / img.height : w / h;
+  const boxAspect = w / h;
+  let dw = w;
+  let dh = h;
+
+  if (imgAspect > boxAspect) {
+    dh = w / imgAspect;
+  } else {
+    dw = h * imgAspect;
+  }
+
+  pdf.addImage(img.dataUrl, "PNG", x + (w - dw) / 2, y + (h - dh) / 2, dw, dh, undefined, "FAST");
+}
+
+/** Reads natural dimensions and applies gentle gamma darkening so thin regular strokes print crisp and dark. */
+function processExportImage(
+  dataUrl: string,
+  gamma = 1.55,
+): Promise<CapturedPageImage> {
   return new Promise((resolve) => {
     const image = new Image();
     image.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return resolve(dataUrl);
-        ctx.drawImage(image, 0, 0);
-        const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const lut = new Uint8Array(256);
-        for (let i = 0; i < 256; i++) lut[i] = Math.round(255 * Math.pow(i / 255, gamma));
-        const px = data.data;
-        for (let i = 0; i < px.length; i += 4) {
-          px[i] = lut[px[i]!]!;
-          px[i + 1] = lut[px[i + 1]!]!;
-          px[i + 2] = lut[px[i + 2]!]!;
-        }
-        ctx.putImageData(data, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
-      } catch {
-        resolve(dataUrl);
+      const width = image.naturalWidth || image.width;
+      const height = image.naturalHeight || image.height;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve({ dataUrl, width, height });
+        return;
       }
+
+      ctx.drawImage(image, 0, 0);
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const pixels = imageData.data;
+
+      // Precompute lookup table for fast per-channel gamma adjustment
+      const lut = new Uint8ClampedArray(256);
+      for (let v = 0; v < 256; v++) {
+        lut[v] = v >= 248 ? v : Math.round(255 * Math.pow(v / 255, gamma));
+      }
+
+      for (let idx = 0; idx < pixels.length; idx += 4) {
+        if ((pixels[idx + 3] ?? 0) === 0) continue;
+        pixels[idx] = lut[pixels[idx] ?? 0] ?? 0;
+        pixels[idx + 1] = lut[pixels[idx + 1] ?? 0] ?? 0;
+        pixels[idx + 2] = lut[pixels[idx + 2] ?? 0] ?? 0;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve({
+        dataUrl: canvas.toDataURL("image/png"),
+        width,
+        height,
+      });
     };
-    image.onerror = () => resolve(dataUrl);
+    image.onerror = () => resolve({ dataUrl, width: 0, height: 0 });
     image.src = dataUrl;
   });
 }
 
-/** Temporary style giving text slightly heavier, crisper strokes during capture. */
+/** Temporary style ensuring crisp font rendering and pure-black body text during PDF capture. */
 function injectExportStyle(): HTMLStyleElement {
   const style = document.createElement("style");
   style.setAttribute("data-export-style", "true");
   style.textContent = `
     [data-page-content], [data-page-content] * {
       text-rendering: geometricPrecision;
-      -webkit-text-stroke: 0.15px currentColor;
+    }
+    [data-page-content] .text-foreground {
+      color: #000000 !important;
     }
   `;
   document.head.appendChild(style);
@@ -234,8 +260,8 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
 
       setExportProgress({ current: 0, total: pageNodes.length });
 
-      // 7. Capture each page as a PNG data URL (4x ≈ 384 DPI) with crisp, darkened text
-      const pageImages: string[] = [];
+      // 7. Capture each page as a PNG data URL (4x ≈ 384 DPI) preserving exact canvas margins & aspect ratio
+      const pageImages: Array<CapturedPageImage | null> = [];
       exportStyleEl = injectExportStyle();
       for (let i = 0; i < pageNodes.length; i++) {
         const pageNode = pageNodes[i];
@@ -246,37 +272,27 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
         await nextPaint();
 
         let dataUrl: string;
-        // Overrides applied to the *cloned* page only, so the live builder never reflows:
-        // - transform none: capture true size regardless of the on-screen zoom
-        // - drop page margins (top/bottom always; left/right for multi-column).
-        //   The safe inset applied when placing the page still protects the printer edge.
-        const removeSideMargins = Number(settings.columns) > 1;
+        // Reset only the on-screen zoom transform on the clone so margins & line wrapping match WYSIWYG 1:1
         const cloneStyle: Record<string, string> = {
           transform: "none",
-          paddingTop: "0px",
-          paddingBottom: "0px",
-          ...(removeSideMargins ? { paddingLeft: "0px", paddingRight: "0px" } : {}),
         };
-        try {
-          dataUrl = await toPng(pageNode, {
-            pixelRatio: 4,
-            filter: exportFilter,
-            cacheBust: true,
-            backgroundColor: "#ffffff",
-            style: cloneStyle,
-          });
-        } catch {
-          // Fallback: try with lower pixel ratio if memory issues
-          dataUrl = await toPng(pageNode, {
-            pixelRatio: 2,
-            filter: exportFilter,
-            cacheBust: true,
-            backgroundColor: "#ffffff",
-            style: cloneStyle,
-          });
+        const ratios = [6, 4, 2];
+        for (let r = 0; r < ratios.length; r++) {
+          try {
+            dataUrl = await toPng(pageNode, {
+              pixelRatio: ratios[r],
+              filter: exportFilter,
+              cacheBust: true,
+              backgroundColor: "#ffffff",
+              style: cloneStyle,
+            });
+            break;
+          } catch (err) {
+            if (r === ratios.length - 1) throw err;
+          }
         }
 
-        pageImages.push(await hardenImage(dataUrl));
+        pageImages.push(await processExportImage(dataUrl!));
         setExportProgress({ current: i + 1, total: pageNodes.length });
         await nextPaint();
 
@@ -288,7 +304,7 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       if (isBookFold) {
         // Pad to multiple of 4 pages (should already be padded in canvas rendering, but safeguard)
         while (pageImages.length % 4 !== 0) {
-          pageImages.push(""); // empty string represents a blank page
+          pageImages.push(null); // null represents a blank page
         }
 
         const S = pageImages.length / 4;

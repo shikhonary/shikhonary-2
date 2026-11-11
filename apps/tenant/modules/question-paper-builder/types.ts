@@ -113,6 +113,7 @@ export interface PaperSettings {
   headerTemplate: "classic" | "modern" | "minimal" | "left-aligned";
 
   optionStyle: "parentheses" | "dot" | "circle" | "round";
+  isAnswerMode?: boolean;
   fontFamily: string;
   fontSize: number;
   fontWeight: "normal" | "medium" | "semibold" | "bold";
@@ -125,6 +126,7 @@ export interface PaperSettings {
   address?: string;
   showWatermark: boolean;
   watermark?: string;
+  showAppBranding?: boolean;
 
   // Header Visibility
   showClassName: boolean;

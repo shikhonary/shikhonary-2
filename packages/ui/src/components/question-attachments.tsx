@@ -136,7 +136,8 @@ export function QuestionAttachmentItem({
       {attachment.caption && (
         <div
           className={cn(
-            "font-semibold text-xs text-foreground leading-tight mb-0.5"
+            "font-semibold text-foreground leading-tight mb-0.5",
+            compact && "text-xs"
           )}
         >
           <RenderMath text={attachment.caption.trim()} isMath={isMath} />
@@ -145,7 +146,12 @@ export function QuestionAttachmentItem({
 
       {/* 2. Attachment Content */}
       {attachment.content && (
-        <div className="text-xs text-foreground whitespace-pre-wrap leading-snug">
+        <div
+          className={cn(
+            "text-foreground whitespace-pre-wrap leading-snug",
+            compact && "text-xs"
+          )}
+        >
           <RenderMath text={attachment.content.trim()} isMath={isMath} />
         </div>
       )}
@@ -170,7 +176,8 @@ export function QuestionAttachmentItem({
         <div className="overflow-x-auto w-full my-0.5 p-px">
           <table
             className={cn(
-              "w-full text-xs text-left border-collapse",
+              "w-full text-left border-collapse",
+              compact && "text-xs",
               hasBorder ? "border border-foreground" : "border-b border-foreground"
             )}
           >
@@ -181,7 +188,7 @@ export function QuestionAttachmentItem({
                     <th
                       key={idx}
                       className={cn(
-                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-xs leading-tight",
+                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 leading-tight",
                         hasBorder ? "border border-foreground" : "border-b border-foreground font-bold"
                       )}
                     >
@@ -198,7 +205,7 @@ export function QuestionAttachmentItem({
                     <td
                       key={cIdx}
                       className={cn(
-                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-xs leading-tight text-foreground",
+                        compact ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 leading-tight text-foreground",
                         hasBorder ? "border border-foreground" : "border-b border-foreground/60"
                       )}
                     >
@@ -214,7 +221,12 @@ export function QuestionAttachmentItem({
 
       {/* 5. Attachment Bottom Content / Bottom Caption (End) */}
       {attachment.bottomContent && (
-        <div className="text-[11px] text-foreground font-medium italic whitespace-pre-wrap leading-tight mt-0.5 mb-0">
+        <div
+          className={cn(
+            "text-foreground font-medium italic whitespace-pre-wrap leading-tight mt-0.5 mb-0",
+            compact && "text-[11px]"
+          )}
+        >
           <RenderMath text={attachment.bottomContent.trim()} isMath={isMath} />
         </div>
       )}

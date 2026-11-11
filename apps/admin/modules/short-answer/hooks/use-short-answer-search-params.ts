@@ -1,4 +1,4 @@
-import { useQueryStates, parseAsString, parseAsInteger } from "nuqs"
+import { useQueryStates, parseAsString, parseAsInteger, parseAsStringEnum } from "nuqs"
 
 export const shortAnswerSortOptions = [
   "All",
@@ -7,14 +7,17 @@ export const shortAnswerSortOptions = [
   "question_asc",
   "question_desc",
 ] as const
+export type ShortAnswerSortOption = (typeof shortAnswerSortOptions)[number]
 
 export const shortAnswerSearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  academicClassId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
   chapterId: parseAsString.withDefault("All"),
   board: parseAsString.withDefault("All"),
-  difficulty: parseAsString.withDefault("All"),
-  sort: parseAsString.withDefault("newest"),
+  isActive: parseAsString.withDefault("All"),
+  hasReport: parseAsString.withDefault("All"),
+  sort: parseAsStringEnum<ShortAnswerSortOption>(Array.from(shortAnswerSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(10),
 }

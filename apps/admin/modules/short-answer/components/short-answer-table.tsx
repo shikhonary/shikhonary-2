@@ -6,41 +6,60 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import { QuestionAttachments, type QuestionAttachmentItemData } from "@workspace/ui/components/question-attachments"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  DataTablePagination,
   QuestionCardHeader,
   QuestionCardFooter,
   QuestionCardActions,
+  type QuestionReportItem,
 } from "@/components/shared"
-import { toBengaliDigits } from "@workspace/utils/helpers/bengali"
-import "katex/dist/katex.min.css"
+import { toBengaliDigits } from "@workspace/utils"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@workspace/ui/components/dropdown-menu"
 import {
   Trash2,
-  FileText,
+  FileQuestion,
+  Plus,
   Eye,
   EyeOff,
   CheckCircle2,
+  AlertTriangle,
+  UserPlus,
+  UserCheck,
+  Flag,
+  ChevronDown,
 } from "lucide-react"
+
+export type { QuestionReportItem }
 
 export interface ShortAnswerItem {
   id: string
   question: string
   answer?: string | null
   options?: string[]
-  isMath?: boolean
+  isMath: boolean
   difficulty: string
   year?: number | null
   source?: string | null
   session?: string | null
   reference: string[]
   isActive: boolean
+  hasReport?: boolean
+  reports?: QuestionReportItem[]
   attachments?: QuestionAttachmentItemData[]
   createdAt: Date | string
   updatedAt: Date | string
-  subject?: {
+  subject: {
     id: string
     nameEn: string
-    nameBn?: string
+    nameBn: string
+    code?: string | null
+    group?: string | null
     classSubjects?: {
       academicClass?: {
         id: string
@@ -48,11 +67,19 @@ export interface ShortAnswerItem {
         nameBn: string
       } | null
     }[]
-  } | null
-  chapter?: {
+  }
+  chapter: {
     id: string
     nameEn: string
-    nameBn?: string
+    nameBn: string
+    position: number
+  }
+  questionType?: {
+    id: string
+    nameEn: string
+    nameBn: string
+    label?: string | null
+    mark?: number | null
   } | null
 }
 
@@ -62,6 +89,8 @@ interface ShortAnswerTableProps {
   isError: boolean
   onDelete: (id: string, questionSnippet: string) => void
   onBulkDelete: (selectedIds: string[]) => void
+  onResolveReport?: (item: ShortAnswerItem) => void
+  onAssignReport?: (item: ShortAnswerItem) => void
   currentPage: number
   itemsPerPage: number
   totalItems: number
@@ -76,15 +105,18 @@ export function ShortAnswerTable({
   isError,
   onDelete,
   onBulkDelete,
+  onResolveReport,
+  onAssignReport,
   currentPage,
   itemsPerPage,
   totalItems,
-  totalPages,
   onPageChange,
   onLimitChange,
 }: ShortAnswerTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({})
+
+  const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -139,7 +171,10 @@ export function ShortAnswerTable({
                   type="button"
                   variant="destructive"
                   size="sm"
-                  onClick={() => onBulkDelete(selectedIds)}
+                  onClick={() => {
+                    onBulkDelete(selectedIds)
+                    setSelectedIds([])
+                  }}
                   className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -165,9 +200,13 @@ export function ShortAnswerTable({
                 <div className="h-5 w-32 bg-slate-200 dark:bg-white/10 rounded-lg" />
               </div>
               <div className="h-6 w-3/4 bg-slate-200 dark:bg-white/10 rounded-md" />
-              <div className="space-y-2 pt-2">
-                <div className="h-4 w-full bg-slate-200 dark:bg-white/10 rounded" />
-                <div className="h-4 w-5/6 bg-slate-200 dark:bg-white/10 rounded" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                {[1, 2].map((j) => (
+                  <div
+                    key={j}
+                    className="h-10 bg-slate-100 dark:bg-white/[0.04] rounded-xl border border-slate-200/60"
+                  />
+                ))}
               </div>
             </div>
           ))}
@@ -176,28 +215,26 @@ export function ShortAnswerTable({
 
       {/* Error State */}
       {isError && !isLoading && (
-        <div className="py-16 text-center rounded-2xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 p-6">
-          <FileText className="h-10 w-10 mx-auto text-red-500 mb-3" />
-          <h3 className="text-lg font-bold text-red-700 dark:text-red-400 font-headline">
-            সংক্ষিপ্ত উত্তর প্রশ্ন লোড করতে সমস্যা হয়েছে
-          </h3>
-          <p className="text-sm text-red-600/80 mt-1 max-w-sm mx-auto font-body">
-            সার্ভার থেকে প্রশ্ন লোড করা যায়নি। অনুগ্রহ করে পেজটি রিফ্রেশ করুন।
+        <div className="overflow-hidden rounded-2xl border border-red-200 dark:border-red-900/30 bg-red-50/20 dark:bg-red-950/10 shadow-xs p-12 text-center text-red-600 font-headline">
+          <FileQuestion className="h-10 w-10 mx-auto text-red-500 mb-3" />
+          <p className="text-base font-bold">সংক্ষিপ্ত উত্তর প্রশ্ন লোড করা সম্ভব হয়নি।</p>
+          <p className="text-xs text-muted-foreground mt-1 font-body">
+            অনুগ্রহ করে পৃষ্ঠাটি রিলোড দিন অথবা কিছুক্ষণ পর চেষ্টা করুন।
           </p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !isError && items.length === 0 && (
-        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs py-16 px-6 text-center select-none">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs py-16 px-6 text-center select-none">
           <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-primary/10 border border-indigo-100/80 dark:border-primary/20 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center mb-4 shadow-sm shadow-indigo-100/50 dark:shadow-none">
-            <FileText className="w-8 h-8 stroke-[1.8]" />
+            <FileQuestion className="w-8 h-8 stroke-[1.8]" />
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-foreground font-headline">
             কোনো সংক্ষিপ্ত উত্তর প্রশ্ন পাওয়া যায়নি
           </h3>
           <p className="mt-1.5 text-xs sm:text-sm text-slate-500 dark:text-muted-foreground max-w-md mx-auto font-body">
-            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন সংক্ষিপ্ত উত্তর যোগ করুন।
+            ফিল্টার পরিবর্তন করে দেখুন অথবা প্রশ্ন ব্যাংকে নতুন সংক্ষিপ্ত উত্তর প্রশ্ন যোগ করুন।
           </p>
           <div className="mt-6">
             <Button
@@ -205,6 +242,7 @@ export function ShortAnswerTable({
               className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 px-5 gap-2 shadow-sm shadow-indigo-200 dark:shadow-none transition-all font-headline cursor-pointer"
             >
               <Link href="/short-answers/create" prefetch={true}>
+                <Plus className="w-4 h-4" />
                 <span>নতুন প্রশ্ন যোগ করুন</span>
               </Link>
             </Button>
@@ -219,6 +257,17 @@ export function ShortAnswerTable({
             const isSelected = selectedIds.includes(item.id)
             const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
             const isAnswerExpanded = Boolean(expandedAnswers[item.id])
+
+            const itemReports = Array.isArray(item.reports) ? item.reports : []
+            const pendingReports = itemReports.filter((r) => r.status === "PENDING")
+            const assignedReports = itemReports.filter((r) => r.status === "ASSIGNED")
+            const resolvedReports = itemReports.filter((r) => r.status === "RESOLVED")
+            const hasPending =
+              pendingReports.length > 0 ||
+              (Boolean(item.hasReport) && assignedReports.length === 0)
+            const isAssigned = assignedReports.length > 0
+            const assignedName =
+              assignedReports[0]?.resolver?.name || assignedReports[0]?.resolver?.email
 
             const classNames = item.subject?.classSubjects
               ?.map((cs) => cs.academicClass?.nameBn || cs.academicClass?.nameEn)
@@ -246,23 +295,78 @@ export function ShortAnswerTable({
                     />
 
                     <div className="flex-1 space-y-4 min-w-0">
-                      {/* 1. Header Badges Row */}
+                      {/* Shared Header Badges Row */}
                       <QuestionCardHeader
                         globalIndex={globalIndex}
                         academicClassName={className}
                         subjectName={item.subject?.nameBn || item.subject?.nameEn || ""}
                         chapterName={item.chapter?.nameBn || item.chapter?.nameEn || ""}
                         isMath={item.isMath}
-                      />
+                      >
+                        <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-semibold border border-blue-200/60 dark:border-blue-800/40 font-body">
+                          {item.questionType?.nameBn ||
+                            item.questionType?.nameEn ||
+                            "সংক্ষিপ্ত উত্তর"}
+                        </span>
 
-                      {/* 2. Attachments Section */}
+                        {!item.isActive && (
+                          <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 rounded-lg text-[11px] font-bold border border-amber-200/60 dark:border-amber-800/40 font-body">
+                            ইনঅ্যাক্টিভ
+                          </span>
+                        )}
+
+                        {hasPending && !isAssigned && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/60 text-rose-700 dark:text-rose-400 rounded-lg text-[11px] font-bold border border-rose-200/60 dark:border-rose-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="রিপোর্ট দেখুন ও সমাধান করুন (Resolve Report)"
+                          >
+                            <AlertTriangle className="w-3 h-3 text-rose-500" />
+                            <span>
+                              রিপোর্ট ({toBengaliDigits(pendingReports.length || itemReports.length || 1)})
+                            </span>
+                          </button>
+                        )}
+
+                        {isAssigned && (
+                          <button
+                            type="button"
+                            onClick={() => onAssignReport?.(item)}
+                            className="px-2 py-0.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="অ্যাসাইন দেখুন বা পরিবর্তন করুন"
+                          >
+                            <UserCheck className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                            <span>
+                              অ্যাসাইনকৃত
+                              {assignedName
+                                ? ` (${assignedName})`
+                                : ` (${toBengaliDigits(assignedReports.length)})`}
+                            </span>
+                          </button>
+                        )}
+
+                        {!hasPending && !isAssigned && resolvedReports.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => onResolveReport?.(item)}
+                            className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-lg text-[11px] font-bold border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                            title="সমাধানকৃত রিপোর্ট হিস্ট্রি দেখুন"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>সমাধানকৃত ({toBengaliDigits(resolvedReports.length)})</span>
+                          </button>
+                        )}
+                      </QuestionCardHeader>
+
+                      {/* Attachments Section */}
                       {Array.isArray(item.attachments) && item.attachments.length > 0 && (
                         <div className="space-y-1.5 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5">
                           <QuestionAttachments attachments={item.attachments} isMath={item.isMath} />
                         </div>
                       )}
 
-                      {/* 3. Question Stem (Exact MCQ Benchmark Clickable Link Standard) */}
+                      {/* Question Text */}
                       <Link
                         href={`/short-answers/${item.id}/edit`}
                         prefetch={true}
@@ -271,26 +375,34 @@ export function ShortAnswerTable({
                         <RenderMath text={item.question} isMath={item.isMath} />
                       </Link>
 
-                      {/* 4. Options (If Present) */}
+                      {/* Option Choices Grid (If Present) */}
                       {Array.isArray(item.options) && item.options.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-3 sm:pl-4 py-2 bg-slate-50/40 dark:bg-white/[0.01] rounded-xl p-3 border border-slate-200/60 dark:border-white/[0.04]">
-                          {item.options.map((opt, oIdx) => {
-                            const labels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"]
-                            return (
-                              <div key={oIdx} className="flex items-start gap-2 text-xs text-foreground font-medium font-body">
-                                <span className="font-bold text-indigo-600 dark:text-primary shrink-0">
-                                  {labels[oIdx] || `(${toBengaliDigits(oIdx + 1)})`}
-                                </span>
-                                <div>
-                                  <RenderMath text={opt} isMath={item.isMath} />
+                        <div className="space-y-2 pt-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block font-headline">
+                            বিকল্প অপশনসমূহ ({toBengaliDigits(item.options.length)}টি):
+                          </span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {item.options.map((opt, optIdx) => {
+                              const letter = optionLetters[optIdx] || toBengaliDigits(optIdx + 1)
+                              return (
+                                <div
+                                  key={optIdx}
+                                  className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-2.5 text-xs text-slate-800 dark:text-slate-200 font-body"
+                                >
+                                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold font-headline bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-muted-foreground">
+                                    {letter}
+                                  </span>
+                                  <span className="flex-1 min-w-0 whitespace-normal break-words">
+                                    <RenderMath text={opt} isMath={item.isMath} />
+                                  </span>
                                 </div>
-                              </div>
-                            )
-                          })}
+                              )
+                            })}
+                          </div>
                         </div>
                       )}
 
-                      {/* Expand Answer Button */}
+                      {/* Expand Answer Toggle */}
                       <div>
                         <Button
                           type="button"
@@ -302,36 +414,37 @@ export function ShortAnswerTable({
                           {isAnswerExpanded ? (
                             <>
                               <EyeOff className="size-3.5" />
-                              <span>উত্তর ও ব্যাখ্যা লুকান</span>
+                              <span>উত্তর ও সমাধান লুকান</span>
                             </>
                           ) : (
                             <>
                               <Eye className="size-3.5" />
-                              <span>উত্তর ও ব্যাখ্যা দেখুন</span>
+                              <span>উত্তর ও সমাধান দেখুন</span>
                             </>
                           )}
                         </Button>
                       </div>
 
-                      {/* Collapsible Answer & Explanation Sheets */}
+                      {/* Collapsible Ideal Answer Sheet */}
                       {isAnswerExpanded && (
-                        <div className="space-y-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-xs font-body animate-fade-in">
-                          <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-xs flex items-center gap-1.5 uppercase tracking-wider font-headline">
+                        <div className="rounded-xl border border-emerald-200/80 dark:border-emerald-800/40 bg-emerald-50/60 dark:bg-emerald-950/20 p-3.5 text-xs text-slate-700 dark:text-muted-foreground font-body space-y-1.5">
+                          <span className="font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-1.5 font-headline">
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            আদর্শ উত্তর ও সমাধান:
-                          </h4>
-
+                            <span>আদর্শ উত্তর ও সমাধান:</span>
+                          </span>
                           {item.answer ? (
-                            <div className="pl-2 text-sm leading-relaxed text-foreground font-medium">
+                            <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                               <RenderMath text={item.answer} isMath={item.isMath} />
                             </div>
                           ) : (
-                            <p className="text-xs text-muted-foreground italic pl-2">এই প্রশ্নের জন্য কোনো উত্তর সংরক্ষণ করা হয়নি।</p>
+                            <p className="text-xs text-muted-foreground italic">
+                              এই প্রশ্নের জন্য কোনো উত্তর সংরক্ষণ করা হয়নি।
+                            </p>
                           )}
                         </div>
                       )}
 
-                      {/* 5. Clean Footer: Source, Session & Reference */}
+                      {/* Shared Footer */}
                       <QuestionCardFooter
                         source={item.source}
                         session={item.session}
@@ -341,13 +454,93 @@ export function ShortAnswerTable({
                     </div>
                   </div>
 
-                  {/* 6. Labeled Action Buttons */}
+                  {/* Shared Actions Column with Report Dropdown */}
                   <QuestionCardActions
                     editHref={`/short-answers/${item.id}/edit`}
                     onDelete={() => onDelete(item.id, item.question)}
-                    editTitle="সম্পাদনা করুন"
-                    deleteTitle="মুছুন"
-                  />
+                    editTitle="সংক্ষিপ্ত উত্তর সম্পাদনা করুন"
+                    deleteTitle="সংক্ষিপ্ত উত্তর মুছুন"
+                  >
+                    {(onAssignReport || onResolveReport) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className={cn(
+                              "inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer border shadow-xs flex-1 md:flex-initial md:w-24 font-headline",
+                              hasPending
+                                ? "bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200/80 dark:border-rose-800/40 hover:border-rose-300"
+                                : isAssigned
+                                  ? "bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200/80 dark:border-blue-800/40 hover:border-blue-300"
+                                  : resolvedReports.length > 0
+                                    ? "bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-300"
+                                    : "bg-slate-50 hover:bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-white/[0.08] hover:border-slate-300"
+                            )}
+                            title="রিপোর্ট ও অ্যাসাইনমেন্ট অপশনসমূহ"
+                          >
+                            <Flag className="w-3.5 h-3.5 shrink-0" />
+                            <span>রিপোর্ট</span>
+                            <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
+                          </button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-56 rounded-2xl p-1.5 shadow-xl border border-slate-200/80 dark:border-white/[0.08] bg-card text-foreground"
+                        >
+                          {onAssignReport && (
+                            <DropdownMenuItem
+                              onClick={() => onAssignReport(item)}
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer normal-case tracking-normal hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950/50 dark:hover:text-blue-300 transition-colors"
+                            >
+                              <UserPlus className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                              <div className="flex flex-col text-left">
+                                <span className="font-headline font-bold">
+                                  {isAssigned ? "রিপোর্ট রি-অ্যাসাইন করুন" : "রিপোর্ট অ্যাসাইন করুন"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground font-normal font-body">
+                                  {isAssigned
+                                    ? assignedName
+                                      ? `বর্তমান: ${assignedName}`
+                                      : "দায়িত্বপ্রাপ্ত সদস্য পরিবর্তন"
+                                    : "পর্যালোচনার দায়িত্ব অর্পণ"}
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          )}
+
+                          {onAssignReport && onResolveReport && (
+                            <DropdownMenuSeparator className="my-1 border-slate-100 dark:border-white/[0.06]" />
+                          )}
+
+                          {onResolveReport && (
+                            <DropdownMenuItem
+                              onClick={() => onResolveReport(item)}
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer normal-case tracking-normal hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/50 dark:hover:text-emerald-300 transition-colors"
+                            >
+                              {hasPending ? (
+                                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                              ) : (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                              )}
+                              <div className="flex flex-col text-left">
+                                <span className="font-headline font-bold">
+                                  {hasPending ? "রিপোর্ট সমাধান করুন" : "রিপোর্ট হিস্ট্রি দেখুন"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground font-normal font-body">
+                                  {hasPending
+                                    ? `${toBengaliDigits(pendingReports.length || 1)}টি অমীমাংসিত রিপোর্ট`
+                                    : resolvedReports.length > 0
+                                      ? `${toBengaliDigits(resolvedReports.length)}টি সমাধানকৃত রিপোর্ট`
+                                      : "কোনো রিপোর্ট হিস্ট্রি নেই"}
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </QuestionCardActions>
                 </div>
               </div>
             )
@@ -355,7 +548,7 @@ export function ShortAnswerTable({
         </div>
       )}
 
-      {/* Pagination Footer */}
+      {/* Reusable Data Table Pagination */}
       {!isLoading && !isError && totalItems > 0 && (
         <DataTablePagination
           page={currentPage}

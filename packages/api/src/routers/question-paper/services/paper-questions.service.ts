@@ -38,6 +38,7 @@ export async function addQuestionPaperQuestion(
     input.pbqId,
     input.paragraphId,
     input.amplificationId,
+    input.thoughtExpansionId,
     input.letterId,
     input.applicationId,
     input.summaryId,
@@ -127,6 +128,12 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("Amplification")
     resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "Amplification: " + item.id
+    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
+  } else if (input.thoughtExpansionId) {
+    const item = await (db as any).thoughtExpansion.findUnique({ where: { id: input.thoughtExpansionId } })
+    if (!item) throw notFound("ThoughtExpansion")
+    resolvedQuestionTypeId = (item as any).questionTypeId ?? null
+    questionLabel = "ThoughtExpansion: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.letterId) {
     const item = await (db as any).letter.findUnique({ where: { id: input.letterId } })
@@ -396,6 +403,7 @@ export async function addQuestionPaperQuestion(
       pbqId: input.pbqId,
       paragraphId: input.paragraphId,
       amplificationId: input.amplificationId,
+      thoughtExpansionId: input.thoughtExpansionId,
       letterId: input.letterId,
       applicationId: input.applicationId,
       summaryId: input.summaryId,
@@ -476,6 +484,7 @@ export async function removeQuestionPaperQuestion(
     PBQ: "pbqId",
     PARAGRAPH: "paragraphId",
     AMPLIFICATION: "amplificationId",
+    THOUGHT_EXPANSION: "thoughtExpansionId",
     LETTER: "letterId",
     APPLICATION: "applicationId",
     SUMMARY: "summaryId",
@@ -709,6 +718,19 @@ export async function bulkAssignQuestions(
       recordsToCreate.push({
         questionPaperId: input.questionPaperId,
         amplificationId,
+        distributionId: input.distributionId,
+        sectionId: finalSectionId,
+        subSectionId: finalSubSectionId,
+        orderIndex: nextOrder++,
+      })
+    }
+  }
+
+  if (input.thoughtExpansionIds && input.thoughtExpansionIds.length > 0) {
+    for (const thoughtExpansionId of input.thoughtExpansionIds) {
+      recordsToCreate.push({
+        questionPaperId: input.questionPaperId,
+        thoughtExpansionId,
         distributionId: input.distributionId,
         sectionId: finalSectionId,
         subSectionId: finalSubSectionId,
@@ -1268,6 +1290,8 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.paragraph.findUnique({ where: { id: record.paragraphId } })) as any
       } else if (record.amplificationId) {
         record.contentSnapshot = (await db.amplification.findUnique({ where: { id: record.amplificationId } })) as any
+      } else if (record.thoughtExpansionId) {
+        record.contentSnapshot = (await (db as any).thoughtExpansion.findUnique({ where: { id: record.thoughtExpansionId } })) as any
       } else if (record.letterId) {
         record.contentSnapshot = (await (db as any).letter.findUnique({ where: { id: record.letterId } })) as any
       } else if (record.applicationId) {
@@ -1365,6 +1389,8 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_paragraphId: { questionPaperId: input.questionPaperId, paragraphId: record.paragraphId } }
     } else if (record.amplificationId) {
       whereCondition = { questionPaperId_amplificationId: { questionPaperId: input.questionPaperId, amplificationId: record.amplificationId } }
+    } else if (record.thoughtExpansionId) {
+      whereCondition = { questionPaperId_thoughtExpansionId: { questionPaperId: input.questionPaperId, thoughtExpansionId: record.thoughtExpansionId } }
     } else if (record.letterId) {
       whereCondition = { questionPaperId_letterId: { questionPaperId: input.questionPaperId, letterId: record.letterId } }
     } else if (record.applicationId) {
@@ -1495,6 +1521,7 @@ export async function bulkRemoveQuestions(
         { shortAnswerId: { in: input.questionIds } },
         { paragraphId: { in: input.questionIds } },
         { amplificationId: { in: input.questionIds } },
+        { thoughtExpansionId: { in: input.questionIds } },
         { letterId: { in: input.questionIds } },
         { applicationId: { in: input.questionIds } },
         { summaryId: { in: input.questionIds } },

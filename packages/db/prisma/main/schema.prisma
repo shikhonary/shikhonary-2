@@ -941,6 +941,7 @@ model SubjectQuestionType {
   markDistribution Json?
   totalQuestions   Int     @default(0)
   requiredCount    Int     @default(0)
+  selectionMode    String?
   renderMethod     Int     @default(1)
   position         Int     @default(0)
 

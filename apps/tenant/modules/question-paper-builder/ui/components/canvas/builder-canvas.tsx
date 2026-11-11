@@ -442,7 +442,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalPoems = questions.filter((q: any) => q.poem).length;
         const totalSummaries = questions.filter((q: any) => q.summary).length;
         const totalParagraphs = questions.filter((q: any) => q.paragraph).length;
-        const totalAmplifications = questions.filter((q: any) => q.amplification).length;
+        const totalAmplifications = questions.filter((q: any) => q.amplification || q.thoughtExpansion).length;
         const totalShortAnswers = questions.filter((q: any) => q.shortAnswer).length;
         const totalDescriptiveQuestions = questions.filter((q: any) => q.descriptiveQuestion).length;
         const totalShortQuestions = questions.filter((q: any) => q.shortQuestion).length;
@@ -1004,7 +1004,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             paragraphIdx++;
           }
-          if (q.amplification) {
+          const resolvedThoughtExpansion = q.thoughtExpansion || q.amplification;
+          if (resolvedThoughtExpansion) {
             if (amplificationIdx === 0) {
               globalWrittenNumber++;
             }
@@ -1014,8 +1015,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               data: {
                 item: {
                   id: q.id,
-                  type: "AMPLIFICATION",
-                  data: q.amplification,
+                  type: q.thoughtExpansion ? "THOUGHT_EXPANSION" : "AMPLIFICATION",
+                  data: resolvedThoughtExpansion,
                   orderIndex: amplificationIdx,
                   masterNumber: globalWrittenNumber,
                   canMoveUp,
@@ -2376,7 +2377,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           paddingLeft: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.left}mm`,
           paddingRight: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.right}mm`,
           fontFamily: settings.fontFamily,
-          fontSize: `${settings.fontSize}px`,
+          fontSize: `${settings.fontSize}pt`,
         }}
       >
         {settings.showWatermark && !page.isBlank && (settings.watermark || settings.institutionName) && (
@@ -2440,12 +2441,14 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         </div>
 
         {/* WYSIWYG Marketing Footer */}
-        <div 
-          className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
-          style={{ bottom: '8px' }}
-        >
-          Generated via Shikhonary
-        </div>
+        {(settings.showAppBranding ?? true) && (
+          <div 
+            className="absolute left-0 right-0 text-center text-[10px] text-black/40 italic pointer-events-none select-none"
+            style={{ bottom: '8px' }}
+          >
+            Generated via Shikhonary
+          </div>
+        )}
       </div>
     );
   };
@@ -2465,7 +2468,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         style={{
           width: `${canvasWidth}mm`,
           fontFamily: settings.fontFamily,
-          fontSize: `${settings.fontSize}px`,
+          fontSize: `${settings.fontSize}pt`,
           paddingTop: `${settings.margins.top}mm`,
           paddingBottom: `${settings.margins.bottom}mm`,
           paddingLeft: `${settings.margins.left}mm`,
@@ -2642,7 +2645,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         className="hidden print:block w-full bg-white text-black"
         style={{
           fontFamily: settings.fontFamily,
-          fontSize: `${settings.fontSize}px`,
+          fontSize: `${settings.fontSize}pt`,
         }}
       >
         {settings.showWatermark && (settings.watermark || settings.institutionName) && (
@@ -2703,9 +2706,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           <tfoot>
             <tr>
               <td style={{ height: `${settings.margins.bottom}mm`, verticalAlign: 'bottom', paddingBottom: '8px' }}>
-                <div className="text-center text-[10px] text-black/40 italic w-full">
-                  Generated via Shikhonary
-                </div>
+                {(settings.showAppBranding ?? true) && (
+                  <div className="text-center text-[10px] text-black/40 italic w-full">
+                    Generated via Shikhonary
+                  </div>
+                )}
               </td>
             </tr>
           </tfoot>

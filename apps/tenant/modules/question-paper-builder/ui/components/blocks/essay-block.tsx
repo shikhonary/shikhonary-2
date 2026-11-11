@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
-import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { isResourceEnglish } from "@workspace/utils";
 
@@ -55,7 +54,7 @@ const EssayEditableText = ({
   };
   
   const changeSize = (delta: number) => {
-    const currentSize = mergedStyle.fontSize || 12;
+    const currentSize = typeof mergedStyle.fontSize === "number" ? mergedStyle.fontSize : (parseFloat(String(mergedStyle.fontSize || 12)) || 12);
     setItemStyle(itemKey, { fontSize: currentSize + delta });
   };
   
@@ -79,7 +78,7 @@ const EssayEditableText = ({
           <div className="w-px h-4 bg-border mx-1"></div>
           
           <button onClick={() => changeSize(-1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Decrease Font Size">-</button>
-          <span className="text-[10px] w-4 text-center font-medium">{mergedStyle.fontSize}</span>
+          <span className="text-[10px] w-4 text-center font-medium">{parseFloat(String(mergedStyle.fontSize || 12)) || 12}</span>
           <button onClick={() => changeSize(1)} className="p-1 px-2 rounded hover:bg-muted font-mono leading-none" title="Increase Font Size">+</button>
         </div>
       )}
@@ -89,7 +88,7 @@ const EssayEditableText = ({
         onClick={() => setIsActive(true)}
         className={`cursor-pointer transition-colors ${isActive ? "bg-primary/5 ring-1 ring-primary/20 rounded-sm" : "hover:bg-muted/30 rounded-sm"} ${className}`}
         style={{
-          fontSize: mergedStyle.fontSize,
+          fontSize: typeof mergedStyle.fontSize === "number" ? `${mergedStyle.fontSize}pt` : mergedStyle.fontSize,
           fontFamily: mergedStyle.fontFamily,
           lineHeight: mergedStyle.lineHeight,
           textAlign: mergedStyle.textAlign,
@@ -207,7 +206,7 @@ export const EssayBlock = ({ item }: { item: any }) => {
 
   const getQuestionStyle = () => {
     return {
-      fontSize: settings.fontSize,
+      fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
       fontFamily: settings.fontFamily,
       textAlign: "left" as const,
       lineHeight: settings.lineHeight,
@@ -273,34 +272,22 @@ export const EssayBlock = ({ item }: { item: any }) => {
     );
   };
 
-  const [showAddAlternative, setShowAddAlternative] = useState(false);
-
   return (
-    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${item.isFirstEssay ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
-      {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-        <button
-          type="button"
-          onClick={() => setShowAddAlternative(true)}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r"
-          title={isEnglish ? "Add alternative (Or) question" : "বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"}
-        >
-          <Split className="w-3 h-3" />
-          {isEnglish ? "Or" : "অথবা"}
-        </button>
-        <button 
-          onClick={handleRemove}
-          disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
-        >
-          {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
-        </button>
-      </div>
-
+    <div className={`flex flex-col break-inside-avoid ${item.isFirstEssay ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {renderMethod === 1 ? (
-        <div className="flex justify-between items-start gap-2 w-full">
+        <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
+          {/* Hover Controls */}
+          <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+            <button 
+              onClick={handleRemove}
+              disabled={isRemoving}
+              className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+              title="Remove Question"
+            >
+              {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              Remove
+            </button>
+          </div>
           <div className="flex gap-1 flex-1 relative flex-col">
             <div className="flex gap-2 items-start w-full">
               <span
@@ -346,7 +333,7 @@ export const EssayBlock = ({ item }: { item: any }) => {
       ) : (
         <>
           {item.isFirstEssay && (
-            <div className="flex justify-between items-start w-full">
+            <div className="relative -mx-4 px-4 rounded-lg flex justify-between items-start">
               <div 
                 className="font-bold ml-[0px] flex items-baseline gap-2" 
                 style={{
@@ -364,10 +351,12 @@ export const EssayBlock = ({ item }: { item: any }) => {
                   {isEnglish ? `${item.masterNumber || 1}.` : `${toBengaliDigits(item.masterNumber || 1)}।`}
                 </span>
                 <EditableSectionLabel
-                  distributionId={item.distributionId || data.distributionId || item.distribution?.id}
+                  readOnly
                   initialLabel={rawLabel}
                   fallbackLabel={isEnglish ? "Write an essay on any one of the following:" : "যেকোনো একটি বিষয়ে প্রবন্ধ রচনা করো:"}
                   questionType="ESSAY"
+                  questionCount={distStatus?.questionCount ?? item.distribution?.questionCount ?? distStatus?.targetCount ?? item.totalQuestions}
+                  questionsToAttempt={(distStatus as any)?.questionsToAttempt ?? item.distribution?.questionsToAttempt ?? item.attemptCount}
                   style={{
                     fontSize: questionStyle.fontSize,
                     fontFamily: questionStyle.fontFamily,
@@ -378,11 +367,25 @@ export const EssayBlock = ({ item }: { item: any }) => {
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
               }}>
-                {isEnglish ? (marksPerQuestion * (attemptCount || 1)) : toBengaliDigits(marksPerQuestion * (attemptCount || 1))}
+                {isEnglish
+                  ? `${marksPerQuestion} × ${attemptCount || 1} = ${marksPerQuestion * (attemptCount || 1)}`
+                  : `${toBengaliDigits(marksPerQuestion)} × ${toBengaliDigits(attemptCount || 1)} = ${toBengaliDigits(marksPerQuestion * (attemptCount || 1))}`}
               </div>
             </div>
           )}
-          <div className="flex justify-between items-start gap-2 w-full">
+          <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
+            {/* Question Hover Controls: Remove question only */}
+            <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+              <button 
+                onClick={handleRemove}
+                disabled={isRemoving}
+                className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+                title="Remove Question"
+              >
+                {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                Remove
+              </button>
+            </div>
             <div className="flex gap-1 flex-1 relative flex-col">
               <div className="flex gap-2 items-start w-full">
                 <span
@@ -422,18 +425,6 @@ export const EssayBlock = ({ item }: { item: any }) => {
         </>
       )}
 
-      <AddAlternativeModal
-        open={showAddAlternative}
-        onOpenChange={setShowAddAlternative}
-        paperId={paperId || ""}
-        primaryQuestionId={item.id}
-        primaryQuestionContentId={data.id}
-        primaryQuestionType="ESSAY"
-        subjectId={item.subjectId || distStatus?.subjectId || ""}
-        primaryMarks={item.assignedMarks ?? item.distribution?.marksPerQuestion ?? marksPerQuestion}
-        masterNumber={item.masterNumber || (item.orderIndex + 1)}
-        distributionId={item.distributionId || data.distributionId || distStatus?.distributionId}
-      />
     </div>
   );
 };

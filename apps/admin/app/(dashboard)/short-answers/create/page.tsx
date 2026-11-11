@@ -6,11 +6,18 @@ export const metadata = {
   title: "Create Short Answer | Shikhonary",
 }
 
-export default async function Page() {
+export default async function CreateShortAnswerRoute() {
   const queryClient = getQueryClient()
 
+  // Prefetch selectors and question type templates
   void queryClient.prefetchQuery(
     trpc.academicClass.list.queryOptions({ limit: 100 })
+  )
+  void queryClient.prefetchQuery(
+    trpc.academicSubject.list.queryOptions({ limit: 100 })
+  )
+  void queryClient.prefetchQuery(
+    trpc.questionType.list.queryOptions({ limit: 100 })
   )
 
   return (

@@ -96,6 +96,10 @@ export const duplicateQuestionPaperSchema = idSchema
 
 export type DuplicateQuestionPaperInput = z.infer<typeof duplicateQuestionPaperSchema>
 
+export const generateAnswerPaperSchema = idSchema
+
+export type GenerateAnswerPaperInput = z.infer<typeof generateAnswerPaperSchema>
+
 // ---------------------------------------------------------------------------
 // Mutations - Sections
 // ---------------------------------------------------------------------------
@@ -216,6 +220,7 @@ export const addQuestionPaperQuestionSchema = z.object({
   pbqId: z.string().optional().nullable(),
   paragraphId: z.string().optional().nullable(),
   amplificationId: z.string().optional().nullable(),
+  thoughtExpansionId: z.string().optional().nullable(),
   letterId: z.string().optional().nullable(),
   applicationId: z.string().optional().nullable(),
   summaryId: z.string().optional().nullable(),
@@ -385,6 +390,7 @@ export const bulkAssignQuestionsSchema = z.object({
   shortAnswerIds: z.array(z.string()).optional(),
   paragraphIds: z.array(z.string()).optional(),
   amplificationIds: z.array(z.string()).optional(),
+  thoughtExpansionIds: z.array(z.string()).optional(),
   letterIds: z.array(z.string()).optional(),
   applicationIds: z.array(z.string()).optional(),
   summaryIds: z.array(z.string()).optional(),
@@ -499,6 +505,7 @@ export const patchQuestionPaperSettingsSchema = z.object({
       twoPagesPerSheet: z.boolean().optional(),
       headerTemplate: z.enum(["classic", "modern", "minimal", "left-aligned"]).optional(),
       optionStyle: z.enum(["parentheses", "dot", "circle", "round"]).optional(),
+      isAnswerMode: z.boolean().optional(),
       fontFamily: z.string().optional(),
       fontSize: z.number().optional(),
       fontWeight: z.enum(["normal", "medium", "semibold", "bold"]).optional(),
@@ -510,6 +517,7 @@ export const patchQuestionPaperSettingsSchema = z.object({
       address: z.string().optional(),
       showWatermark: z.boolean().optional(),
       watermark: z.string().optional(),
+      showAppBranding: z.boolean().optional(),
       showClassName: z.boolean().optional(),
       showSubjectName: z.boolean().optional(),
       showChapterName: z.boolean().optional(),

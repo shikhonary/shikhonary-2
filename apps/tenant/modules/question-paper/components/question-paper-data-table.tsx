@@ -25,10 +25,12 @@ import {
   Clock,
   Copy,
   CheckCircle,
+  CheckCircle2,
   AlertTriangle,
   Sparkles,
   FileQuestion,
   Plus,
+  Loader2,
 } from "lucide-react"
 import { QuestionPaperCardGrid } from "./question-paper-card-grid"
 import type { QuestionPaperViewMode } from "../hooks/use-question-paper-search-params"
@@ -68,6 +70,7 @@ export interface QuestionPaperItem {
   isTemplate: boolean
   total: number
   timeInMinutes: number
+  settings?: Record<string, any> | null
   createdAt: string | Date
 }
 
@@ -78,6 +81,8 @@ interface QuestionPaperDataTableProps {
   viewMode?: QuestionPaperViewMode
   onEdit?: (item: QuestionPaperItem) => void
   onDuplicate: (id: string, title: string) => void
+  onGenerateAnswer?: (id: string, title: string) => void
+  generatingAnswerId?: string | null
   onDelete: (id: string, title: string) => void
 }
 
@@ -88,6 +93,8 @@ export function QuestionPaperDataTable({
   viewMode = "table",
   onEdit,
   onDuplicate,
+  onGenerateAnswer,
+  generatingAnswerId,
   onDelete,
 }: QuestionPaperDataTableProps) {
   const getStatusBadge = (status: string) => {
@@ -136,6 +143,8 @@ export function QuestionPaperDataTable({
         isLoading={false}
         onEdit={onEdit}
         onDuplicate={onDuplicate}
+        onGenerateAnswer={onGenerateAnswer}
+        generatingAnswerId={generatingAnswerId}
         onDelete={onDelete}
       />
     )
@@ -229,6 +238,8 @@ export function QuestionPaperDataTable({
               isLoading={false}
               onEdit={onEdit}
               onDuplicate={onDuplicate}
+              onGenerateAnswer={onGenerateAnswer}
+              generatingAnswerId={generatingAnswerId}
               onDelete={onDelete}
             />
           </div>
@@ -266,9 +277,19 @@ export function QuestionPaperDataTable({
                     >
                       <TableCell className="py-4 px-6">
                         <div className="space-y-0.5">
-                          <p className="text-sm font-bold text-foreground font-headline">
-                            {item.title}
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-bold text-foreground font-headline">
+                              {item.title}
+                            </p>
+                            {Boolean(item.settings?.isAnswerMode) && (
+                              <Badge
+                                variant="outline"
+                                className="rounded-md px-1.5 py-0 border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold font-headline"
+                              >
+                                উত্তরপত্র
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground font-body">{item.examName}</p>
                         </div>
                       </TableCell>
@@ -354,6 +375,20 @@ export function QuestionPaperDataTable({
                                 <Copy className="h-3.5 w-3.5" />
                                 <span>ডুপ্লিকেট করুন</span>
                               </DropdownMenuItem>
+                              {onGenerateAnswer && (
+                                <DropdownMenuItem
+                                  disabled={generatingAnswerId === item.id}
+                                  onClick={() => onGenerateAnswer(item.id, item.title)}
+                                  className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                >
+                                  {generatingAnswerId === item.id ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  ) : (
+                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                  )}
+                                  <span>উত্তরপত্র তৈরি করুন</span>
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem
                                 variant="destructive"
                                 onClick={() => onDelete(item.id, item.title)}

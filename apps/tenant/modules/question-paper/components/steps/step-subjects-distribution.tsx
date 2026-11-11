@@ -157,7 +157,7 @@ export function StepSubjectsDistribution({
         if (!sqt) continue
         const qTypeId = sqt.questionTypeId
         if (!qTypeId) continue
-        const isSingle = isSingleQuestionType(sqt.questionType?.nameEn || sqt.questionType?.nameBn || sqt.customLabel) || sqt.totalQuestions === 1
+        const isSingle = sqt.selectionMode ? (sqt.selectionMode === "SINGLE_WITH_ALT" || sqt.selectionMode === "SINGLE_NO_ALT") : (isSingleQuestionType(sqt.questionType?.nameEn || sqt.questionType?.nameBn || sqt.customLabel) || sqt.totalQuestions === 1)
         if (!map.has(qTypeId)) {
           map.set(qTypeId, {
             id: qTypeId,
@@ -296,7 +296,7 @@ export function StepSubjectsDistribution({
       if (!markDist) markDist = { a: marksPerQ }
 
       const typePolicy = getQuestionTypePolicy(item.nameEn || item.nameBn || (item as any).code || customLabel)
-      const isSingle = typePolicy.selectionMode === "SINGLE" || sqt?.totalQuestions === 1
+      const isSingle = sqt?.selectionMode ? (sqt.selectionMode === "SINGLE_WITH_ALT" || sqt.selectionMode === "SINGLE_NO_ALT") : (typePolicy.selectionMode === "SINGLE" || sqt?.totalQuestions === 1)
 
       return {
         tempId: crypto.randomUUID(),
@@ -401,7 +401,7 @@ export function StepSubjectsDistribution({
     )
 
     const typePolicy = getQuestionTypePolicy(matched.nameEn || matched.nameBn || (matched as any).code || preset?.customLabel)
-    const isSingle = typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1
+    const isSingle = preset?.selectionMode ? (preset.selectionMode === "SINGLE_WITH_ALT" || preset.selectionMode === "SINGLE_NO_ALT") : (typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1)
 
     setDistForm({
       questionTypeId: qTypeId,

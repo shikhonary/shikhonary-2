@@ -5,7 +5,7 @@ import { useBuilderStore } from "../../../../store/use-builder-store";
 import { Label } from "@workspace/ui/components/label";
 import { Switch } from "@workspace/ui/components/switch";
 import { Input } from "@workspace/ui/components/input";
-import { ShieldCheck, Image as ImageIcon, MapPin, Stamp } from "lucide-react";
+import { ShieldCheck, Image as ImageIcon, MapPin, Stamp, Tag } from "lucide-react";
 
 export const BrandingCard: React.FC = () => {
   const settings = useBuilderStore((state) => state.settings);
@@ -105,6 +105,24 @@ export const BrandingCard: React.FC = () => {
               className="h-8 text-xs rounded-xl bg-card border-slate-200 dark:border-white/10 font-body focus-visible:ring-indigo-500 animate-in fade-in-50 duration-200"
             />
           )}
+        </div>
+
+        {/* App Branding Footer Toggle */}
+        <div className="space-y-2 pt-2 border-t border-border/60">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Tag className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Label htmlFor="showAppBranding" className="text-xs sm:text-sm font-semibold text-foreground font-headline cursor-pointer">
+                ফুটার ব্র্যান্ডিং (Shikhonary)
+              </Label>
+            </div>
+            <Switch 
+              id="showAppBranding"
+              checked={settings.showAppBranding ?? true}
+              onCheckedChange={(c) => updateSettings({ showAppBranding: c })}
+              className="data-[state=checked]:bg-indigo-600 cursor-pointer"
+            />
+          </div>
         </div>
       </div>
     </div>

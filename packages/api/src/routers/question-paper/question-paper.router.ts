@@ -7,6 +7,7 @@ import {
   updateQuestionPaperSchema,
   deleteQuestionPaperSchema,
   duplicateQuestionPaperSchema,
+  generateAnswerPaperSchema,
   addQuestionPaperQuestionSchema,
   removeQuestionPaperQuestionSchema,
   reorderQuestionPaperQuestionsSchema,
@@ -44,6 +45,7 @@ import {
   updateQuestionPaper,
   deleteQuestionPaper,
   duplicateQuestionPaper,
+  generateAnswerQuestionPaper,
   addQuestionPaperQuestion,
   updateQuestionPaperQuestion,
   removeQuestionPaperQuestion,
@@ -154,6 +156,12 @@ export const questionPaperRouter = createTRPCRouter({
     .input(duplicateQuestionPaperSchema)
     .mutation(({ ctx, input }) =>
       duplicateQuestionPaper(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  generateAnswer: tenantMemberProcedure
+    .input(generateAnswerPaperSchema)
+    .mutation(({ ctx, input }) =>
+      generateAnswerQuestionPaper(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
     ),
 
   generateSets: tenantMemberProcedure

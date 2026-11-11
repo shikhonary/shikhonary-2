@@ -60,6 +60,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
+  const settings = useBuilderStore((state) => state.settings);
 
   const isActive = !isSectionFilled && activeSectionId === secId && !activeSubSectionId;
 
@@ -107,7 +108,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
       >
         <div className="flex items-center justify-between w-full">
           <div className="w-6"></div>
-          <div className="font-semibold text-xs sm:text-sm text-center flex-1 italic text-foreground leading-normal">
+          <div className="font-semibold text-[10pt] text-center flex-1 italic text-black leading-normal">
             {formattedInst}
             {isActive && (
               <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden not-italic">
@@ -131,7 +132,13 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
     >
       <div className="flex items-center justify-between w-full">
         <div className="w-6"></div>
-        <h3 className="font-bold text-base text-center flex-1">
+        <h3
+          className="font-bold text-center flex-1"
+          style={{
+            fontSize: `${(settings.fontSize || 13) + 2}pt`,
+            fontFamily: settings.fontFamily,
+          }}
+        >
           {rawTitle}
           {isActive && (
             <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
@@ -142,7 +149,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
         <div className="w-6"></div>
       </div>
       {formattedInst && (
-        <p className="text-xs text-muted-foreground italic text-center mt-0.5">{formattedInst}</p>
+        <p className="text-[10pt] text-black italic text-center mt-0.5">{formattedInst}</p>
       )}
     </div>
   );
@@ -172,6 +179,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const subId = id || subSectionId;
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
   const setActiveTarget = useBuilderStore((state) => state.setActiveTarget);
+  const settings = useBuilderStore((state) => state.settings);
   const { mutateAsync: deleteSubSection } = useDeleteSubSection();
 
   const isActive = !isSectionFilled && activeSubSectionId === subId;
@@ -182,7 +190,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   const displayTitle = !isGenericSub ? rawSubTitle : (isSharedQuestionType ? "" : (distName?.trim() || ""));
   const hasSubTitle = Boolean(displayTitle && !hideTitle);
 
-  const formattedInst = instructions
+  const formattedInst = !isSharedQuestionType && instructions
     ? instructions.trim().startsWith("(") && instructions.trim().endsWith(")")
       ? instructions.trim()
       : instructions.trim().startsWith("[") && instructions.trim().endsWith("]")
@@ -206,7 +214,13 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
       {hasSubTitle ? (
         <div className="flex items-center justify-between w-full">
           <div className="w-6"></div>
-          <h4 className="font-semibold text-sm text-center flex-1">
+          <h4
+            className="font-semibold text-center flex-1"
+            style={{
+              fontSize: `${(settings.fontSize || 13) + 1}pt`,
+              fontFamily: settings.fontFamily,
+            }}
+          >
             {displayTitle}
             {isActive && (
               <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
@@ -284,8 +298,8 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
         </div>
       ) : null}
       {canShowBottomRow && (
-        <div className="flex justify-between items-center w-full mt-0.5 mb-0.5 text-[12px] text-black">
-          <div className="text-left font-normal text-black ml-[30px]">
+        <div className="flex justify-between items-center w-full mt-0.5 mb-0.5 text-black">
+          <div className="text-left font-normal text-black text-[10pt] ml-[30px]">
             {formattedInst}
           </div>
           {canShowMarkFormula && (
@@ -367,9 +381,9 @@ const DistTitleBlock = ({ data }: { data: any }) => {
         </div>
       )}
       {(instructionText || isCq || showMarks) && (
-        <div className="flex justify-between items-center text-[12px]">
+        <div className="flex justify-between items-center">
           <div className="flex-1"></div>
-          <div className="text-center font-normal flex-[2]">
+          <div className="text-center font-normal flex-[2] text-[10pt] text-black">
             {instructionText}
           </div>
           <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
