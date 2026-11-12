@@ -2300,7 +2300,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
     // If full header exists, put it on first page
     const fullHeaderBlock = blocks.find(b => b.type === "header-full");
-    let availableHeight = effectivePageHeight - 10; // 10px tolerance
+    let availableHeight = effectivePageHeight - 24; // 24px buffer to prevent page overflow & PDF shrink-to-fit
 
     if (fullHeaderBlock) {
       currentPage.fullHeader = fullHeaderBlock;

@@ -73,7 +73,7 @@ const defaultSettings: PaperSettings = {
   optionStyle: "circle",
   isAnswerMode: false,
   fontFamily: "SolaimanLipi",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: "normal",
   lineHeight: 1.5,
   textAlign: "left",

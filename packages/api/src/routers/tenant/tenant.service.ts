@@ -24,7 +24,20 @@ import type {
 // ---------------------------------------------------------------------------
 
 // Helper to flatten geographic relations into flat string attributes on Tenant
-function flattenTenantGeographics(tenant: any) {
+type GeoRelation = {
+  id: string
+  name: string
+  nameBn?: string | null
+} | null | undefined
+
+type TenantWithGeo = {
+  division?: GeoRelation
+  district?: GeoRelation
+  upazila?: GeoRelation
+  union?: GeoRelation
+}
+
+function flattenTenantGeographics<T extends TenantWithGeo>(tenant: T) {
   if (!tenant) return tenant
   const { division, district, upazila, union, ...rest } = tenant
   return {

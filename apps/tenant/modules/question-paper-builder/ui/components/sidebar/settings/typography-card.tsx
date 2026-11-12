@@ -83,8 +83,8 @@ export const TypographyCard: React.FC = () => {
         {/* Quick Size Presets */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "আদর্শ (১৩)", size: 13 },
-            { label: "মাঝারি (১৪)", size: 14 },
+            { label: "ছোট (১৩)", size: 13 },
+            { label: "আদর্শ (১৪)", size: 14 },
             { label: "বড় (১৬)", size: 16 },
           ].map((preset) => {
             const isSelected = settings.fontSize === preset.size;
