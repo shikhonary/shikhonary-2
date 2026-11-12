@@ -1,560 +1,664 @@
 {
-  "chapterTitle": "শব্দজোড়",
+  "chapterTitle": "ষষ্ঠ অধ্যায়: পলিমার",
   "questions": [
     {
-      "type": "SINGLE",
-      "question": "দুটি শব্দের উচ্চারণ এক বা প্রায় এক কিন্তু অর্থ আলাদা, সেগুলোকে কী বলে?",
-      "options": [
-        "বর্গ",
-        "প্রবাদ",
-        "শব্দজোড়",
-        "শব্দদ্বৈত"
+      "context": "তথ্য-১:",
+      "questionA": "সেলুলোজিক তন্তু কাকে বলে?",
+      "questionB": "রেশমকে তন্তুর রানি বলা হয় কেন?",
+      "questionC": "$Z$ তৈরির প্রক্রিয়া ব্যাখ্যা করো।",
+      "questionD": "শীত নিবারণের ক্ষেত্রে তথ্য-১ এর মধ্যে কোন তন্তু উপযোগী? তুলনামূলক বিশ্লেষণপূর্বক মতামত দাও।",
+      "reference": ["ঢাকা বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: তন্তু ও বৈশিষ্ট্য",
+      "table": {
+        "headers": ["তন্তু", "বৈশিষ্ট্য"],
+        "rows": [
+          ["$X$", "নমনীয়তা, কুঞ্চন প্রতিরোধী"],
+          ["$Y$", "খুব হালকা ও শক্ত, আগুনে পোড়ে না"]
+        ]
+      },
+      "bottomContent": "তথ্য-২: $Z$ একটি পদার্থ যার উৎপাদনে $TiCl_3$ প্রভাবক ব্যবহৃত হয়।"
+    },
+    {
+      "context": null,
+      "questionA": "পলিমারকরণ প্রক্রিয়া কাকে বলে?",
+      "questionB": "পাটের শপিং ব্যাগকে পলিমার বলা হয় কেন? ব্যাখ্যা করো।",
+      "questionC": "$B$ থেকে কীভাবে সুতা তৈরি হয়? ব্যাখ্যা করো।",
+      "questionD": "শীত প্রতিরোধে $B$ থেকে $A$ বেশি উপযোগী কেন? বিশ্লেষণ করো।",
+      "reference": ["ময়মনসিংহ বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: তন্তুর নাম ও সুতার বৈশিষ্ট্য/উৎস",
+      "table": {
+        "headers": ["তন্তুর নাম", "সুতার বৈশিষ্ট্য/উৎস"],
+        "rows": [
+          ["$A$", "নমনীয়তা, স্থিতিস্থাপকতা, কুঞ্চন প্রতিরোধের ক্ষমতা উল্লেখযোগ্য বৈশিষ্ট্য।"],
+          ["$B$", "পলুপোকা নামক এক প্রকার গুটি থেকে বিশেষ প্রক্রিয়ায় তন্তু আহরণ করা হয়।"]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "তন্তু কাকে বলে?",
+      "questionB": "নাইলনকে কেন নন-সেলুলোজিক কৃত্রিম তন্তু বলা হয়?",
+      "questionC": "উদ্দীপকের '$P$' এর উৎপাদন প্রক্রিয়া ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের '$P$' ও '$Q$' এর মধ্যে কোনটি পরিবেশের জন্য অধিকতর ক্ষতিকর? যুক্তিসহ বিশ্লেষণ করো।",
+      "reference": ["রাজশাহী বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: কৃত্রিম ও প্রাকৃতিক পলিমার তালিকা",
+      "table": {
+        "headers": ["সংকেত", "উপাদান"],
+        "rows": [
+          ["$P$", "পলিথিন"],
+          ["$Q$", "পাট, রাবার, রেশম, পশম"]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "পুল্ড উল কাকে বলে?",
+      "questionB": "মেলামাইনকে থার্মোসেটিং প্লাস্টিকস বলা হয় কেন? ব্যাখ্যা করো।",
+      "questionC": "$A$ বস্তু থেকে সুতা তৈরি করার প্রক্রিয়া ব্যাখ্যা করো।",
+      "questionD": "পরিবেশের ভারসাম্য রক্ষায় দৈনন্দিন জীবনে $B$ যৌগসমূহ ব্যবহারের প্রভাব বিশ্লেষণ করো।",
+      "reference": ["দিনাজপুর বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: কোকুন ও প্লাস্টিক যৌগসমূহ",
+      "table": {
+        "headers": ["$A$", "$B$"],
+        "rows": [
+          ["কোকুন", "রাবার, প্লাস্টিক, পলিব্যাগ"]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": "আয়ানদের এলাকায় এক ধরনের উদ্ভিদ পচিয়ে তন্তু আলাদা করা হয়। কিন্তু সে যে বস্ত্র পছন্দ করে তার তন্তুর মধ্যে লুমেন থাকে। আর তার ভাই মারসাদ সেই ধরনের বস্ত্র পরিধান করতে পছন্দ করে যার তন্তুগুলোর কুঞ্চন ক্ষমতা বেশি এবং মথ পোকা দ্বারা সহজেই আক্রান্ত হয়।",
+      "questionA": "পলিমারকরণ প্রক্রিয়া কাকে বলে?",
+      "questionB": "ইথিলিন উচ্চ চাপে ও তাপে পলিথিনে পরিবর্তিত হয়— ব্যাখ্যা করো।",
+      "questionC": "আয়ানদের এলাকার উদ্ভিদ থেকে কীভাবে তন্তু সংগ্রহ করা হয়? ব্যাখ্যা করো।",
+      "questionD": "আয়ান ও মারসাদের পছন্দকৃত উপরোক্ত দুই ধরনের বস্ত্রের মধ্যে কোনটি গ্রীষ্মকালে আরামদায়ক? যুক্তিসহ তোমার মতামত দাও।",
+      "reference": ["কুমিল্লা বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+{
+      "context": "$P$ প্রাণিজ তন্তুর মধ্যে সবচেয়ে শক্ত\n$Q$ নমনীয়, স্থিতিস্থাপক, তাপ কুপরিবাহী তন্তু\n$R$ প্রাকৃতিক উদ্ভিজ্জ তন্তুর মধ্যে প্রধান তন্তু",
+      "questionA": "হেলকিং কাকে বলে?",
+      "questionB": "ডেক্রন নন-সেলুলোজিক কৃত্রিম তন্তু —ব্যাখ্যা করো।",
+      "questionC": "$P$ তন্তুর বৈশিষ্ট্য ব্যাখ্যা করো।",
+      "questionD": "আমাদের দেশে জানুয়ারি মাসে পরিধানের জন্য $Q$ ও $R$ তন্তু দ্বারা তৈরিকৃত পোশাকের মধ্যে কোনটি উপযোগী হবে? বিশ্লেষণ করো।",
+      "reference": ["চট্টগ্রাম বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "রহিমা বেগম তার বাচ্চার জন্মদিন উপলক্ষ্যে প্লাস্টিক খেলনা, বেলুন এবং নিজের জন্য রেশমি শাড়ি বাজার থেকে ক্রয় করলেন।",
+      "questionA": "পলিমার কাকে বলে?",
+      "questionB": "পশমের কাপড় তাপ কুপরিবাহী কেন? ব্যাখ্যা করো।",
+      "questionC": "রহিমা বেগমের শাড়ির সুতা তৈরির প্রক্রিয়া বর্ণনা করো।",
+      "questionD": "রহিমা বেগমের বাচ্চার জন্মদিন উপলক্ষ্যে ক্রয়কৃত সামগ্রী পরিবেশে কীরূপ প্রভাব ফেলবে— বিশ্লেষণ করো।",
+      "reference": ["সিলেট বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "পলিমার কাকে বলে?",
+      "questionB": "তন্তুকে কার্ডিং করা হয় কেন?",
+      "questionC": "উদ্দীপকে '$P$' এর রাসায়নিক বৈশিষ্ট্য ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের আলোকে পরিবেশের ভারসাম্য রক্ষায় '$Q$' ও '$R$' এর মধ্যে কোনটি কার্যকরী? বিশ্লেষণ করো।",
+      "reference": ["যশোর বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: বিভিন্ন প্রাকৃতিক ও কৃত্রিম পলিমার",
+      "table": {
+        "headers": ["সংকেত", "উপাদান"],
+        "rows": [
+          ["$P$", "রাবার"],
+          ["$Q$", "রেশম, পশম, সুতা"],
+          ["$R$", "প্লাস্টিক, পলিথিন"]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": "i. প্লাস্টিক; ii. রেশম; iii. পশম",
+      "questionA": "কটন লিন্ট কী?",
+      "questionB": "প্লাস্টিক সামগ্রী পুনরায় ব্যবহার করা প্রয়োজন কেন?",
+      "questionC": "উদ্দীপকের (i) এর রাসায়নিক ধর্ম ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের (ii) ও (iii) এর মধ্যে কোনটি শীতকালে ব্যবহারের জন্য বেশি উপযোগী? বিশ্লেষণ করো।",
+      "reference": ["বরিশাল বোর্ড ২০২৫"],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "ফাহাদ বৃষ্টির মধ্যে বাসায় যাচ্ছিল। অতিবৃষ্টির কারণে নর্দমার পানি অপসারিত না হতে পেরে রাস্তায় উঠে এসেছে এবং ঐ পানিতে প্রচুর পলিথিন ভাসছে।",
+      "questionA": "পুল্ড উল কাকে বলে?",
+      "questionB": "রেশমকে তন্তুর রানি বলা হয় কেন?",
+      "questionC": "পানিতে ভাসমান বস্তুটির প্রস্তুতপ্রণালি বর্ণনা করো।",
+      "questionD": "উদ্দীপকে উল্লিখিত বস্তুটি পরিবেশের উপর কতটা প্রভাব ফেলবে তা বিশ্লেষণ করো।",
+      "reference": ["ময়মনসিংহ বোর্ড ২০২৪"],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "আতিক সাহেবের ছেলের জন্মদিন উপলক্ষে পলিথিন ব্যাগে করে কিছু বেলুন ও প্লাস্টিকের খেলনা গাড়ি কিনে আনলেন।",
+      "questionA": "পলিমার কাকে বলে?",
+      "questionB": "রেশমকে তন্তুর রানি বলা হয় কেন?",
+      "questionC": "আতিক সাহেবের ব্যবহৃত ব্যাগের উপাদানের উৎপাদন প্রক্রিয়া বর্ণনা করো।",
+      "questionD": "আতিক সাহেবের কেনা বস্তু দুটি পরিবেশের ভারসাম্য নষ্ট করেছে কী? বিশ্লেষণ করো।",
+      "reference": ["দিনাজপুর বোর্ড ২০২৪"],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+{
+      "context": "চাকরি পেয়ে আহাদ পলিথিন ব্যাগে কিছু ফল এবং সিল্কের পাঞ্জাবী কিনে তার বাবাকে দিল।",
+      "questionA": "মনোমার কাকে বলে?",
+      "questionB": "ভিকুনা বলতে কী বোঝায়?",
+      "questionC": "উল্লিখিত পাঞ্জাবীর সুতা তৈরির প্রক্রিয়াটি ব্যাখ্যা করো।",
+      "questionD": "উল্লিখিত ব্যাগ মানবজীবনে অনেক ক্ষতির কারণ— ব্যাখ্যা করো।",
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৪"
       ],
-      "answer": "শব্দজোড়",
-      "explanation": null,
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "করিম সাহেব বর্ষায় ব্যবহারের জন্য রাবারের জুতা কিনলে দোকানদার জুতা একটি পলিথিনের ব্যাগে ভরে করিম সাহেবকে দিলেন।",
+      "questionA": "তন্তু কাকে বলে?",
+      "questionB": "রেশমকে তন্তুর রানী বলা হয় কেন?",
+      "questionC": "দোকানদারের ব্যবহৃত ব্যাগের উৎপাদন প্রক্রিয়া বর্ণনা করো।",
+      "questionD": "করিম সাহেবের ক্রয়কৃত বস্তুটি কীভাবে পরিবেশের ভারসাম্য নষ্ট করে বিশ্লেষণ করো।",
+      "reference": [
+        "সিলেট বোর্ড ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "(i) পলিথিন",
+      "questionA": "ব্যাচিং কাকে বলে?",
+      "questionB": "শীতের দিনে পশমের কাপড় পরিধান করা হয় কেন?",
+      "questionC": "উদ্দীপকের (i) নং যৌগটির প্রস্তুতপ্রণালি বর্ণনা করো।",
+      "questionD": "চিত্র (ii) এবং (iii) নং তন্তু দ্বারা তৈরি বস্ত্রের মধ্যে কোনটি ব্যবহার করা আরামদায়ক এবং কেন? বিশ্লেষণ করো।",
+      "reference": [
+        "যশোর বোর্ড ২০২৪"
+      ],
+      "difficulty": "HARD",
+      "isMath": false,
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: অণুবীক্ষণ যন্ত্রে দৃশ্যমান সুতি ও কিউপ্রামোনিয়াম রেয়ন তন্তুর গঠন",
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "পুল্ড উল কাকে বলে?",
+      "questionB": "'তুলাকে প্রাকৃতিক পলিমার বলা হয়'— কেন?",
+      "questionC": "উদ্দীপকে উল্লিখিত '$P$' থেকে পলিথিন প্রস্তুত প্রক্রিয়া বর্ণনা করো।",
+      "questionD": "উদ্দীপকের '$Q$' ও '$R$' পদার্থ দুইটি পরিবেশের ভারসাম্য রক্ষায় কোনো ভূমিকা রাখে কি? বিশ্লেষণ করো।",
+      "reference": [
+        "বরিশাল বোর্ড ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: মনোমার ও পলিমার পদার্থসমূহ",
+      "table": {
+        "headers": [
+          "$P$",
+          "$Q$",
+          "$R$"
+        ],
+        "rows": [
+          [
+            "$n(\\text{ইথিলিন})$",
+            "রাবার",
+            "প্লাস্টিক"
+          ]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": "সেলিনা রেশমি কাপড়ের পোশাক পরে। কিন্তু তার বান্ধবী পিংকি সুতির পোশাক পরতে পছন্দ করে।",
+      "questionA": "পলিমারকরণ কাকে বলে?",
+      "questionB": "বাকেলাইটকে কেন পলিমার বলা হয়?",
+      "questionC": "সেলিনার পছন্দের কাপড়ের সুতা সংগ্রহের পদ্ধতি ব্যাখ্যা করো।",
+      "questionD": "পিংকির পরিহিত পোশাক তুলনামূলক আরামদায়ক— বিশ্লেষণ করো।",
+      "reference": [
+        "ঢাকা বোর্ড ২০২৩",
+        "সিলেট বোর্ড ২০২৩",
+        "যশোর বোর্ড ২০২৩"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "পলিমার কাকে বলে?",
+      "questionB": "রাবার প্লাস্টিকের মতো অপচনশীল নয়— ব্যাখ্যা করো।",
+      "questionC": "$A$ তন্তু সংগ্রহের পদ্ধতি বর্ণনা করো।",
+      "questionD": "\"উদ্দীপকের তন্তুদ্বয়ের একটি কৃত্রিম\"— উক্তিটির যৌক্তিক বর্ণনা দাও।",
+      "reference": [
+        "ময়মনসিংহ বোর্ড ২০২৩"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: A ও B তন্তুর বৈশিষ্ট্য",
+      "table": {
+        "headers": [
+          "$A$ তন্তু",
+          "$B$ তন্তু"
+        ],
+        "rows": [
+          [
+            "হালকা কিন্তু অনেক বেশি উষ্ণ, খুব অল্প জায়গায় রাখা যায়, সূর্যালোকে দীর্ঘক্ষণ রাখলে নষ্ট হয়।",
+            "মোটামুটি টেকসই এসিডের সাথে বিক্রিয়া করে না অধিক উত্তাপে গলে যায়।"
+          ]
+        ]
+      },
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "ফ্লিস উল কাকে বলে?",
+      "questionB": "সুতি কাপড়ে ময়েশ্চারাইজেশন করা হয় কেন?",
+      "questionC": "উদ্দীপকের $A$-পণ্য তৈরি করার জন্য সুতা কীভাবে সংগ্রহ করা হয়? ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের $B$ ও $C$ পণ্যগুলোর মধ্যে কোনটি পরিবেশের ভারসাম্য নষ্ট করে? যুক্তিসহ তোমার মতামত লেখো।",
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৩"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: A, B ও C চিহ্নিত তিনটি ব্লকে যথাক্রমে তন্তুর রানি দিয়ে তৈরি পোশাক, লিনেন কাপড় ও তুলার বালিশ এবং বৈদ্যুতিক সকেট ও মেলামাইনের থালা",
+      "table": null,
+      "bottomContent": null
+    },
+{
+      "context": "$P$ : তন্তুর তাপ পরিবহন ও পরিচলন ক্ষমতা বেশি।\n$Q$ : পানিতে অদ্রবণীয় একটি অদানাদার কঠিন স্থিতিস্থাপক পদার্থ।\n$R$ : নরম অবস্থায় ছাঁচে ফেলে নির্দিষ্ট আকৃতি দেয়া যায়।",
+      "questionA": "হেলকিং কাকে বলে?",
+      "questionB": "ডেক্রন কী ধরনের তন্তু? ব্যাখ্যা করো।",
+      "questionC": "$P$ তন্তুর বৈশিষ্ট্য ব্যাখ্যা করো।",
+      "questionD": "$Q$ ও $R$ কীভাবে পরিবেশের ভারসাম্য নষ্ট করে? বিশ্লেষণ করো।",
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৩"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "$P$ : তন্তু তাপ কুপরিবাহী, নমনীয়, স্থিতিস্থাপক ও কুঞ্চন প্রতিরোধী।\n$Q$ : একপ্রকার পোকার গুটি থেকে বিশেষ প্রক্রিয়ায় আহরিত তন্তু।\n$R$ : প্রাকৃতিক উদ্ভিজ্জ তন্তুর মধ্যে প্রধান তন্তু।",
+      "questionA": "তন্তু কাকে বলে?",
+      "questionB": "বাকেলাইটকে কেন থার্মোসেটিং প্লাস্টিকস বলা হয়?",
+      "questionC": "$Q$ তন্তু সংগ্রহ পদ্ধতি ব্যাখ্যা করো।",
+      "questionD": "$P$ ও $R$ তন্তু দিয়ে তৈরি পোশাকের মধ্যে একটি গরমের দিনে উপযোগী হলেও অপরটি শীতের দিনে উপযোগী— বিশ্লেষণ করো।",
+      "reference": [
+        "বরিশাল বোর্ড ২০২৩"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "রহিম সাহেবের কারখানায় যে পদার্থটি উৎপন্ন হয় সেটি সাধারণত সাদা বা হালকা বাদামী রঙের হয়। টানলে লম্বা হয়। তার ভাই রহমানের কারখানায় যে পদার্থটি উৎপন্ন হয়, সেটি দাহ্য এবং পুড়লে প্রচুর তাপশক্তি উৎপন্ন হয়।",
+      "questionA": "পলিমার কাকে বলে?",
+      "questionB": "কেরাটিন দিয়ে তৈরি পোশাক কোন ঋতুর জন্য উপযোগী, ব্যাখ্যা করো।",
+      "questionC": "রহিম সাহেবের কারখানায় উৎপন্ন পদার্থটির ভৌত ধর্ম সম্পর্কে লিখ।",
+      "questionD": "রহিম ও রহমানের কারখানার উৎপন্ন দ্রব্য দুটির মধ্যে কোনটি পরিবেশের জন্য বেশি ক্ষতিকর বলে তুমি মনে করো? যুক্তিসহ মতামত দাও।",
+      "reference": [
+        "ঢাকা বোর্ড ২০২০"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "রানার বাবা গত বছর রানাকে এক ধরনের কাপড়ের তৈরি শার্ট কিনে দেন যার তন্তুগুলো অণুবীক্ষণ যন্ত্রে নলের মতো দেখায়। এ বছর শীতে পরিধানের জন্য তার মা একটি সোয়েটার কিনে দেন যার তন্তুর মাঝে ফাঁকা জায়গা থাকে এবং কুঞ্চন প্রতিরোধের ক্ষমতা রয়েছে। তার জন্মদিনে মামা উপহার হিসেবে একটি পাঞ্জাবী কিনে দেন যার তন্তুগুলো এক প্রজাতির পোকার গুটি হতে বিশেষ প্রক্রিয়ায় আহরণ করা হয়।",
+      "questionA": "রাবার কাকে বলে?",
+      "questionB": "বাকেলাইটকে কেন থার্মোসেটিং প্লাস্টিক বলা হয়?",
+      "questionC": "উদ্দীপকে মায়ের কিনে দেয়া পোশাকের তন্তু কীভাবে সংগ্রহ করা হয়? ব্যাখ্যা করো।",
+      "questionD": "গ্রীষ্মকালে পরিধানের জন্য বাবা ও মামার কিনে দেয়া পোশাকের মধ্যে কোনটির ভূমিকা বেশি? তুলনামূলক বিশ্লেষণ করে মতামত দাও।",
+      "reference": [
+        "বরিশাল বোর্ড ২০২০"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "সুমনের একটি পলিথিন ও মোহনের একটি প্লাস্টিক তৈরির কারখানা আছে। প্লাস্টিক সহজে মাটির সাথে মিশে যায় না। এজন্য মোহন আধুনিক প্রযুক্তি ব্যবহার করে পচনশীল প্লাস্টিক সামগ্রী তৈরি করেন।",
+      "questionA": "তন্তু কী?",
+      "questionB": "শীতকালে পশমের তৈরি বস্ত্র ব্যবহার করা আরামদায়ক কেন?",
+      "questionC": "সুমনের কারখানায় গৃহীত প্রক্রিয়াটি রাসায়নিক সমীকরণসহ ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকে মোহনের আধুনিক প্রযুক্তিতে তৈরি সামগ্রী পরিবেশের ভারসাম্য রক্ষায় বিশেষ ভূমিকা পালন করবে— বিশ্লেষণ করো।",
+      "reference": [
+        "যশোর বোর্ড ২০১৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "ম্যাগনেটাইটের সংকেত লেখো।",
+      "questionB": "কীভাবে প্রাকৃতিক গ্যাস তৈরি হয়? ব্যাখ্যা করো।",
+      "questionC": "গ. $A$ উৎপাদন প্রক্রিয়া বর্ণনা করো।",
+      "questionD": "পরিবেশের ভারসাম্যহীনতায় $B$ এর ভূমিকা বিশ্লেষণ করো।",
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: কৃত্রিম পলিমার উপাদানসমূহ",
+      "table": {
+        "headers": [
+          "সংকেত",
+          "উপাদান"
+        ],
+        "rows": [
+          [
+            "$A$",
+            "পলিথিন"
+          ],
+          [
+            "$B$",
+            "রাবার ও প্লাস্টিক"
+          ]
+        ]
+      },
+      "bottomContent": null
+    },
+{
+      "context": "ভারী বৃষ্টি হলেই পারভেজ সাহেবের বাসায় পানি উঠে। এবছর তার বাসায় নর্দমা পরিষ্কার করতে গিয়ে দেখেন প্রচুর পরিমাণে পলিথিন আটকা পড়েছে। এছাড়াও পরিত্যক্ত মগ, বালতি, বাচ্চাদের খেলনা সামগ্রী জমে আছে।",
+      "questionA": "পুল্ড উল কী?",
+      "questionB": "আলপাকা তন্তুর তৈরি পোশাক শীতকালে ব্যবহার আরামদায়ক- ব্যাখ্যা করো।",
+      "questionC": "উদ্দীপকের প্রথম উপকরণটির প্রস্তুত প্রণালী ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের দ্বিতীয় সামগ্রীগুলো পরিবেশের জন্য হুমকিস্বরূপ। বিশ্লেষণ করো।",
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "$n(\\text{ইথিলিন}) \\xrightarrow[\\text{O}_2 \\text{ প্রভাবক}]{\\text{উচ্চতাপ ও চাপ}} \\boxed{\\text{A}}$",
+      "questionA": "থার্মোপ্লাস্টিকস কাকে বলে?",
+      "questionB": "রাবারের ২টি ভৌত ধর্ম লেখো।",
+      "questionC": "উদ্দীপকের \"$A$\" উৎপাদন কৌশল বর্ণনা করো।",
+      "questionD": "উদ্দীপকের উল্লিখিত \"$A$\" এর অপব্যবহার পরিবেশের ভারসাম্যহীনতার জন্য দায়ী। যুক্তি দাও।",
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "'$A$' এমন একটি পদার্থ যা তাপ দিলে আয়তনে কমে। এসিড, ক্ষারক, পানি এদের সাথে বিক্রিয়া করে না। এর পরিবেশের প্রতি নেতিবাচক প্রভাব রয়েছে।",
+      "questionA": "মনোমার কী?",
+      "questionB": "পশমি কাপড় পরিধানে গরম বোধ হয় কেন?",
+      "questionC": "'$A$' এর ভৌত ধর্মগুলো লেখো।",
+      "questionD": "উদ্দীপকে আলোচিত পদার্থটির পরিবেশ বিপর্যয়ের কারণ আলোচনা করো।",
+      "reference": [
+        "শহিদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "আমরা বিভিন্ন ঋতুতে পশমি, রেশমি ও সুতি ইত্যাদি তন্তুর পোশাক পরিধান করে থাকি।",
+      "questionA": "রেজিন কী?",
+      "questionB": "পলিমারকরণ প্রক্রিয়া বলতে কী বোঝায়?",
+      "questionC": "উদ্দীপকের ২য় তন্তুটির বৈশিষ্ট্য ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের ১ম ও ৩য় তন্তুর মধ্যে কোনটি শীতকালের জন্য আরামদায়ক? বিশ্লেষণ করো।",
+      "reference": [
+        "সাভার ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "মিনা ও রীনা দুই বান্ধবী। মিনা সবসময় সুতি কাপড়ের পোশাক পড়তে পছন্দ করে কিন্তু রীনা রেশমি কাপড়ের পোশাক পছন্দ করে।",
+      "questionA": "তন্তু কাকে বলে?",
+      "questionB": "কার্ডিং ও কম্বিং বলতে কী বোঝায়?",
+      "questionC": "উদ্দীপকের রীনার পছন্দের কাপড়ের সুতা সংগ্রহের পদ্ধতি বর্ণনা করো।",
+      "questionD": "উদ্দীপকে মিনা ও রীনার পছন্দের পোশাকের মধ্যে কোনটি অধিক আরামদায়ক— বিশ্লেষণ করো।",
+      "reference": [
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "স্লাইভার কাকে বলে?",
+      "questionB": "পিভিসি পাইপকে থার্মোপ্লাস্টিক বলা হয় কেন?",
+      "questionC": "উদ্দীপকের $B$ তন্তুটি কীভাবে উৎপাদন করা হয় ব্যাখ্যা করো।",
+      "questionD": "কর্মসংস্থান সৃষ্টিতে ও বেকারত্ব দূরীকরণে উদ্দীপকের তন্তু তৈরির কারখানাগুলোর গুরুত্ব বিশ্লেষণ করো।",
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: বিভিন্ন তন্তুর উৎস",
+      "table": {
+        "headers": [
+          "সংকেত",
+          "উৎস"
+        ],
+        "rows": [
+          [
+            "$A$",
+            "উদ্ভিজ্জ তন্তু"
+          ],
+          [
+            "$B$",
+            "পলু পোকা থেকে পাওয়া তন্তু"
+          ],
+          [
+            "$C$",
+            "পশুর লোম থেকে পাওয়া তন্তু"
+          ]
+        ]
+      },
+      "bottomContent": null
+    },
+{
+      "context": "$A$ গাড়ির টায়ার, টিউব, জন্মদিনে ব্যবহৃত বেলুন।\n$B$ পশম।",
+      "questionA": "মনোমার কাকে বলে?",
+      "questionB": "পলিথিন কীভাবে তৈরি হয়?",
+      "questionC": "$B$ এর বৈশিষ্ট্য লেখো।",
+      "questionD": "$A$ এর ভৌত ও রাসায়নিক ধর্ম আলোচনা করো।",
+      "reference": [
+        "হাসান আলী সরকারি উচ্চ বিদ্যালয়, চাঁদপুর; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "(i) পলিথিন; (ii) টেফলন; (iii) PVC.",
+      "questionA": "মনোমার কী?",
+      "questionB": "রাবারের ২টি রাসায়নিক ধর্ম লেখো।",
+      "questionC": "উদ্দীপকের উল্লেখিত i নং পলিমারের প্রস্তুতি ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের উপাদানগুলোর অর্থনৈতিক গুরুত্ব বর্ণনা করো।",
+      "reference": [
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": "নিচে মনোমার হতে পলিমার তৈরীর দুটি বিক্রিয়া দেখানো হলোঃ\n(i) $n(\\text{CH}_2 = \\text{CH}_2) \\xrightarrow[\\text{O}_2]{\\text{উচ্চ চাপ ও তাপ}} \\text{পলিমার-A}$\n(ii) $n(\\text{CH}_2 = \\text{CHCl}) \\xrightarrow[\\text{উচ্চ চাপ পদ্ধতি}]{\\text{পলিমারকরণ}} \\text{পলিমার-B}$",
+      "questionA": "মনোমার কী?",
+      "questionB": "প্রাকৃতিক তন্তু ও কৃত্রিম তন্তুর মধ্যে দুটি পার্থক্য লিখো।",
+      "questionC": "উদ্দীপকে নির্দেশিত পলিমার $A$ এর প্রস্তুতি শর্তসহ ব্যাখ্যা করো।",
+      "questionD": "দৈনন্দিন জীবনে পলিমার $A$ এবং পলিমার $B$ এর ব্যবহার উল্লেখ করে পলিমার $A$ এর পরিবেশের উপর নেতিবাচক প্রভাব নিজের মতামতের ভিত্তিতে ব্যাখ্যা করো।",
+      "reference": [
+        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট; নি. প. ২০২৪"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "context": null,
+      "questionA": "পলিমারকরণ প্রক্রিয়া কাকে বলে?",
+      "questionB": "প্রাণিজ তন্তুর শ্রেণিবিভাগ করো।",
+      "questionC": "তন্তু থেকে সুতা তৈরিতে খ ও গ ধাপটির ব্যাখ্যা করো।",
+      "questionD": "সুতা তৈরিতে ক ধাপটির গুরুত্ব বিশ্লেষণ করো।",
       "reference": [],
-      "statements": [],
-      "context": null,
+      "difficulty": "MEDIUM",
       "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: তন্তু থেকে সুতা তৈরির তিনটি ধাপ— (ক) ব্লেন্ডিং ও মিক্সিং, (খ) কার্ডিং ও কম্বিং, (গ) স্পিনিং",
+      "table": null,
+      "bottomContent": null
     },
     {
-      "type": "SINGLE",
-      "question": "শব্দজোড়ে শব্দের অর্থের পার্থক্য বোঝা যায় কীভাবে?",
-      "options": [
-        "প্রসঙ্গ বিবেচনায়",
-        "সমাজ বিবেচনায়",
-        "স্থান বিবেচনায়",
-        "কাল বিবেচনায়"
-      ],
-      "answer": "প্রসঙ্গ বিবেচনায়",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৩; দিনাজপুর সরকারি বালিকা উচ্চ বিদ্যালয়; লালমনিরহাট সরকারি উচ্চ বিদ্যালয়; সেন্ট যোসেফ উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; পাবনা জিলা স্কুল"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'অণু' এবং 'অনু' - এই শব্দ দুটির মধ্যে তফাত কোন ক্ষেত্রে?",
-      "options": [
-        "বানানে",
-        "উচ্চারণে",
-        "অর্থে",
-        "বানানে ও অর্থে"
-      ],
-      "answer": "বানানে ও অর্থে",
-      "explanation": null,
-      "reference": [
-        "বরিশাল জিলা স্কুল"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'নিবৃত' ও 'নিভৃত' - শব্দজোড়ের মধ্যে মিল কোথায়?",
-      "options": [
-        "উচ্চারণে",
-        "বানানে",
-        "অর্থে",
-        "শব্দশ্রেণিতে"
-      ],
-      "answer": "উচ্চারণে",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ গার্লস ক্যাডেট কলেজ; মাইলস্টোন কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শ্মশ্রু' শব্দের অর্থ হলো-",
-      "options": [
-        "শ্বশুর",
-        "দাড়ি",
-        "শাশুড়ি",
-        "অশ্রু"
-      ],
-      "answer": "দাড়ি",
-      "explanation": null,
-      "reference": [
-        "শেরপুর সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শিল' ও 'শীল' শব্দজোড়ে 'শীল' শব্দের অর্থ কী?",
-      "options": [
-        "পাথর",
-        "চরিত্র",
-        "সুন্দর",
-        "পদবিবিশেষ"
-      ],
-      "answer": "চরিত্র",
-      "explanation": null,
-      "reference": [
-        "মাধ্যমিক ও উচ্চ মাধ্যমিক শিক্ষা বোর্ড, যশোর (কর্মশালা)"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শিল' ও 'শীল' শব্দের অর্থ যথাক্রমে কী কী হবে?",
-      "options": [
-        "পাথর ও ক্ষরণ",
-        "পবিত্র ও চরিত্র",
-        "বদন ও চরিত্র",
-        "পাথর ও চরিত্র"
-      ],
-      "answer": "পাথর ও চরিত্র",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'অশক্ত' ও 'অসক্ত' শব্দ জোড়ের অর্থ যথাক্রমে-",
-      "options": [
-        "অন্যায় ও কথিত",
-        "অক্ষম ও নির্লিপ্ত",
-        "কীর্তি ও মনোযোগ",
-        "অনবরত ও সুন্দর"
-      ],
-      "answer": "অক্ষম ও নির্লিপ্ত",
-      "explanation": null,
-      "reference": [
-        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'অণু' শব্দের অর্থ কোনটি?",
-      "options": [
-        "পশ্চাৎ",
-        "ক্ষুদ্রতম অংশ",
-        "ভিতর",
-        "একব"
-      ],
-      "answer": "ক্ষুদ্রতম অংশ",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বাইস' অর্থ কী?",
-      "options": [
-        "ত্যাগ",
-        "ধারালো যন্ত্র",
-        "দাঁত-বিষয়ক",
-        "বটের শিকড়"
-      ],
-      "answer": "ধারালো যন্ত্র",
-      "explanation": null,
-      "reference": [
-        "কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'দিন' শব্দের অর্থ 'দিবস' হলে শব্দজোড় হিসেবে 'দীন' শব্দের অর্থ কী?",
-      "options": [
-        "ইসলাম",
-        "দিয়ে",
-        "দরিদ্র",
-        "রোজ"
-      ],
-      "answer": "দরিদ্র",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "শব্দজোড় 'অপথ্য' ও 'অপত্য' এর মধ্যে 'অপত্য' শব্দের অর্থ কী?",
-      "options": [
-        "যা পথ্য নয়",
-        "যা খাওয়ার নয়",
-        "স্নেহ",
-        "সন্তান"
-      ],
-      "answer": "সন্তান",
-      "explanation": null,
-      "reference": [
-        "চ. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শ্বশ্রু' শব্দের অর্থ কী?",
-      "options": [
-        "শাশুড়ি",
-        "দাড়ি",
-        "শ্বশুর",
-        "শুচি"
-      ],
-      "answer": "শাশুড়ি",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'উপাধান' শব্দটির অর্থ কী?",
-      "options": [
-        "বালিশ",
-        "উপকরণ",
-        "আবরণ",
-        "মনোযোগ"
-      ],
-      "answer": "বালিশ",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'ধাতৃ' শব্দের অর্থ 'বিধাতা' হলে, 'ধাত্রী' শব্দের অর্থ কী?",
-      "options": [
-        "পৃথিবী",
-        "ধারণ",
-        "দাই",
-        "ধন্য"
-      ],
-      "answer": "দাই",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'চুর' ও 'চূর্ণ'-এর অর্থ যথাক্রমে কী হবে?",
-      "options": [
-        "নেশাগ্রস্ত, স্খলিত",
-        "দ্রুত, চূর্ণ",
-        "ঘূর্ণন, জেগে ওঠা",
-        "নেশাগ্রস্ত, চূর্ণ"
-      ],
-      "answer": "নেশাগ্রস্ত, চূর্ণ",
-      "explanation": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'সাক্ষর' ও 'স্বাক্ষর' শব্দজোড়ের মধ্যে মিল কোথায়?",
-      "options": [
-        "উচ্চারণে",
-        "বানানে",
-        "শব্দ শ্রেণিতে",
-        "অর্থে"
-      ],
-      "answer": "উচ্চারণে",
-      "explanation": null,
-      "reference": [
-        "চ. বো. ২৩; বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'সর্গ' ও 'স্বর্গ' এই শব্দ দুটির মধ্যে তফাত কোন ক্ষেত্রে?",
-      "options": [
-        "বানানে",
-        "উচ্চারণে",
-        "অর্থে",
-        "বানানে ও অর্থে"
-      ],
-      "answer": "বানানে ও অর্থে",
-      "explanation": null,
+      "context": "৯ম শ্রেণির ছাত্র রিমন তিন ধরনের পলিমারের বৈশিষ্ট্য সম্পর্কে পড়ল। একটিকে পোড়ালে কাগজে পোড়ানোর ন্যায় গন্ধ হয় অপরদিকে দ্বিতীয়টি পোড়ালে বোরাক্স বিডের মত গঠন করে। অপরদিকে, তৃতীয় পলিমারটি সূর্যালোকে দীর্ঘক্ষণ রাখলে তাড়াতাড়ি নষ্ট হয়।",
+      "questionA": "কনভেয়ার বেল্ট কীসের তৈরি সামগ্রী?",
+      "questionB": "থার্মোসেটিং প্লাস্টিকস বলতে কী বোঝায়?",
+      "questionC": "উল্লিখিত প্রথম পলিমার দুটির সুতার বৈশিষ্ট্য সমূহ ব্যাখ্যা করো।",
+      "questionD": "উদ্দীপকের তৃতীয় পলিমারটির তন্তু থেকে সুতা তৈরির প্রক্রিয়া বিশ্লেষণ করো।",
       "reference": [],
-      "statements": [],
-      "context": null,
+      "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শাদী' অর্থ বিয়ে আর 'সাদী' অর্থ-",
-      "options": [
-        "ইচ্ছা",
-        "অশ্বত্থ",
-        "অশ্বারোহী",
-        "ইচ্ছুক"
-      ],
-      "answer": "অশ্বারোহী",
-      "explanation": null,
-      "reference": [
-        "নাসিরাবাদ সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'তত্ত্ব' ও 'তথ্য' শব্দজোড়ের অর্থ যথাক্রমে-",
-      "options": [
-        "পারদ ও কথা",
-        "কথা ও পারদ",
-        "জ্ঞাতব্য বিষয় ও গূঢ় অর্থ",
-        "গূঢ় অর্থ ও জ্ঞাতব্য বিষয়"
-      ],
-      "answer": "গূঢ় অর্থ ও জ্ঞাতব্য বিষয়",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'চির' ও 'চীর' শব্দজোড়ের অর্থ যথাক্রমে-",
-      "options": [
-        "চূর্ণ ও নেশাগ্রস্ত",
-        "ছুরি ও স্বাভাবিক",
-        "দীর্ঘ ও ছিন্নবস্ত্র",
-        "ছিন্নবস্ত্র ও দীর্ঘ"
-      ],
-      "answer": "দীর্ঘ ও ছিন্নবস্ত্র",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বাদি' শব্দটি দ্বারা ফরিয়াদি বোঝালেও 'বাদী' শব্দটি দ্বারা কী বোঝানো হয়?",
-      "options": [
-        "চাকরানি",
-        "মতাদর্শী",
-        "যথার্থ",
-        "দেওয়াল"
-      ],
-      "answer": "মতাদর্শী",
-      "explanation": null,
-      "reference": [
-        "মানিকগঞ্জ সরকারি উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'সন' অর্থ 'বছর' কিন্তু 'স্বন' অর্থ কী?",
-      "options": [
-        "স্বপ্ন",
-        "কথা",
-        "শব্দ",
-        "বাণী"
-      ],
-      "answer": "শব্দ",
-      "explanation": null,
-      "reference": [
-        "আল-আমিন একাডেমি স্কুল এন্ড কলেজ, চাঁদপুর"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'চুন' যদি চূর্ণ হয়, তাহলে 'চুর' অর্থ-",
-      "options": [
-        "নেশাগ্রস্ত",
-        "ভাঙা",
-        "গুঁড়া করা",
-        "কলিচুন"
-      ],
-      "answer": "নেশাগ্রস্ত",
-      "explanation": null,
-      "reference": [
-        "হাজীগঞ্জ পাইলট বালিকা উচ্চ বিদ্যালয়, চাঁদপুর"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বীণা' ও 'বীণা' শব্দ দুটির তফাত কোন ক্ষেত্রে?",
-      "options": [
-        "বানানে",
-        "উচ্চারণে",
-        "অর্থে",
-        "বানানে ও অর্থে"
-      ],
-      "answer": "বানানে ও অর্থে",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'বাণী' ও 'বানি' শব্দজোড়ের 'বানি' অর্থ কী?",
-      "options": [
-        "কথা",
-        "বাদ্যযন্ত্র",
-        "বড়ো কলসি",
-        "গয়নার মজুরি"
-      ],
-      "answer": "গয়নার মজুরি",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'চির' শব্দের অর্থ দীর্ঘ হলে, 'চীর' অর্থ কী?",
-      "options": [
-        "চূর্ণ",
-        "স্খলিত",
-        "ছুরি",
-        "ছিন্নবস্ত্র"
-      ],
-      "answer": "ছিন্নবস্ত্র",
-      "explanation": null,
-      "reference": [
-        "মানিকগঞ্জ সরকারি উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
     }
   ]
 }

@@ -20,7 +20,7 @@ const PUBLIC_ROUTES = [
   "/accept-invitation",
 ] as const;
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const;
-const API_PREFIXES = ["/api/auth", "/api/trpc"] as const;
+const API_PREFIXES = ["/api/auth", "/api/trpc", "/api/health"] as const;
 
 export async function proxy(req: NextRequest): Promise<NextResponse> {
   const { pathname } = req.nextUrl;

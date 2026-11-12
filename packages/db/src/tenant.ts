@@ -18,7 +18,10 @@ const globalForPrisma = globalThis as unknown as {
 function createTenantDb() {
   const connectionString = process.env.TENANT_DATABASE_URL || process.env.DATABASE_URL
   if (!connectionString) {
-    if (process.env.NODE_ENV === "production") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.NEXT_PHASE !== "phase-production-build"
+    ) {
       throw new Error("[DB Tenant] TENANT_DATABASE_URL (or DATABASE_URL) environment variable is required in production.")
     }
     console.warn("[DB Tenant] TENANT_DATABASE_URL is not set. Using fallback for build phase.")

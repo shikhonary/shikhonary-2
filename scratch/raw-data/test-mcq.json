@@ -1,40 +1,19 @@
 {
-  "chapterTitle": "অধ্যায় ১",
+  "chapterTitle": "বহুনির্বাচনি প্রশ্ন ও উত্তর",
   "questions": [
     {
       "type": "SINGLE",
-      "question": "কোনটি পূর্ণাঙ্গ জীবনব্যবস্থা?",
+      "question": "নিচের কোনটি শক্তিশালী এসিড?",
       "options": [
-        "ইমান",
-        "ইসলাম",
-        "আকাইদ",
-        "তাওহিদ"
+        "ভিনেগার",
+        "হাইড্রোক্লোরিক এসিড",
+        "বেকিং সোডা",
+        "অ্যামোনিয়া"
       ],
-      "answer": "ইসলাম",
-      "explanation": "এ বিশ্বজগতের সৃষ্টি, ধ্বংস, ইহকালের সব প্রয়োজনীয় বিষয়, মৃত্যু, মৃত্যুর পরবর্তী জীবন সবকিছু সুন্দরভাবে বর্ণিত হয়েছে ইসলামে। মানবজীবনের এমন কোনো দিক নেই, যা ইসলামে আলোচনা করা হয়নি। মানুষের জীবনের সব সমস্যা সমাধানের দিকনির্দেশনা রয়েছে ইসলামে। এজন্য এটি একটি পূর্ণাঙ্গ জীবনব্যবস্থা।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১ / দি. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'আকাইদ' শব্দের অর্থ কী?",
-      "options": [
-        "শান্তির পথ",
-        "একত্ববাদ",
-        "বিশ্বাসমালা",
-        "আত্মসমর্পণ"
-      ],
-      "answer": "বিশ্বাসমালা",
+      "answer": "হাইড্রোক্লোরিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১ / দি. বো. ২০২৫"
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -45,143 +24,80 @@
     },
     {
       "type": "SINGLE",
-      "question": "'আকাইদ' বলতে কী বোঝ?",
+      "question": "নিচের কোনটি শক্তিশালী এসিড?",
       "options": [
-        "বিশ্বাসমালা",
-        "নৈতিক জীবন",
-        "জীবনব্যবস্থা",
-        "আল্লাহর দীন"
+        "$HNO_3$",
+        "$HOOC-COOH$",
+        "$H_2CO_3$",
+        "$CH_3COOH$"
       ],
-      "answer": "বিশ্বাসমালা",
-      "explanation": "আকাইদ শব্দটি আকিদা (عَقِيْدَةٌ) শব্দের বহুবচন। এর অর্থ বিশ্বাসমালা। ইসলামের বিশ্বাসগত দিকের নামই হলো আকাইদ। আল্লাহ তায়ালা, নবি-রাসুল, ফেরেশতা, আসমানি কিতাব, পরকাল, জান্নাত-জাহান্নাম ইত্যাদি আকাইদের অন্তর্ভুক্ত। আকাইদের বিষয়গুলোর ওপর বিশ্বাসের মাধ্যমেই মানুষ ইসলামে প্রবেশ করে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১ / দি. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আকাইদের আচরণগত দিকে আলোচিত হয়—",
-      "options": [
-        "হজ-যাকাত",
-        "নবি-রাসুল",
-        "ফেরেশতা",
-        "জান্নাত-জাহান্নাম"
-      ],
-      "answer": "হজ-যাকাত",
+      "answer": "$HNO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১ / দি. বো. ২০২০"
+        "চ. বো. ২০২৪; রা. বো. ২০২৪; ব. বো. ২০২৩"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "ইসলাম শব্দের অর্থ কী?",
+      "question": "কোনটি শক্তিশালী এসিড?",
       "options": [
-        "আনুগত্য করা",
-        "বিশ্বাস করা",
-        "ধর্মপরায়ণ হওয়া",
-        "দাসত্ব করা"
+        "$C_6H_8O_7$",
+        "$H_2SO_4$",
+        "$CH_3COOH$",
+        "$HOOC-COOH$"
       ],
-      "answer": "আনুগত্য করা",
+      "answer": "$H_2SO_4$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২ / দি. বো. ২০২০; সকল বোর্ড ২০১৮"
+        "য. বো., ব. বো. ২০২৩; ঢা. বো. ২০২০"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "আল্লাহ ও রাসুল (স.)-এর আনুগত্য করাকে কী বলে?",
+      "question": "নিচের কোনটি দুর্বল এসিড?",
       "options": [
-        "তাওহিদ",
-        "ইমান",
-        "ইসলাম",
-        "রিসালাত"
+        "$H_2SO_4$",
+        "$HCl$",
+        "$HNO_3$",
+        "$CH_3COOH$"
       ],
-      "answer": "ইসলাম",
-      "explanation": "আল্লাহর ওপর আন্তরিক বিশ্বাস স্থাপন করে তার কাছে পরিপূর্ণ আত্মসমর্পণ করা, বিনা দ্বিধায় তাঁর যাবতীয় আদেশ-নিষেধ মেনে চলা ও হযরত মুহাম্মদ (স.)-এর দেখানো পথ অনুসারে জীবনযাপন করাকে ইসলাম বলে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২ / কু. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "শরিয়তের সর্বশেষ পূর্ণাঙ্গ রূপ কোনটি?",
-      "options": [
-        "ইমান",
-        "ইসলাম",
-        "তাওহিদ",
-        "রিসালাত"
-      ],
-      "answer": "ইসলাম",
-      "explanation": "আল্লাহ তায়ালা মানবজাতির হেদায়েতের জন্য যুগে যুগে বহু আদেশ-নিষেধ, বিধি-বিধান প্রেরণ করেছেন। এসব আদেশ-নিষেধ শরিয়ত হিসেবে প্রদান করেছেন। আর ইসলাম হলো মানবজাতির জন্য নির্দেশিত সর্বশেষ ও সর্বোত্তম জীবনবিধান। হযরত মুহাম্মদ (স.)-এর মাধ্যমে এর পূর্ণতা ঘোষিত হয়েছে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / য. বো. ২০২৪; সি. বো., ব. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিশ্চয়ই আল্লাহর নিকট ইসলামই একমাত্র মনোনীত জীবনব্যবস্থা— কুরআনের কোন সুরায় বর্ণিত আছে?",
-      "options": [
-        "আল-মায়িদা",
-        "আন-নিসা",
-        "আলে-ইমরান",
-        "আল-বাকারাহ"
-      ],
-      "answer": "আলে-ইমরান",
+      "answer": "$CH_3COOH$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / কু. বো. ২০২৩"
+        "ম. বো. ২০২৩"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "ইসলাম শব্দটির মূল ধাতু কী?",
+      "question": "কোনটি শক্তিশালী এসিড?",
       "options": [
-        "আমানুন",
-        "সিলমুন",
-        "ইয়ুসলিমু",
-        "আহসান"
+        "অক্সালিক এসিড",
+        "নাইট্রিক এসিড",
+        "সাইট্রিক এসিড",
+        "এসিটিক এসিড"
       ],
-      "answer": "সিলমুন",
+      "answer": "নাইট্রিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / ঢা. বো., সি. বো. ২০২৪"
+        "কু. বো. ২০২৩; য. বো. ২০২০; সকল বোর্ড ২০১৮"
       ],
       "statements": [],
       "context": null,
@@ -192,164 +108,59 @@
     },
     {
       "type": "SINGLE",
-      "question": "সিলমুন শব্দের অর্থ কী?",
+      "question": "কোনটি দুর্বল এসিড?",
       "options": [
-        "শান্তি",
-        "বিশ্বাস স্থাপন",
-        "আনুগত্য",
-        "স্বীকৃতি দেওয়া"
+        "$HNO_3$",
+        "$H_2SO_4$",
+        "$HCl$",
+        "$C_6H_8O_7$"
       ],
-      "answer": "শান্তি",
-      "explanation": "সিলমুন শব্দ থেকে ইসলাম শব্দের উৎপত্তি হয়েছে। ইসলাম মানুষকে দুনিয়া ও আখিরাতে পরিপূর্ণ শান্তিময় জীবনের পথে পরিচালিত করে। তাই এটিকে শান্তির ধর্ম বলা হয়।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / সি. বো., ব. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'ইমান' শব্দের অর্থ কী?",
-      "options": [
-        "আনুগত্য করা",
-        "শান্তির পথে চলা",
-        "বিশ্বাস করা",
-        "প্রার্থনা করা"
-      ],
-      "answer": "বিশ্বাস করা",
+      "answer": "$C_6H_8O_7$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৪ / ঢা. বো. ২০২৩; চ. বো. ২০২৪; ব. বো. ২০২৩"
+        "রা. বো. ২০২৪; সি. বো. ২০২০"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "ইসলামের মৌলিক বিষয়গুলোর প্রতি পূর্ণ বিশ্বাসকে কী বলে?",
+      "question": "কোনটি দুর্বল এসিড?",
       "options": [
-        "তাকওয়া",
-        "আখলাক",
-        "ইমান",
-        "ইসলাম"
+        "$HCl$",
+        "$H_2SO_4$",
+        "$H_2CO_3$",
+        "$HNO_3$"
       ],
-      "answer": "ইমান",
+      "answer": "$H_2CO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৪ / দি. বো., কু. বো. ২০২৫"
+        "সি. বো. ২০২৩; মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা; নি. প. ২০২৪"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "কীসের মাধ্যমে ইমানের বহিঃপ্রকাশ ঘটে?",
+      "question": "কোনটি দুর্বল এসিড?",
       "options": [
-        "ইসলামের মাধ্যমে",
-        "সালাতের মাধ্যমে",
-        "যাকাতের মাধ্যমে",
-        "হজের মাধ্যমে"
+        "নাইট্রিক এসিড",
+        "এসিটিক এসিড",
+        "সালফিউরিক এসিড",
+        "হাইড্রোক্লোরিক এসিড"
       ],
-      "answer": "ইসলামের মাধ্যমে",
-      "explanation": "ইমান অন্তরের সাথে সম্পৃক্ত। আর ইসলাম বাহ্যিক আচার-আচরণ ও কার্যাবলির সাথে সম্পৃক্ত। যেমন-আল্লাহ, রাসুল, ফেরেশতা ইত্যাদি বিষয়ে বিশ্বাস করা হলো ইমান। আর সালাত, যাকাত, হজ ইত্যাদি বিষয় পালন করা হলো ইসলাম। তাই ইসলাম হলো ইমানের বহিঃপ্রকাশ।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৫ / সি. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ইমানের মূল বিষয় কয়টি?",
-      "options": [
-        "৪",
-        "৫",
-        "৬",
-        "৭"
-      ],
-      "answer": "৭",
-      "explanation": "একজন মুসলিম মোট ৭টি বিষয়ে বিশ্বাস স্থাপন করবে। এগুলো হলো—১. আল্লাহ তায়ালার প্রতি বিশ্বাস, ২. ফেরেশতাগণের প্রতি বিশ্বাস, ৩. আসমানি কিতাবসমূহের প্রতি বিশ্বাস, ৪. নবি-রাসুলগণের প্রতি বিশ্বাস, ৫. আখিরাতে বিশ্বাস এবং ৬. তাকদিরে বিশ্বাস।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৫ / কু. বো., চ. বো. ২০২৫; কু. বো. ২০২৩; ঢা. বো., ম. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ইমানের সর্বপ্রথম ও সর্বপ্রধান বিষয় কী?",
-      "options": [
-        "আল্লাহর প্রতি বিশ্বাস",
-        "রিসালাতের প্রতি বিশ্বাস",
-        "পরকালের প্রতি বিশ্বাস",
-        "তাকদিরের প্রতি বিশ্বাস"
-      ],
-      "answer": "আল্লাহর প্রতি বিশ্বাস",
-      "explanation": "ইমানের সর্বপ্রথম ও সর্বপ্রধান বিষয় হলো আল্লাহ তায়ালার প্রতি বিশ্বাস। আল্লাহ তায়ালা এক ও অদ্বিতীয়। তিনি ছাড়া কোনো ইলাহ বা মাবুদ নেই। তিনি সকল কিছুর সৃষ্টিকর্তা, পালনকর্তা ও রক্ষাকর্তা। তিনি সকল গুণের আধার। তার সত্তা ও গুণাবলি তুলনাহীন। সমস্ত প্রশংসা ও ইবাদত একমাত্র তারই জন্য নির্ধারিত। আল্লাহ তায়ালার প্রতি এরূপ বিশ্বাসই হলো তাওহিদ।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৫ / সি. বো. ২০২৪; চু. বো., র. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ইমানের মূলকথা মানুষকে করে তোলে—",
-      "options": [
-        "আত্মমর্যাদাবান",
-        "মানবিক",
-        "জ্ঞানী ও বুদ্ধিমান",
-        "আত্মবিশ্বাসী"
-      ],
-      "answer": "আত্মমর্যাদাবান",
-      "explanation": "ইমানের মূলকথা হলো তাওহিদ। আর এটি মানুষকে আল্লাহ ছাড়া আর কারও সামনে মাথা নত না করার শিক্ষা দেয়। ফলে মানুষ আত্মমর্যাদাশীল হয়ে ওঠে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৭ / সকল বোর্ড ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আল্লাহ তায়ালাকে এক ও অদ্বিতীয় হিসেবে স্বীকার করে নেওয়াকে কী বলে?",
-      "options": [
-        "আকাইদ",
-        "নবুয়ত",
-        "তাওহিদ",
-        "রিসালাত"
-      ],
-      "answer": "তাওহিদ",
+      "answer": "এসিটিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / সি. বো. ২০২৩"
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; নি. প. ২০২৪"
       ],
       "statements": [],
       "context": null,
@@ -360,101 +171,59 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনো কিছুই তার মতো নয়— কোন সুরার আয়াত?",
+      "question": "অ্যাসিটিক এসিডকে দুর্বল এসিড হিসেবে শ্রেণিবদ্ধ করার মূল বৈশিষ্ট্য কী?",
       "options": [
-        "আল-বাকারাহ",
-        "আল-ইখলাস",
-        "আদ-দুহা",
-        "আশ-শুরা"
+        "এটি একটি জৈব এসিড",
+        "এটি আংশিকভাবে $H^+$ আয়ন ত্যাগ করে",
+        "এটি আচার তৈরিতে ব্যবহৃত হয়",
+        "এটি অত্যন্ত ক্ষয়কারী"
       ],
-      "answer": "আশ-শুরা",
+      "answer": "এটি আংশিকভাবে $H^+$ আয়ন ত্যাগ করে",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / রা. বো. ২০২৫"
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৪"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "কোনো কিছুই তার মতো নয়— আয়াতটি কোন দিকে ইঙ্গিত করে?",
+      "question": "কোমল পানীয়তে থাকে—",
       "options": [
-        "তাওহিদ",
-        "তাকদির",
-        "রিসালাত",
-        "আখিরাত"
+        "$NH_4OHNH_4OH$",
+        "$Ca(OCl)Cl$",
+        "$H_2CO_3$",
+        "$ZnCO_3$"
       ],
-      "answer": "তাওহিদ",
-      "explanation": "কোনো কিছুই তার মতো নয়। সুরা আশ-শুরার এ আয়াতে মূলত আল্লাহর একত্ববাদ তথা তাওহিদের ঘোষণা দেওয়া হয়েছে। এর মূল কথা হলো আল্লাহ এক ও অদ্বিতীয়। তার সত্তা ও গুণাবলিতে তার সমকক্ষ কেউ নেই। তার তুলনীয় কেউ হতে পারে না। তিনিই একক সৃষ্টিকর্তা, পালনকর্তা, রিজিকদাতা এবং তিনিই একমাত্র ইবাদতের যোগ্য।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / য. বো. ২০২৫; চ. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ইমানের সর্বপ্রথম বিষয় কোনটি?",
-      "options": [
-        "তাওহিদ",
-        "রিসালাত",
-        "শরিয়ত",
-        "আখিরাত"
-      ],
-      "answer": "তাওহিদ",
+      "answer": "$H_2CO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / সি. বো. ২০২৫"
+        "ঝিনাইদহ ক্যাডেট কলেজ; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "নবি-রাসুলগণ সারাজীবন মানুষকে কীসের দাওয়াত দিয়েছেন?",
+      "question": "কোনটি দুর্বল এসিড?",
       "options": [
-        "আল কুরআনের",
-        "আল হাদিসের",
-        "ইলম শিক্ষার",
-        "তাওহিদের"
+        "হাইড্রোক্লোরিক এসিড",
+        "সালফিউরিক এসিড",
+        "নাইট্রিক এসিড",
+        "কার্বনিক এসিড"
       ],
-      "answer": "তাওহিদের",
-      "explanation": "দুনিয়াতে যত নবি-রাসুল এসেছেন তাঁদের সবার দাওয়াতের মূলকথা ছিল— লা ইলাহা ইল্লাল্লাহ অর্থাৎ আল্লাহ ছাড়া কোনো ইলাহ নেই। তাওহিদের শিক্ষা প্রতিষ্ঠার জন্য নবি-রাসুলগণ আজীবন সংগ্রাম করেছেন। হযরত ইবরাহিম (আ.) অগ্নিকুণ্ডে নিক্ষিপ্ত হয়েছেন। আমাদের প্রিয়নবি (স.) জন্মভূমি মক্কা থেকে মদিনায় হিজরত করতে বাধ্য হয়েছেন।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / রা. বো. ২০২৪; ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "তাওহিদ প্রচার করতে গিয়ে কোন নবি অগ্নিকুণ্ডে নিক্ষিপ্ত হয়েছেন?",
-      "options": [
-        "হযরত ইবরাহিম (আ.)",
-        "হযরত আদম (আ.)",
-        "হযরত ঈসা (আ.)",
-        "হযরত মুসা (আ.)"
-      ],
-      "answer": "হযরত ইবরাহিম (আ.)",
+      "answer": "কার্বনিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / রা. বো. ২০২৩"
+        "সি. বো. ২০২৪"
       ],
       "statements": [],
       "context": null,
@@ -465,17 +234,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটির বিশ্বাস মানুষকে কৃতজ্ঞতা প্রকাশের সুযোগ করে দেয়?",
+      "question": "কোনটি পানিতে আংশিকভাবে বিয়োজিত হয়?",
       "options": [
-        "পরকালে",
-        "রিসালাতে",
-        "তাওহিদে",
-        "তাকদিরে"
+        "হাইড্রোক্লোরিক এসিড",
+        "সালফিউরিক এসিড",
+        "নাইট্রিক এসিড",
+        "এসিটিক এসিড"
       ],
-      "answer": "তাওহিদে",
+      "answer": "এসিটিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৯ / ম. বো. ২০২৩"
+        "দি. বো. ২০২৪; দি. বো. ২০১৯; সি. বো. ২০১৯"
       ],
       "statements": [],
       "context": null,
@@ -486,59 +255,59 @@
     },
     {
       "type": "SINGLE",
-      "question": "মহান আল্লাহর একত্ববাদের বর্ণনা করা হয়েছে কোন সুরায়?",
+      "question": "কোনটি এসিড?",
       "options": [
-        "আত-তীন",
-        "আদ-দুহা",
-        "ইখলাস",
-        "আল-মাউন"
+        "$NaOH$",
+        "$NH_4OH$",
+        "$CH_3COOH$",
+        "$NH_4NO_3$"
       ],
-      "answer": "ইখলাস",
+      "answer": "$CH_3COOH$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১০ / ঢা. বো. ২০২৩"
+        "ব. বো. ২০২৪; কু. বো. ২০২৩"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "ইমানের বিপরীত কোনটি?",
+      "question": "নিচের কোনটি এসিড?",
       "options": [
-        "শিরক",
-        "নিফাক",
-        "জুলুম",
-        "কুফর"
+        "$NH_4NO_3$",
+        "$NH_4OH$",
+        "$CaCO_3$",
+        "$H_2CO_3$"
       ],
-      "answer": "কুফর",
+      "answer": "$H_2CO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / চ. বো. ২০২৫"
+        "দি. বো. ২০২০"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "মানুষ কয়ভাবে কাফির বা অবিশ্বাসী হতে পারে?",
+      "question": "লেবুতে কোন এসিড থাকে?",
       "options": [
-        "৬",
-        "৭",
-        "৯",
-        "১০"
+        "টারটারিক",
+        "ল্যাকটিক",
+        "অ্যাসিটিক",
+        "সাইট্রিক"
       ],
-      "answer": "৬",
+      "answer": "সাইট্রিক",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / সি. বো. ২০২৪"
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -549,164 +318,80 @@
     },
     {
       "type": "SINGLE",
-      "question": "করিম ইসলামের কিছু অংশ পালন করে আবার কিছু অংশ অবিশ্বাস করে। তার এরূপ আচরণ হলো—",
+      "question": "উল্লিখিত 'X' চিহ্নিত যৌগটি—",
       "options": [
-        "শিরক",
-        "ফিসক",
-        "কুফর",
-        "নিফাক"
+        "একটি লবণ",
+        "পাকস্থলীতে বিদ্যমান",
+        "টুথপেস্টে উপস্থিত",
+        "শক্তিশালী এসিড"
       ],
-      "answer": "কুফর",
-      "explanation": "একজন মুমিন বা মুসলিম ইসলামের যাবতীয় বিষয় বিশ্বাস করে তা পরিপূর্ণভাবে মেনে চলবেন। এর ব্যত্যয় ঘটলে তা কুফর (আল্লাহর অবাধ্যতা) হিসেবে গণ্য হবে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / ব. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "শাকের ইসলামের মৌলিক ইবাদতসমূহ অস্বীকার করে। ইসলামের দৃষ্টিতে তাকে কী বলা যায়?",
-      "options": [
-        "মুনাফিক",
-        "মুশরিক",
-        "ফাসিক",
-        "কাফির"
-      ],
-      "answer": "কাফির",
-      "explanation": "যে ব্যক্তি কুফরে লিপ্ত হয় তাকে বলা হয় কাফির। অর্থাৎ কোনো ব্যক্তি যদি ইসলামের কোনো মৌলিক বিষয়ে অবিশ্বাস করে তখন তাকে কাফির বলা হয়। মানুষ নানাভাবে কাফির বা অবিশ্বাসী হতে পারে। যেমন— আল্লাহ তায়ালার অস্তিত্ব অবিশ্বাস বা অস্বীকার করার দ্বারা, আল্লাহ তায়ালার গুণাবলি অস্বীকার করার দ্বারা, ইমানের মৌলিক সাতটি বিষয় অস্বীকার করার দ্বারা ইত্যাদি।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / দি. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রাহাত হজ ও যাকাতকে অর্থের অপচয় মনে করে এসব ইবাদতকে অস্বীকার করে। তার এ ধরনের বিশ্বাস কীসের অন্তর্ভুক্ত?",
-      "options": [
-        "কুফর",
-        "নিফাক",
-        "শিরক",
-        "ফিসক"
-      ],
-      "answer": "কুফর",
+      "answer": "শক্তিশালী এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / দি. বো. ২০২৫"
+        "সি. বো. ২০২৬"
       ],
       "statements": [],
-      "context": null,
-      "isMath": false,
+      "context": "$CaO + X \\rightarrow CaSO_4 + H_2O$",
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "হাসিব মনে করে, এই পৃথিবীর জীবনই একমাত্র জীবন। মৃত্যুর পরে মানুষ মাটির সাথে মিশে যাবে। তাকে আর কোনোদিন জীবিত করা হবে না। তার এ ধারণা কীসের শামিল?",
+      "question": "নিচের কোনটি এসিড?",
       "options": [
-        "নিফাক",
-        "কুফর",
-        "শিরক",
-        "ফিতনা"
+        "$NaOH$",
+        "$HNO_3$",
+        "$NH_4NO_3$",
+        "$[(NH_4)_3PO_4]$"
       ],
-      "answer": "কুফর",
+      "answer": "$HNO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১২ / কু. বো. ২০২৪"
+        "দি. বো. ২০১৯"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "কুফর মানুষের মনে কী জন্ম দেয়?",
+      "question": "এসিডসমূহ পানিতে কি ধরনের আয়ন তৈরি করে?",
       "options": [
-        "অকৃতজ্ঞতা",
-        "অহিংসা",
-        "স্বার্থপরতা",
-        "অবহেলা"
+        "হাইড্রোক্সাইড ($OH^-$)",
+        "হাইড্রোজেন আয়ন ($H^+$)",
+        "সালফেট আয়ন",
+        "নাইট্রেট আয়ন"
       ],
-      "answer": "অকৃতজ্ঞতা",
+      "answer": "হাইড্রোজেন আয়ন ($H^+$)",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১২ / চ. বো. ২০২৫"
+        "নবাব ফয়জুন্নেসা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "SINGLE",
-      "question": "যেকোনো ব্যর্থতায় কাফিররা কেন কারণে হতাশ হয়ে পড়ে?",
+      "question": "বিছুর হুলে কোন পদার্থ থাকে?",
       "options": [
-        "মানসিক দুর্বলতা",
-        "ধৈর্যহীনতা",
-        "তাকদিরে অবিশ্বাস",
-        "আল্লাহর অসন্তুষ্টি"
+        "হেপারিন",
+        "নিউট্রোফিল",
+        "হিস্টামিন",
+        "অ্যামিন"
       ],
-      "answer": "তাকদিরে অবিশ্বাস",
-      "explanation": "কাফির ব্যক্তি আল্লাহ তায়ালা ও তাকদিরে অবিশ্বাস করে। ফলে সে যেকোনো বিপদে আপদে ধৈর্যহারা হয়ে পড়ে। মহান আল্লাহর ওপর ভরসা করে ধৈর্য ধারণ করতে পারে না। অন্যদিকে তাকদিরে বিশ্বাস না থাকায় যেকোনো ব্যর্থতায় সে চরম হতাশ হয়ে পড়ে। ফলে তার জীবন চরম হতাশাগ্রস্তভাবে অতিবাহিত হয়।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১২ / সকল বোর্ড ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোনটি মানবজীবনে দুর্নীতির প্রসার ঘটায়?",
-      "options": [
-        "শিরক",
-        "নিফাক",
-        "কুফর",
-        "ফিসক"
-      ],
-      "answer": "কুফর",
-      "explanation": "আখিরাত, জান্নাত ও জাহান্নামে বিশ্বাস না থাকায় কাফির ব্যক্তি নৈতিকতার গুরুত্ব উপলব্ধি করতে পারে না এবং দুনিয়ার স্বার্থে মিথ্যাচার, অনাচার, ব্যভিচার ইত্যাদি যেকোনো পাপ ও অনৈতিক কাজই সে বিনা দ্বিধায় করতে পারে। নবি-রাসুলগণকে বিশ্বাস না করায় তাঁদের নৈতিক চরিত্র এবং শিক্ষাও সে অনুসরণ করে না। এভাবে কুফরের মাধ্যমে সমাজে দুর্নীতির প্রসার ঘটে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১২ / রা. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোন ব্যক্তি চিরস্থায়ী জাহান্নামের যন্ত্রণাদায়ক শাস্তি ভোগ করবে?",
-      "options": [
-        "সুদখোর",
-        "প্রতারক",
-        "কাফির",
-        "মিথ্যাবাদী"
-      ],
-      "answer": "কাফির",
+      "answer": "হিস্টামিন",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৩ / য. বো. ২০২৩"
+        "রা. বো. ২০২০"
       ],
       "statements": [],
       "context": null,
@@ -717,17 +402,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটি তাওহিদের বিপরীত?",
+      "question": "নিচের কোনটি ক্ষার দ্বারা নিষ্ক্রিয় হয়?",
       "options": [
-        "শিরক",
-        "নিফাক",
-        "কুফর",
-        "ফিসক"
+        "হিস্টামিন",
+        "সোডিয়াম গ্লুটামেট",
+        "ক্যালসিয়াম কার্বনেট",
+        "ভিনেগার"
       ],
-      "answer": "শিরক",
+      "answer": "ভিনেগার",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৩ / ঢা. বো., সি. বো. ২০২৪; কু. বো. ২০২৩"
+        "ফেনী সরকারি বালিকা উচ্চ বিদ্যালয়; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -738,17 +423,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "সুরা আল-ইখলাসের প্রথম আয়াত দ্বারা আল্লাহ খণ্ডন করেছেন—",
+      "question": "মাংস, পোলাও, বিরিয়ানি খাবার পর হজমে সহায়তা করে কোনটি?",
       "options": [
-        "তাওহিদ",
-        "শিরক",
-        "কুফর",
-        "নিফাক"
+        "কার্বনিক এসিড",
+        "ল্যাকটিক এসিড",
+        "এসিটিক এসিড",
+        "অক্সালিক এসিড"
       ],
-      "answer": "শিরক",
+      "answer": "ল্যাকটিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / কু. বো. ২০২০"
+        "দি. বো. ২০১৯"
       ],
       "statements": [],
       "context": null,
@@ -759,17 +444,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "আল্লাহর সাথে করা শিরকের প্রকারভেদ কয়টি?",
+      "question": "ভিনেগারের রাসায়নিক নাম কী?",
       "options": [
-        "দুই",
-        "তিন",
-        "চার",
-        "পাঁচ"
+        "অক্সালিক এসিড",
+        "সাইট্রিক এসিড",
+        "এসিটিক এসিড",
+        "টারটারিক এসিড"
       ],
-      "answer": "তিন",
+      "answer": "এসিটিক এসিড",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / কু. বো. ২০২৩"
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -780,38 +465,38 @@
     },
     {
       "type": "SINGLE",
-      "question": "শিরককে সর্বাপেক্ষা বড় জুলুম বলেছেন কে?",
+      "question": "ভিনেগারের সংকেত কোনটি?",
       "options": [
-        "আল্লাহ তায়ালা",
-        "মহানবি (স.)",
-        "আবু বকর (রা)",
-        "লুকমান (আ.)"
+        "$C_6H_8O_7$",
+        "$HOOC-COOH$",
+        "$CH_3COOH$",
+        "$H_3PO_4$"
       ],
-      "answer": "আল্লাহ তায়ালা",
-      "explanation": "শিরকের মাধ্যমে মহান আল্লাহর সত্তা, ক্ষমতার সাথে অংশীদার সাব্যস্ত করা হয়, যা তার সাথে জুলুম করার নামান্তর। তাই আল্লাহ সুরা লুকমানের ১৩ নম্বর আয়াতে শিরককে চরম জুলুম বলে অভিহিত করেছেন।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / কু. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পৃথিবীর সকল প্রকার জুলুমের মধ্যে সবচেয়ে বড় কোনটি?",
-      "options": [
-        "শিরক",
-        "নিফাক",
-        "কুফর",
-        "ফিসক"
-      ],
-      "answer": "শিরক",
+      "answer": "$CH_3COOH$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / ঢা. বো., ব. বো. ২০২৩; সকল বোর্ড ২০১৯"
+        "সি. বো. ২০২৩; রা. বো. ২০২৩; কু. বো. ২০২৪; ঢা. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "হিস্টামিন এক ধরনের—",
+      "options": [
+        "ক্ষারক",
+        "লবণ",
+        "এসিড",
+        "এনজাইম"
+      ],
+      "answer": "ক্ষারক",
+      "explanation": null,
+      "reference": [
+        "ঝিনাইদহ ক্যাডেট কলেজ, নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -822,17 +507,143 @@
     },
     {
       "type": "SINGLE",
-      "question": "নিশ্চয়ই শিরক চরম জুলুম— কোন সুরার আয়াত?",
+      "question": "হিস্টামিনকে অকার্যকর করে কোনটি?",
       "options": [
-        "আল-মায়িদা",
-        "আন-নিসা",
-        "লুকমান",
-        "আশ-শুরা"
+        "ভিনেগার",
+        "ফিনাইল এসিটেট",
+        "নিউট্রোফিল",
+        "অ্যামিন"
       ],
-      "answer": "লুকমান",
+      "answer": "ভিনেগার",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / ম. বো. ২০২৪"
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি হজমে সহায়তা করে?",
+      "options": [
+        "অ্যাসকরবিক এসিড",
+        "এসিটিক এসিড",
+        "ল্যাকটিক এসিড",
+        "টারটারিক এসিড"
+      ],
+      "answer": "ল্যাকটিক এসিড",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বোরহানি বা দইয়ের মধ্যে কোন ধরনের এসিড থাকে?",
+      "options": [
+        "এসিটিক এসিড",
+        "ল্যাকটিক এসিড",
+        "সাইট্রিক এসিড",
+        "অক্সালিক এসিড"
+      ],
+      "answer": "ল্যাকটিক এসিড",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০১৭; দি. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জন্মদিনে কেক ফোলানোর জন্য নুজহাত একটি রাসায়নিক পদার্থ ব্যবহার করে। উল্লিখিত রাসায়নিক পদার্থটি কী?",
+      "options": [
+        "সোডিয়াম ক্লোরাইড",
+        "সোডিয়াম গ্লুটামেট",
+        "সোডিয়াম কার্বোনেট",
+        "সোডিয়াম বাইকার্বোনেট"
+      ],
+      "answer": "সোডিয়াম বাইকার্বোনেট",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ব্যাটারিতে ব্যবহার করা হয় কোনটি?",
+      "options": [
+        "$HNO_3$",
+        "$H_2CO_3$",
+        "$H_2SO_4$",
+        "$CH_3COOH$"
+      ],
+      "answer": "$H_2SO_4$",
+      "explanation": null,
+      "reference": [
+        "সফিউদ্দিন সরকার একাডেমি এন্ড কলেজ, গাজীপুর"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সৌরবিদ্যুৎ সংরক্ষণে ব্যবহৃত ব্যাটারীর অত্যাবশ্যকীয় রাসায়নিক উপাদান কী?",
+      "options": [
+        "$HNO_3$",
+        "$(NH_4)_2SO_4$",
+        "$H_3PO_4$",
+        "$H_2SO_4$"
+      ],
+      "answer": "$H_2SO_4$",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি শক্তিশালী এসিড?",
+      "options": [
+        "ভিনেগার",
+        "হাইড্রোক্লোরিক এসিড",
+        "বেকিং সোডা",
+        "অ্যামোনিয়া"
+      ],
+      "answer": "হাইড্রোক্লোরিক এসিড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -843,374 +654,17 @@
     },
 {
       "type": "SINGLE",
-      "question": "কোনটি ক্ষমার অযোগ্য অপরাধ?",
+      "question": "টয়লেট পরিষ্কারক এর মূল উপাদান নিচের কোনটি?",
       "options": [
-        "কুফর",
-        "নিফাক",
-        "ফিতনা",
-        "শিরক"
+        "$NaOH$",
+        "$CaO$",
+        "$NaCl$",
+        "$HNO_3$"
       ],
-      "answer": "শিরক",
+      "answer": "$NaOH$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / রা. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আল্লাহ তায়ালা কোন অপরাধ ক্ষমা করবেন না?",
-      "options": [
-        "শিরক",
-        "নিফাক",
-        "কুফর",
-        "ফাসাদ"
-      ],
-      "answer": "শিরক",
-      "explanation": "শিরকের মাধ্যমে আল্লাহর সাথে অন্য কোনো কিছু অংশীদার করা হয়। তাই এ ধরনের গুনাহ আল্লাহ ক্ষমা করেন না। আল্লাহ তায়ালা বলেন, নিশ্চয়ই আল্লাহ তার সাথে শিরক করার অপরাধ ক্ষমা করেন না। অন্য যে কোনো পাপ যাকে ইচ্ছা ক্ষমা করেন। (সুরা আন-নিসা আয়াত ৪৮)।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৪ / কু. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিফাক অর্থ কী?",
-      "options": [
-        "পরনিন্দা",
-        "হিংসা",
-        "কপটতা",
-        "অবাধ্যতা"
-      ],
-      "answer": "কপটতা",
-      "explanation": "নিফাক শব্দের অর্থ ভণ্ডামি, কপটতা, দ্বিমুখিতা, ধোঁকাবাজি, প্রতারণা ইত্যাদি। নিফাক শব্দের ব্যবহারিক অর্থ হলো অন্তরে একরকম ভাব রেখে বাইরে এর বিপরীত অবস্থা প্রকাশ করা। ইসলামি শরিয়তের পরিভাষায়, অন্তরে কুফর ও অবাধ্যতা গোপন করে মুখে ইসলামকে স্বীকার করাই হলো নিফাক। যে এরূপ কাজ করে তাকে বলা হয় মুনাফিক।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৫ / কু. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কারা বাহ্যিকভাবে ইসলাম ও ইমান স্বীকার করে মুসলমানদের মতো ইবাদত-বন্দেগি করে?",
-      "options": [
-        "পাপী মুসলমানরা",
-        "মুনাফিকরা",
-        "মুশরিকরা",
-        "ফাসিকরা"
-      ],
-      "answer": "মুনাফিকরা",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৫ / সকল বোর্ড ২০১৮"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আল্লাহ তায়ালা কাকে মিথ্যাবাদী বলেছেন?",
-      "options": [
-        "কাফির",
-        "মুশরিক",
-        "মুনাফিক",
-        "ফাসিক"
-      ],
-      "answer": "মুনাফিক",
-      "explanation": "মিথ্যা বলা মুনাফিকের চরিত্রের প্রধান বৈশিষ্ট্য। এরা মিথ্যা বলে মানুষকে ধোঁকায় ফেলে এবং প্রতারণা করে মানুষ ঠকায়। এজন্য মহান আল্লাহ সুরা আল-মুনাফিকুনের ১ নম্বর আয়াতে এদেরকে মিথ্যাবাদী বলে সাব্যস্ত করেছেন।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৫ / রা. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'ক' মিথ্যা কথা বলে এবং কাউকে কথা দিয়ে কথা রাখে না। 'ক' এর আচরণ কাদের আচরণের সাথে সাদৃশ্যপূর্ণ?",
-      "options": [
-        "কাফির",
-        "মুশরিক",
-        "মুনাফিক",
-        "ফাসিক"
-      ],
-      "answer": "মুনাফিক",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৫ / চ. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মুনাফিকরা চিরকাল জাহান্নামের আগুনে জ্বলবে, কারণ তারা—",
-      "options": [
-        "মিথ্যাবাদী",
-        "আমানতের খিয়ানতকারী",
-        "গায়ে পড়ে ঝগড়াকারী",
-        "তাওহিদে অবিশ্বাসী"
-      ],
-      "answer": "তাওহিদে অবিশ্বাসী",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৫ / দি. বো. ২০২৩; সকল বোর্ড ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নবি-রাসুলগণ কর্তৃক আল্লাহ তায়ালার বাণী মানুষের নিকট পৌঁছে দেওয়ার দায়িত্বকে কী বলে?",
-      "options": [
-        "তাওহিদ",
-        "রিসালাত",
-        "ওহি",
-        "হিকমত"
-      ],
-      "answer": "রিসালাত",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / চ. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নবি-রাসুলের দায়িত্বের নাম কী?",
-      "options": [
-        "ইমান",
-        "আকাইদ",
-        "রিসালাত",
-        "তাওহিদ"
-      ],
-      "answer": "রিসালাত",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / কু. বো. ২০২৫; ঢা. বো., ম. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যারা রিসালাতের দায়িত্ব পালন করেন তাদের পরিচয় হলো—",
-      "options": [
-        "নবি",
-        "রাসুল",
-        "কাতিব",
-        "আল-আমিন"
-      ],
-      "answer": "রাসুল",
-      "explanation": "রিসালাত শব্দের অর্থ বার্তা, চিঠি পৌঁছানো, পয়গাম, সংবাদ বা কোনো ভালো কাজের দায়িত্ব বহন করা। মহান আল্লাহর পবিত্র বাণী মানুষের নিকট পৌঁছে দেওয়াকে রিসালাত বলে। আর যিনি এ দায়িত্ব পালন করেন তাকে রাসুল বলে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / বি. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'লা ইলাহা ইল্লাল্লাহ' কালিমার মূল প্রতিপাদ্য বিষয় কোনটি?",
-      "options": [
-        "রিসালাত",
-        "তাওহিদ",
-        "আখিরাত",
-        "খতমে নবুয়ত"
-      ],
-      "answer": "তাওহিদ",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৭ / সি. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রাসুল (স.)-কে বিশ্বাস করা—",
-      "options": [
-        "মানবতার দাবি",
-        "ইমানের দাবি",
-        "মুসলমানদের দাবি",
-        "মানুষের দাবি"
-      ],
-      "answer": "ইমানের দাবি",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৭ / দি. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আমরা রাসুলগণের মধ্যে কোনো পার্থক্য করি না— কথাটির তাৎপর্য কী?",
-      "options": [
-        "রাসুলগণ আল্লাহর প্রেরিত বান্দা",
-        "রাসুলগণ মানবজাতির শিক্ষক",
-        "রাসুলগণ নির্দিষ্ট সময়ের জন্য প্রেরিত হয়েছেন",
-        "রাসুলগণকে সমানভাবে বিশ্বাস করতে হবে"
-      ],
-      "answer": "রাসুলগণকে সমানভাবে বিশ্বাস করতে হবে",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৭ / দি. বো., ব. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কারা মানব জাতির জন্য অনুপম আদর্শ?",
-      "options": [
-        "আলেমগণ",
-        "হাফেজগণ",
-        "শহিদগণ",
-        "নবি-রাসুলগণ"
-      ],
-      "answer": "নবি-রাসুলগণ",
-      "explanation": "নবি-রাসুলগণ আল্লাহর মনোনীত বান্দা, তাঁরা মানুষকে সত্যের পথে আহ্বান জানিয়েছেন। তাঁরা সব সদ্‌গুণের অনুশীলন করেছেন। সব ধরনের মানবিক গুণ তাঁদের চরিত্রে ছিল। তাই তাঁরা মানবজাতির আদর্শ।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৮ / সকল বোর্ড ২০১৮"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আমিই শেষ নবি। আমার পরে আর কোনো নবি নেই।— বাণীটি কোন হাদিসগ্রন্থে উল্লেখ আছে?",
-      "options": [
-        "মুসলিম",
-        "বুখারি",
-        "নাসাঈ শরিফ",
-        "ইবনে মাজাহ"
-      ],
-      "answer": "মুসলিম",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২১ / যি. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "খাতামুন শব্দের আরেকটি অর্থ কী?",
-      "options": [
-        "শেষ",
-        "সমাপ্তি",
-        "উপসংহার",
-        "সিলমোহর"
-      ],
-      "answer": "সিলমোহর",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২১ / সকল বোর্ড ২০১৮"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'আল-ফুরকান' শব্দের অর্থ কী?",
-      "options": [
-        "জ্ঞান",
-        "উপদেশ",
-        "সত্য",
-        "পার্থক্যকারী"
-      ],
-      "answer": "পার্থক্যকারী",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৫ / কু. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আল হুদা ($ٱلْهُدَىٰ$) অর্থ কী?",
-      "options": [
-        "প্রজ্ঞা",
-        "পথনির্দেশ",
-        "উপদেশ",
-        "সত্য"
-      ],
-      "answer": "পথনির্দেশ",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৫ / চ. বো. ২০২৫; কু. বো. ২০২৩"
+        "কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -1221,17 +675,143 @@
     },
     {
       "type": "SINGLE",
-      "question": "'আল-বুরহান' শব্দের অর্থ কী?",
+      "question": "কোন সাধারণ গৃহস্থালি পণ্যটিতে শক্তিশালী এসিড ($HCl, HNO_3, H_2SO_4$) প্রধান উপাদান হিসেবে থাকে?",
       "options": [
-        "সত্য",
-        "জ্যোতি",
-        "পথ নির্দেশ",
-        "সুস্পষ্ট প্রমাণ"
+        "বেকিং সোডা",
+        "টয়লেট ক্লিনার",
+        "টুথপেস্ট",
+        "কোমল পানীয়"
       ],
-      "answer": "সুস্পষ্ট প্রমাণ",
+      "answer": "টয়লেট ক্লিনার",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৫ / সকল বোর্ড ২০১৭"
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি ফসফরিক এসিডের সংকেত?",
+      "options": [
+        "$H_3PO_4$",
+        "$H_2SO_4$",
+        "$NH_4NO_3$",
+        "$(NH_4)_3PO_4$"
+      ],
+      "answer": "$H_3PO_4$",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অ্যামোনিয়াম ফসফেটের সংকেত কোনটি?",
+      "options": [
+        "$(NH_4)_3PO_4$",
+        "$H_3PO_4$",
+        "$NH_4NO_3$",
+        "$(NH_4)_2SO_4$"
+      ],
+      "answer": "$(NH_4)_3PO_4$",
+      "explanation": null,
+      "reference": [
+        "উইলস লিটল ফ্লাওয়ার স্কুল এন্ড কলেজ, ঢাকা; ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পানিতে অ্যামোনিয়া যোগ করলে কোন আয়নটি উৎপন্ন হয়?",
+      "options": [
+        "$Pb^{2+}$",
+        "$NH_3$",
+        "$H^+$",
+        "$NH_4^+$"
+      ],
+      "answer": "$NH_4^+$",
+      "explanation": null,
+      "reference": [
+        "ঝিনাইদহ ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অ্যামোনিয়াম নাইট্রেট তৈরি হয় কোনটি থেকে—",
+      "options": [
+        "$HNO_3$",
+        "$H_2SO_4$",
+        "$H_3(PO_4)$",
+        "$HCl$"
+      ],
+      "answer": "$HNO_3$",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "A চিহ্নিত যৌগটি নিচের কোন ক্ষেত্রে ব্যবহৃত হয়?",
+      "options": [
+        "সাবান তৈরিতে",
+        "চামড়া সংরক্ষণে",
+        "রাসায়নিক সার তৈরিতে",
+        "মাটির উর্বরতা বাড়াতে"
+      ],
+      "answer": "রাসায়নিক সার তৈরিতে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "$CaO + A \\rightarrow CaSO_4 + H_2O$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি এসিডিটির কারণ—",
+      "options": [
+        "সবুজ চা",
+        "চকলেট",
+        "সয়া মাখন",
+        "বাদাম দুধ"
+      ],
+      "answer": "চকলেট",
+      "explanation": null,
+      "reference": [
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; নি. প. ২০২৪"
       ],
       "statements": [],
       "context": null,
@@ -1242,17 +822,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "আয-যিকর শব্দের অর্থ কী?",
+      "question": "অতিরিক্ত তৈলাক্ত খাবারে এসিডিটি—",
       "options": [
-        "নিরাময়",
-        "উপদেশ",
-        "প্রজ্ঞা",
-        "সত্য"
+        "বাড়বে",
+        "কমবে",
+        "অপরিবর্তনীয়",
+        "নিরপেক্ষ"
       ],
-      "answer": "উপদেশ",
+      "answer": "বাড়বে",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৫ / সি. বো. ২০২৫"
+        "চ. বো. ২০২৩"
       ],
       "statements": [],
       "context": null,
@@ -1263,17 +843,59 @@
     },
     {
       "type": "SINGLE",
-      "question": "'আল-মজিদ' শব্দের অর্থ কী?",
+      "question": "পাকস্থলীর এসিডিটির জন্য দায়ী কোনটি?",
       "options": [
-        "নিরাময়",
-        "সদুপদেশ",
-        "সম্মানিত",
-        "উপদেশ"
+        "$HCl$",
+        "$KOH$",
+        "$H_2SO_4$",
+        "$CH_3COOH$"
       ],
-      "answer": "সম্মানিত",
+      "answer": "$HCl$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৫ / সকল বোর্ড ২০১৯"
+        "দি. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পাকস্থলীতে খাদ্য হজম করে কোনটি?",
+      "options": [
+        "$H_2SO_4$",
+        "$H_2O$",
+        "$HCl$",
+        "$HNO_3$"
+      ],
+      "answer": "$HCl$",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন খাদ্য উপাদানটি এসিডিটি নিষ্ক্রিয় করতে পারে?",
+      "options": [
+        "পিঁয়াজ",
+        "রসুন",
+        "আলু",
+        "মরিচ"
+      ],
+      "answer": "আলু",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২০"
       ],
       "statements": [],
       "context": null,
@@ -1284,38 +906,395 @@
     },
     {
       "type": "SINGLE",
-      "question": "ইসলামের দৃষ্টিতে মানবজীবন কয়ভাগে বিভক্ত?",
+      "question": "পাকস্থলীর এসিডিটি দূর করতে নিচের কোনটি ব্যবহৃত হয়?",
+      "options": [
+        "$HNO_3$",
+        "$CaSO_4$",
+        "$Na_2CO_3$",
+        "$Mg(OH)_2$"
+      ],
+      "answer": "$Mg(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পাকস্থলীর এসিডিটি কমাতে কোন পদার্থটি ব্যবহার করা হয়?",
+      "options": [
+        "ভিনেগার",
+        "অ্যান্টাসিড",
+        "লেবুর রস",
+        "সাবান"
+      ],
+      "answer": "অ্যান্টাসিড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি এসিডিটি বাড়ায়?",
+      "options": [
+        "পুঁইশাক",
+        "মসলাযুক্ত খাবার",
+        "আদা চা",
+        "খেজুর"
+      ],
+      "answer": "মসলাযুক্ত খাবার",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন খাদ্যশস্য এসিডিটি কমায়?",
+      "options": [
+        "পালংশাক",
+        "গাজর",
+        "সিম",
+        "ভুট্টা"
+      ],
+      "answer": "ভুট্টা",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন খাদ্য পাকস্থলীতে এসিডিটি কমাতে সাহায্য করে?",
+      "options": [
+        "খালি পেটে ফলের রস খেলে",
+        "বেশি চর্বিযুক্ত খাবার খেলে",
+        "আদা-চা পান করলে",
+        "মসলাযুক্ত খাবার খেলে"
+      ],
+      "answer": "আদা-চা পান করলে",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন প্রাণির দুধ থেকে তৈরি করা মাখন ক্ষারধর্মী?",
+      "options": [
+        "গরু",
+        "মহিষ",
+        "ছাগল",
+        "ভেড়া"
+      ],
+      "answer": "ছাগল",
+      "explanation": null,
+      "reference": [
+        "বি. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বাংলাদেশ নারী ও শিশু নির্যাতন দমন আইন-১৯৯৫ অনুযায়ী এসিড নিক্ষেপের সর্বোচ্চ শাস্তি কী?",
+      "options": [
+        "যাবজ্জীবন কারাদণ্ড",
+        "১০ বছরের কারাদণ্ড",
+        "জরিমানা ও যাবজ্জীবন জেল",
+        "মৃত্যুদণ্ড"
+      ],
+      "answer": "মৃত্যুদণ্ড",
+      "explanation": null,
+      "reference": [
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন pH মানের দ্রবণটি অধিক তীব্র ক্ষারীয় হবে?",
+      "options": [
+        "9.6",
+        "8.4",
+        "7.8",
+        "7.0"
+      ],
+      "answer": "9.6",
+      "explanation": null,
+      "reference": [
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পানির pH = 7 এর কম হলে পানি কী প্রকৃতির হবে?",
+      "options": [
+        "ক্ষারীয়",
+        "এসিডিক",
+        "নিরপেক্ষ",
+        "নোনা"
+      ],
+      "answer": "এসিডিক",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অম্লীয় দ্রবণের জন্য কোনটি সঠিক?",
+      "options": [
+        "pH > 7",
+        "pH = 7",
+        "pH < 7",
+        "pH > 9"
+      ],
+      "answer": "pH < 7",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৪; রা. বো. ২০১৭; আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সাধারণ নির্দেশকের (যেমন লিটমাস পেপার) পরিবর্তে pH পরিমাপের মূল সুবিধা কী?",
+      "options": [
+        "এটি ক্ষারক শনাক্ত করে",
+        "এটি নিরপেক্ষ পদার্থ শনাক্ত করে",
+        "এটি পরিমাণগত পরিমাপ দেয়",
+        "এটি রঙের পরিবর্তন নির্দেশ করে"
+      ],
+      "answer": "এটি পরিমাণগত পরিমাপ দেয়",
+      "explanation": null,
+      "reference": [
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "আমাদের ত্বকে pH কত?",
+      "options": [
+        "৪-৬",
+        "৪-৮",
+        "৪-১০",
+        "৪-৭"
+      ],
+      "answer": "৪-৬",
+      "explanation": null,
+      "reference": [
+        "কুমিল্লা মডার্ন হাই স্কুল; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটির pH 7?",
+      "options": [
+        "পানি",
+        "এসিড",
+        "লবণ",
+        "ক্ষার"
+      ],
+      "answer": "পানি",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিরপেক্ষ দ্রবণের pH কত?",
+      "options": [
+        "০",
+        "৭",
+        "১০",
+        "১৪"
+      ],
+      "answer": "৭",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিরপেক্ষ পানির pH কত?",
+      "options": [
+        "৫",
+        "৬",
+        "৭",
+        "৮"
+      ],
+      "answer": "৭",
+      "explanation": null,
+      "reference": [
+        "বি. বো. ২০২৩; রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনো জলীয় দ্রবণ এসিডীয় হলে এর pH কোনটি?",
+      "options": [
+        "৬.৫",
+        "৭.০",
+        "৭.৫",
+        "৮.৫"
+      ],
+      "answer": "৬.৫",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "প্রশমন বিক্রিয়ার পরে দ্রবনের pH-এর মান কত হয়?",
+      "options": [
+        "০",
+        "৫",
+        "৭",
+        "১০"
+      ],
+      "answer": "৭",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "আমাদের ধমনির রক্তের pH কত?",
+      "options": [
+        "৬.৬",
+        "৭.৪",
+        "৭.৮",
+        "৯.৫"
+      ],
+      "answer": "৭.৪",
+      "explanation": null,
+      "reference": [
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পাকস্থলীতে খাদ্য হজম করার জন্য দরকারি pH এর মান কত?",
       "options": [
         "২",
-        "৩",
         "৪",
-        "৫"
+        "৬.৬",
+        "৭.৪"
       ],
       "answer": "২",
-      "explanation": "মানবজীবনের পর্যায় দুটি হলো— ইহকাল ও পরকাল। মানুষের মৃত্যুর মধ্য দিয়ে শুরু হয় পরকাল বা আখিরাতের জীবন। এ জীবনের শুরু আছে কিন্তু শেষ নেই। আখিরাতে মানুষের দুনিয়ার জীবনের সব কাজের হিসাব দিতে হবে। দুনিয়াকে বলা হয় আখিরাতের শস্যক্ষেত্র।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৮ / বি. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মৃত্যুর পরবর্তী জীবনকে কী বলে?",
-      "options": [
-        "বারযাখ",
-        "আখিরাত",
-        "পুলসিরাত",
-        "কিয়ামত"
-      ],
-      "answer": "আখিরাত",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৮ / ম. বো. ২০২৩"
+        "সি. বো. ২০২৪"
       ],
       "statements": [],
       "context": null,
@@ -1326,17 +1305,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "আর তারা (মুত্তাকিগণ) আখিরাতে দৃঢ় বিশ্বাস রাখে— কোন সুরার আয়াত?",
+      "question": "টুথপেস্টের pH এর মান কত?",
       "options": [
-        "সুরা আন-নিসা",
-        "সুরা আলে-ইমরান",
-        "সুরা আল-মুমিনুন",
-        "সুরা আল-বাকারাহ"
+        "৪-৬",
+        "৪-৮",
+        "৫-৬",
+        "৯-১১"
       ],
-      "answer": "সুরা আল-বাকারাহ",
+      "answer": "৯-১১",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৯ / দি. বো. ২০২৩"
+        "রা. বো. ২০২৩; পব মুসলীম হাই স্কুল, চট্টগ্রাম; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -1347,290 +1326,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "আখিরাতের জীবনের প্রথম স্তর হলো—",
+      "question": "আরিকদের জমিতে ফসল ভালো হচ্ছে না। সে মাটি পরীক্ষা করে দেখল pH এর মান ৪ এর নিচে। নিচের কোনটি ব্যবহারে pH এর মান ঠিক হবে?",
       "options": [
-        "হাশর",
-        "কবর",
-        "কিয়ামত",
-        "মৃত্যু"
+        "$HNO_3$",
+        "$CaCO_3$",
+        "$H_3PO_4$",
+        "$H_2SO_4$"
       ],
-      "answer": "মৃত্যু",
-      "explanation": "আখিরাত বা পরকালীন চিরস্থায়ী জীবনের সূচনা হয় মৃত্যুর মাধ্যমে। পরকালীন জীবন চিরস্থায়ী ও অনন্ত। এ জীবনের কোনো শেষ নেই। মানুষের মৃত্যুর সাথে সাথে এ জীবনের শুরু হয়।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৯ / সকল বোর্ড ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোনটি চিরস্থায়ী জীবনের সূচনাপর্ব?",
-      "options": [
-        "জান্নাত",
-        "জাহান্নাম",
-        "মৃত্যু",
-        "কবর"
-      ],
-      "answer": "মৃত্যু",
+      "answer": "$CaCO_3$",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৯ / কু. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পরকালের প্রবেশদ্বার কোনটি?",
-      "options": [
-        "জন্ম",
-        "মৃত্যু",
-        "অসুস্থতা",
-        "ঘুম"
-      ],
-      "answer": "মৃত্যু",
-      "explanation": "মৃত্যুর মধ্য দিয়ে মানুষ পরকালের জীবনে প্রবেশ করে। মহান আল্লাহ একদিন এ পৃথিবী ধ্বংস করে দেবেন। এটাই কিয়ামত। আল্লাহর নির্দেশে মৃত্যুর পর সব মানুষ আবার জীবিত হয়ে একটি মাঠে একত্র হবে। একে হাশর বলা হয়। আর হাশরের মাঠে মিযানে মানুষের পাপ-পুণ্য ওজন করা হবে।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ২৯ / দি. বো. ২০২৩; সকল বোর্ড ২০১৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "প্রত্যেক প্রাণীকেই মৃত্যুর স্বাদ গ্রহণ করতে হবে— এটি কোন সুরার আয়াত?",
-      "options": [
-        "আল বাকারা",
-        "আলে ইমরান",
-        "আল-আম্বিয়া",
-        "আন-নাহল"
-      ],
-      "answer": "আলে ইমরান",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩০ / য. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবরের অপর নাম কী?",
-      "options": [
-        "হাশর",
-        "আখিরাত",
-        "কিয়ামত",
-        "বারযাখ"
-      ],
-      "answer": "বারযাখ",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩০ / ম. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ফেরেশতারা কবরে কয়টি প্রশ্ন করবেন?",
-      "options": [
-        "তিনটি",
-        "পাঁচটি",
-        "ছয়টি",
-        "আটটি"
-      ],
-      "answer": "তিনটি",
-      "explanation": "মুনকার-নাকির ফেরেশতাদ্বয় সব মানুষকে তিনটি প্রশ্ন করবেন। এগুলো হলো— ১. মান রাব্বুকা মানে তোমার রব কে? ২. ওয়া মা দীনুকা মানে তোমার দীন কী? ওয়া মান হাযার রাজুলু মানে (রাসুল (স.)-এর প্রতি ইঙ্গিত করে বলা হয়) এই ব্যক্তি কে?",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩০ / সি. বো. ২০২৩; ২০১৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কবরে যে দুজন ফেরেশতা মৃত ব্যক্তিকে প্রশ্ন করবেন তাদেরকে বলা হয়—",
-      "options": [
-        "কিরামান-কাতিবিন",
-        "জিবরাইল-ইসরাফিল",
-        "মুনকার-নাকির",
-        "ইসরাফিল-মিকাইল"
-      ],
-      "answer": "মুনকার-নাকির",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩০ / কু. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "হাশর শব্দের অর্থ কী?",
-      "options": [
-        "দাঁড়িপাল্লা",
-        "অনুরোধ করা",
-        "রাস্তা",
-        "মহাসমাবেশ"
-      ],
-      "answer": "মহাসমাবেশ",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩১ / রা. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যা দ্বারা মানুষের পাপ-পুণ্যের হিসাব করা হবে তাকে কী বলে?",
-      "options": [
-        "মিযান",
-        "বারযাখ",
-        "সিরাত",
-        "শাফাআত"
-      ],
-      "answer": "মিযান",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩২ / বি. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পরকালে মানুষের আমলনামা কখন হাতে দেওয়া হবে?",
-      "options": [
-        "কবরে",
-        "মিযানে",
-        "হাশরের মাঠে",
-        "পুলসিরাতে"
-      ],
-      "answer": "হাশরের মাঠে",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩১ / রা. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কীসে বিশ্বাস করা ছাড়া মুমিন ও মুত্তাকি হওয়া যায় না?",
-      "options": [
-        "দানশীলতায়",
-        "আতিথেয়তায়",
-        "সিরাতে",
-        "উদারতায়"
-      ],
-      "answer": "সিরাতে",
-      "explanation": "সিরাত (পথ, রাস্তা) আখিরাত বা পরকালীন জীবনের একটি গুরুত্বপূর্ণ স্তর। আখিরাতে বিশ্বাস ইমানের মৌলিক বিষয়ের অন্তর্ভুক্ত। তাই মুমিন বা মুসলিমের জন্য পরকালীন জীবনের প্রতিটি স্তরের ওপর ইমান আনা অবশ্য কর্তব্য।",
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩২ / যি. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মুমিনদের সহজে পুলসিরাত পার হওয়া কীসের ওপর নির্ভর করবে?",
-      "options": [
-        "ইলম",
-        "ক্ষমতা",
-        "সুনাম",
-        "নেক আমল"
-      ],
-      "answer": "নেক আমল",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩২ / রা. বো. ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'শাফাআত' শব্দের অর্থ কী?",
-      "options": [
-        "মহাসমাবেশ",
-        "মহাপ্রলয়",
-        "অনুরোধ করা",
-        "উদান"
-      ],
-      "answer": "অনুরোধ করা",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩৩ / ঢা. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "$نَارٌ$ (নার)-এর শাব্দিক অর্থ কী?",
-      "options": [
-        "কাঁটা",
-        "বরফ",
-        "আগুন",
-        "আলো"
-      ],
-      "answer": "আগুন",
-      "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩৪ / রা. বো. ২০২৩"
+        "ঢা. বো. ২০২৩"
       ],
       "statements": [],
       "context": null,
@@ -1641,17 +1347,1785 @@
     },
     {
       "type": "SINGLE",
-      "question": "কাদের পুরস্কার অফুরন্ত?",
+      "question": "রকিবের জমির মাটি বেশি অম্লীয়। মাটির উর্বরতা বৃদ্ধির জন্য তার কোন জাতীয় সার ব্যবহার করা উচিত?",
       "options": [
-        "সৎকর্মশীল",
-        "চরিত্রবান",
-        "জ্ঞানী",
-        "বুদ্ধিমান"
+        "অ্যালুমিনিয়াম",
+        "ক্যালসিয়াম",
+        "নাইট্রেট",
+        "ফসফেট"
       ],
-      "answer": "সৎকর্মশীল",
+      "answer": "ক্যালসিয়াম",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩৭ / সকল বোর্ড ২০১৬"
+        "য. বো ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কৃষি জমির ব্যাকটেরিয়া প্রতিরোধে ব্যবহৃত হয় কোনটি?",
+      "options": [
+        "$HgSO_4$",
+        "$CuSO_4$",
+        "$KNO_3$",
+        "$NH_4NO_3$"
+      ],
+      "answer": "$CuSO_4$",
+      "explanation": null,
+      "reference": [
+        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জমির উর্বরতা বৃদ্ধি করে কোনটি?",
+      "options": [
+        "$NaCO_3$",
+        "$KNO_3$",
+        "$HgSO_4$",
+        "$AgSO_4$"
+      ],
+      "answer": "$KNO_3$",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "করিমের জমির মাটি ক্ষারীয়। মাটির উর্বরতা বৃদ্ধির জন্য তার কোন জাতীয় সার ব্যবহার করা উচিত?",
+      "options": [
+        "ক্যালসিয়াম",
+        "ম্যাগনেসিয়াম",
+        "ফসফেট",
+        "অ্যালুমিনিয়াম"
+      ],
+      "answer": "ফসফেট",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "৫ বছরের অনুপ্রভার ব্যবহৃত প্রসাধনীর pH কত হবে?",
+      "options": [
+        "৫.৫",
+        "৬.৫",
+        "৬.৯",
+        "৮"
+      ],
+      "answer": "৫.৫",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মুখ ধোয়ার প্রসাধনীর ক্ষেত্রে pH এর মান কত?",
+      "options": [
+        "০.৫",
+        "৫.৫",
+        "৬.৬",
+        "৭.৪"
+      ],
+      "answer": "৫.৫",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জিহ্বার লালার কার্যকর pH কত?",
+      "options": [
+        "৪.৪",
+        "৫.৫",
+        "৬.৬",
+        "৭.৭"
+      ],
+      "answer": "৬.৬",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "এসিড এবং ক্ষারক পরীক্ষা করার জন্য কোন নির্দেশকটি ব্যবহার করা হয়?",
+      "options": [
+        "স্টার্চ",
+        "লিটমাস",
+        "গ্লুকোজ",
+        "সালফার"
+      ],
+      "answer": "লিটমাস",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মিথাইল অরেঞ্জ ক্ষারকে কোন বর্ণ ধারণ করে?",
+      "options": [
+        "গোলাপি",
+        "হলুদ",
+        "লাল",
+        "নীল"
+      ],
+      "answer": "হলুদ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মিথাইল রেড নির্দেশকটি ক্ষারকে কোন বর্ণ ধারণ করে?",
+      "options": [
+        "নীল",
+        "লাল",
+        "হলুদ",
+        "গোলাপি"
+      ],
+      "answer": "হলুদ",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২০; কু. বো. ২০২৪; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+{
+      "type": "SINGLE",
+      "question": "ক্ষারীয় দ্রবণে কোন নির্দেশকটি গোলাপি বর্ণ ধারণ করে?",
+      "options": [
+        "লাল লিটমাস কাগজ",
+        "মিথাইল অরেঞ্জ",
+        "ফেনলফথ্যালিন",
+        "মিথাইল রেড"
+      ],
+      "answer": "ফেনলফথ্যালিন",
+      "explanation": null,
+      "reference": [
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন নির্দেশকটি ক্ষারকের সাথে গোলাপি বর্ণ দেখায়?",
+      "options": [
+        "লিটমাস পেপার",
+        "মিথাইল অরেঞ্জ",
+        "ফেনলফথ্যালিন",
+        "মিথাইল রেড"
+      ],
+      "answer": "ফেনলফথ্যালিন",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটির স্বাদ টক?",
+      "options": [
+        "সাবান",
+        "ভিনেগার",
+        "চুনের পানি",
+        "ওয়াশিং সোডা"
+      ],
+      "answer": "ভিনেগার",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ফেনফথ্যালিন ক্ষারকে কোন বর্ণ ধারণ করে?",
+      "options": [
+        "হলুদ",
+        "গোলাপি",
+        "কমলা",
+        "বর্ণহীন"
+      ],
+      "answer": "গোলাপি",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২৩; য. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ক্ষারীয় মাধ্যমে ফেনলফথ্যালিনের রং কী?",
+      "options": [
+        "হলুদ",
+        "গোলাপি",
+        "নীল",
+        "কমলা"
+      ],
+      "answer": "গোলাপি",
+      "explanation": null,
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "NaOH যৌগটি—",
+      "options": [
+        "পানিতে $H^+$ তৈরি করে",
+        "নীল লিটমাস কাগজ লাল করে",
+        "পানিতে হাইড্রক্সাইড আয়ন উৎপন্ন করে",
+        "একধরনের নিরপেক্ষ পদার্থ"
+      ],
+      "answer": "পানিতে হাইড্রক্সাইড আয়ন উৎপন্ন করে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি ক্ষারক?",
+      "options": [
+        "ক্যালসিয়াম হাইড্রোক্সাইড",
+        "হাইড্রোক্লোরিক এসিড",
+        "কার্বন ডাইঅক্সাইড",
+        "গ্লুকোজ"
+      ],
+      "answer": "ক্যালসিয়াম হাইড্রোক্সাইড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি ক্ষারক?",
+      "options": [
+        "$NaCl$",
+        "$H_3PO_3$",
+        "$H_2O_2$",
+        "$NaOH$"
+      ],
+      "answer": "$NaOH$",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি লাল লিটমাস পেপারকে নীল করে?",
+      "options": [
+        "লেবুর রস",
+        "হাইড্রোক্লোরিক এসিড",
+        "সোডিয়াম হাইড্রোক্সাইড",
+        "ভিনেগার"
+      ],
+      "answer": "সোডিয়াম হাইড্রোক্সাইড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন পদার্থটি লাল লিটমাসকে নীল করে?",
+      "options": [
+        "$H_2SO_4$",
+        "$NaOH$",
+        "$NaCl$",
+        "$CaCO_3$"
+      ],
+      "answer": "$NaOH$",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০১৭; নওয়াব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "KOH এর মধ্যে মিথাইল রেড যোগ করলে বর্ণের কী ধরনের পরিবর্তন হবে?",
+      "options": [
+        "লাল",
+        "হলুদ",
+        "কমলা",
+        "গোলাপি"
+      ],
+      "answer": "হলুদ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন নির্দেশকের প্রভাবে বিকারে রক্ষিত KOH দ্রবণ গোলাপি বর্ণ ধারণ করে?",
+      "options": [
+        "লাল লিটমাস কাগজ",
+        "মিথাইল অরেঞ্জ",
+        "মিথাইল রেড",
+        "ফেনলফথ্যালিন"
+      ],
+      "answer": "ফেনলফথ্যালিন",
+      "explanation": null,
+      "reference": [
+        "বি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ক্ষারীয় মাধ্যমে মিথাইল অরেঞ্জ কোন বর্ণ ধারণ করে?",
+      "options": [
+        "নীল",
+        "লাল",
+        "গোলাপি",
+        "হলুদ"
+      ],
+      "answer": "হলুদ",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "লাল লিটমাস পেপার ক্ষারকের মধ্যে কোন বর্ণ উৎপন্ন করে?",
+      "options": [
+        "গোলাপি",
+        "বর্ণহীন",
+        "হলুদ",
+        "নীল"
+      ],
+      "answer": "নীল",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২৩; ঢা. বো. ২০১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটির দ্রবণে লাল লিটমাস ডুবালে সেটি নীল হয়ে যায়?",
+      "options": [
+        "$HCl$",
+        "$NaCl$",
+        "$Ca(OH)_2$",
+        "$CH_3COOH$"
+      ],
+      "answer": "$Ca(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "এসিড নীল লিটমাসকে কোন রংয়ের পরিবর্তন করে?",
+      "options": [
+        "হলুদ",
+        "কমলা",
+        "সবুজ",
+        "লাল"
+      ],
+      "answer": "লাল",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বোলতা বা বিচ্ছুর হুলে কোন ক্ষারক থাকে যা জ্বালাপোড়া ও ফোলা সৃষ্টি করে?",
+      "options": [
+        "হিস্টামিন",
+        "অ্যাসিটিক এসিড",
+        "সোডিয়াম হাইড্রোক্সাইড",
+        "সালফিউরিক এসিড"
+      ],
+      "answer": "হিস্টামিন",
+      "explanation": null,
+      "reference": [
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ; নি. প. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মৌমাছি হুল ফুটালে কোন পদার্থ নিঃসৃত হয়?",
+      "options": [
+        "অক্সালিক এসিড",
+        "সাইট্রিক এসিড",
+        "ফরমিক এসিড",
+        "এসিটিক এসিড"
+      ],
+      "answer": "ফরমিক এসিড",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৩; ঢা. বো., চ. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মৌমাছি হুল ফুটালে কোনটি নিঃসৃত হয়?",
+      "options": [
+        "এসিটিক এসিড",
+        "ক্যালামিন",
+        "মিল্ক অব লাইম",
+        "অ্যাপামিন"
+      ],
+      "answer": "অ্যাপামিন",
+      "explanation": null,
+      "reference": [
+        "র. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মৌমাছি কামড় দিলে কোনটি ব্যবহার করা হয়?",
+      "options": [
+        "$ZnCO_3$",
+        "$K_2CO_3$",
+        "$H_2CO_3$",
+        "$CaCO_3$"
+      ],
+      "answer": "$CaCO_3$",
+      "explanation": null,
+      "reference": [
+        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পিঁপড়ার কামড়ের মাধ্যমে কোন এসিড নিঃসৃত হয়?",
+      "options": [
+        "সাইট্রিক এসিড",
+        "অক্সালিক এসিড",
+        "এসিটিক এসিড",
+        "ফরমিক এসিড"
+      ],
+      "answer": "ফরমিক এসিড",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২০; য. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "হিস্টামিন কী ধরনের পদার্থ?",
+      "options": [
+        "ক্ষারক",
+        "এসিড",
+        "লবণ",
+        "প্রোটিন"
+      ],
+      "answer": "ক্ষারক",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নরম সাবান তৈরিতে ব্যবহৃত হয় কোনটি?",
+      "options": [
+        "$NaOH$",
+        "$KOH$",
+        "$Mg(OH)_2$",
+        "$Al(OH)_3$"
+      ],
+      "answer": "$KOH$",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটিকে ক্যালামিন বলে?",
+      "options": [
+        "$Ca(OH)_2$",
+        "$CaO$",
+        "$ZnCO_3$",
+        "$CaCO_3$"
+      ],
+      "answer": "$ZnCO_3$",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৪, ২০২৩; রা. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন লবণটি পানিতে দ্রবণীয় নয়?",
+      "options": [
+        "$AgCl$",
+        "$MgCl_2$",
+        "$NaCl$",
+        "$CaCl_2$"
+      ],
+      "answer": "$AgCl$",
+      "explanation": null,
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "চুনের পানির সংকেত কোনটি?",
+      "options": [
+        "$CaO$",
+        "$CaSO_4$",
+        "$Ca(OH)_2$",
+        "$CaCO_3$"
+      ],
+      "answer": "$Ca(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি মিল্ক অব লাইম?",
+      "options": [
+        "$Ca(OH)_2$",
+        "$Mg(OH)_2$",
+        "$Al(OH)_3$",
+        "$NaOH$"
+      ],
+      "answer": "$Ca(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০২৩, চ. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনো জমির মাটির pH এর মান $3$ হলে ঐ জমির উর্বরতা বৃদ্ধির জন্য ব্যবহার করতে হবে—",
+      "options": [
+        "$NaCl$",
+        "$CaCO_3$",
+        "$CH_3COOH$",
+        "$ZnCO_3$"
+      ],
+      "answer": "$CaCO_3$",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পাকস্থলীর এসিডিটি কমাতে কোন পদার্থটি ব্যবহার করা হয়?",
+      "options": [
+        "ভিনেগার",
+        "অ্যান্টাসিড",
+        "লেবুর রস",
+        "সাবান"
+      ],
+      "answer": "অ্যান্টাসিড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "গ্যাস্ট্রিকের ব্যথার জন্য যে ঔষধ খাওয়া হয়, তা হলো—",
+      "options": [
+        "ম্যাগনেসিয়াম হাইড্রোক্সাইড",
+        "টেট্রাসোডিয়াম পাইরোফসফেট",
+        "অ্যামোনিয়াম হাইড্রোক্সাইড",
+        "জিঙ্ক কার্বনেট"
+      ],
+      "answer": "ম্যাগনেসিয়াম হাইড্রোক্সাইড",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ক্ষার এসিডকে প্রশমিত করে কী উৎপন্ন করে?",
+      "options": [
+        "লবণ",
+        "ক্ষারক",
+        "এসিড",
+        "হাইড্রোজেন"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "পিরোজপুর সরকারি বালিকা উচ্চ বিদ্যালয়"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "এসিড ও ক্ষারকের বিক্রিয়ায় কী উৎপন্ন হয়?",
+      "options": [
+        "লবণ ও পানি",
+        "লবণ ও গ্যাস",
+        "পানি ও এসিড",
+        "গ্যাস ও ক্ষার"
+      ],
+      "answer": "লবণ ও পানি",
+      "explanation": null,
+      "reference": [
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "গ্যাস্ট্রিকের ব্যথায় আমরা যে এন্টাসিড খাই তাতে কোনটি থাকে?",
+      "options": [
+        "$MgCl_2$",
+        "$Mg(OH)_2$",
+        "$MgSO_4$",
+        "$MgCO_3$"
+      ],
+      "answer": "$Mg(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৩; বরিশাল ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "এসিডিটি কমাতে সাহায্য করে নিচের কোনটি?",
+      "options": [
+        "চকলেট",
+        "পেঁয়াজ",
+        "মাশরুম",
+        "কফি"
+      ],
+      "answer": "মাশরুম",
+      "explanation": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন এসিড রোগ প্রতিরোধ করে?",
+      "options": [
+        "নাইট্রিক এসিড",
+        "এসিটিক এসিড",
+        "কার্বনিক এসিড",
+        "এসকরবিক এসিড"
+      ],
+      "answer": "এসকরবিক এসিড",
+      "explanation": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপক 'A' তে উৎপন্ন পদার্থ কোনটি?",
+      "options": [
+        "এসিড",
+        "ক্ষারক",
+        "ক্ষার",
+        "লবণ"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$HCl + Mg(OH)_2 \\rightarrow A + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "এই বিক্রিয়ায় কোনটি উৎপন্ন হয়?",
+      "options": [
+        "$CaCO_3$",
+        "$CaO$",
+        "$CaCl_2$",
+        "$CaSO_4$"
+      ],
+      "answer": "$CaCl_2$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৯; সি. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "$HCl + Ca(OH)_2 \\rightarrow ?$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "স্ল্যাক লাইম হিসাবে পরিচিত কোনটি?",
+      "options": [
+        "$CaO$",
+        "$Ca(OH)_2$",
+        "$CaCO_3$",
+        "$ZnCO_3$"
+      ],
+      "answer": "$Ca(OH)_2$",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "বিক্রিয়াটির মাধ্যমে—",
+      "options": [
+        "মাটির এসিডিটি দূর হয়",
+        "মাটির ক্ষারীয়ভাব প্রশমিত হয়",
+        "পেটের ব্যথা সেরে যায়",
+        "পেটের বদহজম দূর হয়"
+      ],
+      "answer": "মাটির ক্ষারীয়ভাব প্রশমিত হয়",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "$Ca(OH)_2 + H_2SO_4 \\rightarrow CaSO_4 + 2H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বেকিং সোডাকে উত্তপ্ত করলে কোনটি উৎপন্ন হয়?",
+      "options": [
+        "কার্বন ডাইঅক্সাইড",
+        "হাইড্রোজেন",
+        "অক্সিজেন",
+        "সোডিয়াম"
+      ],
+      "answer": "কার্বন ডাইঅক্সাইড",
+      "explanation": null,
+      "reference": [
+        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "NaOH যৌগটি—",
+      "options": [
+        "নীল লিটমাসকে লাল করে",
+        "ক্ষারীয় পদার্থ",
+        "জলীয় দ্রবণে $H^+$ দেয়",
+        "নিরপেক্ষ পদার্থ"
+      ],
+      "answer": "ক্ষারীয় পদার্থ",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বেকিং সোডার সংকেত কোনটি?",
+      "options": [
+        "$NaCl$",
+        "$NH_4Cl$",
+        "$NaHCO_3$",
+        "$CaCO_3$"
+      ],
+      "answer": "$NaHCO_3$",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "খাবার সোডা কোনটি?",
+      "options": [
+        "সোডিয়াম বাই কার্বনেট",
+        "সোডিয়াম কার্বনেট",
+        "সোডিয়াম সালফেট",
+        "আর্দ্র সোডিয়াম কার্বনেট"
+      ],
+      "answer": "সোডিয়াম বাই কার্বনেট",
+      "explanation": null,
+      "reference": [
+        "পব মুসলীম হাই স্কুল, চট্টগ্রাম; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "খাবার সোডার সংকেত কোনটি?",
+      "options": [
+        "$NaHCO_3$",
+        "$NaCl$",
+        "$Na_2CO_3$",
+        "$NaOCl$"
+      ],
+      "answer": "$NaHCO_3$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "এসিড যখন কার্বনেটের সাথে বিক্রিয়া করে তখন কোন গ্যাস নির্গত হয়?",
+      "options": [
+        "অক্সিজেন",
+        "হাইড্রোজেন",
+        "কার্বন ডাইঅক্সাইড",
+        "নাইট্রোজেন"
+      ],
+      "answer": "কার্বন ডাইঅক্সাইড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "নিচের কোনটি 'A' চিহ্নিত পদার্থ?",
+      "options": [
+        "$HCO_3$",
+        "$KCl$",
+        "$KClO_3$",
+        "$KHCO_3$"
+      ],
+      "answer": "$KCl$",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "$K_2CO_3 + HCl \\rightarrow 'A' + H_2O + CO_2$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "টেবিল লবণ কোনটি?",
+      "options": [
+        "$NaCl$",
+        "$Na_2CO_3$",
+        "$NaHCO_3$",
+        "$AgCl$"
+      ],
+      "answer": "$NaCl$",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি টেবিল লবণ নামে পরিচিত?",
+      "options": [
+        "সোডিয়াম ক্লোরাইড",
+        "সোডিয়াম গ্লুটামেট",
+        "সোডিয়াম কার্বনেট",
+        "সোডিয়াম স্টিয়ারেট"
+      ],
+      "answer": "সোডিয়াম ক্লোরাইড",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২০২৪; র. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি লবণ?",
+      "options": [
+        "$HCl$",
+        "$H_2CO_3$",
+        "$Na_2SO_4$",
+        "$H_2SO_4$"
+      ],
+      "answer": "$Na_2SO_4$",
+      "explanation": null,
+      "reference": [
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি টেস্টিং সল্ট নামে পরিচিত?",
+      "options": [
+        "সোডিয়াম নাইট্রেট",
+        "সোডিয়াম কার্বনেট",
+        "সোডিয়াম গ্লুটামেট",
+        "সোডিয়াম ক্লোরাইড"
+      ],
+      "answer": "সোডিয়াম গ্লুটামেট",
+      "explanation": null,
+      "reference": [
+        "বি. বো. ২০২৪; সি. বো. ২০২৩; ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "খাবার লবণের রাসায়নিক নাম কী?",
+      "options": [
+        "সোডিয়াম ক্লোরাইড",
+        "সোডিয়াম হাইড্রোক্সাইড",
+        "পটাশিয়াম ক্লোরাইড",
+        "ক্যালসিয়াম কার্বনেট"
+      ],
+      "answer": "সোডিয়াম ক্লোরাইড",
+      "explanation": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন লবণটি পানিতে দ্রবণীয় নয়?",
+      "options": [
+        "$AgCl$",
+        "$MgCl_2$",
+        "$NaCl$",
+        "$CaCl_2$"
+      ],
+      "answer": "$AgCl$",
+      "explanation": null,
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "খাবার লবণের সংকেত কোনটি?",
+      "options": [
+        "$NaCl$",
+        "$Na_2SO_4$",
+        "$Na_2CO_3$",
+        "$NaNO_3$"
+      ],
+      "answer": "$NaCl$",
+      "explanation": null,
+      "reference": [
+        "র. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি ডিমের খোসায় থাকে?",
+      "options": [
+        "$NaHCO_3$",
+        "$(NH_4)_2CO_3$",
+        "$Na_2CO_3$",
+        "$CaCO_3$"
+      ],
+      "answer": "$CaCO_3$",
+      "explanation": null,
+      "reference": [
+        "হ. বো. ২০২৩; রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কাপড় কাচা সাবানের নাম—",
+      "options": [
+        "সোডিয়াম গ্লুটামেট",
+        "সোডিয়াম স্টিয়ারেট",
+        "সোডিয়াম এসিটেট",
+        "পটাশিয়াম স্টিয়ারেট"
+      ],
+      "answer": "সোডিয়াম স্টিয়ারেট",
+      "explanation": null,
+      "reference": [
+        "পব মুসলীম হাই স্কুল, চট্টগ্রাম; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সাবানের সংকেত কোনটি?",
+      "options": [
+        "$C_{17}H_{35}COOK$",
+        "$C_{17}H_{35}COONa$",
+        "$Na_2CO_3.10H_2O$",
+        "$CuSO_4.5H_2O$"
+      ],
+      "answer": "$C_{17}H_{35}COONa$",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "শেভিং ফোমে কোনটি থাকে?",
+      "options": [
+        "$C_{17}H_{35}COONa$",
+        "$C_{17}H_{35}COOK$",
+        "$K_2SO_4.Al_2(SO_4)_3.24H_2O$",
+        "$CuSO_4.5H_2O$"
+      ],
+      "answer": "$C_{17}H_{35}COOK$",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "শেভিং জেলে কোনটি থাকে?",
+      "options": [
+        "পটাশিয়াম স্টিয়ারেট",
+        "সোডিয়াম স্টিয়ারেট",
+        "সোডিয়াম কার্বনেট",
+        "কপার সালফেট"
+      ],
+      "answer": "পটাশিয়াম স্টিয়ারেট",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নরম সাবান তৈরিতে কোনটি ব্যবহৃত হয়?",
+      "options": [
+        "$NaOH$",
+        "$KOH$",
+        "$Mg(OH)_2$",
+        "$Al(OH)_3$"
+      ],
+      "answer": "$KOH$",
+      "explanation": null,
+      "reference": [
+        "হ. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন সাবানটি নরম হবে?",
+      "options": [
+        "$C_{17}H_{35}COONa$",
+        "$CH_3COONa$",
+        "$C_{17}H_{35}COOK$",
+        "$CH_3COOK$"
+      ],
+      "answer": "$C_{17}H_{35}COOK$",
+      "explanation": null,
+      "reference": [
+        "সাবের সোবহান সরকারি বালিকা উচ্চ বিদ্যালয়, ব্রাহ্মণবাড়িয়া"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সোডিয়াম স্টিয়ারেট এর সংকেত কোনটি?",
+      "options": [
+        "$CuSO_4.5H_2O$",
+        "$C_{17}H_{35}COOK$",
+        "$C_{17}H_{35}COONa$",
+        "$Na_2CO_3.10H_2O$"
+      ],
+      "answer": "$C_{17}H_{35}COONa$",
+      "explanation": null,
+      "reference": [
+        "র. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি জীবাণুনাশক হিসেবে ব্যবহৃত হয়?",
+      "options": [
+        "$Na_2SO_4$",
+        "$ZnSO_4$",
+        "$CuSO_4$",
+        "$FeSO_4$"
+      ],
+      "answer": "$CuSO_4$",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি তুঁতের সংকেত?",
+      "options": [
+        "$Cu(OH)_2$",
+        "$CuSO_4.5H_2O$",
+        "$CaCl_2$",
+        "$CaSO_4$"
+      ],
+      "answer": "$CuSO_4.5H_2O$",
+      "explanation": null,
+      "reference": [
+        "হ. বো. ২০২৩; চ. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "$CuSO_4$-এর বাণিজ্যিক নাম কী?",
+      "options": [
+        "গন্ধক",
+        "তুঁতে",
+        "নিশাদল",
+        "ন্যাপথালিন"
+      ],
+      "answer": "তুঁতে",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "তুঁতের রাসায়নিক সংকেত কোনটি?",
+      "options": [
+        "$Na_2CO_3. 10H_2O$",
+        "$CaCl_2. 6H_2O$",
+        "$CuSO_4. 5H_2O$",
+        "$CaCO_3. MgCO_3$"
+      ],
+      "answer": "$CuSO_4. 5H_2O$",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অ্যামোনিয়াম নাইট্রেট এর সংকেত কী?",
+      "options": [
+        "$(NH_4)_3PO_4$",
+        "$(NH_4)_2SO_4$",
+        "$NH_4NO_3$",
+        "$NH_4CN$"
+      ],
+      "answer": "$NH_4NO_3$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ভিনেগারের রাসায়নিক সংকেত হলো—",
+      "options": [
+        "$CH_3 - OH$",
+        "$CH_3 - CHO$",
+        "$CH_3 - COOH$",
+        "$CH_2 - CO - CH$"
+      ],
+      "answer": "$CH_3 - COOH$",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কৃষি জমির ব্যাকটেরিয়া প্রতিরোধে ব্যবহৃত হয় কোনটি?",
+      "options": [
+        "$HgSO_4$",
+        "$CuSO_4$",
+        "$KNO_3$",
+        "$NH_4NO_3$"
+      ],
+      "answer": "$CuSO_4$",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২৪; কু. বো. ২০১৯; মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোনটি শিল্প কারখানায় প্রভাবক হিসেবে ব্যবহৃত হয়?",
+      "options": [
+        "$Na_2CO_3$",
+        "$MgCl_2$",
+        "$HgSO_4$",
+        "$NaOH$"
+      ],
+      "answer": "$HgSO_4$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি কৃষি এবং শিল্পে ব্যবহৃত হয়?",
+      "options": [
+        "$CuSO_4$",
+        "$HgSO_4$",
+        "$Ag_2SO_4$",
+        "$KNO_3$"
+      ],
+      "answer": "$CuSO_4$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জনাব মোমিন তার সবজি ক্ষেতে ভাইরাস প্রতিরোধে কোনটি ব্যবহার করেন?",
+      "options": [
+        "$KNO_3$",
+        "$NH_4NO_3$",
+        "$CuSO_4$",
+        "$(NH_4)_3PO_4$"
+      ],
+      "answer": "$CuSO_4$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "শৈবালের উৎপাদন বন্ধে কোন লবণ ব্যবহৃত হয়?",
+      "options": [
+        "$Na_2CO_3.10H_2O$",
+        "$C_{17}H_{35}COOK$",
+        "$CuSO_4.5H_2O$",
+        "$K_2SO_4.Al_2(SO_4)_3.24H_2O$"
+      ],
+      "answer": "$CuSO_4.5H_2O$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "চামড়া ট্যানিং করতে নিচের কোনটি ব্যবহৃত হয়?",
+      "options": [
+        "সালফিউরিক এসিড",
+        "ভিনেগার",
+        "খাবার লবণ",
+        "এসকরবিক এসিড"
+      ],
+      "answer": "খাবার লবণ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+{
+      "type": "MULTIPLE",
+      "question": "শক্তিশালী এসিড হচ্ছে—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০১৯"
+      ],
+      "statements": [
+        "$H_2SO_4$",
+        "$HNO_3$",
+        "$CH_3COOH$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "লেবু ও কমলালেবুতে প্রাকৃতিকভাবে কোন এসিড পাওয়া যায়?",
+      "options": [
+        "ল্যাকটিক এসিড",
+        "অ্যাসিটিক এসিড",
+        "সাইট্রিক এসিড",
+        "সালফিউরিক এসিড"
+      ],
+      "answer": "সাইট্রিক এসিড",
+      "explanation": null,
+      "reference": [
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম; নি. প. ২০২৫"
       ],
       "statements": [],
       "context": null,
@@ -1662,7 +3136,107 @@
     },
     {
       "type": "MULTIPLE",
-      "question": "মি. জামাল ইসলামের বিধি-বিধানগুলো সঠিকভাবে পালন করেন। তার এ ধরনের কর্মকাণ্ড হচ্ছে ইসলামের—",
+      "question": "$pH$ সম্পর্কে বলা যায়—",
+      "options": [
+        "i, ii",
+        "ii, iii",
+        "i, iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "ফৌজদারহাট ক্যাডেট কলেজ, চট্টগ্রাম; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "মানুষের রক্তের $pH$ ৭.৪",
+        "প্রস্রাবের $pH$ ৭.০ এর কম হওয়া উচিত",
+        "ভালো ফলনের জন্য মাটির $pH$ ৪.০ থেকে ৮.০ হওয়া উচিত"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "$H_2SO_4$ ব্যবহৃত হয়—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২০"
+      ],
+      "statements": [
+        "গাড়ির ব্যাটারীতে",
+        "সাবান উৎপাদনে",
+        "টয়লেট পরিষ্কারকে"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "টয়লেট ক্লিনারের মূল উপাদান—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "নওয়াব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "$H_2SO_4$",
+        "$HCl$",
+        "$HNO_3$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "এসিডিটি বেড়ে যায়—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৯"
+      ],
+      "statements": [
+        "দুশ্চিন্তায়",
+        "নিয়মিত খাওয়ায়",
+        "ঘুম না হওয়ায়"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "এসিডিটি কমাতে সাহায্য করে—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1672,12 +3246,12 @@
       "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১ / য. বো. ২০২৫"
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
       ],
       "statements": [
-        "বিশ্বাসগত দিক",
-        "আচরণগত দিক",
-        "প্রায়োগিক দিক"
+        "বীট",
+        "গাজর",
+        "মাশরুম"
       ],
       "context": null,
       "isMath": false,
@@ -1687,7 +3261,82 @@
     },
     {
       "type": "MULTIPLE",
-      "question": "ইসলামের মূল কথা হলো—",
+      "question": "পাকস্থলীর এসিডিটি কমাতে সাহায্য করে—",
+      "options": [
+        "i",
+        "i ও ii",
+        "i ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০১৯"
+      ],
+      "statements": [
+        "কিসমিস, খেজুর",
+        "পরিমিত ঘুম, আদা চা",
+        "কফি, ভাজা পোড়া"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "অম্লীয় মাটির $pH$ এর মান নিয়ন্ত্রণে কোন ধাতুযুক্ত সার ব্যবহৃত হয়?",
+      "options": [
+        "i ও ii",
+        "ii ও iii",
+        "i ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "$Mg$",
+        "$Ca$",
+        "$Al$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "ক্ষারকের বৈশিষ্ট্য—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২০২৩"
+      ],
+      "statements": [
+        "লাল লিটমাস কাগজ নীল করে",
+        "এসিডের সাথে বিক্রিয়া করে",
+        "জলীয় দ্রবণে হাইড্রোজেন আয়ন তৈরি করে"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "ক্ষারীয় মাটির $pH$ এর মান নিয়ন্ত্রণ করে—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1697,37 +3346,62 @@
       "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / দি. বো. ২০২৩"
+        "চ. বো. ২০২৩"
       ],
       "statements": [
-        "আল্লাহ তায়ালা এক ও অদ্বিতীয়",
-        "আল্লাহ তায়ালা পালনকর্তা",
-        "আল্লাহর তুল্য কেউ নেই"
+        "পটাশিয়াম নাইট্রেট",
+        "ট্রিপল সুপার ফসফেট",
+        "ম্যাগনেসিয়াম সালফেট"
       ],
       "context": null,
-      "isMath": false,
+      "isMath": true,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
       "type": "MULTIPLE",
-      "question": "আরিফ ইসলামের বিধানগুলো সঠিকভাবে পালন করেন। তার কাজে কী প্রকাশ পায়?",
+      "question": "মিসেস সাদিকের এসিডিটির সমস্যা। তার কোন ঔষধ সেবন করা উচিত?",
       "options": [
         "i ও ii",
+        "i ও iii",
         "ii ও iii",
-        "i, ii ও iii",
-        "i ও iii"
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২১"
+      ],
+      "statements": [
+        "$Mg(OH)_2$",
+        "$Al(OH)_3$",
+        "$Ca(OH)_2$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "পিঁপড়া কামড়ালে বা মৌমাছি হুল ফুটালে—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৪ / দি. বো. ২০২৩"
+        "ঢা. বো. ২০২৫"
       ],
       "statements": [
-        "বিশ্বাস",
-        "স্বীকৃতি",
-        "প্রয়োগ"
+        "শরীরে জ্বালাপোড়া সৃষ্টি করে",
+        "ফরমিক এসিড নিঃসৃত হয়",
+        "বেকিং সোডা ব্যবহার করলে ব্যথা দূর হয়"
       ],
       "context": null,
       "isMath": false,
@@ -1737,7 +3411,416 @@
     },
     {
       "type": "MULTIPLE",
-      "question": "ইসলাম হলো—",
+      "question": "$NaOH + H_2SO_4 \\rightarrow A + B$ বিক্রিয়ায় উৎপন্ন পদার্থগুলো হলো—",
+      "options": [
+        "i",
+        "ii",
+        "iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৩"
+      ],
+      "statements": [
+        "লবণ, পানি",
+        "ক্ষারক, লবণ",
+        "পানি, ক্ষারক"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "এন্টাসিড হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২৩"
+      ],
+      "statements": [
+        "$Mg(OH)_2$",
+        "$Ca(OH)_2$",
+        "$Al(OH)_3$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "টুথপেস্টের উপাদান হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৪"
+      ],
+      "statements": [
+        "বেকিং সোডা",
+        "ক্যালসিয়াম হাইড্রোক্সাইড",
+        "টেট্রাসোডিয়াম পাইরোফসফেট"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "লবণের বৈশিষ্ট্য হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "পব মুসলীম হাই স্কুল, চট্টগ্রাম; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "এটি এসিড ও ক্ষার হতে উৎপন্ন হয়",
+        "এটি নিরপেক্ষ",
+        "উচ্চ গলনাঙ্ক ও স্ফুটনাঙ্ক"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "লবণ হলো এমন একটি পদার্থ যা—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "ঝিনাইদহ ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "প্রশমন বিক্রিয়ার মাধ্যমে উৎপন্ন হয়",
+        "নীল লিটমাস পেপারকে লাল করে",
+        "একটি নিরপেক্ষ পদার্থ"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "লবণ জাতীয় পদার্থ হচ্ছে—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "তুঁতে",
+        "সোডা",
+        "ফিটকিরি"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "পানিতে খাবার লবণ গুলে তাতে লিটমাস কাগজ ডুবালে—",
+      "options": [
+        "i",
+        "ii",
+        "iii",
+        "i, ii ও iii"
+      ],
+      "answer": "iii",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০১৭; আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "লাল লিটমাস নীল হবে",
+        "নীল লিটমাস লাল হবে",
+        "লিটমাস কাগজের রঙের কোনো পরিবর্তন হবে না"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "$H_2CO_3 + B \\rightarrow Na_2CO_3 + H_2O$ উদ্দীপকের B যৌগটি যে পদার্থকে নির্দেশ করে তা ব্যবহৃত হয়—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২০২৩"
+      ],
+      "statements": [
+        "মাটির এসিডিটি দূরীকরণে",
+        "বিভিন্ন ব্যাটারি তৈরিতে",
+        "টুথপেস্ট তৈরিতে"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "$NaCl$ ব্যবহৃত হয়—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৯"
+      ],
+      "statements": [
+        "পাউরুটিতে",
+        "চানাচুরে",
+        "আচারে"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "মাটির উর্বরতা বৃদ্ধিতে প্রয়োজন—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০১৭"
+      ],
+      "statements": [
+        "$NH_4NO_3$",
+        "$(NH_4)_3PO_4$",
+        "$KNO_3$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "$AlCl_3$ লবণ কোনটি থেকে উৎপন্ন হতে পারে?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "$Al(OH)_3$",
+        "$HCl$",
+        "প্রশমন বিক্রিয়া"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "পানিতে অদ্রবণীয় লবণ—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
+      ],
+      "statements": [
+        "$CaCO_3$",
+        "$Ag_2SO_4$",
+        "$AgCl$"
+      ],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "হুলে কী থাকার জন্য অংকুরের জ্বালা হলো?",
+      "options": [
+        "এসিড",
+        "অ্যালকোহল",
+        "ক্ষারক",
+        "অ্যালডিহাইড"
+      ],
+      "answer": "ক্ষারক",
+      "explanation": null,
+      "reference": [
+        "কদমতোলা পূর্ব বাসাবো স্কুল এন্ড কলেজ, ঢাকা"
+      ],
+      "statements": [],
+      "context": "অংকুরকে বোলতা কামড় দিলে খুব জ্বালা হলো। মা তাকে হুল ফুটানো স্থানে ভিনেগার দিয়ে ধুয়ে দিলেন, তাতে অংকুর আরাম বোধ করল।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "মা অংকুরের ক্ষত স্থানে যে জিনিসটি দিলেন সেটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "এসিড",
+        "ক্ষারককে নিষ্ক্রিয় করে",
+        "নিরপেক্ষ পদার্থ"
+      ],
+      "context": "অংকুরকে বোলতা কামড় দিলে খুব জ্বালা হলো। মা তাকে হুল ফুটানো স্থানে ভিনেগার দিয়ে ধুয়ে দিলেন, তাতে অংকুর আরাম বোধ করল।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "মি. হকের পেটে নিচের কোনটি বেড়ে যেতে পারে?",
+      "options": [
+        "$HCl$",
+        "$HNO_3$",
+        "$H_3PO_4$",
+        "$H_2SO_4$"
+      ],
+      "answer": "$HCl$",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "মি. হক ব্যাটারি তৈরির কারখানায় কাজ করেন। গত রাতে তাঁর ভালো ঘুম হয়নি এবং সকালে তিনি পরোটা ও মাংস খেয়েছেন।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "মি. হকের কারখানায় ব্যবহৃত উপাদান—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "নীল লিটমাসকে লাল করে",
+        "সার তৈরির জন্য ব্যবহৃত হয়",
+        "কাপড়ে লাগলে পুড়ে যায়"
+      ],
+      "context": "মি. হক ব্যাটারি তৈরির কারখানায় কাজ করেন। গত রাতে তাঁর ভালো ঘুম হয়নি এবং সকালে তিনি পরোটা ও মাংস খেয়েছেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "রাফিন রহমানের এ অবস্থার কারণ—",
+      "options": [
+        "সোডিয়াম ক্লোরাইড",
+        "এসিটিক এসিড",
+        "সালফিউরিক এসিড",
+        "হাইড্রোক্লোরিক এসিড"
+      ],
+      "answer": "হাইড্রোক্লোরিক এসিড",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "রাফিন রহমান ভাজা-পোড়া ও তৈলাক্ত খাবার পছন্দ করেন। বর্তমানে তাঁর পেটে অস্বস্তিবোধ করছেন, এ অবস্থা থেকে পরিত্রাণের জন্য তিনি বিশেষ কিছু পানীয় গ্রহণ করেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "রাফিন রহমানের গৃহীত পানীয়—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1746,48 +3829,348 @@
       ],
       "answer": "ii ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ৩ / সি. বো. ২০২৩"
-      ],
+      "reference": [],
       "statements": [
-        "অঞ্চল বা জাতির জন্য সীমাবদ্ধ ধর্ম",
-        "শান্তির ধর্ম",
-        "সর্বজনীন ধর্ম"
+        "গরম কফি",
+        "হারবাল চা",
+        "আদা চা"
       ],
-      "context": null,
+      "context": "রাফিন রহমান ভাজা-পোড়া ও তৈলাক্ত খাবার পছন্দ করেন। বর্তমানে তাঁর পেটে অস্বস্তিবোধ করছেন, এ অবস্থা থেকে পরিত্রাণের জন্য তিনি বিশেষ কিছু পানীয় গ্রহণ করেন।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "আল্লাহর বৈশিষ্ট্য কোনগুলো?",
+      "type": "COMBINED",
+      "question": "জমিটির কোন আয়ন মাটি থেকে গাছের মূলে চলে যায়?",
       "options": [
-        "i",
+        "অ্যালুমিনিয়াম",
+        "ক্যালসিয়াম",
+        "ম্যাগনেসিয়াম",
+        "পটাশিয়াম"
+      ],
+      "answer": "অ্যালুমিনিয়াম",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": "সিরাজুল মিয়া একজন পরিশ্রমী কৃষক হওয়া সত্ত্বেও তার জমিতে আশানুরূপ ফসল উৎপাদন হয়নি। তার জমির মাটি পরীক্ষায় $pH$ এর মান ৯.৫ এর বেশি পাওয়া যায়।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "ভালো ফলনের জন্য সিরাজুল মিয়ার উচিত—",
+      "options": [
         "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "নাইট্রেট জাতীয় সার প্রয়োগ",
+        "ফসফেট জাতীয় সার ব্যবহার",
+        "ক্যালসিয়াম জাতীয় সার ব্যবহার"
+      ],
+      "context": "সিরাজুল মিয়া একজন পরিশ্রমী কৃষক হওয়া সত্ত্বেও তার জমিতে আশানুরূপ ফসল উৎপাদন হয়নি। তার জমির মাটি পরীক্ষায় $pH$ এর মান ৯.৫ এর বেশি পাওয়া যায়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "জব্বার মিয়ার জমিতে কোন উপাদানগুলো হ্রাস পেয়েছে?",
+      "options": [
+        "$Al, Fe$",
+        "$Fe, Mg$",
+        "$Ca, Mg$",
+        "$Ca, Al$"
+      ],
+      "answer": "$Ca, Mg$",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": "জব্বার মিয়া একজন কৃষক। তার জমিতে ফসল আশানুরূপ না হওয়ায় মাটি পরীক্ষা করে দেখল মাটির $pH$ এর মান ৩।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "জমির এসিডিটি নিয়ন্ত্রণে জব্বার মিয়াকে ব্যবহার করতে হবে—",
+      "options": [
+        "i ও ii",
+        "ii ও iii",
         "i ও iii",
         "i, ii ও iii"
       ],
-      "answer": "i, ii ও iii",
+      "answer": "i ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১০ / রা. বো. ২০২৪"
-      ],
+      "reference": [],
       "statements": [
-        "অনাদি ও অনন্ত",
-        "তন্দ্রা ও নিদ্রায় আচ্ছন্ন",
-        "চিরস্থায়ী ও চির বিরাজমান"
+        "ক্যালসিয়ামযুক্ত সার",
+        "ফসফেটযুক্ত সার",
+        "ম্যাগনেসিয়ামযুক্ত সার"
       ],
-      "context": null,
+      "context": "জব্বার মিয়া একজন কৃষক। তার জমিতে ফসল আশানুরূপ না হওয়ায় মাটি পরীক্ষা করে দেখল মাটির $pH$ এর মান ৩।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
+      "type": "COMBINED",
+      "question": "প্রয়োগকৃত পদার্থটির $pH$ এর মান কত?",
+      "options": [
+        "$< 7$",
+        "$\\le 7$",
+        "$> 7$",
+        "$\\ge 7$"
+      ],
+      "answer": "$> 7$",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "ফরিদ একজন ভাল কৃষক। বর্তমানে সে তার জমিতে ভাল ফসল ফলাতে না পারায় মাটির $pH$ পরীক্ষা করে। পরে সে তার জমিতে $Ca(OH)_2$ প্রয়োগ করার সিদ্ধান্ত নেয়।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "ফরিদের নেওয়া সিদ্ধান্তটি যথার্থ ছিল, কারণ পদার্থটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "জমির উর্বরতা বাড়াবে",
+        "জমির অনুর্বর অবস্থার প্রশমন ঘটাবে",
+        "মাটির $pH$ এর মানকে ত্বরান্বিত করবে"
+      ],
+      "context": "ফরিদ একজন ভাল কৃষক। বর্তমানে সে তার জমিতে ভাল ফসল ফলাতে না পারায় মাটির $pH$ পরীক্ষা করে। পরে সে তার জমিতে $Ca(OH)_2$ প্রয়োগ করার সিদ্ধান্ত নেয়।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "কোন ক্ষেত্রে P ব্যবহৃত হয়?",
+      "options": [
+        "টয়লেট পরিষ্কারক হিসেবে",
+        "পাউরুটি ফোলাতে",
+        "ব্যাটারিতে",
+        "হজমে"
+      ],
+      "answer": "টয়লেট পরিষ্কারক হিসেবে",
+      "explanation": null,
+      "reference": [],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: P ও Q পদার্থ"
+    },
+    {
+      "type": "COMBINED",
+      "question": "Q-এর ক্ষেত্রে প্রযোজ্য হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "লাল লিটমাসকে নীল করে",
+        "এসিডিটি কমাতে সাহায্য করে",
+        "পরিপাকে সাহায্য করে"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: P ও Q পদার্থ"
+    },
+    {
+      "type": "COMBINED",
+      "question": "X যৌগটি হচ্ছে—",
+      "options": [
+        "এসিড",
+        "ক্ষারক",
+        "লবণ",
+        "নিরপেক্ষ যৌগ নয়"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$HCl \\text{ (A)} + NaOH \\text{ (B)} \\rightarrow NaCl \\text{ (X)} + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "A যৌগটি খাদ্য হজমে সহায়ক",
+        "B যৌগটির $pH < 7$",
+        "X যৌগটি চামড়া শিল্পে ব্যবহার হয়"
+      ],
+      "context": "$HCl \\text{ (A)} + NaOH \\text{ (B)} \\rightarrow NaCl \\text{ (X)} + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "পলির ব্যবহৃত তরলটিতে কোন উপাদান থাকে?",
+      "options": [
+        "$NaHCO_3$",
+        "$CH_3COOH$",
+        "$H_2CO_3$",
+        "$HCl$"
+      ],
+      "answer": "$H_2CO_3$",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০১৯"
+      ],
+      "statements": [],
+      "context": "রৌপ্যের পাশ দিয়ে স্কুলে যাওয়ার সময় মৌমাছি হুল ফুটালে পলি প্রচণ্ড জ্বালা অনুভব করল। কোকাকোলা দিয়ে আক্রান্ত স্থান ধুয়ে ফেললে সে আরামবোধ করে।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+{
       "type": "MULTIPLE",
-      "question": "'কাফির' বলতে বোঝায়—",
+      "question": "পলির জ্বালা উপশমের কারণ হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "আক্রান্ত স্থান ধুয়ে ফেলা",
+        "এসিড ও ক্ষারকের বিক্রিয়া",
+        "এসিড ও লবণের বিক্রিয়া"
+      ],
+      "context": "রৌপ্যের পাশ দিয়ে স্কুলে যাওয়ার সময় মৌমাছি হুল ফুটালে পলি প্রচণ্ড জ্বালা অনুভব করল। কোকাকোলা দিয়ে আক্রান্ত স্থান ধুয়ে ফেললে সে আরামবোধ করে।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "'X'-এর সংকেত কোনটি?",
+      "options": [
+        "$Na_2CO_3. 10H_2O$",
+        "$C_{17}H_{35}COONa$",
+        "$C_{17}H_{35}COOK$",
+        "$CuSO_4. 5H_2O$"
+      ],
+      "answer": "$C_{17}H_{35}COOK$",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: প্রসাধনী সামগ্রী ও সংকেত"
+    },
+    {
+      "type": "COMBINED",
+      "question": "'Y' পদার্থটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "একটি লবণ",
+        "জীবাণুনাশক হিসেবে ব্যবহৃত হয়",
+        "এর সংকেত $CuSO_4. COONa$"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": true,
+      "attachmentType": "TABLE",
+      "attachmentDescription": "ছক: প্রসাধনী সামগ্রী ও সংকেত"
+    },
+    {
+      "type": "COMBINED",
+      "question": "বিক্রিয়ায় 'A' চিহ্নিত যৌগটির নাম কী?",
+      "options": [
+        "হাইড্রোক্লোরিক এসিড",
+        "নাইট্রিক এসিড",
+        "সালফিউরিক এসিড",
+        "ফসফরিক এসিড"
+      ],
+      "answer": "সালফিউরিক এসিড",
+      "explanation": null,
+      "reference": [
+        "চ. বো., সি. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "$CaO + A \\rightarrow CaSO_4 + H_2O$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "'A' চিহ্নিত যৌগটি ব্যবহৃত হয়—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1796,23 +4179,86 @@
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১১ / য. বো. ২০২৫"
-      ],
+      "reference": [],
       "statements": [
-        "আল্লাহর অস্তিত্ব অস্বীকারকারী",
-        "হালালকে হারাম সাব্যস্তকারী",
-        "সম্পদ জমাকারী"
+        "সাবান তৈরিতে",
+        "রাসায়নিক সার তৈরিতে",
+        "ব্যাটারি তৈরিতে"
       ],
-      "context": null,
+      "context": "$CaO + A \\rightarrow CaSO_4 + H_2O$",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "কুফর বর্জনীয়। কারণ এর মাধ্যমে—",
+      "type": "COMBINED",
+      "question": "উৎপন্ন 'X' যৌগটির ক্ষেত্রে কোনটি সঠিক?",
+      "options": [
+        "নিরপেক্ষ",
+        "অম্লীয়",
+        "ক্ষারীয়",
+        "IPS এ ব্যবহৃত"
+      ],
+      "answer": "নিরপেক্ষ",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "$HCl \\text{ [A]} + NaOH \\text{ [B]} \\rightarrow [X] + H_2O$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে—",
+      "options": [
+        "i ও ii",
+        "ii ও iii",
+        "i ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "A যৌগটি খাদ্য হজমে সহায়ক",
+        "B যৌগটির $pH < 7$",
+        "X যৌগটি চামড়া শিল্পে ব্যবহার হয়"
+      ],
+      "context": "$HCl \\text{ [A]} + NaOH \\text{ [B]} \\rightarrow [X] + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "'X' বিক্রিয়কটি হলো—",
+      "options": [
+        "ক্ষার",
+        "এসিড",
+        "ক্ষারক",
+        "লবণ"
+      ],
+      "answer": "ক্ষার",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২০২১"
+      ],
+      "statements": [],
+      "context": "$(i)\\ HCl + X \\rightarrow MgCl_2 + 2H_2O$\n$(ii)\\ Ca(OH)_2 + H_2SO_4 \\rightarrow A + 2H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "'A' জাতীয় যৌগ ব্যবহৃত হয়—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1821,23 +4267,262 @@
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১২ / সকল বোর্ড ২০১৯"
-      ],
+      "reference": [],
       "statements": [
-        "অনৈতিকতার প্রসার ঘটে",
-        "সাময়িক শান্তি পাওয়া যায়",
-        "হতাশার প্রসার ঘটে"
+        "সাবান তৈরিতে",
+        "টুথপেস্ট তৈরিতে",
+        "শৈবালের উৎপাদন বন্ধে"
       ],
-      "context": null,
+      "context": "$(i)\\ HCl + X \\rightarrow MgCl_2 + 2H_2O$\n$(ii)\\ Ca(OH)_2 + H_2SO_4 \\rightarrow A + 2H_2O$",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "মুনাফিকরা জাহান্নামের সর্বনিম্ন স্তরে থাকবে কেন?",
+      "type": "COMBINED",
+      "question": "নিচের কোনটি Y যৌগ?",
+      "options": [
+        "$HCl$",
+        "$NaCl$",
+        "$NaOH$",
+        "$H_2CO_3$"
+      ],
+      "answer": "$NaCl$",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$Na_2CO_3 + X \\rightarrow Y + H_2O + CO_2$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "X যৌগটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "শক্তিশালী এসিড",
+        "পাকস্থলীতে পাওয়া যায়",
+        "জমির উর্বরতা বৃদ্ধি করে"
+      ],
+      "context": "$Na_2CO_3 + X \\rightarrow Y + H_2O + CO_2$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "X যৌগটি হচ্ছে—",
+      "options": [
+        "ক্ষারক",
+        "এসিড",
+        "লবণ",
+        "ক্ষার"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২০২৬"
+      ],
+      "statements": [],
+      "context": "$HNO_3 + Ca(OH)_2 \\rightarrow X + H_2O$\n$Y + NaOH \\rightarrow Na_2SO_4 + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "Y যৌগটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "সার তৈরিতে ব্যবহার করা হয়",
+        "সাবান তৈরিতে ব্যবহার হয়",
+        "গাড়ির ব্যাটারিতে ব্যবহার করা হয়"
+      ],
+      "context": "$HNO_3 + Ca(OH)_2 \\rightarrow X + H_2O$\n$Y + NaOH \\rightarrow Na_2SO_4 + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে A যৌগটি কী?",
+      "options": [
+        "এসিড",
+        "ক্ষার",
+        "ক্ষারক",
+        "লবণ"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর; নি. প. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$Na_2CO_3 + HCl \\rightarrow A + H_2O + CO_2$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "বিক্রিয়কের দ্বিতীয় যৌগটি ব্যবহৃত হয়—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "খাদ্যদ্রব্য হজমে",
+        "সার তৈরির উপাদান হিসেবে",
+        "থালা বাসন পরিষ্কার হিসেবে"
+      ],
+      "context": "$Na_2CO_3 + HCl \\rightarrow A + H_2O + CO_2$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের বিক্রিয়ায় 'Y' চিহ্নিত পদার্থটি কী?",
+      "options": [
+        "এসিড",
+        "ক্ষার",
+        "লবণ",
+        "ক্ষারক"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$X + H_2SO_4 \\rightarrow Y + H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের 'X' চিহ্নিত পদার্থটির বৈশিষ্ট্য—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "ii ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "লাল লিটমাসকে নীল করে",
+        "নীল লিটমাসকে লাল করে",
+        "পানিতে হাইড্রক্সাইড আয়ন তৈরি করে"
+      ],
+      "context": "$X + H_2SO_4 \\rightarrow Y + H_2O$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "P যৌগটি কী?",
+      "options": [
+        "অম্ল",
+        "ক্ষার",
+        "ক্ষারক",
+        "লবণ"
+      ],
+      "answer": "লবণ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "$Ca(OH)_2 + H_2SO_4 \\rightarrow P + 2H_2O$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে দ্বিতীয় বিক্রিয়ক যৌগের ক্ষেত্রে প্রযোজ্য হলো—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "এটি টয়লেট পরিষ্কারকের মূল উপাদান",
+        "সার তৈরির প্রয়োজনীয় উপাদান",
+        "টুথপেস্ট তৈরির প্রয়োজনীয় বস্তু"
+      ],
+      "context": "$Ca(OH)_2 + H_2SO_4 \\rightarrow P + 2H_2O$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "বিক্রিয়ায় উৎপন্ন 'B' গ্যাসটির নাম কী?",
+      "options": [
+        "হাইড্রোজেন",
+        "অক্সিজেন",
+        "কার্বন মনোক্সাইড",
+        "কার্বন ডাই-অক্সাইড"
+      ],
+      "answer": "কার্বন ডাই-অক্সাইড",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০২০"
+      ],
+      "statements": [],
+      "context": "$CaCO_3 + [A] \\rightarrow CaSO_4 + H_2O + [B]$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "যৌগ 'A' এর ক্ষেত্রে—",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1846,23 +4531,130 @@
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / যি. বো. ২০২৫"
-      ],
+      "reference": [],
       "statements": [
-        "তারা মুসলমানদের গোপন তথ্য শত্রুদের জানিয়ে দেয়",
-        "তারা ইসলামের মৌলিক বিষয়গুলোকে অস্বীকার করে",
-        "তাদের কারণে সমাজে বিশৃঙ্খলা সৃষ্টি হয়"
+        "এতে একটি হাইড্রোজেন পরমাণু আছে",
+        "এটি পরিষ্কারক হিসেবে ব্যবহৃত হয়",
+        "এটি মাটির উর্বরতা বৃদ্ধিতে সহায়তা করে"
       ],
-      "context": null,
+      "context": "$CaCO_3 + [A] \\rightarrow CaSO_4 + H_2O + [B]$",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "মুনাফিকরা জাহান্নামের সর্বনিম্ন স্তরে নিক্ষিপ্ত হবে, কারণ—",
+      "type": "COMBINED",
+      "question": "নিচের কোনটি B যৌগ?",
+      "options": [
+        "$H_2CO_3$",
+        "$NaOH$",
+        "$CO_2$",
+        "$CO$"
+      ],
+      "answer": "$CO_2$",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২০২৪"
+      ],
+      "statements": [],
+      "context": "$NaHCO_3 + A \\rightarrow NaCl + H_2O + B$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "A যৌগটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "টয়লেট পরিষ্কারকের মূল উপাদান হিসেবে ব্যবহৃত হয়",
+        "খাবার হজমে সহায়তা করে",
+        "দাঁত পরিষ্কারে ব্যবহৃত হয়"
+      ],
+      "context": "$NaHCO_3 + A \\rightarrow NaCl + H_2O + B$",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "'X' যৌগের সংকেত কোনটি?",
+      "options": [
+        "$Na_2O$",
+        "$NaOH$",
+        "$Na(OH)_2$",
+        "$Na_2OH$"
+      ],
+      "answer": "$NaOH$",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২০২৩"
+      ],
+      "statements": [],
+      "context": "$Na_2CO_3 + H_2O \\rightarrow X + H_2CO_3(Y)$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের আলোকে—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "ii ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "X একটি দুর্বল ক্ষার",
+        "Y একটি দুর্বল এসিড",
+        "X এর $pH$ 7 এর বেশি"
+      ],
+      "context": "$Na_2CO_3 + H_2O \\rightarrow X + H_2CO_3(Y)$",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের কোন দ্রবণটি পান যোগ্য?",
+      "options": [
+        "P দ্রবণ",
+        "R দ্রবণ",
+        "Q দ্রবণ",
+        "P, Q ও R দ্রবণ"
+      ],
+      "answer": "R দ্রবণ",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২০১৬"
+      ],
+      "statements": [],
+      "context": "P, Q, R তিনটি দ্রবণে লিটমাস পেপার ডুবিয়ে দেখা গেল P দ্রবণে লাল লিটমাস নীল হলো, Q দ্রবণে নীল লিটমাস লাল হলো, R দ্রবণে কোনো পরিবর্তন হলো না।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের দ্রবণ তিনটির ক্ষেত্রে —",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -1871,15 +4663,57 @@
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
-      "reference": [
-        "সূত্র: পাঠ্যবই, পৃষ্ঠা ১৬ / দি. বো., ব. বো. ২০২৪"
-      ],
+      "reference": [],
       "statements": [
-        "ঈমানদারের অভিনয় করায়",
-        "মুসলমানদের গোপনে ক্ষতি করায়",
-        "আখিরাতের চেয়ে দুনিয়াকে প্রাধান্য দেওয়ায়"
+        "P দ্রবণটি হলো ক্ষারীয়",
+        "Q দ্রবণটি হলো অম্লীয়",
+        "R দ্রবণটির $pH > 7$"
       ],
-      "context": null,
+      "context": "P, Q, R তিনটি দ্রবণে লিটমাস পেপার ডুবিয়ে দেখা গেল P দ্রবণে লাল লিটমাস নীল হলো, Q দ্রবণে নীল লিটমাস লাল হলো, R দ্রবণে কোনো পরিবর্তন হলো না।",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের সোডাটির রাসায়নিক নাম কী?",
+      "options": [
+        "সোডিয়াম কার্বোনেট",
+        "সোডিয়াম সালফেট",
+        "সোডিয়াম হাইড্রোজেন সালফেট",
+        "সোডিয়াম হাইড্রোজেন কার্বোনেট"
+      ],
+      "answer": "সোডিয়াম হাইড্রোজেন কার্বোনেট",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০১৭"
+      ],
+      "statements": [],
+      "context": "মসুরের ডাল বেশি পরিমাণ খাওয়ার পর সাজিদ পেটে প্রচণ্ড ব্যথা অনুভব করে। পেটের ব্যথা উপশম করার জন্য সে খাবার সোডা খায়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "সোডাটি—",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [],
+      "statements": [
+        "একটি লবণ",
+        "এর জলীয় দ্রবণ এসিডিক",
+        "এর জলীয় দ্রবণ ক্ষারীয়"
+      ],
+      "context": "মসুরের ডাল বেশি পরিমাণ খাওয়ার পর সাজিদ পেটে প্রচণ্ড ব্যথা অনুভব করে। পেটের ব্যথা উপশম করার জন্য সে খাবার সোডা খায়।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -1887,4 +4721,3 @@
     }
   ]
 }
-

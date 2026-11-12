@@ -243,19 +243,47 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     return;
   }
 
+  // Strip prefixes like "প্রথম অধ্যায়:", "১ম অধ্যায় -", "Chapter 1:"
+  const strippedTitle = chapterTitle
+    .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ|chapter)\s*[:：\-–.]\s*/i, "")
+    .trim();
+
   // Find matching chapter in the database (Exact match first, then fallback to partial/contains)
-  const variants = getBengaliVariants(chapterTitle);
+  const titleCandidates = [chapterTitle, strippedTitle].filter(Boolean);
+  const variants = [...new Set(titleCandidates.flatMap(getBengaliVariants))];
   const searchConditions = variants.flatMap((v) => [
     { nameBn: v },
     { nameEn: { equals: v, mode: "insensitive" as const } },
   ]);
 
   const subjectIdArg = (data as any).subjectId;
-  const subjectCondition = subjectIdArg
-    ? { subjectId: subjectIdArg }
-    : ((data as any).subjectName
-      ? { subject: { nameBn: { contains: (data as any).subjectName } } }
-      : {});
+  const classNameArg = (data as any).className;
+  const subjectNameArg = (data as any).subjectName;
+
+  const subjectCondition: any = {};
+  if (subjectIdArg) {
+    subjectCondition.subjectId = subjectIdArg;
+  } else {
+    const subjectFilter: any = {};
+    if (subjectNameArg) {
+      subjectFilter.nameBn = { contains: subjectNameArg };
+    }
+    if (classNameArg) {
+      subjectFilter.classSubjects = {
+        some: {
+          academicClass: {
+            OR: [
+              { nameEn: { equals: classNameArg, mode: "insensitive" } },
+              { nameBn: { equals: classNameArg, mode: "insensitive" } },
+            ],
+          },
+        },
+      };
+    }
+    if (Object.keys(subjectFilter).length > 0) {
+      subjectCondition.subject = subjectFilter;
+    }
+  }
 
   let matchedChapter = await prisma.academicChapter.findFirst({
     where: {
@@ -379,7 +407,12 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     const questionType = (cleanedContext || q.hasAttachment)
       ? "COMBINED"
       : (q.type || (cleanStatements.length > 0 ? "MULTIPLE" : "SINGLE"));
-    const isMathDetected = Boolean(q.isMath || /[\$\\\{\}\^]|(?:\\frac|\\sqrt|\\times)/.test(cleanQuestion));
+    const isMathDetected = Boolean(
+      q.isMath ||
+      /[\$\\\{\}\^]|(?:\\frac|\\sqrt|\\times)/.test(cleanQuestion) ||
+      (cleanExplanation && /[\$]/.test(cleanExplanation)) ||
+      cleanOptions.some((opt) => /[\$]/.test(opt))
+    );
     const finalSource = q.source || sourceName;
     const finalSession = q.session || sessionYear;
 

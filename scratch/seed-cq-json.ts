@@ -2,12 +2,15 @@ import { resolve } from "node:path";
 import { readFileSync, readdirSync, existsSync, mkdirSync, appendFileSync, statSync } from "node:fs";
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../packages/db/generated/main/client.js";
+import { PrismaClient } from "../packages/db/generated/main/client.ts";
 
 // Load root .env
-const WORKSPACE_ROOT = resolve(import.meta.dirname, "..");
+const WORKSPACE_ROOT = process.cwd().includes("packages") || process.cwd().includes("apps")
+  ? resolve(process.cwd(), "../..")
+  : process.cwd();
+
 config({ path: resolve(WORKSPACE_ROOT, ".env") });
-config();
+config({ path: resolve(WORKSPACE_ROOT, "packages/db/.env") });
 
 const connectionString = process.env.MAIN_DATABASE_URL || process.env.DATABASE_URL;
 if (!connectionString) {
@@ -33,6 +36,11 @@ interface RawCqQuestion {
   hasAttachment?: boolean;
   attachmentType?: string | null;
   attachmentDescription?: string | null;
+  table?: {
+    headers?: string[];
+    rows?: string[][];
+  } | null;
+  bottomContent?: string | null;
 }
 
 interface RawCqFile {
@@ -40,7 +48,8 @@ interface RawCqFile {
   subjectName?: string;
   source?: string;
   session?: string;
-  questions: RawCqQuestion[];
+  questions?: RawCqQuestion[];
+  cqs?: RawCqQuestion[];
 }
 
 function cleanSubQuestion(qText: string | null | undefined, prefixLetter: string): string {
@@ -80,7 +89,7 @@ function cleanContext(rawContext?: string | null): string {
 
 function isQuestionNoReference(ref: string): boolean {
   const trimmed = ref.trim();
-  // Matches "অনন্য প্রশ্ন ...", "প্রশ্ন নং ১", "প্রশ্ন ১", "প্রশ্ন নং-১", "প্রশ্ন: ১", "Question 1", citation tags, etc.
+  // User strict rule: don't consider as ref which starts with প্রশ্ন or প্রশ্ন নং
   if (trimmed.startsWith("অনন্য প্রশ্ন")) return true;
   if (trimmed.startsWith("প্রশ্ন নং")) return true;
   if (trimmed.startsWith("প্রশ্ন")) return true;
@@ -88,7 +97,7 @@ function isQuestionNoReference(ref: string): boolean {
   return /^(?:প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+|q(?:uestion)?\s*(?:no\.?)?\s*[-:–.]?\s*\d+)$/i.test(trimmed);
 }
 
-function normalizeReferences(rawRefs?: string[]): string[] {
+export function normalizeReferences(rawRefs?: string[]): string[] {
   if (!rawRefs || !Array.isArray(rawRefs)) return [];
 
   const splitItems = rawRefs.flatMap((item) =>
@@ -98,15 +107,16 @@ function normalizeReferences(rawRefs?: string[]): string[] {
   const normalized = new Set<string>();
 
   for (const rawItem of splitItems) {
-    // Strip citations and trailing '| প্রশ্ন নং ১' or ', প্রশ্ন নং ১' if present inside a single string
     let item = rawItem
       .replace(/\[cite:\s*[^\]]+\]/gi, "")
       .replace(/\[?\bcite:\s*\d+\b\]?/gi, "")
       .replace(/\s*\|\s*প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+/gi, "")
       .replace(/,\s*প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+/gi, "")
+      .replace(/\s*[-–]\s*প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+/gi, "")
+      .replace(/\s*[(]?প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*[০-৯0-9]+[)]?/gi, "")
       .trim();
 
-    // Skip question number or citation references
+    // Discard any question-number reference or empty string
     if (!item || isQuestionNoReference(item)) {
       continue;
     }
@@ -127,18 +137,56 @@ function normalizeReferences(rawRefs?: string[]): string[] {
   return Array.from(normalized);
 }
 
-function getBengaliVariants(str: string): string[] {
-  const trimmed = str.trim();
-  const canon = trimmed
-    .replace(/\u09AF\u09BC/g, "\u09DF") // য + ় -> য়
-    .replace(/\u09A1\u09BC/g, "\u09DC") // ড + ় -> ড়
-    .replace(/\u09A2\u09BC/g, "\u09DD"); // ঢ + ় -> ঢ়
-  const decomp = trimmed
-    .replace(/\u09DF/g, "\u09AF\u09BC")
-    .replace(/\u09DC/g, "\u09A1\u09BC")
-    .replace(/\u09DD/g, "\u09A2\u09BC");
-  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
-  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+async function resolveTargetChapter(chapterTitle: string) {
+  const trimmed = (chapterTitle || "").trim();
+
+  // Special aliases for Science Class 9/10 Pos 0: উন্নততর জীবনধারা
+  if (
+    trimmed.includes("খাদ্য") ||
+    trimmed.includes("পুষ্টি") ||
+    trimmed.includes("উন্নত") ||
+    trimmed.includes("জীবনধারা")
+  ) {
+    const ch = await prisma.academicChapter.findFirst({
+      where: {
+        id: "cmwd7woyw00002oejaeoce9n6", // Pos 0: উন্নততর জীবনধারা
+      },
+      include: {
+        subject: true,
+      },
+    });
+    if (ch) return ch;
+  }
+
+  // Strip prefixes like "প্রথম অধ্যায়:", "১ম অধ্যায়:"
+  const strippedTitle = trimmed
+    .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ)\s*[:：\-–.]\s*/i, "")
+    .trim();
+
+  const matched = await prisma.academicChapter.findFirst({
+    where: {
+      OR: [
+        { nameBn: { in: [trimmed, strippedTitle] } },
+        { nameBn: { contains: strippedTitle } },
+      ],
+      subject: {
+        OR: [{ nameEn: "Science" }, { nameBn: "বিজ্ঞান" }],
+        academicYear: { isCurrent: true },
+        classSubjects: {
+          some: {
+            academicClass: {
+              OR: [{ nameEn: "Nine" }, { nameBn: "নবম" }, { nameEn: "Ten" }, { nameBn: "দশম" }],
+            },
+          },
+        },
+      },
+    },
+    include: {
+      subject: true,
+    },
+  });
+
+  return matched;
 }
 
 async function seedSingleCqFile(filePath: string, forceClean = false) {
@@ -154,55 +202,22 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
     return;
   }
 
-  if (!data.chapterTitle || !Array.isArray(data.questions)) {
-    console.error("\x1b[31m✖ JSON missing required 'chapterTitle' or 'questions' array.\x1b[0m");
+  const rawQuestions = data.questions || data.cqs || [];
+  if (!data.chapterTitle || !Array.isArray(rawQuestions)) {
+    console.error("\x1b[31m✖ JSON missing required 'chapterTitle' or 'questions'/'cqs' array.\x1b[0m");
     return;
   }
 
-  // 1. Resolve Target Chapter (Exact match first, then fallback to partial/contains)
-  const variants = getBengaliVariants(data.chapterTitle);
-  const searchConditions = variants.flatMap((v) => [
-    { nameBn: v },
-    { nameEn: { equals: v, mode: "insensitive" as const } },
-  ]);
-
-  let matchedChapter = await prisma.academicChapter.findFirst({
-    where: {
-      OR: searchConditions,
-      isActive: true,
-    },
-    include: {
-      subject: true,
-    },
-  });
-
+  // 1. Resolve Target Chapter
+  const matchedChapter = await resolveTargetChapter(data.chapterTitle);
   if (!matchedChapter) {
-    const partialConditions = variants.flatMap((v) => [
-      { nameBn: { contains: v, mode: "insensitive" as const } },
-      { nameEn: { contains: v, mode: "insensitive" as const } },
-    ]);
-    matchedChapter = await prisma.academicChapter.findFirst({
-      where: {
-        OR: partialConditions,
-        isActive: true,
-      },
-      include: {
-        subject: true,
-      },
-      orderBy: {
-        position: "asc",
-      },
-    });
-  }
-
-  if (!matchedChapter) {
-    console.error(`\x1b[31m✖ No active chapter found matching: "${searchTitle}"\x1b[0m`);
+    console.error(`\x1b[31m✖ No active chapter found matching: "${data.chapterTitle}" in Class 9/10 Science!\x1b[0m`);
     return;
   }
 
   console.log(`TARGET SUBJECT:    ${matchedChapter.subject.nameBn || matchedChapter.subject.nameEn} (${matchedChapter.subjectId})`);
   console.log(`TARGET CHAPTER:    ${matchedChapter.nameBn} [Pos ${matchedChapter.position}] (${matchedChapter.id})`);
-  console.log(`QUESTIONS IN FILE: ${data.questions.length}`);
+  console.log(`QUESTIONS IN FILE: ${rawQuestions.length}`);
   console.log(`======================================================`);
 
   if (forceClean) {
@@ -212,15 +227,14 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
     console.log(`\x1b[33m⚠ --force-clean active: Deleted ${deleted.count} existing CQs from this chapter.\x1b[0m`);
   }
 
-  // 2. Resolve CQ QuestionType
-  let questionTypeId: string | null = null;
+  // 2. Resolve CQ QuestionType: 'cmtr5kg3p001kp4tyqtfp30ee' (CQ / সৃজনশীল)
+  let questionTypeId = "cmtr5kg3p001kp4tyqtfp30ee";
   const qt = await prisma.questionType.findFirst({
     where: {
       OR: [
-        { label: { contains: "CQ", mode: "insensitive" } },
-        { nameEn: { contains: "CQ", mode: "insensitive" } },
-        { label: { contains: "Creative", mode: "insensitive" } },
-        { nameEn: { contains: "Creative", mode: "insensitive" } },
+        { id: "cmtr5kg3p001kp4tyqtfp30ee" },
+        { nameEn: "CQ" },
+        { nameBn: "সৃজনশীল" },
       ],
       isActive: true,
     },
@@ -236,8 +250,8 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
   let updatedCount = 0;
   const auditItems: any[] = [];
 
-  for (let idx = 0; idx < data.questions.length; idx++) {
-    const q = data.questions[idx]!;
+  for (let idx = 0; idx < rawQuestions.length; idx++) {
+    const q = rawQuestions[idx]!;
 
     const questionA = cleanSubQuestion(q.questionA, "ক");
     const questionB = cleanSubQuestion(q.questionB, "খ");
@@ -264,13 +278,11 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
     });
 
     const existingCq = existingCandidates.find((c) => {
-      // If questionC exists on both, compare questionC
       if (questionC && c.questionC) {
         return c.questionC.trim() === questionC.trim();
       }
-      // If context/attachment exists, compare stimulus content
       if (context) {
-        const passage = c.attachments.find((a) => a.type === "PASSAGE");
+        const passage = c.attachments.find((a) => a.type === "PASSAGE" || a.type === "TABLE");
         return passage?.content?.trim() === context.trim();
       }
       return true;
@@ -324,13 +336,17 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
       insertedCount++;
     }
 
-    // Handle Question Attachments (Passage stimulus or diagram)
-    if (context || q.hasAttachment) {
+    // Handle Question Attachments (Passage stimulus, Table, or Diagram)
+    const hasTable = Boolean(q.table && (q.table.headers?.length || q.table.rows?.length));
+    if (context || q.hasAttachment || hasTable) {
       const existingAttachment = await prisma.questionAttachment.findFirst({
         where: { cqId: currentCqId },
       });
 
-      const attachmentType = q.attachmentType || (context ? "PASSAGE" : "DIAGRAM");
+      const attachmentType = hasTable
+        ? "TABLE"
+        : q.attachmentType || (context ? "PASSAGE" : "DIAGRAM");
+
       const rawCaption = q.attachmentDescription?.trim();
       // Rule: Never use 'উদ্দীপক' as caption! Strictly null unless a genuine specific caption (e.g. 'চিত্র ১', 'ছক ১')
       const caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক") ? rawCaption : null;
@@ -339,6 +355,9 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
         contentText = null;
       }
 
+      const tableData = hasTable ? q.table : null;
+      const bottomContent = q.bottomContent || null;
+
       if (!existingAttachment) {
         await prisma.questionAttachment.create({
           data: {
@@ -346,6 +365,9 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
             type: attachmentType,
             caption: caption,
             content: contentText,
+            table: tableData,
+            bottomContent: bottomContent,
+            tableBorder: hasTable ? true : null,
           },
         });
       } else {
@@ -355,12 +377,15 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
             type: attachmentType,
             caption: caption,
             content: contentText,
+            table: tableData,
+            bottomContent: bottomContent,
+            tableBorder: hasTable ? true : null,
           },
         });
       }
 
       // If visual media (diagram, circuit, map) is required, log audit & QuestionReport
-      if (q.hasAttachment && !context) {
+      if (q.hasAttachment && !context && !hasTable) {
         auditItems.push({
           id: currentCqId,
           question: questionA,
@@ -369,7 +394,6 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
           reference: normalizedRefs.join(", ") || "N/A",
         });
 
-        // Ensure database QuestionReport entry exists so Admin surfaces it under reports
         const existingReport = await prisma.questionReport.findFirst({
           where: {
             entityType: "CQ",
@@ -434,7 +458,6 @@ async function main() {
       targetPath = resolve(WORKSPACE_ROOT, rawPathArg);
     }
   } else {
-    // If no argument, check scratch/raw-data/test-cq.json first (user's most recent drop location), then scratch/raw-data-cq
     const rawDataTestCq = resolve(WORKSPACE_ROOT, "scratch/raw-data/test-cq.json");
     const rawDataCqDir = resolve(WORKSPACE_ROOT, "scratch/raw-data-cq");
 
@@ -448,15 +471,12 @@ async function main() {
   if (!existsSync(targetPath)) {
     mkdirSync(targetPath, { recursive: true });
     console.log(`Created empty folder: ${targetPath}`);
-    console.log("Please place your CQ JSON files in scratch/raw-data-cq/ or scratch/raw-data/test-cq.json and rerun.");
     return;
   }
 
   if (statSync(targetPath).isFile()) {
     if (targetPath.endsWith(".json")) {
       await seedSingleCqFile(targetPath, forceClean);
-    } else {
-      console.log(`Target file is not a .json file: ${targetPath}`);
     }
     return;
   }
@@ -466,12 +486,6 @@ async function main() {
     .filter((dirent) => dirent.isFile() && dirent.name.endsWith(".json"))
     .map((dirent) => resolve(targetPath, dirent.name));
 
-  if (jsonFiles.length === 0) {
-    console.log(`No .json files found in ${targetPath}`);
-    return;
-  }
-
-  console.log(`Found ${jsonFiles.length} CQ JSON file(s) in ${targetPath}. Processing batch...`);
   for (const file of jsonFiles) {
     await seedSingleCqFile(file, forceClean);
   }

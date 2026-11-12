@@ -5,6 +5,16 @@ dist
 build
 .git
 .gitignore
+.env*
 *.log
 Dockerfile*
 README.md
+walkthrough.md
+scratch
+docs
+/*.json
+!/package.json
+!/tsconfig.json
+!/turbo.json
+/*.html
+/*.jsx
