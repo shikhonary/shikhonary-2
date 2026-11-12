@@ -138,7 +138,7 @@ const HeaderSetCode = ({ settings }: { settings: any }) => {
 
 const HeaderTimeMarks = ({ settings, className = "" }: { settings: any, className?: string }) => {
   return (
-    <div className={cn("flex justify-between items-center py-0 -mt-0.5 mb-0 px-1 text-sm font-bold border-b border-black", className)}>
+    <div className={cn("flex justify-between items-center py-0 -mt-0.5 mb-0 px-1 text-base font-bold border-b border-black", className)}>
       {settings.showTime ? (
         <div className="flex items-center whitespace-nowrap">
           <span className="font-bold mr-1">সময় —</span>
@@ -182,8 +182,8 @@ const ClassicLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
 
       <div className="text-center -space-y-1 w-full">
         <EditableField value={settings.institutionName} field="institutionName" className={cn("font-bold block leading-[1.1] mb-0 mx-auto text-center", isNarrow ? "text-xl" : "text-3xl")} />
-        {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-lg" : "text-2xl")} />}
-        {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-sm" : "text-lg")} />}
+        {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-xl" : "text-[26px]")} />}
+        {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-base" : "text-xl")} />}
         {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-sm" : "text-lg")} />}
       </div>
     </div>
@@ -199,8 +199,8 @@ const ModernLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolean
       <div className="text-center -space-y-1 w-full relative">
         <div className="absolute right-0 top-0"><HeaderSetCode settings={settings} /></div>
         <EditableField value={settings.institutionName} field="institutionName" className={cn("font-bold block leading-[1.1] mb-0 mx-auto text-center", isNarrow ? "text-2xl" : "text-3xl")} />
-        {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-xl" : "text-2xl")} />}
-        {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-base" : "text-lg")} />}
+        {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none mx-auto text-center", isNarrow ? "text-[22px]" : "text-[26px]")} />}
+        {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-lg" : "text-xl")} />}
         {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className={cn("block font-bold leading-none mx-auto text-center", isNarrow ? "text-base" : "text-lg")} />}
       </div>
     </div>
@@ -216,8 +216,8 @@ const LeftAlignedLayout = ({ settings, isNarrow }: { settings: any, isNarrow: bo
         <HeaderLogo settings={settings} />
         <div className="text-left -space-y-1">
           <EditableField value={settings.institutionName} field="institutionName" className={cn("font-bold block leading-[1.1] mb-0 text-left", isNarrow ? "text-lg" : "text-2xl")} />
-          {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none text-left", isNarrow ? "text-base" : "text-xl")} />}
-          <div className={cn("flex gap-3 font-bold leading-none", isNarrow ? "text-sm" : "text-base")}>
+          {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold block leading-none text-left", isNarrow ? "text-lg" : "text-[22px]")} />}
+          <div className={cn("flex gap-3 font-bold leading-none", isNarrow ? "text-base" : "text-lg")}>
             {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className="text-left font-bold" />}
             {settings.showSubjectName && <span className="text-muted-foreground font-bold">•</span>}
             {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className="text-left font-bold" />}
@@ -238,10 +238,10 @@ const MinimalLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
         <div className="flex items-center flex-wrap gap-2">
           <EditableField value={settings.institutionName} field="institutionName" className={cn("font-bold leading-[1.1] text-left", isNarrow ? "text-lg" : "text-xl")} />
           {settings.showExamName && <span className="font-bold leading-none">|</span>}
-          {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold leading-none text-left text-muted-foreground", isNarrow ? "text-lg" : "text-xl")} />}
+          {settings.showExamName && <EditableField value={settings.examName} field="examName" editable placeholder="পরীক্ষার নাম" className={cn("font-bold leading-none text-left text-muted-foreground", isNarrow ? "text-xl" : "text-[22px]")} />}
         </div>
         
-        <div className={cn("flex items-center flex-wrap gap-3 font-bold mt-0 leading-none", isNarrow ? "text-sm" : "text-base")}>
+        <div className={cn("flex items-center flex-wrap gap-3 font-bold mt-0 leading-none", isNarrow ? "text-base" : "text-lg")}>
           {settings.showClassName && <EditableField value={settings.className} field="className" editable placeholder="শ্রেণি" className="text-left font-bold" />}
           {settings.showSubjectName && <span>—</span>}
           {settings.showSubjectName && <EditableField value={settings.subjectName} field="subjectName" className="text-left font-bold" />}
@@ -250,7 +250,7 @@ const MinimalLayout = ({ settings, isNarrow }: { settings: any, isNarrow: boolea
 
       <div className="text-right flex flex-col items-end gap-0 shrink-0 max-w-[40%] overflow-hidden font-bold">
         <HeaderSetCode settings={settings} />
-        <div className="flex flex-col text-sm font-bold text-right mt-0">
+        <div className="flex flex-col text-base font-bold text-right mt-0">
           {settings.showTime && (
             <div className="flex justify-end items-center gap-1 w-full"><span className="font-bold whitespace-nowrap">সময়:</span><EditableField value={settings.time} field="time" className="max-w-[120px] font-bold" /></div>
           )}

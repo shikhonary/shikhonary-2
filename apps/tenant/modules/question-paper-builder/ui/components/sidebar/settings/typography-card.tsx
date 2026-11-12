@@ -22,9 +22,12 @@ const toBengaliDigits = (num: number | string): string => {
     .join("");
 };
 
+const FONT_SIZE_OFFSET = 2;
+
 export const TypographyCard: React.FC = () => {
   const settings = useBuilderStore((state) => state.settings);
   const updateSettings = useBuilderStore((state) => state.updateSettings);
+  const displayFontSize = Math.max(8, (settings.fontSize || 15) - FONT_SIZE_OFFSET);
 
   return (
     <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-4 shadow-xs space-y-4">
@@ -75,7 +78,7 @@ export const TypographyCard: React.FC = () => {
           </Label>
           <div className="flex items-center gap-1.5">
             <span className="font-solaiman font-bold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-lg border border-indigo-200/50 dark:border-indigo-800/40">
-              {toBengaliDigits(settings.fontSize)} pt
+              {toBengaliDigits(displayFontSize)} pt
             </span>
           </div>
         </div>
@@ -83,16 +86,17 @@ export const TypographyCard: React.FC = () => {
         {/* Quick Size Presets */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "ছোট (১৩)", size: 13 },
-            { label: "আদর্শ (১৪)", size: 14 },
+            { label: "আদর্শ (১৩)", size: 13 },
+            { label: "মাঝারি (১৪)", size: 14 },
             { label: "বড় (১৬)", size: 16 },
           ].map((preset) => {
-            const isSelected = settings.fontSize === preset.size;
+            const targetSize = preset.size + FONT_SIZE_OFFSET;
+            const isSelected = settings.fontSize === targetSize;
             return (
               <button
                 key={preset.size}
                 type="button"
-                onClick={() => updateSettings({ fontSize: preset.size })}
+                onClick={() => updateSettings({ fontSize: targetSize })}
                 className={`py-1.5 px-2 text-[11px] rounded-xl font-headline transition-colors cursor-pointer border flex items-center justify-between ${
                   isSelected
                     ? "bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-500 text-indigo-950 dark:text-indigo-200 font-bold shadow-2xs"
@@ -117,10 +121,10 @@ export const TypographyCard: React.FC = () => {
         <input 
           type="range" 
           min={10} 
-          max={24} 
+          max={22} 
           step={1}
-          value={settings.fontSize}
-          onChange={(e) => updateSettings({ fontSize: parseInt(e.target.value) })}
+          value={Math.max(10, Math.min(22, displayFontSize))}
+          onChange={(e) => updateSettings({ fontSize: parseInt(e.target.value) + FONT_SIZE_OFFSET })}
           className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-muted rounded-lg appearance-none"
         />
       </div>

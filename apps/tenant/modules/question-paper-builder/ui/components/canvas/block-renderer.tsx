@@ -108,7 +108,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
       >
         <div className="flex items-center justify-between w-full">
           <div className="w-6"></div>
-          <div className="font-semibold text-[10pt] text-center flex-1 italic text-black leading-normal">
+          <div className="font-semibold text-[12pt] text-center flex-1 italic text-black leading-normal">
             {formattedInst}
             {isActive && (
               <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden not-italic">
@@ -149,7 +149,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
         <div className="w-6"></div>
       </div>
       {formattedInst && (
-        <p className="text-[10pt] text-black italic text-center mt-0.5">{formattedInst}</p>
+        <p className="text-[12pt] text-black italic text-center mt-0.5">{formattedInst}</p>
       )}
     </div>
   );
@@ -299,7 +299,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
       ) : null}
       {canShowBottomRow && (
         <div className="flex justify-between items-center w-full mt-0.5 mb-0.5 text-black">
-          <div className="text-left font-normal text-black text-[10pt] ml-[30px]">
+          <div className="text-left font-normal text-black text-[12pt] ml-[30px]">
             {formattedInst}
           </div>
           {canShowMarkFormula && (

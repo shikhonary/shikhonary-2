@@ -2309,20 +2309,79 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
     const contentBlocks = blocks.filter(b => b.type !== "header-full");
 
+    // Block types that can be taller than a full column and must not be
+    // placed mid-column — they should always start at the top of a fresh column.
+    const OVERSIZED_BLOCK_TYPES = new Set([
+      "question-seen-comprehension",
+      "question-cq",
+      "question-cs",
+    ]);
+
     contentBlocks.forEach((b, idx) => {
       const h = measuredHeights[b.id] || (b.type.startsWith("question-") ? 80 : 40);
-      
-      // If it's a heading, look ahead to see if the first question fits on this page
+
+      // ── Oversized block guard ────────────────────────────────────────────────
+      // If a block is both a known multi-part type AND taller than 75% of the
+      // available column height, eject to the next fresh column *before* placing
+      // it. This prevents a CQ/CS/SeenComprehension passage from starting
+      // mid-column and silently overflowing the page boundary.
+      const isOversized =
+        OVERSIZED_BLOCK_TYPES.has(b.type) && h > effectivePageHeight * 0.75;
+      if (isOversized && currentColumnHeight > 0) {
+        currentColumnIdx++;
+        currentColumnHeight = 0;
+        if (currentColumnIdx >= colCount) {
+          result.push(currentPage);
+          currentPage = { columns: Array.from({ length: colCount }, () => []) };
+          currentColumnIdx = 0;
+          availableHeight = effectivePageHeight - 10;
+        }
+      }
+      // ── End oversized block guard ────────────────────────────────────────────
+
+      // ── Orphan-heading guard ─────────────────────────────────────────────────
+      // If a heading/title block is placed but its first question ends up on the
+      // next column/page, we get a stranded heading with a large empty gap below
+      // it (the "orphan heading" problem visible in the section-title case).
+      //
+      // Fix: for ANY title/heading block, scan ahead past other non-question
+      // blocks (e.g. sub-section-title, dist-title nested inside a section) to
+      // find the FIRST question block. Sum the heights of all the intermediate
+      // heading blocks too so the check accounts for the full heading stack.
+      // If none of that fits in the remaining column space, force a wrap NOW
+      // so the headings start fresh at the top of the next column together
+      // with their first question.
+      const HEADING_TYPES = new Set([
+        "dist-title",
+        "subject-title",
+        "section-title",
+        "sub-section-title",
+      ]);
       let needsEarlyWrap = false;
-      if (b.type === "dist-title" || b.type === "subject-title") {
-        const nextBlock = contentBlocks[idx + 1];
-        if (nextBlock && nextBlock.type.startsWith("question-")) {
-          const hNext = measuredHeights[nextBlock.id] || 0;
-          if (currentColumnHeight + h + hNext > availableHeight && currentColumnHeight > 0) {
-            needsEarlyWrap = true;
+      if (HEADING_TYPES.has(b.type) && currentColumnHeight > 0) {
+        // Walk ahead, accumulating heading heights until we hit a question block
+        let lookaheadH = h; // start with current heading's height
+        for (let j = idx + 1; j < contentBlocks.length; j++) {
+          const ahead = contentBlocks[j];
+          if (!ahead) break;
+          if (ahead.type.startsWith("question-")) {
+            // Found the first question — check if everything fits
+            const hQuestion = measuredHeights[ahead.id] || 80;
+            if (currentColumnHeight + lookaheadH + hQuestion > availableHeight) {
+              needsEarlyWrap = true;
+            }
+            break;
+          }
+          if (HEADING_TYPES.has(ahead.type)) {
+            // Another heading before the first question — accumulate its height
+            lookaheadH += (measuredHeights[ahead.id] || 40) + (ahead.gap || 0);
+          } else {
+            // Non-heading, non-question block (e.g. dist-action) — stop scanning
+            break;
           }
         }
       }
+      // ── End orphan-heading guard ─────────────────────────────────────────────
       
       // Check if adding this block exceeds column height
       if ((currentColumnHeight + h > availableHeight || needsEarlyWrap) && currentColumnHeight > 0) {
