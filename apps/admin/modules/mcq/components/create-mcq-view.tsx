@@ -192,37 +192,37 @@ export function CreateMcqView() {
 
       const compiledAttachments: any[] = []
 
-      // 1. Passage / Stimulus attachment (if context or captions are provided)
-      const hasPassage =
-        data.context?.trim() ||
-        data.contextCaption?.trim() ||
-        data.contextBottomContent?.trim()
-      if (hasPassage) {
-        compiledAttachments.push({
-          type: "PASSAGE",
-          content: data.context?.trim() || null,
-          caption: data.contextCaption?.trim() || null,
-          bottomContent: data.contextBottomContent?.trim() || null,
-          position: 0,
-        })
-      }
-
-      // 2. Media attachments (images, etc.)
+      // Unified attachments (text passages, tables, images, etc.) with their edited order
       if (Array.isArray(data.mediaAttachments)) {
         for (const mAtt of data.mediaAttachments) {
+          const type = (mAtt.type || "").toUpperCase()
+          const isTable = type === "TABLE" || Boolean(mAtt.table && !mAtt.url)
+          const isText =
+            type === "TEXT" ||
+            type === "PASSAGE" ||
+            (!mAtt.url && !mAtt.table)
+
+          let finalType = "image"
+          if (isTable) finalType = "TABLE"
+          else if (isText) finalType = "PASSAGE"
+
           compiledAttachments.push({
             id: mAtt.id,
-            type: mAtt.type || "image",
-            url: mAtt.url || null,
+            type: finalType,
+            url: isTable || isText ? null : (mAtt.url || null),
             caption: mAtt.caption?.trim() || null,
-            content: mAtt.content?.trim() || null,
+            content: isText ? (mAtt.content?.trim() || null) : null,
             bottomContent: mAtt.bottomContent?.trim() || null,
-            table: mAtt.table || null,
-            tableBorder: mAtt.tableBorder ?? false,
+            table: isTable ? (mAtt.table || null) : null,
+            tableBorder: isTable ? (mAtt.tableBorder ?? true) : false,
             position: compiledAttachments.length,
           })
         }
       }
+
+      const firstText = compiledAttachments.find(
+        (a) => a.type === "PASSAGE" || a.type === "text"
+      )
 
       await createMutation.mutateAsync({
         subjectId: data.subjectId,
@@ -236,9 +236,9 @@ export function CreateMcqView() {
         reference: referenceArray,
         explanation: data.explanation?.trim() || null,
         questionUrl: data.questionUrl?.trim() || null,
-        context: data.context?.trim() || null,
-        contextCaption: data.contextCaption?.trim() || null,
-        contextBottomContent: data.contextBottomContent?.trim() || null,
+        context: firstText?.content || null,
+        contextCaption: firstText?.caption || null,
+        contextBottomContent: firstText?.bottomContent || null,
         attachments: compiledAttachments,
         difficulty: data.difficulty,
         year: parsedYear,
@@ -442,94 +442,14 @@ export function CreateMcqView() {
               </div>
             </div>
 
-            {/* Context / Stimulus Passage & Question Attachment */}
-            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
-                    উদ্দীপক / অনুচ্ছেদ (Context / Stimulus Passage)
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5 font-body">
-                    অভিন্ন তথ্যভিত্তিক বা বহুপদী প্রশ্নের উদ্দীপক ও ক্যাপশন (ঐচ্ছিক)
-                  </p>
-                </div>
-              </div>
-
-              {/* Top Caption Input */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  শীর্ষ ক্যাপশন (Attachment Caption - ঐচ্ছিক)
-                </Label>
-                <Input
-                  disabled={isSubmitting}
-                  placeholder="যেমন: নিচের উদ্দীপকটি পড়ে পরবর্তী প্রশ্নের উত্তর দাও:"
-                  {...register("contextCaption")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
-                />
-              </div>
-
-              {/* Passage Content Textarea */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  উদ্দীপক বা অনুচ্ছেদ (Passage Content - ঐচ্ছিক)
-                </Label>
-                <Textarea
-                  disabled={isSubmitting}
-                  rows={4}
-                  placeholder="উদ্দীপক বা অনুচ্ছেদ লিখুন (যদি থাকে)..."
-                  {...register("context")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
-                />
-              </div>
-
-              {/* Bottom Caption / Source Content Input */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  নিচের ক্যাপশন / উৎস (Bottom Caption Content - ঐচ্ছিক)
-                </Label>
-                <Input
-                  disabled={isSubmitting}
-                  placeholder="যেমন: [উৎস: পাঠ্যবই পৃষ্ঠা নং ৪৫]"
-                  {...register("contextBottomContent")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
-                />
-              </div>
-
-              {/* Live Preview of the Stimulus Passage */}
-              {((watchContext && watchContext.trim()) ||
-                (watchContextCaption && watchContextCaption.trim()) ||
-                (watchContextBottomContent && watchContextBottomContent.trim())) && (
-                <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-4 text-xs space-y-2">
-                  <span className="font-semibold text-muted-foreground block text-[11px] uppercase tracking-wider">
-                    উদ্দীপক প্রিভিউ:
-                  </span>
-                  {watchContextCaption && watchContextCaption.trim() && (
-                    <div className="font-bold text-sm text-foreground font-headline">
-                      <RenderMath text={watchContextCaption.trim()} isMath={watchIsMath} />
-                    </div>
-                  )}
-                  {watchContext && watchContext.trim() && (
-                    <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed text-sm">
-                      <RenderMath text={watchContext.trim()} isMath={watchIsMath} />
-                    </div>
-                  )}
-                  {watchContextBottomContent && watchContextBottomContent.trim() && (
-                    <div className="text-muted-foreground font-body italic text-xs pt-1 border-t border-slate-200/50 dark:border-white/[0.05]">
-                      <RenderMath text={watchContextBottomContent.trim()} isMath={watchIsMath} />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Other Media Attachments (Images, Diagrams, etc.) */}
+            {/* Unified Stimulus Passage & Question Attachments (Text, Table, Image) */}
             <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
               <div>
                 <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
-                  সংযুক্ত ছবি ও চিত্র (Question Attachments)
+                  উদ্দীপক ও সংযুক্তি (Stimulus & Question Attachments: Text, Table, Image)
                 </Label>
                 <p className="text-xs text-muted-foreground mt-0.5 font-body">
-                  প্রশ্নে সংযুক্ত ছবি আপলোড করুন অথবা ক্যাপশন ও বিবরণ যুক্ত করুন
+                  প্রশ্নের মূল উদ্দীপক পাঠ্য (Text), ছক (Table) বা ছবি (Image) সংযোজন করুন এবং প্রয়োজনে ক্রম পুনর্বিন্যাস করুন
                 </p>
               </div>
 

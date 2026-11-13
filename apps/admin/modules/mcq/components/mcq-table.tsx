@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
@@ -117,6 +118,11 @@ export function McqTable({
   onPageChange,
   onLimitChange,
 }: McqTableProps) {
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/mcqs/${id}/edit?${queryString}` : `/mcqs/${id}/edit`
+
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const optionLetters = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
@@ -350,7 +356,7 @@ export function McqTable({
 
                       {/* Question Text */}
                       <Link
-                        href={`/mcqs/${item.id}/edit`}
+                        href={buildEditHref(item.id)}
                         prefetch={true}
                         className="block font-headline text-base sm:text-lg font-bold text-slate-900 dark:text-foreground leading-snug group-hover:text-indigo-600 transition-colors"
                       >
@@ -447,7 +453,7 @@ export function McqTable({
 
                   {/* Shared Actions Column */}
                   <QuestionCardActions
-                    editHref={`/mcqs/${item.id}/edit`}
+                    editHref={buildEditHref(item.id)}
                     onDelete={() => onDelete(item.id, item.question)}
                     editTitle="MCQ সম্পাদনা করুন"
                     deleteTitle="MCQ মুছুন"

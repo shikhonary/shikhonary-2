@@ -158,6 +158,24 @@ async function resolveTargetChapter(chapterTitle: string) {
     if (ch) return ch;
   }
 
+  // Special alias for Science Class 9/10 Pos 10: প্রাত্যহিক জীবনে তড়িৎ
+  if (
+    trimmed.includes("তড়িৎ") ||
+    trimmed.includes("তড়িৎ") ||
+    trimmed.includes("বিদ্যুৎ") ||
+    trimmed.includes("প্রাত্যহিক জীবনে")
+  ) {
+    const ch = await prisma.academicChapter.findFirst({
+      where: {
+        id: "cmwd7wpf0000a2oejgd84k06k", // Pos 10: প্রাত্যহিক জীবনে তড়িৎ
+      },
+      include: {
+        subject: true,
+      },
+    });
+    if (ch) return ch;
+  }
+
   // Strip prefixes like "প্রথম অধ্যায়:", "১ম অধ্যায়:"
   const strippedTitle = trimmed
     .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ)\s*[:：\-–.]\s*/i, "")

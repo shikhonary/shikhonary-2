@@ -1,10 +1,13 @@
 {
-  "chapterTitle": "ষষ্ঠ অধ্যায়: পলিমার",
+  "subjectName": "বিজ্ঞান",
+  "chapterTitle": "প্রাত্যহিক জীবনে তড়িৎ",
   "questions": [
     {
-      "question": "পিভিসি পাইপকে থার্মোপ্লাস্টিক বলা হয় কেন? ব্যাখ্যা করো।",
+      "question": "তড়িৎ বর্তনীর প্রতীক বলতে কী বোঝ?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -12,9 +15,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্রাকৃতিক পলিমার বলতে কী বোঝায়?",
+      "question": "মোবাইল ফোনের ব্যাটারি কীভাবে পুনরায় ব্যবহার যোগ্য হয়ে ওঠে?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -22,9 +27,35 @@
       "attachmentDescription": null
     },
     {
-      "question": "কৃত্রিম ও প্রাকৃতিক পলিমারের তিনটি পার্থক্য লেখো।",
+      "question": "উপরের চিত্র দুটির মধ্যে পার্থক্য কী?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: রোধের সিরিজ ও সমান্তরাল সংযোগ বর্তনী"
+    },
+    {
+      "question": "বর্তনীটির মধ্য দিয়ে কী পরিমাণ বিদ্যুৎ প্রবাহিত হচ্ছে?",
+      "answer": null,
+      "reference": [
+        "বরিশাল ক্যাডেট কলেজ"
+      ],
+      "difficulty": "HARD",
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: $9\\text{V}$ ব্যাটারি এবং $10\\text{ k}\\Omega$, $2\\text{ k}\\Omega$, $1\\text{ k}\\Omega$ রোধের সমান্তরাল বর্তনী"
+    },
+    {
+      "question": "বাড়িতে শ্রেণি ও সমান্তরাল তড়িৎ সংযোগের মধ্যে কোনটি ব্যবহার করবে এবং কেন?",
+      "answer": null,
+      "reference": [
+        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -32,9 +63,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "পলিথিন উৎপাদনে $TiCl_3$ (টাইটেনিয়াম ট্রাইক্লোরাইড) ব্যবহার করা হয় কেন?",
+      "question": "$5$ অ্যাম্পিয়ার ফিউজ বলতে কী বোঝায়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": true,
       "hasAttachment": false,
@@ -42,9 +75,16 @@
       "attachmentDescription": null
     },
     {
-      "question": "পলিমার বলতে কী বোঝায় ব্যাখ্যা করো।",
+      "question": "বর্তনীতে ফিউজ ব্যবহার করা হয় কেন? ব্যাখ্যা করো। অথবা, তড়িৎ বর্তনীতে ফিউজ ব্যবহার করার কারণ ব্যাখ্যা করো। অথবা, বাসা-বাড়িতে ফিউজ ব্যবহার করা হয় কেন?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "দি. বো. ২০২৬",
+        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
+        "কুমিল্লা মডার্ণ হাই স্কুল",
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
+        "রা. বো. ২০২৬",
+        "য. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -52,9 +92,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "মেলামাইনের থালা-বাসন কৃত্রিম পলিমার— ব্যাখ্যা করো।",
+      "question": "ফিউজ বলতে কী বোঝ?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ন্যাশনাল আইডিয়াল স্কুল, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -62,9 +104,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "আমাদের বহুল ব্যবহৃত পলিথিনকে ইথিলিনের পলিমার বলা হয় কেন? ব্যাখ্যা করো।",
+      "question": "তড়িৎ বিশ্লেষ্য পদার্থ বলতে কী বোঝ?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "সৃষ্টি একাডেমিক স্কুল, টাঙ্গাইল"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -72,9 +116,23 @@
       "attachmentDescription": null
     },
     {
-      "question": "সুতি বস্ত্র টেকসই হওয়ার কারণ কী? ব্যাখ্যা করো।",
+      "question": "$CuSO_4$ একটি তড়িৎ বিশ্লেষ্য পদার্থ— ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "সি. বো. ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "খাবার লবণ তড়িৎ বিশ্লেষ্য হলেও চিনি তড়িৎ অবিশ্লেষ্য ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -82,9 +140,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "রেশম তন্তু থেকে সুতা তৈরি করা হয় কীভাবে? বুঝিয়ে লেখো।",
+      "question": "খাবার লবণ তড়িৎ বিশ্লেষ্য পদার্থ কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "রা. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -92,9 +152,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "গ্রীষ্মকালে আমরা সুতি কাপড় পড়তে স্বাচ্ছন্দ্য বোধ করি কেন? ব্যাখ্যা করো।",
+      "question": "তড়িৎ বিশ্লেষণ এবং তড়িৎ প্রলেপন প্রক্রিয়া ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -102,9 +164,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "রেয়নের তৈরি কাপড়ে বেশি গরম ইস্ত্রি ব্যবহার করা যায় না কেন?",
+      "question": "তড়িৎ মুদ্রণ কীভাবে করা হয়? অথবা, তড়িৎ মুদ্রণ কাকে বলে?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ",
+        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -112,9 +177,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্রাকৃতিক ও কৃত্রিম তন্তুর মাঝে তিনটি পার্থক্য লেখো।",
+      "question": "ধাতু নিষ্কাশন করতে তড়িৎ বিশ্লেষণ করা হয়— ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -122,9 +189,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "পলিস্টারকে নন সেলুলোজিক কৃত্রিম তন্তু বলা হয় কেন? ব্যাখ্যা করো।",
+      "question": "লোহার তৈরি কোনো জিনিসের উপর কোনো ধাতুর প্রলেপ দেওয়া হয় কেন?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ব. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -132,9 +201,23 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্যারাসুটের কাপড় বুনতে নাইলন এর তন্তু ব্যবহার করা হয় কেন? ব্যাখ্যা করো।",
+      "question": "তড়িৎ ক্ষমতা কাকে বলে?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "যশোর জিলা স্কুল"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "এক ওয়াট বলতে কী বোঝ?",
+      "answer": null,
+      "reference": [
+        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -142,9 +225,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "পাট বা পাট জাতীয় গাছ থেকে কীভাবে তন্তু সংগ্রহ করা হয় বুঝিয়ে লেখো।",
+      "question": "কিলোওয়াট-ঘণ্টা বলতে কী বোঝায়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ফরিদপুর জিলা স্কুল",
+        "বাংলাদেশ মহিলা সমিতি বালিকা উচ্চ বিদ্যালয় ও কলেজ, চট্টগ্রাম"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -152,9 +238,93 @@
       "attachmentDescription": null
     },
     {
-      "question": "রেয়নের প্রকারভেদ আলোচনা করো।",
+      "question": "$1$ কিলোওয়াট-ঘণ্টাকে জুলে পরিণত করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ঢা. বো. ২০২৬"
+      ],
+      "difficulty": "HARD",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "$1$ কিলোওয়াট ঘণ্টাকে মেগা জুলে প্রকাশ করো।",
+      "answer": null,
+      "reference": [
+        "সি. বো. ২০২৬"
+      ],
+      "difficulty": "HARD",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "$\\text{kwh}$/ইউনিট বলতে কী বোঝ ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, বিইউএসএমএস, পার্বতীপুর, দিনাজপুর"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+{
+      "question": "$220\\text{V}-100\\text{W}$ বলতে কী বোঝায়? অথবা, একটি বাল্বের গায়ে $220\\text{V}-100\\text{W}$ লেখা আছে। এর অর্থ কী?",
+      "answer": null,
+      "reference": [
+        "যশোর জিলা স্কুল",
+        "ম. বো. ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কোনো বাল্বে '$220\\text{ Volts}-60\\text{ Watts}$' লেখা থাকলে কী বোঝায়? অথবা, বৈদ্যুতিক বাল্বের গায়ে $220\\text{ V}-60\\text{ W}$ লেখা থাকলে এর অর্থ কী? অথবা, $220\\text{ V}-60\\text{W}$ বলতে কী বোঝায়?",
+      "answer": null,
+      "reference": [
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা",
+        "চ. বো. ২০২৬",
+        "বরিশাল জিলা স্কুল",
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "$100$ ওয়াট এর বাল্ব-এর অর্থ কী?",
+      "answer": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "এনার্জি সেভিং বাল্ব কেন ব্যবহার করা হয়? ব্যাখ্যা করো। অথবা, এনার্জি সেভিং বাল্ব এর সুবিধা লেখো। অথবা, এনার্জি সেভিং বাল্ব ব্যবহারের সুবিধা ব্যাখ্যা করো। অথবা, এনার্জি সেভিং বাল্ব ব্যবহারের সুবিধা কী? অথবা, এনার্জি সেভিং বাল্বের ব্যবহার সুবিধাজনক কেন?",
+      "answer": null,
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ",
+        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
+        "বাংলাদেশ মহিলা সমিতি বালিকা উচ্চ বিদ্যালয় ও কলেজ, চট্টগ্রাম",
+        "য. বো. ২০২৬",
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -162,9 +332,24 @@
       "attachmentDescription": null
     },
     {
-      "question": "নাইলন ও সুতি কাপড় পোড়ালে কী ঘটে? ব্যাখ্যা করো।",
+      "question": "$\\text{LED}$ বাল্ব সাধারণ বাল্বের চেয়ে বেশি টিকে থাকে কেন? অথবা, এল.ই.ডি বাল্ব সাধারণ বাল্বের চেয়ে বেশি দিন টিকে কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী",
+        "রা. বো. ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মিতু তার ঘরে সাধারণ বাল্বের পরিবর্তে এল.ই.ডি. বাল্ব ব্যবহার করছে। উল্লিখিত বাল্ব দুটির মধ্যে কোনটি পরিবেশবান্ধব? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ব. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -172,9 +357,23 @@
       "attachmentDescription": null
     },
     {
-      "question": "গ্রীষ্মকালে সুতি ও রেশমি কাপড়ের মধ্যে কোনটি ব্যবহারে উত্তম? ব্যাখ্যা করো।",
+      "question": "$400\\text{V}-200\\text{W}$ বলতে কী বোঝ? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "কুমিল্লা মডার্ণ হাই স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": true,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আই.পি.এস এর প্রয়োজনীয়তা ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কু. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -182,9 +381,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "ব্লেন্ডিং ও মিক্সিং কেন করা হয়? ব্যাখ্যা করো।",
+      "question": "ইউপিএস এর গুরুত্ব লেখো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "চ. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -192,9 +393,17 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্রাণীর দেহ থেকে লোম কেটে নিলে সমস্যা হয় না কেন? ব্যাখ্যা করো।",
+      "question": "সিস্টেম লস ব্যাখ্যা করো। অথবা, সিস্টেম লস বলতে কী বোঝায়? অথবা, সিস্টেম লস কী? ব্যাখ্যা করো। অথবা, তড়িতের সিস্টেম লস হবার কারণ ব্যাখ্যা করো। অথবা, তড়িতের সিস্টেম লস বলতে কী বোঝায়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "রাজশাহী ক্যাডেট কলেজ",
+        "ঢা. বো. ২০২৬",
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা",
+        "কু. বো. ২০২৬",
+        "ম. বো. ২০২৬",
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -202,9 +411,13 @@
       "attachmentDescription": null
     },
     {
-      "question": "'রাবার ও প্লাস্টিক পরিবেশের ভারসাম্যহীনতার অন্যতম কারণ' বুঝিয়ে লেখো।",
+      "question": "লোডশেডিং বলতে কী বোঝায়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "চ. বো. ২০২৬",
+        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -212,9 +425,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "থার্মোপ্লাস্টিক ও থার্মোসেটিং পলিমারের ভিতর দুটি পার্থক্য লেখো।",
+      "question": "লোডশেডিং এর কারণ ব্যাখ্যা করো। অথবা, লোডশেডিং কেন ঘটে? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "দি. বো. ২০২৬",
+        "ব. বো. ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -222,9 +438,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "ফ্রাইং প্যানের হাতলে কৃত্রিম পলিমার ব্যবহার করা হয় কেন?",
+      "question": "সিস্টেম লস প্রতিকারের ২টি উপায় লেখো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -232,9 +450,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "রাবারের স্থিতিস্থাপকতা ধর্ম ব্যাখ্যা করো।",
+      "question": "কম্পিউটারে ইউপিএস লাগানো হয় কেন?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, বিইউএসএমএস, পার্বতীপুর, দিনাজপুর"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -242,19 +462,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্লাস্টিক পদার্থ পুনর্ব্যবহারের গুরুত্ব ব্যাখ্যা করো।",
+      "question": "সিস্টেম লস এবং লোডশেডিং ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মেডিক্যাল সামগ্রী হিসেবে প্লাস্টিকের গুরুত্ব লেখো।",
-      "answer": null,
-      "reference": [],
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,

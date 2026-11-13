@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import {
@@ -45,6 +46,11 @@ export function CqListView() {
     },
     setSearchParams,
   ] = useCqSearchParams()
+
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/cqs/${id}/edit?${queryString}` : `/cqs/${id}/edit`
 
   const handleAcademicClassChange = (classId: string) => {
     setSelectedAcademicClassId(classId)
@@ -258,7 +264,7 @@ export function CqListView() {
                 subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
                 chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
                 clueText: resolveTarget.context ? `উদ্দীপক: ${resolveTarget.context}` : `ক: ${resolveTarget.questionA}`,
-                editHref: `/cqs/${resolveTarget.id}/edit`,
+                editHref: buildEditHref(resolveTarget.id),
                 editLabel: "CQ এডিট পেজে যান",
               }
             : undefined
@@ -279,7 +285,7 @@ export function CqListView() {
                 subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
                 chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
                 clueText: assignTarget.context ? `উদ্দীপক: ${assignTarget.context}` : `ক: ${assignTarget.questionA}`,
-                editHref: `/cqs/${assignTarget.id}/edit`,
+                editHref: buildEditHref(assignTarget.id),
                 editLabel: "CQ এডিট পেজে যান",
               }
             : undefined

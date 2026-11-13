@@ -108,39 +108,57 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
     if (!cs) return undefined
     const refText = Array.isArray(cs.reference) ? cs.reference.join(", ") : ""
 
-    const passageAttachment = (cs.attachments || []).find(
-      (a: any) =>
-        (a.type === "PASSAGE" || a.type === "text") &&
-        Boolean(a.content && a.content.trim())
-    ) || (cs.attachments || []).find(
-      (a: any) => a.type === "PASSAGE" || a.type === "text"
-    )
+    const rawAttachments = ((cs.attachments || []) as any[])
+    const mediaAttachments = rawAttachments.map((a: any, idx: number) => {
+      const isTable = (a.type || "").toUpperCase() === "TABLE" || Boolean(a.table && !a.url)
+      const isText =
+        (a.type || "").toUpperCase() === "TEXT" ||
+        (a.type || "").toUpperCase() === "PASSAGE" ||
+        (!a.url && !a.table)
+      let type = "image"
+      if (isTable) type = "TABLE"
+      else if (isText) type = "text"
 
-    const initialContext = passageAttachment?.content?.trim() || ""
-    const initialContextCaption = passageAttachment?.caption?.trim() || ""
-    const initialContextBottomContent = passageAttachment?.bottomContent?.trim() || ""
-
-    const mediaAttachments = ((cs.attachments || []) as any[])
-      .filter((a: any) => a.id !== passageAttachment?.id && a.type !== "PASSAGE" && a.type !== "text")
-      .map((a: any) => ({
+      return {
         id: a.id,
-        type: a.type || "image",
+        type,
         caption: a.caption || "",
         content: a.content || "",
         url: a.url || "",
         table: a.table || null,
         bottomContent: a.bottomContent || "",
-        tableBorder: Boolean(a.tableBorder),
-        position: a.position ?? 0,
-      }))
+        tableBorder: a.tableBorder ?? true,
+        position: typeof a.position === "number" ? a.position : idx,
+      }
+    }).sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+
+    if (
+      mediaAttachments.length === 0 &&
+      Boolean(
+        cs.context?.trim() ||
+        cs.contextCaption?.trim() ||
+        cs.contextBottomContent?.trim()
+      )
+    ) {
+      mediaAttachments.push({
+        type: "text",
+        content: cs.context?.trim() || "",
+        caption: cs.contextCaption?.trim() || "",
+        bottomContent: cs.contextBottomContent?.trim() || "",
+        url: "",
+        table: null,
+        tableBorder: true,
+        position: 0,
+      })
+    }
 
     return {
       classId: initialClassId,
       subjectId: cs.subjectId || "",
       chapterId: cs.chapterId || "",
-      context: initialContext,
-      contextCaption: initialContextCaption,
-      contextBottomContent: initialContextBottomContent,
+      context: "",
+      contextCaption: "",
+      contextBottomContent: "",
       mediaAttachments,
       questionA: cs.questionA || "",
       questionB: cs.questionB || "",
@@ -264,43 +282,45 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
 
       const compiledAttachments: any[] = []
 
-      // 1. Passage / Stimulus attachment (if context or captions are provided)
-      const hasPassageData = Boolean(
-        data.context?.trim() || data.contextCaption?.trim() || data.contextBottomContent?.trim()
-      )
-      if (hasPassageData) {
-        compiledAttachments.push({
-          type: "PASSAGE",
-          content: data.context?.trim() || null,
-          caption: data.contextCaption?.trim() || null,
-          bottomContent: data.contextBottomContent?.trim() || null,
-          position: 0,
-        })
-      }
-
-      // 2. Media attachments (images, tables, etc.) with their edited captions
+      // Unified attachments (text passages, tables, images, etc.) with their edited order
       if (Array.isArray(data.mediaAttachments)) {
         for (const mAtt of data.mediaAttachments) {
+          const type = (mAtt.type || "").toUpperCase()
+          const isTable = type === "TABLE" || Boolean(mAtt.table && !mAtt.url)
+          const isText =
+            type === "TEXT" ||
+            type === "PASSAGE" ||
+            (!mAtt.url && !mAtt.table)
+
+          let finalType = "image"
+          if (isTable) finalType = "TABLE"
+          else if (isText) finalType = "PASSAGE"
+
           compiledAttachments.push({
-            type: mAtt.type || "image",
-            url: mAtt.url || null,
-            table: mAtt.table || null,
-            tableBorder: mAtt.tableBorder ?? false,
+            id: mAtt.id,
+            type: finalType,
+            url: isTable || isText ? null : (mAtt.url || null),
+            table: isTable ? (mAtt.table || null) : null,
+            tableBorder: isTable ? (mAtt.tableBorder ?? true) : false,
             caption: mAtt.caption?.trim() || null,
-            content: mAtt.content?.trim() || null,
+            content: isText ? (mAtt.content?.trim() || null) : null,
             bottomContent: mAtt.bottomContent?.trim() || null,
             position: compiledAttachments.length,
           })
         }
       }
 
+      const firstText = compiledAttachments.find(
+        (a) => a.type === "PASSAGE" || a.type === "text"
+      )
+
       await updateMutation.mutateAsync({
         id: targetId,
         subjectId: data.subjectId,
         chapterId: data.chapterId,
-        context: data.context?.trim() || null,
-        contextCaption: data.contextCaption?.trim() || null,
-        contextBottomContent: data.contextBottomContent?.trim() || null,
+        context: firstText?.content || null,
+        contextCaption: firstText?.caption || null,
+        contextBottomContent: firstText?.bottomContent || null,
         attachments: compiledAttachments,
         questionA: data.questionA.trim(),
         questionB: data.questionB.trim(),
@@ -523,92 +543,14 @@ export function EditCsView({ id }: EditCsViewProps = {}) {
               </div>
             </div>
 
-            {/* Stimulus Passage & Question Attachment */}
+            {/* Unified Stimulus Passage & Question Attachments (Text, Table, Image) */}
             <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
               <div>
                 <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
-                  উদ্দীপক / অনুচ্ছেদ (Stimulus Passage)
+                  উদ্দীপক ও সংযুক্তি (Stimulus & Question Attachments: Text, Table, Image)
                 </Label>
                 <p className="text-xs text-muted-foreground mt-0.5 font-body">
-                  প্রশ্নপত্রের মূল উদ্দীপক, শীর্ষ ক্যাপশন ও নিচের পাদটীকা/উৎস
-                </p>
-              </div>
-
-              {/* Top Caption Input */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  শীর্ষক / ক্যাপশন (Attachment Caption - ঐচ্ছিক)
-                </Label>
-                <Input
-                  disabled={isSubmitting}
-                  placeholder="যেমন: উদ্দীপক-১, নিচের অনুচ্ছেদটি পড়ে প্রশ্নের উত্তর দাও..."
-                  {...register("contextCaption")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
-                />
-              </div>
-
-              {/* Main Stimulus Passage Textarea */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  উদ্দীপকের মূল বিবরণ (Passage Content)
-                </Label>
-                <Textarea
-                  disabled={isSubmitting}
-                  rows={4}
-                  placeholder="সৃজনশীল প্রশ্নের উদ্দীপক বা দৃশ্যপট এখানে লিখুন..."
-                  {...register("context")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 p-3.5 font-body leading-relaxed"
-                />
-              </div>
-
-              {/* Bottom Caption / Source Content Input */}
-              <div className="space-y-1.5">
-                <Label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground font-body">
-                  নিচের ক্যাপশন / উৎস (Bottom Caption Content - ঐচ্ছিক)
-                </Label>
-                <Input
-                  disabled={isSubmitting}
-                  placeholder="যেমন: — হজরত সুলায়মান (আ.), উৎস: প্রথম আলো, পাঠ্যবই পৃষ্ঠা ২০..."
-                  {...register("contextBottomContent")}
-                  className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm focus:border-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 px-3.5 font-body"
-                />
-              </div>
-
-              {/* Live Preview of the Stimulus Passage */}
-              {((watchContext && watchContext.trim()) ||
-                (watchContextCaption && watchContextCaption.trim()) ||
-                (watchContextBottomContent && watchContextBottomContent.trim())) && (
-                <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] p-4 text-xs space-y-2">
-                  <span className="font-semibold text-muted-foreground block text-[11px] uppercase tracking-wider">
-                    উদ্দীপক প্রিভিউ:
-                  </span>
-                  {watchContextCaption && watchContextCaption.trim() && (
-                    <div className="font-bold text-sm text-foreground font-headline">
-                      <RenderMath text={watchContextCaption.trim()} isMath={true} />
-                    </div>
-                  )}
-                  {watchContext && watchContext.trim() && (
-                    <div className="whitespace-pre-wrap text-foreground font-body leading-relaxed text-sm">
-                      <RenderMath text={watchContext.trim()} isMath={true} />
-                    </div>
-                  )}
-                  {watchContextBottomContent && watchContextBottomContent.trim() && (
-                    <div className="text-muted-foreground font-body italic text-xs pt-1 border-t border-slate-200/50 dark:border-white/[0.05]">
-                      <RenderMath text={watchContextBottomContent.trim()} isMath={true} />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Other Media Attachments (Images, Tables, Diagrams, etc.) */}
-            <div className="space-y-4 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
-              <div>
-                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground font-headline">
-                  সংযুক্ত ছবি ও চিত্র (Question Attachments)
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5 font-body">
-                  প্রশ্নে সংযুক্ত ছবি আপলোড করুন অথবা ক্যাপশন ও বিবরণ হালনাগাদ করুন
+                  প্রশ্নের মূল উদ্দীপক পাঠ্য (Text), ছক (Table) বা ছবি (Image) সংযোজন করুন এবং প্রয়োজনে ক্রম পুনর্বিন্যাস করুন
                 </p>
               </div>
 

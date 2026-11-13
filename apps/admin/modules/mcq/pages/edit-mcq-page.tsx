@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { EditMcqView } from "../components/edit-mcq-view"
 
 interface EditMcqPageProps {
@@ -7,5 +8,9 @@ interface EditMcqPageProps {
 }
 
 export function EditMcqPage({ id }: EditMcqPageProps) {
-  return <EditMcqView id={id} />
+  return (
+    <Suspense>
+      <EditMcqView id={id} />
+    </Suspense>
+  )
 }

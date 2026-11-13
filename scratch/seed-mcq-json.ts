@@ -35,6 +35,11 @@ interface RawMcqItem {
   hasAttachment?: boolean;
   attachmentType?: string;
   attachmentDescription?: string;
+  table?: {
+    headers?: string[];
+    rows?: string[][];
+  } | null;
+  bottomContent?: string | null;
   source?: string | null;
 }
 
@@ -490,15 +495,25 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
       insertedCount++;
     }
 
-    if (q.hasAttachment || cleanedContext) {
+    const rawTable = (q as any).table;
+    const hasTable = Boolean(rawTable && (rawTable.headers?.length || rawTable.rows?.length));
+
+    if (q.hasAttachment || cleanedContext || hasTable) {
       const existingAttachment = await prisma.questionAttachment.findFirst({
         where: { mcqId: currentMcqId }
       });
 
-      const attachmentType = q.attachmentType || (cleanedContext ? "PASSAGE" : "DIAGRAM");
+      const attachmentType = hasTable
+        ? "TABLE"
+        : q.attachmentType || (cleanedContext ? "PASSAGE" : "DIAGRAM");
+
       const rawCaption = q.attachmentDescription?.trim();
-      const caption = rawCaption && rawCaption !== "উদ্দীপক" ? rawCaption : (cleanedContext ? null : "চিত্র সংযুক্ত করুন");
+      const caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক")
+        ? rawCaption
+        : (cleanedContext || hasTable ? null : "চিত্র সংযুক্ত করুন");
       const content = cleanedContext || null;
+      const tableData = hasTable ? rawTable : null;
+      const bottomContent = (q as any).bottomContent || null;
 
       if (!existingAttachment) {
         await prisma.questionAttachment.create({
@@ -506,7 +521,10 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
             mcqId: currentMcqId,
             type: attachmentType,
             caption: caption,
-            content: content
+            content: content,
+            table: tableData,
+            bottomContent: bottomContent,
+            tableBorder: hasTable ? true : null,
           }
         });
       } else {
@@ -515,12 +533,15 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
           data: {
             type: attachmentType,
             caption: caption,
-            content: content
+            content: content,
+            table: tableData,
+            bottomContent: bottomContent,
+            tableBorder: hasTable ? true : null,
           }
         });
       }
 
-      if (q.hasAttachment && !cleanedContext) {
+      if (q.hasAttachment && !cleanedContext && !hasTable) {
         auditItems.push({
           id: currentMcqId,
           question: cleanQuestion,

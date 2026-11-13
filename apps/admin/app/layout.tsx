@@ -1,6 +1,7 @@
 import { Inter, Manrope, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
+import "katex/dist/katex.min.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TRPCReactProvider } from "@/trpc/client"
 import { cn } from "@workspace/ui/lib/utils"

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import {
   useMcqsList,
   useMcqStats,
@@ -46,6 +47,11 @@ export function McqListView() {
     },
     setSearchParams,
   ] = useMcqSearchParams()
+
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/mcqs/${id}/edit?${queryString}` : `/mcqs/${id}/edit`
 
   const handleAcademicClassChange = (classId: string) => {
     setSelectedAcademicClassId(classId)
@@ -263,7 +269,7 @@ export function McqListView() {
                 subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
                 chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
                 clueText: resolveTarget.question,
-                editHref: `/mcqs/${resolveTarget.id}/edit`,
+                editHref: buildEditHref(resolveTarget.id),
                 editLabel: "MCQ এডিট পেজে যান",
               }
             : undefined
@@ -284,7 +290,7 @@ export function McqListView() {
                 subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
                 chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
                 clueText: assignTarget.question,
-                editHref: `/mcqs/${assignTarget.id}/edit`,
+                editHref: buildEditHref(assignTarget.id),
                 editLabel: "MCQ এডিট পেজে যান",
               }
             : undefined

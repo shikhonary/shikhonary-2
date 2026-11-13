@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
@@ -119,6 +120,11 @@ export function CqTable({
   onPageChange,
   onLimitChange,
 }: CqTableProps) {
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/cqs/${id}/edit?${queryString}` : `/cqs/${id}/edit`
+
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({})
 
@@ -514,7 +520,7 @@ export function CqTable({
 
                   {/* Shared Actions Column */}
                   <QuestionCardActions
-                    editHref={`/cqs/${item.id}/edit`}
+                    editHref={buildEditHref(item.id)}
                     onDelete={() => onDelete(item.id, item.context || item.questionA)}
                     editTitle="CQ সম্পাদনা করুন"
                     deleteTitle="CQ মুছুন"
