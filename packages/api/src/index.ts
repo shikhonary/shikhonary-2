@@ -833,6 +833,7 @@ export type { NormalizedQuestionItem } from "./routers/question-bank/question-ba
 
 export * from "./routers/seen-comprehension/seen-comprehension.schema"
 export * from "./routers/rearrange/rearrange.schema"
+export * from "./routers/content-tracker/content-tracker.schema"
 
 
 

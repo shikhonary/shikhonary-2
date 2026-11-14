@@ -30,8 +30,9 @@ export interface ActiveFilterChip {
 }
 
 export interface DataTableFilterBarProps {
-  searchQuery: string
-  onSearchChange: (value: string) => void
+  searchQuery?: string
+  onSearchChange?: (value: string) => void
+  showSearch?: boolean
   searchPlaceholder?: string
   status?: StatusFilterValue
   onStatusChange?: (status: StatusFilterValue) => void
@@ -51,8 +52,9 @@ export interface DataTableFilterBarProps {
 }
 
 export function DataTableFilterBar({
-  searchQuery,
+  searchQuery = "",
   onSearchChange,
+  showSearch = true,
   searchPlaceholder = "অনুসন্ধান করুন...",
   status,
   onStatusChange,
@@ -77,13 +79,13 @@ export function DataTableFilterBar({
   const [mobileSheetOpen, setMobileSheetOpen] = React.useState(false)
 
   // Compute built-in active filters
-  const hasActiveSearch = Boolean(searchQuery && searchQuery.trim() !== "")
+  const hasActiveSearch = Boolean(showSearch && searchQuery && searchQuery.trim() !== "")
   const hasActiveStatus = Boolean(status && status !== "ALL")
 
   // Combine built-in and custom active filters
   const computedActiveFilters: ActiveFilterChip[] = [...activeFilters]
 
-  if (hasActiveSearch && !computedActiveFilters.some((f) => f.id === "search")) {
+  if (hasActiveSearch && onSearchChange && !computedActiveFilters.some((f) => f.id === "search")) {
     computedActiveFilters.unshift({
       id: "search",
       label: `অনুসন্ধান: "${searchQuery}"`,
@@ -105,7 +107,7 @@ export function DataTableFilterBar({
   const activeCount = computedActiveFilters.length
 
   const handleResetAll = () => {
-    onSearchChange("")
+    if (onSearchChange) onSearchChange("")
     if (onStatusChange) onStatusChange("ALL")
     if (onResetAll) onResetAll()
   }
@@ -115,26 +117,28 @@ export function DataTableFilterBar({
       {/* Primary Filter Toolbar */}
       <div className="flex items-center gap-3 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card p-3 sm:p-4 shadow-xs">
         {/* Search Input Filter */}
-        <div className="relative flex-1 min-w-0">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground pointer-events-none" />
-          <Input
-            type="text"
-            placeholder={searchPlaceholder}
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-9 h-10 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-600 transition-all font-body"
-          />
-          {hasActiveSearch && (
-            <button
-              type="button"
-              onClick={() => onSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
-              title="অনুসন্ধান মুছুন"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
+        {showSearch && onSearchChange && (
+          <div className="relative flex-1 min-w-0">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground pointer-events-none" />
+            <Input
+              type="text"
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-9 pr-9 h-10 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-600 transition-all font-body"
+            />
+            {hasActiveSearch && (
+              <button
+                type="button"
+                onClick={() => onSearchChange("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                title="অনুসন্ধান মুছুন"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Mobile Filter Sheet Trigger Button & Drawer */}
         <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>

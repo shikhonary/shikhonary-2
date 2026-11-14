@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { EditShortAnswerView } from "../components/edit-short-answer-view"
 
 interface EditShortAnswerPageProps {
@@ -7,5 +8,9 @@ interface EditShortAnswerPageProps {
 }
 
 export function EditShortAnswerPage({ id }: EditShortAnswerPageProps) {
-  return <EditShortAnswerView id={id} />
+  return (
+    <Suspense>
+      <EditShortAnswerView id={id} />
+    </Suspense>
+  )
 }

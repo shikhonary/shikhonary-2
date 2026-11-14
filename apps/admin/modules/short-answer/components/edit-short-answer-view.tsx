@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter, useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -90,6 +90,10 @@ export interface EditShortAnswerViewProps {
 export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const listHref = queryString ? `/short-answers?${queryString}` : "/short-answers"
+
   const shortAnswerId = id || (params?.id as string)
 
   const { data: saData, isLoading: isSaLoading, isError } = useShortAnswerById(shortAnswerId)
@@ -363,7 +367,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
 
       toast.success("সংক্ষিপ্ত উত্তর প্রশ্নটি সফলভাবে হালনাগাদ করা হয়েছে।")
       setTimeout(() => {
-        router.push("/short-answers")
+        router.push(listHref)
       }, 600)
     } catch (err: any) {
       const msg = err.message || "সংক্ষিপ্ত উত্তর হালনাগাদে সমস্যা হয়েছে"
@@ -393,7 +397,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
           অনুরোধকৃত সংক্ষিপ্ত উত্তর প্রশ্নটি খুঁজে পাওয়া যায়নি অথবা মুছে ফেলা হয়েছে।
         </p>
         <Button asChild variant="outline" className="rounded-xl">
-          <Link href="/short-answers">তালিকায় ফিরে যান</Link>
+          <Link href={listHref}>তালিকায় ফিরে যান</Link>
         </Button>
       </div>
     )
@@ -408,7 +412,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
         icon={HelpCircle}
         badge={{ label: "সম্পাদনা মোড", variant: "amber" }}
         breadcrumbs={[
-          { label: "সংক্ষিপ্ত উত্তর তালিকা", href: "/short-answers" },
+          { label: "সংক্ষিপ্ত উত্তর তালিকা", href: listHref },
           { label: "প্রশ্ন সম্পাদনা" },
         ]}
       >
@@ -417,7 +421,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
           variant="outline"
           className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
         >
-          <Link href="/short-answers" prefetch={true}>
+          <Link href={listHref} prefetch={true}>
             <ArrowLeft className="w-4 h-4" />
             <span>তালিকায় ফিরে যান</span>
           </Link>
@@ -1015,7 +1019,7 @@ export function EditShortAnswerView({ id }: EditShortAnswerViewProps = {}) {
                   disabled={isSubmitting}
                   className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold px-6 h-11 text-sm transition-all active:scale-95 cursor-pointer"
                 >
-                  <Link href="/short-answers" prefetch={true}>
+                  <Link href={listHref} prefetch={true}>
                     বাতিল
                   </Link>
                 </Button>

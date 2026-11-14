@@ -68,11 +68,11 @@ const navGroups = [
   {
     groupLabel: "Question Bank",
     items: [
+      { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/pbqs", label: "PBQs", icon: HelpCircle },
       { href: "/cs", label: "CS", icon: HelpCircle },
-      { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
       { href: "/amplifications", label: "Amplification", icon: HelpCircle },
       { href: "/letters", label: "Letters", icon: HelpCircle },

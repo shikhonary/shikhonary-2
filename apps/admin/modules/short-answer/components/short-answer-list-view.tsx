@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import {
   useShortAnswersList,
   useShortAnswerStats,
@@ -45,6 +46,11 @@ export function ShortAnswerListView() {
     },
     setSearchParams,
   ] = useShortAnswerSearchParams()
+
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/short-answers/${id}/edit?${queryString}` : `/short-answers/${id}/edit`
 
   const handleAcademicClassChange = (academicClassId: string) => {
     setSearchParams({
@@ -264,7 +270,7 @@ export function ShortAnswerListView() {
                 subjectName: resolveTarget.subject?.nameBn || resolveTarget.subject?.nameEn,
                 chapterName: resolveTarget.chapter?.nameBn || resolveTarget.chapter?.nameEn,
                 clueText: resolveTarget.question,
-                editHref: `/short-answers/${resolveTarget.id}/edit`,
+                editHref: buildEditHref(resolveTarget.id),
                 editLabel: "প্রশ্ন এডিট পেজে যান",
               }
             : undefined
@@ -285,7 +291,7 @@ export function ShortAnswerListView() {
                 subjectName: assignTarget.subject?.nameBn || assignTarget.subject?.nameEn,
                 chapterName: assignTarget.chapter?.nameBn || assignTarget.chapter?.nameEn,
                 clueText: assignTarget.question,
-                editHref: `/short-answers/${assignTarget.id}/edit`,
+                editHref: buildEditHref(assignTarget.id),
                 editLabel: "প্রশ্ন এডিট পেজে যান",
               }
             : undefined

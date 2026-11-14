@@ -74,8 +74,10 @@ import { shuddhoAshuddhoRouter } from "./routers/shuddho-ashuddho/shuddho-ashudd
 import { danBamMilkoronRouter } from "./routers/dan-bam-milkoron/dan-bam-milkoron.router"
 import { seenComprehensionRouter } from "./routers/seen-comprehension/seen-comprehension.router"
 import { numberInWordsRouter } from "./routers/number-in-words/number-in-words.router"
+import { contentTrackerRouter } from "./routers/content-tracker/content-tracker.router"
 
 export const appRouter = createTRPCRouter({
+  contentTracker: contentTrackerRouter,
   health: healthRouter,
   user: userRouter,
   role: roleRouter,

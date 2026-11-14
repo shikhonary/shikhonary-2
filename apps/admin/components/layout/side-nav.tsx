@@ -26,6 +26,7 @@ import {
   PenTool,
   ArrowLeftRight,
   Hash,
+  SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -46,6 +47,7 @@ const navGroups: NavGroup[] = [
     groupLabel: "Main",
     items: [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/content-tracker", label: "Content Pipeline", icon: SlidersHorizontal },
     ],
   },
   {
@@ -66,12 +68,12 @@ const navGroups: NavGroup[] = [
   {
     groupLabel: "Question Bank",
     items: [
+      { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/mcqs", label: "MCQs", icon: HelpCircle },
       { href: "/cqs", label: "CQs", icon: HelpCircle },
       { href: "/pbqs", label: "PBQs", icon: HelpCircle },
       { href: "/seen-comprehensions", label: "Seen Comprehensions", icon: BookOpen },
       { href: "/cs", label: "CS", icon: HelpCircle },
-      { href: "/short-answers", label: "Short Answers", icon: HelpCircle },
       { href: "/descriptive-questions", label: "Descriptive Questions", icon: HelpCircle },
       { href: "/short-questions", label: "Short Questions", icon: HelpCircle },
       { href: "/math-questions", label: "Math Questions", icon: HelpCircle },

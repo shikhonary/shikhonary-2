@@ -157,7 +157,9 @@ export function StepSubjectsDistribution({
         if (!sqt) continue
         const qTypeId = sqt.questionTypeId
         if (!qTypeId) continue
-        const isSingle = sqt.selectionMode ? (sqt.selectionMode === "SINGLE_WITH_ALT" || sqt.selectionMode === "SINGLE_NO_ALT") : (isSingleQuestionType(sqt.questionType?.nameEn || sqt.questionType?.nameBn || sqt.customLabel) || sqt.totalQuestions === 1)
+        const isSingle = sqt.selectionMode
+          ? (sqt.selectionMode === "SINGLE_WITH_ALT" || sqt.selectionMode === "SINGLE_NO_ALT")
+          : isSingleQuestionType(sqt.questionType?.nameEn || sqt.questionType?.nameBn || sqt.customLabel)
         if (!map.has(qTypeId)) {
           map.set(qTypeId, {
             id: qTypeId,
@@ -266,8 +268,25 @@ export function StepSubjectsDistribution({
     }
   }, [subjects, filteredQuestionTypes, questionTypes, data.subjects, onChange])
 
-  // Auto-populate distributions from subject structure if subject has none
-  const autoPopulatedSubjectsRef = useRef<Set<string>>(new Set())
+  const checkIsSingleType = (typeObj?: any, presetObj?: any): boolean => {
+    if (!typeObj && !presetObj) return false
+    const preset = presetObj || typeObj?.preset || subjectDetail?.subjectQuestionTypes?.find(
+      (sqt: any) => sqt.questionTypeId === typeObj?.id
+    )
+    if (preset?.selectionMode) {
+      if (preset.selectionMode === "SINGLE_WITH_ALT" || preset.selectionMode === "SINGLE_NO_ALT") {
+        return true
+      }
+      if (preset.selectionMode === "MULTIPLE") {
+        return false
+      }
+    }
+    const rawName = typeObj?.nameEn || typeObj?.nameBn || typeObj?.code || typeObj?.label || preset?.customLabel
+    const policy = getQuestionTypePolicy(rawName)
+    if (policy.selectionMode === "SINGLE") return true
+    if (isSingleQuestionType(rawName)) return true
+    return false
+  }
 
   const buildStructureDistributions = (targetFilteredTypes: typeof filteredQuestionTypes): WizardDistribution[] => {
     return targetFilteredTypes.map((item) => {
@@ -295,8 +314,7 @@ export function StepSubjectsDistribution({
       const marksPerQ = sqt?.mark || item.mark || 1
       if (!markDist) markDist = { a: marksPerQ }
 
-      const typePolicy = getQuestionTypePolicy(item.nameEn || item.nameBn || (item as any).code || customLabel)
-      const isSingle = sqt?.selectionMode ? (sqt.selectionMode === "SINGLE_WITH_ALT" || sqt.selectionMode === "SINGLE_NO_ALT") : (typePolicy.selectionMode === "SINGLE" || sqt?.totalQuestions === 1)
+      const isSingle = checkIsSingleType(item, sqt)
 
       return {
         tempId: crypto.randomUUID(),
@@ -313,25 +331,6 @@ export function StepSubjectsDistribution({
       }
     })
   }
-
-  useEffect(() => {
-    if (!expandedSubjectId || !subjectDetail) return
-    if (autoPopulatedSubjectsRef.current.has(expandedSubjectId)) return
-
-    const currentSub = data.subjects.find((s) => s.tempId === expandedSubject)
-    if (!currentSub || currentSub.distributions.length > 0) return
-
-    if (filteredQuestionTypes.length > 0) {
-      autoPopulatedSubjectsRef.current.add(expandedSubjectId)
-      const defaultDists = buildStructureDistributions(filteredQuestionTypes)
-      if (defaultDists.length > 0) {
-        const updated = data.subjects.map((s) =>
-          s.tempId === expandedSubject ? { ...s, distributions: defaultDists } : s
-        )
-        onChange({ subjects: updated })
-      }
-    }
-  }, [expandedSubjectId, subjectDetail, filteredQuestionTypes, expandedSubject, data.subjects, isExpandedSubjectEnglish, onChange])
 
   const handleLoadStructureDistributions = (subjectTempId: string) => {
     if (filteredQuestionTypes.length === 0) {
@@ -400,17 +399,17 @@ export function StepSubjectsDistribution({
       (sqt: any) => sqt.questionTypeId === qTypeId
     )
 
-    const typePolicy = getQuestionTypePolicy(matched.nameEn || matched.nameBn || (matched as any).code || preset?.customLabel)
-    const isSingle = preset?.selectionMode ? (preset.selectionMode === "SINGLE_WITH_ALT" || preset.selectionMode === "SINGLE_NO_ALT") : (typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1)
+    const isSingle = checkIsSingleType(matched, preset)
 
     setDistForm({
       questionTypeId: qTypeId,
       marksPerQuestion: preset ? String(preset.mark) : String(matched.mark || 1),
-      questionCount: isSingle ? "1" : (preset ? String(preset.totalQuestions || 0) : ""),
-      questionsToAttempt: isSingle ? "1" : (preset && preset.requiredCount > 0 ? String(preset.requiredCount) : ""),
+      // Keep question count and to attempt blank for manual input, unless it's a single question type
+      questionCount: isSingle ? "1" : "",
+      questionsToAttempt: isSingle ? "1" : "",
     })
 
-    if (preset) {
+    if (preset?.mark) {
       setShowAutoFillToast(true)
       setTimeout(() => setShowAutoFillToast(false), 2000)
     }
@@ -511,8 +510,7 @@ export function StepSubjectsDistribution({
       ? matched.position
       : (typeof preset?.position === "number" ? preset.position : sDistLength)
 
-    const typePolicy = getQuestionTypePolicy(matched.nameEn || matched.nameBn || (matched as any).code || preset?.customLabel)
-    const isSingle = typePolicy.selectionMode === "SINGLE" || preset?.totalQuestions === 1
+    const isSingle = checkIsSingleType(matched, preset)
     if (isSingle) {
       finalQuestionCount = 1
     }
@@ -857,8 +855,8 @@ export function StepSubjectsDistribution({
                             <Sparkles className="h-3.5 w-3.5 shrink-0" />
                             <span>
                               {isExpandedSubjectEnglish
-                                ? "Marks and question count autofilled!"
-                                : "নম্বর ও প্রশ্ন সংখ্যা স্বয়ংক্রিয়ভাবে পূরণ হয়েছে!"}
+                                ? "Marks per question autofilled from subject preset."
+                                : "বিষয় কাঠামো থেকে প্রতি প্রশ্নের নম্বর পূরণ করা হয়েছে।"}
                             </span>
                           </div>
                         )}
@@ -920,65 +918,113 @@ export function StepSubjectsDistribution({
                                 className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10"
                               />
                             </div>
-                            <div>
-                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                                {isExpandedSubjectEnglish ? "Question Count *" : "প্রশ্ন সংখ্যা *"}
-                              </label>
-                              {(() => {
-                                const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
-                                const isCurrentSingle = isSingleQuestionType(selectedTypeObj?.nameEn || selectedTypeObj?.nameBn || (selectedTypeObj as any)?.code)
-                                return (
-                                  <Input
-                                    type="number"
-                                    disabled={isCurrentSingle}
-                                    value={isCurrentSingle ? "1" : distForm.questionCount}
-                                    onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
-                                    onBlur={handleQuestionCountBlur}
-                                    placeholder={isExpandedSubjectEnglish ? "10" : "১০"}
-                                    min={0}
-                                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
-                                  />
-                                )
-                              })()}
-                            </div>
-                            <div>
-                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                                {isExpandedSubjectEnglish ? "To Attempt (Optional)" : "চেষ্টা (ঐচ্ছিক)"}
-                              </label>
-                              {(() => {
-                                const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
-                                const isCurrentSingle = isSingleQuestionType(selectedTypeObj?.nameEn || selectedTypeObj?.nameBn || (selectedTypeObj as any)?.code) || selectedTypeObj?.preset?.totalQuestions === 1
-                                return (
-                                  <Input
-                                    type="number"
-                                    disabled={isCurrentSingle}
-                                    value={isCurrentSingle ? "1" : distForm.questionsToAttempt}
-                                    onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
-                                    onBlur={handleQuestionsToAttemptBlur}
-                                    placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "All" : "সব")}
-                                    min={1}
-                                    className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
-                                  />
-                                )
-                              })()}
-                            </div>
+                            {(() => {
+                              const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                              const isCurrentSingle = checkIsSingleType(selectedTypeObj)
+
+                              return (
+                                <>
+                                  <div>
+                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
+                                      {isExpandedSubjectEnglish ? "Question Count *" : "প্রশ্ন সংখ্যা *"}
+                                    </label>
+                                    <Input
+                                      type="number"
+                                      disabled={isCurrentSingle}
+                                      value={isCurrentSingle ? "1" : distForm.questionCount}
+                                      onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
+                                      onBlur={handleQuestionCountBlur}
+                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "e.g. 10" : "যেমন: ১০")}
+                                      min={1}
+                                      className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
+                                    />
+                                    {isCurrentSingle && (
+                                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-body mt-1 block">
+                                        {isExpandedSubjectEnglish ? "Fixed: 1 (Single)" : "স্থির: ১ (একক প্রশ্ন)"}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
+                                      {isExpandedSubjectEnglish ? "To Attempt (Optional)" : "চেষ্টা (ঐচ্ছিক)"}
+                                    </label>
+                                    <Input
+                                      type="number"
+                                      disabled={isCurrentSingle}
+                                      value={isCurrentSingle ? "1" : distForm.questionsToAttempt}
+                                      onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
+                                      onBlur={handleQuestionsToAttemptBlur}
+                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "All" : "সব")}
+                                      min={1}
+                                      className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
+                                    />
+                                    {isCurrentSingle && (
+                                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-body mt-1 block">
+                                        {isExpandedSubjectEnglish ? "Fixed: 1 (Single)" : "স্থির: ১ (একক প্রশ্ন)"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </>
+                              )
+                            })()}
                           </div>
                         </div>
 
-                        {distForm.questionsToAttempt !== "" && (parseInt(distForm.questionCount, 10) || 0) < (parseInt(distForm.questionsToAttempt, 10) || 0) && (
-                          <p className="text-xs text-rose-600 dark:text-rose-400 font-body font-medium animate-in fade-in duration-200">
-                            {isExpandedSubjectEnglish
-                              ? "⚠️ Questions to attempt cannot exceed total question count."
-                              : "⚠️ চেষ্টার সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।"}
-                          </p>
-                        )}
+                        {/* Note for single question types */}
+                        {(() => {
+                          const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                          const isCurrentSingle = checkIsSingleType(selectedTypeObj)
+                          if (!isCurrentSingle) return null
+
+                          return (
+                            <div className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-body animate-in fade-in duration-200">
+                              <Info className="h-4 w-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                              <div>
+                                <p className="font-semibold">
+                                  {isExpandedSubjectEnglish
+                                    ? "Single Question Type (Multiple questions not allowed)"
+                                    : "একক প্রশ্নের ধরণ (একাধিক প্রশ্ন অনুমোদিত নয়)"}
+                                </p>
+                                <p className="text-[11px] opacity-90 mt-0.5">
+                                  {isExpandedSubjectEnglish
+                                    ? "This question type only permits a single question and multiple questions cannot be configured (this feature is not totally synced)."
+                                    : "এই প্রশ্নের ধরণের ক্ষেত্রে কেবল ১টি প্রশ্ন অনুমোদিত। একাধিক প্রশ্ন তৈরি বা সংখ্যা পরিবর্তন করা যাবে না (এই ফিচারটি পুরোপুরি সিঙ্ক নয়)।"}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        })()}
 
                         {(() => {
+                          const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                          const isCurrentSingle = checkIsSingleType(selectedTypeObj)
+                          const effQuestionCount = isCurrentSingle ? "1" : distForm.questionCount
+                          const effQuestionsToAttempt = isCurrentSingle ? "1" : distForm.questionsToAttempt
+
+                          return (
+                            <>
+                              {effQuestionsToAttempt !== "" && (parseInt(effQuestionCount, 10) || 0) < (parseInt(effQuestionsToAttempt, 10) || 0) && (
+                                <p className="text-xs text-rose-600 dark:text-rose-400 font-body font-medium animate-in fade-in duration-200">
+                                  {isExpandedSubjectEnglish
+                                    ? "⚠️ Questions to attempt cannot exceed total question count."
+                                    : "⚠️ চেষ্টার সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।"}
+                                </p>
+                              )}
+                            </>
+                          )
+                        })()}
+
+                        {(() => {
+                          const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                          const isCurrentSingle = checkIsSingleType(selectedTypeObj)
+                          const effQuestionCount = isCurrentSingle ? "1" : distForm.questionCount
+                          const effQuestionsToAttempt = isCurrentSingle ? "1" : distForm.questionsToAttempt
+
                           const isFormInvalid =
                             !distForm.questionTypeId ||
                             !distForm.marksPerQuestion ||
-                            !distForm.questionCount ||
-                            (distForm.questionsToAttempt !== "" && (parseInt(distForm.questionCount, 10) || 0) < (parseInt(distForm.questionsToAttempt, 10) || 0))
+                            !effQuestionCount ||
+                            (effQuestionsToAttempt !== "" && (parseInt(effQuestionCount, 10) || 0) < (parseInt(effQuestionsToAttempt, 10) || 0))
 
                           return (
                             <Button

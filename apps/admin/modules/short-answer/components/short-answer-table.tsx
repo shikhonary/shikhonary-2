@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
@@ -113,6 +114,11 @@ export function ShortAnswerTable({
   onPageChange,
   onLimitChange,
 }: ShortAnswerTableProps) {
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const buildEditHref = (id: string) =>
+    queryString ? `/short-answers/${id}/edit?${queryString}` : `/short-answers/${id}/edit`
+
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({})
 
@@ -368,7 +374,7 @@ export function ShortAnswerTable({
 
                       {/* Question Text */}
                       <Link
-                        href={`/short-answers/${item.id}/edit`}
+                        href={buildEditHref(item.id)}
                         prefetch={true}
                         className="block font-headline text-base sm:text-lg font-bold text-slate-900 dark:text-foreground leading-snug group-hover:text-indigo-600 transition-colors"
                       >
@@ -456,7 +462,7 @@ export function ShortAnswerTable({
 
                   {/* Shared Actions Column with Report Dropdown */}
                   <QuestionCardActions
-                    editHref={`/short-answers/${item.id}/edit`}
+                    editHref={buildEditHref(item.id)}
                     onDelete={() => onDelete(item.id, item.question)}
                     editTitle="সংক্ষিপ্ত উত্তর সম্পাদনা করুন"
                     deleteTitle="সংক্ষিপ্ত উত্তর মুছুন"
