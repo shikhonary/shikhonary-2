@@ -123,7 +123,10 @@ export function extractContextAndRefs(rawContext: string | null | undefined): {
 
   // 1. Strip question header at beginning (e.g. 'নিচের উদ্দীপকটি পড়ে ৯১ ও ৯২ নম্বর প্রশ্নের উত্তর দাও:')
   text = text
-    .replace(/^(?:নিচের\s+)?(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি|অংশটুকু|কবিতাংশটি|নাট্যাংশটি|দৃশ্যপটটি)\s+(?:পড়ে|পড়ে|লক্ষ\s*কর[েো]|দেখে)[\s\S]*?প্রশ্নের\s*উত্তর\s*দাও[ঃ:।-]*\s*/i, "")
+    .replace(
+      /^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি|অংশটুকু|কবিতাংশটি|নাট্যাংশটি|দৃশ্যপটটি|ছকটি|চিত্রটি|সারণিটি|সারণীটি|চার্টটি|ফ্লোচার্টটি)?\s*(?:পড়ে|পড়ে|পড়ো|পড়ো|পড়|পড়ুন|লক্ষ\s*কর(?:ে|ো)?|দেখে|অনুধাবন\s*কর(?:ে|ো)?)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i,
+      ""
+    )
     .trim();
 
   const extractedRefs: string[] = [];
@@ -168,6 +171,12 @@ export function extractQuestionAndRefs(rawQuestion: string): {
     // Remove bracket from question text, keeping any trailing question mark or punctuation
     text = text.replace(/\s*\[([^\]]+)\]\s*([?।|.]?)/g, "$2").trim();
   }
+
+  // Strip "নিচের কোনটি সঠিক?" from question
+  text = text
+    .replace(/(?:নিচের\s+)?(?:কোনটি|কোনটা)\s*(?:সঠিক|সত্য|ভুল|অসঠিক)\s*[?？।.\-\s]*$/i, "")
+    .replace(/(?:নিচের\s+)?(?:কোনটি|কোনটা)\s*(?:সঠিক|সত্য|ভুল|অসঠিক)\s*[?？।.\-\s]*/i, "")
+    .trim();
 
   return {
     cleanQuestion: text,
@@ -254,7 +263,16 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
     .trim();
 
   // Find matching chapter in the database (Exact match first, then fallback to partial/contains)
-  const titleCandidates = [chapterTitle, strippedTitle].filter(Boolean);
+  const noParensTitle = strippedTitle.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  const spaceVariants = [
+    strippedTitle,
+    noParensTitle,
+    strippedTitle.replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+    noParensTitle.replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+    strippedTitle.replace(/পূর্ব\s+বাংলার/g, "পূর্ববাংলার"),
+    noParensTitle.replace(/পূর্ব\s+বাংলার/g, "পূর্ববাংলার"),
+  ];
+  const titleCandidates = [chapterTitle, strippedTitle, noParensTitle, ...spaceVariants].filter(Boolean);
   const variants = [...new Set(titleCandidates.flatMap(getBengaliVariants))];
   const searchConditions = variants.flatMap((v) => [
     { nameBn: v },
@@ -508,12 +526,23 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
         : q.attachmentType || (cleanedContext ? "PASSAGE" : "DIAGRAM");
 
       const rawCaption = q.attachmentDescription?.trim();
-      const caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক")
+      let caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক")
         ? rawCaption
         : (cleanedContext || hasTable ? null : "চিত্র সংযুক্ত করুন");
-      const content = cleanedContext || null;
+      if (caption && /প্রশ্নের\s*উত্তর\s*দাও/i.test(caption)) {
+        caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim() || null;
+      }
+      let content = cleanedContext || null;
+      if (content && /^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i.test(content)) {
+        content = content.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim() || null;
+      }
       const tableData = hasTable ? rawTable : null;
-      const bottomContent = (q as any).bottomContent || null;
+      let bottomContent = (q as any).bottomContent?.trim() || null;
+      if (bottomContent) {
+        bottomContent = bottomContent
+          .replace(/^(?:নিচের\s+)?(?:কোনটি|কোনটা)\s*(?:সঠিক|সত্য|ভুল|অসঠিক)\s*[?？।.\-\s]*$/gi, "")
+          .trim() || null;
+      }
 
       if (!existingAttachment) {
         await prisma.questionAttachment.create({

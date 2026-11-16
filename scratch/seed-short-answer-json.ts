@@ -57,58 +57,60 @@ async function seedShortAnswers(filePath: string) {
     return;
   }
 
-  // 1. Resolve Target Subject and Chapter for Class 9/10 Science
+  // 1. Resolve Target Subject and Chapter
   let targetChapter: any = null;
   const chapterTitle = (data.chapterTitle || "").trim();
+  const strippedTitle = chapterTitle
+    .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ|chapter)\s*[:：\-–.]\s*/i, "")
+    .trim();
+  const noParensTitle = strippedTitle.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  const spaceVariants = [
+    chapterTitle,
+    strippedTitle,
+    noParensTitle,
+    strippedTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+    noParensTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+  ];
 
-  // If chapterTitle is "খাদ্য ও পুষ্টি", "উন্নত জীবনধারা", or "উন্নততর জীবনধারা", it belongs to Chapter 1: "উন্নততর জীবনধারা"
-  if (
-    chapterTitle.includes("খাদ্য") ||
-    chapterTitle.includes("পুষ্টি") ||
-    chapterTitle.includes("উন্নত") ||
-    chapterTitle.includes("জীবনধারা")
-  ) {
+  const subjectIdArg = (data as any).subjectId;
+
+  if (subjectIdArg) {
     targetChapter = await prisma.academicChapter.findFirst({
       where: {
-        id: "cmwd7woyw00002oejaeoce9n6", // Pos 0: উন্নততর জীবনধারা (Science 9/10)
+        subjectId: subjectIdArg,
+        OR: spaceVariants.flatMap((v) => [
+          { nameBn: { contains: v } },
+          { nameEn: { contains: v, mode: "insensitive" as const } },
+        ]),
+      },
+      include: { subject: true },
+    });
+  }
+
+  if (!targetChapter) {
+    const conditions = spaceVariants.flatMap((v) => [
+      { nameBn: { equals: v } },
+      { nameBn: { contains: v } },
+      { nameEn: { equals: v, mode: "insensitive" as const } },
+      { nameEn: { contains: v, mode: "insensitive" as const } },
+    ]);
+
+    targetChapter = await prisma.academicChapter.findFirst({
+      where: {
+        OR: conditions,
+        isActive: true,
       },
       include: {
         subject: true,
+      },
+      orderBy: {
+        position: "asc",
       },
     });
   }
 
   if (!targetChapter) {
-    const strippedTitle = chapterTitle
-      .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ)\s*[:：\-–.]\s*/i, "")
-      .trim();
-
-    targetChapter = await prisma.academicChapter.findFirst({
-      where: {
-        OR: [
-          { nameBn: { in: [chapterTitle, strippedTitle] } },
-          { nameBn: { contains: strippedTitle } },
-        ],
-        subject: {
-          OR: [{ nameEn: "Science" }, { nameBn: "বিজ্ঞান" }],
-          academicYear: { isCurrent: true },
-          classSubjects: {
-            some: {
-              academicClass: {
-                OR: [{ nameEn: "Nine" }, { nameBn: "নবম" }, { nameEn: "Ten" }, { nameBn: "দশম" }],
-              },
-            },
-          },
-        },
-      },
-      include: {
-        subject: true,
-      },
-    });
-  }
-
-  if (!targetChapter) {
-    throw new Error(`Could not resolve chapter for title "${chapterTitle}" in Class 9/10 Science!`);
+    throw new Error(`Could not resolve chapter for title "${chapterTitle}"!`);
   }
 
   console.log(`\n======================================================`);
@@ -145,9 +147,11 @@ async function seedShortAnswers(filePath: string) {
   for (let idx = 0; idx < rawQuestions.length; idx++) {
     const q = rawQuestions[idx];
 
-    // Strip question numbering prefixes like "১। ", "১. ", etc.
+    // Strip question numbering prefixes like "১। ", "১. ", "(১) ", "(ক) "
     let cleanQuestion = (q.question || "")
-      .replace(/^[০-৯\d]+[.)।|\-\s]+/g, "")
+      .replace(/^(?:প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*)?[০-৯\d]{1,3}[.)।|\-:：]\s*/i, "")
+      .replace(/^[(]?[০-৯\d]{1,3}[)]\s*/i, "")
+      .replace(/^[(]?[ক-হ][)]?[.)।|\-:：]\s*/i, "")
       .trim();
 
     const normalizedRefs = normalizeReferences(q.reference || []);

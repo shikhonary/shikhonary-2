@@ -1,12 +1,14 @@
 {
-  "subjectName": "বিজ্ঞান",
-  "chapterTitle": "প্রাত্যহিক জীবনে তড়িৎ",
+  "chapterTitle": "বাংলাদেশের গণতন্ত্র ও নির্বাচন ব্যবস্থা",
+  "subjectId": "cmwhp8esd000k90ej2lltgpcq",
+  "subjectName": "বাংলাদেশ ও বিশ্বপরিচয়",
   "questions": [
     {
-      "question": "তড়িৎ বর্তনীর প্রতীক বলতে কী বোঝ?",
+      "question": "গণতন্ত্রের ধারণা ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ"
+        "মিরপুর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা",
+        "শেরপুর সরকারি ভিক্টোরিয়া একাডেমী"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -15,10 +17,20 @@
       "attachmentDescription": null
     },
     {
-      "question": "মোবাইল ফোনের ব্যাটারি কীভাবে পুনরায় ব্যবহার যোগ্য হয়ে ওঠে?",
+      "question": "প্রত্যক্ষ গণতন্ত্র বলতে কী বোঝায়?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "পরোক্ষ বা প্রতিনিধিত্বমূলক গণতন্ত্র সম্পর্কে তোমার ধারণা ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ"
+        "বি এ এফ শাহীন কলেজ, কুর্মিটোলা, ঢাকা"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -27,35 +39,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "উপরের চিত্র দুটির মধ্যে পার্থক্য কী?",
+      "question": "গণতন্ত্রের গুণাবলি সম্পর্কে তুমি কী জানো?",
       "answer": null,
-      "reference": [
-        "বরিশাল ক্যাডেট কলেজ"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: রোধের সিরিজ ও সমান্তরাল সংযোগ বর্তনী"
-    },
-    {
-      "question": "বর্তনীটির মধ্য দিয়ে কী পরিমাণ বিদ্যুৎ প্রবাহিত হচ্ছে?",
-      "answer": null,
-      "reference": [
-        "বরিশাল ক্যাডেট কলেজ"
-      ],
-      "difficulty": "HARD",
-      "isMath": true,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: $9\\text{V}$ ব্যাটারি এবং $10\\text{ k}\\Omega$, $2\\text{ k}\\Omega$, $1\\text{ k}\\Omega$ রোধের সমান্তরাল বর্তনী"
-    },
-    {
-      "question": "বাড়িতে শ্রেণি ও সমান্তরাল তড়িৎ সংযোগের মধ্যে কোনটি ব্যবহার করবে এবং কেন?",
-      "answer": null,
-      "reference": [
-        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -63,28 +49,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "$5$ অ্যাম্পিয়ার ফিউজ বলতে কী বোঝায়?",
+      "question": "গণতন্ত্রের দোষ বা ত্রুটি সম্পর্কে ধারণা দাও।",
       "answer": null,
-      "reference": [
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বর্তনীতে ফিউজ ব্যবহার করা হয় কেন? ব্যাখ্যা করো। অথবা, তড়িৎ বর্তনীতে ফিউজ ব্যবহার করার কারণ ব্যাখ্যা করো। অথবা, বাসা-বাড়িতে ফিউজ ব্যবহার করা হয় কেন?",
-      "answer": null,
-      "reference": [
-        "দি. বো. ২০২৬",
-        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
-        "কুমিল্লা মডার্ণ হাই স্কুল",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
-        "রা. বো. ২০২৬",
-        "য. বো. ২০২৬"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -92,11 +59,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "ফিউজ বলতে কী বোঝ?",
+      "question": "রাজনৈতিক দল বলতে তুমি কী বোঝ?",
       "answer": null,
-      "reference": [
-        "ন্যাশনাল আইডিয়াল স্কুল, ঢাকা"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -104,11 +69,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "তড়িৎ বিশ্লেষ্য পদার্থ বলতে কী বোঝ?",
+      "question": "'ক' দল নির্বাচনে জয়লাভের পর সরকার গঠন করে। 'ক' দল কীসের প্রতিনিধিত্ব করে? দলটি কীসের ভিত্তিতে শাসনকার্য পরিচালনা করে?",
       "answer": null,
-      "reference": [
-        "সৃষ্টি একাডেমিক স্কুল, টাঙ্গাইল"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -116,23 +79,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "$CuSO_4$ একটি তড়িৎ বিশ্লেষ্য পদার্থ— ব্যাখ্যা করো।",
+      "question": "গণতান্ত্রিক শাসন ব্যবস্থায় বিরোধী দলের ভূমিকাকে তুমি কীভাবে ব্যাখ্যা করবে?",
       "answer": null,
-      "reference": [
-        "সি. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "খাবার লবণ তড়িৎ বিশ্লেষ্য হলেও চিনি তড়িৎ অবিশ্লেষ্য ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -140,11 +89,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "খাবার লবণ তড়িৎ বিশ্লেষ্য পদার্থ কেন? ব্যাখ্যা করো।",
+      "question": "সংসদীয় ব্যবস্থায় একটি দলকে বিকল্প সরকার বলা হয়। দলটি কী? এটিকে কেন বিকল্প সরকার বলা হয়?",
       "answer": null,
-      "reference": [
-        "রা. বো. ২০২৬"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -152,10 +99,70 @@
       "attachmentDescription": null
     },
     {
-      "question": "তড়িৎ বিশ্লেষণ এবং তড়িৎ প্রলেপন প্রক্রিয়া ব্যাখ্যা করো।",
+      "question": "'খ' গণতন্ত্রের একটি মৌলিক বিষয় হিসেবে স্বীকৃত। 'খ' কোনটিকে প্রতিনিধিত্ব করে? এটি কেন অনুষ্ঠিত হয়?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কীসের মাধ্যমে জনগণ পূর্ববর্তী সরকার ও দলকে প্রত্যাখ্যান করতে পারে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নির্বাচন বলতে তুমি কী বোঝ?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নির্বাচকমণ্ডলী সম্পর্কে তোমার ধারণা ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "প্রত্যক্ষ নির্বাচন পদ্ধতি বলতে তুমি কী বোঝ?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "পরোক্ষ নির্বাচন কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ইলেক্টোরাল কলেজ বলতে কী বোঝ?",
       "answer": null,
       "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+        "মিরপুর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -164,47 +171,10 @@
       "attachmentDescription": null
     },
     {
-      "question": "তড়িৎ মুদ্রণ কীভাবে করা হয়? অথবা, তড়িৎ মুদ্রণ কাকে বলে?",
+      "question": "নির্বাচন কমিশন কী?",
       "answer": null,
       "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী, ময়মনসিংহ",
-        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ধাতু নিষ্কাশন করতে তড়িৎ বিশ্লেষণ করা হয়— ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "লোহার তৈরি কোনো জিনিসের উপর কোনো ধাতুর প্রলেপ দেওয়া হয় কেন?",
-      "answer": null,
-      "reference": [
-        "ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "তড়িৎ ক্ষমতা কাকে বলে?",
-      "answer": null,
-      "reference": [
-        "যশোর জিলা স্কুল"
+        "মিরপুর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, ঢাকা"
       ],
       "difficulty": "EASY",
       "isMath": false,
@@ -213,11 +183,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "এক ওয়াট বলতে কী বোঝ?",
+      "question": "শোয়েব জামান বাংলাদেশের একটি সাংবিধানিক প্রতিষ্ঠানের প্রধান। উক্ত প্রতিষ্ঠান জনপ্রতিনিধি বাছাই প্রক্রিয়া পরিচালনা করে। প্রতিষ্ঠানটির নাম কী? এর গঠন লেখো।",
       "answer": null,
-      "reference": [
-        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -225,12 +193,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "কিলোওয়াট-ঘণ্টা বলতে কী বোঝায়?",
+      "question": "নির্বাচনি আচরণবিধি বলতে কী বোঝায়?",
       "answer": null,
-      "reference": [
-        "ফরিদপুর জিলা স্কুল",
-        "বাংলাদেশ মহিলা সমিতি বালিকা উচ্চ বিদ্যালয় ও কলেজ, চট্টগ্রাম"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -238,235 +203,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "$1$ কিলোওয়াট-ঘণ্টাকে জুলে পরিণত করো।",
+      "question": "নির্বাচনি অপরাধের দণ্ড সম্পর্কে তুমি কী জানো?",
       "answer": null,
-      "reference": [
-        "ঢা. বো. ২০২৬"
-      ],
-      "difficulty": "HARD",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "$1$ কিলোওয়াট ঘণ্টাকে মেগা জুলে প্রকাশ করো।",
-      "answer": null,
-      "reference": [
-        "সি. বো. ২০২৬"
-      ],
-      "difficulty": "HARD",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "$\\text{kwh}$/ইউনিট বলতে কী বোঝ ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, বিইউএসএমএস, পার্বতীপুর, দিনাজপুর"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-{
-      "question": "$220\\text{V}-100\\text{W}$ বলতে কী বোঝায়? অথবা, একটি বাল্বের গায়ে $220\\text{V}-100\\text{W}$ লেখা আছে। এর অর্থ কী?",
-      "answer": null,
-      "reference": [
-        "যশোর জিলা স্কুল",
-        "ম. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোনো বাল্বে '$220\\text{ Volts}-60\\text{ Watts}$' লেখা থাকলে কী বোঝায়? অথবা, বৈদ্যুতিক বাল্বের গায়ে $220\\text{ V}-60\\text{ W}$ লেখা থাকলে এর অর্থ কী? অথবা, $220\\text{ V}-60\\text{W}$ বলতে কী বোঝায়?",
-      "answer": null,
-      "reference": [
-        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
-        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা",
-        "চ. বো. ২০২৬",
-        "বরিশাল জিলা স্কুল",
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "$100$ ওয়াট এর বাল্ব-এর অর্থ কী?",
-      "answer": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "এনার্জি সেভিং বাল্ব কেন ব্যবহার করা হয়? ব্যাখ্যা করো। অথবা, এনার্জি সেভিং বাল্ব এর সুবিধা লেখো। অথবা, এনার্জি সেভিং বাল্ব ব্যবহারের সুবিধা ব্যাখ্যা করো। অথবা, এনার্জি সেভিং বাল্ব ব্যবহারের সুবিধা কী? অথবা, এনার্জি সেভিং বাল্বের ব্যবহার সুবিধাজনক কেন?",
-      "answer": null,
-      "reference": [
-        "রাজশাহী ক্যাডেট কলেজ",
-        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
-        "বাংলাদেশ মহিলা সমিতি বালিকা উচ্চ বিদ্যালয় ও কলেজ, চট্টগ্রাম",
-        "য. বো. ২০২৬",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "$\\text{LED}$ বাল্ব সাধারণ বাল্বের চেয়ে বেশি টিকে থাকে কেন? অথবা, এল.ই.ডি বাল্ব সাধারণ বাল্বের চেয়ে বেশি দিন টিকে কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ মোমেনশাহী",
-        "রা. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মিতু তার ঘরে সাধারণ বাল্বের পরিবর্তে এল.ই.ডি. বাল্ব ব্যবহার করছে। উল্লিখিত বাল্ব দুটির মধ্যে কোনটি পরিবেশবান্ধব? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "$400\\text{V}-200\\text{W}$ বলতে কী বোঝ? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা মডার্ণ হাই স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "আই.পি.এস এর প্রয়োজনীয়তা ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "কু. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ইউপিএস এর গুরুত্ব লেখো।",
-      "answer": null,
-      "reference": [
-        "চ. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সিস্টেম লস ব্যাখ্যা করো। অথবা, সিস্টেম লস বলতে কী বোঝায়? অথবা, সিস্টেম লস কী? ব্যাখ্যা করো। অথবা, তড়িতের সিস্টেম লস হবার কারণ ব্যাখ্যা করো। অথবা, তড়িতের সিস্টেম লস বলতে কী বোঝায়?",
-      "answer": null,
-      "reference": [
-        "রাজশাহী ক্যাডেট কলেজ",
-        "ঢা. বো. ২০২৬",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা",
-        "কু. বো. ২০২৬",
-        "ম. বো. ২০২৬",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "লোডশেডিং বলতে কী বোঝায়?",
-      "answer": null,
-      "reference": [
-        "চ. বো. ২০২৬",
-        "জয়পুরহাট গার্লস ক্যাডেট কলেজ",
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "লোডশেডিং এর কারণ ব্যাখ্যা করো। অথবা, লোডশেডিং কেন ঘটে? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "দি. বো. ২০২৬",
-        "ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সিস্টেম লস প্রতিকারের ২টি উপায় লেখো।",
-      "answer": null,
-      "reference": [
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কম্পিউটারে ইউপিএস লাগানো হয় কেন?",
-      "answer": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, বিইউএসএমএস, পার্বতীপুর, দিনাজপুর"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সিস্টেম লস এবং লোডশেডিং ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,

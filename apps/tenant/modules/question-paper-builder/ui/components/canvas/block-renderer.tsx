@@ -321,6 +321,7 @@ const DistTitleBlock = ({ data }: { data: any }) => {
     isCq,
     isMcq,
     isCs,
+    isSa,
     subTitle,
     isSharedQuestionType,
     showMarks = true,
@@ -333,10 +334,15 @@ const DistTitleBlock = ({ data }: { data: any }) => {
     || dist?.questionType?.nameEn?.toLowerCase().includes("scenario")
     || dist?.questionType?.nameBn?.includes("সৃজনশীল (CS)");
 
-  const resolvedCat = resolveDistCategory(dist);
-  const allowsDistTitle = isCq || resolvedCat === QUESTION_TYPE_CODES.CQ || resolvedCat === QUESTION_TYPE_CODES.SA;
+  const isSA = isSa
+    || dist?.questionType?.code === "SA"
+    || dist?.questionType?.code === QUESTION_TYPE_CODES.SA
+    || resolveDistCategory(dist) === QUESTION_TYPE_CODES.SA;
 
-  if (isSharedQuestionType || isMcq || isCS || !allowsDistTitle) return null;
+  const resolvedCat = resolveDistCategory(dist);
+  const allowsDistTitle = (isCq || resolvedCat === QUESTION_TYPE_CODES.CQ) && !isCS && !isSA;
+
+  if (isSharedQuestionType || isMcq || isCS || isSA || !allowsDistTitle) return null;
 
   const distQuestionCount = Number(dist?.questionCount ?? totalProvided ?? 0);
   const distQuestionsToAttempt = (dist?.questionsToAttempt !== undefined && dist?.questionsToAttempt !== null)

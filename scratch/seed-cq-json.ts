@@ -45,6 +45,7 @@ interface RawCqQuestion {
 
 interface RawCqFile {
   chapterTitle: string;
+  subjectId?: string;
   subjectName?: string;
   source?: string;
   session?: string;
@@ -69,6 +70,9 @@ function cleanSubQuestion(qText: string | null | undefined, prefixLetter: string
   // Strip trailing learning outcome indicators like '◄ শিখনফল-১', 'শিখনফল-১, ২'
   text = text.replace(/\s*[◄►]?\s*শিখনফল[-–\s\d,]+$/g, "").trim();
 
+  // Strip unwanted exam prompts if present
+  text = text.replace(/নিচের\s*কোনটি\s*সঠিক\s*[?？]?/g, "").trim();
+
   return text;
 }
 
@@ -81,8 +85,12 @@ function cleanContext(rawContext?: string | null): string {
   text = text.replace(/\[?\bcite:\s*\d+\b\]?/gi, "").trim();
 
   // Strip introductory exam headers like 'নিচের উদ্দীপকটি পড়ে ১ ও ২ নম্বর প্রশ্নের উত্তর দাও:'
-  text = text.replace(/^[-\s]*নিচের\s+উদ্দীপকটি\s+প[ড়ড]়?ে\s+[০-৯0-9\s,ওএবংথেকেto-]+(?:নং|নম্বর)?\s+প্রশ্নের?\s+উত্তর\s+দাও\s*[:ঃ]?\s*/gi, "").trim();
-  text = text.replace(/^[-\s]*উদ্দীপকটি\s+প[ড়ড]়?ে\s+[০-৯0-9\s,ওএবংথেকেto-]+(?:নং|নম্বর)?\s+প্রশ্নের?\s+উত্তর\s+দাও\s*[:ঃ]?\s*/gi, "").trim();
+  text = text
+    .replace(
+      /^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি|অংশটুকু|কবিতাংশটি|নাট্যাংশটি|দৃশ্যপটটি|ছকটি|চিত্রটি|সারণিটি|সারণীটি|চার্টটি|ফ্লোচার্টটি)?\s*(?:পড়ে|পড়ে|পড়ো|পড়ো|পড়|পড়ুন|লক্ষ\s*কর(?:ে|ো)?|দেখে|অনুধাবন\s*কর(?:ে|ো)?)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i,
+      ""
+    )
+    .trim();
 
   return text;
 }
@@ -137,8 +145,35 @@ export function normalizeReferences(rawRefs?: string[]): string[] {
   return Array.from(normalized);
 }
 
-async function resolveTargetChapter(chapterTitle: string) {
+async function resolveTargetChapter(chapterTitle: string, subjectId?: string) {
   const trimmed = (chapterTitle || "").trim();
+
+  // Strip prefixes like "প্রথম অধ্যায়:", "১ম অধ্যায়:"
+  const strippedTitle = trimmed
+    .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ|chapter)\s*[:：\-–.]\s*/i, "")
+    .trim();
+  const noParensTitle = strippedTitle.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  const spaceVariants = [
+    trimmed,
+    strippedTitle,
+    noParensTitle,
+    strippedTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+    noParensTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
+  ];
+
+  if (subjectId) {
+    const ch = await prisma.academicChapter.findFirst({
+      where: {
+        subjectId,
+        OR: spaceVariants.flatMap((v) => [
+          { nameBn: { contains: v } },
+          { nameEn: { contains: v, mode: "insensitive" as const } },
+        ]),
+      },
+      include: { subject: true },
+    });
+    if (ch) return ch;
+  }
 
   // Special aliases for Science Class 9/10 Pos 0: উন্নততর জীবনধারা
   if (
@@ -176,31 +211,23 @@ async function resolveTargetChapter(chapterTitle: string) {
     if (ch) return ch;
   }
 
-  // Strip prefixes like "প্রথম অধ্যায়:", "১ম অধ্যায়:"
-  const strippedTitle = trimmed
-    .replace(/^(?:[০-৯\d]+|প্রথম|দ্বিতীয়|দ্বিতীয়|তৃতীয়|তৃতীয়|চতুর্থ|পঞ্চম|ষষ্ঠ|সপ্তম|অষ্টম|নবম|দশম|একাদশ|দ্বাদশ)\s*(?:অধ্যায়|অধ্যায়|অধ্যায়ঃ|অধ্যায়ঃ)\s*[:：\-–.]\s*/i, "")
-    .trim();
+  const conditions = spaceVariants.flatMap((v) => [
+    { nameBn: { equals: v } },
+    { nameBn: { contains: v } },
+    { nameEn: { equals: v, mode: "insensitive" as const } },
+    { nameEn: { contains: v, mode: "insensitive" as const } },
+  ]);
 
   const matched = await prisma.academicChapter.findFirst({
     where: {
-      OR: [
-        { nameBn: { in: [trimmed, strippedTitle] } },
-        { nameBn: { contains: strippedTitle } },
-      ],
-      subject: {
-        OR: [{ nameEn: "Science" }, { nameBn: "বিজ্ঞান" }],
-        academicYear: { isCurrent: true },
-        classSubjects: {
-          some: {
-            academicClass: {
-              OR: [{ nameEn: "Nine" }, { nameBn: "নবম" }, { nameEn: "Ten" }, { nameBn: "দশম" }],
-            },
-          },
-        },
-      },
+      OR: conditions,
+      isActive: true,
     },
     include: {
       subject: true,
+    },
+    orderBy: {
+      position: "asc",
     },
   });
 
@@ -227,9 +254,9 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
   }
 
   // 1. Resolve Target Chapter
-  const matchedChapter = await resolveTargetChapter(data.chapterTitle);
+  const matchedChapter = await resolveTargetChapter(data.chapterTitle, data.subjectId);
   if (!matchedChapter) {
-    console.error(`\x1b[31m✖ No active chapter found matching: "${data.chapterTitle}" in Class 9/10 Science!\x1b[0m`);
+    console.error(`\x1b[31m✖ No active chapter found matching: "${data.chapterTitle}"!\x1b[0m`);
     return;
   }
 
@@ -367,14 +394,25 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
 
       const rawCaption = q.attachmentDescription?.trim();
       // Rule: Never use 'উদ্দীপক' as caption! Strictly null unless a genuine specific caption (e.g. 'চিত্র ১', 'ছক ১')
-      const caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক") ? rawCaption : null;
+      let caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক") ? rawCaption : null;
+      if (caption) {
+        caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim();
+        caption = caption.replace(/নিচের\s*কোনটি\s*সঠিক\s*[?？]?/g, "").trim();
+        if (!caption) caption = null;
+      }
+
       let contentText = context || null;
       if (caption && contentText && contentText.trim() === caption.trim()) {
         contentText = null;
       }
 
       const tableData = hasTable ? q.table : null;
-      const bottomContent = q.bottomContent || null;
+      let bottomContent = q.bottomContent ? q.bottomContent.trim() : null;
+      if (bottomContent) {
+        bottomContent = bottomContent.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim();
+        bottomContent = bottomContent.replace(/নিচের\s*কোনটি\s*সঠিক\s*[?？]?/g, "").trim();
+        if (!bottomContent) bottomContent = null;
+      }
 
       if (!existingAttachment) {
         await prisma.questionAttachment.create({
@@ -403,7 +441,7 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
       }
 
       // If visual media (diagram, circuit, map) is required, log audit & QuestionReport
-      if (q.hasAttachment && !context && !hasTable) {
+      if (q.hasAttachment && !hasTable) {
         auditItems.push({
           id: currentCqId,
           question: questionA,

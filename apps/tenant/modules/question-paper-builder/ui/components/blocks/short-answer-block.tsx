@@ -130,13 +130,14 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   const questionStyle = getQuestionStyle();
   const isFirst = item.isFirstShortAnswer !== undefined ? item.isFirstShortAnswer : (item.orderIndex === 0);
   const masterNum = item.masterNumber || 1;
-  const marksPerQuestion = item.assignedMarks ?? item.marksPerQuestion ?? item.distribution?.marksPerQuestion ?? data.mark ?? data.marks ?? 2;
+  const totalQuestions = item.totalQuestions || 1;
 
   const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
   const label = subLabels[item.orderIndex] || "";
 
   const renderSubQuestionLabel = (labelStr: string) => {
     const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
+    if (!cleanLabel) return null;
     return (
       <span
         className="font-bold shrink-0 min-w-[1.6em]"
@@ -151,7 +152,7 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   };
 
   return (
-    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
+    <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-1.5 break-inside-avoid">
       {/* Hover Controls */}
       <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
         <button 
@@ -165,8 +166,8 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
         </button>
       </div>
 
-      <div className="flex justify-between items-start gap-2 w-full">
-        <div className="flex gap-2 items-start w-full">
+      <div className="flex justify-between items-start gap-2">
+        <div className="flex gap-2 flex-1 relative">
           <span
             className={`font-bold shrink-0 min-w-[1.8em] ${!isFirst ? "invisible select-none pointer-events-none" : ""}`}
             style={{
@@ -177,41 +178,34 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
           >
             {toBengaliDigits(masterNum)}।
           </span>
-          {renderSubQuestionLabel(label)}
           <div className="flex-1 w-full min-w-0">
-            <ShortAnswerEditableText 
-              text={data.question}
-              itemKey={`${item.id}-question`}
-              defaultStyle={questionStyle}
-              className="m-0 w-full whitespace-pre-wrap"
-              isMath={data.isMath}
-            />
-            {Array.isArray(data.options) && data.options.length > 0 && (
-              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1">
-                {data.options.map((opt: string, i: number) => {
-                  const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];
-                  return (
-                    <div key={i} className="flex gap-1.5 items-start text-xs">
-                      <span className="shrink-0 font-medium">{optLabels[i] || `(${i + 1})`}</span>
-                      <RenderMath text={opt} isMath={data.isMath} />
-                    </div>
-                  );
-                })}
+            <div className="flex gap-2 items-start w-full">
+              {(totalQuestions > 1 || !isFirst) && renderSubQuestionLabel(label)}
+              <div className="flex-1 w-full min-w-0">
+                <ShortAnswerEditableText 
+                  text={data.question}
+                  itemKey={`${item.id}-question`}
+                  defaultStyle={questionStyle}
+                  className="m-0 w-full whitespace-pre-wrap"
+                  isMath={data.isMath}
+                />
+                {Array.isArray(data.options) && data.options.length > 0 && (
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 mt-1">
+                    {data.options.map((opt: string, i: number) => {
+                      const optLabels = ["(ক)", "(খ)", "(গ)", "(ঘ)", "(ঙ)", "(চ)"];
+                      return (
+                        <div key={i} className="flex gap-1.5 items-start text-xs">
+                          <span className="shrink-0 font-medium">{optLabels[i] || `(${i + 1})`}</span>
+                          <RenderMath text={opt} isMath={data.isMath} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <QuestionAttachments attachments={data.attachments} isMath={data.isMath} />
               </div>
-            )}
-            <QuestionAttachments attachments={data.attachments} isMath={data.isMath} />
+            </div>
           </div>
-          {marksPerQuestion !== undefined && marksPerQuestion !== null && Number(marksPerQuestion) > 0 && (
-            <span
-              className="font-bold text-right shrink-0 whitespace-nowrap text-black ml-2"
-              style={{
-                fontSize: questionStyle.fontSize,
-                fontFamily: questionStyle.fontFamily,
-              }}
-            >
-              {toBengaliDigits(marksPerQuestion)}
-            </span>
-          )}
         </div>
       </div>
     </div>

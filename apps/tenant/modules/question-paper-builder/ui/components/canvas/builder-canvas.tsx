@@ -358,6 +358,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         const totalProvided = slot.distTotalQuestions;
         const attemptCount = slot.slotAttemptCount;
         const isCs = slot.isCs;
+        const isSa = slot.isSa;
         const isCq = slot.isCq;
         const isMcq = slot.isMcq;
 
@@ -377,6 +378,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               isCq,
               isMcq,
               isCs,
+              isSa,
               isSharedQuestionType: slot.mode === "SUBSECTION_SHARED",
               showMarks: slot.marksPlacement === "DISTRIBUTION",
               instructionText: slot.distInstruction,

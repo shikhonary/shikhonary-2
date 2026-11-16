@@ -64,6 +64,7 @@ export interface ResolvedSlot {
   isCq: boolean
   isMcq: boolean
   isCs: boolean
+  isSa: boolean
   marksPerQuestion: number
   marksPlacement: MarksPlacement
   showDistTitle: boolean
@@ -145,6 +146,13 @@ function detectDistFlags(dist: any) {
     nameEn.includes("scenario") ||
     nameBn.includes("সৃজনশীল (cs)")
 
+  const isSa =
+    code === "SA" ||
+    category === QUESTION_TYPE_CODES.SA ||
+    nameEn.includes("short answer") ||
+    nameBn.includes("সংক্ষিপ্ত-উত্তর") ||
+    nameBn.includes("সংক্ষিপ্ত উত্তর")
+
   const isMcq =
     code === "MCQ" ||
     category === QUESTION_TYPE_CODES.MCQ ||
@@ -170,20 +178,21 @@ function detectDistFlags(dist: any) {
     ""
   ).trim()
 
-  return { category, isCs, isMcq, isCq, distTitle }
+  return { category, isCs, isSa, isMcq, isCq, distTitle }
 }
 
 function buildDistInstruction(params: {
   isCs: boolean
+  isSa?: boolean
   isCq: boolean
   isMcq: boolean
   totalProvided: number
   attemptCount: number
 }): string | null {
-  const { isCs, isCq, isMcq, totalProvided, attemptCount } = params
+  const { isCs, isSa, isCq, isMcq, totalProvided, attemptCount } = params
   if (isMcq) return null
 
-  if (isCs) {
+  if (isCs || isSa) {
     if (totalProvided > 0 && attemptCount > 0 && attemptCount < totalProvided) {
       return `[যেকোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দিতে হবে]`
     }
@@ -225,7 +234,7 @@ function buildSlot(params: {
     .map((s: any) => s.id as string)
     .filter((id) => id !== subSectionId)
 
-  const { category, isCs, isMcq, isCq, distTitle } = detectDistFlags(dist)
+  const { category, isCs, isSa, isMcq, isCq, distTitle } = detectDistFlags(dist)
   const distTotalQuestions = Number(dist?.questionCount ?? statusInfo?.targetCount ?? 0)
   const distTotalAttempt =
     dist?.questionsToAttempt !== undefined &&
@@ -366,6 +375,7 @@ function buildSlot(params: {
 
   const distInstruction = buildDistInstruction({
     isCs,
+    isSa,
     isCq,
     isMcq,
     totalProvided: distTotalQuestions,
@@ -382,8 +392,7 @@ function buildSlot(params: {
   }
 
   const subTitle = (subSection?.titleBn || subSection?.title || "").trim()
-  const needsDistTitle =
-    (isCq || category === QUESTION_TYPE_CODES.SA) && !isMcq && !isCs
+  const needsDistTitle = isCq && !isMcq && !isCs && !isSa
 
   const showDistTitle =
     !needsDistTitle || mode === "SUBSECTION_SHARED"
@@ -416,6 +425,7 @@ function buildSlot(params: {
     isCq,
     isMcq,
     isCs,
+    isSa,
     marksPerQuestion,
     marksPlacement,
     showDistTitle,
