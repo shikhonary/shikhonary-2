@@ -42,6 +42,20 @@ export function normalizeReferences(rawList: string[]): string[] {
   return [...new Set(result)];
 }
 
+function getBengaliVariants(str: string): string[] {
+  const trimmed = str.trim();
+  const canon = trimmed
+    .replace(/\u09AF\u09BC/g, "\u09DF")
+    .replace(/\u09A1\u09BC/g, "\u09DC")
+    .replace(/\u09A2\u09BC/g, "\u09DD");
+  const decomp = trimmed
+    .replace(/\u09DF/g, "\u09AF\u09BC")
+    .replace(/\u09DC/g, "\u09A1\u09BC")
+    .replace(/\u09DD/g, "\u09A2\u09BC");
+  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+}
+
 async function seedShortAnswers(filePath: string) {
   const fullPath = resolve(WORKSPACE_ROOT, filePath);
   if (!existsSync(fullPath)) {
@@ -71,6 +85,7 @@ async function seedShortAnswers(filePath: string) {
     strippedTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
     noParensTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
   ];
+  const allVariants = [...new Set(spaceVariants.flatMap(getBengaliVariants))];
 
   const subjectIdArg = (data as any).subjectId;
 
@@ -78,7 +93,7 @@ async function seedShortAnswers(filePath: string) {
     targetChapter = await prisma.academicChapter.findFirst({
       where: {
         subjectId: subjectIdArg,
-        OR: spaceVariants.flatMap((v) => [
+        OR: allVariants.flatMap((v) => [
           { nameBn: { contains: v } },
           { nameEn: { contains: v, mode: "insensitive" as const } },
         ]),
@@ -88,7 +103,7 @@ async function seedShortAnswers(filePath: string) {
   }
 
   if (!targetChapter) {
-    const conditions = spaceVariants.flatMap((v) => [
+    const conditions = allVariants.flatMap((v) => [
       { nameBn: { equals: v } },
       { nameBn: { contains: v } },
       { nameEn: { equals: v, mode: "insensitive" as const } },
