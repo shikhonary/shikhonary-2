@@ -7,10 +7,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@custom-variant dark (&:where(.dark-mode-disabled));
+
 @source "../../../../apps/**/*.{ts,tsx}";
 @source "../../../../packages/**/*.{ts,tsx}";
 
 :root {
+  color-scheme: light;
   /* ═══════════════════════════════════════════════════════════
      Shonar Bangla — Union Porishod Civic Design Tokens
      Inspired by the flag of Bangladesh: forest green & crimson

@@ -1,0 +1,674 @@
+{
+  "chapterTitle": "আখলাক",
+  "questions": [
+    {
+      "question": "আখলাকে হামিদার কয়েকটি উদাহরণ দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "একজন পূর্ণাঙ্গ মুমিন হওয়ার জন্য তুমি কোন চরিত্রের অনুশীলন করবে? এ বিষয়ে রাসুল (স.) কী বলেছেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "তাকওয়া কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "পাবনা ক্যাডেট কলেজ",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর",
+        "কুমিল্লা জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "তাকওয়া সকল সদ্‌গুণের মূল— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ময়মনসিংহ বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "তাকওয়াকে নৈতিকতার মূল ভিত্তি বলার কারণ কী?",
+      "answer": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নৈতিক জীবন গঠনে তাকওয়ার প্রভাব উল্লেখ করো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মানুষের মধ্যে সবচেয়ে মর্যাদাবান কারা? এবং কেন?",
+      "answer": null,
+      "reference": [
+        "বরিশাল জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুত্তাকি কাকে বলে?",
+      "answer": null,
+      "reference": [
+        "ময়মনসিংহ জিলা স্কুল"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুত্তাকিদের জন্য মহাসফলতার কারণ ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "সিলেট বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“নিশ্চয়ই মুত্তাকিগণের জন্য রয়েছে সফলতা”— কথাটি ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'সত্যবাদিতা মুক্তি দেয়, আর মিথ্যা ধ্বংস ডেকে আনে।' ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আল-আহদু।",
+      "answer": null,
+      "reference": [
+        "পাবনা ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'যে ব্যক্তি ওয়াদা পালন করে না তার দ্বীন নেই'— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“ওয়াদা পালন মুমিনের বৈশিষ্ট্য”— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "যশোর বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ওয়াদা পালনের সুফল ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৬",
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কোন গুণটি মানুষকে শালীন হতে সাহায্য করে? গুণটি সম্পর্কে একটি হাদিস উল্লেখ করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রিফাতের কাছে কোনো জিনিস গচ্ছিত রাখলে সে তার ক্ষতি সাধন করে। তাকে তুমি কী বলবে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আমিরুল জাতীয় সম্পদ যথাযথ রক্ষণাবেক্ষণ করে। তার মধ্যে আখলাকে হামিদার কোন বিষয় প্রকাশ পেয়েছে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'মানবসেবা মুমিনের অন্যতম গুণ।' ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মোস্তাফিজ সব ধর্মের মানুষের সাথে ঐক্য ও সহযোগিতার মনোভাব নিয়ে বসবাস করে। তার মনোভাবের পরিচয় দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "হাবিব কুরআনের একটি আয়াত পাঠ করে বলল, সকল মানুষ একই বংশধর। সে কোন আয়াত পাঠ করল? উল্লেখ করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রাকিব রাষ্ট্রের প্রতি অনুগত একজন অমুসলিম নাগরিককে হত্যা করল। তার পরিণতি কী হবে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'নারীদের প্রতি উত্তম ব্যবহার মুমিনের নিদর্শন।' ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুরাদ একজন বিজিবি সদস্য। তিনি দেশের সার্বভৌমত্ব রক্ষার কাজে সীমান্তে নিয়োজিত থেকে অক্লান্ত পরিশ্রম করে যাচ্ছেন। মুরাদের কাজটি আখলাকের আলোকে ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“দেশপ্রেম ইমানের অঙ্গ” কেন? বুঝিয়ে লেখো।",
+      "answer": null,
+      "reference": [
+        "ফেনী গার্লস ক্যাডেট কলেজ",
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা",
+        "ময়মনসিংহ জিলা স্কুল",
+        "দিনাজপুর জিলা স্কুল",
+        "বাংলাদেশ নৌবাহিনী স্কুল ও কলেজ, চট্টগ্রাম"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নিজের দেশকে কীভাবে ভালোবাসবে?",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬",
+        "কুমিল্লা ক্যাডেট কলেজ",
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "স্বদেশপ্রেমের দুটি উপায় লেখো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "যারা দেশকে ভালোবাসে না তারা চরম অকৃতজ্ঞ— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কর্তব্যপরায়ণতা মানবজীবনে সফলতার হাতিয়ার কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সিয়াম প্রত্যেক সালাতের আগে মিসওয়াক করে। সে কার আদর্শ অনুসরণ করে? তিনি এ সম্পর্কে কী বলেছেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ব্যয় করার ক্ষেত্রে মধ্যপন্থা অবলম্বন করা বাঞ্ছনীয় কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আবিদ সবসময় নিজেকে পরিশুদ্ধ করার চেষ্টা করে। তার এ চেষ্টাকে কী বলে? এর উদ্দেশ্য কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আমর বিল মারুফ— কেন গুরুত্বপূর্ণ? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সৎকাজের আদেশ এবং অসৎকাজে নিষেধ করতে হবে কেন?",
+      "answer": null,
+      "reference": [
+        "সিলেট বোর্ড ২০২৬",
+        "রংপুর ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "হাদিসের আলোকে খারাপ কাজ প্রতিরোধের স্তরগুলো লেখো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অন্যায় কাজকে অন্তর দ্বারা প্রতিরোধ করার চেষ্টাকে ইমানের দুর্বলতম স্তর বলার কারণ কী? বুঝিয়ে লেখো।",
+      "answer": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
+        "পুলিশ লাইন্স স্কুল এন্ড কলেজ, রংপুর"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“অসৎ কাজে নিষেধ” বলতে কী বোঝানো হয়েছে?",
+      "answer": null,
+      "reference": [
+        "বরিশাল বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সৎ কাজের আদেশ ও অসৎ কাজের নিষেধ সমাজকে কীভাবে পরিশীলিত করে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আমর বিল মারুফ ও নাহি আনিল মুনকার ত্যাগের পরিণাম বিষয়ক দুটি বাণী উল্লেখ করো।",
+      "answer": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "তানভীর সমাজের চোখে নিন্দনীয়। তার মাঝে কী কী বৈশিষ্ট্য থাকতে পারে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রিয়াজের স্বভাবের জন্য সবাই তাকে পশুর চেয়েও অধম বলে। তার পরিণতি কেমন হবে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আকবর এমন একটি নিন্দনীয় কাজ করে যা মিথ্যাচারের বিশেষ রূপ। তার পরিচয় কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুদি দোকানদার সেলিম ওজনে কম দেয় ও ভেজাল পণ্য বিক্রি করে। এটা কেমন পাপ?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গিবতের স্বরূপ ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "বরিশাল বোর্ড ২০২৬",
+        "পাবনা ক্যাডেট কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রাকিব ক্লাসে মাহিনের ব্যাপারে গোপনে অন্য বন্ধুদের নিকট নানান ধরনের খারাপ মন্তব্য করে। রাকিবের কর্মকাণ্ডে কোন বিষয়টি ফুটে উঠেছে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“গিবত ব্যভিচারের চাইতেও মারাত্মক”— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী",
+        "পুলিশ লাইন্স স্কুল এন্ড কলেজ, রংপুর",
+        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গিবতকে ব্যভিচারের সাথে তুলনা করা হয়েছে কেন?",
+      "answer": null,
+      "reference": [
+        "যশোর বোর্ড ২০২৬",
+        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গিবত কেন পরিত্যাগ করা উচিত?",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬",
+        "মতিঝিল সরকারি বালক উচ্চ বিদ্যালয়, ঢাকা",
+        "ফরিদপুর জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গিবতকে মৃত ভাইয়ের গোশত খাওয়ার সাথে তুলনা করা হয়েছে কেন?",
+      "answer": null,
+      "reference": [
+        "সিলেট বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "জামান অন্যের উন্নতি দেখতে পারে না। সে সবাইকে হিংসা করে। তার পরিচয় কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'আর ফিতনা হত্যার চেয়ে জঘন্য।' ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রুম্মান একটি বিশ্ববিদ্যালয় থেকে এম. এ পাশ করেও কাজ না করে অলস বসে থাকে। এর কুফল কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সুদ কী? বুঝিয়ে লেখো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬",
+        "চট্টগ্রাম কলেজিয়েট স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ইসলামে আল্লাহ কেন সুদ নিষিদ্ধ করেছেন?",
+      "answer": null,
+      "reference": [
+        "ঝিনাইদহ ক্যাডেট কলেজ",
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'ক' একজন অফিসার। তিনি অতিরিক্ত উৎকোচ ছাড়া ফাইলে স্বাক্ষর করেন না। 'ক'-এর কাজের কুফল ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ইসলামের দৃষ্টিতে ঘুষের কুফল ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'ঘুষদাতা ও ঘুষগ্রহীতা উভয়ই জাহান্নামি'— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬",
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    }
+  ],
+  "subjectId": "cmwkmnqz40000qotob85ecmnp",
+  "subjectName": "ইসলাম ও নৈতিক শিক্ষা",
+  "className": "Nine"
+}

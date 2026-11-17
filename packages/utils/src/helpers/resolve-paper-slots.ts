@@ -190,7 +190,7 @@ function buildDistInstruction(params: {
   attemptCount: number
 }): string | null {
   const { isCs, isSa, isCq, isMcq, totalProvided, attemptCount } = params
-  if (isMcq) return null
+  if (isMcq || isCq) return null
 
   if (isCs || isSa) {
     if (totalProvided > 0 && attemptCount > 0 && attemptCount < totalProvided) {
@@ -199,10 +199,10 @@ function buildDistInstruction(params: {
     return `[সবগুলো প্রশ্নের উত্তর দিতে হবে]`
   }
 
-  if ((isCq || !isMcq) && attemptCount > 0 && totalProvided > 0 && attemptCount < totalProvided) {
+  if (attemptCount > 0 && totalProvided > 0 && attemptCount < totalProvided) {
     return `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
   }
-  if ((isCq || !isMcq) && attemptCount > 0) {
+  if (attemptCount > 0) {
     return `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
   }
   return null
@@ -392,15 +392,9 @@ function buildSlot(params: {
   }
 
   const subTitle = (subSection?.titleBn || subSection?.title || "").trim()
-  const needsDistTitle = isCq && !isMcq && !isCs && !isSa
+  const needsDistTitle = false
 
-  const showDistTitle =
-    !needsDistTitle || mode === "SUBSECTION_SHARED"
-      ? false
-      : mode === "DIRECT"
-      ? !sectionId
-      : !isSingleDistInSub ||
-        Boolean(distTitle && subTitle && distTitle.toLowerCase() !== subTitle.toLowerCase())
+  const showDistTitle = false
 
   return {
     key: `${dist.id}::${subSectionId ?? sectionId ?? "root"}`,

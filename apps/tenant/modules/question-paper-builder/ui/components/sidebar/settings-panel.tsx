@@ -84,9 +84,12 @@ export const SettingsPanel: React.FC = () => {
             </>
           )}
 
+          {(activeTab === "all" || activeTab === "layout" || activeTab === "questions") && (
+            <TypographyCard />
+          )}
+
           {(activeTab === "all" || activeTab === "questions") && (
             <>
-              <TypographyCard />
               <QuestionSettingsCard />
               <OMRSettingsCard />
             </>

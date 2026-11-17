@@ -1,7 +1,7 @@
 import React from "react";
 import { PaperBlock } from "../../../types";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { QUESTION_TYPE_CODES, resolveDistCategory, toBengaliDigits } from "@workspace/utils";
+import { toBengaliDigits } from "@workspace/utils";
 import { MCQBlock } from "../blocks/mcq-block";
 import { CQBlock } from "../blocks/cq-block";
 import { CSBlock } from "../blocks/cs-block";
@@ -313,96 +313,8 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
   );
 };
 
-const DistTitleBlock = ({ data }: { data: any }) => {
-  const {
-    dist,
-    attemptCount,
-    totalProvided,
-    isCq,
-    isMcq,
-    isCs,
-    isSa,
-    subTitle,
-    isSharedQuestionType,
-    showMarks = true,
-    instructionText: preResolvedInstruction,
-  } = data || {};
-
-  const isCS = isCs
-    || dist?.questionType?.code === "CS"
-    || dist?.questionTypeName?.toLowerCase().includes("scenario")
-    || dist?.questionType?.nameEn?.toLowerCase().includes("scenario")
-    || dist?.questionType?.nameBn?.includes("সৃজনশীল (CS)");
-
-  const isSA = isSa
-    || dist?.questionType?.code === "SA"
-    || dist?.questionType?.code === QUESTION_TYPE_CODES.SA
-    || resolveDistCategory(dist) === QUESTION_TYPE_CODES.SA;
-
-  const resolvedCat = resolveDistCategory(dist);
-  const allowsDistTitle = (isCq || resolvedCat === QUESTION_TYPE_CODES.CQ) && !isCS && !isSA;
-
-  if (isSharedQuestionType || isMcq || isCS || isSA || !allowsDistTitle) return null;
-
-  const distQuestionCount = Number(dist?.questionCount ?? totalProvided ?? 0);
-  const distQuestionsToAttempt = (dist?.questionsToAttempt !== undefined && dist?.questionsToAttempt !== null)
-    ? Number(dist.questionsToAttempt)
-    : Number(attemptCount ?? distQuestionCount);
-
-  let instructionText: string | null = preResolvedInstruction !== undefined ? preResolvedInstruction : null;
-  if (preResolvedInstruction === undefined) {
-    if (isCS) {
-      if (distQuestionCount > 0 && distQuestionsToAttempt > 0 && distQuestionsToAttempt < distQuestionCount) {
-        instructionText = `[যেকোনো ${toBengaliDigits(distQuestionsToAttempt)}টি প্রশ্নের উত্তর দিতে হবে]`;
-      } else {
-        instructionText = `[সবগুলো প্রশ্নের উত্তর দিতে হবে]`;
-      }
-    } else {
-      instructionText = (isCq || !isMcq) && attemptCount < totalProvided && attemptCount > 0
-        ? `[${toBengaliDigits(totalProvided)}টি প্রশ্ন থেকে যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-        : (isCq || !isMcq) && attemptCount > 0
-        ? `[যে কোনো ${toBengaliDigits(attemptCount)}টি প্রশ্নের উত্তর দাও]`
-        : null;
-    }
-  }
-
-  const titleText =
-    dist?.questionTypeLabel?.trim() ||
-    dist?.questionTypeNameBn ||
-    dist?.questionTypeName ||
-    dist?.questionType?.nameBn ||
-    (isMcq ? "বহুনির্বাচনি অভীক্ষা" : dist?.questionType?.nameEn);
-
-  const shouldRenderTitle = Boolean(
-    titleText && titleText.toLowerCase() !== subTitle?.trim()?.toLowerCase()
-  );
-
-  if (!shouldRenderTitle && !instructionText && !isCq && !showMarks) return null;
-
-  return (
-    <div className="flex flex-col items-stretch w-full mb-1">
-      {shouldRenderTitle && (
-        <div className="font-semibold text-center">
-          {titleText}
-        </div>
-      )}
-      {(instructionText || isCq || showMarks) && (
-        <div className="flex justify-between items-center">
-          <div className="flex-1"></div>
-          <div className="text-center font-normal flex-[2] text-[10pt] text-black">
-            {instructionText}
-          </div>
-          <div className="flex-1 text-right font-bold whitespace-nowrap shrink-0">
-            {showMarks && (
-              <>
-                {toBengaliDigits(dist?.marksPerQuestion || 10)} <span className="font-sans px-1">×</span> {toBengaliDigits(attemptCount || 1)} = {toBengaliDigits((dist?.marksPerQuestion || 10) * (attemptCount || 1))}
-              </> 
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+const DistTitleBlock = (_props: { data?: any }) => {
+  return null;
 };
 
 const SubjectTitleBlock = ({ data }: { data: any }) => {
@@ -447,7 +359,7 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
     case "sub-section-title":
       return <SubSectionTitleBlock data={block.data} />;
     case "dist-title":
-      return <DistTitleBlock data={block.data} />;
+      return null;
     case "question-mcq":
       return <MCQBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
     case "question-cq":

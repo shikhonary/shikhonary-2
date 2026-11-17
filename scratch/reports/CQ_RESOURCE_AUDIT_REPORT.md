@@ -305,3 +305,24 @@
 | CQ ID | Question (ক) Clue | Missing Asset Type | Description | Reference |
 | :--- | :--- | :--- | :--- | :--- |
 | `cmwjacpq3000ay4tocq4hkdfb` | মাতৃকল্যাণ কী?... | **DIAGRAM** | চিত্র-১: খাদ্যগুদাম (চাউল, চিনি, ভোজ্য তেল, পেঁয়াজ) এবং চিত্র-২: নিরাপদ সড়ক চাই | চট্টগ্রাম বোর্ড ২০২৫ |
+
+### CQ Audit for Chapter: আকাইদ (11/17/2026)
+
+| CQ ID | Question (ক) Clue | Missing Asset Type | Description | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `cmwknuj9w000mfwtosnclf8u7` | রিসালাত কী?... | **DIAGRAM** | চিত্র: আকাইদের মৌলিক বিষয়সমূহ (ইমান, শিরক ও দুটি প্রশ্নবোধক চিহ্নিত বক্স) | সিলেট বোর্ড ২০২৬ |
+
+### CQ Audit for Chapter: ইসলামি শরিয়তের উৎস (11/17/2026)
+
+| CQ ID | Question (ক) Clue | Missing Asset Type | Description | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `cmwkpaejp000qkgtonz41xlmi` | 'আল-ইনশিরাহ' কী?... | **DIAGRAM** | চিত্র: শরিয়তের চারটি উৎস (আল-কুরআন, সুন্নাহ ও দুটি প্রশ্নবোধক স্থান) | সিলেট বোর্ড ২০২৬ |
+| `cmwkpag6p0011kgtoeyvub0w7` | 'সুন্নাহ' কী?... | **DIAGRAM** | চিত্র: আল-কুরআনের অবতরণ, সংরক্ষণ ও সংকলন প্রক্রিয়া | ঢাকা বোর্ড ২০২৫ |
+| `cmwkpagw70018kgtougmokq8q` | 'নাযিরা তিলাওয়াত' কী?... | **DIAGRAM** | চিত্র: শরিয়তের চারটি উৎস (আল-কুরআন, সুন্নাহ, প্রশ্নবোধক চিহ্ন ও আল-কিয়াস) | ঢাকা বোর্ড ২০২৫ |
+
+### CQ Audit for Chapter: ইবাদত (11/17/2026)
+
+| CQ ID | Question (ক) Clue | Missing Asset Type | Description | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `cmwkruvkg000icwtolxak3ef0` | ইলম কী?... | **DIAGRAM** | চিত্র: ইবাদতের মৌলিক স্তম্ভগুলোর ফ্লোচার্ট | সিলেট বোর্ড ২০২৬ |
+| `cmwkrv178001pcwtocgy0cgo2` | 'সাওম' কী?... | **DIAGRAM** | চিত্র: ইবাদতের প্রকারভেদ (ছক-ক: সাওম পালন ও হজ করা; ছক-খ: রোগীকে দেখতে যাওয়া ও জানাযায় অংশ নেওয়া) | কুমিল্লা বোর্ড ২০২৪ |

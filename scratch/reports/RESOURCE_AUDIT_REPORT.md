@@ -229,3 +229,9 @@
 | MCQ ID | Question Clue | Missing Asset Type | Description | Reference |
 | :--- | :--- | :--- | :--- | :--- |
 | `cmwj9qoi40001j4tow7islx87` | খালি ঘরের জন্য... | **DIAGRAM** | চিত্র: সামাজিক নৈরাজ্য ও বিশৃঙ্খলার ফ্লোচার্ট | সি. বো. ১৭ |
+
+### Audit for Chapter: আকাইদ (11/17/2026)
+
+| MCQ ID | Question Clue | Missing Asset Type | Description | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `cmwknkw0s006frotomr4vjo3b` | উদ্দীপকে “?” চিহ্নিত স্থানে কী বসবে?... | **DIAGRAM** | চিত্র: অন্তরে বিশ্বাস, মৌখিক স্বীকৃতি ও বাস্তব আমলের ছক | ঢা. বো. ২০২৪, দি. বো. ২০২৩, সকল বোর্ড ২০১৬, আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা, নি. প. ২০২৩, বগুড়া জিলা স্কুল |
