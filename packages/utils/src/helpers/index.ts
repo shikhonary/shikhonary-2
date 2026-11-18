@@ -250,8 +250,39 @@ export function isResourceEnglish(options?: {
   return false;
 }
 
+/**
+ * Builds the canonical question paper title based on class, exam, and subjects.
+ * Naming convention:
+ * - Single subject: `${className} - ${subjectName} - ${examName} প্রশ্নপত্র`
+ * - Multiple subjects or none: `${className} - ${examName} প্রশ্নপত্র`
+ */
+export function buildQuestionPaperTitle({
+  className,
+  examName,
+  subjects,
+}: {
+  className?: string | null
+  examName?: string | null
+  subjects?: Array<{ subjectName?: string | null }> | null
+}): string {
+  const cls = (className || "").trim()
+  const exam = (examName || "").trim()
+  const validSubjects = (subjects || []).filter((s) => Boolean(s?.subjectName?.trim()))
 
+  if (validSubjects.length === 1) {
+    const subName = validSubjects[0]!.subjectName!.trim()
+    if (cls && exam) return `${cls} - ${subName} - ${exam} প্রশ্নপত্র`
+    if (cls) return `${cls} - ${subName} প্রশ্নপত্র`
+    if (exam) return `${subName} - ${exam} প্রশ্নপত্র`
+    return `${subName} প্রশ্নপত্র`
+  }
 
+  // Multiple subjects or no subjects -> Keep class name + exam name convention
+  if (cls && exam) return `${cls} - ${exam} প্রশ্নপত্র`
+  if (cls) return `${cls} প্রশ্নপত্র`
+  if (exam) return `${exam} প্রশ্নপত্র`
+  return "প্রশ্নপত্র"
+}
 
 export * from "./bengali"
 export * from "./reference"

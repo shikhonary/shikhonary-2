@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server"
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import { notFound } from "../../../utils/errors"
+import { buildQuestionPaperTitle } from "@workspace/utils"
 import type {
   ListQuestionPapersInput,
   GetQuestionPaperInput,
@@ -1130,10 +1131,24 @@ export async function createQuestionPaperFull(
   input: CreateQuestionPaperFullInput,
   actorId?: string
 ) {
+  const resolvedTitle = input.title?.trim()
+    ? (input.subjects.length === 1 && input.subjects[0]?.subjectName && !input.title.includes(input.subjects[0].subjectName)
+        ? buildQuestionPaperTitle({
+            className: input.className,
+            examName: input.examName,
+            subjects: input.subjects,
+          })
+        : input.title)
+    : buildQuestionPaperTitle({
+        className: input.className,
+        examName: input.examName,
+        subjects: input.subjects,
+      });
+
   // 1. Create the paper
   const paper = await tenantDb.questionPaper.create({
     data: {
-      title: input.title,
+      title: resolvedTitle,
       examName: input.examName,
       description: input.description,
       classId: input.classId,
@@ -1548,13 +1563,6 @@ export async function deleteQuestionPaper(
 
   if (!existing || existing.deletedAt) {
     throw notFound("QuestionPaper")
-  }
-
-  if (existing.status === "Published") {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Published question papers cannot be deleted directly. Unpublish the paper first.",
-    })
   }
 
   const updated = await tenantDb.questionPaper.update({

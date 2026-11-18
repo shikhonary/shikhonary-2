@@ -161,6 +161,8 @@ export interface PaperSettings {
   // Dismissed Sections & SubSections
   dismissedSectionIds?: string[];
   dismissedSubSectionIds?: string[];
+  hiddenSectionTitleIds?: string[];
+  hiddenSectionInstructionIds?: string[];
 
   // OMR Settings
   showOMRSheet: boolean;
@@ -175,4 +177,41 @@ export interface PaperBlock {
   type: string;
   data: any;
   gap?: number;
+}
+
+export function isBlockCompletelyHidden(b: PaperBlock, settings?: Partial<PaperSettings> | null): boolean {
+  if (!b || !settings) return false;
+
+  if (b.type === "section-title") {
+    const secId = b.data?.id || b.data?.sectionId;
+    const rawTitle = (b.data?.titleBn || b.data?.title)?.trim() || "";
+    const isGenericSection = rawTitle.toLowerCase() === "section";
+    const hasTitle = Boolean(rawTitle && !isGenericSection);
+    const hasInstruction = Boolean(b.data?.instructions && typeof b.data.instructions === "string" && b.data.instructions.trim().length > 0);
+
+    const isTitleHidden = !hasTitle || Boolean(secId && settings.hiddenSectionTitleIds?.includes(secId));
+    const isInstructionHidden = !hasInstruction || Boolean(secId && settings.hiddenSectionInstructionIds?.includes(secId));
+
+    return Boolean(isTitleHidden && isInstructionHidden);
+  }
+
+  if (b.type === "sub-section-title") {
+    const subId = b.data?.id || b.data?.subSectionId;
+    const rawSubTitle = (b.data?.titleBn || b.data?.title)?.trim() || "";
+    const isGenericSub = !rawSubTitle || rawSubTitle.toLowerCase() === "sub-section" || rawSubTitle.toLowerCase() === "subsection";
+    const displayTitle = !isGenericSub ? rawSubTitle : (b.data?.isSharedQuestionType ? "" : (b.data?.distName?.trim() || ""));
+    const hasSubTitle = Boolean(displayTitle && !b.data?.hideTitle);
+    const hasSubInstruction = Boolean(!b.data?.isSharedQuestionType && b.data?.instructions && typeof b.data.instructions === "string" && b.data.instructions.trim().length > 0);
+
+    const marks = b.data?.marksPerQuestion ? Number(b.data.marksPerQuestion) : 0;
+    const attempts = b.data?.attemptCount ? Number(b.data.attemptCount) : 0;
+    const canShowMarkFormula = !b.data?.isSharedQuestionType && b.data?.showMarkDistribution !== false && marks > 0 && attempts > 0;
+
+    const isSubTitleHidden = !hasSubTitle || Boolean(subId && settings.hiddenSectionTitleIds?.includes(subId));
+    const isSubInstructionHidden = !hasSubInstruction || Boolean(subId && settings.hiddenSectionInstructionIds?.includes(subId));
+
+    return Boolean(isSubTitleHidden && isSubInstructionHidden && !canShowMarkFormula);
+  }
+
+  return false;
 }

@@ -69,7 +69,7 @@ async function verify(chapterNameOrId: string) {
   }
 
   if (!chapter) {
-    console.error(`Chapter "${chapterName}" not found!`);
+    console.error(`Chapter "${chapterNameOrId}" not found!`);
     process.exit(1);
   }
 
@@ -110,4 +110,9 @@ async function verify(chapterNameOrId: string) {
 }
 
 const targetChapter = process.argv[2] || "আমার দেশ";
-verify(targetChapter).catch(console.error);
+verify(targetChapter)
+  .catch(console.error)
+  .finally(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  });

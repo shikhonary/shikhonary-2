@@ -162,11 +162,12 @@ async function seedShortAnswers(filePath: string) {
   for (let idx = 0; idx < rawQuestions.length; idx++) {
     const q = rawQuestions[idx];
 
-    // Strip question numbering prefixes like "১। ", "১. ", "(১) ", "(ক) "
+    // Strip question numbering prefixes like "১। ", "১. ", "(১) ", "(ক) " and citation markers
     let cleanQuestion = (q.question || "")
       .replace(/^(?:প্রশ্ন\s*(?:নং|নম্বর)?\s*[-:–.]?\s*)?[০-৯\d]{1,3}[.)।|\-:：]\s*/i, "")
       .replace(/^[(]?[০-৯\d]{1,3}[)]\s*/i, "")
       .replace(/^[(]?[ক-হ][)]?[.)।|\-:：]\s*/i, "")
+      .replace(/\[cite:\s*[^\]]+\]/gi, "")
       .trim();
 
     const normalizedRefs = normalizeReferences(q.reference || []);

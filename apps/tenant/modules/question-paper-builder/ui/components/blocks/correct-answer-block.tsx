@@ -5,7 +5,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { EditableSectionLabel } from "./editable-section-label";
-import { McqOptionLabel, isCorrectMcqOption } from "./mcq-option-label";
+import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -283,15 +283,26 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
       )}
 
       <div className="flex items-start gap-2 ml-[1.8em] pl-2">
-        <span
-          className="font-bold shrink-0 min-w-[1.8em]"
-          style={{
-            fontSize: questionStyle.fontSize,
-            fontFamily: questionStyle.fontFamily,
-          }}
-        >
-          {toBengaliDigits(item.orderIndex + 1)}।
-        </span>
+        {(() => {
+          const qItemKey = `${item.id}-q`;
+          const qCustomStyle = settings.itemStyles?.[qItemKey];
+          const qFontSize = qCustomStyle?.fontSize
+            ? (typeof qCustomStyle.fontSize === "number" ? `${qCustomStyle.fontSize}pt` : qCustomStyle.fontSize)
+            : questionStyle.fontSize;
+          const qFontFamily = qCustomStyle?.fontFamily || questionStyle.fontFamily;
+
+          return (
+            <span
+              className="font-bold shrink-0 min-w-[1.8em]"
+              style={{
+                fontSize: qFontSize,
+                fontFamily: qFontFamily,
+              }}
+            >
+              {toBengaliDigits(item.orderIndex + 1)}।
+            </span>
+          );
+        })()}
         <div className="flex-1 w-full min-w-0">
           <div className="font-bold w-full">
             <EditableItem 
@@ -309,18 +320,35 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
           {data.statements && data.statements.length > 0 && (
             <>
               <div>
-                {data.statements.map((stmt: string, i: number) => (
-                  <div key={i} className="flex gap-2 w-full">
-                    <span className="opacity-70">{["i", "ii", "iii", "iv"][i] || (i + 1)}.</span>
-                    <span className="w-full">
-                      <EditableItem 
-                        content={<RenderMath text={stmt} />}
-                        itemKey={`${item.id}-stmt-${i}`}
-                        defaultStyle={questionStyle}
-                      />
-                    </span>
-                  </div>
-                ))}
+                {data.statements.map((stmt: string, i: number) => {
+                  const stmtKey = `${item.id}-stmt-${i}`;
+                  const stmtCustomStyle = settings.itemStyles?.[stmtKey];
+                  const stmtFontSize = stmtCustomStyle?.fontSize
+                    ? (typeof stmtCustomStyle.fontSize === "number" ? `${stmtCustomStyle.fontSize}pt` : stmtCustomStyle.fontSize)
+                    : questionStyle.fontSize;
+                  const stmtFontFamily = stmtCustomStyle?.fontFamily || questionStyle.fontFamily;
+
+                  return (
+                    <div key={i} className="flex gap-2 w-full">
+                      <span 
+                        className="opacity-70 shrink-0"
+                        style={{
+                          fontSize: stmtFontSize,
+                          fontFamily: stmtFontFamily,
+                        }}
+                      >
+                        {["i", "ii", "iii", "iv"][i] || (i + 1)}.
+                      </span>
+                      <span className="w-full">
+                        <EditableItem 
+                          content={<RenderMath text={stmt} />}
+                          itemKey={stmtKey}
+                          defaultStyle={questionStyle}
+                        />
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
               <div className="font-medium">নিচের কোনটি সঠিক?</div>
             </>
@@ -330,6 +358,11 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             {(item.overrides?.shuffledOptions || data.options || []).map((opt: string, i: number) => {
               const label = ["ক", "খ", "গ", "ঘ"][i] || "";
               const isFilledAnswer = isAnswerMode && isCorrectMcqOption(data, opt, i);
+              const optItemKey = `${item.id}-opt-${i}`;
+              const optCustomStyle = settings.itemStyles?.[optItemKey];
+              const baseFontSize = optCustomStyle?.fontSize ?? settings.fontSize ?? 13;
+              const indicatorFontSize = getIndicatorFontSize(baseFontSize);
+              const effectiveFontFamily = optCustomStyle?.fontFamily || settings.fontFamily;
               
               return (
                 <div key={i} className="flex gap-1.5 items-start w-full">
@@ -337,11 +370,13 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                     label={label}
                     optionStyle={settings.optionStyle}
                     isFilledAnswer={isFilledAnswer}
+                    fontSize={indicatorFontSize}
+                    fontFamily={effectiveFontFamily}
                   />
                   <span className="w-full">
                     <EditableItem 
                       content={<RenderMath text={opt} />}
-                      itemKey={`${item.id}-opt-${i}`}
+                      itemKey={optItemKey}
                       defaultStyle={questionStyle}
                     />
                   </span>

@@ -19,6 +19,7 @@ import {
 } from "../services/use-question-paper"
 import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
+import { buildQuestionPaperTitle } from "@workspace/utils"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs"
@@ -211,7 +212,11 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
     try {
       const selectedClass = classes.find((c: any) => c.id === wizardData.classId)
       const className = selectedClass ? (selectedClass.nameBn || selectedClass.nameEn) : ""
-      const dynamicTitle = `${className} - ${wizardData.examName} প্রশ্নপত্র`
+      const dynamicTitle = buildQuestionPaperTitle({
+        className,
+        examName: wizardData.examName,
+        subjects: wizardData.subjects,
+      })
 
       await updatePaperMutation.mutateAsync({
         id: paper.id,
@@ -296,6 +301,17 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
           })
         }
       }
+
+      // Sync updated title with the latest subject configuration
+      const updatedTitle = buildQuestionPaperTitle({
+        className: wizardData.className || paper.className,
+        examName: wizardData.examName || paper.examName,
+        subjects: wizardData.subjects,
+      })
+      await updatePaperMutation.mutateAsync({
+        id: paper.id,
+        title: updatedTitle,
+      })
 
       toast.success("বিষয় ও নম্বর বণ্টন সফলভাবে সংরক্ষণ করা হয়েছে।")
       return true

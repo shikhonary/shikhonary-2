@@ -110,6 +110,8 @@ const defaultSettings: PaperSettings = {
   instructions: "সবগুলো প্রশ্নের উত্তর দাও। প্রতিটি প্রশ্নের মান সমান।",
   dismissedSectionIds: [],
   dismissedSubSectionIds: [],
+  hiddenSectionTitleIds: [],
+  hiddenSectionInstructionIds: [],
 };
 
 export const useBuilderStore = create<BuilderState>((set) => ({
@@ -130,6 +132,8 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   activeSubSectionId: null,
   dismissedSectionIds: [],
   dismissedSubSectionIds: [],
+  hiddenSectionTitleIds: [],
+  hiddenSectionInstructionIds: [],
 
   setActiveTarget: (target) => set((state) => ({
     activeSectionId: target.sectionId !== undefined ? target.sectionId : state.activeSectionId,

@@ -145,6 +145,20 @@ export function normalizeReferences(rawRefs?: string[]): string[] {
   return Array.from(normalized);
 }
 
+function getBengaliVariants(str: string): string[] {
+  const trimmed = str.trim();
+  const canon = trimmed
+    .replace(/\u09AF\u09BC/g, "\u09DF") // য + ় -> য়
+    .replace(/\u09A1\u09BC/g, "\u09DC") // ড + ় -> ড়
+    .replace(/\u09A2\u09BC/g, "\u09DD"); // ঢ + ় -> ঢ়
+  const decomp = trimmed
+    .replace(/\u09DF/g, "\u09AF\u09BC")
+    .replace(/\u09DC/g, "\u09A1\u09BC")
+    .replace(/\u09DD/g, "\u09A2\u09BC");
+  const vowelNorm = canon.replace(/ী/g, "ি").replace(/ূ/g, "ু");
+  return [...new Set([trimmed, canon, decomp, vowelNorm])];
+}
+
 async function resolveTargetChapter(chapterTitle: string, subjectId?: string) {
   const trimmed = (chapterTitle || "").trim();
 
@@ -160,12 +174,13 @@ async function resolveTargetChapter(chapterTitle: string, subjectId?: string) {
     strippedTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
     noParensTitle.replace(/পূর্ববাংলায়/g, "পূর্ব বাংলার").replace(/পূর্ববাংলার/g, "পূর্ব বাংলার"),
   ];
+  const allVariants = [...new Set(spaceVariants.flatMap(getBengaliVariants))];
 
   if (subjectId) {
     const ch = await prisma.academicChapter.findFirst({
       where: {
         subjectId,
-        OR: spaceVariants.flatMap((v) => [
+        OR: allVariants.flatMap((v) => [
           { nameBn: { contains: v } },
           { nameEn: { contains: v, mode: "insensitive" as const } },
         ]),
@@ -211,7 +226,7 @@ async function resolveTargetChapter(chapterTitle: string, subjectId?: string) {
     if (ch) return ch;
   }
 
-  const conditions = spaceVariants.flatMap((v) => [
+  const conditions = allVariants.flatMap((v) => [
     { nameBn: { equals: v } },
     { nameBn: { contains: v } },
     { nameEn: { equals: v, mode: "insensitive" as const } },

@@ -104,7 +104,7 @@ function getMcqStimulusKey(mcqItem: any): string | null {
   return null;
 }
 
-import { PaperBlock } from "../../../types";
+import { PaperBlock, isBlockCompletelyHidden } from "../../../types";
 
 interface BuilderCanvasProps {
   paperId?: string;
@@ -118,6 +118,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
   const settings = useBuilderStore((state) => state.settings);
   const activeSectionId = useBuilderStore((state) => state.activeSectionId);
   const activeSubSectionId = useBuilderStore((state) => state.activeSubSectionId);
+  const isExporting = useBuilderStore((state) => state.isExporting);
   const dismissedSectionIds = useBuilderStore((state) => state.dismissedSectionIds || state.settings?.dismissedSectionIds || []);
   const dismissedSubSectionIds = useBuilderStore((state) => state.dismissedSubSectionIds || state.settings?.dismissedSubSectionIds || []);
 
@@ -2254,7 +2255,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     });
 
     return newBlocks;
-  }, [paperQuery, statuses, settings.paperOrientation, settings.columns, paperId, settings.blocks, dismissedSectionIds, dismissedSubSectionIds, activeSectionId, activeSubSectionId]);
+  }, [paperQuery, statuses, settings.paperOrientation, settings.columns, paperId, settings.blocks, dismissedSectionIds, dismissedSubSectionIds, activeSectionId, activeSubSectionId, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
 
   // Expose the calculated blocks to the store for GenerateSetsModal
   useEffect(() => {
@@ -2275,6 +2276,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     // Measure blocks
     const newHeights: Record<string, number> = {};
     blocks.forEach((b) => {
+      if (isBlockCompletelyHidden(b, settings)) {
+        newHeights[b.id] = 0;
+        return;
+      }
       const el = document.getElementById(`measure-block-${b.id}`);
       if (el) {
         // add a small buffer for safety to prevent actual overflow
@@ -2282,7 +2287,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       }
     });
     setMeasuredHeights(newHeights);
-  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles, settings.columns]);
+  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles, settings.columns, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
 
   const pages = useMemo(() => {
     if (!blocks || blocks.length === 0) return [];
@@ -2320,7 +2325,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     ]);
 
     contentBlocks.forEach((b, idx) => {
-      const h = measuredHeights[b.id] || (b.type.startsWith("question-") ? 80 : 40);
+      const isHidden = isBlockCompletelyHidden(b, settings);
+      const h = isHidden ? 0 : (measuredHeights[b.id] || (b.type.startsWith("question-") ? 80 : 40));
 
       // ── Oversized block guard ────────────────────────────────────────────────
       // If a block is both a known multi-part type AND taller than 75% of the
@@ -2360,7 +2366,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         "sub-section-title",
       ]);
       let needsEarlyWrap = false;
-      if (HEADING_TYPES.has(b.type) && currentColumnHeight > 0) {
+      if (!isHidden && HEADING_TYPES.has(b.type) && currentColumnHeight > 0) {
         // Walk ahead, accumulating heading heights until we hit a question block
         let lookaheadH = h; // start with current heading's height
         for (let j = idx + 1; j < contentBlocks.length; j++) {
@@ -2375,8 +2381,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             break;
           }
           if (HEADING_TYPES.has(ahead.type)) {
-            // Another heading before the first question — accumulate its height
-            lookaheadH += (measuredHeights[ahead.id] || 40) + (ahead.gap || 0);
+            // Another heading before the first question — accumulate its height if not completely hidden
+            if (!isBlockCompletelyHidden(ahead, settings)) {
+              lookaheadH += (measuredHeights[ahead.id] || 40) + (ahead.gap || 0);
+            }
           } else {
             // Non-heading, non-question block (e.g. dist-action) — stop scanning
             break;
@@ -2399,7 +2407,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       }
       
       currentPage.columns[currentColumnIdx]?.push(b);
-      currentColumnHeight += h + (b.gap || 0);
+      currentColumnHeight += h + (isHidden ? 0 : (b.gap || 0));
     });
 
     if (currentPage.columns.some(col => col.length > 0) || currentPage.fullHeader) {
@@ -2419,16 +2427,17 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     }
 
     return result;
-  }, [blocks, measuredHeights, pageContentHeight, settings.columns, settings.showOMRSheet]);
+  }, [blocks, measuredHeights, pageContentHeight, settings.columns, settings.showOMRSheet, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
 
   const renderPage = (page: typeof pages[0] & { isBlank?: boolean }, seqIndex: number) => {
     return (
       <div 
         key={`page-renderer-${seqIndex}`}
-        className="bg-white relative shrink-0"
+        className="bg-white text-black relative shrink-0"
         data-page-content="true"
         data-page-seq-index={seqIndex}
         style={{
+          color: "#000000",
           width: `${canvasWidth}mm`,
           minHeight: `${canvasMinHeight}mm`,
           transform: `scale(${zoomFactor})`,
@@ -2488,8 +2497,14 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                     }}
                   >
                     {col.map((b, bIdx) => {
+                      const isHidden = isBlockCompletelyHidden(b, settings);
+                      if (isExporting && isHidden) return null;
                       return (
-                        <div key={`${b.id}-${bIdx}`} className="w-full" style={{ marginBottom: `${b.gap || 0}px` }}>
+                        <div 
+                          key={`${b.id}-${bIdx}`} 
+                          className={cn("w-full", isHidden && "print:hidden")} 
+                          style={{ marginBottom: isHidden ? "0px" : `${b.gap || 0}px` }}
+                        >
                           <BlockRenderer block={b} />
                         </div>
                       );
@@ -2546,6 +2561,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               : '100%' 
         }}>
           {blocks.map((b, idx) => {
+            const isHidden = isBlockCompletelyHidden(b, settings);
+            if (isHidden) {
+              return <div key={`measure-${b.id}-${idx}`} id={`measure-block-${b.id}`} style={{ height: 0, overflow: 'hidden' }} />;
+            }
             return (
               <div key={`measure-${b.id}-${idx}`} id={`measure-block-${b.id}`} className="w-full">
                 <BlockRenderer block={b} />
@@ -2559,7 +2578,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       <div
         className={cn(
           "w-full max-w-2xl mx-auto flex flex-col gap-3.5 print:hidden",
-          mobileViewMode === "flow" ? "flex xl:hidden" : "hidden"
+          !isExporting && mobileViewMode === "flow" ? "flex xl:hidden" : "hidden"
         )}
       >
         {/* Header Block Summary in Flow View */}
@@ -2577,14 +2596,20 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         {/* Question, Subject & Section Blocks */}
         {blocks
           .filter((b) => b.type !== "header-full" && b.type !== "header-column")
-          .map((b, idx) => (
-            <div
-              key={`flow-block-${b.id}-${idx}`}
-              className="w-full bg-card rounded-2xl border border-border/80 shadow-xs p-3.5 sm:p-5 transition-all"
-            >
-              <BlockRenderer block={b} />
-            </div>
-          ))}
+          .map((b, idx) => {
+            const isHeading = b.type === "section-title" || b.type === "sub-section-title" || b.type === "subject-title";
+            return (
+              <div
+                key={`flow-block-${b.id}-${idx}`}
+                className={cn(
+                  "w-full transition-all",
+                  isHeading ? "" : "bg-card rounded-2xl border border-border/80 shadow-xs p-3.5 sm:p-5"
+                )}
+              >
+                <BlockRenderer block={b} />
+              </div>
+            );
+          })}
 
         {/* OMR Sheet Block in Flow View */}
         {settings.showOMRSheet && (
@@ -2594,11 +2619,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         )}
       </div>
 
-      {/* ── WYSIWYG Print Sheet Layout (Desktop or Mobile when mobileViewMode === "sheet") ── */}
+      {/* ── WYSIWYG Print Sheet Layout (Desktop or Mobile when mobileViewMode === "sheet" or when exporting) ── */}
       <div
         className={cn(
           "w-max min-w-full mx-auto flex flex-col items-center gap-8 sm:gap-12 print:hidden",
-          mobileViewMode === "sheet" ? "flex" : "hidden xl:flex"
+          mobileViewMode === "sheet" || isExporting ? "flex" : "hidden xl:flex"
         )}
       >
         {pages.map((page, pageIdx) => (
@@ -2635,7 +2660,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       </div>
 
       {/* ── Mobile Floating Canvas Switcher Dock (< xl) ── */}
-      <div className="xl:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 max-w-[calc(100vw-20px)] sm:max-w-lg w-max flex items-center flex-nowrap whitespace-nowrap gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full bg-card/95 backdrop-blur-2xl border border-border shadow-xl select-none">
+      {!isExporting && (
+        <div className="xl:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 max-w-[calc(100vw-20px)] sm:max-w-lg w-max flex items-center flex-nowrap whitespace-nowrap gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full bg-card/95 backdrop-blur-2xl border border-border shadow-xl select-none">
         <button
           type="button"
           onClick={() => setMobileViewMode("flow")}
@@ -2692,6 +2718,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           </button>
         )}
       </div>
+      )}
 
       {/* Native Browser Print Layout (Hidden in UI) */}
       <style type="text/css" media="print">

@@ -4,6 +4,7 @@ import { useState, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@workspace/ui/components/sonner"
 import { Button } from "@workspace/ui/components/button"
+import { buildQuestionPaperTitle } from "@workspace/utils"
 import { useQuery } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
 import { Loader2, Check, ArrowLeft, ArrowRight, SkipForward, FileText } from "lucide-react"
@@ -136,7 +137,11 @@ export function CreateQuestionPaperStepper() {
     setIsSubmitting(true)
 
     try {
-      const dynamicTitle = `${wizardData.className} - ${wizardData.examName} প্রশ্নপত্র`
+      const dynamicTitle = buildQuestionPaperTitle({
+        className: wizardData.className,
+        examName: wizardData.examName,
+        subjects: wizardData.subjects,
+      })
 
       // Single batch request — paper + subjects + distributions all at once
       const paper = await createFullMutation.mutateAsync({

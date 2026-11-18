@@ -41,6 +41,9 @@ interface CapturedPageImage {
 
 /** Places a page image inside the target box while strictly preserving its natural aspect ratio. */
 function placePage(pdf: jsPDF, img: CapturedPageImage, x: number, y: number, w: number, h: number) {
+  if (!img.dataUrl || !img.dataUrl.startsWith("data:image/png;base64,") || img.dataUrl.length < 100) {
+    throw new Error("Invalid page image data. PDF export failed.");
+  }
   const imgAspect = img.width > 0 && img.height > 0 ? img.width / img.height : w / h;
   const boxAspect = w / h;
   let dw = w;
@@ -61,10 +64,20 @@ function processExportImage(
   gamma = 1.55,
 ): Promise<CapturedPageImage> {
   return new Promise((resolve) => {
+    if (!dataUrl || !dataUrl.startsWith("data:image/png;base64,") || dataUrl.length < 100) {
+      resolve({ dataUrl, width: 0, height: 0 });
+      return;
+    }
+
     const image = new Image();
     image.onload = () => {
       const width = image.naturalWidth || image.width;
       const height = image.naturalHeight || image.height;
+      if (!width || !height) {
+        resolve({ dataUrl, width: 0, height: 0 });
+        return;
+      }
+
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
@@ -74,31 +87,47 @@ function processExportImage(
         return;
       }
 
-      ctx.drawImage(image, 0, 0);
-      const imageData = ctx.getImageData(0, 0, width, height);
-      const pixels = imageData.data;
+      try {
+        ctx.drawImage(image, 0, 0);
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const pixels = imageData.data;
 
-      // Precompute lookup table for fast per-channel gamma adjustment
-      const lut = new Uint8ClampedArray(256);
-      for (let v = 0; v < 256; v++) {
-        lut[v] = v >= 248 ? v : Math.round(255 * Math.pow(v / 255, gamma));
+        // Precompute lookup table for fast per-channel gamma adjustment
+        const lut = new Uint8ClampedArray(256);
+        for (let v = 0; v < 256; v++) {
+          lut[v] = v >= 248 ? v : Math.round(255 * Math.pow(v / 255, gamma));
+        }
+
+        for (let idx = 0; idx < pixels.length; idx += 4) {
+          if ((pixels[idx + 3] ?? 0) === 0) continue;
+          pixels[idx] = lut[pixels[idx] ?? 0] ?? 0;
+          pixels[idx + 1] = lut[pixels[idx + 1] ?? 0] ?? 0;
+          pixels[idx + 2] = lut[pixels[idx + 2] ?? 0] ?? 0;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        const processedUrl = canvas.toDataURL("image/png");
+        if (processedUrl && processedUrl.startsWith("data:image/png;base64,") && processedUrl.length > 100) {
+          resolve({
+            dataUrl: processedUrl,
+            width,
+            height,
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn("Gamma darkening failed, falling back to raw capture:", err);
       }
 
-      for (let idx = 0; idx < pixels.length; idx += 4) {
-        if ((pixels[idx + 3] ?? 0) === 0) continue;
-        pixels[idx] = lut[pixels[idx] ?? 0] ?? 0;
-        pixels[idx + 1] = lut[pixels[idx + 1] ?? 0] ?? 0;
-        pixels[idx + 2] = lut[pixels[idx + 2] ?? 0] ?? 0;
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-      resolve({
-        dataUrl: canvas.toDataURL("image/png"),
-        width,
-        height,
-      });
+      // Safe fallback to original valid dataUrl
+      resolve({ dataUrl, width, height });
     };
-    image.onerror = () => resolve({ dataUrl, width: 0, height: 0 });
+
+    image.onerror = (e) => {
+      console.warn("processExportImage image load error:", e);
+      resolve({ dataUrl, width: 0, height: 0 });
+    };
+
     image.src = dataUrl;
   });
 }
@@ -111,6 +140,18 @@ function injectExportStyle(): HTMLStyleElement {
     [data-page-content], [data-page-content] * {
       text-rendering: geometricPrecision;
     }
+    [data-page-content] {
+      color: #000000 !important;
+    }
+    [data-page-content] h1,
+    [data-page-content] h2,
+    [data-page-content] h3,
+    [data-page-content] h4,
+    [data-page-content] h5,
+    [data-page-content] h6,
+    [data-page-content] p,
+    [data-page-content] span:not([class*="text-black/"]),
+    [data-page-content] div:not([class*="text-black/"]),
     [data-page-content] .text-foreground {
       color: #000000 !important;
     }
@@ -155,6 +196,8 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
     setExportProgress(null);
     // Let the overlay mount and paint before any heavy work starts
     await nextPaint();
+    // Allow state updates to settle so WYSIWYG sheet layout can mount on mobile
+    await new Promise((resolve) => setTimeout(resolve, 80));
 
     let originalDescriptor: PropertyDescriptor | undefined;
     let exportStyleEl: HTMLStyleElement | null = null;
@@ -194,7 +237,7 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       //    so the live canvas is not re-rendered (that re-render caused the stall).
       let pageNodes: HTMLElement[] = [];
 
-      for (let attempt = 0; attempt < 15; attempt++) {
+      for (let attempt = 0; attempt < 20; attempt++) {
         if (attempt > 0) await new Promise((resolve) => setTimeout(resolve, 150));
 
         // Strategy 1: Find by [data-page-content] attribute
@@ -216,8 +259,13 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
           }
         }
 
-        if (found.length > 0) {
-          pageNodes = found;
+        // Filter for nodes that are actually rendered and visible (not display:none with 0 dimensions)
+        const visibleNodes = found.filter(
+          (el) => el.offsetWidth > 0 && el.offsetHeight > 0
+        );
+
+        if (visibleNodes.length > 0) {
+          pageNodes = visibleNodes;
           break;
         }
       }
@@ -260,7 +308,17 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
 
       setExportProgress({ current: 0, total: pageNodes.length });
 
-      // 7. Capture each page as a PNG data URL (4x ≈ 384 DPI) preserving exact canvas margins & aspect ratio
+      // 7. Capture each page as a PNG data URL preserving exact canvas margins & aspect ratio.
+      // On modern mobile devices, we target 3x (~288 DPI, matching standard print density)
+      // while safely staying below the 4096px hardware canvas limit, with automatic fallback to 2.5x and 2x.
+      const isMobile =
+        typeof window !== "undefined" &&
+        (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+          window.innerWidth < 1024 ||
+          (typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1 && window.innerWidth < 1280));
+
+      const ratios = isMobile ? [3, 2.5, 2] : [4, 3, 2];
+
       const pageImages: Array<CapturedPageImage | null> = [];
       exportStyleEl = injectExportStyle();
       for (let i = 0; i < pageNodes.length; i++) {
@@ -271,28 +329,38 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
         setExportProgress({ current: i, total: pageNodes.length });
         await nextPaint();
 
-        let dataUrl: string;
+        let dataUrl: string | null = null;
         // Reset only the on-screen zoom transform on the clone so margins & line wrapping match WYSIWYG 1:1
         const cloneStyle: Record<string, string> = {
           transform: "none",
         };
-        const ratios = [6, 4, 2];
         for (let r = 0; r < ratios.length; r++) {
           try {
-            dataUrl = await toPng(pageNode, {
+            const captured = await toPng(pageNode, {
               pixelRatio: ratios[r],
               filter: exportFilter,
               cacheBust: true,
               backgroundColor: "#ffffff",
               style: cloneStyle,
             });
-            break;
+
+            // Validate that we received a real, non-empty base64 PNG data URL
+            if (captured && captured.startsWith("data:image/png;base64,") && captured.length > 100) {
+              dataUrl = captured;
+              break;
+            }
+            throw new Error(`Incomplete canvas data at pixelRatio ${ratios[r]}`);
           } catch (err) {
+            console.warn(`Capture attempt failed at ratio ${ratios[r]}:`, err);
             if (r === ratios.length - 1) throw err;
           }
         }
 
-        pageImages.push(await processExportImage(dataUrl!));
+        if (!dataUrl) {
+          throw new Error(`Failed to generate a valid image for page ${i + 1}`);
+        }
+
+        pageImages.push(await processExportImage(dataUrl));
         setExportProgress({ current: i + 1, total: pageNodes.length });
         await nextPaint();
 

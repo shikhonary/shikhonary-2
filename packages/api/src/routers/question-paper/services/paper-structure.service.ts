@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
 import { notFound, badRequest } from "../../../utils/errors"
+import { buildQuestionPaperTitle } from "@workspace/utils"
 import type {
   UpsertQuestionPaperSectionInput,
   DeleteQuestionPaperSectionInput,
@@ -303,12 +304,20 @@ export async function upsertQuestionPaperSubject(
 
   const subjects = await tenantDb.questionPaperSubject.findMany({
     where: { questionPaperId: input.questionPaperId },
-    select: { subjectTotal: true },
+    select: { subjectName: true, subjectTotal: true },
   })
   const paperTotal = subjects.reduce((sum, s) => sum + s.subjectTotal, 0)
+  const updatedTitle = buildQuestionPaperTitle({
+    className: paper.className,
+    examName: paper.examName,
+    subjects,
+  })
   await tenantDb.questionPaper.update({
     where: { id: input.questionPaperId },
-    data: { total: paperTotal },
+    data: {
+      total: paperTotal,
+      title: updatedTitle,
+    },
   })
 
   await logHistory(tenantDb, {
@@ -337,12 +346,26 @@ export async function deleteQuestionPaperSubject(
 
   const subjects = await tenantDb.questionPaperSubject.findMany({
     where: { questionPaperId: input.questionPaperId },
-    select: { subjectTotal: true },
+    select: { subjectName: true, subjectTotal: true },
   })
   const paperTotal = subjects.reduce((sum, s) => sum + s.subjectTotal, 0)
+  const currentPaper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+    select: { className: true, examName: true },
+  })
+  const updatedTitle = currentPaper
+    ? buildQuestionPaperTitle({
+        className: currentPaper.className,
+        examName: currentPaper.examName,
+        subjects,
+      })
+    : undefined
   await tenantDb.questionPaper.update({
     where: { id: input.questionPaperId },
-    data: { total: paperTotal },
+    data: {
+      total: paperTotal,
+      ...(updatedTitle ? { title: updatedTitle } : {}),
+    },
   })
 
   await logHistory(tenantDb, {

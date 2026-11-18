@@ -28,6 +28,7 @@ import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
+import { getIndicatorFontSize } from "./mcq-option-label";
 import { Badge } from "@workspace/ui/components/badge";
 import { cn } from "@workspace/ui/lib/utils";
 import { toast } from "sonner";
@@ -479,12 +480,13 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
 
   const renderOptionLabel = (label: string) => {
     const clean = String(label).replace(/^\(+|\)+$/g, "").replace(/\.$/, "").trim();
+    const indicatorFontSize = getIndicatorFontSize(settings.fontSize);
     switch (settings.optionStyle) {
       case "parentheses":
         return (
           <span 
             className="shrink-0 font-normal min-w-[1.35em] inline-block" 
-            style={{ fontWeight: "normal" }}
+            style={{ fontWeight: "normal", fontSize: indicatorFontSize }}
           >
             ({clean})
           </span>
@@ -493,7 +495,7 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
         return (
           <span 
             className="shrink-0 font-normal min-w-[1.15em] inline-block" 
-            style={{ fontWeight: "normal" }}
+            style={{ fontWeight: "normal", fontSize: indicatorFontSize }}
           >
             {clean})
           </span>
@@ -505,7 +507,7 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
         return (
           <span 
             className="shrink-0 font-normal min-w-[1.15em] inline-block" 
-            style={{ fontWeight: "normal" }}
+            style={{ fontWeight: "normal", fontSize: indicatorFontSize }}
           >
             {clean}.
           </span>

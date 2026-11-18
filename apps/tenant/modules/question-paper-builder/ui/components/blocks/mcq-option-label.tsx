@@ -1,5 +1,6 @@
 import React from "react";
 import type { PaperSettings } from "../../../types";
+import { cn } from "@workspace/ui/lib/utils";
 
 const OPTION_LETTER_INDEX_MAP: Record<string, number> = {
   "1": 0,
@@ -59,25 +60,67 @@ export function isCorrectMcqOption(
   return displayedIndex === mappedIdx;
 }
 
-/** Renders the option indicator (`ক`, `(ক)`, `ক.`, circle, or solid black circle in answer mode). */
-export const McqOptionLabel: React.FC<{
+export interface McqOptionLabelProps {
   label: string;
   optionStyle?: PaperSettings["optionStyle"];
   isFilledAnswer?: boolean;
-}> = ({ label, optionStyle, isFilledAnswer = false }) => {
+  fontSize?: string | number;
+  baseFontSize?: string | number;
+  fontFamily?: string;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+/** Computes option indicator font size (1pt lower than the given base/paper font size). */
+export function getIndicatorFontSize(baseFontSize?: string | number | null): string | undefined {
+  if (baseFontSize === undefined || baseFontSize === null || baseFontSize === "") return undefined;
+  const num = typeof baseFontSize === "number" ? baseFontSize : parseFloat(String(baseFontSize));
+  if (isNaN(num)) return typeof baseFontSize === "string" ? baseFontSize : undefined;
+  return `${Math.max(4, Math.round((num - 1) * 100) / 100)}pt`;
+}
+
+/** Renders the option indicator (`ক`, `(ক)`, `ক.`, circle, or solid black circle in answer mode). */
+export const McqOptionLabel: React.FC<McqOptionLabelProps> = ({
+  label,
+  optionStyle = "round",
+  isFilledAnswer = false,
+  fontSize,
+  baseFontSize,
+  fontFamily,
+  style,
+  className,
+}) => {
+  const resolvedFontSize = fontSize ?? (baseFontSize !== undefined ? getIndicatorFontSize(baseFontSize) : undefined);
+  const sizeStyle = resolvedFontSize 
+    ? (typeof resolvedFontSize === "number" ? `${resolvedFontSize}pt` : resolvedFontSize) 
+    : undefined;
+
   if (isFilledAnswer) {
     return (
       <div
-        className="shrink-0 flex items-center justify-center rounded-full border border-black leading-none"
+        className={cn(
+          "shrink-0 flex items-center justify-center rounded-full border border-black leading-none p-0",
+          className
+        )}
         style={{
-          width: "1.6em",
-          height: "1.6em",
-          fontSize: "calc(100% - 2px)",
-          marginTop: "2px",
+          width: "1.35em",
+          height: "1.35em",
+          minWidth: "1.35em",
+          maxWidth: "1.35em",
+          minHeight: "1.35em",
+          maxHeight: "1.35em",
+          aspectRatio: "1 / 1",
+          padding: 0,
+          boxSizing: "border-box",
+          fontSize: sizeStyle,
+          fontFamily,
+          marginTop: "0.08em",
           lineHeight: "1",
+          borderColor: "#000000",
           backgroundColor: "#000000",
           WebkitPrintColorAdjust: "exact",
           printColorAdjust: "exact",
+          ...style,
         }}
         aria-label="সঠিক উত্তর"
       />
@@ -86,26 +129,93 @@ export const McqOptionLabel: React.FC<{
 
   switch (optionStyle) {
     case "dot":
-      return <span className="shrink-0">{label}.</span>;
+      return (
+        <span
+          className={cn("shrink-0 font-medium select-none text-black inline-flex items-baseline", className)}
+          style={{
+            fontSize: sizeStyle,
+            fontFamily,
+            lineHeight: "inherit",
+            color: "#000000",
+            ...style,
+          }}
+        >
+          {label}.
+        </span>
+      );
+
     case "parentheses":
-      return <span className="shrink-0">({label})</span>;
+      return (
+        <span
+          className={cn("shrink-0 font-medium select-none text-black inline-flex items-baseline", className)}
+          style={{
+            fontSize: sizeStyle,
+            fontFamily,
+            lineHeight: "inherit",
+            color: "#000000",
+            ...style,
+          }}
+        >
+          ({label})
+        </span>
+      );
+
     case "circle":
       return (
         <div
-          className="font-bold shrink-0 flex items-center justify-center rounded-full border border-black/50 leading-none"
+          className={cn(
+            "font-bold shrink-0 grid place-items-center rounded-full border border-black select-none text-black p-0",
+            className
+          )}
           style={{
-            width: "1.6em",
-            height: "1.6em",
-            fontSize: "calc(100% - 2px)",
-            marginTop: "2px",
-            lineHeight: "1",
+            fontSize: sizeStyle,
+            fontFamily,
+            color: "#000000",
+            borderColor: "#000000",
+            width: "1.35em",
+            height: "1.35em",
+            minWidth: "1.35em",
+            maxWidth: "1.35em",
+            minHeight: "1.35em",
+            maxHeight: "1.35em",
+            aspectRatio: "1 / 1",
+            padding: 0,
+            marginTop: "0.08em",
+            lineHeight: 1,
+            boxSizing: "border-box",
+            ...style,
           }}
         >
-          {label}
+          <span
+            className="flex items-center justify-center select-none w-full h-full text-center"
+            style={{
+              fontSize: "0.82em",
+              lineHeight: 1,
+              padding: 0,
+              margin: 0,
+              transform: "translateY(0.095em)",
+            }}
+          >
+            {label}
+          </span>
         </div>
       );
+
     case "round":
     default:
-      return <span className="shrink-0">{label})</span>;
+      return (
+        <span
+          className={cn("shrink-0 font-medium select-none text-black inline-flex items-baseline", className)}
+          style={{
+            fontSize: sizeStyle,
+            fontFamily,
+            lineHeight: "inherit",
+            color: "#000000",
+            ...style,
+          }}
+        >
+          {label})
+        </span>
+      );
   }
 };

@@ -1,5 +1,6 @@
 import { tool, type ToolSet } from "ai";
 import { z } from "zod";
+import { buildQuestionPaperTitle } from "@workspace/utils";
 import type { AssistantToolContext } from "../types";
 
 export function getPaperTools(ctx: AssistantToolContext): ToolSet {
@@ -296,7 +297,11 @@ export function getPaperTools(ctx: AssistantToolContext): ToolSet {
           }
 
           // 3. Create Title
-          const title = `${matchedClass.nameBn || matchedClass.nameEn} - ${resolvedSubjects.map((s) => s.subjectName).join(", ")} - ${examName}`;
+          const title = buildQuestionPaperTitle({
+            className: matchedClass.nameBn || matchedClass.nameEn,
+            examName,
+            subjects: resolvedSubjects,
+          });
 
           // 4. Create Paper via tRPC
           const created = await ctx.caller.questionPaper.createFull({

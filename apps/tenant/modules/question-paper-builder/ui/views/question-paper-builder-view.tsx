@@ -28,6 +28,7 @@ import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
 import { useDownloadPaper } from "../../hooks/use-download-paper";
 import { ExportOverlay } from "../components/canvas/export-overlay";
 import { CanvasZoomControls } from "../components/toolbar/canvas-zoom-controls";
+import { buildQuestionPaperTitle } from "@workspace/utils";
 
 interface Props {
   paperId: string;
@@ -91,7 +92,15 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
   const { data: distributionStatuses } = useQuestionPaperDistributionStatuses(paperId);
   const { mutateAsync: updateSettingsMutation, isPending: isManualSaving } = useUpdateQuestionPaperSettings();
   const { mutateAsync: updatePaperMutation, isPending: isPublishing } = useUpdateQuestionPaper();
-  const { downloadAsPdf, isDownloading } = useDownloadPaper({ paperTitle: paperQuery?.title });
+  const effectivePaperTitle = React.useMemo(() => {
+    if (!paperQuery) return undefined;
+    return buildQuestionPaperTitle({
+      className: paperQuery.className,
+      examName: paperQuery.examName,
+      subjects: paperQuery.subjects,
+    }) || paperQuery.title;
+  }, [paperQuery]);
+  const { downloadAsPdf, isDownloading } = useDownloadPaper({ paperTitle: effectivePaperTitle });
 
   const incompleteDistributions = React.useMemo(() => {
     if (!distributionStatuses || distributionStatuses.length === 0) return [];

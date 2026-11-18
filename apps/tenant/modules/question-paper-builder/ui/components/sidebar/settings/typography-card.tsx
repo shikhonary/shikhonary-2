@@ -27,35 +27,39 @@ const FONT_SIZE_OFFSET = 2;
 export const TypographyCard: React.FC = () => {
   const settings = useBuilderStore((state) => state.settings);
   const updateSettings = useBuilderStore((state) => state.updateSettings);
-  const displayFontSize = Math.max(8, (settings.fontSize || 15) - FONT_SIZE_OFFSET);
+  const displayFontSize = Math.max(6, Math.round(((settings.fontSize || 15) - FONT_SIZE_OFFSET) * 100) / 100);
 
   const [inputValue, setInputValue] = useState<string>(String(displayFontSize));
 
   useEffect(() => {
-    setInputValue(String(displayFontSize));
+    const currentParsed = parseFloat(inputValue);
+    if (isNaN(currentParsed) || Math.abs(currentParsed - displayFontSize) > 0.001) {
+      setInputValue(String(displayFontSize));
+    }
   }, [displayFontSize]);
 
   const handleSizeChange = (newSize: number) => {
-    const clamped = Math.max(8, Math.min(32, newSize));
+    const clamped = Math.max(6, Math.min(36, Math.round(newSize * 100) / 100));
     setInputValue(String(clamped));
-    updateSettings({ fontSize: clamped + FONT_SIZE_OFFSET });
+    updateSettings({ fontSize: Math.round((clamped + FONT_SIZE_OFFSET) * 100) / 100 });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputValue(val);
-    const parsed = parseInt(val, 10);
+    if (!val || val.endsWith(".")) return;
+    const parsed = parseFloat(val);
     if (!isNaN(parsed) && parsed >= 6 && parsed <= 36) {
-      updateSettings({ fontSize: parsed + FONT_SIZE_OFFSET });
+      updateSettings({ fontSize: Math.round((parsed + FONT_SIZE_OFFSET) * 100) / 100 });
     }
   };
 
   const handleInputBlur = () => {
-    const parsed = parseInt(inputValue, 10);
-    if (isNaN(parsed) || parsed < 8) {
-      handleSizeChange(8);
-    } else if (parsed > 32) {
-      handleSizeChange(32);
+    const parsed = parseFloat(inputValue);
+    if (isNaN(parsed) || parsed < 6) {
+      handleSizeChange(6);
+    } else if (parsed > 36) {
+      handleSizeChange(36);
     } else {
       handleSizeChange(parsed);
     }
@@ -113,10 +117,10 @@ export const TypographyCard: React.FC = () => {
           <div className="flex items-center gap-1 bg-muted/40 rounded-xl border border-slate-200/80 p-0.5 shadow-2xs">
             <button
               type="button"
-              onClick={() => handleSizeChange(displayFontSize - 1)}
-              disabled={displayFontSize <= 8}
+              onClick={() => handleSizeChange(Math.round((displayFontSize - 0.5) * 10) / 10)}
+              disabled={displayFontSize <= 6}
               className="size-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-card transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-              title="ফন্ট সাইজ কমান (-1 pt)"
+              title="ফন্ট সাইজ কমান (-0.5 pt)"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
@@ -124,9 +128,9 @@ export const TypographyCard: React.FC = () => {
             <div className="flex items-center px-1.5 h-7 bg-card rounded-lg border border-slate-200/70 shadow-2xs">
               <input
                 type="number"
-                min={8}
-                max={32}
-                step={1}
+                min={6}
+                max={36}
+                step="any"
                 value={inputValue}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
@@ -135,7 +139,7 @@ export const TypographyCard: React.FC = () => {
                     (e.target as HTMLInputElement).blur();
                   }
                 }}
-                className="w-8 text-center font-bold text-xs bg-transparent border-0 outline-none p-0 focus:ring-0 font-solaiman [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-11 text-center font-bold text-xs bg-transparent border-0 outline-none p-0 focus:ring-0 font-solaiman [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 aria-label="Font size in points"
               />
               <span className="text-[10px] text-muted-foreground font-semibold select-none pl-0.5">pt</span>
@@ -143,10 +147,10 @@ export const TypographyCard: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => handleSizeChange(displayFontSize + 1)}
-              disabled={displayFontSize >= 32}
+              onClick={() => handleSizeChange(Math.round((displayFontSize + 0.5) * 10) / 10)}
+              disabled={displayFontSize >= 36}
               className="size-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-card transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-              title="ফন্ট সাইজ বাড়ান (+1 pt)"
+              title="ফন্ট সাইজ বাড়ান (+0.5 pt)"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
@@ -186,9 +190,9 @@ export const TypographyCard: React.FC = () => {
             type="range" 
             min={8} 
             max={28} 
-            step={1}
+            step={0.5}
             value={Math.max(8, Math.min(28, displayFontSize))}
-            onChange={(e) => handleSizeChange(parseInt(e.target.value, 10))}
+            onChange={(e) => handleSizeChange(parseFloat(e.target.value))}
             className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-muted rounded-lg appearance-none"
           />
           <div className="flex justify-between items-center text-[10px] text-muted-foreground font-solaiman mt-1 px-0.5">
