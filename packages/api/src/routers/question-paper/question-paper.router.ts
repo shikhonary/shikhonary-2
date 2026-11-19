@@ -39,6 +39,7 @@ import {
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
+  getQuestionPaperStats,
   getQuestionPaperById,
   createQuestionPaper,
   createQuestionPaperFull,
@@ -79,6 +80,9 @@ import {
 
 export const questionPaperRouter = createTRPCRouter({
   // Queries
+  stats: tenantMemberProcedure
+    .query(({ ctx }) => getQuestionPaperStats(ctx.tenantDb)),
+
   list: tenantMemberProcedure
     .input(listQuestionPapersSchema)
     .query(({ ctx, input }) => listQuestionPapers(ctx.tenantDb, input)),

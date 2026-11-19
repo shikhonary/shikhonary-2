@@ -7,6 +7,10 @@ import { idSchema, paginationSchema } from "../../schemas/common"
 // ---------------------------------------------------------------------------
 
 export const listQuestionPapersSchema = paginationSchema.extend({
+  limit: z.preprocess(
+    (val) => (typeof val === "number" && val > 1000 ? 1000 : val),
+    z.number().int().min(1).max(1000).default(20)
+  ),
   classId: z.string().optional(),
   status: z.enum(["Draft", "Published"]).optional(),
   isTemplate: z.boolean().optional(),

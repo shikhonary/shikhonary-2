@@ -23,6 +23,10 @@ export function useQuestionPapersList(input: ListQuestionPapersInput = { limit: 
   return useQuery(trpc.questionPaper.list.queryOptions(input))
 }
 
+export function useQuestionPaperStats() {
+  return useQuery(trpc.questionPaper.stats.queryOptions())
+}
+
 export function useQuestionPaperById(id: string, enabled = true) {
   return useQuery({
     ...trpc.questionPaper.byId.queryOptions({ id }),

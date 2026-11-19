@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@workspace/ui/components/sonner"
-import { useQuestionPapersList, useGenerateAnswerPaper } from "../services/use-question-paper"
+import { useQuestionPapersList, useQuestionPaperStats, useGenerateAnswerPaper } from "../services/use-question-paper"
 import { useDeleteQuestionPaperModalStore } from "../store/use-delete-question-paper-modal-store"
 import { useDuplicateQuestionPaperModalStore } from "../store/use-duplicate-question-paper-modal-store"
 import { QuestionPaperPageHeader } from "./question-paper-page-header"
@@ -51,10 +51,8 @@ export function QuestionPaperManagementView() {
     sort: selectedSort,
   })
 
-  // Fetch all question papers for global stats
-  const { data: statsData } = useQuestionPapersList({
-    limit: 1000,
-  })
+  // Fetch global stats via dedicated optimized stats query
+  const { data: statsData, isLoading: isStatsLoading } = useQuestionPaperStats()
 
   // Safely fetch classes list (using try-catch/fallback if the user is not superadmin)
   const { data: classesData } = useQuery({
@@ -69,11 +67,10 @@ export function QuestionPaperManagementView() {
   const totalPages = Math.ceil(totalItems / limit) || 1
 
   // Stats
-  const allPapers = statsData?.papers ?? []
-  const totalPapers = allPapers.length
-  const publishedPapers = allPapers.filter((p) => p.status === "Published").length
-  const templatePapers = allPapers.filter((p) => p.isTemplate).length
-  const averageMarks = allPapers.length > 0 ? Math.round(allPapers.reduce((sum, p) => sum + p.total, 0) / allPapers.length) : 0
+  const totalPapers = statsData?.totalPapers ?? 0
+  const publishedPapers = statsData?.publishedPapers ?? 0
+  const templatePapers = statsData?.templatePapers ?? 0
+  const averageMarks = statsData?.averageMarks ?? 0
 
   return (
     <div className="w-full space-y-6 sm:space-y-8">
@@ -86,7 +83,7 @@ export function QuestionPaperManagementView() {
         publishedPapers={publishedPapers}
         templatePapers={templatePapers}
         averageMarks={averageMarks}
-        isLoading={isLoading}
+        isLoading={isLoading || isStatsLoading}
       />
 
       {/* Filters */}

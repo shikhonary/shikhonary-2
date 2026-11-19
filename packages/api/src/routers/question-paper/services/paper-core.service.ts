@@ -78,6 +78,31 @@ export async function listQuestionPapers(
   return { papers, totalItems, nextCursor }
 }
 
+export async function getQuestionPaperStats(tenantDb: TenantPrismaClient) {
+  const [totalPapers, publishedPapers, templatePapers, aggregate] = await Promise.all([
+    tenantDb.questionPaper.count({
+      where: { deletedAt: null },
+    }),
+    tenantDb.questionPaper.count({
+      where: { deletedAt: null, status: "Published" },
+    }),
+    tenantDb.questionPaper.count({
+      where: { deletedAt: null, isTemplate: true },
+    }),
+    tenantDb.questionPaper.aggregate({
+      where: { deletedAt: null },
+      _avg: { total: true },
+    }),
+  ])
+
+  return {
+    totalPapers,
+    publishedPapers,
+    templatePapers,
+    averageMarks: Math.round(aggregate._avg?.total ?? 0),
+  }
+}
+
 export async function getQuestionPaperById(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
