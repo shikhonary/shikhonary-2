@@ -165,6 +165,10 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
   const isCombined = (data.type || "").toUpperCase() === "COMBINED";
+  const hasStimulusBanner = isCombined || Boolean(contextInstruction);
+  const effectiveAttachments = (Array.isArray(data.attachments) && data.attachments.length > 0)
+    ? data.attachments
+    : (data.questionUrl ? [{ type: "image", url: data.questionUrl }] : []);
   const isAnswerMode = Boolean(settings.isAnswerMode);
   
   return (
@@ -248,8 +252,8 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
         </div>
       )}
 
-      {/* Top Banner & Stimulus: ONLY for COMBINED questions */}
-      {isCombined && !hideContext && (
+      {/* Top Banner & Stimulus: for COMBINED or questions with shared stimulus instruction */}
+      {hasStimulusBanner && !hideContext && (
         <div className="flex items-start gap-2 w-full pt-1.5 mb-0.5 ml-[1.8em] pl-2">
           <span
             className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
@@ -276,8 +280,8 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                 />
               </div>
             )}
-            {/* Shared Attachments for COMBINED questions */}
-            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
+            {/* Shared Attachments for COMBINED / shared stimulus questions */}
+            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
           </div>
         </div>
       )}
@@ -312,9 +316,9 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             />
           </div>
 
-          {/* Attachments for SINGLE and MULTIPLE questions rendered directly below question */}
-          {!isCombined && Array.isArray(data.attachments) && data.attachments.length > 0 && (
-            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
+          {/* Attachments for standalone questions rendered directly below question (hidden if question has a top stimulus banner or is a child question) */}
+          {!hasStimulusBanner && !hideContext && effectiveAttachments.length > 0 && (
+            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
           )}
               
           {data.statements && data.statements.length > 0 && (

@@ -471,6 +471,8 @@ export type AutoFillDistributionInput = z.infer<typeof autoFillDistributionSchem
 export const replaceQuestionSchema = z.object({
   questionPaperId: z.string().min(1),
   questionPaperQuestionId: z.string().min(1),
+  newQuestionId: z.string().optional(),
+  questionType: z.string().optional(),
   chapterId: z.string().optional(),
   difficulty: z.string().optional(),
 })

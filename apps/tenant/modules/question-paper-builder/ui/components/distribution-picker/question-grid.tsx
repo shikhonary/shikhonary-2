@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@workspace/ui/lib/utils";
 import { useAvailableQuestions } from "@/modules/question-paper/services/use-question-paper";
 import type { QuestionTypeCode } from "@workspace/utils";
+import { PickerContext } from "./picker-card-wrapper";
 import { McqPickerCard } from "./mcq-picker-card";
 import { CqPickerCard } from "./cq-picker-card";
 import { CsPickerCard } from "./cs-picker-card";
@@ -96,6 +97,8 @@ export interface QuestionGridProps {
   onLimitChange?: (limit: number) => void;
   onlyBookmarked?: boolean;
   bookmarkedIds?: string[];
+  isExchangeMode?: boolean;
+  currentQuestionId?: string;
 }
 
 export const QuestionGrid: React.FC<QuestionGridProps> = ({
@@ -120,6 +123,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   onLimitChange,
   onlyBookmarked = false,
   bookmarkedIds,
+  isExchangeMode = false,
+  currentQuestionId,
 }) => {
   const { data: result, isLoading } = useAvailableQuestions({
     subjectId,
@@ -283,15 +288,17 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
 
   return (
     <div className="space-y-6">
-      <div
-        className={`grid gap-4 ${
-          category === "CQ" || category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2"
-            ? "grid-cols-1 md:grid-cols-2"
-            : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-        }`}
-      >
-        {questions.map((q: any) => renderCard(q))}
-      </div>
+      <PickerContext.Provider value={{ isExchangeMode, currentQuestionId }}>
+        <div
+          className={`grid gap-4 ${
+            category === "CQ" || category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2"
+              ? "grid-cols-1 md:grid-cols-2"
+              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          }`}
+        >
+          {questions.map((q: any) => renderCard(q))}
+        </div>
+      </PickerContext.Provider>
 
       {totalItems > 0 && (
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 bg-card border border-outline-variant/70 rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-xs font-display">

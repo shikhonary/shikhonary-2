@@ -10,6 +10,7 @@ import {
   useAvailableQuestions,
   useBulkAssignQuestions,
   useAddAlternativeQuestion,
+  useReplaceQuestion,
 } from "@/modules/question-paper/services/use-question-paper";
 import { useBuilderStore } from "../../store/use-builder-store";
 import { Button } from "@workspace/ui/components/button";
@@ -43,6 +44,7 @@ import {
   FileText,
   ArrowUpDown,
   Check,
+  ArrowLeftRight,
 } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
@@ -78,6 +80,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const primaryMarksParam = searchParams.get("primaryMarks");
   const masterNumberParam = searchParams.get("masterNumber");
 
+  const isExchangeMode = searchParams.get("mode") === "exchange";
+  const questionPaperQuestionId = searchParams.get("questionPaperQuestionId") || undefined;
+  const currentQuestionId = searchParams.get("currentQuestionId") || undefined;
+
   const { data: paperQuery, isLoading: paperLoading } = useQuestionPaperById(paperId);
   const { data: statuses, isLoading: statusesLoading } = useQuestionPaperDistributionStatuses(paperId);
 
@@ -97,10 +103,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
   const { mutateAsync: bulkAssign, isPending: isAssigning } = useBulkAssignQuestions();
   const { mutateAsync: addAlternative, isPending: isAddingAlternative } = useAddAlternativeQuestion();
+  const { mutateAsync: replaceQuestion, isPending: isReplacing } = useReplaceQuestion();
 
   const distStatus =
     statuses?.find((s: any) => s.distributionId === distributionId) ||
-    (isAlternativeMode && statuses && statuses.length > 0 ? statuses[0] : null);
+    ((isAlternativeMode || isExchangeMode) && statuses && statuses.length > 0 ? statuses[0] : null);
 
   const bookmarkedIds = React.useMemo(() => {
     return Object.values(bookmarks)
@@ -174,7 +181,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     normalizeQuestionTypeName(distStatus?.questionType?.nameBn);
 
   let category: QuestionTypeCode = QUESTION_TYPE_CODES.MCQ;
-  if (isAlternativeMode && urlCategoryParam) {
+  if ((isAlternativeMode || isExchangeMode) && urlCategoryParam) {
     category = urlCategoryParam as QuestionTypeCode;
   } else if (normalized && QUESTION_TYPE_MAP[normalized]?.code) {
     category = QUESTION_TYPE_MAP[normalized].code as QuestionTypeCode;
@@ -322,8 +329,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const resolvedLimit = resolvedSlot?.slotPickLimit ?? urlLimit ?? distStatus?.targetCount ?? 1;
   const isSingleType = policy.selectionMode === "SINGLE" && resolvedLimit <= 1;
 
-  const effectiveTargetCount = isAlternativeMode ? 1 : (isSingleType ? 1 : (resolvedSlot?.slotPickLimit ?? urlLimit ?? distStatus?.targetCount ?? 0));
-  const maxSelectable = isAlternativeMode
+  const effectiveTargetCount = (isAlternativeMode || isExchangeMode)
+    ? 1
+    : (isSingleType ? 1 : (resolvedSlot?.slotPickLimit ?? urlLimit ?? distStatus?.targetCount ?? 0));
+  const maxSelectable = (isAlternativeMode || isExchangeMode)
     ? 1
     : (isSingleType
         ? Math.max(0, 1 - subSectionQuestionsCount)
@@ -347,6 +356,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   );
 
   const availableUnassigned = (availableData?.items || []).filter((q: any) => !q.isAssigned);
+  const availableForExchange = (availableData?.items || []).filter((q: any) => q.id !== currentQuestionId);
+  const exchangePool = availableForExchange.length > 0 ? availableForExchange : (availableData?.items || []);
 
   if (paperLoading || statusesLoading) {
     return (
@@ -369,6 +380,17 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
   const handleRandomSelect = () => {
     if (questionsLoading) return;
+
+    if (isExchangeMode) {
+      if (exchangePool.length === 0) {
+        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * exchangePool.length);
+      setSelectedIds([exchangePool[randomIndex].id]);
+      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      return;
+    }
 
     if (isAlternativeMode) {
       if (availableUnassigned.length === 0) {
@@ -543,6 +565,26 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   );
   const currentDistIndex = statuses?.findIndex((s: any) => s.distributionId === distributionId) ?? -1;
   const nextDistStatus = currentDistIndex !== -1 && currentDistIndex < (statuses?.length || 0) - 1 ? statuses?.[currentDistIndex + 1] : null;
+
+  const handleSaveExchange = async () => {
+    if (!questionPaperQuestionId || selectedIds.length === 0) return;
+    try {
+      const res: any = await replaceQuestion({
+        questionPaperId: paperId,
+        questionPaperQuestionId,
+        newQuestionId: selectedIds[0]!,
+        questionType: category,
+      });
+      if (res?.ok === false) {
+        toast.error(res.message || "প্রশ্ন প্রতিস্থাপন করা যায়নি");
+        return;
+      }
+      toast.success("প্রশ্নটি সফলভাবে একই পজিশনে প্রতিস্থাপন করা হয়েছে!");
+      router.push(`/question-papers/${paperId}/builder`);
+    } catch (err: any) {
+      toast.error(err?.message || "প্রশ্ন প্রতিস্থাপন করতে সমস্যা হয়েছে");
+    }
+  };
 
   const handleSaveAlternative = async () => {
     if (!parentQuestionId || selectedIds.length === 0) return;
@@ -722,22 +764,30 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               <h1
                 className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[240px] md:max-w-[340px] lg:max-w-lg leading-tight"
                 title={
-                  isAlternativeMode
+                  isExchangeMode
+                    ? `প্রশ্ন বিনিময় / প্রতিস্থাপন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                    : isAlternativeMode
                     ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
                     : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
                 }
               >
-                {isAlternativeMode
+                {isExchangeMode
+                  ? `প্রশ্ন বিনিময় / প্রতিস্থাপন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                  : isAlternativeMode
                   ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
                   : `${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
               </h1>
 
               {/* Target and Progress Sub-line */}
               <div className="flex items-center gap-1.5 mt-0.5">
-                {isAssigning || isAddingAlternative ? (
+                {isAssigning || isAddingAlternative || isReplacing ? (
                   <span className="text-[10px] sm:text-[11px] text-muted-foreground flex items-center gap-1 font-body">
                     <Loader2 className="w-2.5 h-2.5 animate-spin text-indigo-600 dark:text-indigo-400" />
-                    <span>যুক্ত করা হচ্ছে...</span>
+                    <span>{isReplacing ? "প্রতিস্থাপন হচ্ছে..." : "যুক্ত করা হচ্ছে..."}</span>
+                  </span>
+                ) : isExchangeMode ? (
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md font-headline">
+                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)} ` : ""}হুবহু একই পজিশনে প্রতিস্থাপন হবে
                   </span>
                 ) : isAlternativeMode ? (
                   <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.2 rounded-md font-headline">
@@ -770,7 +820,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               variant="outline"
               size="sm"
               onClick={handleRandomSelect}
-              disabled={questionsLoading || availableUnassigned.length === 0}
+              disabled={questionsLoading || (isExchangeMode ? exchangePool.length === 0 : availableUnassigned.length === 0)}
               className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer flex items-center gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95 disabled:opacity-50"
               title="প্রশ্নসমূহ থেকে দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করুন"
             >
@@ -779,8 +829,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               <span className="sm:hidden text-[11px]">র‍্যান্ডম</span>
             </Button>
 
-            {/* Next Sub-Section Button (if not alternative mode and next exists) */}
-            {!isAlternativeMode && nextDistStatus && (
+            {/* Next Sub-Section Button (if not alternative/exchange mode and next exists) */}
+            {!isAlternativeMode && !isExchangeMode && nextDistStatus && (
               <Button
                 variant="outline"
                 size="sm"
@@ -1332,12 +1382,47 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             </div>
           )}
 
+          {/* Exchange Mode Notification Banner */}
+          {isExchangeMode && (
+            <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <ArrowLeftRight className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <span>প্রশ্ন বিনিময় / প্রতিস্থাপন মোড</span>
+                    {masterNumberParam && (
+                      <Badge className="bg-indigo-600 text-white text-[10px] py-0 px-2">
+                        প্রশ্ন নং {toBengaliDigits(masterNumberParam)}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর স্থলে ` : ""}
+                    হুবহু একই পজিশনে প্রতিস্থাপন করতে তালিকা থেকে ১টি নতুন প্রশ্ন নির্বাচন করুন।
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="text-xs border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/15 cursor-pointer shrink-0 rounded-lg font-bold"
+              >
+                <Link href={`/question-papers/${paperId}/builder`}>
+                  বাতিল ও ক্যানভাসে ফিরুন
+                </Link>
+              </Button>
+            </div>
+          )}
+
 
 
           {/* Question Grid */}
           <QuestionGrid
             subjectId={distStatus.subjectId}
-            questionTypeId={isAlternativeMode ? "" : (urlQuestionTypeIdParam || distStatus.questionTypeId)}
+            questionTypeId={(isAlternativeMode || isExchangeMode) ? "" : (urlQuestionTypeIdParam || distStatus.questionTypeId)}
             category={category}
             search={search}
             chapterId={selectedChapterId}
@@ -1345,7 +1430,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             source={selectedSource}
             sort={selectedSort}
             excludePaperId={paperId}
-            distributionId={isAlternativeMode ? undefined : distributionId}
+            distributionId={(isAlternativeMode || isExchangeMode) ? undefined : distributionId}
             selectedIds={selectedIds}
             selectedSubQuestionIdsMap={selectedSubQuestionIdsMap}
             onToggleSubQuestion={handleToggleSubQuestion}
@@ -1356,6 +1441,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             onLimitChange={setLimit}
             onlyBookmarked={onlyBookmarked}
             bookmarkedIds={bookmarkedIds}
+            isExchangeMode={isExchangeMode}
+            currentQuestionId={currentQuestionId}
             onToggle={(id) => {
               setSelectedIds(prev => {
                 if (prev.includes(id)) {
@@ -1366,7 +1453,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                   });
                   return prev.filter((item) => item !== id);
                 }
-                if (isAlternativeMode) {
+                if (isAlternativeMode || isExchangeMode) {
                   return [id];
                 }
                 if (isSingleType) {
@@ -1397,13 +1484,33 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         <div className="fixed bottom-4 left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl md:rounded-full p-2.5 md:px-6 md:py-2.5 flex flex-col md:flex-row items-center gap-2 md:gap-5 z-50 animate-in slide-in-from-bottom-5 select-none">
           <div className="text-xs md:text-sm font-bold text-foreground flex items-center justify-between w-full md:w-auto px-1 md:px-0">
             <span>
-              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> {isSingleType && !isAlternativeMode ? "মূল প্রশ্ন নির্বাচিত" : "প্রশ্ন নির্বাচিত"}
+              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> {isSingleType && !isAlternativeMode && !isExchangeMode ? "মূল প্রশ্ন নির্বাচিত" : "প্রশ্ন নির্বাচিত"}
             </span>
             <span className="text-muted-foreground md:ml-2 font-normal text-[11px] md:text-xs">
               (প্রয়োজন: {toBengaliDigits(maxSelectable)}টি)
             </span>
           </div>
-          {isAlternativeMode ? (
+          {isExchangeMode ? (
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Button
+                variant="outline"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
+                asChild
+              >
+                <Link href={`/question-papers/${paperId}/builder`}>
+                  বাতিল
+                </Link>
+              </Button>
+              <Button
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
+                disabled={isReplacing || selectedIds.length === 0}
+                onClick={handleSaveExchange}
+              >
+                {isReplacing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowLeftRight className="w-3.5 h-3.5" />}
+                <span>প্রতিস্থাপন নিশ্চিত করুন</span>
+              </Button>
+            </div>
+          ) : isAlternativeMode ? (
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 variant="outline"

@@ -12,6 +12,7 @@ import {
   addQuestionPaperQuestion,
 } from "./paper-questions.service";
 import { getAvailableQuestions } from "./paper-available.service";
+import { logHistory } from "./helpers/history-logger";
 
 const CATEGORY_TO_BULK_FIELD: Record<string, string> = {
   MCQ: "mcqIds",
@@ -244,10 +245,18 @@ export async function replaceQuestion(
         { pbqId: input.questionPaperQuestionId },
         { paragraphId: input.questionPaperQuestionId },
         { amplificationId: input.questionPaperQuestionId },
+        { thoughtExpansionId: input.questionPaperQuestionId },
         { letterId: input.questionPaperQuestionId },
         { applicationId: input.questionPaperQuestionId },
         { summaryId: input.questionPaperQuestionId },
+        { essenceId: input.questionPaperQuestionId },
+        { poemId: input.questionPaperQuestionId },
         { essayId: input.questionPaperQuestionId },
+        { newsReportId: input.questionPaperQuestionId },
+        { grammarQuestionId: input.questionPaperQuestionId },
+        { shortQuestionId: input.questionPaperQuestionId },
+        { descriptiveQuestionId: input.questionPaperQuestionId },
+        { seenComprehensionId: input.questionPaperQuestionId },
       ],
     },
     include: {
@@ -284,21 +293,27 @@ export async function replaceQuestion(
     });
   }
 
-  // Find candidate replacement from the same subject/distribution
-  const availableRes = await getAvailableQuestions(db, tenantDb, {
-    subjectId: junction.distribution.paperSubject.subjectId,
-    questionTypeId: junction.distribution.questionTypeId,
-    excludePaperId: input.questionPaperId,
-    chapterId: input.chapterId,
-    difficulty: input.difficulty,
-    limit: 20,
-  });
+  let targetCandidateId = input.newQuestionId;
 
-  const candidate = (availableRes.items || []).find(
-    (item: any) => !item.isAssigned && item.id !== currentQuestionId
-  );
+  // If no newQuestionId was explicitly supplied, find candidate replacement from the same subject/distribution
+  if (!targetCandidateId) {
+    const availableRes = await getAvailableQuestions(db, tenantDb, {
+      subjectId: junction.distribution.paperSubject.subjectId,
+      questionTypeId: junction.distribution.questionTypeId,
+      excludePaperId: input.questionPaperId,
+      chapterId: input.chapterId,
+      difficulty: input.difficulty,
+      limit: 20,
+    });
 
-  if (!candidate) {
+    const candidate = (availableRes.items || []).find(
+      (item: any) => !item.isAssigned && item.id !== currentQuestionId
+    );
+
+    targetCandidateId = candidate?.id;
+  }
+
+  if (!targetCandidateId) {
     return {
       ok: false,
       questionPaperId: input.questionPaperId,
@@ -306,42 +321,41 @@ export async function replaceQuestion(
     };
   }
 
-  // 1. Remove the old question
-  await removeQuestionPaperQuestion(
-    db,
-    tenantDb,
-    {
-      questionPaperId: input.questionPaperId,
-      questionId: currentQuestionId,
-      questionType: currentCategory as any,
-    },
-    actorId,
-    tenantId
-  );
+  // In-place atomic update: keeps the exact same junction record, orderIndex, sectionId, subSectionId, distributionId, and any alternatives!
+  const targetCategory = input.questionType || currentCategory;
+  const oldField = CATEGORY_TO_SINGLE_FIELD[currentCategory] || "mcqId";
+  const newField = CATEGORY_TO_SINGLE_FIELD[targetCategory] || oldField;
 
-  // 2. Add the candidate in the exact same distribution, section, and orderIndex
-  const singleField = CATEGORY_TO_SINGLE_FIELD[currentCategory] || "mcqId";
-  await addQuestionPaperQuestion(
-    db,
-    tenantDb,
-    {
-      questionPaperId: input.questionPaperId,
-      distributionId: junction.distributionId,
-      sectionId: junction.sectionId,
-      subSectionId: junction.subSectionId,
-      orderIndex: junction.orderIndex,
-      [singleField]: candidate.id,
-    } as any,
+  const updateData: Record<string, any> = {};
+  if (oldField !== newField) {
+    updateData[oldField] = null;
+  }
+  updateData[newField] = targetCandidateId;
+
+  await tenantDb.questionPaperQuestion.update({
+    where: { id: junction.id },
+    data: updateData,
+  });
+
+  await logHistory(tenantDb, {
+    questionPaperId: input.questionPaperId,
+    action: "QUESTION_EXCHANGED",
     actorId,
-    tenantId
-  );
+    changes: {
+      junctionId: junction.id,
+      oldQuestionId: currentQuestionId,
+      newQuestionId: targetCandidateId,
+      category: targetCategory,
+      orderIndex: junction.orderIndex,
+    },
+  });
 
   return {
     ok: true,
     questionPaperId: input.questionPaperId,
     oldQuestionId: currentQuestionId,
-    newQuestionId: candidate.id,
-    category: currentCategory,
+    newQuestionId: targetCandidateId,
+    category: targetCategory,
     message: `Question successfully exchanged.`,
   };
 }

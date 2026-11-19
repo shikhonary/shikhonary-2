@@ -103,14 +103,14 @@ export function QuestionAttachmentItem({
   compact?: boolean
 }) {
   const type = (attachment.type || "").toLowerCase()
+  const hasUrl = Boolean(attachment.url && attachment.url !== "text-context")
+  const isTable = type === "table" || (Boolean(attachment.table) && !hasUrl)
   const isImage =
     type === "image" ||
-    (attachment.url &&
-      attachment.url !== "text-context" &&
-      /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(attachment.url))
-
-  const isTable = type === "table" || (Boolean(attachment.table) && !isImage)
-  const isText = type === "text" || type === "context" || (!isImage && !isTable)
+    type === "img" ||
+    (hasUrl && !isTable && type !== "text" && type !== "passage" && type !== "context") ||
+    Boolean(hasUrl && /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(attachment.url!))
+  const isText = type === "text" || type === "passage" || type === "context" || (!isImage && !isTable)
 
   const tableData = isTable && attachment.table ? normalizeTableData(attachment.table) : null
   const hasBorder = attachment.tableBorder ?? true

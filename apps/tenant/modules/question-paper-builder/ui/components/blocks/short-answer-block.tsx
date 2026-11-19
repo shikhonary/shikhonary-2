@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, ArrowLeftRight } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
 
 const ShortAnswerEditableText = ({ 
@@ -102,11 +103,28 @@ const toBengaliDigits = (num?: number | string | null): string => {
 };
 
 export const ShortAnswerBlock = ({ item }: { item: any }) => {
+  const router = useRouter();
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
   const data = item.data || {};
 
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
+
+  const handleExchange = () => {
+    if (!paperId) return;
+    const distId = item.distributionId || data.distributionId || "default";
+    const params = new URLSearchParams();
+    params.set("mode", "exchange");
+    params.set("questionPaperQuestionId", item.id);
+    if (data.id) params.set("currentQuestionId", data.id);
+    params.set("category", "SA");
+    const mNum = item.masterNumber || (item.orderIndex !== undefined ? item.orderIndex + 1 : 1);
+    if (mNum) params.set("masterNumber", String(mNum));
+    if (item.sectionId) params.set("sectionId", item.sectionId);
+    if (item.subSectionId) params.set("subSectionId", item.subSectionId);
+
+    router.push(`/question-papers/${paperId}/distributions/${distId}/pick?${params.toString()}`);
+  };
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -155,6 +173,15 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-1.5 break-inside-avoid">
       {/* Hover Controls */}
       <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+        <button
+          type="button"
+          onClick={handleExchange}
+          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
+          title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+        >
+          <ArrowLeftRight className="w-3 h-3" />
+          বিনিময়
+        </button>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}

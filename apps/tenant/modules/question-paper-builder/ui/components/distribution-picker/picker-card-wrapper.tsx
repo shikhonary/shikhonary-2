@@ -6,6 +6,14 @@ import { Button } from "@workspace/ui/components/button";
 import { CheckCircle2, Check, Plus, ArrowRight, X } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
+export interface PickerContextType {
+  isExchangeMode?: boolean;
+  currentQuestionId?: string;
+}
+
+export const PickerContext = React.createContext<PickerContextType>({});
+export const usePickerContext = () => React.useContext(PickerContext);
+
 interface PickerCardWrapperProps {
   id: string;
   isAssigned?: boolean;
@@ -42,14 +50,18 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   children,
 }) => {
   const isEn = language === "en";
+  const { isExchangeMode, currentQuestionId } = usePickerContext();
+  const isCurrentQuestion = currentQuestionId === id;
+  const isBlocked = isExchangeMode ? false : Boolean(isAssigned);
+
   return (
     <article
       onClick={() => {
-        if (!isAssigned) onToggle(id);
+        if (!isBlocked) onToggle(id);
       }}
       className={cn(
         "bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group select-none relative font-display",
-        isAssigned
+        isBlocked
           ? "bg-slate-50/70 dark:bg-muted/20 border-slate-200/90 dark:border-border/70 cursor-not-allowed shadow-none"
           : isSelected
             ? "border-primary/80 ring-2 ring-primary/20 bg-primary/[0.02] cursor-pointer"
@@ -57,7 +69,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
       )}
     >
       {/* Animated selection corner borders for selected state */}
-      {!isAssigned && (
+      {!isBlocked && (
         <>
           <div
             className={`absolute -top-[1px] -left-[1px] w-12 h-12 border-t-3 border-l-3 border-primary rounded-tl-2xl pointer-events-none transition-all duration-200 origin-top-left ${
@@ -86,7 +98,17 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
       <div className="p-4 sm:p-5 pb-3 sm:pb-4 flex-1 flex flex-col">
         {/* Card Header: Badges & Checkbox */}
         <div className="flex items-start justify-between gap-3 mb-3">
-          <div className={cn("flex flex-wrap items-center gap-1.5 sm:gap-2", isAssigned && "opacity-60")}>
+          <div className={cn("flex flex-wrap items-center gap-1.5 sm:gap-2", isBlocked && "opacity-60")}>
+            {isCurrentQuestion && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold border uppercase tracking-wide font-headline bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700/50">
+                {isEn ? "Current Question" : "বর্তমান প্রশ্ন"}
+              </span>
+            )}
+            {isAssigned && !isCurrentQuestion && isExchangeMode && (
+              <span className="px-2 py-0.5 rounded text-[11px] font-semibold border font-headline bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/40">
+                {isEn ? "In Paper" : "প্রশ্নপত্রে বিদ্যমান"}
+              </span>
+            )}
             {chapterName && (
               <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-white/[0.06] text-slate-700 dark:text-muted-foreground border border-slate-200 dark:border-white/[0.08] rounded-md text-xs font-medium font-body">
                 {chapterName}
@@ -116,7 +138,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
 
           {/* Top-Right Status / Selection Checkbox */}
           <div className="shrink-0">
-            {isAssigned ? (
+            {isBlocked ? (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300/70 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs font-headline">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="hidden sm:inline">{isEn ? "Added" : "যুক্ত"}</span>
@@ -137,7 +159,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
         </div>
 
         {/* Children (Question Content) */}
-        <div className={cn("transition-opacity flex-1", isAssigned && "opacity-55")}>
+        <div className={cn("transition-opacity flex-1", isBlocked && "opacity-55")}>
           {children}
         </div>
       </div>
@@ -148,15 +170,19 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
         <div className="flex items-center gap-2">
           {footerLeft ? (
             footerLeft
-          ) : isAssigned ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40 font-headline">
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              <span>{isEn ? "Already added" : "যুক্ত রয়েছে"}</span>
-            </span>
           ) : isSelected ? (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800/40 font-headline">
               <Check className="h-3.5 w-3.5 shrink-0" />
               <span>{isEn ? "Selected" : "নির্বাচিত"}</span>
+            </span>
+          ) : isCurrentQuestion ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/40 font-headline">
+              <span>{isEn ? "Current Question" : "বিদ্যমান প্রশ্ন"}</span>
+            </span>
+          ) : isBlocked ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/40 font-headline">
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              <span>{isEn ? "Already added" : "যুক্ত রয়েছে"}</span>
             </span>
           ) : (
             <span className="text-slate-400 dark:text-muted-foreground font-medium text-xs font-body">
@@ -169,7 +195,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
         <div>
           {footerRight ? (
             footerRight
-          ) : isAssigned ? (
+          ) : isBlocked ? (
             <span className="text-xs font-medium text-muted-foreground italic font-body">
               {isEn ? "Already in paper" : "প্রশ্নপত্রে বিদ্যমান"}
             </span>

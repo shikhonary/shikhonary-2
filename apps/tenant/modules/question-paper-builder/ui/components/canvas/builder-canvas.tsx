@@ -16,39 +16,120 @@ const PAPER_DIMENSIONS = {
 };
 
 /**
+ * Normalizes an image URL or identifier into a canonical key.
+ */
+function normalizeImageUrl(rawUrl: string | null | undefined): string | null {
+  if (!rawUrl || typeof rawUrl !== "string") return null;
+  const trimmed = rawUrl.trim();
+  if (!trimmed || trimmed === "text-context") return null;
+
+  if (trimmed.startsWith("data:")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed, "https://placeholder.internal");
+    const utfsMatch = parsed.pathname.match(/\/f\/([a-zA-Z0-9_-]+)/);
+    if (utfsMatch && utfsMatch[1]) {
+      return `utfs:${utfsMatch[1].toLowerCase()}`;
+    }
+
+    const host = parsed.hostname.toLowerCase();
+    const pathname = parsed.pathname.toLowerCase().replace(/\/+$/, "");
+    return `${host}${pathname}`;
+  } catch {
+    return trimmed.toLowerCase().replace(/[?#].*$/, "").replace(/\/+$/, "");
+  }
+}
+
+/**
+ * Checks if an attachment is an image.
+ */
+function isImageAttachment(a: any): boolean {
+  if (!a || typeof a !== "object") return false;
+  const rawType = (a.type || "").toLowerCase();
+  const url = a.url && a.url !== "text-context" ? String(a.url).trim() : null;
+
+  if (rawType === "image" || rawType === "img") return true;
+  if (url) {
+    if (rawType === "table" || a.table) return false;
+    if (rawType === "text" || rawType === "passage") return false;
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Checks if an attachment is a table.
+ */
+function isTableAttachment(a: any): boolean {
+  if (!a || typeof a !== "object") return false;
+  const rawType = (a.type || "").toLowerCase();
+  if (rawType === "table") return true;
+  if (a.table && !isImageAttachment(a)) return true;
+  return false;
+}
+
+/**
+ * Checks if an attachment is text.
+ */
+function isTextAttachment(a: any): boolean {
+  if (!a || typeof a !== "object") return false;
+  if (isImageAttachment(a) || isTableAttachment(a)) return false;
+  const rawType = (a.type || "").toLowerCase();
+  return rawType === "text" || rawType === "passage" || rawType === "context" || Boolean(a.content || a.caption);
+}
+
+/**
+ * Checks if a caption is a specific, non-generic caption.
+ */
+function isMeaningfulCaption(caption: string | null | undefined): boolean {
+  if (!caption) return false;
+  const norm = caption.trim().replace(/\s+/g, " ");
+  if (norm.length < 3) return false;
+  const genericCaptions = new Set(["উদ্দীপক", "অনুচ্ছেদ", "চিত্র", "image", "stimulus", "context", "ছবি"]);
+  return !genericCaptions.has(norm.toLowerCase());
+}
+
+/**
+ * Returns true if the MCQ has any stimulus (attachment, context, or COMBINED type).
+ */
+function hasMcqStimulus(mcq: any): boolean {
+  if (!mcq || typeof mcq !== "object") return false;
+  if ((mcq.type || "").toUpperCase() === "COMBINED") return true;
+  if (mcq.questionContext?.text?.trim() || mcq.context?.trim()) return true;
+  if (mcq.questionUrl?.trim()) return true;
+  if (Array.isArray(mcq.attachments) && mcq.attachments.length > 0) {
+    return mcq.attachments.some((a: any) =>
+      isImageAttachment(a) || isTableAttachment(a) || Boolean(a.content?.trim() || a.caption?.trim())
+    );
+  }
+  return false;
+}
+
+/**
  * Normalizes an attachment into a canonical signature for grouping shared stimuli in COMBINED MCQs.
  * Handles text, image, and table attachment types uniformly.
  */
 function getAttachmentSignature(a: any): string | null {
   if (!a || typeof a !== "object") return null;
 
-  const rawType = (a.type || "").toLowerCase();
   const url = a.url && a.url !== "text-context" ? String(a.url).trim() : null;
-
-  const isImage =
-    rawType === "image" ||
-    Boolean(url && /\.(jpeg|jpg|gif|png|webp|svg)($|\?)/i.test(url));
-
-  const tableData = a.table ? normalizeTableData(a.table) : null;
-  const isTable = rawType === "table" || (Boolean(tableData) && !isImage);
-  const isText = rawType === "text" || rawType === "context" || (!isImage && !isTable);
+  const isImage = isImageAttachment(a);
+  const isTable = isTableAttachment(a);
+  const isText = isTextAttachment(a);
 
   if (isImage) {
     if (url) {
-      let cleanUrl = url;
-      try {
-        const parsed = new URL(url);
-        cleanUrl = `${parsed.origin.toLowerCase()}${parsed.pathname}`.replace(/\/+$/, "");
-      } catch {
-        cleanUrl = url.toLowerCase().replace(/\/+$/, "");
-      }
-      return `img:${cleanUrl}`;
+      const norm = normalizeImageUrl(url);
+      if (norm) return `img:${norm}`;
     }
     const desc = (a.caption || a.content || "").trim().replace(/\s+/g, " ");
     return desc ? `img_desc:${desc}` : null;
   }
 
   if (isTable) {
+    const tableData = a.table ? normalizeTableData(a.table) : null;
     if (tableData && (tableData.headers.length > 0 || tableData.rows.length > 0)) {
       const norm = (s: any) => String(s ?? "").trim().replace(/\s+/g, " ");
       const hStr = tableData.headers.map(norm).join("|");
@@ -70,6 +151,108 @@ function getAttachmentSignature(a: any): string | null {
   }
 
   return null;
+}
+
+/**
+ * Determines whether two MCQs share the exact same stimulus (image, table, text, or context).
+ */
+function areMcqStimuliMatching(mcq1: any, mcq2: any): boolean {
+  if (!mcq1 || !mcq2) return false;
+
+  // 1. Direct text context matching
+  const ctx1 = (mcq1.questionContext?.text || mcq1.context || "").trim().replace(/\s+/g, " ");
+  const ctx2 = (mcq2.questionContext?.text || mcq2.context || "").trim().replace(/\s+/g, " ");
+  const hasMatchingCtx = Boolean(ctx1 && ctx2 && ctx1 === ctx2);
+
+  // 2. Extract image signatures from both MCQs
+  const getImages = (mcq: any) => {
+    const urls = new Set<string>();
+    const captions = new Set<string>();
+
+    if (mcq.questionUrl) {
+      const norm = normalizeImageUrl(mcq.questionUrl);
+      if (norm) urls.add(norm);
+    }
+
+    if (Array.isArray(mcq.attachments)) {
+      for (const a of mcq.attachments) {
+        if (isImageAttachment(a)) {
+          const norm = normalizeImageUrl(a.url);
+          if (norm) urls.add(norm);
+          const cap = (a.caption || a.content || "").trim().replace(/\s+/g, " ");
+          if (isMeaningfulCaption(cap)) captions.add(cap);
+        }
+      }
+    }
+    return { urls, captions };
+  };
+
+  const img1 = getImages(mcq1);
+  const img2 = getImages(mcq2);
+
+  // Check image URL match (any overlap in normalized URLs)
+  for (const u of img1.urls) {
+    if (img2.urls.has(u)) return true;
+  }
+
+  // Check image caption match (any overlap in meaningful captions)
+  for (const c of img1.captions) {
+    if (img2.captions.has(c)) return true;
+  }
+
+  // 3. Extract table signatures from both MCQs
+  const getTables = (mcq: any) => {
+    const tables: string[] = [];
+    if (Array.isArray(mcq.attachments)) {
+      for (const a of mcq.attachments) {
+        if (isTableAttachment(a)) {
+          const tData = a.table ? normalizeTableData(a.table) : null;
+          if (tData && (tData.headers.length > 0 || tData.rows.length > 0)) {
+            const norm = (s: any) => String(s ?? "").trim().replace(/\s+/g, " ");
+            const hStr = tData.headers.map(norm).join("|");
+            const rStr = tData.rows.map((row: string[]) => row.map(norm).join(",")).join(";");
+            tables.push(`tbl:h[${hStr}]r[${rStr}]`);
+          } else if (a.content?.trim()) {
+            tables.push(`tbl_content:${a.content.trim().replace(/\s+/g, " ")}`);
+          }
+        }
+      }
+    }
+    return tables;
+  };
+
+  const tbl1 = getTables(mcq1);
+  const tbl2 = getTables(mcq2);
+  for (const t of tbl1) {
+    if (tbl2.includes(t)) return true;
+  }
+
+  // 4. Extract text attachments from both MCQs
+  const getTexts = (mcq: any) => {
+    const texts: string[] = [];
+    if (Array.isArray(mcq.attachments)) {
+      for (const a of mcq.attachments) {
+        if (isTextAttachment(a)) {
+          const text = (a.content || a.caption || "").trim().replace(/\s+/g, " ");
+          if (text) texts.push(text);
+        }
+      }
+    }
+    return texts;
+  };
+
+  const txt1 = getTexts(mcq1);
+  const txt2 = getTexts(mcq2);
+  for (const t of txt1) {
+    if (txt2.includes(t)) return true;
+  }
+
+  // 5. If direct contexts match and are non-empty
+  if (hasMatchingCtx && ctx1.length > 0) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -486,42 +669,39 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             let contextInstruction = "";
 
             const currMcq = q.mcq as any;
-            const isCombined = (currMcq?.type || "").toUpperCase() === "COMBINED";
-            const currStimulusKey = isCombined ? getMcqStimulusKey(currMcq) : null;
+            const hasStimulus = hasMcqStimulus(currMcq);
 
-            if (isCombined && idx > 0) {
+            if (hasStimulus && idx > 0) {
               const prevMcq = questions[idx - 1]?.mcq as any;
-              const isPrevCombined = (prevMcq?.type || "").toUpperCase() === "COMBINED";
-              if (isPrevCombined) {
-                const prevStimulusKey = getMcqStimulusKey(prevMcq);
-                if (currStimulusKey && prevStimulusKey === currStimulusKey) {
-                  hideContext = true;
-                }
+              if (prevMcq && areMcqStimuliMatching(currMcq, prevMcq)) {
+                hideContext = true;
               }
             }
 
-            if (isCombined && !hideContext && currStimulusKey) {
+            if (hasStimulus && !hideContext) {
               let sharedCount = 1;
               for (let j = idx + 1; j < questions.length; j++) {
                 const nextMcq = questions[j]?.mcq as any;
-                if ((nextMcq?.type || "").toUpperCase() !== "COMBINED") break;
-                const nextStimulusKey = getMcqStimulusKey(nextMcq);
-                if (nextStimulusKey && nextStimulusKey === currStimulusKey) {
+                if (!nextMcq) break;
+                if (areMcqStimuliMatching(currMcq, nextMcq)) {
                   sharedCount++;
                 } else {
                   break;
                 }
               }
 
-              const startNumBn = toBengaliDigits(idx + 1);
-              if (sharedCount === 1) {
-                contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} নং প্রশ্নের উত্তর দাও:`;
-              } else if (sharedCount === 2) {
-                const endNumBn = toBengaliDigits(idx + 2);
-                contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} ও ${endNumBn} নং প্রশ্নগুলোর উত্তর দাও:`;
-              } else {
-                const endNumBn = toBengaliDigits(idx + sharedCount);
-                contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} - ${endNumBn} নং প্রশ্নগুলোর উত্তর দাও:`;
+              const isCombined = (currMcq?.type || "").toUpperCase() === "COMBINED";
+              if (sharedCount > 1 || isCombined) {
+                const startNumBn = toBengaliDigits(idx + 1);
+                if (sharedCount === 1) {
+                  contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} নং প্রশ্নের উত্তর দাও:`;
+                } else if (sharedCount === 2) {
+                  const endNumBn = toBengaliDigits(idx + 2);
+                  contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} ও ${endNumBn} নং প্রশ্নগুলোর উত্তর দাও:`;
+                } else {
+                  const endNumBn = toBengaliDigits(idx + sharedCount);
+                  contextInstruction = `নিচের উদ্দীপকের আলোকে ${startNumBn} - ${endNumBn} নং প্রশ্নগুলোর উত্তর দাও:`;
+                }
               }
             }
 

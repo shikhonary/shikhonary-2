@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { useBuilderStore } from "../../../store/use-builder-store";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, ArrowLeftRight } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
 import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
 
@@ -100,12 +101,29 @@ const EditableItem = ({
 };
 
 export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }: { item: any, hideContext?: boolean, contextInstruction?: string }) => {
+  const router = useRouter();
   const data = item.data || {};
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
   const setMcqOptionLayout = useBuilderStore((state) => state.setMcqOptionLayout);
   
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
+
+  const handleExchange = () => {
+    if (!paperId) return;
+    const distId = item.distributionId || data.distributionId || "default";
+    const params = new URLSearchParams();
+    params.set("mode", "exchange");
+    params.set("questionPaperQuestionId", item.id);
+    if (data.id) params.set("currentQuestionId", data.id);
+    params.set("category", "MCQ");
+    const mNum = item.masterNumber || (item.orderIndex !== undefined ? item.orderIndex + 1 : 1);
+    if (mNum) params.set("masterNumber", String(mNum));
+    if (item.sectionId) params.set("sectionId", item.sectionId);
+    if (item.subSectionId) params.set("subSectionId", item.subSectionId);
+
+    router.push(`/question-papers/${paperId}/distributions/${distId}/pick?${params.toString()}`);
+  };
 
   const handleRemove = () => {
     if (!paperId) return;
@@ -141,6 +159,10 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
   const isCombined = (data.type || "").toUpperCase() === "COMBINED";
+  const hasStimulusBanner = isCombined || Boolean(contextInstruction);
+  const effectiveAttachments = (Array.isArray(data.attachments) && data.attachments.length > 0)
+    ? data.attachments
+    : (data.questionUrl ? [{ type: "image", url: data.questionUrl }] : []);
   const isAnswerMode = Boolean(settings.isAnswerMode);
   
   return (
@@ -170,6 +192,15 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
         >
           4
         </button>
+        <button
+          type="button"
+          onClick={handleExchange}
+          className="px-2 py-1 text-xs hover:bg-primary/10 border-l transition-colors text-primary flex items-center gap-1 cursor-pointer"
+          title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+        >
+          <ArrowLeftRight className="w-3 h-3" />
+          বিনিময়
+        </button>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
@@ -181,8 +212,8 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
         </button>
       </div>
 
-      {/* Top Banner & Stimulus: ONLY for COMBINED questions */}
-      {isCombined && !hideContext && (
+      {/* Top Banner & Stimulus: for COMBINED or questions with shared stimulus instruction */}
+      {hasStimulusBanner && !hideContext && (
         <div className="flex items-start gap-2 w-full pt-1.5 mb-0.5">
           <span
             className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
@@ -209,8 +240,8 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
                 />
               </div>
             )}
-            {/* Shared Attachments for COMBINED questions */}
-            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
+            {/* Shared Attachments for COMBINED / shared stimulus questions */}
+            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
           </div>
         </div>
       )}
@@ -245,9 +276,9 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
             />
           </div>
 
-          {/* Attachments for SINGLE and MULTIPLE questions rendered directly below question */}
-          {!isCombined && Array.isArray(data.attachments) && data.attachments.length > 0 && (
-            <QuestionAttachments attachments={data.attachments} isMath={data.isMath ?? true} />
+          {/* Attachments for standalone questions rendered directly below question (hidden if question has a top stimulus banner or is a child question) */}
+          {!hasStimulusBanner && !hideContext && effectiveAttachments.length > 0 && (
+            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
           )}
               
           {data.statements && data.statements.length > 0 && (

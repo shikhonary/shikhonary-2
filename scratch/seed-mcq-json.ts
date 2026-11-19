@@ -535,11 +535,14 @@ async function seedSingleFile(filePath: string, forceClean: boolean = false) {
         : q.attachmentType || (cleanedContext ? "PASSAGE" : "DIAGRAM");
 
       const rawCaption = q.attachmentDescription?.trim();
-      let caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক")
-        ? rawCaption
-        : (cleanedContext || hasTable ? null : "চিত্র সংযুক্ত করুন");
-      if (caption && /প্রশ্নের\s*উত্তর\s*দাও/i.test(caption)) {
-        caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim() || null;
+      let caption: string | null = null;
+      if (!hasTable && attachmentType !== "TABLE") {
+        caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক")
+          ? rawCaption
+          : (cleanedContext ? null : "চিত্র সংযুক্ত করুন");
+        if (caption && /প্রশ্নের\s*উত্তর\s*দাও/i.test(caption)) {
+          caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim() || null;
+        }
       }
       let content = cleanedContext || null;
       if (content && /^(?:নিচের|উপরের|প্রদত্ত)?\s*[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i.test(content)) {
