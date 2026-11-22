@@ -155,6 +155,8 @@ export interface PaperSettings {
 
   mcqOptionLayouts?: Record<string, number>;
   mcqOptionColumns?: 1 | 2 | 4;
+  mcqStatementLayouts?: Record<string, number>;
+  mcqStatementColumns?: 1 | 2 | 4;
   itemStyles?: Record<string, ElementStyle>;
   itemTexts?: Record<string, string>;
 

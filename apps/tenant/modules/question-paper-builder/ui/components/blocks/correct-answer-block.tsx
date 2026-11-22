@@ -106,6 +106,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
   const setMcqOptionLayout = useBuilderStore((state) => state.setMcqOptionLayout);
+  const setMcqStatementLayout = useBuilderStore((state) => state.setMcqStatementLayout);
   
   const { mutate: removeQuestion, isPending: isRemoving } = useRemoveQuestion();
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
@@ -146,6 +147,19 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
   const columns = settings.mcqOptionLayouts?.[item.id] || settings.mcqOptionColumns || 2;
   const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
 
+  const hasStatements = Boolean(data.statements && data.statements.length > 0);
+  const stmtColumns = settings.mcqStatementLayouts?.[item.id] || settings.mcqStatementColumns || 1;
+  const stmtCount = data.statements?.length || 0;
+  const stmtGridClass = stmtColumns === 1
+    ? "grid-cols-1"
+    : stmtColumns === 2
+    ? "grid-cols-2"
+    : stmtCount === 3
+    ? "grid-cols-3"
+    : stmtCount === 2
+    ? "grid-cols-2"
+    : "grid-cols-4";
+
   const getQuestionStyle = () => ({
     fontSize: settings.fontSize ? `${settings.fontSize}pt` : undefined,
     fontFamily: settings.fontFamily,
@@ -176,28 +190,70 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
          style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}>
          
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
-        <button 
-          onClick={() => setMcqOptionLayout(item.id, 1)}
-          className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${columns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-          title="1 Option per row"
-        >
-          1
-        </button>
-        <button 
-          onClick={() => setMcqOptionLayout(item.id, 2)}
-          className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-          title="2 Options per row"
-        >
-          2
-        </button>
-        <button 
-          onClick={() => setMcqOptionLayout(item.id, 4)}
-          className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-          title="4 Options per row"
-        >
-          4
-        </button>
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden items-center whitespace-nowrap">
+        {hasStatements && (
+          <div className="flex items-center border-r bg-muted/20">
+            <span className="px-1.5 py-1 text-[10px] text-muted-foreground font-semibold select-none" title="বিবৃতি/উক্তি লেআউট">
+              বিবৃতি:
+            </span>
+            <button 
+              type="button"
+              onClick={() => setMcqStatementLayout(item.id, 1)}
+              className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${stmtColumns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+              title="প্রতি লাইনে ১টি বক্তব্য (1 statement per row)"
+            >
+              1
+            </button>
+            <button 
+              type="button"
+              onClick={() => setMcqStatementLayout(item.id, 2)}
+              className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+              title="প্রতি লাইনে ২টি বক্তব্য (2 statements per row)"
+            >
+              2
+            </button>
+            <button 
+              type="button"
+              onClick={() => setMcqStatementLayout(item.id, 4)}
+              className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+              title="সবগুলো এক লাইনে / প্রতি লাইনে ৪টি বক্তব্য (All/4 statements per row)"
+            >
+              4
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center">
+          {hasStatements && (
+            <span className="px-1.5 py-1 text-[10px] text-muted-foreground font-semibold select-none border-r bg-muted/20" title="অপশন লেআউট">
+              অপশন:
+            </span>
+          )}
+          <button 
+            type="button"
+            onClick={() => setMcqOptionLayout(item.id, 1)}
+            className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${columns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+            title="প্রতি লাইনে ১টি অপশন (1 option per row)"
+          >
+            1
+          </button>
+          <button 
+            type="button"
+            onClick={() => setMcqOptionLayout(item.id, 2)}
+            className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+            title="প্রতি লাইনে ২টি অপশন (2 options per row)"
+          >
+            2
+          </button>
+          <button 
+            type="button"
+            onClick={() => setMcqOptionLayout(item.id, 4)}
+            className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
+            title="প্রতি লাইনে ৪টি অপশন (4 options per row)"
+          >
+            4
+          </button>
+        </div>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
@@ -321,9 +377,9 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
           )}
               
-          {data.statements && data.statements.length > 0 && (
+          {hasStatements && (
             <>
-              <div>
+              <div className={`grid gap-x-2 gap-y-0.5 ${stmtGridClass}`}>
                 {data.statements.map((stmt: string, i: number) => {
                   const stmtKey = `${item.id}-stmt-${i}`;
                   const stmtCustomStyle = settings.itemStyles?.[stmtKey];
@@ -333,7 +389,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                   const stmtFontFamily = stmtCustomStyle?.fontFamily || questionStyle.fontFamily;
 
                   return (
-                    <div key={i} className="flex gap-2 w-full">
+                    <div key={i} className="flex gap-2 w-full min-w-0 items-start">
                       <span 
                         className="opacity-70 shrink-0"
                         style={{
@@ -343,7 +399,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                       >
                         {["i", "ii", "iii", "iv"][i] || (i + 1)}.
                       </span>
-                      <span className="w-full">
+                      <span className="w-full min-w-0">
                         <EditableItem 
                           content={<RenderMath text={stmt} />}
                           itemKey={stmtKey}

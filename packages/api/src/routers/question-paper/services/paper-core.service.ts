@@ -1694,6 +1694,7 @@ function remapSettingsIds(
   const result = { ...rawSettings }
   if (result.blockBreaks) result.blockBreaks = remapRecordKeys(result.blockBreaks)
   if (result.mcqOptionLayouts) result.mcqOptionLayouts = remapRecordKeys(result.mcqOptionLayouts)
+  if (result.mcqStatementLayouts) result.mcqStatementLayouts = remapRecordKeys(result.mcqStatementLayouts)
   if (result.itemStyles) result.itemStyles = remapRecordKeys(result.itemStyles)
   if (result.itemTexts) result.itemTexts = remapRecordKeys(result.itemTexts)
   if (result.dismissedSectionIds) {

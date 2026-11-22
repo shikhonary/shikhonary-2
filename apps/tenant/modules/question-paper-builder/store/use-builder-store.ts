@@ -50,6 +50,7 @@ interface BuilderState {
   setSaveStatus: (status: "idle" | "saving" | "saved" | "error") => void;
   markSaved: () => void;
   setMcqOptionLayout: (id: string, columns: number) => void;
+  setMcqStatementLayout: (id: string, columns: number) => void;
   setItemStyle: (key: string, style: Partial<ElementStyle>) => void;
   setItemText: (key: string, text: string) => void;
   setOMRSetting: (key: keyof PaperSettings["omrSettings"], value: any) => void;
@@ -98,6 +99,8 @@ const defaultSettings: PaperSettings = {
     columns: 3,
     includeRollNumber: true,
   },
+
+  mcqStatementColumns: 1,
 
   institutionName: "শিখনারী একাডেমি",
   className: "দশম শ্রেণি",
@@ -277,6 +280,17 @@ export const useBuilderStore = create<BuilderState>((set) => ({
       ...state.settings,
       mcqOptionLayouts: {
         ...(state.settings.mcqOptionLayouts || {}),
+        [id]: columns
+      }
+    },
+    hasUnsavedChanges: true,
+  })),
+
+  setMcqStatementLayout: (id, columns) => set((state) => ({
+    settings: {
+      ...state.settings,
+      mcqStatementLayouts: {
+        ...(state.settings.mcqStatementLayouts || {}),
         [id]: columns
       }
     },

@@ -2467,7 +2467,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       }
     });
     setMeasuredHeights(newHeights);
-  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.itemStyles, settings.columns, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
+  }, [blocks, settings.fontSize, settings.fontFamily, settings.margins, canvasMinHeight, settings.mcqOptionLayouts, settings.mcqOptionColumns, settings.mcqStatementLayouts, settings.mcqStatementColumns, settings.itemStyles, settings.columns, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
 
   const pages = useMemo(() => {
     if (!blocks || blocks.length === 0) return [];
