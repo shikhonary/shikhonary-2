@@ -6,17 +6,19 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface SummaryPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const SummaryPickerCard: React.FC<SummaryPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

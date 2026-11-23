@@ -6,17 +6,19 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface ParagraphPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const ParagraphPickerCard: React.FC<ParagraphPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

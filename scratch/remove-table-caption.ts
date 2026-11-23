@@ -30,19 +30,38 @@ async function main() {
   };
 
   if (targetArg) {
-    whereClause.mcq = {
-      OR: [
-        { chapterId: targetArg },
-        { chapter: { nameBn: { contains: targetArg } } },
-        { chapter: { nameEn: { contains: targetArg } } },
-      ],
-    };
+    whereClause.OR = [
+      {
+        mcq: {
+          OR: [
+            { chapterId: targetArg },
+            { chapter: { nameBn: { contains: targetArg } } },
+            { chapter: { nameEn: { contains: targetArg } } },
+          ],
+        },
+      },
+      {
+        cq: {
+          OR: [
+            { chapterId: targetArg },
+            { chapter: { nameBn: { contains: targetArg } } },
+            { chapter: { nameEn: { contains: targetArg } } },
+          ],
+        },
+      },
+    ];
   }
 
   const attachments = await prisma.questionAttachment.findMany({
     where: whereClause,
     include: {
       mcq: {
+        include: {
+          chapter: true,
+          subject: true,
+        },
+      },
+      cq: {
         include: {
           chapter: true,
           subject: true,
@@ -62,8 +81,8 @@ async function main() {
   // Group by chapter
   const byChapter: Record<string, { chapterName: string; total: number; withCaption: number; sampleCaptions: string[] }> = {};
   for (const att of attachments) {
-    const chId = att.mcq?.chapterId || "unknown";
-    const chName = att.mcq?.chapter?.nameBn || "Unknown Chapter";
+    const chId = att.mcq?.chapterId || att.cq?.chapterId || "unknown";
+    const chName = att.mcq?.chapter?.nameBn || att.cq?.chapter?.nameBn || "Unknown Chapter";
     if (!byChapter[chId]) {
       byChapter[chId] = { chapterName: chName, total: 0, withCaption: 0, sampleCaptions: [] };
     }

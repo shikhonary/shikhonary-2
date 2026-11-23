@@ -55,14 +55,14 @@ export const QuestionPaperPagination: React.FC<QuestionPaperPaginationProps> = (
       {/* Left Item Counter & Items Per Page Dropdown */}
       <div className="flex items-center gap-3.5 flex-wrap justify-center sm:justify-start">
         <div className="text-xs text-slate-500 dark:text-muted-foreground font-body">
-          মোট <span className="font-bold text-foreground font-solaiman">{toBengaliDigits(totalItems)}</span>টি প্রশ্নপত্রের মধ্যে{" "}
+          মোট <span className="font-bold text-foreground font-solaiman">{toBengaliDigits(totalItems)}</span>টির মধ্যে{" "}
           <span className="font-bold text-foreground font-solaiman">{toBengaliDigits(startItem)}</span>–
-          <span className="font-bold text-foreground font-solaiman">{toBengaliDigits(endItem)}</span> প্রদর্শিত হচ্ছে
+          <span className="font-bold text-foreground font-solaiman">{toBengaliDigits(endItem)}</span>টি প্রশ্নপত্র দেখানো হচ্ছে
         </div>
 
         {onLimitChange && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-medium">প্রতি পাতায়:</span>
+            <span className="text-xs text-muted-foreground font-medium">প্রতি পৃষ্ঠায়:</span>
             <Select
               value={String(limit)}
               onValueChange={(val) => onLimitChange(Number(val) || 10)}

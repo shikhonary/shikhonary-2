@@ -220,11 +220,11 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
             </div>
             <div>
               <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
-                বিকল্প (অথবা) প্রশ্নের ধরন নির্বাচন
+                বিকল্প প্রশ্ন (অথবা) যোগ করুন
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
                 {masterNumber ? `${toBengaliDigits(masterNumber)} নং প্রশ্নের জন্য ` : ""}
-                বিকল্প হিসেবে কোন ধরনের প্রশ্ন নির্বাচন করতে চান তা নির্ধারণ করুন
+                বিকল্প হিসেবে কোন ধরনের প্রশ্ন যোগ করতে চান তা সিলেক্ট করুন
               </DialogDescription>
             </div>
           </div>
@@ -261,7 +261,7 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold font-headline text-foreground flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>বিকল্প প্রশ্নের ধরন (Question Type):</span>
+                <span>বিকল্প প্রশ্নের ধরন:</span>
               </label>
               {isSubjectLoading && (
                 <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-body">
@@ -333,7 +333,7 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
           {/* Connector Label */}
           <div className="p-3.5 rounded-xl border border-border/80 bg-muted/20 space-y-2 shadow-2xs">
             <label className="text-xs font-bold font-headline text-foreground block">
-              সংযোগকারী লেবেল (Connector Label):
+              বিকল্প নির্দেশক শব্দ (Connector Label):
             </label>
             <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
               <Input
@@ -378,7 +378,7 @@ export const AddAlternativeModal: React.FC<AddAlternativeModalProps> = ({
             onClick={handleProceedToPicker}
             className="w-full sm:w-auto h-9 px-4.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold font-headline text-xs cursor-pointer gap-2 shadow-xs transition-all active:scale-95 disabled:opacity-50"
           >
-            <span>গ্রিড ভিউতে প্রশ্ন নির্বাচন করুন</span>
+            <span>প্রশ্ন যোগ করতে যান</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Button>
         </DialogFooter>

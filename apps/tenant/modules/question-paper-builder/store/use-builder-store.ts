@@ -9,6 +9,7 @@ interface BuilderState {
   // UI State
   zoom: number | "auto";
   effectiveZoom: number;
+  pageCount: number;
   selectedItemId: string | null;
   calculatedBlocks: PaperBlock[];
   isExporting: boolean;
@@ -44,6 +45,7 @@ interface BuilderState {
   
   setZoom: (zoom: number | "auto") => void;
   setEffectiveZoom: (effectiveZoom: number) => void;
+  setPageCount: (count: number) => void;
   setSelectedItemId: (id: string | null) => void;
   setIsExporting: (isExporting: boolean) => void;
   setExportProgress: (progress: { current: number; total: number } | null) => void;
@@ -66,10 +68,11 @@ const defaultSettings: PaperSettings = {
   paperOrientation: "portrait",
   margins: { top: 20, bottom: 20, left: 20, right: 20 },
   columns: 1,
+  columnGap: 12,
   showColumnDivider: false,
   bookletMode: false,
   bookFoldLayout: false,
-  twoPagesPerSheet: false,
+  duplicateSinglePage: false,
   headerTemplate: "modern",
   optionStyle: "circle",
   isAnswerMode: false,
@@ -124,6 +127,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   
   zoom: "auto",
   effectiveZoom: 1,
+  pageCount: 1,
   selectedItemId: null,
   calculatedBlocks: [],
   isExporting: false,
@@ -227,10 +231,10 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   
   updateSettings: (updates) => set((state) => {
     const finalUpdates = { ...updates };
-    if (updates.twoPagesPerSheet) {
+    if (updates.duplicateSinglePage) {
       finalUpdates.bookFoldLayout = false;
     } else if (updates.bookFoldLayout) {
-      finalUpdates.twoPagesPerSheet = false;
+      finalUpdates.duplicateSinglePage = false;
     }
     return {
       settings: { ...state.settings, ...finalUpdates },
@@ -240,10 +244,10 @@ export const useBuilderStore = create<BuilderState>((set) => ({
 
   applyRemoteSettings: (updates) => set((state) => {
     const finalUpdates = { ...updates };
-    if (updates.twoPagesPerSheet) {
+    if (updates.duplicateSinglePage) {
       finalUpdates.bookFoldLayout = false;
     } else if (updates.bookFoldLayout) {
-      finalUpdates.twoPagesPerSheet = false;
+      finalUpdates.duplicateSinglePage = false;
     }
     return {
       settings: { ...state.settings, ...finalUpdates },
@@ -269,6 +273,7 @@ export const useBuilderStore = create<BuilderState>((set) => ({
 
   setZoom: (zoom) => set({ zoom }),
   setEffectiveZoom: (effectiveZoom) => set({ effectiveZoom }),
+  setPageCount: (pageCount) => set({ pageCount }),
   setSelectedItemId: (id) => set({ selectedItemId: id }),
   setIsExporting: (isExporting) => set({ isExporting }),
   setExportProgress: (exportProgress) => set({ exportProgress }),

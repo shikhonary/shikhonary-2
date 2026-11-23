@@ -105,10 +105,12 @@ export interface PaperSettings {
   paperOrientation: "portrait" | "landscape";
   margins: MarginSettings;
   columns: 1 | 2 | 3;
+  columnGap?: number;
   showColumnDivider: boolean;
   bookletMode: boolean;
   bookFoldLayout: boolean;
-  twoPagesPerSheet: boolean;
+  twoPagesPerSheet?: boolean;
+  duplicateSinglePage?: boolean;
 
   headerTemplate: "classic" | "modern" | "minimal" | "left-aligned";
 

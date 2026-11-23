@@ -197,7 +197,7 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                     >
                       <Link href={`/question-papers/${item.id}/edit`}>
                         <Pen className="h-3.5 w-3.5" />
-                        <span>সম্পাদনা করুন</span>
+                        <span>এডিট করুন</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -227,7 +227,7 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                       className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                     >
                       <Trash className="h-3.5 w-3.5" />
-                      <span>মুছে ফেলুন</span>
+                      <span>ডিলিট করুন</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

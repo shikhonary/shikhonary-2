@@ -92,7 +92,7 @@ export const TypographyCard: React.FC = () => {
           onValueChange={(v) => updateSettings({ fontFamily: v })}
         >
           <SelectTrigger className="w-full text-xs sm:text-sm h-9 px-3.5 rounded-xl bg-card border-slate-200 font-body">
-            <SelectValue placeholder="ফন্ট নির্বাচন করুন" />
+            <SelectValue placeholder="ফন্ট সিলেক্ট করুন" />
           </SelectTrigger>
           <SelectContent className="font-body text-xs sm:text-sm rounded-xl">
             {FONT_FAMILIES.map((font) => (
@@ -110,7 +110,7 @@ export const TypographyCard: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <Label className="text-xs font-semibold text-muted-foreground font-headline">
-            ফন্টের আকার (Font Size)
+            ফন্ট সাইজ (Font Size)
           </Label>
 
           {/* Stepper & Direct Number Input Control */}
@@ -161,7 +161,7 @@ export const TypographyCard: React.FC = () => {
         <div className="grid grid-cols-4 gap-1.5">
           {[
             { label: "ছোট (১২)", size: 12 },
-            { label: "আদর্শ (১৩)", size: 13 },
+            { label: "স্ট্যান্ডার্ড (১৩)", size: 13 },
             { label: "মাঝারি (১৪)", size: 14 },
             { label: "বড় (১৬)", size: 16 },
           ].map((preset) => {

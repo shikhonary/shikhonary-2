@@ -1,12 +1,21 @@
 import React, { useEffect, useLayoutEffect, useState, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { BlockRenderer } from "./block-renderer";
 import { OMRBlock } from "../blocks/omr-block";
-import { useQuestionPaperById, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
-import { LayoutList, FileText, ZoomIn, Eye, Sparkles } from "lucide-react";
+import { 
+  useQuestionPaperById, 
+  useQuestionPaperDistributionStatuses,
+  useRemoveQuestion 
+} from "@/modules/question-paper/services/use-question-paper";
+import { LayoutList, FileText, ZoomIn, Eye, Sparkles, ArrowLeftRight, Trash2, Scissors } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { normalizeTableData } from "@workspace/ui/components/question-attachments";
 import { toBengaliDigits, resolvePaperSlots, type ResolvedSlot } from "@workspace/utils";
+import { 
+  getQuestionCategoryFromBlockType, 
+  getQuestionTypeBengaliName 
+} from "./block-action-utils";
 
 const PAPER_DIMENSIONS = {
   A4: { w: 210, h: 297 },
@@ -315,6 +324,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
   const [mobileViewMode, setMobileViewMode] = useState<"flow" | "sheet">("flow");
   const [is100PercentZoom, setIs100PercentZoom] = useState(false);
   const [pinchZoom, setPinchZoom] = useState<number | null>(null);
+  const setMcqOptionLayout = useBuilderStore((state) => state.setMcqOptionLayout);
+  const setMcqStatementLayout = useBuilderStore((state) => state.setMcqStatementLayout);
+  const { mutate: removeQuestion } = useRemoveQuestion();
+  const router = useRouter();
 
   const initialPinchDistRef = useRef<number | null>(null);
   const initialPinchZoomRef = useRef<number>(1);
@@ -723,7 +736,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                 hideContext,
                 contextInstruction
               },
-              gap: 0
+              gap: mcqIdx === totalMcqs - 1 ? 4 : 0
             });
             mcqIdx++;
           }
@@ -2496,26 +2509,21 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
     const contentBlocks = blocks.filter(b => b.type !== "header-full");
 
-    // Block types that can be taller than a full column and must not be
-    // placed mid-column — they should always start at the top of a fresh column.
-    const OVERSIZED_BLOCK_TYPES = new Set([
-      "question-seen-comprehension",
-      "question-cq",
-      "question-cs",
-    ]);
-
     contentBlocks.forEach((b, idx) => {
       const isHidden = isBlockCompletelyHidden(b, settings);
       const h = isHidden ? 0 : (measuredHeights[b.id] || (b.type.startsWith("question-") ? 80 : 40));
+      const manualBreak = settings.blockBreaks?.[b.id] || settings.blockBreaks?.[(b.data as any)?.item?.id];
 
-      // ── Oversized block guard ────────────────────────────────────────────────
-      // If a block is both a known multi-part type AND taller than 75% of the
-      // available column height, eject to the next fresh column *before* placing
-      // it. This prevents a CQ/CS/SeenComprehension passage from starting
-      // mid-column and silently overflowing the page boundary.
-      const isOversized =
-        OVERSIZED_BLOCK_TYPES.has(b.type) && h > effectivePageHeight * 0.75;
-      if (isOversized && currentColumnHeight > 0) {
+      // ── Manual Break (Page or Column) ────────────────────────────────────────
+      if (manualBreak === "page" && (currentColumnHeight > 0 || currentColumnIdx > 0 || result.length > 0)) {
+        if (currentPage.columns.some((col) => col.length > 0) || currentPage.fullHeader) {
+          result.push(currentPage);
+          currentPage = { columns: Array.from({ length: colCount }, () => []) };
+          currentColumnIdx = 0;
+          currentColumnHeight = 0;
+          availableHeight = effectivePageHeight - 10;
+        }
+      } else if (manualBreak === "column" && currentColumnHeight > 0) {
         currentColumnIdx++;
         currentColumnHeight = 0;
         if (currentColumnIdx >= colCount) {
@@ -2525,7 +2533,6 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           availableHeight = effectivePageHeight - 10;
         }
       }
-      // ── End oversized block guard ────────────────────────────────────────────
 
       // ── Orphan-heading guard ─────────────────────────────────────────────────
       // If a heading/title block is placed but its first question ends up on the
@@ -2606,8 +2613,73 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       result.push({ isOMRPage: true, columns: [] });
     }
 
+    // ── Handle Duplicate Single Page (1 Sheet -> 2 Copies) ──
+    if (
+      settings.duplicateSinglePage &&
+      settings.paperOrientation === "landscape" &&
+      settings.columns === 2 &&
+      result.length === 1 &&
+      !result[0]?.isOMRPage
+    ) {
+      const page0 = result[0];
+      if (!page0) return result;
+      const col0 = page0.columns[0] || [];
+      const col1 = page0.columns[1] || [];
+
+      // Case 1: Content fits in Column 1 only (col1 is empty)
+      if (col0.length > 0 && col1.length === 0) {
+        page0.columns[1] = col0.map((b) => ({
+          ...b,
+          id: `${b.id}-dup-col1`,
+        }));
+      }
+      // Case 2: Content filled BOTH Column 0 and Column 1 on Page 1
+      else if (col0.length > 0 && col1.length > 0) {
+        result.push({
+          fullHeader: page0.fullHeader,
+          columns: [
+            col0.map((b) => ({ ...b, id: `${b.id}-dup-p2c0` })),
+            col1.map((b) => ({ ...b, id: `${b.id}-dup-p2c1` })),
+          ],
+        });
+      }
+    }
+
     return result;
-  }, [blocks, measuredHeights, pageContentHeight, settings.columns, settings.showOMRSheet, settings.hiddenSectionTitleIds, settings.hiddenSectionInstructionIds]);
+  }, [
+    blocks,
+    measuredHeights,
+    pageContentHeight,
+    settings.columns,
+    settings.columnGap,
+    settings.paperOrientation,
+    settings.duplicateSinglePage,
+    settings.showOMRSheet,
+    settings.hiddenSectionTitleIds,
+    settings.hiddenSectionInstructionIds,
+    settings.blockBreaks,
+  ]);
+
+  React.useEffect(() => {
+    // Natural page count (before cloning Page 0 as Page 1)
+    const naturalCount = (settings.duplicateSinglePage && pages.length === 2) ? 1 : pages.length;
+    useBuilderStore.getState().setPageCount(naturalCount);
+  }, [pages.length, settings.duplicateSinglePage]);
+
+  const effectiveColumnGapMm = useMemo(() => {
+    if (settings.bookFoldLayout) {
+      // Locked for booklet spine/gutter
+      return 30;
+    }
+    if (settings.duplicateSinglePage) {
+      // Locked for half-sheet duplicate cut spacing (1in)
+      return 25.4;
+    }
+    if (typeof settings.columnGap === "number" && settings.columnGap > 0) {
+      return settings.columnGap;
+    }
+    return settings.columns === 2 ? 12 : 10;
+  }, [settings.bookFoldLayout, settings.duplicateSinglePage, settings.columnGap, settings.columns]);
 
   const renderPage = (page: typeof pages[0] & { isBlank?: boolean }, seqIndex: number) => {
     return (
@@ -2663,17 +2735,28 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               )}
               
               <div 
-                className="flex h-full"
-                style={{ gap: settings.columns === 2 ? "1in" : "40px" }}
+                className="flex h-full relative"
+                style={{ gap: `${effectiveColumnGapMm}mm` }}
               >
+                {settings.duplicateSinglePage && settings.showColumnDivider && page.columns.length > 1 && (
+                  <div 
+                    className="absolute left-1/2 -translate-x-1/2 -top-2.5 z-10 bg-white px-1 text-slate-400 select-none flex items-center justify-center pointer-events-none"
+                    style={{ color: "#94a3b8" }}
+                    title="কাটার স্থান"
+                  >
+                    <Scissors className="w-3.5 h-3.5 rotate-90" />
+                  </div>
+                )}
                 {page.columns.map((col, colIdx) => (
                   <div 
                     key={`col-${colIdx}`} 
                     className="flex-1 flex flex-col"
                     style={{ 
-                      borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? "1px solid #e2e8f0" : "none",
-                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? (settings.columns === 2 ? "0.5in" : "20px") : "0",
-                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? (settings.columns === 2 ? "-0.5in" : "-20px") : "0",
+                      borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1)
+                        ? (settings.duplicateSinglePage ? "1px dashed #94a3b8" : "1px solid #e2e8f0")
+                        : "none",
+                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `${effectiveColumnGapMm / 2}mm` : "0",
+                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `-${effectiveColumnGapMm / 2}mm` : "0",
                     }}
                   >
                     {col.map((b, bIdx) => {
@@ -2734,11 +2817,9 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         <div id="page-content-measurer" style={{ height: `${canvasMinHeight}mm` }} className="w-full"></div>
         {/* We need the column width for accurate text wrapping measurements */}
         <div style={{ 
-          width: settings.columns === 2 
-            ? 'calc((100% - 1in) / 2)' 
-            : settings.columns > 2 
-              ? `calc((100% - ${(settings.columns - 1) * 40}px) / ${settings.columns})` 
-              : '100%' 
+          width: settings.columns > 1 
+            ? `calc((100% - ${(settings.columns - 1) * effectiveColumnGapMm}mm) / ${settings.columns})` 
+            : '100%' 
         }}>
           {blocks.map((b, idx) => {
             const isHidden = isBlockCompletelyHidden(b, settings);
@@ -2778,6 +2859,28 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           .filter((b) => b.type !== "header-full" && b.type !== "header-column")
           .map((b, idx) => {
             const isHeading = b.type === "section-title" || b.type === "sub-section-title" || b.type === "subject-title";
+            const isQuestion = b.type.startsWith("question-");
+            const item = b.data?.item || b.data || {};
+            const data = item.data || {};
+            const category = getQuestionCategoryFromBlockType(b.type, data);
+            const mNum = item.masterNumber || (item.orderIndex !== undefined ? item.orderIndex + 1 : idx + 1);
+
+            const handleDirectExchange = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              if (!paperId) return;
+              const distId = item.distributionId || data.distributionId || "default";
+              const params = new URLSearchParams();
+              params.set("mode", "exchange");
+              params.set("questionPaperQuestionId", item.id || b.id);
+              if (data.id) params.set("currentQuestionId", data.id);
+              if (category) params.set("category", category);
+              if (mNum) params.set("masterNumber", String(mNum));
+              if (item.sectionId) params.set("sectionId", item.sectionId);
+              if (item.subSectionId) params.set("subSectionId", item.subSectionId);
+
+              router.push(`/question-papers/${paperId}/distributions/${distId}/pick?${params.toString()}`);
+            };
+
             return (
               <div
                 key={`flow-block-${b.id}-${idx}`}
@@ -2786,6 +2889,151 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   isHeading ? "" : "bg-card rounded-2xl border border-border/80 shadow-xs p-3.5 sm:p-5"
                 )}
               >
+                {!isHeading && isQuestion && (() => {
+                  const isMcq = b.type === "question-mcq" || b.type === "question-correct-answer";
+                  const optColumns = settings.mcqOptionLayouts?.[item.id || b.id] || settings.mcqOptionColumns || 2;
+                  const hasStatements = Boolean(data.statements && data.statements.length > 0);
+                  const stmtColumns = settings.mcqStatementLayouts?.[item.id || b.id] || settings.mcqStatementColumns || 1;
+
+                  const handleDirectRemove = (e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    if (!paperId) return;
+                    removeQuestion({
+                      questionPaperId: paperId,
+                      questionId: data.id || item.id || b.id,
+                      questionType: category as any,
+                    });
+                  };
+
+                  return (
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-border/60 select-none">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="h-6 px-2.5 rounded-full text-xs font-bold bg-primary/10 text-primary flex items-center shrink-0">
+                          {toBengaliDigits(mNum)} নং
+                        </span>
+                        <span className="text-xs font-semibold text-muted-foreground font-headline truncate">
+                          {getQuestionTypeBengaliName(category)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                        {/* MCQ Option & Statement Layout Toggles */}
+                        {isMcq && (
+                          <div className="flex items-center rounded-lg border border-border/80 overflow-hidden bg-background shadow-2xs text-xs">
+                            {hasStatements && (
+                              <div className="flex items-center border-r border-border/70 bg-muted/30">
+                                <span className="px-1.5 py-0.5 text-[10px] text-muted-foreground font-semibold">
+                                  বিবৃতি:
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setMcqStatementLayout(item.id || b.id, 1)}
+                                  className={`px-1.5 py-1 text-xs transition-colors cursor-pointer ${
+                                    stmtColumns === 1
+                                      ? "bg-primary/15 text-primary font-bold"
+                                      : "text-muted-foreground hover:bg-muted"
+                                  }`}
+                                  title="প্রতি লাইনে ১টি বিবৃতি"
+                                >
+                                  1
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setMcqStatementLayout(item.id || b.id, 2)}
+                                  className={`px-1.5 py-1 text-xs border-l transition-colors cursor-pointer ${
+                                    stmtColumns === 2
+                                      ? "bg-primary/15 text-primary font-bold"
+                                      : "text-muted-foreground hover:bg-muted"
+                                  }`}
+                                  title="প্রতি লাইনে ২টি বিবৃতি"
+                                >
+                                  2
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setMcqStatementLayout(item.id || b.id, 4)}
+                                  className={`px-1.5 py-1 text-xs border-l transition-colors cursor-pointer ${
+                                    stmtColumns === 4
+                                      ? "bg-primary/15 text-primary font-bold"
+                                      : "text-muted-foreground hover:bg-muted"
+                                  }`}
+                                  title="সব এক লাইনে"
+                                >
+                                  4
+                                </button>
+                              </div>
+                            )}
+
+                            <div className="flex items-center">
+                              {hasStatements && (
+                                <span className="px-1.5 py-0.5 text-[10px] text-muted-foreground font-semibold border-r bg-muted/30">
+                                  অপশন:
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setMcqOptionLayout(item.id || b.id, 1)}
+                                className={`px-2 py-1 text-xs transition-colors cursor-pointer ${
+                                  optColumns === 1
+                                    ? "bg-primary/15 text-primary font-bold"
+                                    : "text-muted-foreground hover:bg-muted"
+                                }`}
+                                title="প্রতি লাইনে ১টি অপশন"
+                              >
+                                1
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setMcqOptionLayout(item.id || b.id, 2)}
+                                className={`px-2 py-1 text-xs border-l transition-colors cursor-pointer ${
+                                  optColumns === 2
+                                    ? "bg-primary/15 text-primary font-bold"
+                                    : "text-muted-foreground hover:bg-muted"
+                                }`}
+                                title="প্রতি লাইনে ২টি অপশন"
+                              >
+                                2
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setMcqOptionLayout(item.id || b.id, 4)}
+                                className={`px-2 py-1 text-xs border-l transition-colors cursor-pointer ${
+                                  optColumns === 4
+                                    ? "bg-primary/15 text-primary font-bold"
+                                    : "text-muted-foreground hover:bg-muted"
+                                }`}
+                                title="প্রতি লাইনে ৪টি অপশন"
+                              >
+                                4
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Direct Exchange Button */}
+                        <button
+                          type="button"
+                          onClick={handleDirectExchange}
+                          className="h-7 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 font-headline font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
+                        >
+                          <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>পরিবর্তন</span>
+                        </button>
+
+                        {/* Direct Remove Button */}
+                        <button
+                          type="button"
+                          onClick={handleDirectRemove}
+                          className="h-7 w-7 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive flex items-center justify-center transition-all cursor-pointer border border-border/60 bg-card active:scale-95"
+                          title="প্রশ্নটি ডিলিট করুন"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
                 <BlockRenderer block={b} />
               </div>
             );
@@ -2812,9 +3060,10 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             className="shrink-0 flex flex-col items-center gap-3 w-max"
             data-page-index={pageIdx}
           >
-            {settings.twoPagesPerSheet ? (
-              <div className="text-xs font-semibold text-muted-foreground bg-card shadow-xs border border-border px-3 py-1 rounded-xl select-none">
-                শিট {Math.floor(pageIdx / 2) + 1} • পৃষ্ঠা {pageIdx + 1}
+            {settings.duplicateSinglePage ? (
+              <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-xs border border-indigo-200/60 dark:border-indigo-800/40 px-3.5 py-1 rounded-xl select-none flex items-center gap-1.5 font-headline">
+                <Scissors className="w-3.5 h-3.5" />
+                <span>{pages.length > 1 ? `কপি ${pageIdx + 1} (ডুপ্লিকেট)` : "১ পাতায় ২টি কপি (মাঝখানে কাটার দাগ)"}</span>
               </div>
             ) : settings.bookFoldLayout ? (
               <div className="text-xs font-semibold text-muted-foreground bg-card shadow-xs border border-border px-3 py-1 rounded-xl select-none">
@@ -2953,11 +3202,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
                   <div style={{ 
                     columnCount: settings.columns, 
-                    columnGap: settings.columns === 2 ? '1in' : '40px',
-                    columnRule: settings.showColumnDivider ? '1px solid #e2e8f0' : 'none'
+                    columnGap: `${effectiveColumnGapMm}mm`,
+                    columnRule: settings.showColumnDivider ? (settings.duplicateSinglePage ? '1px dashed #94a3b8' : '1px solid #e2e8f0') : 'none'
                   }}>
                     {blocks.filter(b => b.type !== "header-full").map((b, idx) => {
-                      const blockBreak = settings.blockBreaks?.[b.id] || "none";
+                      const blockBreak = settings.blockBreaks?.[b.id] || settings.blockBreaks?.[(b.data as any)?.item?.id] || "none";
                       const breakClass = blockBreak === "page" ? "break-before-page" : blockBreak === "column" ? "break-before-column" : "break-inside-avoid";
                       
                       return (

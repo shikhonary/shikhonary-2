@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, FileQuestion, SearchX, FilterX, BookmarkX, RotateCcw } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
@@ -62,15 +62,23 @@ const toBengaliDigits = (num?: number | string | null): string => {
     .join("");
 };
 
+const fromBengaliDigits = (str: string): string => {
+  const bengaliToEnglish: Record<string, string> = {
+    "০": "0", "১": "1", "২": "2", "৩": "3", "৪": "4",
+    "৫": "5", "৬": "6", "৭": "7", "৮": "8", "৯": "9",
+  };
+  return str.replace(/[০-৯]/g, (match) => bengaliToEnglish[match] || match);
+};
+
 function getPaginationPages(currentPage: number, totalPages: number): (number | "...")[] {
-  if (totalPages <= 7) {
+  if (totalPages <= 5) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
-  if (currentPage <= 4) {
-    return [1, 2, 3, 4, 5, "...", totalPages];
+  if (currentPage <= 3) {
+    return [1, 2, 3, 4, "...", totalPages];
   }
-  if (currentPage >= totalPages - 3) {
-    return [1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  if (currentPage >= totalPages - 2) {
+    return [1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
   }
   return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
 }
@@ -84,6 +92,7 @@ export interface QuestionGridProps {
   board: string;
   source?: string;
   sort?: "newest" | "oldest";
+  mcqType?: string;
   excludePaperId: string;
   distributionId?: string;
   selectedIds: string[];
@@ -99,6 +108,9 @@ export interface QuestionGridProps {
   bookmarkedIds?: string[];
   isExchangeMode?: boolean;
   currentQuestionId?: string;
+  onResetFilters?: () => void;
+  onClearSearch?: () => void;
+  onResetBookmarks?: () => void;
 }
 
 export const QuestionGrid: React.FC<QuestionGridProps> = ({
@@ -110,6 +122,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   board,
   source,
   sort,
+  mcqType,
   excludePaperId,
   distributionId,
   selectedIds,
@@ -125,6 +138,9 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   bookmarkedIds,
   isExchangeMode = false,
   currentQuestionId,
+  onResetFilters,
+  onClearSearch,
+  onResetBookmarks,
 }) => {
   const { data: result, isLoading } = useAvailableQuestions({
     subjectId,
@@ -135,6 +151,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     board: board !== "All" ? board : undefined,
     source: source && source !== "All" ? source : undefined,
     sort,
+    mcqType: mcqType && mcqType !== "All" ? mcqType : undefined,
     excludePaperId,
     distributionId,
     page,
@@ -156,85 +173,213 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   const displayStart = totalItems === 0 ? 0 : (currentPage - 1) * currentLimit + 1;
   const displayEnd = Math.min(totalItems, currentPage * currentLimit);
 
+  const gridTopRef = React.useRef<HTMLDivElement>(null);
+  const [jumpPage, setJumpPage] = React.useState<string>("");
+
+  const handlePageChange = (newPage: number) => {
+    onPageChange?.(newPage);
+    gridTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleJumpSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const cleanStr = fromBengaliDigits(jumpPage.trim());
+    const parsed = parseInt(cleanStr, 10);
+    if (!isNaN(parsed) && parsed >= 1 && parsed <= totalPages) {
+      handlePageChange(parsed);
+      setJumpPage("");
+    }
+  };
+
 
   if (isLoading) {
     return (
-      <div className="py-20 text-center">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+      <div className="py-24 text-center flex flex-col items-center justify-center gap-3">
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+        <p className="text-sm font-semibold text-muted-foreground font-body">প্রশ্নসমূহ লোড হচ্ছে...</p>
       </div>
     );
   }
 
   if (!questions || questions.length === 0) {
+    const hasSearch = Boolean(search && search.trim() !== "");
+    const hasFilters = (chapterId && chapterId !== "All") || (board && board !== "All") || (source && source !== "All");
+
+    if (onlyBookmarked) {
+      return (
+        <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 ring-8 ring-rose-500/5 border border-rose-500/20 shadow-2xs">
+              <BookmarkX className="w-7 h-7" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">কোনো বুকমার্ক পাওয়া যায়নি</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            এই বিষয়ের কোনো প্রশ্ন এখনো আপনার বুকমার্ক তালিকায় যুক্ত করা হয়নি।
+          </p>
+          {onResetBookmarks && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onResetBookmarks}
+              className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+            >
+              <span>সকল প্রশ্ন দেখুন</span>
+            </Button>
+          )}
+        </div>
+      );
+    }
+
+    if (hasSearch) {
+      return (
+        <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary ring-8 ring-primary/5 border border-primary/20 shadow-2xs">
+              <SearchX className="w-7 h-7" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            &quot;{search}&quot;-এর কোনো ফলাফল নেই
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            বানান যাচাই করুন অথবা ভিন্ন কোনো প্রাসঙ্গিক কী-ওয়ার্ড দিয়ে সার্চ করুন।
+          </p>
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onClearSearch && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClearSearch}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <span>সার্চ ক্লিয়ার করুন</span>
+              </Button>
+            )}
+            {hasFilters && onResetFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onResetFilters}
+                className="h-9 px-3.5 rounded-xl font-bold font-headline text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 cursor-pointer flex items-center gap-1.5 active:scale-95"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>সব ফিল্টার রিসেট</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (hasFilters) {
+      return (
+        <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 ring-8 ring-amber-500/5 border border-amber-500/20 shadow-2xs">
+              <FilterX className="w-7 h-7" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            সিলেক্টেড ফিল্টারে কোনো প্রশ্ন নেই
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            অন্য অধ্যায় বা বোর্ড সিলেক্ট করুন অথবা বর্তমান ফিল্টারগুলো রিসেট করুন।
+          </p>
+          {onResetFilters && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onResetFilters}
+              className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>ফিল্টার রিসেট করুন</span>
+            </Button>
+          )}
+        </div>
+      );
+    }
+
     return (
-      <div className="py-20 text-center text-muted-foreground bg-card border rounded-2xl p-8 font-body">
-        কোনো প্রশ্ন পাওয়া যায়নি। অন্য কোনো ফিল্টার বা অনুসন্ধান শব্দ ব্যবহার করুন।
+      <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+        <div className="relative mb-4 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-muted/70 flex items-center justify-center text-muted-foreground ring-8 ring-muted/30 border border-border/70 shadow-2xs">
+            <FileQuestion className="w-7 h-7" />
+          </div>
+        </div>
+        <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">প্রশ্ন তালিকা ফাঁকা</h3>
+        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto">
+          এই বিভাগ বা বিষয়ের জন্য প্রশ্ন ব্যাংকে এখনো কোনো প্রশ্ন প্রস্তুত নেই।
+        </p>
       </div>
     );
   }
 
   const effectiveCategory = (result?.category || category) as QuestionTypeCode;
 
-  const renderCard = (q: any) => {
+  const renderCard = (q: any, globalIndex?: number) => {
     const isSelected = selectedIds.includes(q.id);
 
     switch (effectiveCategory as string) {
       case "PARTS_OF_SPEECH":
-        return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PartsOfSpeechPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "RIGHT_FORM_OF_VERBS":
-        return <RightFormOfVerbPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <RightFormOfVerbPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "CHANGING_SENTENCES":
-        return <ChangingSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ChangingSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "FILL_IN_THE_BLANKS_WITH_CLUES":
-        return <FillInTheBlanksWithCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <FillInTheBlanksWithCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "FILL_IN_THE_BLANKS_WITHOUT_CLUES":
-        return <FillInTheBlanksWithoutCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <FillInTheBlanksWithoutCluesPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SUBSTITUTION_TABLE":
-        return <SubstitutionTablePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <SubstitutionTablePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "PUNCTUATION":
-        return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PunctuationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SHORT_COMPOSITION":
-        return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ShortCompositionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "DESCRIPTIVE_QUESTION":
-        return <DescriptiveQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <DescriptiveQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SHORT_QUESTION":
-        return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ShortQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SHUDDHO_ASHUDDHO":
-        return <ShuddhoAshuddhoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ShuddhoAshuddhoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "DAN_BAM_MILKORON":
-        return <DanBamMilkoronPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <DanBamMilkoronPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "REARRANGE":
-        return <RearrangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <RearrangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "POEM":
-        return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PoemPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "MAKE_SENTENCES":
-        return <MakeSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <MakeSentencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "MAKE_QUESTION":
-        return <MakeQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <MakeQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "NUMBER_IN_WORDS":
-        return <NumberInWordsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <NumberInWordsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "WORD_MEANING":
-        return <WordMeaningPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <WordMeaningPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "OPPOSITE_WORD":
-        return <OppositeWordPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <OppositeWordPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "GENDER_CHANGE":
-        return <GenderChangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <GenderChangePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "JUKTOBORNO":
-        return <JuktobornoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <JuktobornoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "EK_KOTHAY_PROKASH":
-        return <EkKothayProkashPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <EkKothayProkashPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SYNONYM":
-        return <SynonymPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <SynonymPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SADHU_TO_CHOLITO":
-        return <SadhuToCholitoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <SadhuToCholitoPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "POD_NIRNOY":
-        return <PodNirnoyPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PodNirnoyPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "VERB_TENSE":
-        return <VerbTensePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <VerbTensePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "CQ":
-        return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <CqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "PBQ":
-        return <PbqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PbqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SEEN_COMPREHENSION_1":
       case "SEEN_COMPREHENSION_2":
         return (
@@ -246,48 +391,51 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
             onToggle={onToggle}
             onToggleSubQuestion={onToggleSubQuestion}
             onSelectGroup={onSelectGroup}
-          />
+           index={globalIndex} />
         );
       case "CS":
-        return <CsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <CsPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SA":
-        return <SaPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <SaPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "PARAGRAPH":
-        return <ParagraphPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ParagraphPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "ESSENCE":
-        return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <EssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "FORM_FILLUP":
       case "FORM_FILLING":
-        return <FormFillupPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <FormFillupPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "PROSE_ESSENCE":
-        return <ProseEssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ProseEssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "POEM_ESSENCE":
-        return <PoemEssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <PoemEssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SUMMARY":
-        return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "AMPLIFICATION":
       case "THOUGHT_EXPANSION":
-        return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "APPLICATION":
-        return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <ApplicationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "MATH_QUESTION":
-        return <MathQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <MathQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "GRAMMAR_QUESTION":
-        return <GrammarQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <GrammarQuestionPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "NEWS_REPORT":
-        return <NewsReportPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <NewsReportPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "ESSAY":
-        return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <EssayPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "LETTER":
-        return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <LetterPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "MCQ":
       default:
-        return <McqPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle} />;
+        return <McqPickerCard key={q.id} question={q} index={globalIndex} isSelected={isSelected} onToggle={onToggle} />;
     }
   };
 
   return (
     <div className="space-y-6">
+      {/* Top anchor for smooth scrolling on page change */}
+      <div ref={gridTopRef} className="scroll-mt-6" />
+
       <PickerContext.Provider value={{ isExchangeMode, currentQuestionId }}>
         <div
           className={`grid gap-4 ${
@@ -296,42 +444,40 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
               : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           }`}
         >
-          {questions.map((q: any) => renderCard(q))}
+          {questions.map((q: any, idx: number) => {
+            const globalIndex = (page - 1) * limit + idx + 1;
+            return renderCard(q, globalIndex);
+          })}
         </div>
       </PickerContext.Provider>
 
       {totalItems > 0 && (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 bg-card border border-outline-variant/70 rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-xs font-display">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 bg-card/90 backdrop-blur-xs border border-border/70 rounded-2xl p-2.5 sm:px-4 sm:py-3 shadow-2xs font-display text-xs">
           {/* Summary & Limit Selector */}
-          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center md:justify-start w-full md:w-auto text-xs text-on-surface-variant">
-            <div className="flex items-center gap-1.5 bg-muted/40 px-3 py-1.5 rounded-xl border border-outline-variant/40">
-              <span className="text-muted-foreground">মোট</span>
-              <span className="font-bold text-primary">{toBengaliDigits(totalItems)}</span>
-              <span className="text-muted-foreground">টি প্রশ্নের মধ্যে</span>
-              <span className="font-bold text-foreground">
-                {toBengaliDigits(displayStart)}-{toBengaliDigits(displayEnd)}
-              </span>
-              <span className="text-muted-foreground">টি প্রদর্শিত</span>
-            </div>
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap justify-center sm:justify-start w-full sm:w-auto text-xs text-muted-foreground font-body">
+            <span>
+              প্রদর্শিত: <strong className="text-foreground font-headline font-bold">{toBengaliDigits(displayStart)}–{toBengaliDigits(displayEnd)}</strong>
+              <span className="mx-1.5 opacity-40">•</span>
+              মোট: <strong className="text-primary font-headline font-bold">{toBengaliDigits(totalItems)}</strong>টি প্রশ্ন
+            </span>
 
             {onLimitChange && (
-              <div className="flex items-center gap-1.5 bg-muted/40 px-2.5 py-1 rounded-xl border border-outline-variant/40">
-                <span className="text-muted-foreground">প্রতি পাতায়:</span>
+              <div className="flex items-center gap-1.5 pl-2 border-l border-border/60">
                 <Select
                   value={String(currentLimit)}
                   onValueChange={(val) => {
                     onLimitChange(Number(val) || 20);
-                    onPageChange?.(1);
+                    handlePageChange(1);
                   }}
                 >
-                  <SelectTrigger className="h-7 rounded-lg border-0 bg-transparent px-2 text-xs font-bold text-foreground w-auto gap-1 focus:ring-0 shadow-none hover:bg-muted/70 cursor-pointer">
+                  <SelectTrigger className="h-7 rounded-lg border border-border/60 bg-muted/40 px-2 text-[11px] font-bold text-foreground w-auto gap-1 focus:ring-1 focus:ring-primary shadow-none hover:bg-muted/70 cursor-pointer font-headline">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border border-outline-variant shadow-md rounded-xl min-w-[80px]">
-                    <SelectItem value="10">১০টি</SelectItem>
-                    <SelectItem value="20">২০টি</SelectItem>
-                    <SelectItem value="30">৩০টি</SelectItem>
-                    <SelectItem value="50">৫০টি</SelectItem>
+                  <SelectContent className="bg-popover border border-border shadow-md rounded-xl min-w-[80px] font-body text-xs">
+                    <SelectItem value="10">১০টি / পেজ</SelectItem>
+                    <SelectItem value="20">২০টি / পেজ</SelectItem>
+                    <SelectItem value="30">৩০টি / পেজ</SelectItem>
+                    <SelectItem value="50">৫০টি / পেজ</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -340,63 +486,151 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
 
           {/* Navigation Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage <= 1}
-                onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
-                className="h-8.5 px-2.5 sm:px-3 rounded-xl border-outline-variant/70 text-xs font-medium gap-1 hover:bg-muted/80 disabled:opacity-30 cursor-pointer shadow-none"
-                title="পূর্ববর্তী পাতা"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">পূর্ববর্তী</span>
-              </Button>
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center font-display">
+              {/* Mobile Compact Page Indicator (sm:hidden) */}
+              <div className="flex sm:hidden items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground disabled:opacity-30 active:scale-95 cursor-pointer"
+                  title="পূর্ববর্তী পেজ"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
 
-              <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-xl border border-outline-variant/40">
-                {getPaginationPages(currentPage, totalPages).map((p, idx) => {
-                  if (p === "...") {
-                    return (
-                      <span
-                        key={`dots-${idx}`}
-                        className="px-1.5 text-xs text-muted-foreground select-none font-bold tracking-widest"
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-                  const pageNum = p as number;
-                  const isCurrent = currentPage === pageNum;
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={isCurrent ? "default" : "ghost"}
-                      size="icon"
-                      onClick={() => onPageChange?.(pageNum)}
-                      className={cn(
-                        "h-7.5 w-7.5 sm:h-8 sm:w-8 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer",
-                        isCurrent
-                          ? "bg-primary text-white shadow-xs hover:bg-primary/95 scale-105"
-                          : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      {toBengaliDigits(pageNum)}
-                    </Button>
-                  );
-                })}
+                <span className="px-2.5 py-1 rounded-lg bg-muted/50 border border-border/50 text-xs font-bold text-foreground font-headline">
+                  {toBengaliDigits(currentPage)} / {toBengaliDigits(totalPages)}
+                </span>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground disabled:opacity-30 active:scale-95 cursor-pointer"
+                  title="পরবর্তী পেজ"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
               </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage >= totalPages}
-                onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
-                className="h-8.5 px-2.5 sm:px-3 rounded-xl border-outline-variant/70 text-xs font-medium gap-1 hover:bg-muted/80 disabled:opacity-30 cursor-pointer shadow-none"
-                title="পরবর্তী পাতা"
-              >
-                <span className="hidden sm:inline">পরবর্তী</span>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
+              {/* Desktop Full Navigation with Chevrons and Windowed Buttons (hidden sm:flex) */}
+              <div className="hidden sm:flex items-center gap-1">
+                {/* First Page (<<) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(1)}
+                  className="h-8 w-8 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 cursor-pointer transition-all active:scale-95"
+                  title="প্রথম পেজ (১)"
+                >
+                  <ChevronsLeft className="w-3.5 h-3.5" />
+                </Button>
+
+                {/* Previous Page (<) */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className="h-8 px-2 rounded-lg text-xs font-semibold gap-1 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 cursor-pointer font-headline transition-all active:scale-95"
+                  title="পূর্ববর্তী পেজ"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">পূর্ববর্তী</span>
+                </Button>
+
+                {/* Numbered Buttons */}
+                <div className="flex items-center gap-1 px-1">
+                  {getPaginationPages(currentPage, totalPages).map((p, idx) => {
+                    if (p === "...") {
+                      return (
+                        <span
+                          key={`dots-${idx}`}
+                          className="px-1 text-xs text-muted-foreground/60 select-none font-bold tracking-widest"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+                    const pageNum = p as number;
+                    const isCurrent = currentPage === pageNum;
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={isCurrent ? "default" : "ghost"}
+                        size="icon"
+                        onClick={() => handlePageChange(pageNum)}
+                        className={cn(
+                          "h-8 w-8 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer font-headline",
+                          isCurrent
+                            ? "bg-primary text-primary-foreground shadow-2xs hover:bg-primary/95 scale-105"
+                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {toBengaliDigits(pageNum)}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                {/* Next Page (>) */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  className="h-8 px-2 rounded-lg text-xs font-semibold gap-1 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 cursor-pointer font-headline transition-all active:scale-95"
+                  title="পরবর্তী পেজ"
+                >
+                  <span className="hidden md:inline">পরবর্তী</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Button>
+
+                {/* Last Page (>>) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(totalPages)}
+                  className="h-8 w-8 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30 cursor-pointer transition-all active:scale-95"
+                  title={`শেষ পেজ (${toBengaliDigits(totalPages)})`}
+                >
+                  <ChevronsRight className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+
+              {/* Jump to Page Input (When totalPages > 5 on tablet/desktop) */}
+              {totalPages > 5 && (
+                <form
+                  onSubmit={handleJumpSubmit}
+                  className="hidden sm:flex items-center gap-1.5 pl-2 border-l border-border/60 text-xs font-body text-muted-foreground shrink-0"
+                >
+                  <span className="hidden lg:inline text-[11px]">পেজে যান:</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={toBengaliDigits(currentPage)}
+                    value={jumpPage}
+                    onChange={(e) => setJumpPage(e.target.value)}
+                    className="w-10 h-7 rounded-lg border border-border/60 bg-muted/30 focus:bg-background text-center text-xs font-bold text-foreground font-headline focus:ring-1 focus:ring-primary focus:outline-hidden transition-all shadow-2xs"
+                    title={`১ থেকে ${toBengaliDigits(totalPages)} এর মধ্যে একটি পেজ নম্বর লিখুন`}
+                  />
+                  <span className="text-[11px] text-muted-foreground/80">/{toBengaliDigits(totalPages)}</span>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="sm"
+                    disabled={!jumpPage.trim()}
+                    className="h-7 px-2 rounded-lg text-[11px] font-bold text-primary hover:bg-primary/10 disabled:opacity-30 cursor-pointer font-headline transition-all active:scale-95"
+                  >
+                    যান
+                  </Button>
+                </form>
+              )}
             </div>
           )}
         </div>

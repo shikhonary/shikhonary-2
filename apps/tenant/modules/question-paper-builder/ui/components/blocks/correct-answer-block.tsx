@@ -190,7 +190,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
          style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}>
          
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden items-center whitespace-nowrap">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden items-center whitespace-nowrap">
         {hasStatements && (
           <div className="flex items-center border-r bg-muted/20">
             <span className="px-1.5 py-1 text-[10px] text-muted-foreground font-semibold select-none" title="বিবৃতি/উক্তি লেআউট">
@@ -200,7 +200,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 1)}
               className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${stmtColumns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="প্রতি লাইনে ১টি বক্তব্য (1 statement per row)"
+              title="প্রতি লাইনে ১টি বিবৃতি"
             >
               1
             </button>
@@ -208,7 +208,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 2)}
               className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="প্রতি লাইনে ২টি বক্তব্য (2 statements per row)"
+              title="প্রতি লাইনে ২টি বিবৃতি"
             >
               2
             </button>
@@ -216,7 +216,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 4)}
               className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="সবগুলো এক লাইনে / প্রতি লাইনে ৪টি বক্তব্য (All/4 statements per row)"
+              title="সবগুলো এক লাইনে / প্রতি লাইনে ৪টি বিবৃতি"
             >
               4
             </button>
@@ -233,7 +233,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 1)}
             className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${columns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ১টি অপশন (1 option per row)"
+            title="প্রতি লাইনে ১টি অপশন"
           >
             1
           </button>
@@ -241,7 +241,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 2)}
             className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ২টি অপশন (2 options per row)"
+            title="প্রতি লাইনে ২টি অপশন"
           >
             2
           </button>
@@ -249,7 +249,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 4)}
             className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ৪টি অপশন (4 options per row)"
+            title="প্রতি লাইনে ৪টি অপশন"
           >
             4
           </button>
@@ -258,10 +258,10 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
           onClick={handleRemove}
           disabled={isRemoving}
           className={`px-2 py-1 text-xs hover:bg-destructive/10 border-l transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
+          title="প্রশ্নটি ডিলিট করুন"
         >
           {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
+          ডিলিট
         </button>
       </div>
 
@@ -410,7 +410,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                   );
                 })}
               </div>
-              <div className="font-medium">নিচের কোনটি সঠিক?</div>
+              <div className="font-bold">নিচের কোনটি সঠিক?</div>
             </>
           )}
           

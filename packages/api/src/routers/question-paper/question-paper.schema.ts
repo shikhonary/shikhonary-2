@@ -360,6 +360,7 @@ export const getAvailableQuestionsSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20).optional(),
   cursor: z.string().optional(),
   sort: z.enum(["newest", "oldest"]).optional(),
+  mcqType: z.string().optional(),
 })
 
 export type GetAvailableQuestionsInput = z.infer<typeof getAvailableQuestionsSchema>
@@ -505,10 +506,12 @@ export const patchQuestionPaperSettingsSchema = z.object({
         })
         .optional(),
       columns: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+      columnGap: z.number().optional(),
       showColumnDivider: z.boolean().optional(),
       bookletMode: z.boolean().optional(),
       bookFoldLayout: z.boolean().optional(),
       twoPagesPerSheet: z.boolean().optional(),
+      duplicateSinglePage: z.boolean().optional(),
       headerTemplate: z.enum(["classic", "modern", "minimal", "left-aligned"]).optional(),
       optionStyle: z.enum(["parentheses", "dot", "circle", "round"]).optional(),
       isAnswerMode: z.boolean().optional(),

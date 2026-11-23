@@ -2,26 +2,19 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface ShortQuestionPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
-const toBengaliDigits = (num?: number | string | null): string => {
-  if (num === null || num === undefined || num === "") return "";
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((char) => (/\d/.test(char) ? bengaliDigits[parseInt(char)] : char))
-    .join("");
-};
-
 export const ShortQuestionPickerCard: React.FC<ShortQuestionPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -34,45 +27,34 @@ export const ShortQuestionPickerCard: React.FC<ShortQuestionPickerCardProps> = (
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={chapterName}
+      typeLabel={q.questionType?.nameBn || "সংক্ষিপ্ত প্রশ্ন"}
       difficulty={q.difficulty}
+      marks={q.marks || 2}
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
     >
       <div className="flex flex-col gap-2 font-body">
         {/* Question Text */}
-        <div className="text-sm font-semibold text-on-surface leading-relaxed py-0.5">
+        <div className="text-xs sm:text-sm font-semibold text-foreground leading-relaxed py-0.5">
           <RenderMath text={q.question || q.name || q.title || ""} isMath={true} />
         </div>
 
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(q.source || q.session) && (
-              <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
-              </span>
-            )}
-            {Array.isArray(q.reference) && q.reference.length > 0 ? (
-              q.reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {ref}
-                </span>
-              ))
-            ) : (
-              !(q.source || q.session) && (
-                <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
-                </span>
-              )
-            )}
+        {/* Attachments */}
+        <QuestionAttachments attachments={q.attachments} compact />
+
+        {/* Answer key preview if available */}
+        {q.answer && (
+          <div className="text-xs text-muted-foreground mt-0.5 bg-muted/20 p-2 rounded-xl border border-border/40">
+            <span className="font-semibold text-primary block mb-0.5 text-[11px] font-headline">উত্তর:</span>
+            <RenderMath text={q.answer} />
           </div>
-        </div>
+        )}
       </div>
     </PickerCardWrapper>
   );

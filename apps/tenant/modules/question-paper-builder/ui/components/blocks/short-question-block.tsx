@@ -6,6 +6,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -175,6 +176,7 @@ export const ShortQuestionBlock = ({ item }: { item: any }) => {
     <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${item.isFirstShortQuestion ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
       {/* Hover Controls */}
       <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+        <BlockBreakButton id={item.id} className="border-r" />
         <button
           type="button"
           onClick={() => setShowAddAlternative(true)}
@@ -187,13 +189,15 @@ export const ShortQuestionBlock = ({ item }: { item: any }) => {
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
+          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+          title="প্রশ্নটি ডিলিট করুন"
         >
           {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
+          ডিলিট
         </button>
       </div>
+
+      <BlockBreakIndicator id={item.id} />
 
       {item.isFirstShortQuestion && (
         <div className="flex justify-between items-start w-full mb-1">

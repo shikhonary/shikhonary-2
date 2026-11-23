@@ -42,12 +42,12 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
             </div>
             <div>
               <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
-                {isGenerateSets ? "প্রশ্নপত্র প্রকাশ ও সেট তৈরি" : "প্রশ্নপত্র প্রকাশ ও ডাউনলোড"}
+                {isGenerateSets ? "পাবলিশ ও সেট তৈরি" : "পাবলিশ ও ডাউনলোড"}
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
                 {isGenerateSets
-                  ? "সেট তৈরি করার পূর্বে স্ট্যাটাস পরিবর্তনের সতর্কতা"
-                  : "ডাউনলোড করার পূর্বে স্ট্যাটাস পরিবর্তনের সতর্কতা"}
+                  ? "সেট তৈরি করার আগে প্রশ্নপত্রটি ফাইনাল ও পাবলিশ হবে"
+                  : "ডাউনলোড করার আগে প্রশ্নপত্রটি ফাইনাল ও পাবলিশ হবে"}
               </DialogDescription>
             </div>
           </div>
@@ -72,12 +72,12 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
             </div>
             <p className="text-xs leading-relaxed opacity-90">
               {isGenerateSets
-                ? "প্রশ্নপত্রের একাধিক সেট তৈরি করতে এর স্ট্যাটাস স্বয়ংক্রিয়ভাবে 'পাবলিশড (Published)' হিসেবে সংরক্ষিত হবে।"
-                : "প্রশ্নপত্রটি ডাউনলোড সম্পন্ন করলে এর স্ট্যাটাস স্বয়ংক্রিয়ভাবে 'পাবলিশড (Published)' হিসেবে সংরক্ষিত হবে।"}
+                ? "মাল্টিপল সেট তৈরি করার পর প্রশ্নপত্রটি স্বয়ংক্রিয়ভাবে ফাইনাল ও 'পাবলিশড (Published)' হিসেবে সেভ হবে।"
+                : "প্রশ্নপত্রটি ডাউনলোড করলে এটি স্বয়ংক্রিয়ভাবে ফাইনাল ও 'পাবলিশড (Published)' হিসেবে সেভ হবে।"}
             </p>
             <div className="flex items-start gap-1.5 pt-1 text-[11px] text-amber-700 dark:text-amber-300/90 font-medium">
               <Lock className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-              <span>প্রকাশিত হওয়ার পর প্রশ্নপত্রের প্রশ্ন বা নম্বরে আর কোনো পরিবর্তন করা যাবে না।</span>
+              <span>পাবলিশ হওয়ার পর প্রশ্নপত্রের প্রশ্ন বা নম্বরে আর কোনো পরিবর্তন করা যাবে না।</span>
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@ export const PublishBeforeDownloadModal: React.FC<PublishBeforeDownloadModalProp
               <Download className="w-3.5 h-3.5" />
             )}
             <span>
-              {isGenerateSets ? "প্রকাশ ও সেট তৈরি করুন" : "প্রকাশ ও ডাউনলোড করুন"}
+              {isGenerateSets ? "পাবলিশ ও সেট তৈরি করুন" : "পাবলিশ ও ডাউনলোড করুন"}
             </span>
           </Button>
         </DialogFooter>

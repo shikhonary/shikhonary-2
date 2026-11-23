@@ -465,7 +465,7 @@ export async function getAvailableQuestions(
   tenantDb: TenantPrismaClient,
   input: GetAvailableQuestionsInput
 ) {
-  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor, sort } = input
+  const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor, sort, mcqType } = input
 
   const sortOrder: "asc" | "desc" = sort === "oldest" ? "asc" : "desc"
 
@@ -585,6 +585,17 @@ export async function getAvailableQuestions(
   }
   if (source && source !== "all" && source !== "All") {
     whereCommon.source = source
+  }
+  if ((effectiveCategory === "MCQ" || !effectiveCategory || config.model === "mcq") && mcqType && mcqType !== "all" && mcqType !== "All") {
+    if (mcqType === "SINGLE") {
+      whereCommon.type = { in: ["SINGLE", "GENERAL"] }
+    } else if (mcqType === "MULTIPLE") {
+      whereCommon.type = { in: ["MULTIPLE", "MULTIPLE_COMPLETION"] }
+    } else if (mcqType === "COMBINED") {
+      whereCommon.type = { in: ["COMBINED", "CONTEXTUAL"] }
+    } else {
+      whereCommon.type = mcqType
+    }
   }
 
   const where: any = { ...whereCommon }

@@ -286,9 +286,8 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
       });
 
       // 5. Determine PDF dimensions and sheet settings
-      const isBookFold = settings.bookFoldLayout;
-      const isTwoPagesPerSheet = settings.twoPagesPerSheet;
-      const isSideBySide = isBookFold || isTwoPagesPerSheet;
+      const isBookFold = Boolean(settings.bookFoldLayout);
+      const isSideBySide = isBookFold;
       const dims = PAPER_DIMENSIONS[settings.paperSize] ?? PAPER_DIMENSIONS.A4!;
       const isLandscape = settings.paperOrientation === "landscape";
 
@@ -411,30 +410,6 @@ export function useDownloadPaper({ paperTitle }: UseDownloadPaperOptions = {}) {
           }
           if (backRightImg) {
             placePage(pdf, backRightImg, logicalWidth, 0, logicalWidth, logicalHeight);
-          }
-        }
-      } else if (isTwoPagesPerSheet) {
-        // Sequential 2 Pages per Sheet Layout: [1 | 2], [3 | 4], [5 | 6]...
-        const sheetCount = Math.ceil(pageImages.length / 2);
-        let addedFirst = false;
-
-        for (let i = 0; i < sheetCount; i++) {
-          const leftIdx = 2 * i;
-          const rightIdx = 2 * i + 1;
-          const leftImg = pageImages[leftIdx];
-          const rightImg = pageImages[rightIdx];
-
-          if (addedFirst) {
-            pdf.addPage([pdfWidth, pdfHeight], "landscape");
-          } else {
-            addedFirst = true;
-          }
-
-          if (leftImg) {
-            placePage(pdf, leftImg, 0, 0, logicalWidth, logicalHeight);
-          }
-          if (rightImg) {
-            placePage(pdf, rightImg, logicalWidth, 0, logicalWidth, logicalHeight);
           }
         }
       } else {

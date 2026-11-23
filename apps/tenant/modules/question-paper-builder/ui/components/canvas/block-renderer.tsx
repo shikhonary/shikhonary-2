@@ -176,10 +176,10 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
         <div className="flex items-center gap-2 text-xs text-muted-foreground font-body">
           <EyeOff className="w-3.5 h-3.5 text-amber-600 shrink-0" />
           <span className="font-bold text-foreground/85 font-headline">{rawTitle || "বিভাগ"}</span>
-          <span className="text-[11px] text-muted-foreground">(লুকানো বিভাগ)</span>
+          <span className="text-[11px] text-muted-foreground">(হাইড করা সেকশন)</span>
           {isActive && (
             <span className="ml-1 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5">
-              <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+              <Target className="w-2.5 h-2.5" /> সিলেক্টেড সেকশন
             </span>
           )}
         </div>
@@ -207,7 +207,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
             {formattedInst}
             {isActive && (
               <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden not-italic">
-                <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+                <Target className="w-2.5 h-2.5" /> সিলেক্টেড সেকশন
               </span>
             )}
           </div>
@@ -239,7 +239,7 @@ const SectionTitleBlock = ({ data }: { data: any }) => {
           {rawTitle}
           {isActive && (
             <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
-              <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+              <Target className="w-2.5 h-2.5" /> সিলেক্টেড সেকশন
             </span>
           )}
         </h3>
@@ -314,10 +314,10 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
     const current = new Set(settings.hiddenSectionTitleIds || []);
     if (current.has(subId)) {
       current.delete(subId);
-      toast.success("উপ-বিভাগ শিরোনাম দৃশ্যমান করা হয়েছে");
+      toast.success("সাব-সেকশন শিরোনাম দেখানো হচ্ছে");
     } else {
       current.add(subId);
-      toast.info("উপ-বিভাগ শিরোনাম লুকানো হয়েছে");
+      toast.info("সাব-সেকশন শিরোনাম হাইড করা হয়েছে");
     }
     updateSettings({ hiddenSectionTitleIds: Array.from(current) });
   };
@@ -328,10 +328,10 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
     const current = new Set(settings.hiddenSectionInstructionIds || []);
     if (current.has(subId)) {
       current.delete(subId);
-      toast.success("উপ-বিভাগ নির্দেশিকা দৃশ্যমান করা হয়েছে");
+      toast.success("সাব-সেকশন নির্দেশিকা দেখানো হচ্ছে");
     } else {
       current.add(subId);
-      toast.info("উপ-বিভাগ নির্দেশিকা লুকানো হয়েছে");
+      toast.info("সাব-সেকশন নির্দেশিকা হাইড করা হয়েছে");
     }
     updateSettings({ hiddenSectionInstructionIds: Array.from(current) });
   };
@@ -357,11 +357,11 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
       >
         <div className="flex items-center gap-2 text-xs text-muted-foreground font-body">
           <EyeOff className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-          <span className="font-semibold text-foreground/85 font-headline">{displayTitle || "উপ-বিভাগ"}</span>
-          <span className="text-[11px] text-muted-foreground">(লুকানো উপ-বিভাগ)</span>
+          <span className="font-semibold text-foreground/85 font-headline">{displayTitle || "সাব-সেকশন"}</span>
+          <span className="text-[11px] text-muted-foreground">(হাইড করা সাব-সেকশন)</span>
           {isActive && (
             <span className="ml-1 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5">
-              <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+              <Target className="w-2.5 h-2.5" /> সিলেক্টেড সাব-সেকশন
             </span>
           )}
         </div>
@@ -370,7 +370,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
             <button
               type="button"
               onClick={toggleSubTitle}
-              title="উপ-বিভাগ শিরোনাম দেখান"
+              title="সাব-সেকশন শিরোনাম দেখান"
               className="p-1 rounded text-amber-600 bg-amber-50 dark:bg-amber-950/60 font-bold hover:bg-amber-100 flex items-center gap-0.5 cursor-pointer text-xs"
             >
               <EyeOff className="h-3 w-3" />
@@ -381,7 +381,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
             <button
               type="button"
               onClick={toggleSubInstruction}
-              title="উপ-বিভাগ নির্দেশিকা দেখান"
+              title="সাব-সেকশন নির্দেশিকা দেখান"
               className="p-1 rounded text-amber-600 bg-amber-50 dark:bg-amber-950/60 font-bold hover:bg-amber-100 flex items-center gap-0.5 cursor-pointer text-xs"
             >
               <EyeOff className="h-3 w-3" />
@@ -396,7 +396,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                 if (subId && sectionId) {
                   try {
                     await deleteSubSection({ sectionId, id: subId });
-                    toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                    toast.success("সাব-সেকশন ডিলিট করা হয়েছে");
                     if (nextSubSectionId) {
                       setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
                     } else if (prevSubSectionId) {
@@ -405,12 +405,12 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                       setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
                     }
                   } catch (err: any) {
-                    toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+                    toast.error(err?.message || "ডিলিট করা যায়নি");
                   }
                 }
               }}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-              title="উপ-বিভাগ মুছুন"
+              title="সাব-সেকশন ডিলিট"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -442,14 +442,14 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
               {displayTitle}
               {isActive && (
                 <span className="ml-2 text-[9px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 print:hidden">
-                  <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য
+                  <Target className="w-2.5 h-2.5" /> সিলেক্টেড সাব-সেকশন
                 </span>
               )}
             </h4>
           ) : (
             <div className="flex-1 text-center print:hidden">
               <span className="text-[11px] text-muted-foreground italic">
-                {displayTitle} (লুকানো)
+                {displayTitle} (হাইড করা)
               </span>
             </div>
           )}
@@ -457,7 +457,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
             <button
               type="button"
               onClick={toggleSubTitle}
-              title={showSubTitle ? "উপ-বিভাগ শিরোনাম লুকান" : "উপ-বিভাগ শিরোনাম দেখান"}
+              title={showSubTitle ? "সাব-সেকশন শিরোনাম হাইড করুন" : "সাব-সেকশন শিরোনাম দেখান"}
               className={cn(
                 "p-1 rounded print:hidden transition-all flex items-center gap-0.5 cursor-pointer",
                 showSubTitle
@@ -471,7 +471,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
               <button
                 type="button"
                 onClick={toggleSubInstruction}
-                title={showSubInstruction ? "উপ-বিভাগ নির্দেশিকা লুকান" : "উপ-বিভাগ নির্দেশিকা দেখান"}
+                title={showSubInstruction ? "সাব-সেকশন নির্দেশিকা হাইড করুন" : "সাব-সেকশন নির্দেশিকা দেখান"}
                 className={cn(
                   "p-1 rounded print:hidden transition-all flex items-center gap-0.5 cursor-pointer",
                   showSubInstruction
@@ -490,7 +490,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                   if (subId && sectionId) {
                     try {
                       await deleteSubSection({ sectionId, id: subId });
-                      toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                      toast.success("সাব-সেকশন ডিলিট করা হয়েছে");
                       if (nextSubSectionId) {
                         setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
                       } else if (prevSubSectionId) {
@@ -499,12 +499,12 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                         setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
                       }
                     } catch (err: any) {
-                      toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+                      toast.error(err?.message || "ডিলিট করা যায়নি");
                     }
                   }
                 }}
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-                title="উপ-বিভাগ মুছুন"
+                title="সাব-সেকশন ডিলিট"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -515,7 +515,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
         <div className="flex items-center justify-between w-full print:hidden">
           <div className="w-6 print:hidden"></div>
           <span className="text-[10px] bg-primary text-white font-normal px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 mx-auto">
-            <Target className="w-2.5 h-2.5" /> নির্বাচনযোগ্য উপ-বিভাগ
+            <Target className="w-2.5 h-2.5" /> সিলেক্টেড সাব-সেকশন
           </span>
           {canDeleteSubSection ? (
             <button
@@ -525,7 +525,7 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                 if (subId && sectionId) {
                   try {
                     await deleteSubSection({ sectionId, id: subId });
-                    toast.success("উপ-বিভাগ মুছে ফেলা হয়েছে");
+                    toast.success("সাব-সেকশন ডিলিট করা হয়েছে");
                     if (nextSubSectionId) {
                       setActiveTarget({ sectionId: sectionId || null, subSectionId: nextSubSectionId });
                     } else if (prevSubSectionId) {
@@ -534,12 +534,12 @@ const SubSectionTitleBlock = ({ data }: { data: any }) => {
                       setActiveTarget({ sectionId: sectionId || null, subSectionId: null });
                     }
                   } catch (err: any) {
-                    toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+                    toast.error(err?.message || "ডিলিট করা যায়নি");
                   }
                 }
               }}
               className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded print:hidden"
-              title="উপ-বিভাগ মুছুন"
+              title="সাব-সেকশন ডিলিট"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -584,7 +584,7 @@ const EmptyBlock = () => {
   if (isExporting) return null;
   return (
     <div className="text-center py-20 text-muted-foreground print:hidden border-2 border-dashed rounded-lg">
-      কোনো বিষয় বা বণ্টন সাজানো হয়নি। অনুগ্রহ করে পাশের সেটিংস প্যানেল থেকে নম্বর বণ্টন প্রস্তুত করুন।
+      কোনো বিষয় বা নম্বর বণ্টন যুক্ত করা হয়নি। অনুগ্রহ করে পাশের সেটিংস থেকে নম্বর বণ্টন সেটআপ করুন।
     </div>
   );
 };

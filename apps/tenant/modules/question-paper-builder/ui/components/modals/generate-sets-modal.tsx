@@ -53,12 +53,12 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
         shuffleOptions,
       });
 
-      toast.success(`${toBengaliDigits(numSets)}টি সেট সফলভাবে তৈরি করা হয়েছে!`);
+      toast.success(`${toBengaliDigits(numSets)}টি সেট সফলভাবে তৈরি হয়েছে!`);
       useBuilderStore.getState().requestRehydrate();
       onOpenChange(false);
     } catch (error: any) {
       console.error(error);
-      toast.error(error?.message || "সেট তৈরি করতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।");
+      toast.error(error?.message || "সেট তৈরি করা যায়নি। আবার চেষ্টা করুন।");
     }
   };
 
@@ -73,10 +73,10 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
             </div>
             <div>
               <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
-                প্রশ্নপত্রের একাধিক সেট তৈরি
+                প্রশ্নপত্রের মাল্টিপল সেট তৈরি
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
-                মূল প্রশ্নপত্র থেকে প্রশ্ন ও বিকল্পগুলোর ক্রম পরিবর্তন করে নতুন সেট তৈরি করুন
+                মূল প্রশ্নপত্র থেকে প্রশ্ন ও অপশনগুলো শাফল (এলোমেলো) করে নতুন সেট তৈরি করুন
               </DialogDescription>
             </div>
           </div>
@@ -94,7 +94,7 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
                 </span>
               </div>
               <Badge variant="secondary" className="text-[11px] font-bold shrink-0 bg-background border border-border/80">
-                উৎস প্রশ্নপত্র
+                মূল প্রশ্নপত্র
               </Badge>
             </div>
           )}
@@ -109,7 +109,7 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
                 variant="outline"
                 className="text-[11px] font-bold border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 font-headline"
               >
-                {toBengaliDigits(numSets)}টি সেট নির্বাচিত
+                {toBengaliDigits(numSets)}টি সেট সিলেক্টেড
               </Badge>
             </div>
 
@@ -151,7 +151,7 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
           <div className="p-3 rounded-xl bg-muted/30 border border-border/60 space-y-2">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground font-headline uppercase tracking-wider">
               <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>তৈরি হতে যাওয়া সেটসমূহ:</span>
+              <span>তৈরি হতে যাওয়া সেট:</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {SET_CODES.slice(0, numSets).map((code) => (
@@ -170,7 +170,7 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
           <div className="space-y-2 pt-1">
             <label className="text-xs font-bold font-headline text-foreground flex items-center gap-1.5">
               <Shuffle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>শাফল (Shuffle) কনফিগারেশন:</span>
+              <span>শাফল (Shuffle) সেটিংস:</span>
             </label>
 
             <div className="space-y-2">
@@ -189,11 +189,11 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
                 <div className="space-y-0.5 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold font-headline text-foreground">
-                      প্রশ্নের ক্রম এলোমেলো করুন
+                      প্রশ্নের ক্রম শাফল করুন (Shuffle Questions)
                     </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground font-body">
-                    প্রতিটি সেটে প্রশ্নের সিরিয়াল নম্বর ও অবস্থান ভিন্ন হবে
+                    প্রতিটি সেটে প্রশ্নের সিরিয়াল ও অবস্থান এলোমেলো হবে
                   </p>
                 </div>
                 <Switch
@@ -217,11 +217,11 @@ export const GenerateSetsModal: React.FC<GenerateSetsModalProps> = ({
                 <div className="space-y-0.5 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold font-headline text-foreground">
-                      বিকল্পের ক্রম এলোমেলো করুন
+                      MCQ অপশনগুলো শাফল করুন (Shuffle Options)
                     </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground font-body">
-                    বহুনির্বাচনি প্রশ্নের অপশনগুলোর (ক, খ, গ, ঘ) ক্রম পরিবর্তন হবে
+                    বহুনির্বাচনি প্রশ্নের অপশনগুলোর (ক, খ, গ, ঘ) ক্রম এলোমেলো হবে
                   </p>
                 </div>
                 <Switch

@@ -7,6 +7,7 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface SadhuToCholitoPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
@@ -23,6 +24,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
 
 export const SadhuToCholitoPickerCard: React.FC<SadhuToCholitoPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -37,12 +39,17 @@ export const SadhuToCholitoPickerCard: React.FC<SadhuToCholitoPickerCardProps> =
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={q.difficulty}
-    >
+    
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
+      marks={q.marks}>
       <div className="flex flex-col gap-2 font-body">
         {/* Word Box */}
         <div className="text-sm text-on-surface leading-relaxed py-0.5">
@@ -54,35 +61,7 @@ export const SadhuToCholitoPickerCard: React.FC<SadhuToCholitoPickerCardProps> =
           >
             <RenderMath text={wordText} isMath={true} />
           </div>
-        </div>
-
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(q.source || q.session) && (
-              <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
-              </span>
-            )}
-            {Array.isArray(q.reference) && q.reference.length > 0 ? (
-              q.reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {ref}
-                </span>
-              ))
-            ) : (
-              !(q.source || q.session) && (
-                <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
-                </span>
-              )
-            )}
-          </div>
-        </div>
+        </div>
       </div>
     </PickerCardWrapper>
   );

@@ -20,10 +20,10 @@ export const OMRSettingsCard: React.FC = () => {
         </div>
         <div>
           <h3 className="font-headline font-bold text-xs sm:text-sm text-foreground">
-            OMR শিট সেটিং
+            OMR শিট সেটিংস
           </h3>
           <p className="text-[11px] text-muted-foreground font-body">
-            স্বয়ংক্রিয় OMR উত্তরপত্র সংযোজন
+            স্বয়ংক্রিয় OMR শিট যোগ করুন
           </p>
         </div>
       </div>
@@ -35,7 +35,7 @@ export const OMRSettingsCard: React.FC = () => {
             OMR শিট যুক্ত করুন
           </Label>
           <span className="text-[11px] text-muted-foreground font-body">
-            প্রশ্নপত্রের শেষে পৃথক OMR উত্তরপত্র পাতা তৈরি হবে
+            প্রশ্নপত্রের শেষে OMR শিট যোগ হবে
           </span>
         </div>
         <Switch 
@@ -51,7 +51,7 @@ export const OMRSettingsCard: React.FC = () => {
           {/* OMR Columns */}
           <div className="space-y-1.5">
             <Label className="text-xs font-semibold text-muted-foreground font-headline">
-              OMR কলাম সংখ্যা
+              OMR কলাম
             </Label>
             <div className="grid grid-cols-3 gap-2">
               {[2, 3, 4].map((cols) => {
@@ -96,7 +96,7 @@ export const OMRSettingsCard: React.FC = () => {
                 </Label>
               </div>
               <span className="text-[11px] text-muted-foreground font-body pl-5">
-                শিক্ষার্থীদের রোল ও রেজিঃ ভরাট করার বাবল গ্রিড
+                শিক্ষার্থীদের রোল ও রেজিঃ নম্বরের বাবল গ্রিড
               </span>
             </div>
             <Switch 

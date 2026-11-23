@@ -19,10 +19,10 @@ export const PageSetupCard: React.FC = () => {
         </div>
         <div>
           <h3 className="font-headline font-bold text-xs sm:text-sm text-foreground">
-            পৃষ্ঠার আকার ও মার্জিন
+            পেইজ সাইজ ও মার্জিন
           </h3>
           <p className="text-[11px] text-muted-foreground font-body">
-            কাগজের সাইজ, ওরিয়েন্টেশন ও মার্জিন
+            কাগজের মাপ, ওরিয়েন্টেশন ও মার্জিন
           </p>
         </div>
       </div>
@@ -37,7 +37,7 @@ export const PageSetupCard: React.FC = () => {
           onValueChange={(v: any) => updateSettings({ paperSize: v })}
         >
           <SelectTrigger className="w-full text-xs sm:text-sm h-9 px-3.5 rounded-xl bg-card border-slate-200 dark:border-white/10 font-body">
-            <SelectValue placeholder="সাইজ নির্বাচন করুন" />
+            <SelectValue placeholder="সাইজ সিলেক্ট করুন" />
           </SelectTrigger>
           <SelectContent className="font-body text-xs sm:text-sm rounded-xl">
             <SelectItem value="A4">A4 (210 × 297 mm)</SelectItem>
@@ -111,8 +111,8 @@ export const PageSetupCard: React.FC = () => {
           </Label>
           <div className="flex gap-1">
             {[
-              { label: "স্বাভাবিক (২০)", val: 20 },
-              { label: "সংকীর্ণ (১০)", val: 10 },
+              { label: "নরমাল (২০)", val: 20 },
+              { label: "ন্যারো (১০)", val: 10 },
               { label: "চওড়া (৩০)", val: 30 },
             ].map((preset) => {
               const isMatch = 

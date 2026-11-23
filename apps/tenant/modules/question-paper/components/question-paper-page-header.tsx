@@ -17,13 +17,13 @@ export function QuestionPaperPageHeader() {
             <h1 className="text-xl sm:text-2xl font-bold font-headline tracking-tight text-foreground leading-none">
               প্রশ্নপত্র ব্যবস্থাপনা
             </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0 font-headline">
               <Sparkles className="w-3 h-3 text-emerald-500" />
-              <span>এআই সম্বলিত বিল্ডার</span>
+              <span>স্মার্ট এআই বিল্ডার</span>
             </span>
           </div>
           <p className="mt-1.5 text-xs sm:text-[13px] text-muted-foreground font-body line-clamp-1 max-w-2xl">
-            প্রতিষ্ঠানের সকল পরীক্ষা ও বিষয়ের প্রশ্নপত্র প্রণয়ন, এআই অ্যাসিস্ট্যান্ট সম্পাদনা ও প্রিন্ট ব্যবস্থাপনা
+            প্রতিষ্ঠানের সকল বিষয়ের পরীক্ষার প্রশ্নপত্র তৈরি, এআই সহায়তায় সম্পাদনা ও প্রিন্ট ব্যবস্থাপনা
           </p>
         </div>
       </div>

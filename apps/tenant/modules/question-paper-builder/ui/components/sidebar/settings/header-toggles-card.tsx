@@ -30,10 +30,10 @@ export const HeaderTogglesCard: React.FC = () => {
         </div>
         <div>
           <h3 className="font-headline font-bold text-xs sm:text-sm text-foreground">
-            হেডার টেমপ্লেট ও তথ্য
+            হেডার সেটিংস ও তথ্য
           </h3>
           <p className="text-[11px] text-muted-foreground font-body">
-            প্রশ্নপত্রের শিরোনাম ও দৃশ্যমান তথ্যাদি
+            প্রশ্নপত্রের শিরোনাম ও দৃশ্যমান তথ্য
           </p>
         </div>
       </div>
@@ -48,13 +48,13 @@ export const HeaderTogglesCard: React.FC = () => {
           onValueChange={(v: any) => updateSettings({ headerTemplate: v })}
         >
           <SelectTrigger className="w-full text-xs sm:text-sm h-9 px-3.5 rounded-xl bg-card border-slate-200 dark:border-white/10 font-body">
-            <SelectValue placeholder="টেমপ্লেট নির্বাচন করুন" />
+            <SelectValue placeholder="টেমপ্লেট সিলেক্ট করুন" />
           </SelectTrigger>
           <SelectContent className="font-body text-xs sm:text-sm rounded-xl">
-            <SelectItem value="classic">ক্লাসিক (কেন্দ্রিক বিন্যাস)</SelectItem>
-            <SelectItem value="modern">মডার্ন (স্তরীভূত কার্ড)</SelectItem>
-            <SelectItem value="left-aligned">বাম-সারিবদ্ধ (অফিসিয়াল)</SelectItem>
-            <SelectItem value="minimal">সংক্ষিপ্ত (Minimal)</SelectItem>
+            <SelectItem value="classic">ক্লাসিক (সেন্টার)</SelectItem>
+            <SelectItem value="modern">মডার্ন (কার্ড স্টাইল)</SelectItem>
+            <SelectItem value="left-aligned">বাম পাশে (Left-aligned)</SelectItem>
+            <SelectItem value="minimal">মিনিমাল (সংক্ষিপ্ত)</SelectItem>
           </SelectContent>
         </Select>
       </div>

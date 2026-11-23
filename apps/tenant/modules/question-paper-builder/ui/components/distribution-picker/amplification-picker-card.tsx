@@ -6,17 +6,19 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface AmplificationPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const AmplificationPickerCard: React.FC<AmplificationPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

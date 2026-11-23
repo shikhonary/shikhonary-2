@@ -244,9 +244,9 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, mcqIds: [questionId] });
       }
 
-      toast.success("প্রশ্নটি প্রশ্নপত্রে যোগ করা হয়েছে!");
+      toast.success("প্রশ্নটি সফলভাবে যোগ করা হয়েছে");
     } catch (err: any) {
-      toast.error(err?.message || "প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "প্রশ্ন যোগ করা যায়নি");
     }
   };
 
@@ -263,9 +263,9 @@ export const QuestionPickerPanel: React.FC = () => {
         ...payloadBase,
         seenComprehensionItems: [{ id: questionId, selectedSubQuestionIds: groupSubIds }],
       });
-      toast.success("উপ-প্রশ্নসমূহ সফলভাবে যোগ করা হয়েছে!");
+      toast.success("উপ-প্রশ্নগুলো সফলভাবে যোগ করা হয়েছে");
     } catch (err: any) {
-      toast.error(err?.message || "উপ-প্রশ্ন যোগ করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "উপ-প্রশ্ন যোগ করা যায়নি");
     }
   };
 
@@ -274,7 +274,7 @@ export const QuestionPickerPanel: React.FC = () => {
   const handleRandomQuickAssign = async () => {
     const unassigned = questions.filter((q: any) => !q.isAssigned);
     if (unassigned.length === 0) {
-      toast.error("যুক্ত করার মতো কোনো নতুন প্রশ্ন পাওয়া যায়নি।");
+      toast.error("যোগ করার মতো কোনো নতুন প্রশ্ন পাওয়া যায়নি");
       return;
     }
     const randomIndex = Math.floor(Math.random() * unassigned.length);
@@ -287,14 +287,14 @@ export const QuestionPickerPanel: React.FC = () => {
       {/* Distribution selector & search bar */}
       <div className="p-3 border-b space-y-2 bg-card">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-on-surface">বণ্টন নির্বাচন করুন:</label>
+          <label className="text-xs font-bold text-on-surface">নম্বর বণ্টন:</label>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleRandomQuickAssign}
               disabled={isAssigning || questionsLoading}
               className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
-              title="দৈবচয়ন (Random) পদ্ধতিতে একটি প্রশ্ন যুক্ত করুন"
+              title="র‍্যান্ডমভাবে একটি প্রশ্ন যোগ করুন"
             >
               <Shuffle className="w-3 h-3" />
               <span>র‍্যান্ডম যোগ</span>
@@ -355,9 +355,9 @@ export const QuestionPickerPanel: React.FC = () => {
         {allSubSections.length > 0 && (
           <div className="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-lg p-2 text-xs">
             <div className="flex items-center gap-1.5 truncate">
-              <span className="font-bold text-primary shrink-0">উপ-বিভাগ:</span>
+              <span className="font-bold text-primary shrink-0">সাব-সেকশন:</span>
               <span className="truncate font-medium text-foreground">
-                {currentSub ? (currentSub.titleBn || currentSub.title) : "সকল / নির্বাচিত নয়"}
+                {currentSub ? (currentSub.titleBn || currentSub.title) : "সকল / সিলেক্ট করা হয়নি"}
               </span>
             </div>
             {nextSub && (
@@ -367,7 +367,7 @@ export const QuestionPickerPanel: React.FC = () => {
                 variant="default"
                 onClick={() => setActiveTarget({ sectionId: nextSub.sectionId, subSectionId: nextSub.id })}
                 className="h-6 text-[10px] px-2 bg-primary text-white hover:bg-primary/95 font-bold shrink-0 flex items-center gap-1 cursor-pointer"
-                title={`পরবর্তী উপ-বিভাগ: ${nextSub.titleBn || nextSub.title}`}
+                title={`পরবর্তী সাব-সেকশন: ${nextSub.titleBn || nextSub.title}`}
               >
                 <span>পরবর্তী</span>
                 <ArrowRight className="w-3 h-3" />
@@ -395,8 +395,8 @@ export const QuestionPickerPanel: React.FC = () => {
               <SelectValue placeholder="সর্ট" />
             </SelectTrigger>
             <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg font-body text-xs">
-              <SelectItem value="newest">নতুন যুক্ত</SelectItem>
-              <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
+              <SelectItem value="newest">নতুন আগে</SelectItem>
+              <SelectItem value="oldest">পুরাতন আগে</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -472,7 +472,7 @@ export const QuestionPickerPanel: React.FC = () => {
                     </div>
                     {isAssigned ? (
                       <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> {isCurrentEnglish ? "Added" : "যোগকৃত"}
+                        <CheckCircle2 className="w-3 h-3" /> {isCurrentEnglish ? "Added" : "যুক্ত আছে"}
                       </span>
                     ) : (
                       <Button
@@ -483,7 +483,7 @@ export const QuestionPickerPanel: React.FC = () => {
                         className="h-6 px-2 text-[11px] gap-1 text-primary hover:bg-primary/10 rounded-md font-bold cursor-pointer shrink-0"
                       >
                         <Plus className="w-3 h-3" />
-                        <span>{isCurrentEnglish ? "Add" : "যোগ"}</span>
+                        <span>{isCurrentEnglish ? "Add" : "যোগ করুন"}</span>
                       </Button>
                     )}
                   </div>

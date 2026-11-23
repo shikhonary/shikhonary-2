@@ -2006,9 +2006,11 @@ export async function patchQuestionPaperSettings(
 
   // Handle mutual exclusivity rules identical to use-builder-store
   const patchData: Record<string, any> = { ...input.patch }
-  if (patchData.twoPagesPerSheet) {
+  if (patchData.duplicateSinglePage) {
     patchData.bookFoldLayout = false
+    patchData.twoPagesPerSheet = false
   } else if (patchData.bookFoldLayout) {
+    patchData.duplicateSinglePage = false
     patchData.twoPagesPerSheet = false
   }
 

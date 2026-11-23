@@ -57,10 +57,10 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
             </div>
             <div>
               <DialogTitle className="text-base sm:text-lg font-bold font-headline text-foreground leading-snug">
-                প্রশ্নপত্র ডাউনলোড করা সম্ভব নয়
+                প্রশ্নপত্র এখনো অসম্পূর্ণ
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground font-body mt-0.5">
-                প্রশ্নপত্রের সকল অংশের প্রয়োজনীয় প্রশ্ন নির্বাচন এখনো সম্পন্ন হয়নি
+                সবগুলো সেকশনের নির্ধারিত প্রশ্ন এখনো যোগ করা হয়নি
               </DialogDescription>
             </div>
           </div>
@@ -71,19 +71,19 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
           {/* Summary Metric Strip */}
           <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-muted/40 border border-border/60 text-center">
             <div className="flex flex-col">
-              <span className="text-[11px] text-muted-foreground font-medium">অসম্পূর্ণ অংশ</span>
+              <span className="text-[11px] text-muted-foreground font-medium">বাকি সেকশন</span>
               <span className="text-base font-bold font-headline text-amber-600 dark:text-amber-400 mt-0.5">
                 {toBengaliDigits(incompleteDistributions.length)}টি
               </span>
             </div>
             <div className="flex flex-col border-x border-border/50">
-              <span className="text-[11px] text-muted-foreground font-medium">বর্তমানে যুক্ত</span>
+              <span className="text-[11px] text-muted-foreground font-medium">যুক্ত হয়েছে</span>
               <span className="text-base font-bold font-headline text-foreground mt-0.5">
                 {toBengaliDigits(totalAdded)}টি
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[11px] text-muted-foreground font-medium">কমতি রয়েছে</span>
+              <span className="text-[11px] text-muted-foreground font-medium">বাকি আছে</span>
               <span className="text-base font-bold font-headline text-rose-600 dark:text-rose-400 mt-0.5">
                 {toBengaliDigits(totalMissing)}টি প্রশ্ন
               </span>
@@ -95,7 +95,7 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
             <div className="flex items-center justify-between text-xs font-bold text-foreground font-headline px-1">
               <span className="flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>যেসব অংশে প্রশ্ন যোগ করা বাকি:</span>
+                <span>যেসব সেকশনে প্রশ্ন যোগ করা বাকি:</span>
               </span>
             </div>
 
@@ -113,7 +113,7 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-xs text-foreground font-headline truncate">
-                          {dist.questionTypeNameBn || dist.questionTypeName || dist.questionTypeLabel || "প্রশ্ন অংশ"}
+                          {dist.questionTypeNameBn || dist.questionTypeName || dist.questionTypeLabel || "প্রশ্ন সেকশন"}
                         </h4>
                         {dist.subjectName && (
                           <p className="text-[11px] text-muted-foreground truncate">
@@ -142,7 +142,7 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
                           href={`/question-papers/${paperId}/distributions/${dist.distributionId}/pick`}
                           onClick={() => onOpenChange(false)}
                         >
-                          <span>নির্বাচন</span>
+                          <span>যোগ করুন</span>
                           <ArrowRight className="w-3 h-3 ml-1" />
                         </Link>
                       </Button>
@@ -161,7 +161,7 @@ export const IncompletePaperModal: React.FC<IncompletePaperModalProps> = ({
             onClick={() => onOpenChange(false)}
             className="w-full h-9 px-5 text-xs font-bold font-headline rounded-xl cursor-pointer"
           >
-            বাতিল
+            বন্ধ করুন
           </Button>
         </DialogFooter>
       </DialogContent>

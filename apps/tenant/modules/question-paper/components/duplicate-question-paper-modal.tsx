@@ -25,11 +25,11 @@ export function DuplicateQuestionPaperModal() {
     try {
       await duplicateMutation.mutateAsync({ id: paperId })
       toast.success(
-        `প্রশ্নপত্র "${paperTitle || "Question Paper"}" সফলভাবে ডুপ্লিকেট করা হয়েছে।`
+        `প্রশ্নপত্র "${paperTitle || "Question Paper"}" সফলভাবে ডুপ্লিকেট করা হয়েছে।`
       )
       closeModal()
     } catch (err: any) {
-      toast.error(err.message || "ডুপ্লিকেট করতে ব্যর্থ হয়েছে")
+      toast.error(err.message || "ডুপ্লিকেট করা যায়নি")
     }
   }
 
@@ -49,7 +49,7 @@ export function DuplicateQuestionPaperModal() {
               প্রশ্নপত্র ডুপ্লিকেট করবেন?
             </DialogTitle>
             <p className="text-xs text-outline mt-0.5">
-              এই কার্যক্রমে নিশ্চিতকরণ প্রয়োজন
+              প্রশ্নপত্রের একটি অবিকল নতুন কপি তৈরি হবে
             </p>
           </div>
         </div>
@@ -60,14 +60,14 @@ export function DuplicateQuestionPaperModal() {
             <span className="font-bold text-on-surface">
               &quot;{paperTitle || "নির্বাচিত প্রশ্নপত্র"}&quot;
             </span>{" "}
-            ডুপ্লিকেট করতে চান? এর ফলে হুবহু একই পরীক্ষা সেটিংস, সেকশন এবং প্রশ্ন নিয়ে একটি খসড়া (Copy) কপি তৈরি হবে।
+            ডুপ্লিকেট করতে চান? এর ফলে হুবহু একই পরীক্ষা সেটিংস, সেকশন এবং প্রশ্ন নিয়ে একটি নতুন ড্রাফট কপি তৈরি হবে।
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-start gap-2.5 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-primary font-body">
           <Info className="h-4 w-4 shrink-0 text-primary mt-0.5" />
           <p className="leading-snug">
-            নতুন কপিটি খসড়া (Draft) হিসেবে থাকবে, আপনি এটি পরে যেকোনো সময় পরিবর্তন করতে পারবেন।
+            নতুন কপিটি ড্রাফট হিসেবে সেভ থাকবে, আপনি পরবর্তীতে যেকোনো তথ্য ও প্রশ্ন এডিট করতে পারবেন।
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export function DuplicateQuestionPaperModal() {
             onClick={closeModal}
             className="w-full sm:w-auto rounded-lg border border-outline-variant px-5 py-2 text-xs font-semibold text-on-surface hover:bg-surface-container-high cursor-pointer h-10"
           >
-            বাতিল করুন
+            বাতিল
           </Button>
           <Button
             type="button"
@@ -95,7 +95,7 @@ export function DuplicateQuestionPaperModal() {
             ) : (
               <>
                 <Copy className="h-4 w-4" />
-                <span>নিশ্চিত ডুপ্লিকেট</span>
+                <span>হ্যাঁ, ডুপ্লিকেট করুন</span>
               </>
             )}
           </Button>

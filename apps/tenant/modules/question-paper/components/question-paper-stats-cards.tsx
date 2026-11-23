@@ -32,7 +32,7 @@ export function QuestionPaperStatsCards({
     {
       title: "মোট প্রশ্নপত্র",
       value: `${toBengaliDigits(totalPapers)}টি`,
-      subtitle: "ড্রাফট ও প্রস্তুতকৃত প্রশ্নপত্র",
+      subtitle: "ড্রাফট ও প্রস্তুত করা প্রশ্ন",
       icon: FileText,
       iconColor: "text-indigo-600 dark:text-indigo-400",
       iconBg: "bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/40",
@@ -40,7 +40,7 @@ export function QuestionPaperStatsCards({
     {
       title: "প্রকাশিত প্রশ্নপত্র",
       value: `${toBengaliDigits(publishedPapers)}টি`,
-      subtitle: "পরীক্ষার জন্য সক্রিয় ও প্রস্তুত",
+      subtitle: "প্রিন্ট ও পরীক্ষার জন্য প্রস্তুত",
       icon: CheckCircle2,
       iconColor: "text-emerald-600 dark:text-emerald-400",
       iconBg: "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/40",
@@ -48,7 +48,7 @@ export function QuestionPaperStatsCards({
     {
       title: "টেমপ্লেট প্রশ্নপত্র",
       value: `${toBengaliDigits(templatePapers)}টি`,
-      subtitle: "পুনরায় ব্যবহারযোগ্য প্রশ্ন কাঠামো",
+      subtitle: "পুনরায় ব্যবহারযোগ্য প্রশ্ন ফরম্যাট",
       icon: Copy,
       iconColor: "text-amber-600 dark:text-amber-400",
       iconBg: "bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800/40",
@@ -56,7 +56,7 @@ export function QuestionPaperStatsCards({
     {
       title: "গড় পূর্ণমান",
       value: `${toBengaliDigits(averageMarks)} নম্বর`,
-      subtitle: "প্রতিটি প্রশ্নপত্রের গড় মান",
+      subtitle: "প্রশ্নপত্রগুলোর গড় পূর্ণমান",
       icon: BookOpen,
       iconColor: "text-teal-600 dark:text-teal-400",
       iconBg: "bg-teal-50 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-800/40",

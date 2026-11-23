@@ -7,6 +7,7 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface PodNirnoyPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
@@ -23,6 +24,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
 
 export const PodNirnoyPickerCard: React.FC<PodNirnoyPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -60,12 +62,17 @@ export const PodNirnoyPickerCard: React.FC<PodNirnoyPickerCardProps> = ({
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={difficulty}
-    >
+    
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
+      marks={q.marks}>
       <div className="flex flex-col gap-2 font-body">
         {/* Content Box */}
         {content && (
@@ -82,31 +89,7 @@ export const PodNirnoyPickerCard: React.FC<PodNirnoyPickerCardProps> = ({
               return <div key={wIdx}>{cleanW} -</div>;
             })}
           </div>
-        )}
-
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(source || session) && (
-              <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {source || "N/A"}
-                {session ? ` (${toBengaliDigits(session)})` : ""}
-              </span>
-            )}
-            {reference.length > 0 ? (
-              reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {ref}
-                </span>
-              ))
-            ) : (
-              <span className="text-[11px] text-on-surface-variant/60 italic">No board reference</span>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </PickerCardWrapper>
   );

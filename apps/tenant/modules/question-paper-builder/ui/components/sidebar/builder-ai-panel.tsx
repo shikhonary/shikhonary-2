@@ -91,7 +91,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
               type="button"
               onClick={clearMessages}
               className="size-8 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-              title="চ্যাট হিস্ট্রি মুছুন"
+              title="চ্যাট হিস্ট্রি ক্লিয়ার করুন"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -135,7 +135,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
               <div className="flex flex-col gap-1.5 max-w-[85%] items-start">
                 <div className="p-3 rounded-2xl rounded-tl-sm text-xs leading-relaxed shadow-xs bg-card border border-border text-foreground">
                   <p className="font-medium">
-                    আসসালামু আলাইকুম! প্রশ্নপত্র সম্পাদনায় কীভাবে সাহায্য করতে পারি? প্রশ্ন সংযোজন, বিকল্প প্রশ্ন তৈরি বা বিন্যাস পরিবর্তন করতে সরাসরি বলুন।
+                    আসসালামু আলাইকুম! প্রশ্নপত্র তৈরিতে কীভাবে সাহায্য করতে পারি? প্রশ্ন যোগ করা, বিকল্প প্রশ্ন তৈরি বা ফরম্যাট পরিবর্তন করতে যেকোনো কিছু বলুন।
                   </p>
                 </div>
                 <span className="text-[10px] text-muted-foreground px-1">
@@ -156,7 +156,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
           <div className="p-3 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-xs space-y-1">
             <p className="font-semibold flex items-center gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-              একটি সমস্যা দেখা দিয়েছে
+              একটি সমস্যা দেখা দিয়েছে
             </p>
             <p className="opacity-90 leading-relaxed text-[11px]">{error.message}</p>
           </div>
@@ -218,7 +218,7 @@ export const BuilderAiPanel: React.FC<Props> = ({ paperTitle, className, onClose
           </span>
           <span className="flex items-center gap-1">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            AI সংযুক্ত
+            AI কানেক্টেড
           </span>
         </div>
       </div>

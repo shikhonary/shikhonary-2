@@ -6,12 +6,14 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface PbqPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const PbqPickerCard: React.FC<PbqPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -19,7 +21,7 @@ export const PbqPickerCard: React.FC<PbqPickerCardProps> = ({
   const typeLabel = q.questionType?.nameBn || q.questionType?.nameEn || "অনুচ্ছেদভিত্তিক (PBQ)";
 
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

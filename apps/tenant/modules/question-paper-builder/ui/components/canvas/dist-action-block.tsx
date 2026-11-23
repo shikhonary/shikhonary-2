@@ -87,7 +87,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
               if (dropdownMax <= 0 && currentAttempt === 0) {
                 e.preventDefault();
                 toast.error(
-                  `এই প্রশ্নের ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`
+                  `এই ধরনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য সাব-সেকশনে পূর্ণ হয়ে গেছে।`
                 );
               }
             }}
@@ -97,38 +97,38 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
               if (isNaN(val) || !val) {
                 try {
                   await upsertSubSection({ id: subSectionId, questionsToAttempt: 0 });
-                  toast.success("আবশ্যক প্রশ্নের সংখ্যা রিসেট করা হয়েছে");
+                  toast.success("আবশ্যক প্রশ্নের সংখ্যা রিসেট করা হয়েছে");
                 } catch (err: any) {
-                  toast.error(err?.message ?? "হালনাগাদ করতে ব্যর্থ হয়েছে");
+                  toast.error(err?.message ?? "আপডেট করা যায়নি");
                 }
                 return;
               }
 
               if (dropdownMax <= 0) {
                 toast.error(
-                  `এই প্রশ্নের ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য উপ-বিভাগে সম্পূর্ণ পূরণ করা হয়েছে।`
+                  `এই ধরনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) ইতিমধ্যেই অন্যান্য সাব-সেকশনে পূর্ণ হয়ে গেছে।`
                 );
                 return;
               }
 
               if (sharedTypeAttempt > 0 && val > dropdownMax) {
                 toast.error(
-                  `ভুল মান: এই ধরণের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) অতিক্রম করা যাবে না। এই উপ-বিভাগে সর্বোচ্চ ${toBengaliDigits(dropdownMax)}টি উত্তর নির্ধারণ করতে পারবেন।`
+                  `ভুল মান: এই ধরনের মোট আবশ্যক প্রশ্নের সংখ্যা (${toBengaliDigits(sharedTypeAttempt)}টি) অতিক্রম করা যাবে না। এই সাব-সেকশনে সর্বোচ্চ ${toBengaliDigits(dropdownMax)}টি সিলেক্ট করতে পারবেন।`
                 );
                 return;
               }
 
               try {
                 await upsertSubSection({ id: subSectionId, questionsToAttempt: val });
-                toast.success(`উত্তর দিতে হবে: ${toBengaliDigits(val)}টি নির্ধারিত হয়েছে`);
+                toast.success(`উত্তর দিতে হবে: ${toBengaliDigits(val)}টি সেট করা হয়েছে`);
               } catch (err: any) {
-                toast.error(err?.message ?? "হালনাগাদ করতে ব্যর্থ হয়েছে");
+                toast.error(err?.message ?? "আপডেট করা যায়নি");
               }
             }}
             className="bg-transparent font-bold cursor-pointer focus:outline-none text-indigo-600 dark:text-indigo-400"
           >
             <option value="" className="text-muted-foreground">
-              {dropdownMax <= 0 ? "কোটা পূর্ণ" : "নির্বাচন করুন"}
+              {dropdownMax <= 0 ? "টার্গেট পূর্ণ" : "সিলেক্ট করুন"}
             </option>
             {Array.from({ length: dropdownMax }, (_, i) => i + 1).map((n) => (
               <option key={n} value={String(n)}>
@@ -147,7 +147,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
           className="w-full sm:w-auto rounded-xl h-9 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold text-xs shadow-xs cursor-pointer gap-1.5 transition-all active:scale-95"
         >
           <Link href={pickUrl}>
-            <span>+ প্রশ্ন নির্বাচন করুন</span>
+            <span>+ প্রশ্ন যোগ করুন</span>
           </Link>
         </Button>
 
@@ -160,7 +160,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
                 size="sm"
                 onClick={() => setActiveTarget({ sectionId: sectionId ?? null, subSectionId: prevSubSectionId })}
                 className="flex-1 sm:flex-none rounded-xl border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 font-bold text-xs h-9 cursor-pointer flex items-center justify-center gap-1 shrink-0"
-                title={`পূর্ববর্তী উপ-বিভাগে যান: ${prevSubSectionTitle}`}
+                title={`আগের সাব-সেকশনে যান: ${prevSubSectionTitle}`}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>পূর্ববর্তী</span>
@@ -174,7 +174,7 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
                 size="sm"
                 onClick={() => setActiveTarget({ sectionId: sectionId ?? null, subSectionId: nextSubSectionId })}
                 className="flex-1 sm:flex-none rounded-xl border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 font-bold text-xs h-9 cursor-pointer flex items-center justify-center gap-1 shrink-0"
-                title={`পরবর্তী উপ-বিভাগে যান: ${nextSubSectionTitle}`}
+                title={`পরের সাব-সেকশনে যান: ${nextSubSectionTitle}`}
               >
                 <span>পরবর্তী</span>
                 <ArrowRight className="w-3.5 h-3.5" />

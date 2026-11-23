@@ -6,17 +6,19 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface RightFormOfVerbPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const RightFormOfVerbPickerCard: React.FC<RightFormOfVerbPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

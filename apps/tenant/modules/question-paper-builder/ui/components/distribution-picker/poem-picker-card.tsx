@@ -7,6 +7,7 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface PoemPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
@@ -23,6 +24,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
 
 export const PoemPickerCard: React.FC<PoemPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -56,12 +58,17 @@ export const PoemPickerCard: React.FC<PoemPickerCardProps> = ({
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={chapterName}
       difficulty={difficulty}
-    >
+    
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
+      marks={q.marks}>
       <div className="flex flex-col gap-2 font-body">
         {/* Poem Title Box */}
         <div className="text-sm text-on-surface leading-relaxed py-0.5">
@@ -73,27 +80,7 @@ export const PoemPickerCard: React.FC<PoemPickerCardProps> = ({
           >
             <RenderMath text={poemTitle} isMath={true} />
           </div>
-        </div>
-
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-              📚 {source}
-              {session ? ` (${toBengaliDigits(session)})` : ""}
-            </span>
-            {reference
-              .filter((ref: string) => ref !== source)
-              .map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {ref}
-                </span>
-              ))}
-          </div>
-        </div>
+        </div>
       </div>
     </PickerCardWrapper>
   );

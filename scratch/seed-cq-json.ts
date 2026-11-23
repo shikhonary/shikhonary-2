@@ -95,6 +95,44 @@ function cleanContext(rawContext?: string | null): string {
   return text;
 }
 
+export function splitCqContext(content: string): { caption: string; content: string }[] | null {
+  if (!content) return null;
+  const trimmed = content.trim();
+
+  // Match headers like দৃশ্যকল্প-১, চিত্র-১, দৃশ্যপট-১, উদ্দীপক-১
+  const headerRegex = /(?:^|[\r\n]+)\s*((?:দৃশ্যকল্প|চিত্র|দৃশ্যপট|উদ্দীপক)\s*[-–:：]?\s*[১-৯\d]+)\s*[:：\-–.]?\s*/gi;
+  const matches = [...trimmed.matchAll(headerRegex)];
+
+  if (matches.length < 2) {
+    return null;
+  }
+
+  const parts: { caption: string; content: string }[] = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    const currentMatch = matches[i]!;
+    const rawCaption = currentMatch[1]!.trim();
+
+    // Standardize caption: "দৃশ্যকল্প-১", "চিত্র-১", etc.
+    const normalizedCaption = rawCaption
+      .replace(/\s*[-–:：]\s*/g, "-")
+      .replace(/\s+/g, "-");
+
+    const startIndex = currentMatch.index! + currentMatch[0].length;
+    const endIndex = i + 1 < matches.length ? matches[i + 1]!.index! : trimmed.length;
+
+    let partContent = trimmed.slice(startIndex, endIndex).trim();
+    partContent = partContent.replace(/^[:：\-–.\s]+/, "").trim();
+
+    parts.push({
+      caption: normalizedCaption,
+      content: partContent,
+    });
+  }
+
+  return parts;
+}
+
 function isQuestionNoReference(ref: string): boolean {
   const trimmed = ref.trim();
   // User strict rule: don't consider as ref which starts with প্রশ্ন or প্রশ্ন নং
@@ -408,12 +446,15 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
         : q.attachmentType || (context ? "PASSAGE" : "DIAGRAM");
 
       const rawCaption = q.attachmentDescription?.trim();
-      // Rule: Never use 'উদ্দীপক' as caption! Strictly null unless a genuine specific caption (e.g. 'চিত্র ১', 'ছক ১')
-      let caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক") ? rawCaption : null;
-      if (caption) {
-        caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim();
-        caption = caption.replace(/নিচের\s*কোনটি\s*সঠিক\s*[?？]?/g, "").trim();
-        if (!caption) caption = null;
+      let caption: string | null = null;
+      if (!hasTable && attachmentType !== "TABLE") {
+        // Rule: Never use 'উদ্দীপক' as caption! Strictly null unless a genuine specific caption (e.g. 'চিত্র ১', 'ছক ১')
+        caption = rawCaption && rawCaption !== "উদ্দীপক" && !rawCaption.includes("উদ্দীপক") ? rawCaption : null;
+        if (caption) {
+          caption = caption.replace(/^(?:নিচের|উপরের|প্রদত্ত)?\s*(?:উদ্দীপকটি|অনুচ্ছেদটি|তথ্যটি)[\s\S]*?(?:প্রশ্নের\s*উত্তর\s*দাও|প্রশ্নগুলোর\s*উত্তর\s*দাও)[ঃ:।.\-\s]*/i, "").trim();
+          caption = caption.replace(/নিচের\s*কোনটি\s*সঠিক\s*[?？]?/g, "").trim();
+          if (!caption) caption = null;
+        }
       }
 
       let contentText = context || null;
@@ -429,7 +470,23 @@ async function seedSingleCqFile(filePath: string, forceClean = false) {
         if (!bottomContent) bottomContent = null;
       }
 
-      if (!existingAttachment) {
+      const scenarioParts = contentText && !hasTable ? splitCqContext(contentText) : null;
+      if (scenarioParts && scenarioParts.length >= 2) {
+        await prisma.questionAttachment.deleteMany({
+          where: { cqId: currentCqId },
+        });
+        for (let pIdx = 0; pIdx < scenarioParts.length; pIdx++) {
+          await prisma.questionAttachment.create({
+            data: {
+              cqId: currentCqId,
+              type: attachmentType,
+              caption: scenarioParts[pIdx]!.caption,
+              content: scenarioParts[pIdx]!.content,
+              position: pIdx,
+            },
+          });
+        }
+      } else if (!existingAttachment) {
         await prisma.questionAttachment.create({
           data: {
             cqId: currentCqId,

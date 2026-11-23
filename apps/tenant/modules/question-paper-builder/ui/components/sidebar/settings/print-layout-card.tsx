@@ -4,11 +4,39 @@ import React from "react";
 import { useBuilderStore } from "../../../../store/use-builder-store";
 import { Label } from "@workspace/ui/components/label";
 import { Switch } from "@workspace/ui/components/switch";
-import { Columns, BookOpen, Layers } from "lucide-react";
+import { toast } from "@workspace/ui/components/sonner";
+import { Columns, BookOpen, Scissors, Lock } from "lucide-react";
 
 export const PrintLayoutCard: React.FC = () => {
   const settings = useBuilderStore((state) => state.settings);
   const updateSettings = useBuilderStore((state) => state.updateSettings);
+  const pageCount = useBuilderStore((state) => state.pageCount);
+
+  const isDuplicateActive = Boolean(settings.duplicateSinglePage);
+  const isGapLocked = Boolean(settings.bookFoldLayout || settings.duplicateSinglePage);
+  const currentGap = isGapLocked
+    ? (settings.bookFoldLayout ? 30 : 25)
+    : (settings.columnGap ?? (settings.columns === 2 ? 12 : 10));
+
+  const handleToggleDuplicate = () => {
+    if (!isDuplicateActive) {
+      if (pageCount > 1) {
+        toast.error("আপনার প্রশ্নপত্রটি ১ পৃষ্ঠার বেশি। ডুপ্লিকেট কপির জন্য প্রশ্ন ১ পৃষ্ঠায় সীমাবদ্ধ রাখুন অথবা নিচের 'বুক ফোল্ড লেআউট' ব্যবহার করুন।");
+        return;
+      }
+
+      updateSettings({
+        duplicateSinglePage: true,
+        paperOrientation: "landscape",
+        columns: 2,
+        showColumnDivider: true,
+        bookFoldLayout: false,
+      });
+      toast.success("ল্যান্ডস্কেপ ২-কলামে ১ পাতায় ২টি কপির লেআউট তৈরি হয়েছে!");
+    } else {
+      updateSettings({ duplicateSinglePage: false });
+    }
+  };
 
   return (
     <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-4 shadow-xs space-y-4">
@@ -22,7 +50,7 @@ export const PrintLayoutCard: React.FC = () => {
             কলাম ও প্রিন্ট লেআউট
           </h3>
           <p className="text-[11px] text-muted-foreground font-body">
-            কলাম বিভাজন ও বিশেষ বুকলেট বিন্যাস
+            কলাম সংখ্যা ও বুকলেট লেআউট
           </p>
         </div>
       </div>
@@ -30,7 +58,7 @@ export const PrintLayoutCard: React.FC = () => {
       {/* Columns */}
       <div className="space-y-1.5">
         <Label className="text-xs font-semibold text-muted-foreground font-headline">
-          কলাম বিন্যাস
+          কলাম সংখ্যা
         </Label>
         <div className="grid grid-cols-3 gap-2">
           {[1, 2, 3].map((cols) => {
@@ -65,6 +93,60 @@ export const PrintLayoutCard: React.FC = () => {
         </div>
       </div>
 
+      {/* Column Gap (when columns > 1) */}
+      {settings.columns > 1 && (
+        <div className="space-y-1.5 pt-0.5">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold text-muted-foreground font-headline">
+              কলামের ফাঁকা জায়গা (গ্যাপ)
+            </Label>
+            {isGapLocked ? (
+              <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold font-headline flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-200/50 dark:border-indigo-800/40">
+                <Lock className="w-3 h-3" />
+                <span>{settings.bookFoldLayout ? "বুকলেট স্পাইন (৩০ মিমি)" : "কাটার দাগ (২৫ মিমি)"}</span>
+              </span>
+            ) : (
+              <span className="text-[11px] text-foreground font-bold font-headline">
+                {currentGap} মিমি
+              </span>
+            )}
+          </div>
+
+          {isGapLocked ? (
+            <p className="text-[11px] text-muted-foreground font-body bg-muted/20 px-2.5 py-1.5 rounded-xl border border-dashed border-border/70">
+              {settings.bookFoldLayout
+                ? "বুকলেট লেআউটে কাগজ ভাঁজ ও স্পাইনের সুরক্ষার জন্য ৩০ মিমি ফাঁকা জায়গা স্বয়ংক্রিয়ভাবে সংরক্ষিত রয়েছে।"
+                : "১ পাতায় ২টি কপি লেআউটে মাঝখানে কাটার দাগের জন্য ২৫ মিমি ফাঁকা জায়গা স্বয়ংক্রিয়ভাবে লক করা হয়েছে।"}
+            </p>
+          ) : (
+            <div className="grid grid-cols-4 gap-1.5">
+              {[
+                { label: "কম (৮ মিমি)", val: 8 },
+                { label: "স্বাভাবিক (১২)", val: 12 },
+                { label: "মাঝারি (১৬)", val: 16 },
+                { label: "বেশি (২০)", val: 20 },
+              ].map((item) => {
+                const isSelected = (settings.columnGap ?? (settings.columns === 2 ? 12 : 10)) === item.val;
+                return (
+                  <button
+                    key={item.val}
+                    type="button"
+                    onClick={() => updateSettings({ columnGap: item.val })}
+                    className={`py-1.5 px-1 text-[11px] rounded-xl font-headline transition-all cursor-pointer border text-center ${
+                      isSelected
+                        ? "bg-indigo-50/80 dark:bg-indigo-950/60 border-indigo-500 text-indigo-950 dark:text-indigo-200 font-bold shadow-2xs"
+                        : "bg-muted/30 hover:bg-muted/60 text-muted-foreground border-slate-200/60 dark:border-white/[0.06] hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Column Divider */}
       <div 
         onClick={() => {
@@ -85,7 +167,7 @@ export const PrintLayoutCard: React.FC = () => {
             কলাম ডিভাইডার
           </Label>
           <p className="text-[11px] text-muted-foreground font-body">
-            কলামগুলোর মাঝে বিভাজন রেখা প্রদর্শন
+            কলামের মাঝে ডিভাইডার দাগ দেখান
           </p>
         </div>
         <Switch 
@@ -99,29 +181,35 @@ export const PrintLayoutCard: React.FC = () => {
 
       {/* Advanced Layout Toggles */}
       <div className="pt-2 border-t border-border/60 space-y-2">
+        {/* 1 Sheet 2 Copies (Duplicate Half-Sheet) */}
         <div 
-          onClick={() => updateSettings({ twoPagesPerSheet: !settings.twoPagesPerSheet })}
+          onClick={handleToggleDuplicate}
           className={`flex items-center justify-between py-2 px-2.5 rounded-xl border transition-all cursor-pointer ${
-            settings.twoPagesPerSheet
-              ? "bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-200/60 dark:border-indigo-800/40"
+            isDuplicateActive
+              ? "bg-indigo-50/50 dark:bg-indigo-950/40 border-indigo-500/60 text-foreground ring-1 ring-indigo-500/20"
               : "bg-muted/20 hover:bg-muted/50 border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          <div>
+          <div className="space-y-0.5">
             <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <Label htmlFor="two-pages-per-sheet" className="text-xs sm:text-sm font-semibold font-headline cursor-pointer pointer-events-none">
-                ২ পৃষ্ঠা প্রতি শিট
+              <Scissors className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <Label htmlFor="duplicate-single-page" className="text-xs sm:text-sm font-semibold font-headline cursor-pointer pointer-events-none">
+                ১ পাতায় ২টি কপি (হাফ-শিট)
               </Label>
+              {pageCount === 1 && !isDuplicateActive && (
+                <span className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 rounded-md font-bold font-headline">
+                  ছোট পরীক্ষা
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-muted-foreground font-body pl-5">
-              প্রতি শিটে পাশাপাশি ২টি পৃষ্ঠা (১+২, ৩+৪) বিন্যাস
+              ১ পৃষ্ঠার প্রশ্ন A4 পাতায় পাশাপাশি ২টি কপি বসবে (মাঝখানে কাটার দাগসহ)
             </p>
           </div>
           <Switch 
-            id="two-pages-per-sheet"
-            checked={settings.twoPagesPerSheet}
-            onCheckedChange={(c) => updateSettings({ twoPagesPerSheet: c })}
+            id="duplicate-single-page"
+            checked={isDuplicateActive}
+            onCheckedChange={handleToggleDuplicate}
             className="pointer-events-none"
           />
         </div>
@@ -142,7 +230,7 @@ export const PrintLayoutCard: React.FC = () => {
               </Label>
             </div>
             <p className="text-[11px] text-muted-foreground font-body pl-5">
-              বুকলেট প্রিন্ট করার সুবিধাজনক ভাঁজ বিন্যাস
+              বইয়ের মতো ভাঁজ করার বুকলেট লেআউট
             </p>
           </div>
           <Switch 

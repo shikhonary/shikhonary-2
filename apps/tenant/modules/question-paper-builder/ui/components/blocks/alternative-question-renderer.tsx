@@ -101,9 +101,9 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         questionPaperId: paperId,
         alternativeQuestionId,
       });
-      toast.success("বিকল্প প্রশ্ন মুছে ফেলা হয়েছে");
+      toast.success("বিকল্প প্রশ্ন ডিলিট করা হয়েছে");
     } catch (err: any) {
-      toast.error(err?.message || "মুছে ফেলতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "ডিলিট করা যায়নি");
     }
   };
 
@@ -271,10 +271,10 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
                   onClick={() => handleRemove(alt.id)}
                   disabled={isRemoving}
                   className="px-2 py-0.5 hover:bg-destructive/10 text-destructive flex items-center gap-1 transition-colors font-medium"
-                  title="বিকল্প প্রশ্ন মুছে ফেলুন"
+                  title="বিকল্প প্রশ্ন ডিলিট করুন"
                 >
                   {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                  মুছুন
+                  ডিলিট
                 </button>
               </div>
 

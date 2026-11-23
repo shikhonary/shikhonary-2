@@ -6,17 +6,19 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface PartsOfSpeechPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const PartsOfSpeechPickerCard: React.FC<PartsOfSpeechPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

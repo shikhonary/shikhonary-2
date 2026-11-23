@@ -29,7 +29,7 @@ export const QuestionSettingsCard: React.FC = () => {
       {/* MCQ Option Style */}
       <div className="space-y-1.5">
         <Label className="text-xs font-semibold text-muted-foreground font-headline">
-          বহুনির্বাচনির অপশন স্টাইল
+          MCQ অপশন স্টাইল
         </Label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
@@ -71,7 +71,7 @@ export const QuestionSettingsCard: React.FC = () => {
       {/* MCQ Option Columns */}
       <div className="space-y-1.5">
         <Label className="text-xs font-semibold text-muted-foreground font-headline">
-          বহুনির্বাচনির অপশন কলাম সংখ্যা
+          MCQ অপশনের কলাম
         </Label>
         <div className="grid grid-cols-3 gap-2">
           {[
@@ -113,7 +113,7 @@ export const QuestionSettingsCard: React.FC = () => {
       {/* MCQ Statement Columns */}
       <div className="space-y-1.5">
         <Label className="text-xs font-semibold text-muted-foreground font-headline">
-          বহুপদী বিবৃতির কলাম সংখ্যা
+          MCQ বিবৃতির কলাম
         </Label>
         <div className="grid grid-cols-3 gap-2">
           {[

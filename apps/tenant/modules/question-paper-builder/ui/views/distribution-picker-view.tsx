@@ -17,7 +17,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { toast } from "@workspace/ui/components/sonner";
-import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, getQuestionTypePolicy, isSingleQuestionType, resolvePaperSlots, type QuestionTypeCode } from "@workspace/utils";
+import { cn } from "@workspace/ui/lib/utils";
+import { QUESTION_TYPES, QUESTION_TYPE_CODES, QUESTION_TYPE_MAP, normalizeQuestionTypeName, getQuestionTypePolicy, isSingleQuestionType, resolvePaperSlots, MCQ_TYPE_OPTIONS, type QuestionTypeCode } from "@workspace/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import {
   Sheet,
@@ -29,6 +30,7 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
+  ChevronRight,
   Loader2,
   Save,
   Search,
@@ -45,6 +47,7 @@ import {
   ArrowUpDown,
   Check,
   ArrowLeftRight,
+  HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
@@ -90,10 +93,42 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedSubQuestionIdsMap, setSelectedSubQuestionIdsMap] = useState<Record<string, string[]>>({});
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  // 500ms Debounce to give ample time while typing phrases before fetching
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Global Keyboard Shortcut: Ctrl+K or / to quickly focus search
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      } else if (e.key === "/" && document.activeElement !== searchInputRef.current) {
+        const target = e.target as HTMLElement;
+        if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA" && !target.isContentEditable) {
+          e.preventDefault();
+          searchInputRef.current?.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const [selectedChapterId, setSelectedChapterId] = useState<string>("All");
   const [selectedBoard, setSelectedBoard] = useState<string>("All");
   const [selectedSource, setSelectedSource] = useState<string>("All");
   const [selectedSort, setSelectedSort] = useState<"newest" | "oldest">("newest");
+  const [selectedMcqType, setSelectedMcqType] = useState<string>("All");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
@@ -343,11 +378,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       subjectId: distStatus?.subjectId || "",
       questionTypeId: isAlternativeMode ? "" : (urlQuestionTypeIdParam || distStatus?.questionTypeId),
       category,
-      search: search.trim() || undefined,
+      search: debouncedSearch.trim() || undefined,
       chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
       board: selectedBoard !== "All" ? selectedBoard : undefined,
       source: selectedSource !== "All" ? selectedSource : undefined,
       sort: selectedSort,
+      mcqType: selectedMcqType !== "All" ? selectedMcqType : undefined,
       excludePaperId: paperId,
       page,
       limit,
@@ -383,48 +419,48 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
     if (isExchangeMode) {
       if (exchangePool.length === 0) {
-        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        toast.error("সিলেক্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি");
         return;
       }
       const randomIndex = Math.floor(Math.random() * exchangePool.length);
       setSelectedIds([exchangePool[randomIndex].id]);
-      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      toast.success("১টি প্রশ্ন র‍্যান্ডমভাবে সিলেক্ট করা হয়েছে!");
       return;
     }
 
     if (isAlternativeMode) {
       if (availableUnassigned.length === 0) {
-        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        toast.error("সিলেক্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি");
         return;
       }
       const randomIndex = Math.floor(Math.random() * availableUnassigned.length);
       setSelectedIds([availableUnassigned[randomIndex].id]);
-      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      toast.success("১টি প্রশ্ন র‍্যান্ডমভাবে সিলেক্ট করা হয়েছে!");
       return;
     }
 
     if (isSingleType) {
       if (subSectionQuestionsCount >= 1) {
-        toast.info("এই অংশে ১টি মূল প্রশ্ন ইতিমধ্যে নির্ধারিত। বিকল্প প্রশ্ন যোগ করতে বিল্ডারের অথবা বিকল্প ব্যবহার করুন।");
+        toast.info("এই সেকশনে ১টি মূল প্রশ্ন ইতিমধ্যে যোগ করা হয়েছে। বিকল্প প্রশ্ন যোগ করতে বিল্ডারের অথবা অপশন ব্যবহার করুন।");
         return;
       }
       if (availableUnassigned.length === 0) {
-        toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+        toast.error("সিলেক্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি");
         return;
       }
       const randomIndex = Math.floor(Math.random() * availableUnassigned.length);
       setSelectedIds([availableUnassigned[randomIndex].id]);
-      toast.success("১টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!");
+      toast.success("১টি প্রশ্ন র‍্যান্ডমভাবে সিলেক্ট করা হয়েছে!");
       return;
     }
 
     if (maxSelectable <= 0) {
-      toast.info("এই অংশের প্রশ্নের লক্ষ্য ইতিমধ্যে পূরণ হয়ে গেছে।");
+      toast.info("এই সেকশনের প্রশ্নের টার্গেট ইতিমধ্যে পূর্ণ হয়ে গেছে।");
       return;
     }
 
     if (availableUnassigned.length === 0) {
-      toast.error("নির্বাচন করার মতো কোনো প্রশ্ন পাওয়া যায়নি।");
+      toast.error("সিলেক্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি");
       return;
     }
 
@@ -433,7 +469,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     const pickedIds = shuffled.slice(0, selectedCount).map((q: any) => q.id);
 
     setSelectedIds(pickedIds);
-    toast.success(`${toBengaliDigits(pickedIds.length)}টি প্রশ্ন দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করা হয়েছে!`);
+    toast.success(`${toBengaliDigits(pickedIds.length)}টি প্রশ্ন র‍্যান্ডমভাবে সিলেক্ট করা হয়েছে!`);
   };
 
   const qTypeNameEn = (distStatus.questionType?.nameEn || distStatus.questionTypeName || "").toLowerCase();
@@ -442,127 +478,39 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const qTypeLabel = (distStatus.questionTypeLabel || "").toLowerCase();
   const combinedStr = `${qTypeNameEn} ${qTypeNameBn} ${qTypeCode} ${qTypeLabel}`.toLowerCase();
 
+  const isMcqCategory = category === "MCQ";
   const hasActiveQuery = Boolean(search && search.trim() !== "");
   const hasActiveChapter = Boolean(selectedChapterId && selectedChapterId !== "All");
+  const hasActiveMcqType = isMcqCategory && Boolean(selectedMcqType && selectedMcqType !== "All");
   const hasActiveBoard = Boolean(selectedBoard && selectedBoard !== "All");
   const hasActiveSource = Boolean(selectedSource && selectedSource !== "All");
   const hasActiveSort = Boolean(selectedSort && selectedSort !== "newest");
+  const hasActiveBookmarked = Boolean(onlyBookmarked);
 
-  const hasAnyFilter = hasActiveQuery || hasActiveChapter || hasActiveBoard || hasActiveSource || hasActiveSort;
-  const activeFilterCount = (hasActiveChapter ? 1 : 0) + (hasActiveBoard ? 1 : 0) + (hasActiveSource ? 1 : 0) + (hasActiveSort ? 1 : 0);
+  const hasAnyFilter = hasActiveBookmarked || hasActiveChapter || hasActiveMcqType || hasActiveBoard || hasActiveSource || hasActiveSort || hasActiveQuery;
+  const activeFilterCount =
+    (hasActiveBookmarked ? 1 : 0) +
+    (hasActiveChapter ? 1 : 0) +
+    (hasActiveMcqType ? 1 : 0) +
+    (hasActiveBoard ? 1 : 0) +
+    (hasActiveSource ? 1 : 0) +
+    (hasActiveSort ? 1 : 0) +
+    (hasActiveQuery ? 1 : 0);
 
   const handleResetAll = () => {
     setSearch("");
+    setDebouncedSearch("");
     setSelectedChapterId("All");
     setSelectedBoard("All");
     setSelectedSource("All");
     setSelectedSort("newest");
+    setSelectedMcqType("All");
+    setOnlyBookmarked(false);
     setPage(1);
   };
 
   const isChapterApplicable = !["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "THOUGHT_EXPANSION", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(category);
 
-  const renderSelectFilters = () => (
-    <>
-      {/* Chapter Filter */}
-      {isChapterApplicable && (
-        <div className="min-w-[150px]">
-          <Select
-            value={selectedChapterId}
-            onValueChange={(val) => {
-              setSelectedChapterId(val ?? "All");
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
-              <SelectValue placeholder="সকল অধ্যায়" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
-              <SelectItem value="All">সকল অধ্যায়</SelectItem>
-              {chapters.map((ch: any, idx: number) => (
-                <SelectItem key={ch.id} value={ch.id}>
-                  <span
-                    className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
-                    style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
-                  >
-                    {toBengaliDigits(idx + 1)}.
-                  </span>{" "}
-                  {ch.nameBn || ch.nameEn}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      {/* Reference Filter */}
-      <div className="min-w-[150px]">
-        <Select
-          value={selectedBoard}
-          onValueChange={(val) => {
-            setSelectedBoard(val ?? "All");
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
-            <SelectValue placeholder="সকল রেফারেন্স" />
-          </SelectTrigger>
-          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
-            <SelectItem value="All">সকল রেফারেন্স</SelectItem>
-            {boardYears.map((item: any) => (
-              <SelectItem key={item.rawRef} value={item.rawRef}>
-                🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Source Filter */}
-      {sources.length > 0 && (
-        <div className="min-w-[150px]">
-          <Select
-            value={selectedSource}
-            onValueChange={(val) => {
-              setSelectedSource(val ?? "All");
-              setPage(1);
-            }}
-          >
-            <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
-              <SelectValue placeholder="সকল উৎস" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
-              <SelectItem value="All">সকল উৎস</SelectItem>
-              {sources.map((item: any) => (
-                <SelectItem key={item.rawSource} value={item.rawSource}>
-                  📚 {item.rawSource} ({toBengaliDigits(item.count)})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      {/* Sort Filter */}
-      <div className="min-w-[130px]">
-        <Select
-          value={selectedSort}
-          onValueChange={(val: "newest" | "oldest") => {
-            setSelectedSort(val ?? "newest");
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card text-foreground py-2 px-3.5 text-xs font-medium outline-hidden hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors h-10 justify-between">
-            <SelectValue placeholder="সাজানো" />
-          </SelectTrigger>
-          <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl max-h-64 font-body">
-            <SelectItem value="newest">নতুন যুক্ত</SelectItem>
-            <SelectItem value="oldest">পুরাতন যুক্ত</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </>
-  );
   const currentDistIndex = statuses?.findIndex((s: any) => s.distributionId === distributionId) ?? -1;
   const nextDistStatus = currentDistIndex !== -1 && currentDistIndex < (statuses?.length || 0) - 1 ? statuses?.[currentDistIndex + 1] : null;
 
@@ -576,13 +524,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         questionType: category,
       });
       if (res?.ok === false) {
-        toast.error(res.message || "প্রশ্ন প্রতিস্থাপন করা যায়নি");
+        toast.error(res.message || "প্রশ্ন পরিবর্তন করা যায়নি");
         return;
       }
-      toast.success("প্রশ্নটি সফলভাবে একই পজিশনে প্রতিস্থাপন করা হয়েছে!");
+      toast.success("প্রশ্নটি সফলভাবে পরিবর্তন করা হয়েছে!");
       router.push(`/question-papers/${paperId}/builder`);
     } catch (err: any) {
-      toast.error(err?.message || "প্রশ্ন প্রতিস্থাপন করতে সমস্যা হয়েছে");
+      toast.error(err?.message || "প্রশ্ন পরিবর্তন করা যায়নি");
     }
   };
 
@@ -742,75 +690,138 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
   return (
     <div className="flex flex-col w-full h-full min-h-0 max-h-full overflow-hidden bg-background font-display select-none">
-      {/* Header */}
-      <header className="h-16 border-b border-border bg-card shrink-0 z-40 shadow-xs">
-        <div className="max-w-6xl mx-auto w-full h-full px-3 sm:px-6 flex items-center justify-between gap-2">
-          {/* Left Side: Back button & Title & Target Status */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+      {/* Top Header */}
+      <header className="h-14 sm:h-16 border-b border-border/80 bg-card/95 backdrop-blur-md shrink-0 z-40 shadow-2xs w-full">
+        <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto w-full h-full px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Left Side: Back button, Breadcrumb & Title */}
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               asChild
-              className="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
+              className="h-8.5 w-8.5 sm:h-9 sm:w-9 rounded-xl border-border/70 bg-card hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
               <Link href={`/question-papers/${paperId}/builder`} title="বিল্ডারে ফিরে যান">
-                <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="hidden sm:inline">বিল্ডারে ফিরুন</span>
-                <span className="inline sm:hidden text-[11px]">ফিরে যান</span>
+                <ArrowLeft className="w-4 h-4" />
               </Link>
             </Button>
 
-            <div className="flex flex-col justify-center min-w-0">
-              <h1
-                className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[240px] md:max-w-[340px] lg:max-w-lg leading-tight"
-                title={
-                  isExchangeMode
-                    ? `প্রশ্ন বিনিময় / প্রতিস্থাপন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
-                    : isAlternativeMode
-                    ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
-                    : `প্রশ্ন নির্বাচন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
-                }
-              >
-                {isExchangeMode
-                  ? `প্রশ্ন বিনিময় / প্রতিস্থাপন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
-                  : isAlternativeMode
-                  ? `বিকল্প প্রশ্ন নির্বাচন (${orLabel})`
-                  : `${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
-              </h1>
+            <div className="h-6 w-px bg-border/60 shrink-0 hidden sm:block" />
 
-              {/* Target and Progress Sub-line */}
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {isAssigning || isAddingAlternative || isReplacing ? (
-                  <span className="text-[10px] sm:text-[11px] text-muted-foreground flex items-center gap-1 font-body">
-                    <Loader2 className="w-2.5 h-2.5 animate-spin text-indigo-600 dark:text-indigo-400" />
-                    <span>{isReplacing ? "প্রতিস্থাপন হচ্ছে..." : "যুক্ত করা হচ্ছে..."}</span>
-                  </span>
-                ) : isExchangeMode ? (
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.5 rounded-md font-headline">
-                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)} ` : ""}হুবহু একই পজিশনে প্রতিস্থাপন হবে
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link
+                  href={`/question-papers/${paperId}/builder`}
+                  className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-body shrink-0 truncate max-w-[130px]"
+                  title="বিল্ডারে ফিরে যান"
+                >
+                  <span className="font-semibold">বিল্ডার</span>
+                  <ChevronRight className="w-3 h-3 text-muted-foreground/50 shrink-0" />
+                </Link>
+
+                <h1
+                  className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[190px] xs:max-w-[230px] sm:max-w-[300px] md:max-w-[340px] lg:max-w-md leading-tight"
+                  title={
+                    isExchangeMode
+                      ? `প্রশ্ন পরিবর্তন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                      : isAlternativeMode
+                      ? `বিকল্প প্রশ্ন যোগ (${orLabel})`
+                      : `${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                  }
+                >
+                  {isExchangeMode
+                    ? `প্রশ্ন পরিবর্তন: ${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`
+                    : isAlternativeMode
+                    ? `বিকল্প প্রশ্ন যোগ (${orLabel})`
+                    : `${distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName}`}
+                </h1>
+
+                {isExchangeMode ? (
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-300/50 text-[10px] font-bold font-headline shrink-0">
+                    <ArrowLeftRight className="w-2.5 h-2.5" />
+                    পরিবর্তন মোড
                   </span>
                 ) : isAlternativeMode ? (
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/50 dark:border-indigo-800/40 px-2 py-0.2 rounded-md font-headline">
-                    ১টি বিকল্প প্রশ্ন নির্বাচন করুন
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25 text-[10px] font-bold font-headline shrink-0">
+                    <Split className="w-2.5 h-2.5" />
+                    {orLabel}
+                  </span>
+                ) : null}
+              </div>
+
+              {/* Mobile Target Sub-line (hidden on md+) */}
+              <div className="flex md:hidden items-center gap-1.5 mt-0.5">
+                {isAssigning || isAddingAlternative || isReplacing ? (
+                  <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-body">
+                    <Loader2 className="w-2.5 h-2.5 animate-spin text-primary" />
+                    <span>{isReplacing ? "পরিবর্তন হচ্ছে..." : "যুক্ত করা হচ্ছে..."}</span>
+                  </span>
+                ) : isExchangeMode ? (
+                  <span className="text-[10px] font-medium text-amber-700 dark:text-amber-400 font-body">
+                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)} ` : ""}পরিবর্তন মোড
+                  </span>
+                ) : isAlternativeMode ? (
+                  <span className="text-[10px] font-medium text-primary font-body">
+                    ১টি বিকল্প প্রশ্ন সিলেক্ট করুন
                   </span>
                 ) : (
-                  <span className="text-[10px] sm:text-[11px] text-muted-foreground font-body flex items-center gap-1">
-                    <span>টার্গেট: <strong className="text-foreground font-headline">{toBengaliDigits(effectiveTargetCount)}টি</strong></span>
-                    <span>•</span>
-                    <span>যুক্ত: <strong className="text-indigo-600 dark:text-indigo-400 font-headline">{toBengaliDigits(subSectionQuestionsCount)}টি</strong></span>
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-body">
+                    <span>যুক্ত: <strong className="text-foreground font-headline">{toBengaliDigits(subSectionQuestionsCount)}/{toBengaliDigits(effectiveTargetCount)}টি</strong></span>
                     {selectedIds.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-headline font-semibold">
-                          +{toBengaliDigits(selectedIds.length)}টি নির্বাচিত
-                        </span>
-                      </>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-headline font-semibold">
+                        (+{toBengaliDigits(selectedIds.length)})
+                      </span>
                     )}
-                  </span>
+                  </div>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Center: Visual Target Progress Pill (Desktop / Tablet) */}
+          {!isAlternativeMode && !isExchangeMode ? (
+            <div className="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/60 text-xs shadow-2xs">
+              <div className="flex items-center gap-1.5 font-body">
+                <span className="text-[11px] text-muted-foreground">টার্গেট পূরণ:</span>
+                <span className="font-bold text-foreground font-headline">
+                  {toBengaliDigits(subSectionQuestionsCount)}/{toBengaliDigits(effectiveTargetCount)}টি
+                </span>
+              </div>
+
+              {/* Progress mini meter bar */}
+              <div className="w-16 lg:w-20 h-2 rounded-full bg-muted/80 dark:bg-white/10 overflow-hidden relative">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-all duration-300",
+                    subSectionQuestionsCount >= effectiveTargetCount && effectiveTargetCount > 0
+                      ? "bg-emerald-500"
+                      : "bg-primary"
+                  )}
+                  style={{
+                    width: `${Math.min(100, Math.round((subSectionQuestionsCount / (effectiveTargetCount || 1)) * 100))}%`,
+                  }}
+                />
+              </div>
+
+              {selectedIds.length > 0 && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-[11px] font-bold font-headline animate-in fade-in duration-150">
+                  +{toBengaliDigits(selectedIds.length)}টি সিলেক্টেড
+                </span>
+              )}
+            </div>
+          ) : isExchangeMode ? (
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-300/40 text-xs font-medium font-body shadow-2xs">
+              <ArrowLeftRight className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>
+                {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)} ` : ""}একই পজিশনে পরিবর্তন হবে
+              </span>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs">
+              <Split className="w-3.5 h-3.5 text-primary" />
+              <span>১টি বিকল্প প্রশ্ন সিলেক্ট করুন</span>
+            </div>
+          )}
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -820,13 +831,20 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               variant="outline"
               size="sm"
               onClick={handleRandomSelect}
-              disabled={questionsLoading || (isExchangeMode ? exchangePool.length === 0 : availableUnassigned.length === 0)}
-              className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer flex items-center gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95 disabled:opacity-50"
-              title="প্রশ্নসমূহ থেকে দৈবচয়ন (Random) পদ্ধতিতে নির্বাচন করুন"
+              disabled={questionsLoading || (!isExchangeMode && !isAlternativeMode && maxSelectable <= 0) || (isExchangeMode ? exchangePool.length === 0 : availableUnassigned.length === 0)}
+              className="group/rand h-8.5 sm:h-9 w-8.5 sm:w-auto px-0 sm:px-3 rounded-xl border-border/70 bg-card hover:bg-primary/5 hover:border-primary/40 hover:text-primary text-xs font-bold text-foreground cursor-pointer flex items-center justify-center sm:justify-start gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card disabled:hover:border-border/70 disabled:hover:text-foreground"
+              title={
+                !isExchangeMode && !isAlternativeMode && maxSelectable <= 0
+                  ? "এই সেকশনের নির্ধারিত টার্গেট ইতিমধ্যে পূর্ণ হয়েছে"
+                  : selectedIds.length > 0
+                  ? "পছন্দ না হলে পুনরায় র‍্যান্ডম (Re-shuffle) করুন"
+                  : "তালিকা থেকে র‍্যান্ডমভাবে প্রশ্ন সিলেক্ট করুন"
+              }
             >
-              <Shuffle className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline">র‍্যান্ডম নির্বাচন</span>
-              <span className="sm:hidden text-[11px]">র‍্যান্ডম</span>
+              <Shuffle className="w-3.5 h-3.5 text-primary shrink-0 transition-transform duration-300 group-hover/rand:rotate-45 group-active/rand:rotate-180" />
+              <span className="hidden sm:inline">
+                {selectedIds.length > 0 && !isExchangeMode && !isAlternativeMode ? "পুনরায় র‍্যান্ডম" : "র‍্যান্ডম সিলেক্ট"}
+              </span>
             </Button>
 
             {/* Next Sub-Section Button (if not alternative/exchange mode and next exists) */}
@@ -835,658 +853,1191 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 variant="outline"
                 size="sm"
                 asChild
-                className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer flex items-center gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95"
+                className="h-8.5 sm:h-9 w-8.5 md:w-auto px-0 md:px-3 rounded-xl border-border/70 bg-card hover:bg-muted text-xs font-bold text-foreground cursor-pointer flex items-center justify-center md:justify-start gap-1.5 font-headline shrink-0 shadow-2xs transition-all active:scale-95"
+                title="পরবর্তী সেকশনে যান"
               >
                 <Link href={`/question-papers/${paperId}/distributions/${nextDistStatus.distributionId}/pick`}>
-                  <span className="hidden md:inline">পরবর্তী উপ-বিভাগ</span>
-                  <span className="md:hidden text-[11px]">পরবর্তী</span>
-                  <ArrowRight className="w-3.5 h-3.5 ml-0.5 text-muted-foreground" />
+                  <span className="hidden md:inline">পরবর্তী সেকশন</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 </Link>
               </Button>
             )}
           </div>
         </div>
+
+        {/* Mobile Slim Target Progress Bar along bottom edge of header */}
+        {!isAlternativeMode && !isExchangeMode && effectiveTargetCount > 0 && (
+          <div className="md:hidden w-full h-[2.5px] bg-muted/60 relative overflow-hidden">
+            <div
+              className={cn(
+                "h-full transition-all duration-300",
+                subSectionQuestionsCount >= effectiveTargetCount
+                  ? "bg-emerald-500"
+                  : "bg-primary"
+              )}
+              style={{
+                width: `${Math.min(100, Math.round((subSectionQuestionsCount / effectiveTargetCount) * 100))}%`,
+              }}
+            />
+          </div>
+        )}
       </header>
 
-      {/* Sub-Header Filter Bar directly attached under Header with ZERO gap */}
-      <div className="bg-card border-b border-border shrink-0 z-30 shadow-2xs px-3 sm:px-6 py-2.5 sm:py-3">
-        <div className="max-w-6xl mx-auto w-full flex flex-col gap-2.5">
-          {/* Primary Filter Row */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Search Input Filter */}
-            <div className="relative flex-1 min-w-0">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground pointer-events-none" />
-              <Input
-                type="text"
-                placeholder="প্রশ্ন বা বিষয় দিয়ে অনুসন্ধান করুন..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full pl-9 pr-9 h-10 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500/50 transition-all font-body"
-              />
-              {hasActiveQuery && (
+      {/* Main Workspace Body: Left Sidebar + Right Content Canvas (Constrained to max-w-7xl / 1440px) */}
+      <div className="flex-1 flex min-h-0 w-full max-w-7xl 2xl:max-w-[1440px] mx-auto overflow-hidden border-x border-border/40">
+        {/* Left Filter Sidebar (Desktop) - Fixed & Non-collapsible */}
+        <aside className="w-64 lg:w-72 border-r border-border/80 bg-card/60 backdrop-blur-xs hidden md:flex flex-col shrink-0 select-none overflow-hidden z-20">
+            {/* Sidebar Header */}
+            <div className="h-[58px] px-3.5 sm:px-4 border-b border-border/80 flex items-center justify-between shrink-0 bg-card/95 backdrop-blur-xs shadow-2xs">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
+                <span className="font-headline font-bold text-xs sm:text-sm text-foreground">ফিল্টারসমূহ</span>
+                {activeFilterCount > 0 && (
+                  <Badge className="px-1.5 py-0.2 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {toBengaliDigits(activeFilterCount)}
+                  </Badge>
+                )}
+              </div>
+              {activeFilterCount > 0 && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearch("");
-                    setPage(1);
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
-                  title="অনুসন্ধান মুছুন"
+                  onClick={handleResetAll}
+                  className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 flex items-center gap-1 font-body cursor-pointer transition-colors"
+                  title="সব ফিল্টার রিসেট করুন"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-3 h-3" />
+                  <span>রিসেট</span>
                 </button>
               )}
             </div>
 
-            {/* Bookmarked Filter Pill */}
-            <button
-              type="button"
-              onClick={() => {
-                setOnlyBookmarked(!onlyBookmarked);
-                setPage(1);
-              }}
-              className={`h-10 px-3 sm:px-3.5 rounded-xl border inline-flex items-center gap-1.5 text-xs font-bold font-headline transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs ${
-                onlyBookmarked
-                  ? "bg-rose-600 text-white border-rose-600 shadow-xs"
-                  : "bg-card border-slate-200 dark:border-white/[0.08] text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04]"
-              }`}
-              title="বুকমার্ককৃত প্রশ্ন ফিল্টার"
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${onlyBookmarked ? "fill-white text-white" : "fill-rose-500 text-rose-500"}`} />
-              <span className="hidden sm:inline">বুকমার্ককৃত</span>
-              <span className="text-[11px] font-semibold">({toBengaliDigits(bookmarkedIds.length)})</span>
-            </button>
-
-            {/* Mobile Filter Sheet Trigger Button & Content */}
-            <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
-              <SheetTrigger asChild>
-                <button
-                  type="button"
-                  className={`md:hidden h-10 px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold font-body transition-all shrink-0 cursor-pointer active:scale-95 ${
-                    activeFilterCount > 0
-                      ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
-                      : "bg-card border-border/60 text-foreground hover:bg-muted/60 shadow-2xs"
-                  }`}
-                >
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span>ফিল্টার</span>
-                  {activeFilterCount > 0 && (
-                    <span className="w-4.5 h-4.5 rounded-full bg-white text-indigo-700 text-[10px] font-bold flex items-center justify-center ml-0.5">
-                      {toBengaliDigits(activeFilterCount)}
-                    </span>
-                  )}
-                </button>
-              </SheetTrigger>
-
-              <SheetContent
-                side="bottom"
-                className="rounded-t-3xl max-h-[88vh] flex flex-col p-0 border-t border-border/50 bg-card text-foreground shadow-2xl focus:outline-hidden overflow-hidden"
+            {/* Scrollable Filter List */}
+            <div className="flex-1 overflow-y-auto p-3.5 space-y-4 font-body text-xs">
+              {/* Quick Bookmark Toggle Tile */}
+              <div
+                onClick={() => {
+                  setOnlyBookmarked(!onlyBookmarked);
+                  setPage(1);
+                }}
+                className={cn(
+                  "p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all active:scale-[0.98]",
+                  onlyBookmarked
+                    ? "bg-rose-500/10 border-rose-500/40 text-rose-700 dark:text-rose-400 shadow-2xs"
+                    : "bg-muted/30 border-border/60 hover:bg-muted/60 text-foreground"
+                )}
               >
-                {/* Grab Handle */}
-                <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 mx-auto mt-3 mb-1 shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Bookmark className={cn("w-4 h-4", onlyBookmarked ? "fill-rose-500 text-rose-500" : "text-muted-foreground")} />
+                  <span className="font-headline font-semibold text-xs">বুকমার্ককৃত প্রশ্ন</span>
+                </div>
+                <span
+                  className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-bold font-headline",
+                    onlyBookmarked ? "bg-rose-500 text-white" : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {toBengaliDigits(bookmarkedIds.length)}
+                </span>
+              </div>
 
-                {/* Sheet Header */}
-                <SheetHeader className="px-4 py-3 border-b border-border/40 text-left shrink-0">
-                  <SheetTitle className="text-base font-bold font-headline flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                        <SlidersHorizontal className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span>ফিল্টারসমূহ</span>
-                          {activeFilterCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">
-                              {toBengaliDigits(activeFilterCount)}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] font-normal text-muted-foreground font-body leading-none mt-0.5">
-                          {activeFilterCount > 0
-                            ? `${toBengaliDigits(activeFilterCount)}টি ফিল্টার সক্রিয় রয়েছে`
-                            : "পছন্দমতো ফিল্টার নির্বাচন করুন"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {activeFilterCount > 0 && (
+              {/* Chapter Filter Group */}
+              {isChapterApplicable && chapters.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                      <BookOpen className="w-3.5 h-3.5 text-primary" />
+                      <span>অধ্যায়</span>
+                    </label>
+                    {hasActiveChapter && (
                       <button
                         type="button"
-                        onClick={handleResetAll}
-                        className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-body cursor-pointer transition-all active:scale-95"
+                        onClick={() => {
+                          setSelectedChapterId("All");
+                          setPage(1);
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5"
                       >
-                        <RotateCcw className="w-3 h-3" />
-                        <span>সব মুছুন</span>
+                        <span>ক্লিয়ার</span>
+                        <X className="w-2.5 h-2.5" />
                       </button>
                     )}
-                  </SheetTitle>
-                </SheetHeader>
-
-                {/* Sheet Body */}
-                <div className="flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3.5 font-body text-xs">
-                  {/* Active Filter Chips Strip inside Drawer */}
-                  {activeFilterCount > 0 && (
-                    <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-border/40">
-                      <span className="text-[10px] font-semibold text-muted-foreground">সক্রিয়:</span>
-                      {hasActiveChapter && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
-                          <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
-                          <button
-                            type="button"
-                            onClick={() => { setSelectedChapterId("All"); setPage(1); }}
-                            className="hover:opacity-75 cursor-pointer ml-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      )}
-                      {hasActiveBoard && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
-                          <span>রেফারেন্স: {selectedBoard}</span>
-                          <button
-                            type="button"
-                            onClick={() => { setSelectedBoard("All"); setPage(1); }}
-                            className="hover:opacity-75 cursor-pointer ml-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      )}
-                      {hasActiveSource && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
-                          <span>উৎস: {selectedSource}</span>
-                          <button
-                            type="button"
-                            onClick={() => { setSelectedSource("All"); setPage(1); }}
-                            className="hover:opacity-75 cursor-pointer ml-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      )}
-                      {hasActiveSort && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
-                          <span>সাজানো: {selectedSort === "newest" ? "নতুন যুক্ত" : "পুরাতন যুক্ত"}</span>
-                          <button
-                            type="button"
-                            onClick={() => { setSelectedSort("newest"); setPage(1); }}
-                            className="hover:opacity-75 cursor-pointer ml-0.5"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Chapter Filter in Sheet */}
-                  {isChapterApplicable && chapters.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="font-bold text-foreground flex items-center gap-2">
-                          <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                          <span>অধ্যায় নির্বাচন</span>
-                        </label>
-                        {hasActiveChapter && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
-                            সক্রিয়
-                          </span>
-                        )}
-                      </div>
-                      <Select
-                        value={selectedChapterId}
-                        onValueChange={(val) => {
-                          setSelectedChapterId(val ?? "All");
-                          setPage(1);
-                        }}
-                      >
-                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
-                          <div className="flex items-center gap-2 truncate pl-1">
-                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                            <SelectValue placeholder="সকল অধ্যায়" />
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="max-h-64 font-body">
-                          <SelectItem value="All">সকল অধ্যায়</SelectItem>
-                          {chapters.map((ch: any, idx: number) => (
-                            <SelectItem key={ch.id} value={ch.id}>
-                              <span
-                                className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
-                                style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
-                              >
-                                {toBengaliDigits(idx + 1)}.
-                              </span>{" "}
-                              {ch.nameBn || ch.nameEn}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {/* Reference / Board in Sheet */}
-                  {boardYears.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="font-bold text-foreground flex items-center gap-2">
-                          <Tag className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                          <span>রেফারেন্স / বোর্ড</span>
-                        </label>
-                        {hasActiveBoard && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
-                            সক্রিয়
-                          </span>
-                        )}
-                      </div>
-                      <Select
-                        value={selectedBoard}
-                        onValueChange={(val) => {
-                          setSelectedBoard(val ?? "All");
-                          setPage(1);
-                        }}
-                      >
-                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
-                          <div className="flex items-center gap-2 truncate pl-1">
-                            <Tag className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                            <SelectValue placeholder="সকল রেফারেন্স" />
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="max-h-64 font-body">
-                          <SelectItem value="All">সকল রেফারেন্স</SelectItem>
-                          {boardYears.map((item: any) => (
-                            <SelectItem key={item.rawRef} value={item.rawRef}>
-                              🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {/* Source in Sheet */}
-                  {sources.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <label className="font-bold text-foreground flex items-center gap-2">
-                          <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                          <span>উৎস</span>
-                        </label>
-                        {hasActiveSource && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
-                            সক্রিয়
-                          </span>
-                        )}
-                      </div>
-                      <Select
-                        value={selectedSource}
-                        onValueChange={(val) => {
-                          setSelectedSource(val ?? "All");
-                          setPage(1);
-                        }}
-                      >
-                        <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
-                          <div className="flex items-center gap-2 truncate pl-1">
-                            <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                            <SelectValue placeholder="সকল উৎস" />
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="max-h-64 font-body">
-                          <SelectItem value="All">সকল উৎস</SelectItem>
-                          {sources.map((item: any) => (
-                            <SelectItem key={item.rawSource} value={item.rawSource}>
-                              📚 {item.rawSource} ({toBengaliDigits(item.count)})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {/* Sort Order in Sheet */}
-                  <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <label className="font-bold text-foreground flex items-center gap-2">
-                        <ArrowUpDown className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>ক্রমবিন্যাস</span>
-                      </label>
-                      {hasActiveSort && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
-                          সক্রিয়
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => { setSelectedSort("newest"); setPage(1); }}
-                        className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
-                          selectedSort === "newest"
-                            ? "bg-indigo-600 text-white shadow-xs"
-                            : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
-                        }`}
-                      >
-                        নতুন যুক্ত আগে
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setSelectedSort("oldest"); setPage(1); }}
-                        className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
-                          selectedSort === "oldest"
-                            ? "bg-indigo-600 text-white shadow-xs"
-                            : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
-                        }`}
-                      >
-                        পুরাতন যুক্ত আগে
-                      </button>
-                    </div>
                   </div>
-                </div>
-
-                {/* Sticky Action Footer */}
-                <div className="px-3.5 py-3 bg-background/95 backdrop-blur-md border-t border-border/50 flex items-center gap-2.5 shrink-0">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleResetAll}
-                    disabled={activeFilterCount === 0}
-                    className="h-11 px-4 rounded-xl font-bold flex items-center gap-1.5 border-border text-foreground shrink-0 disabled:opacity-40 cursor-pointer"
+                  <Select
+                    value={selectedChapterId}
+                    onValueChange={(val) => {
+                      setSelectedChapterId(val ?? "All");
+                      setPage(1);
+                    }}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>রিসেট</span>
-                  </Button>
-
-                  <Button
-                    type="button"
-                    onClick={() => setMobileFilterOpen(false)}
-                    className="flex-1 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-transform cursor-pointer"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>ফলাফল দেখুন</span>
-                  </Button>
+                    <SelectTrigger className="w-full h-9 px-3 rounded-xl bg-background border border-border/70 text-xs shadow-2xs hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center gap-2 truncate">
+                        <SelectValue placeholder="সকল অধ্যায়" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 font-body">
+                      <SelectItem value="All">সকল অধ্যায়</SelectItem>
+                      {chapters.map((ch: any, idx: number) => (
+                        <SelectItem key={ch.id} value={ch.id}>
+                          <span
+                            className="font-solaiman font-semibold text-primary"
+                            style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+                          >
+                            {toBengaliDigits(idx + 1)}.
+                          </span>{" "}
+                          {ch.nameBn || ch.nameEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </SheetContent>
-            </Sheet>
+              )}
 
-            {/* Desktop Filters (Hidden on Mobile) */}
-            <div className="hidden md:flex items-center gap-2.5 shrink-0">
-              {renderSelectFilters()}
+              {/* MCQ Type Filter Group (Desktop) */}
+              {isMcqCategory && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                      <HelpCircle className="w-3.5 h-3.5 text-primary" />
+                      <span>MCQ ধরন</span>
+                    </label>
+                    {hasActiveMcqType && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedMcqType("All");
+                          setPage(1);
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5"
+                      >
+                        <span>ক্লিয়ার</span>
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    )}
+                  </div>
+                  <Select
+                    value={selectedMcqType}
+                    onValueChange={(val) => {
+                      setSelectedMcqType(val ?? "All");
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-9 px-3 rounded-xl bg-background border border-border/70 text-xs shadow-2xs hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center gap-2 truncate">
+                        <SelectValue placeholder="সকল প্রকার" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 font-body">
+                      <SelectItem value="All">সকল প্রকার</SelectItem>
+                      {MCQ_TYPE_OPTIONS.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.labelBn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Reference / Board Group */}
+              {boardYears.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                      <Tag className="w-3.5 h-3.5 text-primary" />
+                      <span>রেফারেন্স / বোর্ড</span>
+                    </label>
+                    {hasActiveBoard && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBoard("All");
+                          setPage(1);
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5"
+                      >
+                        <span>ক্লিয়ার</span>
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    )}
+                  </div>
+                  <Select
+                    value={selectedBoard}
+                    onValueChange={(val) => {
+                      setSelectedBoard(val ?? "All");
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-9 px-3 rounded-xl bg-background border border-border/70 text-xs shadow-2xs hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center gap-2 truncate">
+                        <SelectValue placeholder="সকল রেফারেন্স" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 font-body">
+                      <SelectItem value="All">সকল রেফারেন্স</SelectItem>
+                      {boardYears.map((item: any) => (
+                        <SelectItem key={item.rawRef} value={item.rawRef}>
+                          🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Source Group */}
+              {sources.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                      <FileText className="w-3.5 h-3.5 text-primary" />
+                      <span>উৎস</span>
+                    </label>
+                    {hasActiveSource && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSource("All");
+                          setPage(1);
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5"
+                      >
+                        <span>ক্লিয়ার</span>
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    )}
+                  </div>
+                  <Select
+                    value={selectedSource}
+                    onValueChange={(val) => {
+                      setSelectedSource(val ?? "All");
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-9 px-3 rounded-xl bg-background border border-border/70 text-xs shadow-2xs hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center gap-2 truncate">
+                        <SelectValue placeholder="সকল উৎস" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60 font-body">
+                      <SelectItem value="All">সকল উৎস</SelectItem>
+                      {sources.map((item: any) => (
+                        <SelectItem key={item.rawSource} value={item.rawSource}>
+                          📚 {item.rawSource} ({toBengaliDigits(item.count)})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Sort Order Group */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                  <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
+                  <span>সাজান</span>
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedSort("newest");
+                      setPage(1);
+                    }}
+                    className={cn(
+                      "py-2 px-2.5 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 font-headline",
+                      selectedSort === "newest"
+                        ? "bg-primary text-primary-foreground shadow-2xs"
+                        : "bg-background text-muted-foreground border border-border/70 hover:bg-muted/50"
+                    )}
+                  >
+                    নতুনগুলো আগে
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedSort("oldest");
+                      setPage(1);
+                    }}
+                    className={cn(
+                      "py-2 px-2.5 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 font-headline",
+                      selectedSort === "oldest"
+                        ? "bg-primary text-primary-foreground shadow-2xs"
+                        : "bg-background text-muted-foreground border border-border/70 hover:bg-muted/50"
+                    )}
+                  >
+                    পুরাতনগুলো আগে
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          </aside>
 
-          {/* Active Filter Badges & Reset Row */}
-          {hasAnyFilter && (
-            <div className="flex flex-col gap-2 rounded-xl bg-slate-50/70 dark:bg-muted/30 border border-slate-200/60 dark:border-white/[0.04] p-2.5 text-xs sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <span className="font-semibold text-slate-500 dark:text-muted-foreground text-[11px] sm:text-xs font-headline">
-                  সক্রিয় ফিল্টারসমূহ:
-                </span>
+        {/* Right Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-background">
+          {/* Sub-Header: Search Bar, Mobile Filters Trigger, Active Badges */}
+          <div
+            className={cn(
+              "bg-card/95 backdrop-blur-xs border-b border-border/80 shrink-0 z-30 shadow-2xs px-3 sm:px-6 flex flex-col justify-center transition-all",
+              hasAnyFilter ? "py-2 sm:py-2.5 min-h-[58px]" : "h-[58px]"
+            )}
+          >
+            <div className="w-full flex flex-col gap-2">
+              {/* Primary Search & Quick Actions Row */}
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                {/* Mobile: Prominent Chapter Filter Dropdown (Outside Drawer) */}
+                <div className="md:hidden flex-1 min-w-0">
+                  {isChapterApplicable && chapters.length > 0 ? (
+                    <Select
+                      value={selectedChapterId}
+                      onValueChange={(val) => {
+                        setSelectedChapterId(val ?? "All");
+                        setPage(1);
+                      }}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "w-full h-9.5 px-2.5 sm:px-3 rounded-xl border text-xs shadow-2xs transition-colors truncate font-headline flex items-center justify-between",
+                          hasActiveChapter
+                            ? "bg-primary/10 border-primary/40 text-primary font-bold"
+                            : "bg-card border-border/70 text-foreground hover:bg-muted/40"
+                        )}
+                      >
+                        <div className="flex items-center gap-1.5 truncate">
+                          <BookOpen className="w-3.5 h-3.5 shrink-0 text-primary" />
+                          <span className="truncate">
+                            {hasActiveChapter
+                              ? (chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn ||
+                                 chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn ||
+                                 "অধ্যায়")
+                              : "সকল অধ্যায়"}
+                          </span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64 font-body">
+                        <SelectItem value="All">সকল অধ্যায়</SelectItem>
+                        {chapters.map((ch: any, idx: number) => (
+                          <SelectItem key={ch.id} value={ch.id}>
+                            <span
+                              className="font-solaiman font-semibold text-primary"
+                              style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+                            >
+                              {toBengaliDigits(idx + 1)}.
+                            </span>{" "}
+                            {ch.nameBn || ch.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="h-9.5 px-3 rounded-xl border border-border/70 bg-card text-xs text-muted-foreground font-headline flex items-center gap-1.5 truncate shadow-2xs">
+                      <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="truncate font-semibold text-foreground">
+                        {distStatus.questionTypeNameBn || distStatus.questionTypeName || distStatus.subjectName || "সকল প্রশ্ন"}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-                {/* Search Query Badge */}
-                {hasActiveQuery && (
-                  <Badge
-                    variant="secondary"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal max-w-[220px] truncate font-body"
-                  >
-                    <span className="truncate">অনুসন্ধান: &quot;{search}&quot;</span>
+                {/* Desktop: Primary Search Input Filter (Hidden on Mobile) */}
+                <div className="hidden md:block relative flex-1 min-w-0">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <Input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="প্রশ্ন, উদ্দীপক বা কী-ওয়ার্ড লিখে সার্চ করুন..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-8.5 pr-16 h-9.5 rounded-xl border border-border/70 bg-muted/30 focus-visible:bg-background text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all font-body shadow-2xs"
+                  />
+                  {hasActiveQuery ? (
                     <button
                       type="button"
                       onClick={() => {
                         setSearch("");
+                        setDebouncedSearch("");
                         setPage(1);
+                        searchInputRef.current?.focus();
                       }}
-                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                      title="অনুসন্ধান ফিল্টার বাদ দিন"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors cursor-pointer"
+                      title="সার্চ ক্লিয়ার করুন"
                     >
-                      <X className="h-3 w-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
-                  </Badge>
+                  ) : (
+                    <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/80 bg-muted/80 border border-border/60 rounded-md absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none select-none">
+                      Ctrl K
+                    </kbd>
+                  )}
+                </div>
+
+                {/* Available Questions Count Badge (Desktop) */}
+                {availableData?.totalItems !== undefined && (
+                  <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted/30 border border-border/60 text-xs text-muted-foreground font-body shrink-0 shadow-2xs">
+                    <span>{hasActiveQuery ? "ফলাফল:" : "মোট প্রশ্ন:"}</span>
+                    <strong className="text-foreground font-headline font-bold">
+                      {toBengaliDigits(availableData.totalItems)}টি
+                    </strong>
+                  </div>
                 )}
 
-                {/* Chapter Filter Badge */}
-                {hasActiveChapter && (
-                  <Badge
-                    variant="secondary"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
-                  >
-                    <span>অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn || chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedChapterId("All");
-                        setPage(1);
-                      }}
-                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                      title="অধ্যায় ফিল্টার বাদ দিন"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
+                {/* Mobile Bookmarked Filter Pill */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOnlyBookmarked(!onlyBookmarked);
+                    setPage(1);
+                  }}
+                  className={cn(
+                    "md:hidden h-9.5 px-3 rounded-xl border inline-flex items-center gap-1.5 text-xs font-bold font-headline transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs",
+                    onlyBookmarked
+                      ? "bg-rose-600 text-white border-rose-600 shadow-xs"
+                      : "bg-card border-border/70 text-foreground hover:bg-muted/50"
+                  )}
+                  title="বুকমার্ককৃত প্রশ্ন ফিল্টার"
+                >
+                  <Bookmark
+                    className={cn(
+                      "w-3.5 h-3.5",
+                      onlyBookmarked ? "fill-white text-white" : "fill-rose-500 text-rose-500"
+                    )}
+                  />
+                  <span className="text-[11px] font-semibold">({toBengaliDigits(bookmarkedIds.length)})</span>
+                </button>
 
-                {/* Reference Filter Badge */}
-                {hasActiveBoard && (
-                  <Badge
-                    variant="secondary"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
-                  >
-                    <span>রেফারেন্স: {selectedBoard}</span>
+                {/* Mobile Filter Sheet Trigger Button & Content */}
+                <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
+                  <SheetTrigger asChild>
                     <button
                       type="button"
-                      onClick={() => {
-                        setSelectedBoard("All");
-                        setPage(1);
-                      }}
-                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                      title="রেফারেন্স ফিল্টার বাদ দিন"
+                      className={cn(
+                        "md:hidden h-9.5 px-2.5 sm:px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold font-headline transition-all shrink-0 cursor-pointer active:scale-95 shadow-2xs",
+                        activeFilterCount > 0
+                          ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                          : "bg-card border-border/70 text-foreground hover:bg-muted/50"
+                      )}
+                      title="সার্চ ও ফিল্টারসমূহ খুলুন"
                     >
-                      <X className="h-3 w-3" />
+                      <SlidersHorizontal className="w-3.5 h-3.5" />
+                      <span className="hidden xs:inline">সার্চ ও ফিল্টার</span>
+                      {activeFilterCount > 0 && (
+                        <span className="w-4 h-4 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center ml-0.5">
+                          {toBengaliDigits(activeFilterCount)}
+                        </span>
+                      )}
                     </button>
-                  </Badge>
-                )}
+                  </SheetTrigger>
 
-                {/* Source Filter Badge */}
-                {hasActiveSource && (
-                  <Badge
-                    variant="secondary"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
+                  <SheetContent
+                    side="bottom"
+                    className="rounded-t-3xl max-h-[88vh] flex flex-col p-0 border-t border-border/60 bg-card text-foreground shadow-2xl focus:outline-hidden overflow-hidden"
                   >
-                    <span>উৎস: {selectedSource}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSource("All");
-                        setPage(1);
-                      }}
-                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                      title="উৎস ফিল্টার বাদ দিন"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
+                    {/* Grab Handle */}
+                    <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 mx-auto mt-3 mb-1 shrink-0" />
 
-                {/* Sort Filter Badge */}
-                {hasActiveSort && (
-                  <Badge
-                    variant="secondary"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal shrink-0 font-body"
-                  >
-                    <span>সাজানো: {selectedSort === "oldest" ? "পুরাতন যুক্ত" : "নতুন যুক্ত"}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSort("newest");
-                        setPage(1);
-                      }}
-                      className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                      title="ক্রম পরিবর্তন বাদ দিন"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                )}
+                    {/* Sheet Header */}
+                    <SheetHeader className="px-4 py-3 border-b border-border/40 text-left shrink-0">
+                      <SheetTitle className="text-base font-bold font-headline flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <SlidersHorizontal className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span>সার্চ ও ফিল্টার</span>
+                              {activeFilterCount > 0 && (
+                                <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                                  {toBengaliDigits(activeFilterCount)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] font-normal text-muted-foreground font-body leading-none mt-0.5">
+                              {activeFilterCount > 0
+                                ? `${toBengaliDigits(activeFilterCount)}টি ফিল্টার সক্রিয় রয়েছে`
+                                : "সার্চ ও ফিল্টার সিলেক্ট করুন"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {activeFilterCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={handleResetAll}
+                            className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-body cursor-pointer transition-all active:scale-95"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>সব রিসেট</span>
+                          </button>
+                        )}
+                      </SheetTitle>
+                    </SheetHeader>
+
+                    {/* Sheet Body */}
+                    <div className="flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3.5 font-body text-xs">
+                      {/* Active Filter Chips Strip inside Drawer */}
+                      {activeFilterCount > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-border/40">
+                          <span className="text-[10px] font-semibold text-muted-foreground">সক্রিয়:</span>
+                          {hasActiveQuery && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <Search className="w-3 h-3 text-primary shrink-0" />
+                              <span>সার্চ: &quot;{search}&quot;</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSearch("");
+                                  setDebouncedSearch("");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveMcqType && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <HelpCircle className="w-3 h-3 text-primary shrink-0" />
+                              <span>ধরন: {MCQ_TYPE_OPTIONS.find((t) => t.value === selectedMcqType)?.labelBn || selectedMcqType}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedMcqType("All");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveChapter && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <span>
+                                অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn ||
+                                  chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedChapterId("All");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveBoard && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <span>রেফারেন্স: {selectedBoard}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedBoard("All");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveSource && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <span>উৎস: {selectedSource}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedSource("All");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveSort && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                              <span>সাজান: {selectedSort === "oldest" ? "পুরাতনগুলো আগে" : "নতুনগুলো আগে"}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedSort("newest");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Primary Search Bar in Sheet (First Item) */}
+                      <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="font-bold text-foreground flex items-center gap-2 font-headline">
+                            <Search className="w-3.5 h-3.5 text-primary" />
+                            <span>প্রশ্ন সার্চ করুন</span>
+                          </label>
+                          {hasActiveQuery && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearch("");
+                                setDebouncedSearch("");
+                                setPage(1);
+                              }}
+                              className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-0.5 font-headline"
+                            >
+                              <span>ক্লিয়ার</span>
+                              <X className="w-2.5 h-2.5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="relative">
+                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                          <Input
+                            type="text"
+                            placeholder="প্রশ্ন, উদ্দীপক বা কী-ওয়ার্ড লিখে সার্চ..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-8.5 pr-8 h-11 rounded-xl border border-border/60 bg-background text-xs font-body shadow-2xs focus-visible:ring-1 focus-visible:ring-primary"
+                          />
+                          {hasActiveQuery && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearch("");
+                                setDebouncedSearch("");
+                                setPage(1);
+                              }}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors cursor-pointer"
+                              title="সার্চ ক্লিয়ার করুন"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* MCQ Type Filter in Sheet (Mobile) */}
+                      {isMcqCategory && (
+                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="font-bold text-foreground flex items-center gap-2 font-headline">
+                              <HelpCircle className="w-3.5 h-3.5 text-primary" />
+                              <span>MCQ ধরন</span>
+                            </label>
+                            {hasActiveMcqType && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold font-headline">
+                                সক্রিয়
+                              </span>
+                            )}
+                          </div>
+                          <Select
+                            value={selectedMcqType}
+                            onValueChange={(val) => {
+                              setSelectedMcqType(val ?? "All");
+                              setPage(1);
+                            }}
+                          >
+                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary font-body">
+                              <div className="flex items-center gap-2 truncate pl-1">
+                                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                <SelectValue placeholder="সকল প্রকার" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="max-h-64 font-body">
+                              <SelectItem value="All">সকল প্রকার</SelectItem>
+                              {MCQ_TYPE_OPTIONS.map((item) => (
+                                <SelectItem key={item.value} value={item.value}>
+                                  {item.labelBn}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Reference / Board in Sheet */}
+                      {boardYears.length > 0 && (
+                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="font-bold text-foreground flex items-center gap-2">
+                              <Tag className="w-3.5 h-3.5 text-primary" />
+                              <span>রেফারেন্স / বোর্ড</span>
+                            </label>
+                            {hasActiveBoard && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                                সক্রিয়
+                              </span>
+                            )}
+                          </div>
+                          <Select
+                            value={selectedBoard}
+                            onValueChange={(val) => {
+                              setSelectedBoard(val ?? "All");
+                              setPage(1);
+                            }}
+                          >
+                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
+                              <div className="flex items-center gap-2 truncate pl-1">
+                                <Tag className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                <SelectValue placeholder="সকল রেফারেন্স" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="max-h-64 font-body">
+                              <SelectItem value="All">সকল রেফারেন্স</SelectItem>
+                              {boardYears.map((item: any) => (
+                                <SelectItem key={item.rawRef} value={item.rawRef}>
+                                  🏷️ {item.rawRef} ({toBengaliDigits(item.count)})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Source in Sheet */}
+                      {sources.length > 0 && (
+                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <label className="font-bold text-foreground flex items-center gap-2">
+                              <FileText className="w-3.5 h-3.5 text-primary" />
+                              <span>উৎস</span>
+                            </label>
+                            {hasActiveSource && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                                সক্রিয়
+                              </span>
+                            )}
+                          </div>
+                          <Select
+                            value={selectedSource}
+                            onValueChange={(val) => {
+                              setSelectedSource(val ?? "All");
+                              setPage(1);
+                            }}
+                          >
+                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
+                              <div className="flex items-center gap-2 truncate pl-1">
+                                <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                <SelectValue placeholder="সকল উৎস" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="max-h-64 font-body">
+                              <SelectItem value="All">সকল উৎস</SelectItem>
+                              {sources.map((item: any) => (
+                                <SelectItem key={item.rawSource} value={item.rawSource}>
+                                  📚 {item.rawSource} ({toBengaliDigits(item.count)})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Sort Order in Sheet */}
+                      <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
+                        <div className="flex items-center justify-between">
+                          <label className="font-bold text-foreground flex items-center gap-2">
+                            <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
+                            <span>সাজান</span>
+                          </label>
+                          {hasActiveSort && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                              সক্রিয়
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSort("newest");
+                              setPage(1);
+                            }}
+                            className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                              selectedSort === "newest"
+                                ? "bg-primary text-primary-foreground shadow-xs"
+                                : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
+                            }`}
+                          >
+                            নতুনগুলো আগে
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedSort("oldest");
+                              setPage(1);
+                            }}
+                            className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                              selectedSort === "oldest"
+                                ? "bg-primary text-primary-foreground shadow-xs"
+                                : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
+                            }`}
+                          >
+                            পুরাতনগুলো আগে
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sticky Action Footer */}
+                    <div className="px-3.5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-background/95 backdrop-blur-md border-t border-border/50 flex items-center gap-2.5 shrink-0">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleResetAll}
+                        disabled={activeFilterCount === 0}
+                        className="h-11 px-4 rounded-xl font-bold flex items-center gap-1.5 border-border text-foreground shrink-0 disabled:opacity-40 cursor-pointer font-headline"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>রিসেট</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        onClick={() => setMobileFilterOpen(false)}
+                        className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-transform cursor-pointer font-headline"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>ফলাফল দেখুন</span>
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
 
-              {/* Reset All Button */}
-              <button
-                type="button"
-                onClick={handleResetAll}
-                className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer self-end sm:self-auto shrink-0 font-body"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>সব ফিল্টার মুছুন</span>
-              </button>
+              {/* Active Filter Chips Strip */}
+              {hasAnyFilter && (
+                <div className="flex items-center justify-between gap-2 pt-0.5 text-xs font-display overflow-hidden">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 flex-1 min-w-0">
+                    <span className="text-[11px] font-semibold text-muted-foreground mr-0.5 font-headline shrink-0">
+                      সক্রিয়:
+                    </span>
+
+                    {/* Search Query Filter Pill */}
+                    {hasActiveQuery && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <Search className="w-3 h-3 text-primary shrink-0" />
+                        <span className="truncate max-w-[140px] sm:max-w-[200px]">
+                          সার্চ: &quot;{search}&quot;
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSearch("");
+                            setDebouncedSearch("");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="সার্চ ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Bookmarked Filter Pill */}
+                    {hasActiveBookmarked && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <Bookmark className="w-3 h-3 fill-rose-500 text-rose-500 shrink-0" />
+                        <span>বুকমার্ককৃত</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOnlyBookmarked(false);
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="বুকমার্ক ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Chapter Filter Pill */}
+                    {hasActiveChapter && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <BookOpen className="w-3 h-3 text-primary shrink-0" />
+                        <span className="truncate max-w-[170px] sm:max-w-[200px]">
+                          অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn ||
+                            chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedChapterId("All");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="অধ্যায় ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* MCQ Type Filter Pill */}
+                    {hasActiveMcqType && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <HelpCircle className="w-3 h-3 text-primary shrink-0" />
+                        <span>ধরন: {MCQ_TYPE_OPTIONS.find((t) => t.value === selectedMcqType)?.labelBn || selectedMcqType}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedMcqType("All");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="MCQ ধরন ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Reference / Board Filter Pill */}
+                    {hasActiveBoard && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <Tag className="w-3 h-3 text-primary shrink-0" />
+                        <span className="truncate max-w-[150px] sm:max-w-[180px]">বোর্ড: {selectedBoard}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedBoard("All");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="রেফারেন্স ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Source Filter Pill */}
+                    {hasActiveSource && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <FileText className="w-3 h-3 text-primary shrink-0" />
+                        <span className="truncate max-w-[150px] sm:max-w-[180px]">উৎস: {selectedSource}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedSource("All");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-primary/20 text-primary transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="উৎস ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Sort Order Pill */}
+                    {hasActiveSort && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted border border-border/70 text-foreground text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <ArrowUpDown className="w-3 h-3 text-muted-foreground shrink-0" />
+                        <span className="shrink-0">সাজান: {selectedSort === "oldest" ? "পুরাতনগুলো আগে" : "নতুনগুলো আগে"}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedSort("newest");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-muted-foreground/20 text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="ক্রম পরিবর্তন বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Reset All Filters Button */}
+                  <button
+                    type="button"
+                    onClick={handleResetAll}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer shrink-0 font-headline ml-auto active:scale-95 pl-1.5 border-l border-border/50"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span className="hidden xs:inline">সব রিসেট</span>
+                    <span className="xs:hidden">রিসেট</span>
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Main Content Question Canvas */}
+          <main className="flex-1 overflow-auto p-3 sm:p-6">
+            <div className="w-full space-y-4 sm:space-y-6 pb-28 sm:pb-32">
+              {/* Alternative Mode Notification Banner */}
+              {isAlternativeMode && (
+                <div className="bg-primary/5 border border-primary/25 rounded-2xl p-3 sm:px-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs font-display">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <Split className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2">
+                        <span>বিকল্প প্রশ্ন যোগ মোড</span>
+                        <Badge className="bg-primary text-primary-foreground text-[10px] py-0 px-2 font-headline">
+                          {orLabel}
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 truncate">
+                        {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর জন্য ` : ""}
+                        বিকল্প হিসেবে ১টি প্রশ্ন সিলেক্ট করুন।
+                        {primaryMarksParam ? ` (মান: ${toBengaliDigits(primaryMarksParam)})` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="text-xs border-primary/30 text-primary hover:bg-primary/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
+                  >
+                    <Link href={`/question-papers/${paperId}/builder`}>
+                      বাতিল ও ক্যানভাসে ফিরুন
+                    </Link>
+                  </Button>
+                </div>
+              )}
+
+              {/* Exchange Mode Notification Banner */}
+              {isExchangeMode && (
+                <div className="bg-amber-500/5 border border-amber-500/25 rounded-2xl p-3 sm:px-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs font-display">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+                      <ArrowLeftRight className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2">
+                        <span>প্রশ্ন পরিবর্তন মোড</span>
+                        {masterNumberParam && (
+                          <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-300/40 text-[10px] py-0 px-2 font-headline">
+                            প্রশ্ন নং {toBengaliDigits(masterNumberParam)}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 truncate">
+                        {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর স্থলে ` : ""}
+                        একই পজিশনে পরিবর্তন করতে তালিকা থেকে ১টি নতুন প্রশ্ন সিলেক্ট করুন।
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="text-xs border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
+                  >
+                    <Link href={`/question-papers/${paperId}/builder`}>
+                      বাতিল ও ক্যানভাসে ফিরুন
+                    </Link>
+                  </Button>
+                </div>
+              )}
+
+              {/* Question Grid */}
+              <QuestionGrid
+                subjectId={distStatus.subjectId}
+                questionTypeId={(isAlternativeMode || isExchangeMode) ? "" : (urlQuestionTypeIdParam || distStatus.questionTypeId)}
+                category={category}
+                search={debouncedSearch}
+                chapterId={selectedChapterId}
+                board={selectedBoard}
+                source={selectedSource}
+                sort={selectedSort}
+                mcqType={selectedMcqType}
+                excludePaperId={paperId}
+                distributionId={(isAlternativeMode || isExchangeMode) ? undefined : distributionId}
+                selectedIds={selectedIds}
+                selectedSubQuestionIdsMap={selectedSubQuestionIdsMap}
+                onToggleSubQuestion={handleToggleSubQuestion}
+                onSelectGroup={handleSelectGroup}
+                page={page}
+                limit={limit}
+                onPageChange={setPage}
+                onLimitChange={setLimit}
+                onlyBookmarked={onlyBookmarked}
+                bookmarkedIds={bookmarkedIds}
+                isExchangeMode={isExchangeMode}
+                currentQuestionId={currentQuestionId}
+                onResetFilters={handleResetAll}
+                onClearSearch={() => {
+                  setSearch("");
+                  setDebouncedSearch("");
+                  setPage(1);
+                  searchInputRef.current?.focus();
+                }}
+                onResetBookmarks={() => {
+                  setOnlyBookmarked(false);
+                  setPage(1);
+                }}
+                onToggle={(id) => {
+                  setSelectedIds((prev) => {
+                    if (prev.includes(id)) {
+                      setSelectedSubQuestionIdsMap((m) => {
+                        const next = { ...m };
+                        delete next[id];
+                        return next;
+                      });
+                      return prev.filter((item) => item !== id);
+                    }
+                    if (isAlternativeMode || isExchangeMode) {
+                      return [id];
+                    }
+                    if (isSingleType) {
+                      if (subSectionQuestionsCount >= 1) {
+                        toast.error(
+                          "এই অংশে ১টি মূল প্রশ্ন ইতিমধ্যে যুক্ত আছে। বিকল্প প্রশ্ন যোগ করতে বিল্ডারে গিয়ে 'বিকল্প (অথবা) যোগ করুন' ব্যবহার করুন।"
+                        );
+                        return prev;
+                      }
+                      return [id];
+                    }
+                    if (effectiveTargetCount > 0 && prev.length >= maxSelectable) {
+                      if (maxSelectable === 0) {
+                        toast.error("এই সেকশনের প্রশ্নের টার্গেট ইতিমধ্যে পূর্ণ হয়ে গেছে।");
+                      } else {
+                        toast.error(
+                          `আপনি এই সেকশনে সর্বোচ্চ ${toBengaliDigits(maxSelectable)}টি প্রশ্ন সিলেক্ট করতে পারবেন।`
+                        );
+                      }
+                      return prev;
+                    }
+                    return [...prev, id];
+                  });
+                }}
+              />
+            </div>
+          </main>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto p-4 sm:p-6">
-        <div className="max-w-6xl mx-auto space-y-6 pb-28">
-
-          {/* Alternative Mode Notification Banner */}
-          {isAlternativeMode && (
-            <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <Split className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <span>বিকল্প প্রশ্ন নির্বাচন মোড</span>
-                    <Badge className="bg-primary text-white text-[10px] py-0 px-2">
-                      {orLabel}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর জন্য ` : ""}
-                    বিকল্প হিসেবে ১টি প্রশ্ন নির্বাচন করুন।
-                    {primaryMarksParam ? ` (মান: ${toBengaliDigits(primaryMarksParam)})` : ""}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="text-xs border-primary/40 text-primary hover:bg-primary/15 cursor-pointer shrink-0 rounded-lg font-bold"
-              >
-                <Link href={`/question-papers/${paperId}/builder`}>
-                  বাতিল ও ক্যানভাসে ফিরুন
-                </Link>
-              </Button>
-            </div>
-          )}
-
-          {/* Exchange Mode Notification Banner */}
-          {isExchangeMode && (
-            <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <ArrowLeftRight className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <span>প্রশ্ন বিনিময় / প্রতিস্থাপন মোড</span>
-                    {masterNumberParam && (
-                      <Badge className="bg-indigo-600 text-white text-[10px] py-0 px-2">
-                        প্রশ্ন নং {toBengaliDigits(masterNumberParam)}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর স্থলে ` : ""}
-                    হুবহু একই পজিশনে প্রতিস্থাপন করতে তালিকা থেকে ১টি নতুন প্রশ্ন নির্বাচন করুন।
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="text-xs border-indigo-500/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/15 cursor-pointer shrink-0 rounded-lg font-bold"
-              >
-                <Link href={`/question-papers/${paperId}/builder`}>
-                  বাতিল ও ক্যানভাসে ফিরুন
-                </Link>
-              </Button>
-            </div>
-          )}
-
-
-
-          {/* Question Grid */}
-          <QuestionGrid
-            subjectId={distStatus.subjectId}
-            questionTypeId={(isAlternativeMode || isExchangeMode) ? "" : (urlQuestionTypeIdParam || distStatus.questionTypeId)}
-            category={category}
-            search={search}
-            chapterId={selectedChapterId}
-            board={selectedBoard}
-            source={selectedSource}
-            sort={selectedSort}
-            excludePaperId={paperId}
-            distributionId={(isAlternativeMode || isExchangeMode) ? undefined : distributionId}
-            selectedIds={selectedIds}
-            selectedSubQuestionIdsMap={selectedSubQuestionIdsMap}
-            onToggleSubQuestion={handleToggleSubQuestion}
-            onSelectGroup={handleSelectGroup}
-            page={page}
-            limit={limit}
-            onPageChange={setPage}
-            onLimitChange={setLimit}
-            onlyBookmarked={onlyBookmarked}
-            bookmarkedIds={bookmarkedIds}
-            isExchangeMode={isExchangeMode}
-            currentQuestionId={currentQuestionId}
-            onToggle={(id) => {
-              setSelectedIds(prev => {
-                if (prev.includes(id)) {
-                  setSelectedSubQuestionIdsMap((m) => {
-                    const next = { ...m };
-                    delete next[id];
-                    return next;
-                  });
-                  return prev.filter((item) => item !== id);
-                }
-                if (isAlternativeMode || isExchangeMode) {
-                  return [id];
-                }
-                if (isSingleType) {
-                  if (subSectionQuestionsCount >= 1) {
-                    toast.error("এই অংশে ১টি মূল প্রশ্ন ইতিমধ্যে যুক্ত আছে। বিকল্প প্রশ্ন যোগ করতে বিল্ডারে গিয়ে 'বিকল্প (অথবা) যোগ করুন' ব্যবহার করুন।");
-                    return prev;
-                  }
-                  return [id];
-                }
-                if (effectiveTargetCount > 0 && prev.length >= maxSelectable) {
-                  if (maxSelectable === 0) {
-                    toast.error("এই অংশের প্রশ্নের লক্ষ্য ইতিমধ্যে পূরণ হয়ে গেছে।");
-                  } else {
-                    toast.error(`আপনি এই অংশের জন্য সর্বোচ্চ ${toBengaliDigits(maxSelectable)}টি অতিরিক্ত প্রশ্ন নির্বাচন করতে পারবেন।`);
-                  }
-                  return prev;
-                }
-                return [...prev, id];
-              });
-            }}
-          />
-
-        </div>
-      </main>
-
-      {/* Floating Action Bar */}
+      {/* Floating Action Dock */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-4 left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl md:rounded-full p-2.5 md:px-6 md:py-2.5 flex flex-col md:flex-row items-center gap-2 md:gap-5 z-50 animate-in slide-in-from-bottom-5 select-none">
+        <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 bg-card/95 backdrop-blur-xl border border-border/80 shadow-2xl rounded-2xl md:rounded-full p-2.5 md:px-5 md:py-2.5 flex flex-col md:flex-row items-center gap-2.5 md:gap-4 z-50 animate-in slide-in-from-bottom-5 select-none font-display">
           <div className="text-xs md:text-sm font-bold text-foreground flex items-center justify-between w-full md:w-auto px-1 md:px-0">
-            <span>
-              <span className="text-indigo-600 dark:text-indigo-400 font-headline font-black">{toBengaliDigits(selectedIds.length)}টি</span> {isSingleType && !isAlternativeMode && !isExchangeMode ? "মূল প্রশ্ন নির্বাচিত" : "প্রশ্ন নির্বাচিত"}
+            <span className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-headline font-black text-xs">
+                {toBengaliDigits(selectedIds.length)}টি
+              </span>
+              <span className="font-headline font-bold">
+                {isSingleType && !isAlternativeMode && !isExchangeMode ? "মূল প্রশ্ন নির্বাচিত" : "প্রশ্ন নির্বাচিত"}
+              </span>
             </span>
-            <span className="text-muted-foreground md:ml-2 font-normal text-[11px] md:text-xs">
+            <span className="text-muted-foreground md:ml-1 font-normal text-[11px] md:text-xs font-body">
               (প্রয়োজন: {toBengaliDigits(maxSelectable)}টি)
             </span>
           </div>
@@ -1494,7 +2045,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 variant="outline"
-                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border/70 text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
                 asChild
               >
                 <Link href={`/question-papers/${paperId}/builder`}>
@@ -1502,19 +2053,19 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 </Link>
               </Button>
               <Button
-                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
                 disabled={isReplacing || selectedIds.length === 0}
                 onClick={handleSaveExchange}
               >
                 {isReplacing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowLeftRight className="w-3.5 h-3.5" />}
-                <span>প্রতিস্থাপন নিশ্চিত করুন</span>
+                <span>পরিবর্তন নিশ্চিত করুন</span>
               </Button>
             </div>
           ) : isAlternativeMode ? (
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 variant="outline"
-                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 border-border/70 text-muted-foreground hover:bg-muted font-headline font-bold cursor-pointer text-xs px-4"
                 asChild
               >
                 <Link href={`/question-papers/${paperId}/builder`}>
@@ -1522,7 +2073,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 </Link>
               </Button>
               <Button
-                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
+                className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
                 disabled={isAddingAlternative}
                 onClick={handleSaveAlternative}
               >
@@ -1533,12 +2084,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           ) : (
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
-                className="w-full md:w-auto rounded-xl md:rounded-full h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
+                className="w-full md:w-auto rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
                 disabled={isAssigning}
                 onClick={() => handleSaveAndContinue(false)}
               >
                 {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                <span>সংরক্ষণ ও বিল্ডারে ফিরে যান</span>
+                <span>সেভ করে বিল্ডারে ফিরুন</span>
               </Button>
             </div>
           )}

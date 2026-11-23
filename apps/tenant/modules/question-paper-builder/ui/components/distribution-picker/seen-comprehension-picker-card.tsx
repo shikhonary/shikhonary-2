@@ -9,6 +9,7 @@ import { cn } from "@workspace/ui/lib/utils";
 
 interface SeenComprehensionPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   selectedSubQuestionIds?: string[];
   onToggle: (id: string) => void;
@@ -18,6 +19,7 @@ interface SeenComprehensionPickerCardProps {
 
 export const SeenComprehensionPickerCard: React.FC<SeenComprehensionPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   selectedSubQuestionIds = [],
   onToggle,
@@ -111,7 +113,7 @@ export const SeenComprehensionPickerCard: React.FC<SeenComprehensionPickerCardPr
   };
 
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

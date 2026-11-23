@@ -33,9 +33,9 @@ export function QuestionPaperManagementView() {
     setGeneratingAnswerId(id)
     try {
       await generateAnswerMutation.mutateAsync({ id })
-      toast.success(`"${title}"-এর উত্তরপত্র সফলভাবে তৈরি হয়েছে।`)
+      toast.success(`"${title}"-এর উত্তরপত্র সফলভাবে তৈরি হয়েছে।`)
     } catch (err: any) {
-      toast.error(err?.message || "উত্তরপত্র তৈরি করতে ব্যর্থ হয়েছে।")
+      toast.error(err?.message || "উত্তরপত্র তৈরি করা যায়নি।")
     } finally {
       setGeneratingAnswerId(null)
     }

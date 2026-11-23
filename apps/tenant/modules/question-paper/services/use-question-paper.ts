@@ -250,6 +250,7 @@ export function useAvailableQuestions(
     limit?: number
     cursor?: string
     sort?: "newest" | "oldest"
+    mcqType?: string
   },
   enabled = true
 ) {

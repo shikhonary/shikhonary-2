@@ -7,6 +7,7 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
+import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -217,22 +218,24 @@ export const CQBlock = ({ item }: { item: any }) => {
   };
 
   const [showAddAlternative, setShowAddAlternative] = useState(false);
+  const stimulus = data.context || data.stimulus || data.scenario || data.questionContext?.text || null;
 
   return (
     <div
-      className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-2 break-inside-avoid"
+      className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-1 break-inside-avoid"
       style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}
     >
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
+        <BlockBreakButton id={item.id} />
         <button
           type="button"
           onClick={handleExchange}
           className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-          title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
         >
           <ArrowLeftRight className="w-3 h-3" />
-          বিনিময়
+          পরিবর্তন
         </button>
         <button
           type="button"
@@ -246,13 +249,15 @@ export const CQBlock = ({ item }: { item: any }) => {
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
+          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+          title="প্রশ্নটি ডিলিট করুন"
         >
           {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
+          ডিলিট
         </button>
       </div>
+
+      <BlockBreakIndicator id={item.id} />
 
       <div className="flex justify-between items-start gap-2">
         <div className="flex gap-2 flex-1 relative">
@@ -266,13 +271,25 @@ export const CQBlock = ({ item }: { item: any }) => {
             {toBengaliDigits(item.masterNumber || (item.orderIndex + 1))}।
           </span>
           <div className="flex-1 w-full min-w-0">
+            {/* Stimulus / Context / Scenario */}
+            {stimulus && (
+              <div className="mb-0.5 leading-relaxed text-foreground whitespace-pre-wrap w-full">
+                <CQEditableText 
+                  text={stimulus}
+                  itemKey={`${item.id}-context`}
+                  defaultStyle={contextStyle}
+                  className="m-0 w-full"
+                />
+              </div>
+            )}
+
             {/* Attachments (e.g. diagrams, stems, tables) */}
             <QuestionAttachments attachments={data.attachments} />
 
             {subQuestions.length > 0 && (
-              <div className="mt-1 space-y-0.5">
+              <div className="mt-0.5 space-y-0">
                 {subQuestions.map((sq, idx) => (
-                  <div key={idx} className="flex gap-2 items-start w-full">
+                  <div key={idx} className="flex gap-2 items-start w-full py-0">
                     {renderSubQuestionLabel(sq.label)}
                     
                     <CQEditableText 

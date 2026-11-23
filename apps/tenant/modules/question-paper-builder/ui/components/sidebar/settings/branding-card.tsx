@@ -20,10 +20,10 @@ export const BrandingCard: React.FC = () => {
         </div>
         <div>
           <h3 className="font-headline font-bold text-xs sm:text-sm text-foreground">
-            ব্র্যান্ডিং ও জলছাপ
+            ব্র্যান্ডিং ও ওয়াটারমার্ক
           </h3>
           <p className="text-[11px] text-muted-foreground font-body">
-            লোগো, ঠিকানা ও নিরাপত্তা ওয়াটারমার্ক
+            লোগো, ঠিকানা ও ওয়াটারমার্ক
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export const BrandingCard: React.FC = () => {
           </div>
           {settings.showLogo && (
             <Input 
-              placeholder="লোগোর ইমেজ ইউআরএল (ঐচ্ছিক)" 
+              placeholder="লোগো ছবির লিঙ্ক/URL (ঐচ্ছিক)" 
               value={settings.logoUrl || ""}
               onChange={(e) => updateSettings({ logoUrl: e.target.value })}
               className="h-8 text-xs rounded-xl bg-card border-slate-200 dark:border-white/10 font-body focus-visible:ring-indigo-500 animate-in fade-in-50 duration-200"
@@ -87,7 +87,7 @@ export const BrandingCard: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <Stamp className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <Label htmlFor="showWatermark" className="text-xs sm:text-sm font-semibold text-foreground font-headline cursor-pointer">
-                জলছাপ (Watermark)
+                ওয়াটারমার্ক (জলছাপ)
               </Label>
             </div>
             <Switch 
@@ -99,7 +99,7 @@ export const BrandingCard: React.FC = () => {
           </div>
           {settings.showWatermark && (
             <Input 
-              placeholder="জলছাপের টেক্সট লিখুন..." 
+              placeholder="ওয়াটারমার্কের টেক্সট লিখুন..." 
               value={settings.watermark || ""}
               onChange={(e) => updateSettings({ watermark: e.target.value })}
               className="h-8 text-xs rounded-xl bg-card border-slate-200 dark:border-white/10 font-body focus-visible:ring-indigo-500 animate-in fade-in-50 duration-200"

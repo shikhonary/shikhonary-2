@@ -6,22 +6,14 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface FillInTheBlanksWithoutCluesPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
-const toBengaliDigits = (num?: number | string | null): string => {
-  if (num === null || num === undefined || num === "") return "";
-  const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
-  return num
-    .toString()
-    .split("")
-    .map((char) => (/\d/.test(char) ? bengaliDigits[parseInt(char)] : char))
-    .join("");
-};
-
 export const FillInTheBlanksWithoutCluesPickerCard: React.FC<FillInTheBlanksWithoutCluesPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -34,49 +26,22 @@ export const FillInTheBlanksWithoutCluesPickerCard: React.FC<FillInTheBlanksWith
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
       chapterName={chapterName}
+      typeLabel={q.questionType?.nameBn || "শূন্যস্থান পূরণ (ক্লু ছাড়া)"}
       difficulty={q.difficulty}
+      marks={q.marks || 5}
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
     >
       <div className="flex flex-col gap-2 font-body">
         {/* Formatted Content Preview */}
-        <div className="text-sm font-medium text-on-surface leading-relaxed whitespace-pre-wrap py-0.5">
+        <div className="text-xs sm:text-sm font-medium text-foreground leading-relaxed whitespace-pre-wrap py-0.5">
           <RenderFillInTheBlanksContent text={q.content || ""} isMath={q.isMath} />
-        </div>
-
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {q.isMath && (
-              <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-[11px] font-bold border border-purple-200">
-                ∑ Math
-              </span>
-            )}
-            {(q.source || q.session) && (
-              <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {q.source || "N/A"}
-                {q.session ? ` (${toBengaliDigits(q.session)})` : ""}
-              </span>
-            )}
-            {Array.isArray(q.reference) && q.reference.length > 0 ? (
-              q.reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {ref}
-                </span>
-              ))
-            ) : (
-              !(q.source || q.session) && (
-                <span className="text-[11px] text-muted-foreground italic">
-                  No reference tags
-                </span>
-              )
-            )}
-          </div>
         </div>
       </div>
     </PickerCardWrapper>

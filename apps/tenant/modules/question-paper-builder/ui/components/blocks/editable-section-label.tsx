@@ -145,10 +145,10 @@ export const EditableSectionLabel = ({
         id: distributionId,
         questionTypeLabel: trimmed,
       });
-      toast.success("বিভাগের নির্দেশিকা লেবেল আপডেট হয়েছে");
+      toast.success("নির্দেশিকা লেবেল আপডেট হয়েছে");
       setIsEditing(false);
     } catch (err: any) {
-      toast.error(err?.message || "লেবেল আপডেট করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "লেবেল আপডেট করা যায়নি");
     }
   };
 
@@ -203,7 +203,7 @@ export const EditableSectionLabel = ({
           onClick={handleSave}
           disabled={isPending}
           className="p-1 text-primary hover:bg-primary/10 rounded transition-colors"
-          title="সংরক্ষণ করুন"
+          title="সেভ করুন"
         >
           {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
         </button>

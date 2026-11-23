@@ -68,7 +68,7 @@ function AutoSaveManager({ paperId }: { paperId: string }) {
         })
         .catch((err: any) => {
           setSaveStatus("error");
-          toast.error(err?.message || "স্বয়ংক্রিয় সংরক্ষণ ব্যর্থ হয়েছে");
+          toast.error(err?.message || "অটো-সেভ করা যায়নি");
         });
     }
   }, [debouncedSettings, paperId, hasUnsavedChanges, updateSettings, setSaveStatus, markSaved]);
@@ -173,14 +173,14 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
       setShowPublishModal(false);
 
       if (publishActionType === "generate-sets") {
-        toast.success("প্রশ্নপত্র সফলভাবে সংরক্ষিত ও প্রকাশিত হয়েছে");
+        toast.success("প্রশ্নপত্র সফলভাবে সেভ ও পাবলিশ হয়েছে");
         setShowGenerateModal(true);
       } else {
-        toast.success("প্রশ্নপত্র সফলভাবে সংরক্ষিত ও প্রকাশিত হয়েছে");
+        toast.success("প্রশ্নপত্র সফলভাবে সেভ ও পাবলিশ হয়েছে");
         downloadAsPdf();
       }
     } catch (err: any) {
-      toast.error(err?.message || "প্রশ্নপত্রের তথ্য সংরক্ষণ ও স্ট্যাটাস পরিবর্তন করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "প্রশ্নপত্র সেভ বা স্ট্যাটাস আপডেট করা যায়নি");
     }
   };
 
@@ -238,10 +238,10 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
     try {
       await updateSettingsMutation({ id: paperId, settings });
       markSaved();
-      toast.success("সকল পরিবর্তন সংরক্ষণ করা হয়েছে");
+      toast.success("সব পরিবর্তন সেভ হয়েছে");
     } catch (err: any) {
       useBuilderStore.setState({ saveStatus: "error" });
-      toast.error(err?.message || "সংরক্ষণ করতে ব্যর্থ হয়েছে");
+      toast.error(err?.message || "সেভ করা যায়নি");
     }
   };
 
@@ -299,18 +299,18 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
               {saveStatus === "saving" && (
                 <span className="text-[10px] sm:text-[11px] text-muted-foreground flex items-center gap-1 font-body">
                   <Loader2 className="w-2.5 h-2.5 animate-spin text-indigo-600 dark:text-indigo-400" />
-                  <span>সংরক্ষণ হচ্ছে...</span>
+                  <span>সেভ হচ্ছে...</span>
                 </span>
               )}
               {saveStatus === "saved" && (
                 <span className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-body flex items-center gap-1 font-semibold">
                   <span>✓</span>
-                  <span>সংরক্ষিত</span>
+                  <span>সেভ হয়েছে</span>
                 </span>
               )}
               {saveStatus === "error" && (
                 <span className="text-[10px] sm:text-[11px] text-rose-600 dark:text-rose-400 font-body font-semibold">
-                  সংরক্ষণ ব্যর্থ
+                  সেভ হয়নি
                 </span>
               )}
             </div>
@@ -341,14 +341,14 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
             onClick={handleDownloadClick}
             disabled={isDownloading}
             className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer gap-1.5 font-headline shrink-0"
-            title="ডাউনলোড PDF"
+            title="PDF ডাউনলোড"
           >
             {isDownloading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
             ) : (
               <Download className="w-3.5 h-3.5 text-muted-foreground" />
             )}
-            <span className="hidden sm:inline">ডাউনলোড PDF</span>
+            <span className="hidden sm:inline">PDF ডাউনলোড</span>
           </Button>
 
           {/* Save Button */}
@@ -357,14 +357,14 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
             onClick={handleManualSave}
             disabled={saveStatus === "saving" || isManualSaving}
             className="h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold font-headline cursor-pointer gap-1.5 shadow-xs transition-all active:scale-95 disabled:opacity-50 shrink-0"
-            title="সংরক্ষণ করুন"
+            title="সেভ করুন"
           >
             {saveStatus === "saving" || isManualSaving ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Save className="w-3.5 h-3.5" />
             )}
-            <span>সংরক্ষণ</span>
+            <span>সেভ করুন</span>
           </Button>
         </div>
       </header>

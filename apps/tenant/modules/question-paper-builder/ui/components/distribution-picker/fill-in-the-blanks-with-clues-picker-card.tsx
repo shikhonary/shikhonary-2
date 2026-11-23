@@ -6,23 +6,37 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface FillInTheBlanksWithCluesPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const FillInTheBlanksWithCluesPickerCard: React.FC<FillInTheBlanksWithCluesPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
+  const chapterName =
+    q.academicChapter?.nameBn ||
+    q.academicChapter?.nameEn ||
+    q.chapter?.nameBn ||
+    q.chapter?.nameEn;
+
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
-      chapterName={q.chapter?.nameBn || q.chapter?.nameEn}
-      typeLabel="Fill in the Blanks with Clues"
+      chapterName={chapterName}
+      typeLabel={q.questionType?.nameBn || "শূন্যস্থান পূরণ (ক্লু সহ)"}
+      difficulty={q.difficulty}
+      marks={q.marks || 5}
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
     >
       <div className="flex flex-col gap-2 font-body">
         {/* Clues Box Preview */}
@@ -34,7 +48,7 @@ export const FillInTheBlanksWithCluesPickerCard: React.FC<FillInTheBlanksWithClu
 
         {/* Formatted Passage / Options Preview */}
         {q.content ? (
-          <div className="text-sm font-medium text-on-surface leading-relaxed whitespace-pre-wrap">
+          <div className="text-xs sm:text-sm font-medium text-foreground leading-relaxed whitespace-pre-wrap">
             <RenderFillInTheBlanksContent text={q.content} />
           </div>
         ) : null}
@@ -42,7 +56,7 @@ export const FillInTheBlanksWithCluesPickerCard: React.FC<FillInTheBlanksWithClu
         {Array.isArray(q.options) && q.options.length > 0 && (
           <div className="space-y-1">
             {q.options.map((opt: string, idx: number) => (
-              <div key={idx} className="text-sm font-medium text-on-surface leading-relaxed">
+              <div key={idx} className="text-xs sm:text-sm font-medium text-foreground leading-relaxed">
                 <RenderFillInTheBlanksContent text={opt} />
               </div>
             ))}

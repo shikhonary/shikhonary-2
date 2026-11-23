@@ -8,12 +8,14 @@ import { formatShortCompositionPrompt } from "../blocks/short-composition-block"
 
 interface ShortCompositionPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const ShortCompositionPickerCard: React.FC<ShortCompositionPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -24,7 +26,7 @@ export const ShortCompositionPickerCard: React.FC<ShortCompositionPickerCardProp
   );
 
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}

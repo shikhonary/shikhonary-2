@@ -1,16 +1,10 @@
 {
-  "subjectId": "cmwlwqwgs00006ktoljgru49h",
-  "subjectName": "হিন্দুধর্ম ও নৈতিক শিক্ষা",
-  "className": "Nine",
-  "chapterTitle": "অবতার ও আদর্শ জীবনচরিত",
+  "chapterTitle": "মানববসতি",
   "questions": [
     {
-      "question": "অবতার কাকে বলে? অংশাবতার বলতে কী বোঝায়? অথবা, অংশাবতার কী? বুঝিয়ে লেখো।",
+      "question": "বসতি স্থাপনের নিয়ামকসমূহ ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [
-        "যশোর জিলা স্কুল",
-        "কুমিল্লা জিলা স্কুল"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -18,11 +12,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "শ্রীকৃষ্ণকে ভগবান বলা হয় কেন?",
+      "question": "দিনাজপুরের তুলনায় পার্বত্য চট্টগ্রামে বসতির ঘনত্ব কম হওয়ার কারণ ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [
-        "রা. বো. ২০২৬"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -30,11 +22,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "ভগবান বিষ্ণু বিভিন্ন সময়ে বিভিন্ন রূপ ধারণ করে অবতরণ করেন কেন?",
+      "question": "নদীর তীরে কোন ধরনের বসতি গড়ে ওঠে- ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [
-        "চ. বো. ২০২৬"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -42,11 +32,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "ভগবান শ্রীকৃষ্ণ কেন পৃথিবীতে আবির্ভূত হয়েছিলেন? বর্ণনা করো।",
+      "question": "সংখ্যাগরিষ্ঠ অধিবাসী প্রথম পর্যায়ের অর্থনৈতিক কর্মকাণ্ডে জড়িত এমন বসতির একটি বৈশিষ্ট্য বর্ণনা করো।",
       "answer": null,
-      "reference": [
-        "ম. বো. ২০২৬"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -54,12 +42,9 @@
       "attachmentDescription": null
     },
     {
-      "question": "সুশ্রুত কে ছিলেন? তাঁর সম্পর্কে ৬টি বাক্য লেখো।",
+      "question": "কৃষি জমির নিকট জনবসতি গড়ে ওঠে কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [
-        "পুলিশ লাইন্স স্কুল এন্ড কলেজ, রংপুর",
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
+      "reference": [],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -67,58 +52,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "আয়ুর্বেদ চিকিৎসা-সংক্রান্ত গ্রন্থ কোনটি? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সুশ্রুতকে কেন ভারতীয় শল্যবিদ্যার জনক বলা হয়? অথবা, ভারতীয় শল্যবিদ্যার জনক কে? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
-        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
-        "বরিশাল জিলা স্কুল",
-        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চরককে ভারতীয় চিকিৎসা শাস্ত্রের জনক বলা হয় কেন?",
-      "answer": null,
-      "reference": [
-        "চ. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চরক শরীরের উপকারিতার জন্য যে কয়টি উপাদানের কথা বলেছেন তা ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "সি. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোন আদর্শ মহাপুরুষ 'অদ্বৈতবাদ' মতবাদ প্রচার করেন? এই মতবাদের মূল কথা কী?",
+      "question": "কোন নিয়ামকের প্রভাবে প্রাচীনকাল থেকে নদী তীরবর্তী অঞ্চলে বিভিন্ন সভ্যতা গড়ে উঠেছে?",
       "answer": null,
       "reference": [],
       "difficulty": "EASY",
@@ -128,7 +62,117 @@
       "attachmentDescription": null
     },
     {
-      "question": "মোহমুদগার কাব্যগ্রন্থটি কে লিখেছেন? এই কাব্যের একটি শ্লোক উল্লেখ করো।",
+      "question": "গ্রামীণ পরিবেশে বসতি গড়ে ওঠার নিয়ামকগুলো ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের অর্থনীতি প্রধানত কৃষির উপর নির্ভরশীল। এদেশের অর্থনীতিতে গ্রামীণ অঞ্চলের ভূমিকা ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "উন্নত জীবনযাপনের লক্ষ্যে মানুষ শহর অঞ্চলে বসতি স্থাপন করে কেন ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সংঘবদ্ধ বসতি বলতে কী বোঝ?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গ্রামীণ বসতির ধরন ও বিন্যাস ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গোষ্ঠীবদ্ধ বসতি কীভাবে নগরে রূপান্তরিত হয়?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের বন্যাপ্রবণ অঞ্চলে কোন ধরনের বসতি গড়ে উঠে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "গ্রাম্য বসতিতে পথঘাট কম থাকে কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বিক্ষিপ্ত বসতি বন্ধুর ভূপ্রাকৃতিক অঞ্চলে গড়ে উঠে কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নগরায়ণ কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের কক্সবাজার কোন ধরনের নগর? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ফ্রান্সের প্যারিসে চিত্রকলা কোন ধরনের নগর স্থাপনে সহায়তা করেছে?",
       "answer": null,
       "reference": [],
       "difficulty": "EASY",
@@ -138,170 +182,19 @@
       "attachmentDescription": null
     },
     {
-      "question": "প্রভু নিত্যানন্দ কবে কোথায় জন্মগ্রহণ করেন? তাঁর বাল্যশিক্ষার পরিচয় দাও।",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা জিলা স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রভু নিত্যানন্দের পরিবারের পরিচয় দাও।",
-      "answer": null,
-      "reference": [
-        "কু. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কুবের কৃষ্ণদর্শন পেয়েছিলেন কীভাবে?",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কুবের বৃন্দাবনে গেলেন কেন?",
-      "answer": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কুবেরের নাম কীভাবে নিত্যানন্দ হলো? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "দি. বো. ২০২৬",
-        "বগুড়া সরকারি বালিকা উচ্চ বিদ্যালয়",
-        "চট্টগ্রাম কলেজিয়েট স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সমগ্র রাজস্থানে মীরার নাম প্রচারিত হলো কীভাবে?",
-      "answer": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মীরাবাঈয়ের জীবনী থেকে যে যে শিক্ষা পাই তা ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "সি. বো., ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "'যত মত তত পথ' এই কথাটির তাৎপর্য ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ম. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "গদাধরের পক্ষে প্রাতিষ্ঠানিক শিক্ষা লাভ সম্ভব হয়নি কেন?",
-      "answer": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "শ্রীরামকৃষ্ণের দুইটি উপদেশ লেখো।",
-      "answer": null,
-      "reference": [
-        "য. বো. ২০২৬",
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ",
-        "বরিশাল জিলা স্কুল",
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম",
-        "চট্টগ্রাম কলেজিয়েট স্কুল"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "শ্রীরাম কৃষ্ণের জীবনী থেকে আমরা কী নীতি শিক্ষা পাই আলোচনা করো।",
-      "answer": null,
-      "reference": [
-        "ম. বো., দি. বো., ব. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "একজন মহাপুরুষ বলেন, 'পৈতা জাতিভেদের চিহ্ন'। তিনি কে? পৈতা ত্যাগ করে তিনি কোন ধর্ম গ্রহণ করেন?",
+      "question": "শহরের লোকজন নিজ নিজ পরিমণ্ডলের লোকদের সঙ্গে প্রত্যক্ষ সম্পর্ক বজায় রাখতে পারে না কেন?",
       "answer": null,
       "reference": [],
-      "difficulty": "EASY",
+      "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "question": "শ্রীবিজয়কৃষ্ণ গোস্বামী কর্তৃক প্রতিষ্ঠিত সভার নাম কী? এই সভার সিদ্ধান্ত কী ছিলো?",
+      "question": "মানুষের ধর্মীয় বিশ্বাস নগরায়ণকে প্রভাবিত করে। এর ফলে কোন বসতির বিস্তার দেখা যায় তা ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্বামী বিবেকানন্দ যুবকদের শরীর গঠনের কথা বলতেন কেন?",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
-      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -309,121 +202,66 @@
       "attachmentDescription": null
     },
     {
-      "question": "'বেলুড় মঠ' প্রতিষ্ঠার উদ্দেশ্য কী? ব্যাখ্যা করো। অথবা, বেলুর মঠ প্রতিষ্ঠার কারণ ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ঢা. বো. ২০২৬",
-        "দি. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "শিক্ষা ব্যবস্থার উন্নয়নে স্বামীজীর দৃষ্টিভঙ্গি উল্লেখ করো।",
-      "answer": null,
-      "reference": [
-        "য. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বিবেকানন্দ বাল্যবিবাহকে ঘৃণা করতেন কেন?",
-      "answer": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কে, কত সালে 'রামকৃষ্ণ মিশন' প্রতিষ্ঠা করেন?",
-      "answer": null,
-      "reference": [
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্বামী বিবেকানন্দ কেন রামকৃষ্ণ মিশন প্রতিষ্ঠা করেন?",
-      "answer": null,
-      "reference": [
-        "কু. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্বামী বিবেকানন্দের জীবনী থেকে আমরা কী শিক্ষা পাই?",
-      "answer": null,
-      "reference": [
-        "কু. বো. ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্বামী বিবেকানন্দের সমাজ সংস্কারমূলক দুটি বাণী লেখো।",
-      "answer": null,
-      "reference": [
-        "ঢা. বো., ম. বো. ২০২৬"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "পাঠ্যপুস্তক থেকে স্বামী বিবেকানন্দের দুইটি উপদেশ লেখো।",
-      "answer": null,
-      "reference": [
-        "সি. বো. ২০২৬"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "একজন মহীয়সী তাঁর গুরুর নামানুসারে একটি নগর প্রতিষ্ঠা করেন। উক্ত মহীয়সী ও তাঁর প্রতিষ্ঠিত নগরের নাম কী?",
+      "question": "নগরায়ণের ফলে সৃষ্ট প্রভাবসমূহ ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
-      "difficulty": "EASY",
+      "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "question": "অরোভিল নগর সম্পর্কে দুটি তথ্য উল্লেখ করো।",
+      "question": "নগরায়ণের প্রভাবগুলোর মধ্যে বাংলাদেশের জন্য সবচেয়ে ক্ষতিকর দিকটি ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
-      "difficulty": "EASY",
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "শহরে অপরাধ বেশি সংঘটিত হয় কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বড় বড় শহরগুলোতে বস্তি বেশি কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "নগরে বায়ুবাহিত রোগের মাত্রা বেড়ে যাওয়ার কারণ কী?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "পরিকল্পিত নগরায়ণের জন্য পয়ঃনিষ্কাশন ব্যবস্থা উন্নত হওয়া প্রয়োজন কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     }
-  ]
+  ],
+  "subjectId": "cmwrmhge900000gto9rooxt4v",
+  "className": "Nine"
 }

@@ -131,7 +131,7 @@ export function QuestionPaperDataTable({
       return (
         <div className="p-12 text-center text-red-500 font-headline bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs">
           <AlertTriangle className="h-10 w-10 mx-auto text-red-400 mb-3" />
-          <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করতে ব্যর্থ হয়েছে।</p>
+          <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করা যায়নি।</p>
           <p className="text-xs text-muted-foreground mt-1">অনুগ্রহ করে পুনরায় পেজটি রিফ্রেশ করুন বা পরে চেষ্টা করুন।</p>
         </div>
       )
@@ -199,7 +199,7 @@ export function QuestionPaperDataTable({
     return (
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.06] bg-card shadow-xs p-12 text-center text-red-500 font-headline">
         <AlertTriangle className="h-10 w-10 mx-auto text-red-400 mb-3" />
-        <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করতে ব্যর্থ হয়েছে।</p>
+        <p className="text-base font-bold">প্রশ্নপত্র তালিকা লোড করা যায়নি।</p>
         <p className="text-xs text-muted-foreground mt-1">অনুগ্রহ করে পুনরায় পেজটি রিফ্রেশ করুন বা পরে চেষ্টা করুন।</p>
       </div>
     )
@@ -250,7 +250,7 @@ export function QuestionPaperDataTable({
               <TableHeader className="bg-slate-50/70 dark:bg-card/70 border-b border-slate-200/80 dark:border-white/[0.06]">
                   <TableRow className="border-b border-slate-200/80 dark:border-white/[0.06] hover:bg-transparent">
                     <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
-                      প্রশ্নপত্র বিবরণ
+                      প্রশ্নপত্রের বিবরণ
                     </TableHead>
                     <TableHead className="px-6 py-3.5 font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
                       শ্রেণি
@@ -265,7 +265,7 @@ export function QuestionPaperDataTable({
                       তৈরির তারিখ
                     </TableHead>
                     <TableHead className="px-6 py-3.5 text-right font-bold text-xs text-slate-500 dark:text-muted-foreground font-headline">
-                      কার্যক্রম
+                      অ্যাকশন
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -365,7 +365,7 @@ export function QuestionPaperDataTable({
                               >
                                 <Link href={`/question-papers/${item.id}/edit`}>
                                   <Pen className="h-3.5 w-3.5" />
-                                  <span>সম্পাদনা করুন</span>
+                                  <span>এডিট করুন</span>
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -395,7 +395,7 @@ export function QuestionPaperDataTable({
                                 className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                               >
                                 <Trash className="h-3.5 w-3.5" />
-                                <span>মুছে ফেলুন</span>
+                                <span>ডিলিট করুন</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

@@ -164,7 +164,7 @@ export function QuestionPaperFilterBar({
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-muted-foreground pointer-events-none" />
           <Input
             type="text"
-            placeholder="পরীক্ষার নাম বা প্রশ্নপত্র শিরোনাম দিয়ে অনুসন্ধান করুন..."
+            placeholder="পরীক্ষার নাম বা বিষয়ের শিরোনাম দিয়ে খুঁজুন..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-9 pr-9 h-10 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-xs sm:text-sm text-foreground focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus-visible:border-indigo-500/50 transition-all font-body"
@@ -174,7 +174,7 @@ export function QuestionPaperFilterBar({
               type="button"
               onClick={() => onSearchChange("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-foreground rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
-              title="অনুসন্ধান মুছুন"
+              title="ক্লিয়ার করুন"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -240,7 +240,7 @@ export function QuestionPaperFilterBar({
                     className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-body cursor-pointer transition-all active:scale-95"
                   >
                     <RotateCcw className="w-3 h-3" />
-                    <span>সব মুছুন</span>
+                    <span>রিসেট করুন</span>
                   </button>
                 )}
               </SheetTitle>
@@ -511,7 +511,7 @@ export function QuestionPaperFilterBar({
         <div className="flex flex-col gap-2 rounded-xl bg-slate-50/70 dark:bg-card/60 border border-slate-200/60 dark:border-white/[0.04] p-3 text-xs sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="font-semibold text-slate-500 dark:text-muted-foreground text-[11px] sm:text-xs font-headline">
-              সক্রিয় ফিল্টারসমূহ:
+              সক্রিয় ফিল্টার:
             </span>
 
             {/* Search Query Badge */}
@@ -520,12 +520,12 @@ export function QuestionPaperFilterBar({
                 variant="secondary"
                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-card px-2.5 py-1 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.04] cursor-default normal-case tracking-normal max-w-[220px] truncate font-body"
               >
-                <span className="truncate">অনুসন্ধান: &quot;{searchQuery}&quot;</span>
+                <span className="truncate">সার্চ: &quot;{searchQuery}&quot;</span>
                 <button
                   type="button"
                   onClick={() => onSearchChange("")}
                   className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                  title="অনুসন্ধান ফিল্টার বাদ দিন"
+                  title="সার্চ ফিল্টার বাদ দিন"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -579,7 +579,7 @@ export function QuestionPaperFilterBar({
                   type="button"
                   onClick={() => onSortChange("All")}
                   className="rounded-full p-0.5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer shrink-0"
-                  title="সাজানো বাতিল করুন"
+                  title="সাজানো রিসেট করুন"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -593,14 +593,14 @@ export function QuestionPaperFilterBar({
               type="button"
               onClick={handleResetAll}
               className="cursor-pointer focus:outline-hidden"
-              title="সব ফিল্টার বাতিল করুন"
+              title="সব ফিল্টার রিসেট করুন"
             >
               <Badge
                 variant="outline"
                 className="inline-flex items-center gap-1 rounded-lg border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary hover:bg-primary/20 transition-colors normal-case tracking-normal font-headline cursor-pointer"
               >
                 <RotateCcw className="h-3 w-3" />
-                <span>সব ফিল্টার রিসেট</span>
+                <span>ফিল্টার রিসেট</span>
               </Badge>
             </button>
           </div>

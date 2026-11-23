@@ -151,6 +151,12 @@ async function seedShortAnswers(filePath: string) {
   });
   console.log(`Resolved QuestionType: ${questionType?.nameBn} / ${questionType?.nameEn} (${questionType?.id})`);
 
+  // Force clean previous short answers for this chapter to ensure clean state
+  const deleteResult = await prisma.shortAnswer.deleteMany({
+    where: { chapterId: targetChapter.id }
+  });
+  console.log(`[Force Clean] Deleted ${deleteResult.count} previous short answer(s) for this chapter.\n`);
+
   const currentYear = new Date().getFullYear().toString();
   const sourceName = data.source || DEFAULT_SOURCE || "সহায়ক সংকলন";
   const sessionYear = data.session || currentYear;

@@ -6,6 +6,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, ArrowLeftRight } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
 import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
+import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -178,13 +179,14 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
     ? data.attachments
     : (data.questionUrl ? [{ type: "image", url: data.questionUrl }] : []);
   const isAnswerMode = Boolean(settings.isAnswerMode);
+  const isFirst = item.orderIndex === 0;
   
   return (
-    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors ${breakClass}`}
+    <div className={`group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col break-inside-avoid ${breakClass} ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}
          style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}>
          
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden items-center whitespace-nowrap">
+      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden items-center whitespace-nowrap">
         {hasStatements && (
           <div className="flex items-center border-r bg-muted/20">
             <span className="px-1.5 py-1 text-[10px] text-muted-foreground font-semibold select-none" title="বিবৃতি/উক্তি লেআউট">
@@ -194,7 +196,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 1)}
               className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${stmtColumns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="প্রতি লাইনে ১টি বক্তব্য (1 statement per row)"
+              title="প্রতি লাইনে ১টি বিবৃতি"
             >
               1
             </button>
@@ -202,7 +204,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 2)}
               className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="প্রতি লাইনে ২টি বক্তব্য (2 statements per row)"
+              title="প্রতি লাইনে ২টি বিবৃতি"
             >
               2
             </button>
@@ -210,7 +212,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
               type="button"
               onClick={() => setMcqStatementLayout(item.id, 4)}
               className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${stmtColumns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-              title="সবগুলো এক লাইনে / প্রতি লাইনে ৪টি বক্তব্য (All/4 statements per row)"
+              title="সবগুলো এক লাইনে / প্রতি লাইনে ৪টি বিবৃতি"
             >
               4
             </button>
@@ -227,7 +229,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 1)}
             className={`px-2 py-1 text-xs hover:bg-muted transition-colors ${columns === 1 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ১টি অপশন (1 option per row)"
+            title="প্রতি লাইনে ১টি অপশন"
           >
             1
           </button>
@@ -235,7 +237,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 2)}
             className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 2 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ২টি অপশন (2 options per row)"
+            title="প্রতি লাইনে ২টি অপশন"
           >
             2
           </button>
@@ -243,34 +245,37 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
             type="button"
             onClick={() => setMcqOptionLayout(item.id, 4)}
             className={`px-2 py-1 text-xs hover:bg-muted border-l transition-colors ${columns === 4 ? "bg-muted font-bold text-primary" : "text-muted-foreground"}`}
-            title="প্রতি লাইনে ৪টি অপশন (4 options per row)"
+            title="প্রতি লাইনে ৪টি অপশন"
           >
             4
           </button>
         </div>
+        <BlockBreakButton id={item.id} className="border-l" />
         <button
           type="button"
           onClick={handleExchange}
           className="px-2 py-1 text-xs hover:bg-primary/10 border-l transition-colors text-primary flex items-center gap-1 cursor-pointer"
-          title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
         >
           <ArrowLeftRight className="w-3 h-3" />
-          বিনিময়
+          পরিবর্তন
         </button>
         <button 
           onClick={handleRemove}
           disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 border-l transition-colors text-destructive flex items-center gap-1 ${isRemoving ? "opacity-50" : ""}`}
-          title="Remove Question"
+          className={`px-2 py-1 text-xs hover:bg-destructive/10 border-l transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+          title="প্রশ্নটি ডিলিট করুন"
         >
           {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          Remove
+          ডিলিট
         </button>
       </div>
 
+      <BlockBreakIndicator id={item.id} />
+
       {/* Top Banner & Stimulus: for COMBINED or questions with shared stimulus instruction */}
       {hasStimulusBanner && !hideContext && (
-        <div className="flex items-start gap-2 w-full pt-1.5 mb-0.5">
+        <div className="flex items-start gap-2 w-full pt-0.5 mb-0.5">
           <span
             className="font-bold shrink-0 min-w-[1.8em] invisible select-none pointer-events-none"
             style={{
@@ -370,11 +375,11 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
                   );
                 })}
               </div>
-              <div className="font-medium">নিচের কোনটি সঠিক?</div>
+              <div className="font-bold">নিচের কোনটি সঠিক?</div>
             </>
           )}
           
-          <div className={`grid gap-x-2 gap-y-0 ${gridClass}`}>
+          <div className={`grid gap-x-2 gap-y-0 mt-0.5 ${gridClass}`}>
             {(item.overrides?.shuffledOptions || data.options || []).map((opt: string, i: number) => {
               const label = ["ক", "খ", "গ", "ঘ"][i] || "";
               const isFilledAnswer = isAnswerMode && isCorrectMcqOption(data, opt, i);

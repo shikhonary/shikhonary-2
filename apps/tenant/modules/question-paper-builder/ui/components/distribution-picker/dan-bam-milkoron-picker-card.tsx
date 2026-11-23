@@ -8,6 +8,7 @@ import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
 
 interface DanBamMilkoronPickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
@@ -24,6 +25,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
 
 export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -70,6 +72,7 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
   return (
     <PickerCardWrapper
       id={q.id}
+      index={index}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
       onToggle={onToggle}
@@ -77,7 +80,11 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
       difficulty={q.difficulty}
       typeLabel={isEnglish ? "Matching" : "ডান-বাম মিলকরণ"}
       language={isEnglish ? "en" : "bn"}
-    >
+    
+      referenceTags={Array.isArray(q.reference) ? q.reference : []}
+      source={q.source}
+      session={q.session}
+      marks={q.marks}>
       <div className="flex flex-col gap-2 font-body">
         <div className="w-full">
           <RenderDanBamMilkoronTable
@@ -85,44 +92,7 @@ export const DanBamMilkoronPickerCard: React.FC<DanBamMilkoronPickerCardProps> =
             rightColumn={rightCol}
             isEnglish={isEnglish}
           />
-        </div>
-
-        {/* Reference Tags & Source Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-outline-variant/30 pt-2.5 mt-0.5">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(q.source || q.session) && (
-              <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                📚 {isEnglish ? translateTag(q.source || "Textbook") : (q.source || "N/A")}
-                {q.session ? ` (${isEnglish ? toEnglishDigits(q.session) : toBengaliDigits(q.session)})` : ""}
-              </span>
-            )}
-            {Array.isArray(q.reference) && q.reference.length > 0 ? (
-              q.reference.map((ref: string, rIdx: number) => (
-                <span
-                  key={rIdx}
-                  className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                >
-                  🏷️ {isEnglish ? translateTag(ref) : ref}
-                </span>
-              ))
-            ) : (
-              !(q.source || q.session) && (
-                <span className="text-[11px] text-muted-foreground italic">
-                  {isEnglish ? "No reference tags" : "কোনো রেফারেন্স ট্যাগ নেই"}
-                </span>
-              )
-            )}
-          </div>
-
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground font-mono">
-            <span>
-              {isEnglish ? "Rows:" : "সারি সংখ্যা:"}{" "}
-              {isEnglish
-                ? (leftCol.length || 0).toString()
-                : toBengaliDigits((leftCol.length || 0).toString())}
-            </span>
-          </div>
-        </div>
+        </div>
       </div>
     </PickerCardWrapper>
   );

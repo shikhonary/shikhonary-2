@@ -10,6 +10,7 @@ import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { isResourceEnglish } from "@workspace/utils";
+import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -295,18 +296,20 @@ export const SummaryBlock = ({ item }: { item: any }) => {
 
   return (
     <div className={`flex flex-col break-inside-avoid ${isFirst ? "pt-0.5 pb-0" : "py-0 my-0"}`}>
+      <BlockBreakIndicator id={item.id} />
       {renderMethod === 1 ? (
         <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
           {/* Hover Controls */}
-          <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+          <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
+            <BlockBreakButton id={item.id} className="border-r" />
             <button
               type="button"
               onClick={handleExchange}
               className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-              title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+              title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
             >
               <ArrowLeftRight className="w-3 h-3" />
-              বিনিময়
+              পরিবর্তন
             </button>
             {isFirst && (
               <button
@@ -323,10 +326,10 @@ export const SummaryBlock = ({ item }: { item: any }) => {
               onClick={handleRemove}
               disabled={isRemoving}
               className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
-              title="Remove Question"
+              title="প্রশ্নটি ডিলিট করুন"
             >
               {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-              Remove
+              ডিলিট
             </button>
           </div>
 
@@ -374,7 +377,7 @@ export const SummaryBlock = ({ item }: { item: any }) => {
       ) : (
         <>
           {isFirst && (
-            <div className="group/label relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start">
+            <div className="group/label relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start mb-0.5">
               {/* Question Label Hover Controls: Alternative trigger only */}
               <div className="absolute top-0 right-4 opacity-0 group-hover/label:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
                 <button
@@ -430,24 +433,25 @@ export const SummaryBlock = ({ item }: { item: any }) => {
 
           <div className="group/question relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex justify-between items-start gap-2">
             {/* Question Hover Controls: Remove question only */}
-            <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-10 print:hidden">
+            <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
+              <BlockBreakButton id={item.id} className="border-r" />
               <button
                 type="button"
                 onClick={handleExchange}
                 className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-                title="একই পজিশনে প্রশ্ন পরিবর্তন/বিনিময় করুন"
+                title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
               >
                 <ArrowLeftRight className="w-3 h-3" />
-                বিনিময়
+                পরিবর্তন
               </button>
               <button 
                 onClick={handleRemove}
                 disabled={isRemoving}
                 className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
-                title="Remove Question"
+                title="প্রশ্নটি ডিলিট করুন"
               >
                 {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                Remove
+                ডিলিট
               </button>
             </div>
 

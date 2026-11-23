@@ -6,6 +6,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
+import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";

@@ -6,12 +6,14 @@ import { PickerCardWrapper } from "./picker-card-wrapper";
 
 interface ChangingSentencePickerCardProps {
   question: any;
+  index?: number;
   isSelected: boolean;
   onToggle: (id: string) => void;
 }
 
 export const ChangingSentencePickerCard: React.FC<ChangingSentencePickerCardProps> = ({
   question: q,
+  index,
   isSelected,
   onToggle,
 }) => {
@@ -20,7 +22,7 @@ export const ChangingSentencePickerCard: React.FC<ChangingSentencePickerCardProp
   const hasOptionsList = optionsList.length > 0;
 
   return (
-    <PickerCardWrapper
+    <PickerCardWrapper index={index}
       id={q.id}
       isAssigned={q.isAssigned}
       isSelected={isSelected}
