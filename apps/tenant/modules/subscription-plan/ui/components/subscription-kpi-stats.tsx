@@ -11,7 +11,7 @@ import {
   Zap,
   CheckCircle2,
 } from "lucide-react"
-import { toBengaliDigits, formatBengaliPrice } from "@/modules/subscription-plan/utils"
+import { toBengaliDigits, formatBengaliPrice, naturalizePlanName } from "@/modules/subscription-plan/utils"
 import type { TenantSubscriptionDetails } from "@/modules/subscription-plan/types"
 
 interface SubscriptionKpiStatsProps {
@@ -42,7 +42,7 @@ export const SubscriptionKpiStats: React.FC<SubscriptionKpiStatsProps> = ({
   const stats = [
     {
       title: "বর্তমান প্ল্যান ও মেয়াদ",
-      value: plan?.displayName || "শিক্ষক প্যাক",
+      value: naturalizePlanName(plan?.displayName) || "শিক্ষক প্যাক",
       subValue: `বাকি ${toBengaliDigits(remainingDays)} দিন • ${
         sub?.billingCycle === "YEARLY" ? "বার্ষিক বিলিং" : "মাসিক বিলিং"
       }`,

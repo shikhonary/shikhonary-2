@@ -39,7 +39,9 @@ export const DistActionBlock: React.FC<{ blockData: any }> = ({ blockData }) => 
     category,
   } = useDistLimits(blockData, paperQuery);
 
-  if (isExporting || isCompleted) return null;
+  const isPublished = useBuilderStore((state) => state.isPublished) || paperQuery?.status === "Published";
+
+  if (isExporting || isCompleted || isPublished) return null;
 
   // ── Build pick URL ──────────────────────────────────────────────────────
   const resolvedCategory = category || resolveDistCategory(dist);

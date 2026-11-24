@@ -40,13 +40,6 @@ import { SubjectExplorerGrid } from "./subject-explorer-grid"
 import type { SubjectDetailsData, AcademicChapterBrief } from "../../../types"
 import type { QuestionTypeCode } from "@workspace/utils"
 
-const DIFFICULTIES = [
-  { value: "All", label: "সকল মান" },
-  { value: "EASY", label: "সহজ" },
-  { value: "MEDIUM", label: "মধ্যম" },
-  { value: "HARD", label: "কঠিন" },
-]
-
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "০"
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
@@ -74,8 +67,6 @@ interface MobileSubjectExplorerProps {
   selectedSource: string
   onSourceChange: (source: string) => void
   sources?: { rawSource: string; count: number }[]
-  selectedDifficulty: string
-  onDifficultyChange: (difficulty: string) => void
   selectedSort: "newest" | "oldest"
   onSortChange: (sort: "newest" | "oldest") => void
   onResetFilters: () => void
@@ -104,8 +95,6 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
   selectedSource,
   onSourceChange,
   sources = [],
-  selectedDifficulty,
-  onDifficultyChange,
   selectedSort,
   onSortChange,
   onResetFilters,
@@ -246,26 +235,34 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
           )}
         </div>
 
-        {/* Row 3: Search Bar & Filter Sheet Trigger */}
+        {/* Row 3: Chapter Filter & Filter Sheet Trigger */}
         <div className="flex items-center gap-2 pt-0.5 w-full min-w-0">
-          <div className="relative flex-1 min-w-0">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-            <Input
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="প্রশ্ন বা টপিক খুঁজুন..."
-              className="pl-9 pr-8 h-9.5 rounded-xl bg-card border-border/60 text-xs font-body w-full shadow-2xs focus-visible:ring-1 focus-visible:ring-indigo-500 placeholder:text-muted-foreground/70"
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={() => onSearchChange("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer"
-                title="মুছুন"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+          <div className="flex-1 min-w-0">
+            <Select
+              value={selectedChapterId}
+              onValueChange={(val) => onChapterChange(val)}
+            >
+              <SelectTrigger className="w-full h-9.5 px-3 rounded-xl bg-card border border-border/60 text-xs shadow-2xs font-body focus:ring-1 focus:ring-indigo-500">
+                <div className="flex items-center gap-2 truncate">
+                  <BookOpen className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder="সকল অধ্যায়" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="max-h-64 font-body">
+                <SelectItem value="All">সকল অধ্যায়</SelectItem>
+                {chapters.map((ch, idx) => (
+                  <SelectItem key={ch.id} value={ch.id}>
+                    <span
+                      className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
+                      style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
+                    >
+                      {toBengaliDigits(idx + 1)}.
+                    </span>{" "}
+                    {ch.nameBn}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Filter Sheet Trigger Button */}
@@ -339,6 +336,18 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                 {activeFiltersCount > 0 && (
                   <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-border/40">
                     <span className="text-[10px] font-semibold text-muted-foreground">সক্রিয়:</span>
+                    {search.trim() !== "" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
+                        <span>খোঁজ: "{search}"</span>
+                        <button
+                          type="button"
+                          onClick={() => onSearchChange("")}
+                          className="hover:opacity-75 cursor-pointer ml-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
                     {selectedChapterId !== "All" && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
                         <span>অধ্যায়: {chapters.find((c) => c.id === selectedChapterId)?.nameBn || "নির্বাচিত"}</span>
@@ -375,18 +384,6 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                         </button>
                       </span>
                     )}
-                    {selectedDifficulty !== "All" && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
-                        <span>মান: {DIFFICULTIES.find((d) => d.value === selectedDifficulty)?.label}</span>
-                        <button
-                          type="button"
-                          onClick={() => onDifficultyChange("All")}
-                          className="hover:opacity-75 cursor-pointer ml-0.5"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    )}
                     {selectedSort !== "newest" && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
                         <span>পূর্ববর্তী আগে</span>
@@ -402,44 +399,38 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                   </div>
                 )}
 
-                {/* Section: Chapter Selection */}
+                {/* Section: Search Query */}
                 <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="font-bold text-foreground flex items-center gap-2">
-                      <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>অধ্যায় নির্বাচন</span>
+                      <Search className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>অনুসন্ধান</span>
                     </label>
-                    {selectedChapterId !== "All" && (
+                    {search.trim() !== "" && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
                         সক্রিয়
                       </span>
                     )}
                   </div>
-                  <Select
-                    value={selectedChapterId}
-                    onValueChange={(val) => onChapterChange(val)}
-                  >
-                    <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-indigo-500">
-                      <div className="flex items-center gap-2 truncate pl-1">
-                        <BookOpen className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                        <SelectValue placeholder="সকল অধ্যায়" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64 font-body">
-                      <SelectItem value="All">সকল অধ্যায়</SelectItem>
-                      {chapters.map((ch, idx) => (
-                        <SelectItem key={ch.id} value={ch.id}>
-                          <span
-                            className="font-solaiman font-semibold text-indigo-600 dark:text-indigo-400"
-                            style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
-                          >
-                            {toBengaliDigits(idx + 1)}.
-                          </span>{" "}
-                          {ch.nameBn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <Input
+                      value={search}
+                      onChange={(e) => onSearchChange(e.target.value)}
+                      placeholder="প্রশ্ন বা প্রাসঙ্গিক বিষয় খুঁজুন..."
+                      className="pl-9.5 pr-8 h-11 rounded-xl bg-background border border-border/60 text-xs font-body w-full shadow-2xs focus-visible:ring-1 focus-visible:ring-indigo-500 placeholder:text-muted-foreground/70"
+                    />
+                    {search && (
+                      <button
+                        type="button"
+                        onClick={() => onSearchChange("")}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground cursor-pointer"
+                        title="মুছুন"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Section: Reference Selection */}
@@ -524,52 +515,6 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                   </div>
                 )}
 
-                {/* Section: Difficulty Pills */}
-                <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <label className="font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>কঠিনতার মান</span>
-                    </label>
-                    {selectedDifficulty !== "All" && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold">
-                        সক্রিয়
-                      </span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {DIFFICULTIES.map((d) => {
-                      const isActive = selectedDifficulty === d.value
-                      let activeStyle = "bg-indigo-600 text-white shadow-xs"
-                      let inactiveStyle = "bg-background text-foreground border border-border/60 hover:bg-muted/60"
-
-                      if (d.value === "EASY") {
-                        if (isActive) activeStyle = "bg-emerald-600 text-white shadow-xs font-bold"
-                        else inactiveStyle = "bg-background text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                      } else if (d.value === "MEDIUM") {
-                        if (isActive) activeStyle = "bg-amber-600 text-white shadow-xs font-bold"
-                        else inactiveStyle = "bg-background text-amber-700 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-950/30"
-                      } else if (d.value === "HARD") {
-                        if (isActive) activeStyle = "bg-rose-600 text-white shadow-xs font-bold"
-                        else inactiveStyle = "bg-background text-rose-700 dark:text-rose-400 border border-rose-500/30 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-                      }
-
-                      return (
-                        <button
-                          key={d.value}
-                          type="button"
-                          onClick={() => onDifficultyChange(d.value)}
-                          className={`py-2.5 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
-                            isActive ? activeStyle : inactiveStyle
-                          }`}
-                        >
-                          {d.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
                 {/* Section: Sort Order Toggle */}
                 <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
                   <div className="flex items-center justify-between">
@@ -643,6 +588,16 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
               <SlidersHorizontal className="w-2.5 h-2.5" />
               <span>ফিল্টার:</span>
             </span>
+            {search.trim() !== "" && (
+              <button
+                type="button"
+                onClick={() => onSearchChange("")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-medium shrink-0 border border-indigo-500/20 cursor-pointer transition-colors"
+              >
+                <span className="truncate max-w-[100px]">খোঁজ: "{search}"</span>
+                <X className="w-2.5 h-2.5 opacity-70" />
+              </button>
+            )}
             {selectedChapterId !== "All" && (
               <button
                 type="button"
@@ -672,16 +627,6 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-medium shrink-0 border border-indigo-500/20 cursor-pointer transition-colors"
               >
                 <span className="truncate max-w-[90px]">{selectedSource}</span>
-                <X className="w-2.5 h-2.5 opacity-70" />
-              </button>
-            )}
-            {selectedDifficulty !== "All" && (
-              <button
-                type="button"
-                onClick={() => onDifficultyChange("All")}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-medium shrink-0 border border-indigo-500/20 cursor-pointer transition-colors"
-              >
-                <span>{DIFFICULTIES.find((d) => d.value === selectedDifficulty)?.label}</span>
                 <X className="w-2.5 h-2.5 opacity-70" />
               </button>
             )}
@@ -716,7 +661,6 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
           chapterId={selectedChapterId}
           board={selectedBoard}
           source={selectedSource}
-          difficulty={selectedDifficulty}
           sort={selectedSort}
           page={page}
           limit={15}

@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@workspace/db/main";
 import type { TenantPrismaClient } from "@workspace/db/tenant";
-import { notFound } from "../../../utils/errors";
+import { notFound, badRequest } from "../../../utils/errors";
 import type {
   AutoFillDistributionInput,
   ReplaceQuestionInput,
@@ -132,6 +132,9 @@ export async function autoFillDistribution(
     where: { id: input.questionPaperId },
   });
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper");
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে কোনো প্রশ্ন যুক্ত, পরিবর্তন বা এক্সচেঞ্জ করা যাবে না।");
+  }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
     where: { id: input.distributionId },
@@ -231,6 +234,9 @@ export async function replaceQuestion(
     where: { id: input.questionPaperId },
   });
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper");
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে কোনো প্রশ্ন যুক্ত, পরিবর্তন বা এক্সচেঞ্জ করা যাবে না।");
+  }
 
   // Locate the junction record
   const junction = await tenantDb.questionPaperQuestion.findFirst({

@@ -3,7 +3,7 @@
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface ShortQuestionPickerCardProps {
   question: any;
@@ -18,6 +18,7 @@ export const ShortQuestionPickerCard: React.FC<ShortQuestionPickerCardProps> = (
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -49,7 +50,7 @@ export const ShortQuestionPickerCard: React.FC<ShortQuestionPickerCardProps> = (
         <QuestionAttachments attachments={q.attachments} compact />
 
         {/* Answer key preview if available */}
-        {q.answer && (
+        {!isBankMode && q.answer && (
           <div className="text-xs text-muted-foreground mt-0.5 bg-muted/20 p-2 rounded-xl border border-border/40">
             <span className="font-semibold text-primary block mb-0.5 text-[11px] font-headline">উত্তর:</span>
             <RenderMath text={q.answer} />

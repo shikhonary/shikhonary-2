@@ -103,7 +103,7 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                           : "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60"
                       }`}
                     >
-                      {isPublished ? "পাবলিশড" : "ড্রাফট"}
+                      {isPublished ? "প্রকাশিত" : "খসড়া"}
                     </Badge>
                   </div>
 
@@ -207,7 +207,7 @@ export const RecentQuestionPapers: React.FC<RecentQuestionPapersProps> = ({ pape
                               : "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/60"
                           }`}
                         >
-                          {isPublished ? "পাবলিশড" : "ড্রাফট"}
+                          {isPublished ? "প্রকাশিত" : "খসড়া"}
                         </Badge>
                       </td>
 

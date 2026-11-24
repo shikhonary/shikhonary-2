@@ -86,6 +86,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
   if (!alternatives || alternatives.length === 0) return null;
 
   const storeSettings = useBuilderStore((state) => state.settings);
+  const isPublished = useBuilderStore((state) => state.isPublished);
   const activeSettings = settings || storeSettings;
 
   const questionStyle = {
@@ -255,28 +256,30 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
             {/* ── ALTERNATIVE QUESTION CONTENT (EXACT BLOCK REPRESENTATION WITH NUMBER ALIGNMENT) ── */}
             <div className="relative rounded-lg hover:bg-muted/15 transition-colors py-0 w-full">
               {/* Hover actions */}
-              <div className="absolute top-0 right-1 opacity-0 group-hover/alt:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-20 print:hidden text-[11px]">
-                <button
-                  type="button"
-                  onClick={() => handleSwap(alt.id)}
-                  disabled={isSwapping}
-                  className="px-2 py-0.5 hover:bg-primary/10 text-primary flex items-center gap-1 transition-colors border-r font-medium"
-                  title="মূল প্রশ্ন ও বিকল্প প্রশ্ন অদলবদল করুন"
-                >
-                  <ArrowUpDown className="w-3 h-3" />
-                  মূল প্রশ্ন বানান
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRemove(alt.id)}
-                  disabled={isRemoving}
-                  className="px-2 py-0.5 hover:bg-destructive/10 text-destructive flex items-center gap-1 transition-colors font-medium"
-                  title="বিকল্প প্রশ্ন ডিলিট করুন"
-                >
-                  {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                  ডিলিট
-                </button>
-              </div>
+              {!isPublished && (
+                <div className="absolute top-0 right-1 opacity-0 group-hover/alt:opacity-100 transition-opacity bg-white border shadow-sm rounded-md flex overflow-hidden z-20 print:hidden text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => handleSwap(alt.id)}
+                    disabled={isSwapping}
+                    className="px-2 py-0.5 hover:bg-primary/10 text-primary flex items-center gap-1 transition-colors border-r font-medium"
+                    title="মূল প্রশ্ন ও বিকল্প প্রশ্ন অদলবদল করুন"
+                  >
+                    <ArrowUpDown className="w-3 h-3" />
+                    মূল প্রশ্ন বানান
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(alt.id)}
+                    disabled={isRemoving}
+                    className="px-2 py-0.5 hover:bg-destructive/10 text-destructive flex items-center gap-1 transition-colors font-medium"
+                    title="বিকল্প প্রশ্ন ডিলিট করুন"
+                  >
+                    {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                    ডিলিট
+                  </button>
+                </div>
+              )}
 
               {/* 0.85 EXACT SHORT COMPOSITION BLOCK REPRESENTATION */}
               {shortComposition && (() => {

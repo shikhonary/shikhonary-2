@@ -3,12 +3,19 @@
 import React from "react";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { CheckCircle2, Check, Plus, ArrowRight, X, BookOpen, Tag, Calculator } from "lucide-react";
+import { CheckCircle2, Check, Plus, ArrowRight, X, BookOpen, Tag, Calculator, Bookmark } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { QuestionAnswerAccordion } from "@/modules/question-bank/ui/components/cards/question-answer-accordion";
 
 export interface PickerContextType {
   isExchangeMode?: boolean;
   currentQuestionId?: string;
+  isBankMode?: boolean;
+  isBookmarked?: (id: string) => boolean;
+  onToggleBookmark?: (id: string) => void;
+  onPreview?: (id: string) => void;
+  hasSubscription?: boolean;
+  getQuestion?: (id: string) => any;
 }
 
 export const PickerContext = React.createContext<PickerContextType>({});
@@ -16,6 +23,7 @@ export const usePickerContext = () => React.useContext(PickerContext);
 
 interface PickerCardWrapperProps {
   id: string;
+  question?: any;
   isAssigned?: boolean;
   isSelected: boolean;
   onToggle: (id: string) => void;
@@ -53,6 +61,7 @@ const toBengaliDigits = (num?: number | string | null): string => {
 
 export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   id,
+  question,
   isAssigned,
   isSelected,
   onToggle,
@@ -72,13 +81,116 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   children,
 }) => {
   const isEn = language === "en";
-  const { isExchangeMode, currentQuestionId } = usePickerContext();
+  const {
+    isExchangeMode,
+    currentQuestionId,
+    isBankMode,
+    isBookmarked: checkBookmarked,
+    onToggleBookmark: handleToggleBookmark,
+    onPreview: handlePreview,
+    hasSubscription,
+    getQuestion,
+  } = usePickerContext();
   const isCurrentQuestion = currentQuestionId === id;
   const isBlocked = isExchangeMode ? false : Boolean(isAssigned);
+  const bookmarked = checkBookmarked ? checkBookmarked(id) : false;
 
   const refList = Array.isArray(referenceTags) ? referenceTags.filter(Boolean) : [];
   const refString = refList.join(", ");
   const sourceText = source ? `${source}${session ? ` (${toBengaliDigits(session)})` : ""}` : "";
+
+  if (isBankMode) {
+    const finalRef = refString || sourceText || "শিখনারী প্রশ্নভাণ্ডার";
+    const questionData = question || (getQuestion ? getQuestion(id) : null) || { id, marks };
+
+    return (
+      <article
+        onClick={() => {
+          if (handlePreview) handlePreview(id);
+        }}
+        className={cn(
+          "rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-0 shadow-xs",
+          "transition-all duration-200 hover:shadow-md hover:border-indigo-500/30 flex flex-col justify-between overflow-hidden relative font-display cursor-pointer",
+          "h-full"
+        )}
+      >
+        <div className="p-4 sm:p-5 pb-3.5 flex-1 flex flex-col">
+          {/* Bank Mode Header: NO difficulty, NO mark, NO checkbox */}
+          <div className="flex items-center justify-between gap-2.5 pb-2.5 mb-3 border-b border-border/40 select-none">
+            <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+              {index !== undefined && index !== null && (
+                <span className="px-2 py-0.5 bg-muted/70 text-muted-foreground font-solaiman text-[11px] font-bold rounded-md border border-border/60">
+                  #{toBengaliDigits(index)}
+                </span>
+              )}
+              {chapterName && (
+                <span
+                  className="px-2.5 py-0.5 bg-primary/10 text-primary border border-primary/25 rounded-md text-[11px] font-semibold font-body truncate max-w-[150px] sm:max-w-[240px]"
+                  title={chapterName}
+                >
+                  {chapterName}
+                </span>
+              )}
+              {extraBadges}
+            </div>
+          </div>
+
+          {/* Children (Question Content) */}
+          <div className="flex-1">
+            {children}
+          </div>
+
+          {/* Question Bank Answer Accordion */}
+          <div className="mt-3 pt-2.5 border-t border-border/30">
+            <QuestionAnswerAccordion
+              question={questionData}
+              hasSubscription={hasSubscription}
+            />
+          </div>
+        </div>
+
+        {/* Bank Mode Footer: Reference left, ONLY "Add to Bookmark" button right */}
+        <div className="px-4 py-2.5 bg-slate-50/80 dark:bg-white/[0.02] border-t border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between text-xs font-body mt-auto relative z-10">
+          <div className="flex items-center gap-1.5 min-w-0 pr-2">
+            <span
+              className="text-[11px] text-muted-foreground/80 flex items-center gap-1.5 truncate max-w-[150px] sm:max-w-[220px] font-body"
+              title={finalRef}
+            >
+              <Tag className="w-3 h-3 shrink-0 text-muted-foreground/60" />
+              <span className="truncate">{finalRef}</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {handleToggleBookmark && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleBookmark(id);
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer active:scale-95",
+                  bookmarked
+                    ? "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400"
+                    : "bg-white dark:bg-card border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 shadow-2xs hover:bg-rose-50/50 dark:hover:bg-rose-950/20"
+                )}
+                title={bookmarked ? "বুকমার্ক থেকে মুছুন" : "বুকমার্কে সংরক্ষণ করুন"}
+              >
+                <Bookmark
+                  className={cn(
+                    "w-3.5 h-3.5",
+                    bookmarked ? "fill-rose-500 text-rose-500" : "text-slate-500"
+                  )}
+                />
+                <span>{bookmarked ? "বুকমার্কে সংরক্ষিত" : "বুকমার্কে যোগ করুন"}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article

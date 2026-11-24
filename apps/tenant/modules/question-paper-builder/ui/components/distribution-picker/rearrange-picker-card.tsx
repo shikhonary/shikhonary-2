@@ -2,7 +2,7 @@
 
 import React from "react";
 import { getRearrangeIndicator } from "../blocks/rearrange-block";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 import { isResourceEnglish } from "@workspace/utils";
 import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
 import { RenderMath } from "@workspace/ui/components/render-math";
@@ -30,6 +30,7 @@ export const RearrangePickerCard: React.FC<RearrangePickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const parseOptions = (opts: any): string[] => {
     if (Array.isArray(opts)) return opts;
     if (typeof opts === "string") {
@@ -99,7 +100,7 @@ export const RearrangePickerCard: React.FC<RearrangePickerCardProps> = ({
         </div>
 
         {/* Answer key if present */}
-        {q.answerKey && (
+        {!isBankMode && q.answerKey && (
           <div className="text-xs text-muted-foreground bg-surface-container-low p-2 rounded border border-outline-variant/30 flex items-center gap-1.5 font-mono">
             <span className="font-semibold text-primary font-body mr-1">
               {isEnglish ? "Answer Order:" : "উত্তর ক্রম:"}

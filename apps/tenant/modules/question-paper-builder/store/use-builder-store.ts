@@ -1,8 +1,23 @@
 import { create } from "zustand";
-import { PaperItem, PaperSettings, MCQItem, CQItem, PaperHeaderItem, ElementStyle, PaperBlock } from "../types";
+import { toast } from "@workspace/ui/components/sonner";
+import { PaperItem, PaperSettings, MCQItem, CQItem, PaperHeaderItem, ElementStyle, PaperBlock, BlockBreakType } from "../types";
+
+export interface HistorySnapshot {
+  settings: PaperSettings;
+  dismissedSectionIds: string[];
+  dismissedSubSectionIds: string[];
+}
+
+export interface HistoryEntry {
+  description?: string;
+  undo: () => void | Promise<void>;
+  redo: () => void | Promise<void>;
+}
 
 interface BuilderState {
   paperId: string | null;
+  paperStatus: string | null;
+  isPublished: boolean;
   items: PaperItem[];
   settings: PaperSettings;
   
@@ -25,6 +40,8 @@ interface BuilderState {
 
   // Actions
   setPaperId: (id: string) => void;
+  setPaperStatus: (status: string) => void;
+  setIsPublished: (isPublished: boolean) => void;
   setItems: (items: PaperItem[]) => void;
   updateItem: (id: string, updates: Partial<PaperItem>) => void;
   deleteItem: (id: string) => void;
@@ -57,7 +74,16 @@ interface BuilderState {
   setItemText: (key: string, text: string) => void;
   setOMRSetting: (key: keyof PaperSettings["omrSettings"], value: any) => void;
   toggleOMRSheet: (show: boolean) => void;
-  setBlockBreak: (id: string, type: "page" | "column" | "none") => void;
+  setBlockBreak: (id: string, type: BlockBreakType) => void;
+  
+  // History (Undo / Redo)
+  past: HistoryEntry[];
+  future: HistoryEntry[];
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => Promise<void>;
+  redo: () => Promise<void>;
+  pushHistoryEntry: (entry: HistoryEntry) => void;
   
   // Hydration
   hydratePaper: (id: string, settings: Partial<PaperSettings>, paperData?: any, tenantNameBn?: string | null) => void;
@@ -120,10 +146,137 @@ const defaultSettings: PaperSettings = {
   hiddenSectionInstructionIds: [],
 };
 
-export const useBuilderStore = create<BuilderState>((set) => ({
+const MAX_HISTORY = 30;
+
+const createSnapshot = (state: {
+  settings: PaperSettings;
+  dismissedSectionIds?: string[];
+  dismissedSubSectionIds?: string[];
+}): HistorySnapshot => ({
+  settings: JSON.parse(JSON.stringify(state.settings || defaultSettings)),
+  dismissedSectionIds: [...(state.dismissedSectionIds || [])],
+  dismissedSubSectionIds: [...(state.dismissedSubSectionIds || [])],
+});
+
+export const useBuilderStore = create<BuilderState>((set, get) => {
+  const recordSettingsChange = (
+    description: string,
+    applyNext: (currentSettings: PaperSettings, state: BuilderState) => {
+      settings: PaperSettings;
+      dismissedSectionIds?: string[];
+      dismissedSubSectionIds?: string[];
+    }
+  ) => {
+    const state = get();
+    const prevSnapshot = createSnapshot(state);
+
+    const result = applyNext(state.settings, state);
+    const nextSettings = result.settings;
+    const nextSnapshot: HistorySnapshot = {
+      settings: JSON.parse(JSON.stringify(nextSettings)),
+      dismissedSectionIds: result.dismissedSectionIds ? [...result.dismissedSectionIds] : [...state.dismissedSectionIds],
+      dismissedSubSectionIds: result.dismissedSubSectionIds ? [...result.dismissedSubSectionIds] : [...state.dismissedSubSectionIds],
+    };
+
+    const entry: HistoryEntry = {
+      description,
+      undo: () => set({
+        settings: prevSnapshot.settings,
+        dismissedSectionIds: prevSnapshot.dismissedSectionIds,
+        dismissedSubSectionIds: prevSnapshot.dismissedSubSectionIds,
+        hasUnsavedChanges: true,
+      }),
+      redo: () => set({
+        settings: nextSnapshot.settings,
+        dismissedSectionIds: nextSnapshot.dismissedSectionIds,
+        dismissedSubSectionIds: nextSnapshot.dismissedSubSectionIds,
+        hasUnsavedChanges: true,
+      }),
+    };
+
+    const newPast = [...state.past, entry].slice(-MAX_HISTORY);
+
+    set({
+      settings: nextSettings,
+      dismissedSectionIds: nextSnapshot.dismissedSectionIds,
+      dismissedSubSectionIds: nextSnapshot.dismissedSubSectionIds,
+      hasUnsavedChanges: true,
+      past: newPast,
+      future: [],
+      canUndo: true,
+      canRedo: false,
+    });
+  };
+
+  return {
   paperId: null,
+  paperStatus: null,
+  isPublished: false,
   items: [],
   settings: defaultSettings,
+
+  past: [],
+  future: [],
+  canUndo: false,
+  canRedo: false,
+
+  pushHistoryEntry: (entry) => set((state) => {
+    const newPast = [...state.past, entry].slice(-MAX_HISTORY);
+    return {
+      past: newPast,
+      future: [],
+      canUndo: newPast.length > 0,
+      canRedo: false,
+    };
+  }),
+
+  undo: async () => {
+    const { past, future } = get();
+    if (past.length === 0) {
+      toast.info("পূর্বাবস্থায় নেওয়ার মতো কোনো পরিবর্তন নেই");
+      return;
+    }
+    const entry = past[past.length - 1];
+    if (!entry) return;
+    const newPast = past.slice(0, -1);
+    const newFuture = [entry, ...future];
+    set({
+      past: newPast,
+      future: newFuture,
+      canUndo: newPast.length > 0,
+      canRedo: true,
+    });
+    try {
+      await entry.undo();
+      toast.info(entry.description ? `${entry.description}: পূর্বাবস্থায় নেওয়া হয়েছে` : "পূর্বাবস্থায় নেওয়া হয়েছে");
+    } catch (err: any) {
+      toast.error(err?.message || "পূর্বাবস্থায় ফেরানো যায়নি");
+    }
+  },
+
+  redo: async () => {
+    const { past, future } = get();
+    if (future.length === 0) {
+      toast.info("পুনরায় করার মতো কোনো পরিবর্তন নেই");
+      return;
+    }
+    const entry = future[0];
+    if (!entry) return;
+    const newFuture = future.slice(1);
+    const newPast = [...past, entry];
+    set({
+      past: newPast,
+      future: newFuture,
+      canUndo: true,
+      canRedo: newFuture.length > 0,
+    });
+    try {
+      await entry.redo();
+      toast.info(entry.description ? `${entry.description}: পুনরায় প্রয়োগ করা হয়েছে` : "পুনরায় প্রয়োগ করা হয়েছে");
+    } catch (err: any) {
+      toast.error(err?.message || "পুনরায় প্রয়োগ করা যায়নি");
+    }
+  },
   
   zoom: "auto",
   effectiveZoom: 1,
@@ -147,58 +300,52 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     activeSubSectionId: target.subSectionId !== undefined ? target.subSectionId : state.activeSubSectionId,
   })),
 
-  dismissSection: (sectionId) => set((state) => {
+  dismissSection: (sectionId) => {
+    const state = get();
     const nextDismissed = Array.from(new Set([...(state.settings.dismissedSectionIds || state.dismissedSectionIds || []), sectionId]));
-    return {
+    recordSettingsChange("সেকশন বাতিল", (curr) => ({
+      settings: { ...curr, dismissedSectionIds: nextDismissed },
       dismissedSectionIds: nextDismissed,
-      settings: {
-        ...state.settings,
-        dismissedSectionIds: nextDismissed,
-      },
-      hasUnsavedChanges: true,
+    }));
+    set({
       activeSectionId: state.activeSectionId === sectionId ? null : state.activeSectionId,
       activeSubSectionId: state.activeSectionId === sectionId ? null : state.activeSubSectionId,
-    };
-  }),
+    });
+  },
 
-  dismissSubSection: (subSectionId) => set((state) => {
+  dismissSubSection: (subSectionId) => {
+    const state = get();
     const nextDismissed = Array.from(new Set([...(state.settings.dismissedSubSectionIds || state.dismissedSubSectionIds || []), subSectionId]));
-    return {
+    recordSettingsChange("সাব-সেকশন বাতিল", (curr) => ({
+      settings: { ...curr, dismissedSubSectionIds: nextDismissed },
       dismissedSubSectionIds: nextDismissed,
-      settings: {
-        ...state.settings,
-        dismissedSubSectionIds: nextDismissed,
-      },
-      hasUnsavedChanges: true,
+    }));
+    set({
       activeSubSectionId: state.activeSubSectionId === subSectionId ? null : state.activeSubSectionId,
-    };
-  }),
+    });
+  },
 
-  restoreSection: (sectionId) => set((state) => {
+  restoreSection: (sectionId) => {
+    const state = get();
     const nextDismissed = (state.settings.dismissedSectionIds || state.dismissedSectionIds || []).filter((id) => id !== sectionId);
-    return {
+    recordSettingsChange("সেকশন পুনরুদ্ধার", (curr) => ({
+      settings: { ...curr, dismissedSectionIds: nextDismissed },
       dismissedSectionIds: nextDismissed,
-      settings: {
-        ...state.settings,
-        dismissedSectionIds: nextDismissed,
-      },
-      hasUnsavedChanges: true,
-    };
-  }),
+    }));
+  },
 
-  restoreSubSection: (subSectionId) => set((state) => {
+  restoreSubSection: (subSectionId) => {
+    const state = get();
     const nextDismissed = (state.settings.dismissedSubSectionIds || state.dismissedSubSectionIds || []).filter((id) => id !== subSectionId);
-    return {
+    recordSettingsChange("সাব-সেকশন পুনরুদ্ধার", (curr) => ({
+      settings: { ...curr, dismissedSubSectionIds: nextDismissed },
       dismissedSubSectionIds: nextDismissed,
-      settings: {
-        ...state.settings,
-        dismissedSubSectionIds: nextDismissed,
-      },
-      hasUnsavedChanges: true,
-    };
-  }),
+    }));
+  },
 
   setPaperId: (id) => set({ paperId: id }),
+  setPaperStatus: (status) => set({ paperStatus: status, isPublished: status === "Published" }),
+  setIsPublished: (isPublished) => set({ isPublished }),
   
   setItems: (items) => set({ items, hasUnsavedChanges: true }),
   
@@ -229,18 +376,17 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     return { items: reordered as PaperItem[], hasUnsavedChanges: true };
   }),
   
-  updateSettings: (updates) => set((state) => {
+  updateSettings: (updates) => {
     const finalUpdates = { ...updates };
     if (updates.duplicateSinglePage) {
       finalUpdates.bookFoldLayout = false;
     } else if (updates.bookFoldLayout) {
       finalUpdates.duplicateSinglePage = false;
     }
-    return {
-      settings: { ...state.settings, ...finalUpdates },
-      hasUnsavedChanges: true,
-    };
-  }),
+    recordSettingsChange("সেটিংস পরিবর্তন", (curr) => ({
+      settings: { ...curr, ...finalUpdates },
+    }));
+  },
 
   applyRemoteSettings: (updates) => set((state) => {
     const finalUpdates = { ...updates };
@@ -280,78 +426,87 @@ export const useBuilderStore = create<BuilderState>((set) => ({
   setSaveStatus: (saveStatus) => set({ saveStatus }),
   markSaved: () => set({ hasUnsavedChanges: false, saveStatus: "saved" }),
   
-  setMcqOptionLayout: (id, columns) => set((state) => ({
-    settings: {
-      ...state.settings,
-      mcqOptionLayouts: {
-        ...(state.settings.mcqOptionLayouts || {}),
-        [id]: columns
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
+  setMcqOptionLayout: (id, columns) => {
+    recordSettingsChange("অপশন লেআউট পরিবর্তন", (curr) => ({
+      settings: {
+        ...curr,
+        mcqOptionLayouts: {
+          ...(curr.mcqOptionLayouts || {}),
+          [id]: columns,
+        },
+      },
+    }));
+  },
 
-  setMcqStatementLayout: (id, columns) => set((state) => ({
-    settings: {
-      ...state.settings,
-      mcqStatementLayouts: {
-        ...(state.settings.mcqStatementLayouts || {}),
-        [id]: columns
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
+  setMcqStatementLayout: (id, columns) => {
+    recordSettingsChange("স্টেটমেন্ট লেআউট পরিবর্তন", (curr) => ({
+      settings: {
+        ...curr,
+        mcqStatementLayouts: {
+          ...(curr.mcqStatementLayouts || {}),
+          [id]: columns,
+        },
+      },
+    }));
+  },
 
-  setBlockBreak: (id, type) => set((state) => ({
-    settings: {
-      ...state.settings,
-      blockBreaks: {
-        ...(state.settings.blockBreaks || {}),
-        [id]: type
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
+  setBlockBreak: (id, type) => {
+    const desc = type === "none" ? "ব্রেক বাতিল" : type.includes("page") ? "পেজ ব্রেক" : "কলাম ব্রেক";
+    recordSettingsChange(desc, (curr) => ({
+      settings: {
+        ...curr,
+        blockBreaks: {
+          ...(curr.blockBreaks || {}),
+          [id]: type,
+        },
+      },
+    }));
+  },
 
-  setItemStyle: (key, style) => set((state) => ({
-    settings: {
-      ...state.settings,
-      itemStyles: {
-        ...(state.settings.itemStyles || {}),
-        [key]: {
-          ...(state.settings.itemStyles?.[key] || {}),
-          ...style
-        }
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
-  setItemText: (key, text) => set((state) => ({
-    settings: {
-      ...state.settings,
-      itemTexts: {
-        ...(state.settings.itemTexts || {}),
-        [key]: text
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
+  setItemStyle: (key, style) => {
+    recordSettingsChange("স্টাইল পরিবর্তন", (curr) => ({
+      settings: {
+        ...curr,
+        itemStyles: {
+          ...(curr.itemStyles || {}),
+          [key]: {
+            ...(curr.itemStyles?.[key] || {}),
+            ...style,
+          },
+        },
+      },
+    }));
+  },
 
-  toggleOMRSheet: (show) => set((state) => ({
-    settings: { ...state.settings, showOMRSheet: show },
-    hasUnsavedChanges: true,
-  })),
+  setItemText: (key, text) => {
+    recordSettingsChange("টেক্সট সম্পাদনা", (curr) => ({
+      settings: {
+        ...curr,
+        itemTexts: {
+          ...(curr.itemTexts || {}),
+          [key]: text,
+        },
+      },
+    }));
+  },
 
-  setOMRSetting: (key, value) => set((state) => ({
-    settings: {
-      ...state.settings,
-      omrSettings: {
-        ...(state.settings.omrSettings || defaultSettings.omrSettings),
-        [key]: value
-      }
-    },
-    hasUnsavedChanges: true,
-  })),
+  toggleOMRSheet: (show) => {
+    recordSettingsChange(show ? "OMR শীট যুক্ত" : "OMR শীট বাতিল", (curr) => ({
+      settings: { ...curr, showOMRSheet: show },
+    }));
+  },
+
+  setOMRSetting: (key, value) => {
+    recordSettingsChange("OMR সেটিংস", (curr) => ({
+      settings: {
+        ...curr,
+        omrSettings: {
+          ...(curr.omrSettings || defaultSettings.omrSettings),
+          [key]: value,
+        },
+      },
+    }));
+  },
   
   hydratePaper: (id, dbSettings, paperData, tenantNameBn) => set((state) => {
     // If items are present in the JSON (e.g. for generated sets), load them overriding relational data
@@ -441,14 +596,24 @@ export const useBuilderStore = create<BuilderState>((set) => ({
     const dismissedSectionIds = finalSettings.dismissedSectionIds || [];
     const dismissedSubSectionIds = finalSettings.dismissedSubSectionIds || [];
 
+    const paperStatus = paperData?.status || "Draft";
+    const isPublished = paperStatus === "Published";
+
     return {
       paperId: id,
+      paperStatus,
+      isPublished,
       settings: finalSettings,
       dismissedSectionIds,
       dismissedSubSectionIds,
       items: overrideItems ? overrideItems : state.items,
       hasUnsavedChanges: false,
       saveStatus: "idle",
+      past: [],
+      future: [],
+      canUndo: false,
+      canRedo: false,
     };
   }),
-}));
+};
+});

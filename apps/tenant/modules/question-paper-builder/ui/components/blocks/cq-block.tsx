@@ -8,6 +8,7 @@ import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modul
 import { AlternativeQuestionRenderer } from "./alternative-question-renderer";
 import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
+import { QuestionPositionControl } from "./question-position-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -103,7 +104,17 @@ const CQEditableText = ({
   );
 };
 
-export const CQBlock = ({ item }: { item: any }) => {
+export const CQBlock = ({ 
+  item,
+  isContinuation = false,
+  subQuestionsToRender,
+  hideStimulus = false,
+}: { 
+  item: any;
+  isContinuation?: boolean;
+  subQuestionsToRender?: string[];
+  hideStimulus?: boolean;
+}) => {
   const router = useRouter();
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
@@ -195,12 +206,16 @@ export const CQBlock = ({ item }: { item: any }) => {
     return defaultMark;
   };
 
-  const subQuestions = [
+  const allSubQuestions = [
     { id: "A", label: "ক", text: data.questionA, marks: getSubQuestionMark("A", 0, 1) },
     { id: "B", label: "খ", text: data.questionB, marks: getSubQuestionMark("B", 1, 2) },
     { id: "C", label: "গ", text: data.questionC, marks: getSubQuestionMark("C", 2, 3) },
     { id: "D", label: "ঘ", text: data.questionD, marks: getSubQuestionMark("D", 3, 4) },
   ].filter((sq) => sq.text);
+
+  const subQuestions = subQuestionsToRender
+    ? allSubQuestions.filter((sq) => subQuestionsToRender.includes(sq.id))
+    : allSubQuestions;
 
   const renderSubQuestionLabel = (label: string) => {
     const cleanLabel = (label || "").replace(/^\(+|\)+$/g, "").trim();
@@ -226,43 +241,54 @@ export const CQBlock = ({ item }: { item: any }) => {
       style={{ fontSize: `${settings.fontSize || 13}pt`, fontFamily: settings.fontFamily }}
     >
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
-        <BlockBreakButton id={item.id} />
-        <button
-          type="button"
-          onClick={handleExchange}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
-        >
-          <ArrowLeftRight className="w-3 h-3" />
-          পরিবর্তন
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowAddAlternative(true)}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-          title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
-        >
-          <Split className="w-3 h-3" />
-          অথবা
-        </button>
-        <button 
-          onClick={handleRemove}
-          disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
-          title="প্রশ্নটি ডিলিট করুন"
-        >
-          {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          ডিলিট
-        </button>
-      </div>
+      {!isContinuation && (
+        <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
+          <BlockBreakButton id={item.id} className="border-r" />
+          <QuestionPositionControl
+            paperId={paperId}
+            questionPaperQuestionId={item.id}
+            canMoveUp={item.canMoveUp}
+            canMoveDown={item.canMoveDown}
+            siblingQuestions={item.siblingQuestions}
+            alternatives={item.alternatives}
+            className="border-r"
+          />
+          <button
+            type="button"
+            onClick={handleExchange}
+            className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
+            title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
+          >
+            <ArrowLeftRight className="w-3 h-3" />
+            পরিবর্তন
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAddAlternative(true)}
+            className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
+            title="বিকল্প (অথবা) প্রশ্ন যুক্ত করুন"
+          >
+            <Split className="w-3 h-3" />
+            অথবা
+          </button>
+          <button 
+            onClick={handleRemove}
+            disabled={isRemoving}
+            className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+            title="প্রশ্নটি ডিলিট করুন"
+          >
+            {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+            ডিলিট
+          </button>
+        </div>
+      )}
 
-      <BlockBreakIndicator id={item.id} />
+      {!isContinuation && <BlockBreakIndicator id={item.id} />}
 
       <div className="flex justify-between items-start gap-2">
         <div className="flex gap-2 flex-1 relative">
           <span
-            className="font-bold shrink-0 min-w-[1.8em]"
+            className={`font-bold shrink-0 min-w-[1.8em] ${isContinuation ? "invisible select-none pointer-events-none" : ""}`}
             style={{
               fontSize: questionStyle.fontSize,
               fontFamily: questionStyle.fontFamily,
@@ -272,7 +298,7 @@ export const CQBlock = ({ item }: { item: any }) => {
           </span>
           <div className="flex-1 w-full min-w-0">
             {/* Stimulus / Context / Scenario */}
-            {stimulus && (
+            {!hideStimulus && !isContinuation && stimulus && (
               <div className="mb-0.5 leading-relaxed text-foreground whitespace-pre-wrap w-full">
                 <CQEditableText 
                   text={stimulus}
@@ -284,7 +310,9 @@ export const CQBlock = ({ item }: { item: any }) => {
             )}
 
             {/* Attachments (e.g. diagrams, stems, tables) */}
-            <QuestionAttachments attachments={data.attachments} />
+            {!hideStimulus && !isContinuation && (
+              <QuestionAttachments attachments={data.attachments} />
+            )}
 
             {subQuestions.length > 0 && (
               <div className="mt-0.5 space-y-0">
@@ -314,7 +342,7 @@ export const CQBlock = ({ item }: { item: any }) => {
             )}
 
             {/* Attached Alternatives */}
-            {item.alternatives && item.alternatives.length > 0 && (
+            {(!isContinuation || subQuestions.some((sq) => sq.id === "D")) && item.alternatives && item.alternatives.length > 0 && (
               <AlternativeQuestionRenderer
                 paperId={paperId || ""}
                 parentQuestionId={item.id}

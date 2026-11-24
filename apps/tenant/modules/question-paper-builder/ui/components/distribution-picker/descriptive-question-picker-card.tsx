@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface DescriptiveQuestionPickerCardProps {
   question: any;
@@ -27,6 +27,7 @@ export const DescriptiveQuestionPickerCard: React.FC<DescriptiveQuestionPickerCa
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -54,7 +55,7 @@ export const DescriptiveQuestionPickerCard: React.FC<DescriptiveQuestionPickerCa
         </div>
 
         {/* Answer Box if available */}
-        {q.answer && (
+        {!isBankMode && q.answer && (
           <div className="text-xs text-muted-foreground/80 bg-muted/30 p-2 rounded border border-border/50 line-clamp-3">
             <span className="font-semibold text-primary">উত্তর: </span>
             <RenderMath text={q.answer} isMath={true} />

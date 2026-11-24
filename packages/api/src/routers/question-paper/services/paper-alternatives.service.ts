@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
-import { notFound } from "../../../utils/errors"
+import { notFound, badRequest } from "../../../utils/errors"
 import type {
   AddAlternativeQuestionInput,
   RemoveAlternativeQuestionInput,
@@ -21,6 +21,9 @@ export async function addAlternativeQuestion(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে বিকল্প প্রশ্ন যোগ করা যাবে না।")
+  }
 
   // 1. Fetch the primary question
   const primaryQuestion = await tenantDb.questionPaperQuestion.findUnique({
@@ -303,6 +306,14 @@ export async function removeAlternativeQuestion(
   actorId?: string,
   tenantId?: string
 ) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্র থেকে বিকল্প প্রশ্ন ডিলিট করা যাবে না।")
+  }
+
   const altQuestion = await tenantDb.questionPaperQuestion.findFirst({
     where: {
       id: input.alternativeQuestionId,
@@ -364,6 +375,14 @@ export async function swapAlternativeQuestion(
     where: { id: input.alternativeQuestionId },
   })
   if (!primary || !alt) throw notFound("Question")
+
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: primary.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে বিকল্প প্রশ্ন পরিবর্তন করা যাবে না।")
+  }
 
   const fkFields = [
     "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId", "thoughtExpansionId",

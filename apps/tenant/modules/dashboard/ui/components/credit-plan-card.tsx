@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Sparkles, Coins, Plus, ShieldCheck, ArrowRight } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
-import { toBengaliDigits } from "@/modules/subscription-plan/utils"
+import { toBengaliDigits, naturalizePlanName } from "@/modules/subscription-plan/utils"
 
 interface SubscriptionInfo {
   status: string
@@ -78,7 +78,7 @@ export const CreditPlanCard: React.FC<CreditPlanCardProps> = ({
             বর্তমান প্ল্যান
           </span>
           <Badge className="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 text-[11px] font-bold rounded-lg font-headline">
-            {subscription?.planName || "ফ্রি টায়ার"}
+            {naturalizePlanName(subscription?.planName) || "ফ্রি প্যাক"}
           </Badge>
         </div>
 
@@ -86,7 +86,7 @@ export const CreditPlanCard: React.FC<CreditPlanCardProps> = ({
           <span className="text-muted-foreground font-body">অবস্থা</span>
           <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-headline flex items-center gap-1">
             <ShieldCheck className="h-3.5 w-3.5" />
-            {subscription?.status === "ACTIVE" ? "সক্রিয় (Active)" : "স্ট্যান্ডার্ড"}
+            {subscription?.status === "ACTIVE" ? "সক্রিয়" : "অপেক্ষমান"}
           </span>
         </div>
 

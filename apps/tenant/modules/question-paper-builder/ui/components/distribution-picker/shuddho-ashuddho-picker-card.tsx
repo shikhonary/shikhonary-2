@@ -3,7 +3,7 @@
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { cn } from "@workspace/ui/lib/utils";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface ShuddhoAshuddhoPickerCardProps {
   question: any;
@@ -28,6 +28,7 @@ export const ShuddhoAshuddhoPickerCard: React.FC<ShuddhoAshuddhoPickerCardProps>
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -65,7 +66,7 @@ export const ShuddhoAshuddhoPickerCard: React.FC<ShuddhoAshuddhoPickerCardProps>
         </div>
 
         {/* Answer Pill (if available) */}
-        {answerText && (
+        {!isBankMode && answerText && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="font-semibold text-primary/80">উত্তর:</span>
             <span

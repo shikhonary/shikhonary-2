@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RenderPunctuationContent } from "../blocks/punctuation-block";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { isResourceEnglish } from "@workspace/utils";
 import { toEnglishDigits, translateTag } from "./number-in-words-picker-card";
@@ -30,6 +30,7 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const mainText = q.rawText || q.content || q.prompt || "";
   const promptText = q.prompt && q.prompt !== q.rawText && q.prompt !== q.content ? q.prompt : "";
   const answerText = q.answerText || q.answer || "";
@@ -75,7 +76,7 @@ export const PunctuationPickerCard: React.FC<PunctuationPickerCardProps> = ({
         </div>
 
         {/* Answer preview if present */}
-        {answerText && (
+        {!isBankMode && answerText && (
           <div className="text-xs text-muted-foreground bg-surface-container-low p-2 rounded border border-outline-variant/30">
             <span className="font-semibold text-primary mr-1">Ans:</span>
             <RenderMath text={answerText} />

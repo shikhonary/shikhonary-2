@@ -11,6 +11,7 @@ import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { isResourceEnglish } from "@workspace/utils";
 import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
+import { QuestionPositionControl } from "./question-position-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -301,6 +302,16 @@ export const EssenceBlock = ({ item }: { item: any }) => {
           {/* Hover Controls */}
           <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
             <BlockBreakButton id={item.id} className="border-r" />
+            <QuestionPositionControl
+              paperId={paperId}
+              questionPaperQuestionId={item.id}
+              canMoveUp={item.canMoveUp}
+              canMoveDown={item.canMoveDown}
+              siblingQuestions={item.siblingQuestions}
+              alternatives={item.alternatives}
+              isSubQuestion={renderMethod !== 1}
+              className="border-r"
+            />
             <button
               type="button"
               onClick={handleExchange}
@@ -434,6 +445,16 @@ export const EssenceBlock = ({ item }: { item: any }) => {
             {/* Question Hover Controls: Remove question only */}
             <div className="absolute top-0 right-4 opacity-0 group-hover/question:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
               <BlockBreakButton id={item.id} className="border-r" />
+              <QuestionPositionControl
+                paperId={paperId}
+                questionPaperQuestionId={item.id}
+                canMoveUp={item.canMoveUp}
+                canMoveDown={item.canMoveDown}
+                siblingQuestions={item.siblingQuestions}
+                alternatives={item.alternatives}
+                isSubQuestion={renderMethod !== 1}
+                className="border-r"
+              />
               <button
                 type="button"
                 onClick={handleExchange}

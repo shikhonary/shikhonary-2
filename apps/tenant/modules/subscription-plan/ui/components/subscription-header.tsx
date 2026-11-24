@@ -3,7 +3,13 @@
 import React from "react"
 import { Sparkles, Calendar, ShieldCheck, ArrowUpRight, Zap } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
-import { toBengaliDigits, formatBengaliDate } from "@/modules/subscription-plan/utils"
+import {
+  toBengaliDigits,
+  formatBengaliDate,
+  naturalizePlanName,
+  naturalizePlanDescription,
+  formatSubscriptionStatus,
+} from "@/modules/subscription-plan/utils"
 import type { TenantSubscriptionDetails } from "@/modules/subscription-plan/types"
 
 interface SubscriptionHeaderProps {
@@ -20,22 +26,7 @@ export const SubscriptionHeader: React.FC<SubscriptionHeaderProps> = ({
   const sub = subscriptionDetails?.subscription
   const plan = sub?.plan
   const remainingDays = subscriptionDetails?.remainingDays ?? 0
-
-  const statusLabel =
-    sub?.status === "ACTIVE"
-      ? "সক্রিয়"
-      : sub?.status === "TRIALING"
-      ? "ট্রায়াল মোড"
-      : sub?.status === "EXPIRED"
-      ? "মেয়াদোত্তীর্ণ"
-      : "অপেক্ষমান"
-
-  const statusColor =
-    sub?.status === "ACTIVE"
-      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
-      : sub?.status === "TRIALING"
-      ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20"
-      : "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20"
+  const statusInfo = formatSubscriptionStatus(sub?.status)
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-indigo-900 via-indigo-800 to-slate-900 p-6 sm:p-8 text-white shadow-xl">
@@ -55,21 +46,20 @@ export const SubscriptionHeader: React.FC<SubscriptionHeaderProps> = ({
               <div className="h-6 w-20 bg-white/10 rounded-full animate-pulse" />
             ) : (
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${statusColor}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${statusInfo.color}`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                <span>{statusLabel}</span>
+                <span>{statusInfo.label}</span>
               </span>
             )}
           </div>
 
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold font-headline tracking-tight leading-tight">
-              {plan?.displayName || "বর্তমান সাবস্ক্রিপশন প্ল্যান"}
+              {naturalizePlanName(plan?.displayName) || "বর্তমান সাবস্ক্রিপশন প্ল্যান"}
             </h1>
             <p className="text-indigo-100/80 text-xs sm:text-sm font-body mt-1 leading-relaxed">
-              {plan?.description ||
-                "আপনার প্রতিষ্ঠানের সকল ডিজিটাল কার্যক্রম, প্রশ্নব্যাংক ও এআই সুবিধার বিস্তারিত বিবরণ"}
+              {naturalizePlanDescription(plan?.name, plan?.description)}
             </p>
           </div>
 

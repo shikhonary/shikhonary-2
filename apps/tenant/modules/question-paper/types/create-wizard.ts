@@ -62,12 +62,13 @@ export interface QuestionTypeRef {
   nameBn: string
   nameEn: string
   mark: number
+  label?: string | null
 }
 
 // Step definitions for the indicator
 export const WIZARD_STEPS = [
   { id: "basic", label: "প্রাথমিক তথ্য" },
-  { id: "subjects", label: "বিষয় ও নম্বর" },
+  { id: "subjects", label: "বিষয় ও মানবণ্টন" },
   { id: "review", label: "পর্যালোচনা" },
 ] as const
 

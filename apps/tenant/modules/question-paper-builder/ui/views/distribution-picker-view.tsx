@@ -48,6 +48,7 @@ import {
   Check,
   ArrowLeftRight,
   HelpCircle,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
@@ -88,6 +89,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const currentQuestionId = searchParams.get("currentQuestionId") || undefined;
 
   const { data: paperQuery, isLoading: paperLoading } = useQuestionPaperById(paperId);
+  const isPublished = paperQuery?.status === "Published";
   const { data: statuses, isLoading: statusesLoading } = useQuestionPaperDistributionStatuses(paperId);
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -515,6 +517,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const nextDistStatus = currentDistIndex !== -1 && currentDistIndex < (statuses?.length || 0) - 1 ? statuses?.[currentDistIndex + 1] : null;
 
   const handleSaveExchange = async () => {
+    if (isPublished) {
+      toast.error("পাবলিশড প্রশ্নপত্রে প্রশ্ন পরিবর্তন করা যাবে না।");
+      return;
+    }
     if (!questionPaperQuestionId || selectedIds.length === 0) return;
     try {
       const res: any = await replaceQuestion({
@@ -535,6 +541,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   };
 
   const handleSaveAlternative = async () => {
+    if (isPublished) {
+      toast.error("পাবলিশড প্রশ্নপত্রে বিকল্প প্রশ্ন যোগ করা যাবে না।");
+      return;
+    }
     if (!parentQuestionId || selectedIds.length === 0) return;
     try {
       await addAlternative({
@@ -552,6 +562,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   };
 
   const handleSaveAndContinue = async (goToNext = false) => {
+    if (isPublished) {
+      toast.error("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।");
+      return;
+    }
     if (selectedIds.length === 0) return;
     try {
       const payloadBase = {
@@ -1948,6 +1962,27 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 </div>
               )}
 
+              {/* Published Warning Banner */}
+              {isPublished && (
+                <div className="mb-3.5 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 dark:text-amber-200 shadow-2xs font-body">
+                  <div className="flex items-center gap-2.5">
+                    <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <div>
+                      <h4 className="font-bold text-xs sm:text-sm font-headline">প্রশ্নপত্রটি প্রকাশিত (Published) অবস্থায় রয়েছে</h4>
+                      <p className="text-[11px] sm:text-xs text-amber-800 dark:text-amber-300">প্রশ্নপত্র প্রকাশিত থাকায় নতুন কোনো প্রশ্ন যোগ, নির্বাচন বা পরিবর্তন করা বন্ধ রয়েছে।</p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                    className="border-amber-400 dark:border-amber-700 font-headline text-xs shrink-0"
+                  >
+                    <Link href={`/question-papers/${paperId}/builder`}>বিল্ডারে ফিরুন</Link>
+                  </Button>
+                </div>
+              )}
+
               {/* Question Grid */}
               <QuestionGrid
                 subjectId={distStatus.subjectId}
@@ -2054,7 +2089,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               </Button>
               <Button
                 className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
-                disabled={isReplacing || selectedIds.length === 0}
+                disabled={isReplacing || isPublished || selectedIds.length === 0}
                 onClick={handleSaveExchange}
               >
                 {isReplacing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowLeftRight className="w-3.5 h-3.5" />}
@@ -2074,7 +2109,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               </Button>
               <Button
                 className="flex-1 md:flex-none rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
-                disabled={isAddingAlternative}
+                disabled={isAddingAlternative || isPublished || selectedIds.length === 0}
                 onClick={handleSaveAlternative}
               >
                 {isAddingAlternative ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Split className="w-3.5 h-3.5" />}
@@ -2085,7 +2120,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
             <div className="flex items-center gap-2 w-full md:w-auto">
               <Button
                 className="w-full md:w-auto rounded-xl md:rounded-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-headline font-bold cursor-pointer gap-1.5 text-xs px-5 shrink-0 shadow-xs transition-all active:scale-95"
-                disabled={isAssigning}
+                disabled={isAssigning || isPublished || selectedIds.length === 0}
                 onClick={() => handleSaveAndContinue(false)}
               >
                 {isAssigning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}

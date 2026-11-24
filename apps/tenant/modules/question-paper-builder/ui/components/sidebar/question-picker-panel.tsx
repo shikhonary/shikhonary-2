@@ -6,7 +6,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { Search, Loader2, Plus, CheckCircle2, ArrowRight, ExternalLink, Shuffle } from "lucide-react";
+import { Search, Loader2, Plus, CheckCircle2, ArrowRight, ExternalLink, Shuffle, Lock } from "lucide-react";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { 
   useQuestionPaperById, 
@@ -48,6 +48,7 @@ const toEnglishDigits = (num?: number | string | null): string => {
 export const QuestionPickerPanel: React.FC = () => {
   const paperId = useBuilderStore((state) => state.paperId);
   const { data: paperQuery } = useQuestionPaperById(paperId || "");
+  const isPublished = useBuilderStore((state) => state.isPublished) || paperQuery?.status === "Published";
   const { data: statuses, isLoading: statusesLoading } = useQuestionPaperDistributionStatuses(paperId || "");
   
   const [selectedDistId, setSelectedDistId] = useState<string>("");
@@ -141,6 +142,10 @@ export const QuestionPickerPanel: React.FC = () => {
   const { mutateAsync: assignQuestion, isPending: isAssigning } = useBulkAssignQuestions();
 
   const handleQuickAssign = async (questionId: string) => {
+    if (isPublished) {
+      toast.error("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।");
+      return;
+    }
     if (!paperId || !activeDistId) return;
     try {
       const payloadBase = {
@@ -251,6 +256,10 @@ export const QuestionPickerPanel: React.FC = () => {
   };
 
   const handleQuickAssignGroup = async (questionId: string, groupSubIds: string[]) => {
+    if (isPublished) {
+      toast.error("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।");
+      return;
+    }
     if (!paperId || !activeDistId) return;
     try {
       const payloadBase = {
@@ -284,6 +293,12 @@ export const QuestionPickerPanel: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-background relative font-display">
+      {isPublished && (
+        <div className="p-2.5 mx-3 mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/50 text-amber-900 dark:text-amber-200 text-xs font-body flex items-center gap-2 shrink-0">
+          <Lock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span>প্রশ্নপত্রটি প্রকাশিত থাকায় নতুন প্রশ্ন যুক্ত করা লক রয়েছে।</span>
+        </div>
+      )}
       {/* Distribution selector & search bar */}
       <div className="p-3 border-b space-y-2 bg-card">
         <div className="flex items-center justify-between">
@@ -292,7 +307,7 @@ export const QuestionPickerPanel: React.FC = () => {
             <button
               type="button"
               onClick={handleRandomQuickAssign}
-              disabled={isAssigning || questionsLoading}
+              disabled={isAssigning || questionsLoading || isPublished}
               className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
               title="র‍্যান্ডমভাবে একটি প্রশ্ন যোগ করুন"
             >
@@ -478,7 +493,7 @@ export const QuestionPickerPanel: React.FC = () => {
                       <Button
                         size="sm"
                         variant="ghost"
-                        disabled={isAssigning}
+                        disabled={isAssigning || isPublished}
                         onClick={() => handleQuickAssign(q.id)}
                         className="h-6 px-2 text-[11px] gap-1 text-primary hover:bg-primary/10 rounded-md font-bold cursor-pointer shrink-0"
                       >
@@ -544,11 +559,12 @@ export const QuestionPickerPanel: React.FC = () => {
                                   <button
                                     key={gNum}
                                     type="button"
+                                    disabled={isPublished}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleQuickAssignGroup(q.id, groupSubIds);
                                     }}
-                                    className="px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                                    className="px-1.5 py-0.5 rounded bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
                                     title={`শুধু গ্রুপ ${toBengaliDigits(gNum)} যোগ করুন`}
                                   >
                                     <Plus className="w-2.5 h-2.5" />
@@ -704,7 +720,14 @@ export const QuestionPickerPanel: React.FC = () => {
                   </div>
 
                   {/* Attachments */}
-                  <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
+                  {Array.isArray(q.attachments) && q.attachments.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="font-bold text-primary block text-[11px] font-headline">
+                        {isCurrentEnglish ? "Stimulus:" : "উদ্দীপক:"}
+                      </span>
+                      <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
+                    </div>
+                  )}
 
 
                   {/* References & Source */}

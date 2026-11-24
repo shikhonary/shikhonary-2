@@ -11,7 +11,7 @@ import {
 } from "@workspace/ui/components/dialog"
 import { Button } from "@workspace/ui/components/button"
 import { Sparkles, Check, ArrowRight, Loader2 } from "lucide-react"
-import { toBengaliDigits, formatBengaliPrice } from "@/modules/subscription-plan/utils"
+import { toBengaliDigits, formatBengaliPrice, naturalizePlanName } from "@/modules/subscription-plan/utils"
 import { useChangeSubscriptionPlan } from "@/modules/subscription-plan/services/use-subscription"
 import type { SubscriptionPlanItem, BillingCycle } from "@/modules/subscription-plan/types"
 
@@ -76,20 +76,20 @@ export const PlanChangeModal: React.FC<PlanChangeModalProps> = ({
           <div className="p-4 rounded-2xl bg-muted/40 border border-border/50 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">বর্তমান প্ল্যান:</span>
-              <strong className="text-foreground">{currentPlanName || "ফ্রি"}</strong>
+              <strong className="text-foreground">{naturalizePlanName(currentPlanName) || "ফ্রি প্যাক"}</strong>
             </div>
 
             <div className="flex items-center justify-between border-t border-border/40 pt-2">
               <span className="text-muted-foreground">নতুন নির্বাচিত প্ল্যান:</span>
               <strong className="text-indigo-600 dark:text-indigo-400 text-sm font-bold">
-                {selectedPlan.displayName}
+                {naturalizePlanName(selectedPlan.displayName)}
               </strong>
             </div>
 
             <div className="flex items-center justify-between border-t border-border/40 pt-2">
               <span className="text-muted-foreground">বিলিং সাইকেল:</span>
               <span className="font-semibold text-foreground">
-                {billingCycle === "YEARLY" ? "বার্ষিক" : "মাসিক"}
+                {billingCycle === "YEARLY" ? "বার্ষিক বিলিং" : "মাসিক বিলিং"}
               </span>
             </div>
 

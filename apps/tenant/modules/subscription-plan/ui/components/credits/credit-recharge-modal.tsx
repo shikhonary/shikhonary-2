@@ -68,10 +68,10 @@ export const CreditRechargeModal: React.FC<CreditRechargeModalProps> = ({
   }
 
   const paymentMethods = [
-    { id: "BKASH" as const, name: "bKash", color: "bg-[#E2136E]/10 text-[#E2136E] border-[#E2136E]/30" },
-    { id: "NAGAD" as const, name: "Nagad", color: "bg-[#F7941D]/10 text-[#F7941D] border-[#F7941D]/30" },
-    { id: "ROCKET" as const, name: "Rocket", color: "bg-[#8C3494]/10 text-[#8C3494] border-[#8C3494]/30" },
-    { id: "CARD" as const, name: "Card / IB", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/30" },
+    { id: "BKASH" as const, name: "বিকাশ", color: "bg-[#E2136E]/10 text-[#E2136E] border-[#E2136E]/30" },
+    { id: "NAGAD" as const, name: "নগদ", color: "bg-[#F7941D]/10 text-[#F7941D] border-[#F7941D]/30" },
+    { id: "ROCKET" as const, name: "রকেট", color: "bg-[#8C3494]/10 text-[#8C3494] border-[#8C3494]/30" },
+    { id: "CARD" as const, name: "কার্ড / নেট ব্যাংকিং", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/30" },
   ]
 
   return (

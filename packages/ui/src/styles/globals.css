@@ -738,3 +738,38 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Sonner Toaster & Bengali Typography
+   ══════════════════════════════════════════════════════════════ */
+[data-sonner-toaster],
+[data-sonner-toast],
+.cn-toast {
+  font-family: var(--font-solaiman, "SolaimanLipi", "Kalpurush", "AdorshoLipi", sans-serif);
+}
+
+[data-sonner-toast] {
+  position: relative;
+}
+
+[data-sonner-toast]:has([data-close-button]) [data-content] {
+  padding-right: 1.5rem;
+}
+
+[data-sonner-toast]:has([data-close-button]) [data-button] {
+  margin-right: 1.5rem;
+}
+
+[data-sonner-toast] [data-close-button] {
+  left: auto !important;
+  right: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  cursor: pointer;
+}
+
+[data-sonner-toast]:has([data-description]) [data-close-button] {
+  top: 0.875rem !important;
+  transform: none !important;
+}
+

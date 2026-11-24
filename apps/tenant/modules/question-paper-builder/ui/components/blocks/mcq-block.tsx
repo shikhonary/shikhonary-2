@@ -7,6 +7,7 @@ import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
 import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
 import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
+import { QuestionPositionControl } from "./question-position-control";
 
 const toBengaliDigits = (num: number | string): string => {
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -137,7 +138,16 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   };
 
   const blockBreak = settings.blockBreaks?.[item.id] || "none";
-  const breakClass = blockBreak === "page" ? "break-before-page" : blockBreak === "column" ? "break-before-column" : "";
+  const breakClass =
+    blockBreak === "page"
+      ? "break-before-page"
+      : blockBreak === "column"
+      ? "break-before-column"
+      : blockBreak === "page-after"
+      ? "break-after-page"
+      : blockBreak === "column-after"
+      ? "break-after-column"
+      : "";
 
   const columns = settings.mcqOptionLayouts?.[item.id] || settings.mcqOptionColumns || 2;
   const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
@@ -251,6 +261,15 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
           </button>
         </div>
         <BlockBreakButton id={item.id} className="border-l" />
+        <QuestionPositionControl
+          paperId={paperId}
+          questionPaperQuestionId={item.id}
+          canMoveUp={item.canMoveUp}
+          canMoveDown={item.canMoveDown}
+          siblingQuestions={item.siblingQuestions}
+          alternatives={item.alternatives}
+          className="border-l"
+        />
         <button
           type="button"
           onClick={handleExchange}

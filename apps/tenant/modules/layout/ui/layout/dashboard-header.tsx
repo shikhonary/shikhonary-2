@@ -121,7 +121,7 @@ export function DashboardHeader() {
                 id="mobile-navigation-trigger"
                 type="button"
                 className="md:hidden w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors cursor-pointer active:opacity-80"
-                title="Open Navigation"
+                title="মেনু খুলুন"
               >
                 <Menu className="h-5 w-5" />
               </button>
@@ -248,11 +248,11 @@ export function DashboardHeader() {
                 id="user-profile-dropdown-trigger"
                 type="button"
                 className="w-9 h-9 rounded-full overflow-hidden border border-border/80 cursor-pointer active:opacity-80 hover:ring-2 hover:ring-primary/20 transition-all shrink-0 flex items-center justify-center bg-card shadow-2xs"
-                title={user?.name || "Shikhonary Profile"}
+                title={user?.name || "শিখনারী প্রোফাইল"}
               >
                 {user?.image ? (
                   <img
-                    alt={user?.name || "Shikhonary Profile"}
+                    alt={user?.name || "শিখনারী প্রোফাইল"}
                     className="w-full h-full object-cover"
                     src={user.image}
                   />
@@ -267,10 +267,10 @@ export function DashboardHeader() {
             <DropdownMenuContent className="w-56 mt-1 rounded-2xl bg-card border border-border shadow-xl" align="end">
               <DropdownMenuLabel className="pb-1.5 pt-2">
                 <div className="flex flex-col text-left">
-                  <span className="text-sm font-bold text-foreground truncate">{user?.name || "User"}</span>
+                  <span className="text-sm font-bold text-foreground truncate">{user?.name || "ব্যবহারকারী"}</span>
                   <span className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</span>
                   <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-md uppercase w-max mt-1">
-                    {membership.role === "ADMIN" ? "অ্যাডমিন" : membership.role}
+                    {membership.role === "ADMIN" ? "অ্যাডমিন" : membership.role === "TEACHER" ? "শিক্ষক" : membership.role === "OWNER" ? "মালিক" : membership.role}
                   </span>
                 </div>
               </DropdownMenuLabel>

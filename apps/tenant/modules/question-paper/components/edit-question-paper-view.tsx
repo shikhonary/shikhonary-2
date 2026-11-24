@@ -73,7 +73,7 @@ export function formatDurationBn(minutes: number): string {
 
 const EDIT_WIZARD_STEPS = [
   { id: "basic", label: "প্রাথমিক তথ্য" },
-  { id: "subjects", label: "বিষয় ও নম্বর" },
+  { id: "subjects", label: "বিষয় ও মানবণ্টন" },
   { id: "review", label: "পর্যালোচনা" },
 ] as const
 
@@ -359,19 +359,7 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
     setCurrentStep(stepNum)
   }
 
-  // Publish / Save Toggle
-  const handlePublishToggle = async () => {
-    const nextStatus = paper.status === "Published" ? "Draft" : "Published"
-    try {
-      await updatePaperMutation.mutateAsync({
-        id: paper.id,
-        status: nextStatus,
-      })
-      toast.success(nextStatus === "Published" ? "প্রশ্নপত্র সফলভাবে প্রকাশিত হয়েছে।" : "প্রশ্নপত্র ড্রাফট মুডে ফিরিয়ে নেওয়া হয়েছে।")
-    } catch (err: any) {
-      toast.error(err.message || "স্ট্যাটাস পরিবর্তন করতে ব্যর্থ হয়েছে")
-    }
-  }
+
 
   const handleFinalSave = async () => {
     const success = await handleSaveSubjects()

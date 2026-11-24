@@ -614,9 +614,23 @@ export const BlockRenderer = ({ block }: { block: PaperBlock }) => {
     case "question-mcq":
       return <MCQBlock item={block.data.item} hideContext={block.data.hideContext} contextInstruction={block.data.contextInstruction} />;
     case "question-cq":
-      return <CQBlock item={block.data.item} />;
+      return (
+        <CQBlock
+          item={block.data.item}
+          isContinuation={block.data.isContinuation}
+          subQuestionsToRender={block.data.subQuestionsToRender}
+          hideStimulus={block.data.hideStimulus}
+        />
+      );
     case "question-cs":
-      return <CSBlock item={block.data.item} />;
+      return (
+        <CSBlock
+          item={block.data.item}
+          isContinuation={block.data.isContinuation}
+          subQuestionsToRender={block.data.subQuestionsToRender}
+          hideStimulus={block.data.hideStimulus}
+        />
+      );
     case "question-pbq":
       return <PBQBlock item={block.data.item} />;
     case "question-short":

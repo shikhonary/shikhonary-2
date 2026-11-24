@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useBuilderStore } from "../../store/use-builder-store";
 import { BuilderSidebar } from "../components/sidebar/builder-sidebar";
 import { BuilderAiPanel } from "../components/sidebar/builder-ai-panel";
 import { BuilderCanvas } from "../components/canvas/builder-canvas";
 import { FloatingFormatToolbar } from "../components/toolbar/floating-format-toolbar";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Loader2, Save, Copy, Download, SlidersHorizontal, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Copy, Download, SlidersHorizontal, Sparkles, Lock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
 import {
@@ -15,6 +15,12 @@ import {
   SheetTrigger,
   SheetContent,
 } from "@workspace/ui/components/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
 import {
   useQuestionPaperById,
   useUpdateQuestionPaper,
@@ -28,7 +34,9 @@ import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
 import { useDownloadPaper } from "../../hooks/use-download-paper";
 import { ExportOverlay } from "../components/canvas/export-overlay";
 import { CanvasZoomControls } from "../components/toolbar/canvas-zoom-controls";
-import { buildQuestionPaperTitle } from "@workspace/utils";
+import { CanvasHistoryControls } from "../components/toolbar/canvas-history-controls";
+import { buildQuestionPaperTitle, toBengaliDigits } from "@workspace/utils";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface Props {
   paperId: string;
@@ -46,24 +54,30 @@ function useDebounce<T>(value: T, delay: number): T {
 // Invisible component to handle auto-saving without triggering re-renders on the main view
 function AutoSaveManager({ paperId }: { paperId: string }) {
   const settings = useBuilderStore((state) => state.settings);
-  const hasUnsavedChanges = useBuilderStore((state) => state.hasUnsavedChanges);
   const setSaveStatus = useBuilderStore((state) => state.setSaveStatus);
   const markSaved = useBuilderStore((state) => state.markSaved);
 
   const { mutateAsync: updateSettings } = useUpdateQuestionPaperSettings();
   const debouncedSettings = useDebounce(settings, 1200);
   const initialMount = useRef(true);
+  const lastSavedSettingsRef = useRef<string>("");
 
   useEffect(() => {
     if (initialMount.current) {
       initialMount.current = false;
+      lastSavedSettingsRef.current = JSON.stringify(settings);
       return;
     }
 
-    if (hasUnsavedChanges) {
+    const currentStringified = JSON.stringify(debouncedSettings);
+    const hasUnsaved = useBuilderStore.getState().hasUnsavedChanges;
+
+    // Only save when debounced settings differ from last saved snapshot or when unsaved changes exist
+    if (hasUnsaved || currentStringified !== lastSavedSettingsRef.current) {
       setSaveStatus("saving");
       updateSettings({ id: paperId, settings: debouncedSettings })
         .then(() => {
+          lastSavedSettingsRef.current = currentStringified;
           markSaved();
         })
         .catch((err: any) => {
@@ -71,17 +85,18 @@ function AutoSaveManager({ paperId }: { paperId: string }) {
           toast.error(err?.message || "অটো-সেভ করা যায়নি");
         });
     }
-  }, [debouncedSettings, paperId, hasUnsavedChanges, updateSettings, setSaveStatus, markSaved]);
+  }, [debouncedSettings, paperId, updateSettings, setSaveStatus, markSaved]);
 
   return null;
 }
 
 export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
   const { tenant } = useTenant();
-  const { hydratePaper, saveStatus, markSaved, settings, rehydrateCounter } = useBuilderStore();
+  const { hydratePaper, saveStatus, markSaved, settings, rehydrateCounter, hasUnsavedChanges } = useBuilderStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [showIncompleteModal, setShowIncompleteModal] = useState(false);
+  const [incompleteActionType, setIncompleteActionType] = useState<"download" | "generate-sets">("download");
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishActionType, setPublishActionType] = useState<"download" | "generate-sets">("download");
   const [isSettingsSheetOpen, setIsSettingsSheetOpen] = useState(false);
@@ -109,8 +124,29 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
     );
   }, [distributionStatuses]);
 
+  const totalTargetQuestions = React.useMemo(() => {
+    return (distributionStatuses || []).reduce((acc, d) => acc + (d.targetCount || 0), 0);
+  }, [distributionStatuses]);
+
+  const totalAddedQuestions = React.useMemo(() => {
+    return (distributionStatuses || []).reduce((acc, d) => acc + (d.addedCount || 0), 0);
+  }, [distributionStatuses]);
+
+  const isPaperComplete = Boolean(
+    distributionStatuses &&
+    distributionStatuses.length > 0 &&
+    totalTargetQuestions > 0 &&
+    totalAddedQuestions >= totalTargetQuestions &&
+    incompleteDistributions.length === 0
+  );
+
+  const remainingQuestions = Math.max(0, totalTargetQuestions - totalAddedQuestions);
+
   const handleDownloadClick = async () => {
-    if (incompleteDistributions.length > 0) {
+    if (isDownloading) return;
+
+    if (!isPaperComplete) {
+      setIncompleteActionType("download");
       setShowIncompleteModal(true);
       return;
     }
@@ -133,7 +169,8 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
   };
 
   const handleGenerateSetsClick = async () => {
-    if (incompleteDistributions.length > 0) {
+    if (!isPaperComplete) {
+      setIncompleteActionType("generate-sets");
       setShowIncompleteModal(true);
       return;
     }
@@ -197,10 +234,38 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
     }
   }, [paperQuery, isHydrated, rehydrateCounter, hydratePaper, paperId, tenant]);
 
-  // Global Keyboard Shortcuts for Zooming (Ctrl/Cmd + Plus, Minus, 0)
+  const handleManualSave = useCallback(async () => {
+    useBuilderStore.setState({ saveStatus: "saving" });
+    try {
+      const currentSettings = useBuilderStore.getState().settings;
+      await updateSettingsMutation({ id: paperId, settings: currentSettings });
+      markSaved();
+      toast.success("সব পরিবর্তন সেভ হয়েছে");
+    } catch (err: any) {
+      useBuilderStore.setState({ saveStatus: "error" });
+      toast.error(err?.message || "সেভ করা যায়নি");
+    }
+  }, [paperId, updateSettingsMutation, markSaved]);
+
+  const handleManualSaveRef = useRef(handleManualSave);
+  handleManualSaveRef.current = handleManualSave;
+
+  // Global Keyboard Shortcuts for Save, Undo/Redo & Zooming (Ctrl/Cmd + S, Z, Y, Plus, Minus, 0)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
+      // Only process when modifier is active (Ctrl or Cmd)
+      if (!e.ctrlKey && !e.metaKey) return;
+
+      // Check for Save shortcut (Ctrl+S / Cmd+S)
+      const isS = e.code === "KeyS" || e.key?.toLowerCase() === "s";
+      if (isS) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleManualSaveRef.current();
+        return;
+      }
+
+      const target = (e.target || document.activeElement) as HTMLElement | null;
       if (
         target &&
         (target.tagName === "INPUT" ||
@@ -210,40 +275,44 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         return;
       }
 
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === "=" || e.key === "+") {
-          e.preventDefault();
-          const { zoom, setZoom } = useBuilderStore.getState();
-          const current = typeof zoom === "number" ? zoom : 1.0;
-          setZoom(Math.min(2.5, +(current + 0.15).toFixed(2)));
-        } else if (e.key === "-") {
-          e.preventDefault();
-          const { zoom, setZoom } = useBuilderStore.getState();
-          const current = typeof zoom === "number" ? zoom : 1.0;
-          setZoom(Math.max(0.3, +(current - 0.15).toFixed(2)));
-        } else if (e.key === "0") {
-          e.preventDefault();
-          const { setZoom } = useBuilderStore.getState();
-          setZoom("auto");
-        }
+      // Check both key and code to support all international, Mac, and Bengali keyboard layouts
+      const isZ = e.code === "KeyZ" || e.key?.toLowerCase() === "z";
+      const isY = e.code === "KeyY" || e.key?.toLowerCase() === "y";
+
+      if (isZ && !e.shiftKey) {
+        // Undo: Ctrl+Z or Cmd+Z
+        e.preventDefault();
+        e.stopPropagation();
+        useBuilderStore.getState().undo();
+      } else if ((isZ && e.shiftKey) || isY) {
+        // Redo: Ctrl+Shift+Z, Cmd+Shift+Z, Ctrl+Y, Cmd+Y
+        e.preventDefault();
+        e.stopPropagation();
+        useBuilderStore.getState().redo();
+      } else if (e.key === "=" || e.key === "+" || e.code === "Equal") {
+        e.preventDefault();
+        e.stopPropagation();
+        const { zoom, setZoom } = useBuilderStore.getState();
+        const current = typeof zoom === "number" ? zoom : 1.0;
+        setZoom(Math.min(2.5, +(current + 0.15).toFixed(2)));
+      } else if (e.key === "-" || e.code === "Minus") {
+        e.preventDefault();
+        e.stopPropagation();
+        const { zoom, setZoom } = useBuilderStore.getState();
+        const current = typeof zoom === "number" ? zoom : 1.0;
+        setZoom(Math.max(0.3, +(current - 0.15).toFixed(2)));
+      } else if (e.key === "0" || e.code === "Digit0") {
+        e.preventDefault();
+        e.stopPropagation();
+        const { setZoom } = useBuilderStore.getState();
+        setZoom("auto");
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    // Use capture phase on document to intercept before child components or Radix UI can stop propagation
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => document.removeEventListener("keydown", handleKeyDown, true);
   }, []);
-
-  const handleManualSave = async () => {
-    useBuilderStore.setState({ saveStatus: "saving" });
-    try {
-      await updateSettingsMutation({ id: paperId, settings });
-      markSaved();
-      toast.success("সব পরিবর্তন সেভ হয়েছে");
-    } catch (err: any) {
-      useBuilderStore.setState({ saveStatus: "error" });
-      toast.error(err?.message || "সেভ করা যায়নি");
-    }
-  };
 
   if (isLoading || !isHydrated) {
     return (
@@ -287,12 +356,19 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
           </Button>
 
           <div className="flex flex-col justify-center min-w-0">
-            <h1
-              className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[220px] md:max-w-[300px] lg:max-w-md leading-tight"
-              title={paperQuery.title}
-            >
-              {paperQuery.title}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1
+                className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[220px] md:max-w-[300px] lg:max-w-md leading-tight"
+                title={paperQuery.title}
+              >
+                {paperQuery.title}
+              </h1>
+              {paperQuery.status === "Published" && (
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 font-headline shrink-0">
+                  <Lock className="w-2.5 h-2.5" /> প্রকাশিত
+                </span>
+              )}
+            </div>
 
             {/* Save Status & Paper Meta Sub-line */}
             <div className="flex items-center gap-1.5 mt-0.5">
@@ -302,7 +378,13 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
                   <span>সেভ হচ্ছে...</span>
                 </span>
               )}
-              {saveStatus === "saved" && (
+              {hasUnsavedChanges && saveStatus !== "saving" && (
+                <span className="text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 font-body flex items-center gap-1 font-medium">
+                  <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span>পরিবর্তন হচ্ছে...</span>
+                </span>
+              )}
+              {!hasUnsavedChanges && saveStatus === "saved" && (
                 <span className="text-[10px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 font-body flex items-center gap-1 font-semibold">
                   <span>✓</span>
                   <span>সেভ হয়েছে</span>
@@ -318,55 +400,108 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         </div>
         
         {/* Right Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Zoom Controls */}
-          <CanvasZoomControls className="hidden sm:flex" />
+        <TooltipProvider delayDuration={150}>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* History Controls (Undo / Redo) */}
+            <CanvasHistoryControls className="flex" />
 
-          {/* Generate Sets Modal Trigger */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleGenerateSetsClick}
-            className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer gap-1.5 font-headline shrink-0"
-            title="সেট তৈরি করুন"
-          >
-            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="hidden sm:inline">সেট তৈরি</span>
-          </Button>
+            {/* Zoom Controls */}
+            <CanvasZoomControls className="hidden sm:flex" />
 
-          {/* Download PDF Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDownloadClick}
-            disabled={isDownloading}
-            className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground hover:bg-muted/80 cursor-pointer gap-1.5 font-headline shrink-0"
-            title="PDF ডাউনলোড"
-          >
-            {isDownloading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-            ) : (
-              <Download className="w-3.5 h-3.5 text-muted-foreground" />
-            )}
-            <span className="hidden sm:inline">PDF ডাউনলোড</span>
-          </Button>
+            {/* Generate Sets Modal Trigger */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateSetsClick}
+                  className="h-8.5 w-8.5 sm:w-auto p-0 sm:px-3 sm:h-9 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60"
+                >
+                  <Copy className={cn("w-3.5 h-3.5", !isPaperComplete ? "text-amber-500" : "text-muted-foreground")} />
+                  <span className="hidden sm:inline">সেট তৈরি</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center" className="rounded-xl shadow-lg border border-border/20 px-3 py-2 text-xs font-body max-w-xs z-50">
+                {!isPaperComplete ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 font-bold font-headline text-amber-600 dark:text-amber-400">
+                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                      <span>প্রশ্নপত্র অসম্পূর্ণ ({toBengaliDigits(totalAddedQuestions)}/{toBengaliDigits(totalTargetQuestions)}টি যুক্ত)</span>
+                    </div>
+                    <p className="text-[11px] opacity-90 leading-tight">
+                      ক্লিক করে ঘাটতিগুলো দেখুন এবং সেট তৈরি সম্পন্ন করুন
+                    </p>
+                  </div>
+                ) : (
+                  <span>মাল্টিপল সেট তৈরি করুন</span>
+                )}
+              </TooltipContent>
+            </Tooltip>
 
-          {/* Save Button */}
-          <Button
-            size="sm"
-            onClick={handleManualSave}
-            disabled={saveStatus === "saving" || isManualSaving}
-            className="h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold font-headline cursor-pointer gap-1.5 shadow-xs transition-all active:scale-95 disabled:opacity-50 shrink-0"
-            title="সেভ করুন"
-          >
-            {saveStatus === "saving" || isManualSaving ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Save className="w-3.5 h-3.5" />
-            )}
-            <span>সেভ করুন</span>
-          </Button>
-        </div>
+            {/* Download PDF Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadClick}
+                  disabled={isDownloading}
+                  className={cn(
+                    "h-8.5 w-8.5 sm:w-auto p-0 sm:px-3 sm:h-9 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60",
+                    isDownloading && "opacity-70 cursor-not-allowed"
+                  )}
+                >
+                  {isDownloading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                  ) : (
+                    <Download className={cn("w-3.5 h-3.5", !isPaperComplete ? "text-amber-500" : "text-muted-foreground")} />
+                  )}
+                  <span className="hidden sm:inline">PDF ডাউনলোড</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center" className="rounded-xl shadow-lg border border-border/20 px-3 py-2 text-xs font-body max-w-xs z-50">
+                {isDownloading ? (
+                  <span>PDF প্রস্তুত হচ্ছে...</span>
+                ) : !isPaperComplete ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5 font-bold font-headline text-amber-600 dark:text-amber-400">
+                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                      <span>প্রশ্নপত্র অসম্পূর্ণ ({toBengaliDigits(totalAddedQuestions)}/{toBengaliDigits(totalTargetQuestions)}টি যুক্ত)</span>
+                    </div>
+                    <p className="text-[11px] opacity-90 leading-tight">
+                      ক্লিক করে ড্রাফট ডাউনলোড করুন বা বাকি প্রশ্নগুলো দেখুন
+                    </p>
+                  </div>
+                ) : (
+                  <span>প্রশ্নপত্র PDF ফরম্যাটে ডাউনলোড করুন</span>
+                )}
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Save Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={handleManualSave}
+                  disabled={saveStatus === "saving" || isManualSaving}
+                  className="h-8.5 sm:h-9 px-3 sm:px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold font-headline cursor-pointer gap-1.5 shadow-xs transition-all active:scale-95 disabled:opacity-50 shrink-0"
+                >
+                  {saveStatus === "saving" || isManualSaving ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Save className="w-3.5 h-3.5" />
+                  )}
+                  <span className="hidden sm:inline">সেভ করুন</span>
+                  <span className="inline sm:hidden">সেভ</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="end" className="rounded-xl shadow-lg border border-border/20 px-3 py-1.5 text-xs font-body z-50">
+                <span>পরিবর্তন সেভ করুন (Ctrl+S)</span>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </header>
 
       {/* Dedicated Mobile & Tablet Utility Toolbar Below Header (< xl) */}
@@ -405,6 +540,16 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         </Sheet>
       </div>
 
+      {/* Published Notice Banner */}
+      {paperQuery.status === "Published" && (
+        <div className="bg-emerald-50/90 dark:bg-emerald-950/40 border-b border-emerald-200/60 dark:border-emerald-800/30 px-3 sm:px-6 py-2 flex items-center gap-2.5 text-emerald-950 dark:text-emerald-200 text-xs font-body shrink-0 z-30 print:hidden shadow-2xs">
+          <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <p>
+            <strong className="font-headline font-semibold">প্রশ্নপত্রটি প্রকাশিত (সুরক্ষিত):</strong> প্রশ্নসমূহ স্থায়ীভাবে লক করা হয়েছে। তবে আপনি ফন্ট সাইজ, পেজ ব্রেক এবং প্রিন্ট লেআউট পরিবর্তন ও সংরক্ষণ করতে পারবেন।
+          </p>
+        </div>
+      )}
+
       {/* Main Workspace */}
       <div className="flex flex-1 overflow-hidden print:overflow-visible relative min-h-0">
         <BuilderSidebar className="hidden xl:flex" />
@@ -424,6 +569,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
         open={showIncompleteModal}
         onOpenChange={setShowIncompleteModal}
         paperId={paperId}
+        actionType={incompleteActionType}
         incompleteDistributions={incompleteDistributions}
       />
       <PublishBeforeDownloadModal

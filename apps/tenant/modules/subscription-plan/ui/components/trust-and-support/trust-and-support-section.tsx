@@ -67,12 +67,12 @@ export const TrustAndSupportSection: React.FC<TrustAndSupportSectionProps> = ({
   const faqs = isCredits ? creditsFaqs : subscriptionFaqs
 
   const paymentMethods = [
-    { name: "bKash", color: "bg-[#E2136E]/10 text-[#E2136E] border-[#E2136E]/20" },
-    { name: "Nagad", color: "bg-[#F7941D]/10 text-[#F7941D] border-[#F7941D]/20" },
-    { name: "Rocket", color: "bg-[#8C3494]/10 text-[#8C3494] border-[#8C3494]/20" },
-    { name: "BEFTN / NPSB", color: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
-    { name: "Visa / Mastercard", color: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20" },
-    { name: "Citytouch & IB", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20" },
+    { name: "বিকাশ", color: "bg-[#E2136E]/10 text-[#E2136E] border-[#E2136E]/20" },
+    { name: "নগদ", color: "bg-[#F7941D]/10 text-[#F7941D] border-[#F7941D]/20" },
+    { name: "রকেট", color: "bg-[#8C3494]/10 text-[#8C3494] border-[#8C3494]/20" },
+    { name: "ব্যাংক ট্রান্সফার (BEFTN / NPSB)", color: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
+    { name: "ভিসা / মাস্টারকার্ড", color: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20" },
+    { name: "ইন্টারনেট ব্যাংকিং", color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20" },
   ]
 
   return (
@@ -92,7 +92,7 @@ export const TrustAndSupportSection: React.FC<TrustAndSupportSectionProps> = ({
 
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 w-fit">
             <Lock className="w-3.5 h-3.5" />
-            <span>256-bit SSL সিকিউরড গেটওয়ে</span>
+            <span>২৫৬-বিট SSL সুরক্ষিত গেটওয়ে</span>
           </div>
         </div>
 

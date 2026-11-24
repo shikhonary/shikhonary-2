@@ -3,7 +3,13 @@
 import React from "react"
 import { Receipt, FileText, Download, CheckCircle2, Clock, ExternalLink } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
-import { toBengaliDigits, formatBengaliPrice, formatBengaliDate } from "@/modules/subscription-plan/utils"
+import {
+  toBengaliDigits,
+  formatBengaliPrice,
+  formatBengaliDate,
+  formatPaymentMethod,
+  formatInvoiceStatus,
+} from "@/modules/subscription-plan/utils"
 import type { InvoiceItem } from "@/modules/subscription-plan/types"
 
 interface InvoicesSectionProps {
@@ -58,17 +64,17 @@ export const InvoicesSection: React.FC<InvoicesSectionProps> = ({
             </thead>
             <tbody className="divide-y divide-border/30">
               {invoices.map((inv) => {
-                const isPaid = inv.status === "PAID"
+                const statusInfo = formatInvoiceStatus(inv.status)
                 return (
                   <tr key={inv.id} className="hover:bg-muted/20 transition-colors">
                     <td className="py-3 pl-2 font-mono font-medium text-foreground">
-                      {inv.invoiceNumber}
+                      {toBengaliDigits(inv.invoiceNumber)}
                     </td>
                     <td className="py-3 text-muted-foreground">
                       {formatBengaliDate(inv.periodStart)} – {formatBengaliDate(inv.periodEnd)}
                     </td>
                     <td className="py-3 text-foreground">
-                      {inv.paymentMethod || "অনলাইন গেটওয়ে"}
+                      {formatPaymentMethod(inv.paymentMethod)}
                     </td>
                     <td
                       className="py-3 text-right font-bold font-solaiman text-foreground"
@@ -78,18 +84,14 @@ export const InvoicesSection: React.FC<InvoicesSectionProps> = ({
                     </td>
                     <td className="py-3 text-center">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          isPaid
-                            ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
-                            : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
-                        }`}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusInfo.color}`}
                       >
-                        {isPaid ? (
+                        {statusInfo.isPaid ? (
                           <CheckCircle2 className="w-3 h-3" />
                         ) : (
                           <Clock className="w-3 h-3" />
                         )}
-                        <span>{isPaid ? "পরিশোধিত" : "অপেক্ষমান"}</span>
+                        <span>{statusInfo.label}</span>
                       </span>
                     </td>
                     <td className="py-3 pr-2 text-right">

@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
-import { notFound } from "../../../utils/errors"
+import { notFound, badRequest } from "../../../utils/errors"
 import { isSingleQuestionType } from "@workspace/utils"
 import type {
   AddQuestionPaperQuestionInput,
@@ -29,6 +29,9 @@ export async function addQuestionPaperQuestion(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
 
   const idsSet = [
     input.mcqId,
@@ -475,6 +478,9 @@ export async function removeQuestionPaperQuestion(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
 
   const typeFieldMap: Record<string, string> = {
     MCQ: "mcqId",
@@ -586,6 +592,9 @@ export async function reorderQuestionPaperQuestions(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
 
   const updates = input.questionOrders.map((q) =>
     tenantDb.questionPaperQuestion.update({
@@ -617,6 +626,9 @@ export async function bulkAssignQuestions(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
 
   const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
     where: { id: input.distributionId },
@@ -1508,6 +1520,9 @@ export async function bulkRemoveQuestions(
     where: { id: input.questionPaperId },
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
 
   const targetQuestions = await tenantDb.questionPaperQuestion.findMany({
     where: {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface GrammarQuestionPickerCardProps {
   question: any;
@@ -27,6 +27,7 @@ export const GrammarQuestionPickerCard: React.FC<GrammarQuestionPickerCardProps>
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -56,7 +57,7 @@ export const GrammarQuestionPickerCard: React.FC<GrammarQuestionPickerCardProps>
         </div>
 
         {/* Optional Answer Preview */}
-        {q.answer && (
+        {!isBankMode && q.answer && (
           <div className="text-xs bg-surface-container-low/70 border border-outline-variant/40 rounded-md p-2 text-on-surface-variant flex items-start gap-1.5">
             <span className="font-bold text-primary shrink-0">উত্তর:</span>
             <span className="flex-1">

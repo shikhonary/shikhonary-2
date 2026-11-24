@@ -82,6 +82,14 @@ export async function upsertQuestionPaperSubSection(
     })
     if (!existing) throw notFound("QuestionPaperSubSection")
 
+  const paper = await tenantDb.questionPaper.findFirst({
+    where: { sections: { some: { subSections: { some: { id: input.id } } } } },
+    select: { status: true },
+  })
+  if (paper?.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রের সাব-সেকশন ডিলিট করা যাবে না।")
+  }
+
     sub = await tenantDb.questionPaperSubSection.update({
       where: { id: input.id },
       data: {
@@ -120,6 +128,14 @@ export async function deleteQuestionPaperSubSection(
     },
   })
   if (!existing) throw notFound("QuestionPaperSubSection")
+
+  const paper = await tenantDb.questionPaper.findFirst({
+    where: { sections: { some: { subSections: { some: { id: input.id } } } } },
+    select: { status: true },
+  })
+  if (paper?.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রের সাব-সেকশন ডিলিট করা যাবে না।")
+  }
 
   if (existing.questions && existing.questions.length > 0) {
     throw badRequest("Cannot delete a sub-section that contains questions.")

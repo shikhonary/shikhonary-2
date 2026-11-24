@@ -34,7 +34,6 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
   const urlChapterId = searchParams.get("chapterId") || "All"
   const urlBoard = searchParams.get("board") || "All"
   const urlSource = searchParams.get("source") || "All"
-  const urlDifficulty = searchParams.get("difficulty") || "All"
   const urlSearch = searchParams.get("search") || ""
   const urlSort = (searchParams.get("sort") as "newest" | "oldest") || "newest"
   const urlPage = parseInt(searchParams.get("page") || "1", 10)
@@ -94,11 +93,10 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
     if (urlChapterId !== "All") count++
     if (urlBoard !== "All") count++
     if (urlSource !== "All") count++
-    if (urlDifficulty !== "All") count++
     if (debouncedSearch.trim() !== "") count++
     if (urlSort !== "newest") count++
     return count
-  }, [urlChapterId, urlBoard, urlSource, urlDifficulty, debouncedSearch, urlSort])
+  }, [urlChapterId, urlBoard, urlSource, debouncedSearch, urlSort])
 
   const updateUrlParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -128,10 +126,6 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
 
   const handleSourceChange = (source: string) => {
     updateUrlParam("source", source === "All" ? null : source)
-  }
-
-  const handleDifficultyChange = (diff: string) => {
-    updateUrlParam("difficulty", diff === "All" ? null : diff)
   }
 
   const handleSortChange = (sort: "newest" | "oldest") => {
@@ -218,8 +212,6 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
             selectedSource={urlSource}
             onSourceChange={handleSourceChange}
             sources={sources}
-            selectedDifficulty={urlDifficulty}
-            onDifficultyChange={handleDifficultyChange}
             selectedSort={urlSort}
             onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
@@ -235,7 +227,6 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
             chapterId={urlChapterId}
             board={urlBoard}
             source={urlSource}
-            difficulty={urlDifficulty}
             sort={urlSort}
             page={urlPage}
             limit={20}
@@ -267,8 +258,6 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
           selectedSource={urlSource}
           onSourceChange={handleSourceChange}
           sources={sources}
-          selectedDifficulty={urlDifficulty}
-          onDifficultyChange={handleDifficultyChange}
           selectedSort={urlSort}
           onSortChange={handleSortChange}
           onResetFilters={handleResetFilters}

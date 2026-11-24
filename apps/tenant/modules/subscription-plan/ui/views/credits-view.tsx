@@ -240,7 +240,7 @@ export const CreditsView: React.FC = () => {
                           <span className="text-xs text-muted-foreground">এককালীন</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-0.5">
-                          প্রতি ক্রেডিট মাত্র ৳{(pack.priceBDT / pack.totalCredits).toFixed(2)}
+                          প্রতি ক্রেডিট মাত্র ৳{toBengaliDigits((pack.priceBDT / pack.totalCredits).toFixed(2))}
                         </p>
                       </div>
 

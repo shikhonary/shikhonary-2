@@ -22,7 +22,7 @@ import { ResourceQuotaMeters } from "../resource-usage/resource-quota-meters"
 import { CreditTransactionsSection } from "../credits/credit-transactions-section"
 import { InvoicesSection } from "../invoices/invoices-section"
 import { TrustAndSupportSection } from "../trust-and-support/trust-and-support-section"
-import { toBengaliDigits, formatBengaliDate } from "@/modules/subscription-plan/utils"
+import { toBengaliDigits, formatBengaliDate, naturalizePlanName } from "@/modules/subscription-plan/utils"
 import type {
   TenantSubscriptionDetails,
   SubscriptionPlanItem,
@@ -84,7 +84,7 @@ export const MobileSubscriptionView: React.FC<MobileSubscriptionViewProps> = ({
               </h1>
               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-body truncate mt-0.5">
                 <span className="px-1.5 py-0.2 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-500/20 text-[10px] shrink-0">
-                  {plan?.displayName || "শিক্ষক প্যাক"}
+                  {naturalizePlanName(plan?.displayName) || "শিক্ষক প্যাক"}
                 </span>
                 <span className="text-muted-foreground/40">•</span>
                 <span className="truncate">বাকি {toBengaliDigits(remainingDays)} দিন</span>

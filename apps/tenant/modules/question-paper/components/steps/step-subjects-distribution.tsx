@@ -11,8 +11,22 @@ import { BookOpen, Plus, Trash2, ChevronDown, ChevronUp, Loader2, Calculator, Sp
 import { trpc } from "@/trpc/client"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "@workspace/ui/components/sonner"
-import { isResourceEnglish, getQuestionTypePolicy, isSingleQuestionType } from "@workspace/utils"
+import {
+  isResourceEnglish,
+  getQuestionTypePolicy,
+  isSingleQuestionType,
+  resolveQuestionTypeBilingualNames,
+  getQuestionTypeDisplayName,
+} from "@workspace/utils"
 import type { StepProps, WizardSubject, WizardDistribution, AcademicSubjectRef, QuestionTypeRef } from "../../types/create-wizard"
+
+const toBengaliNumber = (num: number | string) => {
+  const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+  return String(num)
+    .split("")
+    .map((d) => bnDigits[parseInt(d, 10)] || d)
+    .join("")
+}
 
 interface StepSubjectsDistributionProps extends StepProps {
   subjects: AcademicSubjectRef[]
@@ -234,17 +248,37 @@ export function StepSubjectsDistribution({
 
         let distsChanged = false
         const updatedDists = s.distributions.map((d) => {
+          const qType =
+            filteredQuestionTypes.find((q) => q.id === d.questionTypeId) ||
+            questionTypes.find((q) => q.id === d.questionTypeId)
+          const resolved = resolveQuestionTypeBilingualNames({
+            nameBn: qType?.nameBn || d.questionTypeNameBn || (d.questionTypeName && /[\u0980-\u09FF]/.test(d.questionTypeName) ? d.questionTypeName : null),
+            nameEn: qType?.nameEn || (!/[\u0980-\u09FF]/.test(d.questionTypeName || "") ? d.questionTypeName : null),
+            label: d.questionTypeLabel,
+          })
+
           if (isEng) {
-            const qType = filteredQuestionTypes.find((q) => q.id === d.questionTypeId) || questionTypes.find((q) => q.id === d.questionTypeId)
-            const engName = qType?.nameEn || d.questionTypeName
+            const engName = resolved.nameEn || d.questionTypeName
             const isNameBn = /[\u0980-\u09FF]/.test(d.questionTypeName || "")
             const isLabelBn = /[\u0980-\u09FF]/.test(d.questionTypeLabel || "")
-            if (isNameBn || (isLabelBn && engName)) {
+            if (isNameBn || (isLabelBn && engName) || d.questionTypeName !== engName) {
               distsChanged = true
               return {
                 ...d,
                 questionTypeName: engName,
+                questionTypeNameBn: resolved.nameBn || d.questionTypeNameBn || null,
                 questionTypeLabel: (!isLabelBn && d.questionTypeLabel) ? d.questionTypeLabel : engName,
+              }
+            }
+          } else {
+            const bnName = resolved.nameBn || d.questionTypeNameBn || d.questionTypeName
+            const isNameEn = d.questionTypeName && !/[\u0980-\u09FF]/.test(d.questionTypeName)
+            if (bnName && (isNameEn || d.questionTypeName !== bnName || !d.questionTypeNameBn)) {
+              distsChanged = true
+              return {
+                ...d,
+                questionTypeName: bnName,
+                questionTypeNameBn: bnName,
               }
             }
           }
@@ -295,13 +329,19 @@ export function StepSubjectsDistribution({
       const customLabel = sqt?.customLabel || item.label
       const isCustomEng = customLabel && !/[\u0980-\u09FF]/.test(customLabel)
 
+      const resolved = resolveQuestionTypeBilingualNames({
+        nameBn: item.nameBn,
+        nameEn: item.nameEn,
+        label: customLabel || item.label,
+      })
+
       const resolvedName = isEng
-        ? (item.nameEn || item.nameBn)
-        : (item.nameBn || item.nameEn)
+        ? (resolved.nameEn || resolved.nameBn)
+        : (resolved.nameBn || resolved.nameEn)
 
       const resolvedLabel = isEng
-        ? (isCustomEng ? customLabel : (item.nameEn || item.nameBn))
-        : (customLabel || item.nameBn || item.nameEn)
+        ? (isCustomEng ? customLabel : (resolved.nameEn || resolved.nameBn))
+        : (customLabel || resolved.nameBn || resolved.nameEn)
 
       let markDist = sqt?.markDistribution
       if (typeof markDist === "string") {
@@ -320,7 +360,7 @@ export function StepSubjectsDistribution({
         tempId: crypto.randomUUID(),
         questionTypeId: item.id,
         questionTypeName: resolvedName,
-        questionTypeNameBn: item.nameBn || null,
+        questionTypeNameBn: resolved.nameBn || item.nameBn || null,
         questionTypeLabel: resolvedLabel,
         marksPerQuestion: marksPerQ,
         markDistribution: markDist,
@@ -446,7 +486,7 @@ export function StepSubjectsDistribution({
       toast.info(
         isExpandedSubjectEnglish
           ? "Question count adjusted based on attempt count."
-          : "চেষ্টার সংখ্যা অনুযায়ী মোট প্রশ্ন সংখ্যা সমন্বয় করা হয়েছে।"
+          : "উত্তর আবশ্যক সংখ্যার তুলনায় মোট প্রশ্ন কম থাকায় তা সমন্বয় করা হয়েছে।"
       )
     }
 
@@ -488,21 +528,19 @@ export function StepSubjectsDistribution({
     const customLabel = (preset as any)?.customLabel || (preset as any)?.questionTypeLabel
     const isCustomLabelEnglish = customLabel && !/[\u0980-\u09FF]/.test(customLabel)
 
-    const englishLabel = isCustomLabelEnglish
-      ? customLabel
-      : (matched.nameEn || matched.nameBn)
-
-    const bengaliLabel = customLabel && /[\u0980-\u09FF]/.test(customLabel)
-      ? customLabel
-      : (matched.nameBn || customLabel || matched.nameEn)
+    const resolved = resolveQuestionTypeBilingualNames({
+      nameBn: matched.nameBn,
+      nameEn: matched.nameEn,
+      label: customLabel || matched.label,
+    })
 
     const resolvedTypeName = isExpandedSubjectEnglish
-      ? (matched.nameEn || matched.nameBn)
-      : (matched.nameBn || matched.nameEn)
+      ? (resolved.nameEn || resolved.nameBn)
+      : (resolved.nameBn || resolved.nameEn)
 
     const resolvedTypeLabel = isExpandedSubjectEnglish
-      ? englishLabel
-      : (bengaliLabel || englishLabel)
+      ? (isCustomLabelEnglish ? customLabel : (resolved.nameEn || resolved.nameBn))
+      : (customLabel || resolved.nameBn || resolved.nameEn)
 
     const currentSub = data.subjects.find((s) => s.tempId === subjectTempId)
     const sDistLength = currentSub?.distributions.length || 0
@@ -519,7 +557,7 @@ export function StepSubjectsDistribution({
       tempId: crypto.randomUUID(),
       questionTypeId: matched.id,
       questionTypeName: resolvedTypeName,
-      questionTypeNameBn: matched.nameBn || null,
+      questionTypeNameBn: resolved.nameBn || matched.nameBn || null,
       questionTypeLabel: resolvedTypeLabel,
       marksPerQuestion: marksNum,
       markDistribution: markDist,
@@ -676,14 +714,14 @@ export function StepSubjectsDistribution({
                     className="w-full flex items-center gap-3 p-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
                   >
                     <span className="flex size-8 items-center justify-center rounded-xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary text-xs font-bold shrink-0 font-solaiman">
-                      {sIdx + 1}
+                      {toBengaliNumber(sIdx + 1)}
                     </span>
                     <span className="flex-1 text-left font-bold text-sm text-foreground font-headline">
                       {subject.subjectName}
                     </span>
                     {subject.distributions.length > 0 && (
                       <Badge className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60 px-2.5 py-0.5 text-xs font-bold rounded-lg font-solaiman">
-                        {subjectTotal} নম্বর
+                        {toBengaliNumber(subjectTotal)} নম্বর
                       </Badge>
                     )}
                     <span className="text-muted-foreground">
@@ -706,7 +744,7 @@ export function StepSubjectsDistribution({
                             <span>
                               {isExpandedSubjectEnglish
                                 ? "This subject has a pre-configured question structure. Would you like to load it?"
-                                : "এই বিষয়ের জন্য পূর্বনির্ধারিত কাঠামো রয়েছে। আপনি কি তা লোড করতে চান?"}
+                                : "এই বিষয়ের জন্য বোর্ড বা বিদ্যালয়ের নির্ধারিত মানবণ্টন কাঠামো রয়েছে। আপনি কি তা যুক্ত করতে চান?"}
                             </span>
                           </div>
                           <Button
@@ -714,7 +752,7 @@ export function StepSubjectsDistribution({
                             onClick={() => handleLoadStructureDistributions(subject.tempId)}
                             className="h-8 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shrink-0 cursor-pointer shadow-xs font-headline"
                           >
-                            {isExpandedSubjectEnglish ? "Load Structure" : "কাঠামো অনুযায়ী লোড করুন"}
+                            {isExpandedSubjectEnglish ? "Load Structure" : "প্রমিত মানবণ্টন লোড করুন"}
                           </Button>
                         </div>
                       )}
@@ -733,9 +771,19 @@ export function StepSubjectsDistribution({
                             {/* Mobile Cards (sm:hidden) */}
                             <div className="space-y-2 sm:hidden">
                               {subject.distributions.map((dist) => {
-                                const displayTypeName = isSubEnglish
-                                  ? (dist.questionTypeLabel || dist.questionTypeName || dist.questionTypeNameBn)
-                                  : (dist.questionTypeNameBn || dist.questionTypeName || dist.questionTypeLabel)
+                                const matchedQType =
+                                  filteredQuestionTypes.find((q) => q.id === dist.questionTypeId) ||
+                                  subjectQuestionTypes.find((q) => q.id === dist.questionTypeId) ||
+                                  questionTypes.find((q) => q.id === dist.questionTypeId)
+
+                                const displayTypeName = getQuestionTypeDisplayName(
+                                  {
+                                    nameBn: matchedQType?.nameBn || dist.questionTypeNameBn || (/[\u0980-\u09FF]/.test(dist.questionTypeName || "") ? dist.questionTypeName : null),
+                                    nameEn: matchedQType?.nameEn || (!/[\u0980-\u09FF]/.test(dist.questionTypeName || "") ? dist.questionTypeName : null),
+                                    label: matchedQType?.label || dist.questionTypeLabel,
+                                  },
+                                  isSubEnglish
+                                )
 
                                 return (
                                   <div
@@ -751,7 +799,7 @@ export function StepSubjectsDistribution({
                                           {isSubEnglish ? (
                                             <>Marks per question: <span className="font-semibold text-foreground">{dist.marksPerQuestion}</span></>
                                           ) : (
-                                            <>প্রতি প্রশ্নে: <span className="font-semibold text-foreground font-solaiman">{dist.marksPerQuestion}</span> নম্বর</>
+                                            <>প্রতি প্রশ্নের মান: <span className="font-semibold text-foreground font-solaiman">{toBengaliNumber(dist.marksPerQuestion)}</span></>
                                           )}
                                         </p>
                                       </div>
@@ -766,11 +814,11 @@ export function StepSubjectsDistribution({
                                     </div>
                                     <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-slate-100 dark:border-white/[0.04]">
                                       <div className="flex items-center gap-3 text-muted-foreground font-body">
-                                        <span>{isSubEnglish ? "Count: " : "সংখ্যা: "}<strong className={`text-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{dist.questionCount}</strong></span>
-                                        <span>{isSubEnglish ? "Attempt: " : "চেষ্টা: "}<strong className={`text-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{dist.questionsToAttempt ?? (isSubEnglish ? "All" : "সব")}</strong></span>
+                                        <span>{isSubEnglish ? "Total Q: " : "মোট প্রশ্ন: "}<strong className={`text-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{isSubEnglish ? dist.questionCount : toBengaliNumber(dist.questionCount)}</strong></span>
+                                        <span>{isSubEnglish ? "To Answer: " : "উত্তর আবশ্যক: "}<strong className={`text-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{dist.questionsToAttempt != null ? (isSubEnglish ? dist.questionsToAttempt : toBengaliNumber(dist.questionsToAttempt)) : (isSubEnglish ? "All" : "সকল")}</strong></span>
                                       </div>
                                       <span className={`font-bold text-xs text-indigo-600 dark:text-indigo-400 ${isSubEnglish ? "" : "font-solaiman"}`}>
-                                        {isSubEnglish ? `Total: ${dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}` : `মোট: ${dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}`}
+                                        {isSubEnglish ? `Total: ${dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}` : `মোট: ${toBengaliNumber(dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount))} নম্বর`}
                                       </span>
                                     </div>
                                   </div>
@@ -783,30 +831,40 @@ export function StepSubjectsDistribution({
                               <table className="w-full text-xs font-body">
                                 <thead>
                                   <tr className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.02] text-muted-foreground">
-                                    <th className="text-left py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Type" : "ধরণ"}</th>
-                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Marks/Q" : "নম্বর/প্রশ্ন"}</th>
-                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Count" : "প্রশ্ন সংখ্যা"}</th>
-                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Attempt" : "চেষ্টা"}</th>
-                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Total" : "মোট"}</th>
+                                    <th className="text-left py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Type" : "প্রশ্নের ধরন"}</th>
+                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Marks/Q" : "মান"}</th>
+                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Total Q" : "মোট প্রশ্ন"}</th>
+                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "To Answer" : "উত্তর আবশ্যক"}</th>
+                                    <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider">{isSubEnglish ? "Total" : "মোট নম্বর"}</th>
                                     <th className="text-center py-2.5 px-3 text-[11px] font-bold font-headline uppercase tracking-wider w-10"></th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
                                   {subject.distributions.map((dist) => {
-                                    const displayTypeName = isSubEnglish
-                                      ? (dist.questionTypeLabel || dist.questionTypeName || dist.questionTypeNameBn)
-                                      : (dist.questionTypeNameBn || dist.questionTypeName || dist.questionTypeLabel)
+                                    const matchedQType =
+                                      filteredQuestionTypes.find((q) => q.id === dist.questionTypeId) ||
+                                      subjectQuestionTypes.find((q) => q.id === dist.questionTypeId) ||
+                                      questionTypes.find((q) => q.id === dist.questionTypeId)
+
+                                    const displayTypeName = getQuestionTypeDisplayName(
+                                      {
+                                        nameBn: matchedQType?.nameBn || dist.questionTypeNameBn || (/[\u0980-\u09FF]/.test(dist.questionTypeName || "") ? dist.questionTypeName : null),
+                                        nameEn: matchedQType?.nameEn || (!/[\u0980-\u09FF]/.test(dist.questionTypeName || "") ? dist.questionTypeName : null),
+                                        label: (matchedQType as any)?.label || dist.questionTypeLabel,
+                                      },
+                                      isSubEnglish
+                                    )
 
                                     return (
                                       <tr key={dist.tempId} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
                                         <td className="py-2.5 px-3 font-semibold text-foreground">{displayTypeName}</td>
-                                        <td className={`py-2.5 px-3 text-center text-muted-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{dist.marksPerQuestion}</td>
-                                        <td className={`py-2.5 px-3 text-center text-muted-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{dist.questionCount}</td>
+                                        <td className={`py-2.5 px-3 text-center text-muted-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{isSubEnglish ? dist.marksPerQuestion : toBengaliNumber(dist.marksPerQuestion)}</td>
+                                        <td className={`py-2.5 px-3 text-center text-muted-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>{isSubEnglish ? dist.questionCount : toBengaliNumber(dist.questionCount)}</td>
                                         <td className={`py-2.5 px-3 text-center text-muted-foreground ${isSubEnglish ? "" : "font-solaiman"}`}>
-                                          {dist.questionsToAttempt ?? (isSubEnglish ? "All" : "সব")}
+                                          {dist.questionsToAttempt != null ? (isSubEnglish ? dist.questionsToAttempt : toBengaliNumber(dist.questionsToAttempt)) : (isSubEnglish ? "All" : "সকল")}
                                         </td>
                                         <td className={`py-2.5 px-3 text-center font-bold text-indigo-600 dark:text-indigo-400 ${isSubEnglish ? "" : "font-solaiman"}`}>
-                                          {dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount)}
+                                          {isSubEnglish ? dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount) : toBengaliNumber(dist.marksPerQuestion * (dist.questionsToAttempt ?? dist.questionCount))}
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                           <Button
@@ -832,7 +890,7 @@ export function StepSubjectsDistribution({
                       <div className="rounded-xl border border-dashed border-indigo-200 dark:border-indigo-800/50 p-3.5 sm:p-4 space-y-3 bg-indigo-50/30 dark:bg-indigo-950/10">
                         <div className="flex items-center gap-2">
                           <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 font-headline">
-                            {isExpandedSubjectEnglish ? "Add New Question Type & Marks Distribution" : "নতুন প্রশ্নের ধরণ ও নম্বর বণ্টন যোগ করুন"}
+                            {isExpandedSubjectEnglish ? "Add New Question Type & Marks Distribution" : "নতুন প্রশ্নের ধরন ও মানবণ্টন যোগ করুন"}
                           </p>
                           {(isDetailLoading || isTypesLoading) && (
                             <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600 shrink-0" />
@@ -845,7 +903,7 @@ export function StepSubjectsDistribution({
                             <span>
                               {isExpandedSubjectEnglish
                                 ? "No question types configured for this subject yet."
-                                : "এই বিষয়ের জন্য কোনো প্রশ্নের ধরণ কনফিগার করা হয়নি।"}
+                                : "এই বিষয়ের জন্য কোনো প্রশ্নের ধরন কনফিগার করা হয়নি।"}
                             </span>
                           </div>
                         )}
@@ -856,7 +914,7 @@ export function StepSubjectsDistribution({
                             <span>
                               {isExpandedSubjectEnglish
                                 ? "Marks per question autofilled from subject preset."
-                                : "বিষয় কাঠামো থেকে প্রতি প্রশ্নের নম্বর পূরণ করা হয়েছে।"}
+                                : "বিষয় কাঠামো থেকে প্রতি প্রশ্নের মান পূরণ করা হয়েছে।"}
                             </span>
                           </div>
                         )}
@@ -864,34 +922,35 @@ export function StepSubjectsDistribution({
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 sm:gap-3">
                           <div className="sm:col-span-1">
                             <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                              {isExpandedSubjectEnglish ? "Question Type *" : "প্রশ্নের ধরণ *"}
+                              {isExpandedSubjectEnglish ? "Question Type *" : "প্রশ্নের ধরন *"}
                             </label>
                             <Select value={distForm.questionTypeId} onValueChange={handleQuestionTypeChange}>
                               <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-card py-2 px-3 font-body text-xs h-10 justify-between">
-                                <SelectValue placeholder={isExpandedSubjectEnglish ? "Select Type" : "ধরণ নির্বাচন করুন"} />
+                                <SelectValue placeholder={isExpandedSubjectEnglish ? "Select Type" : "ধরন নির্বাচন করুন"} />
                               </SelectTrigger>
                               <SelectContent className="bg-popover border border-slate-200 dark:border-white/[0.08] shadow-lg rounded-xl font-body">
                                 {(isDetailLoading || isTypesLoading) && filteredQuestionTypes.length === 0 ? (
                                   <div className="flex items-center justify-center p-3 text-xs text-muted-foreground gap-2 font-body">
                                     <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
-                                    <span>{isExpandedSubjectEnglish ? "Loading question types..." : "প্রশ্নের ধরণ লোড হচ্ছে..."}</span>
+                                    <span>{isExpandedSubjectEnglish ? "Loading question types..." : "প্রশ্নের ধরন লোড হচ্ছে..."}</span>
                                   </div>
                                 ) : filteredQuestionTypes.length === 0 ? (
                                   <div className="px-3 py-2 text-xs text-muted-foreground font-body">
-                                    {isExpandedSubjectEnglish ? "No question types configured" : "কোনো প্রশ্নের ধরণ পাওয়া যায়নি"}
+                                    {isExpandedSubjectEnglish ? "No question types configured" : "কোনো প্রশ্নের ধরন পাওয়া যায়নি"}
                                   </div>
                                 ) : (
                                   filteredQuestionTypes.map((t) => {
                                     const preset = t.preset || subjectDetail?.subjectQuestionTypes?.find(
                                       (sqt: any) => sqt.questionTypeId === t.id
                                     )
-                                    const isCustomEnglish = preset?.customLabel && !/[\u0980-\u09FF]/.test(preset.customLabel)
-                                    const englishName = t.nameEn || ""
-                                    const bengaliName = t.nameBn || ""
-
-                                    const displayLabel = isExpandedSubjectEnglish
-                                      ? (englishName || (isCustomEnglish ? preset.customLabel : "") || t.label || bengaliName)
-                                      : (preset?.customLabel || bengaliName || englishName)
+                                    const displayLabel = getQuestionTypeDisplayName(
+                                      {
+                                        nameBn: t.nameBn,
+                                        nameEn: t.nameEn,
+                                        label: preset?.customLabel || t.label,
+                                      },
+                                      isExpandedSubjectEnglish
+                                    )
 
                                     return (
                                       <SelectItem key={t.id} value={t.id}>
@@ -905,11 +964,22 @@ export function StepSubjectsDistribution({
                           </div>
                           <div className="grid grid-cols-3 gap-2 sm:contents">
                             <div>
-                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                                {isExpandedSubjectEnglish ? "Marks/Question *" : "নম্বর/প্রশ্ন *"}
+                              <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block truncate">
+                                {isExpandedSubjectEnglish ? (
+                                  <>
+                                    <span className="sm:hidden">Marks/Q *</span>
+                                    <span className="hidden sm:inline">Marks/Question *</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="sm:hidden">মান *</span>
+                                    <span className="hidden sm:inline">প্রতি প্রশ্নের মান *</span>
+                                  </>
+                                )}
                               </label>
                               <Input
                                 type="number"
+                                inputMode="decimal"
                                 value={distForm.marksPerQuestion}
                                 onChange={(e) => setDistForm((p) => ({ ...p, marksPerQuestion: e.target.value }))}
                                 placeholder={isExpandedSubjectEnglish ? "1" : "১"}
@@ -925,16 +995,17 @@ export function StepSubjectsDistribution({
                               return (
                                 <>
                                   <div>
-                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                                      {isExpandedSubjectEnglish ? "Question Count *" : "প্রশ্ন সংখ্যা *"}
+                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block truncate">
+                                      {isExpandedSubjectEnglish ? "Total Q *" : "মোট প্রশ্ন *"}
                                     </label>
                                     <Input
                                       type="number"
+                                      inputMode="numeric"
                                       disabled={isCurrentSingle}
                                       value={isCurrentSingle ? "1" : distForm.questionCount}
                                       onChange={(e) => setDistForm((p) => ({ ...p, questionCount: e.target.value }))}
                                       onBlur={handleQuestionCountBlur}
-                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "e.g. 10" : "যেমন: ১০")}
+                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "e.g. 10" : "উদা: ১০")}
                                       min={1}
                                       className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
                                     />
@@ -945,16 +1016,27 @@ export function StepSubjectsDistribution({
                                     )}
                                   </div>
                                   <div>
-                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block">
-                                      {isExpandedSubjectEnglish ? "To Attempt (Optional)" : "চেষ্টা (ঐচ্ছিক)"}
+                                    <label className="text-[11px] font-semibold text-muted-foreground font-body mb-1 block truncate">
+                                      {isExpandedSubjectEnglish ? (
+                                        <>
+                                          <span className="sm:hidden">To Answer</span>
+                                          <span className="hidden sm:inline">To Answer (Optional)</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span className="sm:hidden">উত্তর আবশ্যক</span>
+                                          <span className="hidden sm:inline">উত্তর আবশ্যক (ঐচ্ছিক)</span>
+                                        </>
+                                      )}
                                     </label>
                                     <Input
                                       type="number"
+                                      inputMode="numeric"
                                       disabled={isCurrentSingle}
                                       value={isCurrentSingle ? "1" : distForm.questionsToAttempt}
                                       onChange={(e) => setDistForm((p) => ({ ...p, questionsToAttempt: e.target.value }))}
                                       onBlur={handleQuestionsToAttemptBlur}
-                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "All" : "সব")}
+                                      placeholder={isCurrentSingle ? "1" : (isExpandedSubjectEnglish ? "All" : "সকল")}
                                       min={1}
                                       className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] py-2 px-3 font-body text-xs text-foreground bg-card focus:border-indigo-500/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 h-10 disabled:opacity-80 disabled:bg-slate-100 dark:disabled:bg-slate-900"
                                     />
@@ -982,13 +1064,13 @@ export function StepSubjectsDistribution({
                               <div>
                                 <p className="font-semibold">
                                   {isExpandedSubjectEnglish
-                                    ? "Single Question Type (Multiple questions not allowed)"
-                                    : "একক প্রশ্নের ধরণ (একাধিক প্রশ্ন অনুমোদিত নয়)"}
+                                    ? "Single Question Type (Single item)"
+                                    : "একক প্রশ্নের ধরন (১টি প্রশ্ন)"}
                                 </p>
                                 <p className="text-[11px] opacity-90 mt-0.5">
                                   {isExpandedSubjectEnglish
-                                    ? "This question type only permits a single question and multiple questions cannot be configured (this feature is not totally synced)."
-                                    : "এই প্রশ্নের ধরণের ক্ষেত্রে কেবল ১টি প্রশ্ন অনুমোদিত। একাধিক প্রশ্ন তৈরি বা সংখ্যা পরিবর্তন করা যাবে না (এই ফিচারটি পুরোপুরি সিঙ্ক নয়)।"}
+                                    ? "This question type is designed as a single question (e.g. Essay, Letter, Summary). You can attach alternative questions in the builder."
+                                    : "এই প্রশ্নের ধরনের ক্ষেত্রে কেবল ১টি প্রশ্ন প্রযোজ্য (যেমন: ভাবসম্প্রসারণ, রচনা, চিঠি)। পরবর্তীতে বিল্ডারে প্রয়োজন অনুযায়ী বিকল্প (অথবা) প্রশ্ন যুক্ত করা যাবে।"}
                                 </p>
                               </div>
                             </div>
@@ -1006,11 +1088,37 @@ export function StepSubjectsDistribution({
                               {effQuestionsToAttempt !== "" && (parseInt(effQuestionCount, 10) || 0) < (parseInt(effQuestionsToAttempt, 10) || 0) && (
                                 <p className="text-xs text-rose-600 dark:text-rose-400 font-body font-medium animate-in fade-in duration-200">
                                   {isExpandedSubjectEnglish
-                                    ? "⚠️ Questions to attempt cannot exceed total question count."
-                                    : "⚠️ চেষ্টার সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।"}
+                                    ? "⚠️ Questions to answer cannot exceed total question count."
+                                    : "⚠️ উত্তর আবশ্যক সংখ্যা মোট প্রশ্ন সংখ্যার চেয়ে বেশি হতে পারবে না।"}
                                 </p>
                               )}
                             </>
+                          )
+                        })()}
+
+                        {/* Live calculation preview pill */}
+                        {(() => {
+                          const selectedTypeObj = filteredQuestionTypes.find((t) => t.id === distForm.questionTypeId)
+                          const isCurrentSingle = checkIsSingleType(selectedTypeObj)
+                          const effQuestionCount = isCurrentSingle ? "1" : distForm.questionCount
+                          const effQuestionsToAttempt = isCurrentSingle ? "1" : distForm.questionsToAttempt
+                          const marksNum = parseFloat(distForm.marksPerQuestion) || 0
+                          const countNum = parseInt(effQuestionCount, 10) || 0
+                          const toAnswerNum = effQuestionsToAttempt ? (parseInt(effQuestionsToAttempt, 10) || 0) : countNum
+                          const calcTotal = toAnswerNum * marksNum
+
+                          if (!distForm.questionTypeId || !distForm.marksPerQuestion || countNum <= 0) return null
+
+                          return (
+                            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 text-xs font-body text-indigo-700 dark:text-indigo-300">
+                              <Calculator className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                              <span>
+                                {isExpandedSubjectEnglish
+                                  ? `Calculation: ${toAnswerNum} to answer × ${marksNum} marks = ${calcTotal} marks (Total Questions: ${countNum})`
+                                  : `হিসাব: ${toBengaliNumber(toAnswerNum)}টি উত্তর × ${toBengaliNumber(marksNum)} মান = ${toBengaliNumber(calcTotal)} নম্বর (মোট প্রশ্ন: ${toBengaliNumber(countNum)}টি)`
+                                }
+                              </span>
+                            </div>
                           )
                         })()}
 
@@ -1038,7 +1146,7 @@ export function StepSubjectsDistribution({
                               }`}
                             >
                               <Calculator className="h-3.5 w-3.5" />
-                              <span>{isExpandedSubjectEnglish ? "Add Distribution" : "নম্বর বণ্টন যোগ করুন"}</span>
+                              <span>{isExpandedSubjectEnglish ? "Add Distribution" : "মানবণ্টন যোগ করুন"}</span>
                             </Button>
                           )
                         })()}
@@ -1054,7 +1162,7 @@ export function StepSubjectsDistribution({
                             className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl px-3 py-1.5 cursor-pointer h-auto font-headline font-semibold"
                           >
                             <Sparkles className="h-3.5 w-3.5" />
-                            <span>{isExpandedSubjectEnglish ? "Reload Subject Structure" : "কাঠামো অনুযায়ী বণ্টন রিলোড"}</span>
+                            <span>{isExpandedSubjectEnglish ? "Reload Subject Structure" : "প্রমিত মানবণ্টন রিলোড"}</span>
                           </Button>
                         ) : <div />}
                         <Button
@@ -1075,11 +1183,29 @@ export function StepSubjectsDistribution({
           </div>
         )}
 
-        {/* Grand Total */}
+        {/* Grand Total with Marks Balance */}
         {data.subjects.length > 0 && (
-          <div className="flex items-center justify-between rounded-2xl border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 p-5 font-headline shadow-2xs">
-            <span className="text-sm font-bold text-foreground">সর্বমোট নম্বর</span>
-            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400 font-solaiman">{grandTotal}</span>
+          <div className="rounded-2xl border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 p-4 sm:p-5 font-headline shadow-2xs space-y-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-bold text-foreground">সর্বমোট পরীক্ষার নম্বর</span>
+                <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                  {grandTotal === 100
+                    ? "✅ প্রচলিত ১০০ নম্বরের পূর্ণাঙ্গ মানবণ্টন সম্পন্ন হয়েছে।"
+                    : grandTotal === 50
+                      ? "✅ প্রচলিত ৫০ নম্বরের পূর্ণাঙ্গ মানবণ্টন সম্পন্ন হয়েছে।"
+                      : grandTotal < 100
+                        ? `প্রচলিত পূর্ণমান ১০০ নম্বরের সাপেক্ষে এখনও ${toBengaliNumber(100 - grandTotal)} নম্বর বণ্টন বাকি রয়েছে।`
+                        : `বর্তমান সর্বমোট মানবণ্টন ${toBengaliNumber(grandTotal)} নম্বর।`}
+                </p>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400 font-solaiman">
+                  {toBengaliNumber(grandTotal)}
+                </span>
+                <span className="text-xs text-muted-foreground font-body">নম্বর</span>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>

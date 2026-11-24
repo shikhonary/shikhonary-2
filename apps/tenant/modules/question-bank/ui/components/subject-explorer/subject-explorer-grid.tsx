@@ -17,9 +17,12 @@ import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
 import { cn } from "@workspace/ui/lib/utils"
 import { useAvailableQuestions } from "@/modules/question-paper/services/use-question-paper"
+import { useMySubscription } from "@/modules/subscription-plan/services/use-subscription"
 import { useBookmarkedQuestionsStore } from "@/modules/question-bank/store/use-bookmarked-questions-store"
 import { useQuestionPreviewStore } from "@/modules/question-bank/store/use-question-preview-store"
 import type { QuestionTypeCode } from "@workspace/utils"
+import { McqBankCard } from "../cards"
+import { PickerContext } from "@/modules/question-paper-builder/ui/components/distribution-picker/picker-card-wrapper"
 
 // Import all Question Picker Cards
 import { McqPickerCard } from "@/modules/question-paper-builder/ui/components/distribution-picker/mcq-picker-card"
@@ -111,7 +114,6 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   chapterId,
   board,
   source,
-  difficulty,
   sort,
   page,
   limit,
@@ -123,6 +125,14 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   const toggleBookmark = useBookmarkedQuestionsStore((s) => s.toggleBookmark)
   const openPreview = useQuestionPreviewStore((s) => s.openPreview)
 
+  const { data: subData } = useMySubscription()
+  const hasSubscription = Boolean(
+    subData?.subscription &&
+    subData.subscription.status === "ACTIVE" &&
+    subData.subscription.plan?.name !== "free" &&
+    (subData.remainingDays ?? 1) > 0
+  )
+
   const { data: result, isLoading } = useAvailableQuestions({
     subjectId,
     category: category === "ALL" as any ? undefined : category,
@@ -130,7 +140,6 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
     chapterId: chapterId !== "All" ? chapterId : undefined,
     board: board !== "All" ? board : undefined,
     source: source && source !== "All" ? source : undefined,
-    difficulty: difficulty && difficulty !== "All" ? difficulty : undefined,
     sort,
     page,
     limit,
@@ -150,6 +159,14 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
     : result?.totalPages || 1
   const currentPage = result?.page || page
 
+  const questionsMap = React.useMemo(() => {
+    const map = new Map<string, any>()
+    questions.forEach((q: any) => {
+      if (q?.id) map.set(q.id, q)
+    })
+    return map
+  }, [questions])
+
   const handleCopyQuestion = (q: any) => {
     let text = q.number
       ? `${formatNumberInWords(q).numberText} - ${formatNumberInWords(q).inWordsText || q.inWords}`
@@ -158,7 +175,8 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
         : q.rawText || q.content || q.question || q.title || q.name || ""
     if (q.context) text = `উদ্দীপক:\n${q.context}\n\nপ্রশ্ন:\n${text}`
     if (q.options && Array.isArray(q.options)) {
-      text += `\n\nবিকল্পসমূহ:\n` + q.options.map((opt: string, i: number) => `${i + 1}) ${opt}`).join("\n")
+      const OPTION_LETTERS = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"]
+      text += `\n\nবিকল্পসমূহ:\n` + q.options.map((opt: string, i: number) => `${OPTION_LETTERS[i] || i + 1}) ${opt}`).join("\n")
     }
     if (q.answer || q.answerText) text += `\n\nসঠিক উত্তর: ${q.answer || q.answerText}`
 
@@ -192,16 +210,17 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
       difficulty: q.difficulty || "MEDIUM",
       reference: q.reference || [],
       source: q.source,
-      isMath: false,
+      isMath: Boolean(q.isMath),
       attachments: q.attachments,
       subQuestions: q.subQuestions,
       createdAt: q.createdAt,
     })
   }
 
-  const renderCard = (q: any) => {
+  const renderCard = (q: any, idx?: number) => {
     const cardProps = {
       question: q,
+      index: idx !== undefined ? (currentPage - 1) * limit + idx + 1 : undefined,
       isSelected: false,
       onToggle: () => {},
     }
@@ -349,87 +368,65 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   return (
     <div className="space-y-6">
       {/* Question Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {questions.map((q: any) => {
-          const bookmarked = isBookmarked(q.id)
+      <PickerContext.Provider
+        value={{
+          isBankMode: true,
+          hasSubscription,
+          getQuestion: (id) => questionsMap.get(id),
+          isBookmarked: (id) => isBookmarked(id),
+          onToggleBookmark: (id) => {
+            const q = questions.find((item: any) => item.id === id)
+            if (q) {
+              toggleBookmark({
+                id: q.id,
+                category: effectiveCategory as string,
+                subjectId,
+                chapterId: q.academicChapterId || q.chapterId,
+                questionText: q.question || q.title || q.name || "",
+              })
+            }
+          },
+          onPreview: (id) => {
+            const q = questions.find((item: any) => item.id === id)
+            if (q) handlePreviewQuestion(q)
+          },
+        }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {questions.map((q: any, idx: number) => {
+            const isMcq =
+              effectiveCategory === "MCQ" ||
+              (!effectiveCategory && Array.isArray(q.options) && q.options.length > 0)
 
-          return (
-            <div
-              key={q.id}
-              className="group/card relative flex flex-col justify-between rounded-2xl transition-all duration-200"
-            >
-              {/* Card Main Body */}
-              <div className="flex-1">{renderCard(q)}</div>
+            if (isMcq) {
+              return (
+                <McqBankCard
+                  key={q.id}
+                  question={q}
+                  index={(currentPage - 1) * limit + idx + 1}
+                  isBookmarked={isBookmarked(q.id)}
+                  onToggleBookmark={() =>
+                    toggleBookmark({
+                      id: q.id,
+                      category: effectiveCategory as string,
+                      subjectId,
+                      chapterId: q.academicChapterId || q.chapterId,
+                      questionText: q.question || q.title || q.name || "",
+                    })
+                  }
+                  onPreview={() => handlePreviewQuestion(q)}
+                />
+              )
+            }
 
-              {/* Action Toolbar on Bottom Edge of Card */}
-              <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50/80 dark:bg-white/[0.02] border border-t-0 border-slate-200/80 dark:border-white/[0.08] rounded-b-2xl -mt-3 relative z-10">
-                <span className="text-[11px] text-slate-400 dark:text-muted-foreground font-body truncate max-w-[140px]">
-                  {q.reference && q.reference[0] ? q.reference[0] : "শিখনারী প্রশ্নভাণ্ডার"}
-                </span>
-
-                <div className="flex items-center gap-1.5">
-                  {/* Bookmark Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleBookmark({
-                        id: q.id,
-                        category: effectiveCategory as string,
-                        subjectId,
-                        chapterId: q.academicChapterId || q.chapterId,
-                        questionText: q.question || q.title || q.name || "",
-                      })
-                    }}
-                    className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                      bookmarked
-                        ? "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
-                        : "bg-white dark:bg-card border-slate-200 dark:border-white/[0.08] text-slate-500 hover:text-rose-600 hover:border-rose-300"
-                    }`}
-                    title={bookmarked ? "বুকমার্ক থেকে মুছুন" : "বুকমার্কে সংরক্ষণ করুন"}
-                  >
-                    <Bookmark
-                      className={`w-3.5 h-3.5 ${
-                        bookmarked ? "fill-rose-500 text-rose-500" : ""
-                      }`}
-                    />
-                  </button>
-
-                  {/* Copy Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleCopyQuestion(q)
-                    }}
-                    className="p-1.5 rounded-lg border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-card text-slate-500 hover:text-indigo-600 hover:border-indigo-300 transition-colors cursor-pointer"
-                    title="প্রশ্ন কপি করুন"
-                  >
-                    {copiedId === q.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-
-                  {/* Preview Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handlePreviewQuestion(q)
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-primary/10 border border-indigo-100 dark:border-primary/20 text-indigo-700 dark:text-primary text-[11px] font-bold font-headline hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <Eye className="w-3 h-3" />
-                    <span>বিস্তারিত</span>
-                  </button>
-                </div>
+            return (
+              <div key={q.id} className="h-full">
+                {renderCard(q, idx)}
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      </PickerContext.Provider>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (

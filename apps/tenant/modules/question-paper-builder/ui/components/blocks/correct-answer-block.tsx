@@ -142,7 +142,16 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
   );
 
   const blockBreak = settings.blockBreaks?.[item.id] || "none";
-  const breakClass = blockBreak === "page" ? "break-before-page" : blockBreak === "column" ? "break-before-column" : "";
+  const breakClass =
+    blockBreak === "page"
+      ? "break-before-page"
+      : blockBreak === "column"
+      ? "break-before-column"
+      : blockBreak === "page-after"
+      ? "break-after-page"
+      : blockBreak === "column-after"
+      ? "break-after-column"
+      : "";
 
   const columns = settings.mcqOptionLayouts?.[item.id] || settings.mcqOptionColumns || 2;
   const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";

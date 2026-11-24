@@ -17,12 +17,30 @@ import { StepBasicInfo } from "./steps/step-basic-info"
 import { StepSubjectsDistribution } from "./steps/step-subjects-distribution"
 import { StepReview } from "./steps/step-review"
 
+const toBengaliNumber = (num: number | string) => {
+  const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+  return String(num)
+    .split("")
+    .map((d) => bnDigits[parseInt(d, 10)] || d)
+    .join("")
+}
+
 export function CreateQuestionPaperStepper() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
   const [wizardData, setWizardData] = useState<WizardData>({ ...INITIAL_WIZARD_DATA })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const grandTotalMarks = wizardData.subjects.reduce(
+    (sum, s) =>
+      sum +
+      s.distributions.reduce(
+        (dSum, d) => dSum + d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
+        0
+      ),
+    0
+  )
 
   // Mutations
   const createFullMutation = useCreateQuestionPaperFull()
@@ -194,54 +212,61 @@ export function CreateQuestionPaperStepper() {
   // ── Render ─────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-6 sm:space-y-8 pb-24 sm:pb-8">
       {/* Step Indicator */}
-      <div className="flex items-center justify-center p-4 sm:p-5 rounded-2xl bg-card border border-slate-200/80 dark:border-white/[0.08] shadow-xs">
-        {WIZARD_STEPS.map((step, index) => {
-          const isCompleted = index < currentStep
-          const isActive = index === currentStep
+      <div className="flex flex-col items-center justify-center p-4 sm:p-5 rounded-2xl bg-card border border-slate-200/80 dark:border-white/[0.08] shadow-xs gap-3">
+        <div className="flex items-center justify-center w-full">
+          {WIZARD_STEPS.map((step, index) => {
+            const isCompleted = index < currentStep
+            const isActive = index === currentStep
 
-          return (
-            <Fragment key={step.id}>
-              {index > 0 && (
-                <div
-                  className={`h-0.5 w-8 sm:w-16 mx-2 transition-colors ${
-                    isCompleted ? "bg-indigo-600" : "bg-slate-200 dark:bg-white/10"
-                  }`}
-                />
-              )}
-              <button
-                type="button"
-                onClick={() => goToStep(index)}
-                className="flex items-center gap-2 cursor-pointer group select-none"
-              >
-                <div
-                  className={`flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
-                    isCompleted
-                      ? "size-8 sm:size-9 bg-emerald-600 text-white shadow-xs"
-                      : isActive
-                        ? "size-8 sm:size-9 bg-indigo-600 text-white ring-4 ring-indigo-500/20 shadow-xs"
-                        : "size-8 sm:size-9 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] text-muted-foreground group-hover:border-slate-300"
-                  }`}
+            return (
+              <Fragment key={step.id}>
+                {index > 0 && (
+                  <div
+                    className={`h-0.5 w-6 sm:w-16 mx-1.5 sm:mx-2 transition-colors ${
+                      isCompleted ? "bg-indigo-600" : "bg-slate-200 dark:bg-white/10"
+                    }`}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={() => goToStep(index)}
+                  className="flex items-center gap-2 cursor-pointer group select-none"
                 >
-                  {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
-                </div>
-                <div className="hidden sm:flex flex-col text-left">
-                  <span
-                    className={`text-xs font-bold font-headline transition-colors ${
-                      isActive ? "text-indigo-600 dark:text-indigo-400" : isCompleted ? "text-foreground" : "text-muted-foreground"
+                  <div
+                    className={`flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
+                      isCompleted
+                        ? "size-8 sm:size-9 bg-emerald-600 text-white shadow-xs"
+                        : isActive
+                          ? "size-8 sm:size-9 bg-indigo-600 text-white ring-4 ring-indigo-500/20 shadow-xs"
+                          : "size-8 sm:size-9 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] text-muted-foreground group-hover:border-slate-300"
                     }`}
                   >
-                    {step.label}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    ধাপ {index + 1}
-                  </span>
-                </div>
-              </button>
-            </Fragment>
-          )
-        })}
+                    {isCompleted ? <Check className="h-4 w-4" /> : toBengaliNumber(index + 1)}
+                  </div>
+                  <div className="hidden sm:flex flex-col text-left">
+                    <span
+                      className={`text-xs font-bold font-headline transition-colors ${
+                        isActive ? "text-indigo-600 dark:text-indigo-400" : isCompleted ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {step.label}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-body">
+                      ধাপ {toBengaliNumber(index + 1)}
+                    </span>
+                  </div>
+                </button>
+              </Fragment>
+            )
+          })}
+        </div>
+        {/* Mobile active step pill */}
+        <div className="flex sm:hidden items-center justify-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 font-headline">
+          <span>ধাপ {toBengaliNumber(currentStep + 1)}:</span>
+          <span className="text-foreground">{WIZARD_STEPS[currentStep]?.label}</span>
+        </div>
       </div>
 
       {/* Step Content */}
@@ -269,8 +294,8 @@ export function CreateQuestionPaperStepper() {
         )}
       </div>
 
-      {/* Navigation Action Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-2 font-headline">
+      {/* Desktop Navigation Action Buttons */}
+      <div className="hidden sm:flex items-center justify-between gap-4 pt-2 font-headline">
         <div>
           {currentStep > 0 && (
             <Button
@@ -278,20 +303,20 @@ export function CreateQuestionPaperStepper() {
               variant="outline"
               onClick={handlePrev}
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-11 px-5 rounded-xl border border-slate-200 dark:border-white/[0.08] font-bold text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all cursor-pointer text-xs sm:text-sm"
+              className="h-11 px-5 rounded-xl border border-slate-200 dark:border-white/[0.08] font-bold text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all cursor-pointer text-xs sm:text-sm"
             >
               <ArrowLeft className="h-4 w-4 mr-1.5" />
               <span>পূর্ববর্তী ধাপ</span>
             </Button>
           )}
         </div>
-        <div className="flex flex-col-reverse sm:flex-row w-full sm:w-auto items-stretch sm:items-center gap-3">
+        <div className="flex items-center gap-3">
           {isLastStep ? (
             <Button
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
+              className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
             >
               {isSubmitting ? (
                 <Loader2 className="h-4.5 w-4.5 animate-spin mr-2" />
@@ -305,13 +330,68 @@ export function CreateQuestionPaperStepper() {
               type="button"
               onClick={handleNext}
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
+              className="h-11 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs sm:text-sm"
             >
               <span>পরবর্তী ধাপ</span>
               <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-card/95 backdrop-blur-md border-t border-slate-200/80 dark:border-white/[0.08] shadow-lg flex items-center justify-between gap-2.5 sm:hidden font-headline">
+        {currentStep > 0 ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handlePrev}
+            disabled={isSubmitting}
+            className="h-10 px-3.5 rounded-xl border border-slate-200 dark:border-white/[0.08] font-bold text-foreground hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-all cursor-pointer text-xs shrink-0"
+          >
+            <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+            <span>পূর্ববর্তী</span>
+          </Button>
+        ) : (
+          <div className="text-[11px] font-semibold text-muted-foreground px-1 font-body">
+            ধাপ {toBengaliNumber(currentStep + 1)} / {toBengaliNumber(WIZARD_STEPS.length)}
+          </div>
+        )}
+
+        {grandTotalMarks > 0 && currentStep > 0 && (
+          <div className="text-center">
+            <span className="text-[10px] text-muted-foreground block font-body">মোট মানবণ্টন</span>
+            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 font-solaiman">
+              {toBengaliNumber(grandTotalMarks)} নম্বর
+            </span>
+          </div>
+        )}
+
+        {isLastStep ? (
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs shrink-0"
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+            ) : (
+              <FileText className="h-4 w-4 mr-1.5" />
+            )}
+            <span>{isSubmitting ? "তৈরি হচ্ছে..." : "সম্পন্ন করুন"}</span>
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={handleNext}
+            disabled={isSubmitting}
+            className="h-10 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs active:scale-95 transition-all cursor-pointer text-xs shrink-0"
+          >
+            <span>পরবর্তী ধাপ</span>
+            <ArrowRight className="h-3.5 w-3.5 ml-1" />
+          </Button>
+        )}
       </div>
     </div>
   )

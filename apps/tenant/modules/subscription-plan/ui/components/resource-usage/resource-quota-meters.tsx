@@ -195,7 +195,7 @@ export const ResourceQuotaMeters: React.FC<ResourceQuotaMetersProps> = ({
                 </div>
 
                 <div className="text-[11px] text-muted-foreground/80">
-                  (মোট {toBengaliDigits(meter.limit)})
+                  (সর্বোচ্চ কোটা: {toBengaliDigits(meter.limit)} {meter.unit})
                 </div>
               </div>
             </div>

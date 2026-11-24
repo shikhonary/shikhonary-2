@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Coins, ArrowDownLeft, ArrowUpRight, Sparkles, RefreshCw } from "lucide-react"
-import { toBengaliDigits, formatBengaliDate } from "@/modules/subscription-plan/utils"
+import { toBengaliDigits, formatBengaliDate, formatTxType } from "@/modules/subscription-plan/utils"
 
 interface CreditTransactionsSectionProps {
   creditBalance?: number
@@ -125,7 +125,7 @@ export const CreditTransactionsSection: React.FC<CreditTransactionsSectionProps>
                       ) : (
                         <ArrowUpRight className="w-3 h-3 text-slate-600" />
                       )}
-                      <span>{tx.type}</span>
+                      <span>{formatTxType(tx.type)}</span>
                     </span>
 
                     <div className="text-muted-foreground font-body">
@@ -176,7 +176,7 @@ export const CreditTransactionsSection: React.FC<CreditTransactionsSectionProps>
                           ) : (
                             <ArrowUpRight className="w-3 h-3 text-slate-600" />
                           )}
-                          <span>{tx.type}</span>
+                          <span>{formatTxType(tx.type)}</span>
                         </span>
                       </td>
                       <td

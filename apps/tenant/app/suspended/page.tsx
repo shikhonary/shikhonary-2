@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "পোর্টাল স্থগিত | ইউনিয়ন পরিষদ পোর্টাল",
+  title: "পোর্টাল স্থগিত | শিখনারী পোর্টাল",
   description: "এই পোর্টালটি বর্তমানে নিষ্ক্রিয় বা স্থগিত করা হয়েছে।",
 };
 

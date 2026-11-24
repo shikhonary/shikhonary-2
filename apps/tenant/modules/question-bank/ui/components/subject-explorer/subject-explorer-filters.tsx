@@ -21,13 +21,6 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 import type { AcademicChapterBrief } from "../../../types"
 
-const DIFFICULTIES = [
-  { value: "All", label: "সকল মান" },
-  { value: "EASY", label: "সহজ" },
-  { value: "MEDIUM", label: "মধ্যম" },
-  { value: "HARD", label: "কঠিন" },
-]
-
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "০"
   const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
@@ -50,8 +43,6 @@ interface SubjectExplorerFiltersProps {
   selectedSource: string
   onSourceChange: (source: string) => void
   sources?: { rawSource: string; count: number }[]
-  selectedDifficulty: string
-  onDifficultyChange: (difficulty: string) => void
   selectedSort: "newest" | "oldest"
   onSortChange: (sort: "newest" | "oldest") => void
   onResetFilters: () => void
@@ -71,8 +62,6 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
   selectedSource,
   onSourceChange,
   sources = [],
-  selectedDifficulty,
-  onDifficultyChange,
   selectedSort,
   onSortChange,
   onResetFilters,
@@ -275,18 +264,6 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
               </button>
             </span>
           )}
-          {selectedDifficulty !== "All" && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-medium">
-              <span>কঠিনতা: {DIFFICULTIES.find((d) => d.value === selectedDifficulty)?.label}</span>
-              <button
-                type="button"
-                onClick={() => onDifficultyChange("All")}
-                className="hover:text-indigo-900 dark:hover:text-white cursor-pointer"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          )}
           {selectedSort !== "newest" && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-medium">
               <span>সর্ট: পুরাতন আগে</span>
@@ -302,34 +279,9 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
         </div>
       )}
 
-      {/* Secondary Bar: Difficulty Pills & Reset */}
-      <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-white/[0.06] flex-wrap">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 dark:text-muted-foreground font-body font-medium mr-1">
-            কঠিনতার মাত্রা:
-          </span>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {DIFFICULTIES.map((d) => {
-              const isActive = selectedDifficulty === d.value
-              return (
-                <button
-                  key={d.value}
-                  type="button"
-                  onClick={() => onDifficultyChange(d.value)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium font-body transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "bg-slate-100 dark:bg-white/[0.04] text-slate-600 dark:text-muted-foreground hover:bg-slate-200/80 dark:hover:bg-white/[0.08]"
-                  }`}
-                >
-                  {d.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {activeFiltersCount > 0 && (
+      {/* Secondary Bar: Reset Filters */}
+      {activeFiltersCount > 0 && (
+        <div className="flex items-center justify-end gap-3 pt-1 border-t border-slate-100 dark:border-white/[0.06]">
           <button
             type="button"
             onClick={onResetFilters}
@@ -338,8 +290,8 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
             <RotateCcw className="w-3.5 h-3.5" />
             <span>ফিল্টার রিসেট ({activeFiltersCount})</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -74,7 +74,14 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
         )}
 
         {/* Attachments */}
-        <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
+        {Array.isArray(q.attachments) && q.attachments.length > 0 && (
+          <div className="space-y-1">
+            <span className="font-bold text-primary block text-[11px] font-headline">
+              উদ্দীপক:
+            </span>
+            <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
+          </div>
+        )}
 
         {/* 2. Question Stem / Title */}
         <div className="text-sm sm:text-base font-bold text-foreground leading-snug font-headline">

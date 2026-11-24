@@ -3,7 +3,7 @@
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface CsPickerCardProps {
   question: any;
@@ -28,6 +28,7 @@ export const CsPickerCard: React.FC<CsPickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -68,7 +69,14 @@ export const CsPickerCard: React.FC<CsPickerCardProps> = ({
         )}
 
         {/* Attachments */}
-        <QuestionAttachments attachments={q.attachments} compact />
+        {Array.isArray(q.attachments) && q.attachments.length > 0 && (
+          <div className="space-y-1">
+            <span className="font-bold text-primary block text-[11px] font-headline">
+              উদ্দীপক:
+            </span>
+            <QuestionAttachments attachments={q.attachments} compact />
+          </div>
+        )}
 
         {/* Sub-questions List (No whole box border, badge with border) */}
         {subQuestions.length > 0 && (
@@ -86,9 +94,11 @@ export const CsPickerCard: React.FC<CsPickerCardProps> = ({
                     <RenderMath text={sq.text} />
                   </div>
                 </div>
-                <span className="shrink-0 px-2 py-0.5 rounded-md bg-muted/60 text-muted-foreground font-headline font-semibold text-[11px] mt-0.5">
-                  {toBengaliDigits(sq.mark)} নম্বর
-                </span>
+                {!isBankMode && (
+                  <span className="shrink-0 px-2 py-0.5 rounded-md bg-muted/60 text-muted-foreground font-headline font-semibold text-[11px] mt-0.5">
+                    {toBengaliDigits(sq.mark)} নম্বর
+                  </span>
+                )}
               </div>
             ))}
           </div>

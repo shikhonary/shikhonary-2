@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server"
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
-import { notFound } from "../../../utils/errors"
+import { notFound, badRequest } from "../../../utils/errors"
 import { buildQuestionPaperTitle } from "@workspace/utils"
 import type {
   ListQuestionPapersInput,
@@ -1539,6 +1539,10 @@ export async function updateQuestionPaper(
     throw notFound("QuestionPaper")
   }
 
+  if (existing.status === "Published" && data.status && data.status !== "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের স্ট্যাটাস পরিবর্তন বা ড্রাফট করা সম্ভব নয়।")
+  }
+
   const updateData: any = {}
   if (data.title !== undefined) updateData.title = data.title
   if (data.examName !== undefined) updateData.examName = data.examName
@@ -1588,6 +1592,10 @@ export async function deleteQuestionPaper(
 
   if (!existing || existing.deletedAt) {
     throw notFound("QuestionPaper")
+  }
+
+  if (existing.status === "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্র ডিলিট করা সম্ভব নয়।")
   }
 
   const updated = await tenantDb.questionPaper.update({

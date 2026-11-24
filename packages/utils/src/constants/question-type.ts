@@ -1050,3 +1050,78 @@ export function getQuestionTypePolicy(raw?: string | null): QuestionTypePolicy {
 export function isSingleQuestionType(raw?: string | null): boolean {
   return getQuestionTypePolicy(raw).selectionMode === "SINGLE"
 }
+
+/**
+ * Resolves both Bengali and English names for a question type from any raw input or code.
+ */
+export function resolveQuestionTypeBilingualNames(raw: {
+  nameBn?: string | null
+  nameEn?: string | null
+  label?: string | null
+  code?: string | null
+}): { nameBn: string; nameEn: string } {
+  let nameBn = (raw.nameBn && raw.nameBn.trim()) || ""
+  let nameEn = (raw.nameEn && raw.nameEn.trim()) || ""
+  const label = (raw.label && raw.label.trim()) || ""
+
+  const isNameBnBengali = Boolean(nameBn && /[\u0980-\u09FF]/.test(nameBn))
+  const isLabelBengali = Boolean(label && /[\u0980-\u09FF]/.test(label))
+
+  const probeCandidates = [
+    nameEn,
+    !isNameBnBengali ? nameBn : null,
+    !isLabelBengali ? label : null,
+    raw.code,
+    isNameBnBengali ? nameBn : null,
+    isLabelBengali ? label : null,
+  ].filter(Boolean) as string[]
+
+  let canonicalEntry: (typeof QUESTION_TYPE_MAP)[keyof typeof QUESTION_TYPE_MAP] | null = null
+  for (const candidate of probeCandidates) {
+    const norm = normalizeQuestionTypeName(candidate)
+    if (norm && QUESTION_TYPE_MAP[norm]) {
+      canonicalEntry = QUESTION_TYPE_MAP[norm]
+      break
+    }
+  }
+
+  if (canonicalEntry) {
+    if (!nameBn || !isNameBnBengali) {
+      nameBn = canonicalEntry.nameBn
+    }
+    if (!nameEn) {
+      nameEn = canonicalEntry.nameEn
+    }
+  }
+
+  if (!nameBn) {
+    nameBn = isLabelBengali ? label : (nameEn || label || "")
+  }
+  if (!nameEn) {
+    nameEn = (!isLabelBengali && label) ? label : (nameBn || "")
+  }
+
+  return { nameBn, nameEn }
+}
+
+/**
+ * Returns the proper display name of a question type according to subject language.
+ * If isEnglish is true, returns the English name.
+ * If isEnglish is false, returns the Bengali name.
+ */
+export function getQuestionTypeDisplayName(
+  raw: {
+    nameBn?: string | null
+    nameEn?: string | null
+    label?: string | null
+    code?: string | null
+  },
+  isEnglish: boolean
+): string {
+  const resolved = resolveQuestionTypeBilingualNames(raw)
+  if (isEnglish) {
+    return resolved.nameEn || resolved.nameBn || raw.label || raw.nameEn || raw.nameBn || ""
+  }
+  return resolved.nameBn || resolved.nameEn || raw.label || raw.nameBn || raw.nameEn || ""
+}
+

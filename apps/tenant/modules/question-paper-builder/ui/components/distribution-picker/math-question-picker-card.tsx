@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
-import { PickerCardWrapper } from "./picker-card-wrapper";
+import { PickerCardWrapper, usePickerContext } from "./picker-card-wrapper";
 
 interface MathQuestionPickerCardProps {
   question: any;
@@ -17,6 +17,7 @@ export const MathQuestionPickerCard: React.FC<MathQuestionPickerCardProps> = ({
   isSelected,
   onToggle,
 }) => {
+  const { isBankMode } = usePickerContext();
   const chapterName =
     q.academicChapter?.nameBn ||
     q.academicChapter?.nameEn ||
@@ -53,7 +54,7 @@ export const MathQuestionPickerCard: React.FC<MathQuestionPickerCardProps> = ({
         </div>
 
         {/* Optional Answer Preview */}
-        {q.answer && (
+        {!isBankMode && q.answer && (
           <div className="text-xs bg-muted/30 border border-border/50 rounded-xl p-2.5 text-foreground/90 flex items-start gap-1.5">
             <span className="font-bold text-primary shrink-0">সমাধান/উত্তর:</span>
             <span className="flex-1">

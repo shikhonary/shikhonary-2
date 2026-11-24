@@ -5,6 +5,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, ArrowLeftRight } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
+import { QuestionPositionControl } from "./question-position-control";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -100,7 +101,17 @@ const CSEditableText = ({
   );
 };
 
-export const CSBlock = ({ item }: { item: any }) => {
+export const CSBlock = ({ 
+  item,
+  isContinuation = false,
+  subQuestionsToRender,
+  hideStimulus = false,
+}: { 
+  item: any;
+  isContinuation?: boolean;
+  subQuestionsToRender?: string[];
+  hideStimulus?: boolean;
+}) => {
   const router = useRouter();
   const paperId = useBuilderStore((state) => state.paperId);
   const settings = useBuilderStore((state) => state.settings);
@@ -178,10 +189,14 @@ export const CSBlock = ({ item }: { item: any }) => {
     return defaultMark;
   };
 
-  const subQuestions = [
+  const allSubQuestions = [
     { id: "A", label: "ক", text: data.questionA, marks: getSubQuestionMark("A", 0, 1) },
     { id: "B", label: "খ", text: data.questionB, marks: getSubQuestionMark("B", 1, 2) },
   ].filter((sq) => sq.text);
+
+  const subQuestions = subQuestionsToRender
+    ? allSubQuestions.filter((sq) => subQuestionsToRender.includes(sq.id))
+    : allSubQuestions;
 
   const renderSubQuestionLabel = (label: string) => {
     const cleanLabel = (label || "").replace(/^\(+|\)+$/g, "").trim();
@@ -201,34 +216,45 @@ export const CSBlock = ({ item }: { item: any }) => {
   return (
     <div className="group relative -mx-4 px-4 hover:bg-muted/10 rounded-lg transition-colors flex flex-col mb-1 break-inside-avoid">
       {/* Hover Controls */}
-      <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
-        <BlockBreakButton id={item.id} className="border-r" />
-        <button
-          type="button"
-          onClick={handleExchange}
-          className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
-          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
-        >
-          <ArrowLeftRight className="w-3 h-3" />
-          পরিবর্তন
-        </button>
-        <button 
-          onClick={handleRemove}
-          disabled={isRemoving}
-          className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
-          title="প্রশ্নটি ডিলিট করুন"
-        >
-          {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-          ডিলিট
-        </button>
-      </div>
+      {!isContinuation && (
+        <div className="absolute top-0 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white border shadow-sm rounded-md hidden xl:flex overflow-hidden z-10 print:hidden">
+          <BlockBreakButton id={item.id} className="border-r" />
+          <QuestionPositionControl
+            paperId={paperId}
+            questionPaperQuestionId={item.id}
+            canMoveUp={item.canMoveUp}
+            canMoveDown={item.canMoveDown}
+            siblingQuestions={item.siblingQuestions}
+            alternatives={item.alternatives}
+            className="border-r"
+          />
+          <button
+            type="button"
+            onClick={handleExchange}
+            className="px-2 py-1 text-xs hover:bg-primary/10 transition-colors text-primary flex items-center gap-1 border-r cursor-pointer"
+            title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
+          >
+            <ArrowLeftRight className="w-3 h-3" />
+            পরিবর্তন
+          </button>
+          <button 
+            onClick={handleRemove}
+            disabled={isRemoving}
+            className={`px-2 py-1 text-xs hover:bg-destructive/10 transition-colors text-destructive flex items-center gap-1 cursor-pointer ${isRemoving ? "opacity-50" : ""}`}
+            title="প্রশ্নটি ডিলিট করুন"
+          >
+            {isRemoving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+            ডিলিট
+          </button>
+        </div>
+      )}
 
-      <BlockBreakIndicator id={item.id} />
+      {!isContinuation && <BlockBreakIndicator id={item.id} />}
 
       <div className="flex justify-between items-start gap-2">
         <div className="flex gap-2 flex-1 relative">
           <span
-            className="font-bold shrink-0 min-w-[1.8em]"
+            className={`font-bold shrink-0 min-w-[1.8em] ${isContinuation ? "invisible select-none pointer-events-none" : ""}`}
             style={{
               fontSize: questionStyle.fontSize,
               fontFamily: questionStyle.fontFamily,

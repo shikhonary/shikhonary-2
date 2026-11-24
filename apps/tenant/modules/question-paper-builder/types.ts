@@ -100,6 +100,8 @@ export interface MarginSettings {
   right: number;
 }
 
+export type BlockBreakType = "page" | "column" | "page-after" | "column-after" | "none";
+
 export interface PaperSettings {
   paperSize: "A4" | "Letter" | "Legal" | "A5";
   paperOrientation: "portrait" | "landscape";
@@ -142,7 +144,7 @@ export interface PaperSettings {
   showNoMarkingNote: boolean;
   showReference: boolean;
   blocks?: PaperBlock[];
-  blockBreaks?: Record<string, "page" | "column" | "none">;
+  blockBreaks?: Record<string, BlockBreakType>;
 
   // Header Texts
   institutionName: string;

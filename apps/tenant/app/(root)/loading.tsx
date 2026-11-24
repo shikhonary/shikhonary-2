@@ -1,44 +1,51 @@
+import React from "react"
+
 /**
- * Root layout loading skeleton — shown while the DB tenant membership query runs.
- * Prevents blank screens on slow connections or DB cold starts.
+ * Root layout loading skeleton — benchmark fallback for root routes without dedicated loading UI.
+ * Completely free of duplicate sidebar/header skeletons.
  */
 export default function Loading() {
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar skeleton */}
-      <div className="w-64 shrink-0 border-r border-border bg-card h-screen flex flex-col gap-4 p-4">
-        {/* Logo area */}
-        <div className="h-12 rounded-lg bg-muted animate-pulse" />
-        <div className="h-px bg-border" />
-        {/* Nav items */}
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-9 rounded-md bg-muted animate-pulse" style={{ opacity: 1 - i * 0.1 }} />
-        ))}
-        <div className="flex-1" />
-        {/* User area */}
-        <div className="h-12 rounded-lg bg-muted animate-pulse" />
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-pulse min-w-0">
+      {/* Header skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/60">
+        <div className="space-y-2">
+          <div className="h-8 w-56 rounded-lg bg-muted" />
+          <div className="h-4 w-80 max-w-full rounded bg-muted/60" />
+        </div>
+        <div className="h-10 w-36 rounded-xl bg-muted/70" />
       </div>
 
-      {/* Main content skeleton */}
-      <div className="flex-1 flex flex-col">
-        {/* Top bar */}
-        <div className="h-16 border-b border-border bg-card flex items-center gap-4 px-6">
-          <div className="h-6 w-48 rounded bg-muted animate-pulse" />
-          <div className="flex-1" />
-          <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-        </div>
-
-        {/* Page content */}
-        <div className="flex-1 p-6 space-y-6">
-          <div className="h-8 w-64 rounded-lg bg-muted animate-pulse" />
-          <div className="grid grid-cols-4 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-28 rounded-xl bg-muted animate-pulse" />
-            ))}
+      {/* 4 Stats KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4.5">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-28 rounded-2xl bg-card border border-border/60 p-5 flex flex-col justify-between"
+          >
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <div className="h-3.5 w-24 bg-muted rounded" />
+                <div className="h-7 w-20 bg-muted rounded" />
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-muted" />
+            </div>
+            <div className="h-3 w-36 bg-muted/60 rounded" />
           </div>
-          <div className="h-64 rounded-xl bg-muted animate-pulse" />
+        ))}
+      </div>
+
+      {/* Main Content Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="h-72 rounded-2xl bg-card border border-border/60 p-6" />
+          <div className="h-56 rounded-2xl bg-card border border-border/60 p-6" />
+        </div>
+        <div className="space-y-6">
+          <div className="h-64 rounded-2xl bg-card border border-border/60 p-6" />
+          <div className="h-64 rounded-2xl bg-card border border-border/60 p-6" />
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -27,6 +27,7 @@ import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
 import { useQuery } from "@tanstack/react-query";
 import { trpc } from "@/trpc/client";
 
+import { toBengaliDigits } from "@/modules/subscription-plan/utils";
 import {
   Tooltip,
   TooltipTrigger,
@@ -245,7 +246,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 className="font-extrabold text-amber-900 dark:text-amber-300 bg-card px-2 py-0.5 rounded-lg border border-amber-500/30 font-solaiman text-xs leading-relaxed"
                 style={{ fontFamily: '"SolaimanLipi", "Kalpurush", sans-serif' }}
               >
-                {creditData?.creditBalance ?? 0}
+                {toBengaliDigits(creditData?.creditBalance ?? 0)}
               </span>
             </Link>
           ) : (
@@ -265,7 +266,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
                 sideOffset={12}
                 className="rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 px-3 py-1.5 text-xs font-bold shadow-xl border border-slate-700/50 dark:border-slate-300/50 font-solaiman z-50"
               >
-                <span>ক্রেডিট ব্যালেন্স: {creditData?.creditBalance ?? 0}</span>
+                <span>ক্রেডিট ব্যালেন্স: {toBengaliDigits(creditData?.creditBalance ?? 0)}</span>
               </TooltipContent>
             </Tooltip>
           )}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "প্রবেশাধিকার নেই | ইউনিয়ন পরিষদ পোর্টাল",
+  title: "প্রবেশাধিকার নেই | শিখনারী পোর্টাল",
   description: "আপনার অ্যাকাউন্টে কোনো সক্রিয় অ্যাডমিন সদস্যপদ পাওয়া যায়নি।",
 };
 
@@ -23,7 +23,7 @@ export default function NoAccessPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-foreground">প্রবেশাধিকার নেই</h1>
           <p className="text-muted-foreground leading-relaxed">
-            আপনার অ্যাকাউন্টে কোনো সক্রিয় ইউনিয়ন পরিষদের অ্যাডমিন সদস্যপদ
+            আপনার অ্যাকাউন্টে কোনো সক্রিয় শিক্ষা প্রতিষ্ঠানের অ্যাডমিন সদস্যপদ
             পাওয়া যায়নি। অনুগ্রহ করে প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেটরের সাথে
             যোগাযোগ করুন।
           </p>

@@ -3,12 +3,14 @@ import { useRouter } from "next/navigation";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { BlockRenderer } from "./block-renderer";
 import { OMRBlock } from "../blocks/omr-block";
+import { BlockBreakButton, BlockBreakIndicator, LastItemBreakControl } from "../blocks/block-break-control";
+import { QuestionPositionControl } from "../blocks/question-position-control";
 import { 
   useQuestionPaperById, 
   useQuestionPaperDistributionStatuses,
   useRemoveQuestion 
 } from "@/modules/question-paper/services/use-question-paper";
-import { LayoutList, FileText, ZoomIn, Eye, Sparkles, ArrowLeftRight, Trash2, Scissors } from "lucide-react";
+import { LayoutList, FileText, ZoomIn, Eye, Sparkles, ArrowLeftRight, Trash2, Scissors, Lock, Unlock } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { normalizeTableData } from "@workspace/ui/components/question-attachments";
 import { toBengaliDigits, resolvePaperSlots, type ResolvedSlot } from "@workspace/utils";
@@ -316,6 +318,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
   const { data: fetchedPaper } = useQuestionPaperById(paperId || "");
   const paperQuery = propPaper || fetchedPaper;
+  const isPublished = (paperQuery?.status || (paperQuery as any)?.status) === "Published";
   const { data: statuses } = useQuestionPaperDistributionStatuses(paperId || "");
 
   const [measuredHeights, setMeasuredHeights] = useState<Record<string, number>>({});
@@ -2476,7 +2479,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
       const el = document.getElementById(`measure-block-${b.id}`);
       if (el) {
         // add a small buffer for safety to prevent actual overflow
-        newHeights[b.id] = el.getBoundingClientRect().height + 4;
+        newHeights[b.id] = el.getBoundingClientRect().height + 1;
       }
     });
     setMeasuredHeights(newHeights);
@@ -2500,7 +2503,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
 
     // If full header exists, put it on first page
     const fullHeaderBlock = blocks.find(b => b.type === "header-full");
-    let availableHeight = effectivePageHeight - 24; // 24px buffer to prevent page overflow & PDF shrink-to-fit
+    const PAGE_BOTTOM_BUFFER = 24; // 24px buffer to comfortably house marketing footer, margins & prevent cutoff
+    let availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
 
     if (fullHeaderBlock) {
       currentPage.fullHeader = fullHeaderBlock;
@@ -2521,7 +2525,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           currentPage = { columns: Array.from({ length: colCount }, () => []) };
           currentColumnIdx = 0;
           currentColumnHeight = 0;
-          availableHeight = effectivePageHeight - 10;
+          availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
         }
       } else if (manualBreak === "column" && currentColumnHeight > 0) {
         currentColumnIdx++;
@@ -2530,7 +2534,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           result.push(currentPage);
           currentPage = { columns: Array.from({ length: colCount }, () => []) };
           currentColumnIdx = 0;
-          availableHeight = effectivePageHeight - 10;
+          availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
         }
       }
 
@@ -2560,9 +2564,15 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           const ahead = contentBlocks[j];
           if (!ahead) break;
           if (ahead.type.startsWith("question-")) {
-            // Found the first question — check if everything fits
-            const hQuestion = measuredHeights[ahead.id] || 80;
-            if (currentColumnHeight + lookaheadH + hQuestion > availableHeight) {
+            const totalAheadH = measuredHeights[ahead.id] || (ahead.type.startsWith("question-") ? 80 : 40);
+            const isSplittable = ahead.type === "question-cq" || ahead.type === "question-cs";
+            // For splittable questions (CQ/CS), only the start (stem + first subquestion ~45% of height)
+            // is required to prevent an orphan heading. For non-splittable questions, the full question is required.
+            const minAheadStartH = isSplittable
+              ? Math.max(65, Math.round(totalAheadH * 0.45))
+              : totalAheadH;
+
+            if (currentColumnHeight + lookaheadH + minAheadStartH > availableHeight) {
               needsEarlyWrap = true;
             }
             break;
@@ -2579,7 +2589,131 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         }
       }
       // ── End orphan-heading guard ─────────────────────────────────────────────
-      
+
+      // ── Splittable multi-part question flow (MS Word style) ──────────────────
+      // If a CQ or CS block cannot fit completely in the remaining column height,
+      // but its stimulus + initial subquestion(s) can fit, split it across the column/page boundary!
+      const isSplittableType = b.type === "question-cq" || b.type === "question-cs";
+      const hasManualBreak = Boolean(manualBreak && manualBreak !== "none");
+
+      if (isSplittableType && !hasManualBreak && currentColumnHeight > 0 && currentColumnHeight + h > availableHeight) {
+        const remainingH = availableHeight - currentColumnHeight;
+
+        if (b.type === "question-cq") {
+          const allSubKeys = ["A", "B", "C", "D"];
+          const hStem = Math.max(65, Math.round(h * 0.42));
+          const hSub = Math.max(24, Math.round((h - hStem) / allSubKeys.length));
+
+          if (hStem + hSub <= remainingH) {
+            let fitCount = 1;
+            for (let k = 2; k < allSubKeys.length; k++) {
+              if (hStem + k * hSub <= remainingH) {
+                fitCount = k;
+              } else {
+                break;
+              }
+            }
+
+            const part1Keys = allSubKeys.slice(0, fitCount);
+            const part2Keys = allSubKeys.slice(fitCount);
+
+            const hPart1 = hStem + fitCount * hSub;
+            const hPart2 = Math.max(30, h - hPart1);
+
+            const part1Block: PaperBlock = {
+              ...b,
+              id: `${b.id}-part1`,
+              data: {
+                ...b.data,
+                isContinuation: false,
+                subQuestionsToRender: part1Keys,
+                hideStimulus: false,
+              },
+              gap: 0,
+            };
+
+            const part2Block: PaperBlock = {
+              ...b,
+              id: `${b.id}-part2`,
+              data: {
+                ...b.data,
+                isContinuation: true,
+                subQuestionsToRender: part2Keys,
+                hideStimulus: true,
+              },
+              gap: b.gap,
+            };
+
+            // Place Part 1 on current column/page
+            currentPage.columns[currentColumnIdx]?.push(part1Block);
+            currentColumnHeight += hPart1;
+
+            // Wrap to next column/page
+            currentColumnIdx++;
+            currentColumnHeight = 0;
+            if (currentColumnIdx >= colCount) {
+              result.push(currentPage);
+              currentPage = { columns: Array.from({ length: colCount }, () => []) };
+              currentColumnIdx = 0;
+              availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
+            }
+
+            // Place Part 2 on next column/page
+            currentPage.columns[currentColumnIdx]?.push(part2Block);
+            currentColumnHeight += hPart2 + (b.gap || 0);
+            return;
+          }
+        } else if (b.type === "question-cs") {
+          const hStem = Math.max(50, Math.round(h * 0.5));
+          const hSub = Math.max(24, Math.round((h - hStem) / 2));
+
+          if (hStem + hSub <= remainingH) {
+            const hPart1 = hStem + hSub;
+            const hPart2 = Math.max(25, h - hPart1);
+
+            const part1Block: PaperBlock = {
+              ...b,
+              id: `${b.id}-part1`,
+              data: {
+                ...b.data,
+                isContinuation: false,
+                subQuestionsToRender: ["A"],
+                hideStimulus: false,
+              },
+              gap: 0,
+            };
+
+            const part2Block: PaperBlock = {
+              ...b,
+              id: `${b.id}-part2`,
+              data: {
+                ...b.data,
+                isContinuation: true,
+                subQuestionsToRender: ["B"],
+                hideStimulus: true,
+              },
+              gap: b.gap,
+            };
+
+            currentPage.columns[currentColumnIdx]?.push(part1Block);
+            currentColumnHeight += hPart1;
+
+            currentColumnIdx++;
+            currentColumnHeight = 0;
+            if (currentColumnIdx >= colCount) {
+              result.push(currentPage);
+              currentPage = { columns: Array.from({ length: colCount }, () => []) };
+              currentColumnIdx = 0;
+              availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
+            }
+
+            currentPage.columns[currentColumnIdx]?.push(part2Block);
+            currentColumnHeight += hPart2 + (b.gap || 0);
+            return;
+          }
+        }
+      }
+
       // Check if adding this block exceeds column height
       if ((currentColumnHeight + h > availableHeight || needsEarlyWrap) && currentColumnHeight > 0) {
         currentColumnIdx++;
@@ -2589,12 +2723,34 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           result.push(currentPage);
           currentPage = { columns: Array.from({ length: colCount }, () => []) };
           currentColumnIdx = 0;
-          availableHeight = effectivePageHeight - 10;
+          availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
         }
       }
       
       currentPage.columns[currentColumnIdx]?.push(b);
       currentColumnHeight += h + (isHidden ? 0 : (b.gap || 0));
+
+      // ── Manual Break (Page or Column After) ────────────────────────────
+      if (idx < contentBlocks.length - 1) {
+        if (manualBreak === "page-after") {
+          if (currentPage.columns.some((col) => col.length > 0) || currentPage.fullHeader) {
+            result.push(currentPage);
+            currentPage = { columns: Array.from({ length: colCount }, () => []) };
+            currentColumnIdx = 0;
+            currentColumnHeight = 0;
+            availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
+          }
+        } else if (manualBreak === "column-after" && currentColumnHeight > 0) {
+          currentColumnIdx++;
+          currentColumnHeight = 0;
+          if (currentColumnIdx >= colCount) {
+            result.push(currentPage);
+            currentPage = { columns: Array.from({ length: colCount }, () => []) };
+            currentColumnIdx = 0;
+            availableHeight = effectivePageHeight - PAGE_BOTTOM_BUFFER;
+          }
+        }
+      }
     });
 
     if (currentPage.columns.some(col => col.length > 0) || currentPage.fullHeader) {
@@ -2691,7 +2847,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
         style={{
           color: "#000000",
           width: `${canvasWidth}mm`,
-          minHeight: `${canvasMinHeight}mm`,
+          height: `${canvasMinHeight}mm`,
+          boxSizing: "border-box",
           transform: `scale(${zoomFactor})`,
           transformOrigin: "top left",
           paddingTop: (page.isOMRPage || page.isBlank) ? '0mm' : `${settings.margins.top}mm`,
@@ -2747,33 +2904,52 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                     <Scissors className="w-3.5 h-3.5 rotate-90" />
                   </div>
                 )}
-                {page.columns.map((col, colIdx) => (
-                  <div 
-                    key={`col-${colIdx}`} 
-                    className="flex-1 flex flex-col"
-                    style={{ 
-                      borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1)
-                        ? (settings.duplicateSinglePage ? "1px dashed #94a3b8" : "1px solid #e2e8f0")
-                        : "none",
-                      paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `${effectiveColumnGapMm / 2}mm` : "0",
-                      marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `-${effectiveColumnGapMm / 2}mm` : "0",
-                    }}
-                  >
-                    {col.map((b, bIdx) => {
-                      const isHidden = isBlockCompletelyHidden(b, settings);
-                      if (isExporting && isHidden) return null;
-                      return (
-                        <div 
-                          key={`${b.id}-${bIdx}`} 
-                          className={cn("w-full", isHidden && "print:hidden")} 
-                          style={{ marginBottom: isHidden ? "0px" : `${b.gap || 0}px` }}
-                        >
-                          <BlockRenderer block={b} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
+                {page.columns.map((col, colIdx) => {
+                  const isLastColumnOnPage = colIdx === page.columns.length - 1;
+                  return (
+                    <div 
+                      key={`col-${colIdx}`} 
+                      className="flex-1 flex flex-col"
+                      style={{ 
+                        borderRight: (settings.showColumnDivider && colIdx < page.columns.length - 1)
+                          ? (settings.duplicateSinglePage ? "1px dashed #94a3b8" : "1px solid #e2e8f0")
+                          : "none",
+                        paddingRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `${effectiveColumnGapMm / 2}mm` : "0",
+                        marginRight: (settings.showColumnDivider && colIdx < page.columns.length - 1) ? `-${effectiveColumnGapMm / 2}mm` : "0",
+                      }}
+                    >
+                      {col.map((b, bIdx) => {
+                        const isHidden = isBlockCompletelyHidden(b, settings);
+                        if (isExporting && isHidden) return null;
+                        const isLastInColumn = bIdx === col.length - 1;
+                        const isLastInPage = isLastInColumn && isLastColumnOnPage;
+                        const targetId = ((b.data as any)?.item?.id || b.id) as string;
+
+                        return (
+                          <div 
+                            key={`${b.id}-${bIdx}`} 
+                            className={cn("w-full relative group/paged-block", isHidden && "print:hidden")} 
+                            style={{ marginBottom: isHidden ? "0px" : `${b.gap || 0}px` }}
+                          >
+                            <BlockRenderer block={b} />
+
+                            {/* Break After indicator if set */}
+                            <BlockBreakIndicator id={targetId} position="after" />
+
+                            {/* Direct Quick-Action on Last Item of Column/Page */}
+                            {!isExporting && isLastInColumn && (
+                              <LastItemBreakControl
+                                id={targetId}
+                                isLastInPage={isLastInPage}
+                                columns={page.columns.length}
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}
@@ -2798,8 +2974,24 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
     <div
       ref={containerRef}
       id="print-container"
-      className="w-full h-full overflow-auto p-3 sm:p-6 md:p-8 pb-32 flex flex-col gap-6 sm:gap-12 print:p-0 print:gap-0 print:block print:overflow-visible bg-slate-100/80 dark:bg-zinc-950/60 print:bg-white relative"
+      data-paper-published={isPublished ? "true" : undefined}
+      className={cn(
+        "w-full h-full overflow-auto p-3 sm:p-6 md:p-8 pb-32 flex flex-col gap-6 sm:gap-12 print:p-0 print:gap-0 print:block print:overflow-visible bg-slate-100/80 dark:bg-zinc-950/60 print:bg-white relative",
+        isPublished && "paper-is-published"
+      )}
     >
+      {isPublished && (
+        <style dangerouslySetInnerHTML={{ __html: `
+          [data-paper-published="true"] button[title*="ডিলিট"],
+          [data-paper-published="true"] button[title*="রিমুভ"],
+          [data-paper-published="true"] button[title*="বিনিময়"],
+          [data-paper-published="true"] button[title*="পরিবর্তন"],
+          [data-paper-published="true"] button[title*="অথবা"],
+          [data-paper-published="true"] button[title*="বিকল্প"] {
+            display: none !important;
+          }
+        `}} />
+      )}
       {/* Invisible Measurement Container */}
       <div 
         ref={measureContainerRef} 
@@ -2814,7 +3006,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
           paddingRight: `${settings.margins.right}mm`,
         }}
       >
-        <div id="page-content-measurer" style={{ height: `${canvasMinHeight}mm` }} className="w-full"></div>
+        <div id="page-content-measurer" style={{ height: `calc(${canvasMinHeight}mm - ${(settings.margins?.top ?? 10) + (settings.margins?.bottom ?? 10)}mm)` }} className="w-full"></div>
         {/* We need the column width for accurate text wrapping measurements */}
         <div style={{ 
           width: settings.columns > 1 
@@ -3010,31 +3202,59 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                           </div>
                         )}
 
+                        {/* Break Control Button */}
+                        <BlockBreakButton
+                          id={(item?.id || b.id) as string}
+                          showText={false}
+                          className="h-7 px-2 rounded-lg border border-border/60 bg-card shadow-2xs hover:bg-muted/60"
+                        />
+
+                        {/* Position Control Button */}
+                        <QuestionPositionControl
+                          paperId={paperId}
+                          questionPaperQuestionId={(item?.id || b.id) as string}
+                          canMoveUp={item?.canMoveUp}
+                          canMoveDown={item?.canMoveDown}
+                          siblingQuestions={item?.siblingQuestions}
+                          alternatives={item?.alternatives}
+                          className="h-7 px-2 rounded-lg border border-border/60 bg-card shadow-2xs hover:bg-muted/60"
+                        />
+
                         {/* Direct Exchange Button */}
-                        <button
-                          type="button"
-                          onClick={handleDirectExchange}
-                          className="h-7 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 font-headline font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
-                          title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
-                        >
-                          <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                          <span>পরিবর্তন</span>
-                        </button>
+                        {!isPublished && (
+                          <button
+                            type="button"
+                            onClick={handleDirectExchange}
+                            className="h-7 px-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-700 dark:text-indigo-300 font-headline font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                            title="প্রশ্ন পরিবর্তন (এক্সচেঞ্জ) করুন"
+                          >
+                            <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                            <span>পরিবর্তন</span>
+                          </button>
+                        )}
 
                         {/* Direct Remove Button */}
-                        <button
-                          type="button"
-                          onClick={handleDirectRemove}
-                          className="h-7 w-7 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive flex items-center justify-center transition-all cursor-pointer border border-border/60 bg-card active:scale-95"
-                          title="প্রশ্নটি ডিলিট করুন"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        {!isPublished && (
+                          <button
+                            type="button"
+                            onClick={handleDirectRemove}
+                            className="h-7 w-7 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive flex items-center justify-center transition-all cursor-pointer border border-border/60 bg-card active:scale-95"
+                            title="প্রশ্নটি ডিলিট করুন"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        {isPublished && (
+                          <span className="h-7 px-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold flex items-center gap-1 select-none">
+                            <Lock className="w-3 h-3" /> সুরক্ষিত
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
                 })()}
                 <BlockRenderer block={b} />
+                <BlockBreakIndicator id={((b.data as any)?.item?.id || b.id) as string} position="after" />
               </div>
             );
           })}
@@ -3077,8 +3297,8 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             <div
               className="bg-white shadow-xl relative shrink-0 border border-slate-200/80 overflow-hidden"
               style={{
-                width: `${canvasWidth * 3.78 * zoomFactor}px`,
-                height: `${canvasMinHeight * 3.78 * zoomFactor}px`,
+                width: `${Math.ceil(canvasWidth * 3.779528 * zoomFactor)}px`,
+                height: `${Math.ceil(canvasMinHeight * 3.779528 * zoomFactor)}px`,
                 position: "relative",
               }}
             >
@@ -3207,7 +3427,16 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
                   }}>
                     {blocks.filter(b => b.type !== "header-full").map((b, idx) => {
                       const blockBreak = settings.blockBreaks?.[b.id] || settings.blockBreaks?.[(b.data as any)?.item?.id] || "none";
-                      const breakClass = blockBreak === "page" ? "break-before-page" : blockBreak === "column" ? "break-before-column" : "break-inside-avoid";
+                      const breakClass =
+                        blockBreak === "page"
+                          ? "break-before-page"
+                          : blockBreak === "column"
+                          ? "break-before-column"
+                          : blockBreak === "page-after"
+                          ? "break-after-page"
+                          : blockBreak === "column-after"
+                          ? "break-after-column"
+                          : "break-inside-avoid";
                       
                       return (
                         <div key={`print-block-${b.id}-${idx}`} className={`w-full ${breakClass}`} style={{ marginBottom: `${b.gap || 0}px` }}>

@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
+import { toBengaliDigits } from "@/modules/subscription-plan/utils"
 import {
   GraduationCap,
   Building2,
@@ -362,8 +363,8 @@ export function ProfileView() {
 
               <div className="flex items-center gap-3 text-xs text-indigo-200/90 font-body flex-wrap">
                 {establishedYear && (
-                  <span className="font-mono bg-white/10 px-2 py-0.5 rounded-md">
-                    প্রতিষ্ঠা: {establishedYear}
+                  <span className="font-solaiman bg-white/10 px-2 py-0.5 rounded-md">
+                    প্রতিষ্ঠা: {toBengaliDigits(establishedYear)}
                   </span>
                 )}
                 {divisionName && districtName && (
@@ -445,7 +446,7 @@ export function ProfileView() {
                 {/* Institution Name (English) */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-bold text-foreground">
-                    প্রতিষ্ঠানের নাম (English) <span className="text-destructive">*</span>
+                    প্রতিষ্ঠানের নাম (ইংরেজি) <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative group">
                     <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -481,7 +482,7 @@ export function ProfileView() {
               {/* Established Year */}
               <div className="space-y-1.5 max-w-sm">
                 <Label className="block text-xs font-bold text-foreground">
-                  প্রতিষ্ঠার সাল (Established Year)
+                  প্রতিষ্ঠার সাল
                 </Label>
                 <div className="relative group">
                   <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -567,7 +568,7 @@ export function ProfileView() {
                 {/* Website */}
                 <div className="space-y-1.5">
                   <Label className="block text-xs font-bold text-foreground">
-                    অফিসিয়াল ওয়েবসাইট (Website)
+                    অফিসিয়াল ওয়েবসাইট
                   </Label>
                   <div className="relative group">
                     <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -592,7 +593,7 @@ export function ProfileView() {
                   {/* Division */}
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      বিভাগ (Division)
+                      বিভাগ
                     </Label>
                     <Select
                       value={divisionId}
@@ -615,7 +616,7 @@ export function ProfileView() {
                   {/* District */}
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      জেলা (District)
+                      জেলা
                     </Label>
                     <Select
                       value={districtId}
@@ -644,7 +645,7 @@ export function ProfileView() {
                   {/* Upazila */}
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      উপজেলা / থানা (Upazila)
+                      উপজেলা / থানা
                     </Label>
                     <Select
                       value={upazilaId}
@@ -673,7 +674,7 @@ export function ProfileView() {
                   {/* Union */}
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      ইউনিয়ন / এলাকা (Union)
+                      ইউনিয়ন / এলাকা
                     </Label>
                     <Select
                       value={unionId}
@@ -748,7 +749,7 @@ export function ProfileView() {
 
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      ডিজিটাল স্বাক্ষরের ছবি লিংক (Signature URL)
+                      ডিজিটাল স্বাক্ষরের ছবির লিংক (URL)
                     </Label>
                     <div className="relative group">
                       <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -803,7 +804,7 @@ export function ProfileView() {
 
                   <div className="space-y-1.5">
                     <Label className="block text-xs font-bold text-foreground">
-                      ডিজিটাল স্বাক্ষরের ছবি লিংক (Signature URL)
+                      ডিজিটাল স্বাক্ষরের ছবির লিংক (URL)
                     </Label>
                     <div className="relative group">
                       <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -852,7 +853,7 @@ export function ProfileView() {
             <div className="space-y-6">
               <div className="space-y-1.5">
                 <Label className="block text-xs font-bold text-foreground">
-                  লোগোর ইমেজ লিংক (Logo Image URL)
+                  লোগোর ছবির লিংক (URL)
                 </Label>
                 <div className="relative group">
                   <ImageIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors h-4 w-4" />
@@ -875,7 +876,7 @@ export function ProfileView() {
                   {logo ? (
                     <img
                       src={logo}
-                      alt="Institution Logo Preview"
+                      alt="লোগো প্রিভিউ"
                       className="w-full h-full object-contain p-2"
                       onError={(e) => {
                         ;(e.target as any).style.display = "none"

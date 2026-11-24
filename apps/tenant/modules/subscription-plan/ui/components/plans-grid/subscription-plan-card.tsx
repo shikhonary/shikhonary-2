@@ -3,7 +3,12 @@
 import React from "react"
 import { Check, X, Zap, Crown, CheckCircle2, Sparkles } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
-import { toBengaliDigits, formatBengaliPrice } from "@/modules/subscription-plan/utils"
+import {
+  toBengaliDigits,
+  formatBengaliPrice,
+  naturalizePlanName,
+  naturalizePlanDescription,
+} from "@/modules/subscription-plan/utils"
 import type { SubscriptionPlanItem, BillingCycle } from "@/modules/subscription-plan/types"
 
 interface SubscriptionPlanCardProps {
@@ -87,14 +92,14 @@ export const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
         <div className="pb-5 border-b border-border/50">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-bold font-headline text-foreground">
-              {plan.displayName}
+              {naturalizePlanName(plan.displayName)}
             </h3>
             {plan.name === "campus" && (
               <Sparkles className="w-5 h-5 text-indigo-500 fill-indigo-500/20" />
             )}
           </div>
           <p className="text-xs text-muted-foreground font-body mt-1 min-h-[32px] line-clamp-2">
-            {plan.description || "ডিজিটাল প্রশ্নপত্র তৈরি, ওএমআর ও অনলাইন পরীক্ষার সম্পূর্ণ সমাধান"}
+            {naturalizePlanDescription(plan.name, plan.description)}
           </p>
 
           {/* Pricing Display */}
@@ -191,7 +196,7 @@ export const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
                 <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                   <Check className="w-2.5 h-2.5 stroke-[3]" />
                 </div>
-                <span>{bullet}</span>
+                <span>{toBengaliDigits(bullet)}</span>
               </li>
             ))}
           </ul>

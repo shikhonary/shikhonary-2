@@ -17,6 +17,7 @@ import { TrustAndSupportSection } from "../components/trust-and-support/trust-an
 import { PlanChangeModal } from "../components/modals/plan-change-modal"
 import { CreditRechargeModal } from "../components/credits/credit-recharge-modal"
 import { MobileSubscriptionView } from "../components/mobile/mobile-subscription-view"
+import { naturalizePlanName, naturalizePlanDescription } from "../../utils"
 import type { SubscriptionPlanItem, BillingCycle } from "../../types"
 
 export const SubscriptionPlansView: React.FC = () => {
@@ -40,8 +41,8 @@ export const SubscriptionPlansView: React.FC = () => {
     .map((p) => ({
       id: p.id,
       name: p.name,
-      displayName: p.displayName,
-      description: p.description,
+      displayName: naturalizePlanName(p.displayName),
+      description: naturalizePlanDescription(p.name, p.description),
       monthlyPriceBDT: p.monthlyPriceBDT,
       yearlyPriceBDT: p.yearlyPriceBDT,
       features: p.features,
@@ -75,7 +76,7 @@ export const SubscriptionPlansView: React.FC = () => {
   const creditTransactions = (creditTxData?.transactions as any[]) ?? []
 
   const currentPlanId = subscriptionDetails?.subscription?.planId
-  const currentPlanName = subscriptionDetails?.subscription?.plan?.displayName
+  const currentPlanName = naturalizePlanName(subscriptionDetails?.subscription?.plan?.displayName)
 
   const handleOpenPlanModal = (plan: SubscriptionPlanItem) => {
     setSelectedPlanForModal(plan)
