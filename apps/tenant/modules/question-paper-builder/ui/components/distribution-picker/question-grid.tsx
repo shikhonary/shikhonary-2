@@ -410,7 +410,6 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
         return <PoemEssencePickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "SUMMARY":
         return <SummaryPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
-      case "AMPLIFICATION":
       case "THOUGHT_EXPANSION":
         return <AmplificationPickerCard key={q.id} question={q} isSelected={isSelected} onToggle={onToggle}  index={globalIndex} />;
       case "APPLICATION":

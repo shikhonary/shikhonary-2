@@ -1203,7 +1203,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
             });
             paragraphIdx++;
           }
-          const resolvedThoughtExpansion = q.thoughtExpansion || q.amplification;
+          const resolvedThoughtExpansion = q.thoughtExpansion;
           if (resolvedThoughtExpansion) {
             if (amplificationIdx === 0) {
               globalWrittenNumber++;
@@ -1214,7 +1214,7 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ paperId: propPaper
               data: {
                 item: {
                   id: q.id,
-                  type: q.thoughtExpansion ? "THOUGHT_EXPANSION" : "AMPLIFICATION",
+                  type: "THOUGHT_EXPANSION",
                   data: resolvedThoughtExpansion,
                   orderIndex: amplificationIdx,
                   masterNumber: globalWrittenNumber,

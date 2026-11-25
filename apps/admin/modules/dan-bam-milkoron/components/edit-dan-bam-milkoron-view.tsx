@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useMemo } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -25,25 +25,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { ChevronRightIcon, Plus, Trash2, ArrowRightLeft, Loader2 } from "lucide-react"
-import { QUESTION_DIFFICULTY } from "@workspace/utils"
+import { ArrowLeft, Plus, Trash2, ArrowRightLeft, AlertCircle, Loader2, Save } from "lucide-react"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { DAN_BAM_MILKORON_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
 import { DanBamMilkoronGrid } from "./dan-bam-milkoron-table"
 
 const editDanBamMilkoronFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করুন"),
   difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Popularity count must be a number",
+    message: "জনপ্রিয়তা সংখ্যা হতে হবে",
   }),
 })
 
 type EditDanBamMilkoronFormData = z.infer<typeof editDanBamMilkoronFormSchema>
+
+const difficultyLabels: Record<string, string> = {
+  EASY: "সহজ (Easy)",
+  MEDIUM: "মাঝারি (Medium)",
+  HARD: "কঠিন (Hard)",
+}
 
 interface EditDanBamMilkoronViewProps {
   id: string
@@ -51,14 +58,43 @@ interface EditDanBamMilkoronViewProps {
 
 export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const queryString = searchParams?.toString()
+  const listHref = queryString ? `/dan-bam-milkoron?${queryString}` : "/dan-bam-milkoron"
+
   const { data: item, isLoading, isError } = useDanBamMilkoronById(id)
   const updateMutation = useUpdateDanBamMilkoron()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  // 2-Column Rows State
   const [rows, setRows] = useState<Array<{ left: string; right: string }>>([
     { left: "", right: "" },
   ])
+
+  const initialClassId = useMemo(() => {
+    if (!item) return ""
+    const itm = item as any
+    return (
+      itm.subject?.classSubjects?.[0]?.classId ||
+      itm.academicChapter?.subject?.classSubjects?.[0]?.classId ||
+      itm.classId ||
+      ""
+    )
+  }, [item])
+
+  const formValues = useMemo<EditDanBamMilkoronFormData | undefined>(() => {
+    if (!item) return undefined
+    const itm = item as any
+    return {
+      classId: initialClassId,
+      subjectId: itm.subjectId || "",
+      chapterId: itm.academicChapterId || itm.chapterId || "",
+      difficulty: (itm.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
+      referenceText: Array.isArray(itm.reference) ? itm.reference.join(", ") : "",
+      source: itm.source ? String(itm.source).trim() : DEFAULT_SOURCE,
+      session: itm.session || new Date().getFullYear().toString(),
+      popularityCount: String(itm.popularityCount || 0),
+    }
+  }, [item, initialClassId])
 
   const {
     register,
@@ -66,7 +102,6 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
     control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditDanBamMilkoronFormData>({
     resolver: zodResolver(editDanBamMilkoronFormSchema),
@@ -76,39 +111,75 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
       chapterId: "",
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       referenceText: "",
-      source: "",
-      session: "",
+      source: DEFAULT_SOURCE,
+      session: new Date().getFullYear().toString(),
       popularityCount: "0",
+    },
+    values: formValues,
+    resetOptions: {
+      keepDirtyValues: true,
     },
   })
 
   const selectedClassId = watch("classId")
+  const activeClassId = selectedClassId || initialClassId
   const selectedSubjectId = watch("subjectId")
+  const activeSubjectId = selectedSubjectId || item?.subjectId || ""
 
   const { data: academicClasses = [] } = useAcademicClassesForSelection()
   const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
   const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+    activeSubjectId ? { subjectId: activeSubjectId } : undefined
   )
+
+  const combinedClasses = useMemo(() => {
+    const map = new Map<string, any>()
+    const subjectClass = (item as any)?.subject?.classSubjects?.[0]?.academicClass
+    if (subjectClass) {
+      map.set(subjectClass.id, subjectClass)
+    }
+    for (const cls of academicClasses) {
+      map.set(cls.id, cls)
+    }
+    return Array.from(map.values())
+  }, [academicClasses, item])
+
+  const combinedSubjects = useMemo(() => {
+    const map = new Map<string, any>()
+    if ((item as any)?.subject) {
+      map.set((item as any).subject.id, (item as any).subject)
+    }
+    for (const sub of subjects) {
+      map.set(sub.id, sub)
+    }
+    return Array.from(map.values())
+  }, [subjects, item])
+
+  const combinedChapters = useMemo(() => {
+    const map = new Map<string, any>()
+    const chap = (item as any)?.academicChapter || (item as any)?.chapter
+    if (chap) {
+      map.set(chap.id, chap)
+    }
+    for (const ch of chapters) {
+      map.set(ch.id, ch)
+    }
+    return Array.from(map.values())
+  }, [chapters, item])
+
+  const combinedSources = useMemo(() => {
+    const list: { value: string; label: string }[] = [...DAN_BAM_MILKORON_SOURCE_OPTIONS]
+    const currentSource = (item as any)?.source ? String((item as any).source).trim() : null
+    if (currentSource && !list.some((s) => s.value === currentSource)) {
+      list.unshift({ value: currentSource, label: currentSource })
+    }
+    return list
+  }, [item])
 
   useEffect(() => {
     if (item) {
-      const subject = item.subject as any
-      const classIdFromSubject = subject?.classSubjects?.[0]?.classId || ""
-
-      reset({
-        classId: classIdFromSubject,
-        subjectId: item.subjectId,
-        chapterId: item.academicChapterId || "",
-        difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
-        referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: item.source || DEFAULT_SOURCE,
-        session: item.session || new Date().getFullYear().toString(),
-        popularityCount: String(item.popularityCount || 0),
-      })
-
       const left = item.leftColumn || []
       const right = item.rightColumn || []
       const maxRows = Math.max(left.length, right.length, 1)
@@ -118,7 +189,7 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
       }))
       setRows(initialRows)
     }
-  }, [item, reset])
+  }, [item])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -128,24 +199,22 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
     )
   }
 
-  const handleAddRow = () => {
-    setRows([...rows, { left: "", right: "" }])
-  }
-
-  const handleRemoveRow = (index: number) => {
+  const addRow = () => setRows((prev) => [...prev, { left: "", right: "" }])
+  const removeRow = (index: number) => {
     if (rows.length <= 1) return
-    setRows(rows.filter((_, i) => i !== index))
+    setRows((prev) => prev.filter((_, i) => i !== index))
   }
-
-  const leftColumn = rows.map((r) => r.left.trim()).filter(Boolean)
-  const rightColumn = rows.map((r) => r.right.trim()).filter(Boolean)
 
   const onSubmit = async (data: EditDanBamMilkoronFormData) => {
     setErrorMessage(null)
 
+    const leftColumn = rows.map((r) => r.left.trim()).filter(Boolean)
+    const rightColumn = rows.map((r) => r.right.trim()).filter(Boolean)
+
     if (leftColumn.length === 0 || rightColumn.length === 0) {
-      setErrorMessage("বাম পাশ এবং ডান পাশ উভয় কলামে অন্তত একটি করে আইটেম দিন")
-      toast.error("বাম পাশ এবং ডান পাশ উভয় কলামে অন্তত একটি করে আইটেম দিন")
+      const msg = "বাম পাশ ও ডান পাশে কমপক্ষে ১টি করে আইটেম দিন।"
+      setErrorMessage(msg)
+      toast.error(msg)
       return
     }
 
@@ -154,27 +223,28 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
         ? data.referenceText
             .split(",")
             .map((r) => r.trim())
-            .filter((r) => r.length > 0)
+            .filter(Boolean)
         : []
 
       await updateMutation.mutateAsync({
         id,
         subjectId: data.subjectId,
-        chapterId: data.chapterId,
         academicChapterId: data.chapterId,
         leftColumn,
         rightColumn,
         difficulty: data.difficulty,
         reference: referenceArray,
-        source: data.source || undefined,
-        session: data.session || undefined,
+        source: data.source?.trim() || DEFAULT_SOURCE,
+        session: data.session?.trim() || new Date().getFullYear().toString(),
         popularityCount: Number(data.popularityCount) || 0,
       })
 
-      toast.success("ডান-বাম মিলকরণ সফলভাবে আপডেট করা হয়েছে")
-      router.push("/dan-bam-milkoron")
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : "আপডেট করতে ব্যর্থ হয়েছে"
+      toast.success("ডান-বাম মিলকরণটি সফলভাবে আপডেট করা হয়েছে।")
+      setTimeout(() => {
+        router.push(listHref)
+      }, 800)
+    } catch (err: any) {
+      const msg = err.message || "ডান-বাম মিলকরণ আপডেট করতে সমস্যা হয়েছে"
       setErrorMessage(msg)
       toast.error(msg)
     }
@@ -182,366 +252,361 @@ export function EditDanBamMilkoronView({ id }: EditDanBamMilkoronViewProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="py-20 text-center text-muted-foreground space-y-3">
+        <Loader2 className="w-7 h-7 animate-spin mx-auto text-indigo-600" />
+        <p className="text-sm font-medium">ডান-বাম মিলকরণের তথ্য লোড হচ্ছে...</p>
       </div>
     )
   }
 
-  if (isError || !item) {
+  if (isError) {
     return (
-      <div className="rounded-xl border border-outline-variant/30 bg-surface p-8 text-center">
-        <p className="text-sm font-medium text-error">ডান-বাম মিলকরণ তথ্য খুঁজে পাওয়া যায়নি</p>
-        <Link href="/dan-bam-milkoron">
-          <Button variant="outline" className="mt-4 border-outline-variant cursor-pointer">
-            তালিকায় ফিরে যান
-          </Button>
-        </Link>
+      <div className="py-16 text-center text-rose-600 border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/10 rounded-2xl">
+        <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+        <p className="font-bold">ডান-বাম মিলকরণ লোড করা যায়নি</p>
+        <p className="text-xs text-muted-foreground mt-1">অনুগ্রহ করে URL যাচাই করুন অথবা পৃষ্ঠাটি রিলোড দিন।</p>
       </div>
     )
   }
+
+  const previewLeft = rows.map((r) => r.left.trim()).filter(Boolean)
+  const previewRight = rows.map((r) => r.right.trim()).filter(Boolean)
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs font-medium text-on-surface-variant">
-        <Link href="/dan-bam-milkoron" className="hover:text-primary transition-colors">
-          ডান-বাম মিলকরণ
-        </Link>
-        <ChevronRightIcon className="h-3 w-3" />
-        <span className="text-on-surface font-semibold">সম্পাদনা</span>
-      </nav>
-
-      {/* Header */}
-      <div>
-        <h1 className="font-headline-sm text-2xl font-bold tracking-tight text-on-surface">
-          ডান-বাম মিলকরণ সম্পাদনা করুন
-        </h1>
-        <p className="font-body-md text-sm text-on-surface-variant">
-          বাম এবং ডান কলামের তথ্য পরিবর্তন করে আপডেট করুন।
-        </p>
-      </div>
+    <div className="w-full min-w-0 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-200">
+      <PageHeader
+        title="ডান-বাম মিলকরণ সম্পাদনা করুন"
+        description="শ্রেণি, বিষয়, অধ্যায়, বাম ও ডান পাশের সারি এবং রেফারেন্স হালনাগাদ করুন।"
+        icon={ArrowRightLeft}
+        badge={{ label: "ডান-বাম মিলকরণ সম্পাদনা", variant: "indigo" }}
+        breadcrumbs={[
+          { label: "ডান-বাম মিলকরণ তালিকা", href: listHref },
+          { label: "সম্পাদনা" },
+        ]}
+      >
+        <Button
+          asChild
+          variant="outline"
+          className="h-10 px-4 rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.04] text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer shadow-xs"
+        >
+          <Link href={listHref} prefetch={true}>
+            <ArrowLeft className="w-4 h-4" />
+            <span>তালিকায় ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {errorMessage && (
-        <div className="rounded-lg bg-error/10 border border-error/20 p-4 text-sm text-error">
-          {errorMessage}
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/20 p-4 text-rose-700 dark:text-rose-400">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <p className="text-sm font-medium">{errorMessage}</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Taxonomy Section */}
-        <Card className="rounded-xl border border-outline-variant/30 bg-surface shadow-xs">
-          <CardHeader>
-            <CardTitle className="text-base font-bold text-on-surface">
-              একাডেমিক তথ্য (Academic Information)
+      <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card shadow-xs overflow-hidden">
+        <CardHeader className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-5 sm:p-7 flex flex-row items-center gap-3.5 sm:gap-4">
+          <div className="flex size-11 sm:size-12 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary border border-indigo-100/80 dark:border-primary/20 shrink-0">
+            <ArrowRightLeft className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <CardTitle className="text-lg sm:text-xl font-bold font-headline text-foreground">
+              ডান-বাম মিলকরণের বিবরণ ও কলাম কনফিগারেশন
             </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Academic Class */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">
-                শ্রেণী (Class) <span className="text-error">*</span>
-              </Label>
-              <Controller
-                name="classId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("subjectId", "")
-                      setValue("chapterId", "")
-                    }}
-                  >
-                    <SelectTrigger className="w-full bg-white border border-outline-variant">
-                      <SelectValue placeholder="শ্রেণী নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {academicClasses.map((cls) => (
-                        <SelectItem key={cls.id} value={cls.id}>
-                          {cls.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              শ্রেণি, বিষয়, অধ্যায়, বাম ও ডান পাশের সারি এবং মেটাডেটা হালনাগাদ করুন।
+            </p>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-6 sm:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  শ্রেণি (Academic Class) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="classId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`class-select-${field.value || "empty"}-${combinedClasses.length}`}
+                      disabled={isSubmitting}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("subjectId", "")
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 justify-between">
+                        <SelectValue placeholder="শ্রেণি নির্বাচন করুন..." />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl max-h-64">
+                        {combinedClasses.map((cls) => (
+                          <SelectItem key={cls.id} value={cls.id}>
+                            {cls.nameBn || cls.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.classId && (
+                  <p className="text-xs font-medium text-rose-500">{errors.classId.message}</p>
                 )}
-              />
-              {errors.classId && (
-                <p className="text-xs text-error">{errors.classId.message}</p>
-              )}
-            </div>
-
-            {/* Subject */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">
-                বিষয় (Subject) <span className="text-error">*</span>
-              </Label>
-              <Controller
-                name="subjectId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("chapterId", "")
-                    }}
-                    disabled={!selectedClassId}
-                  >
-                    <SelectTrigger className="w-full bg-white border border-outline-variant disabled:opacity-50">
-                      <SelectValue
-                        placeholder={
-                          selectedClassId ? "বিষয় নির্বাচন করুন" : "প্রথমে শ্রেণী নির্বাচন করুন"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {subjects.map((sub) => (
-                        <SelectItem key={sub.id} value={sub.id}>
-                          {sub.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.subjectId && (
-                <p className="text-xs text-error">{errors.subjectId.message}</p>
-              )}
-            </div>
-
-            {/* Chapter */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">
-                অধ্যায় (Chapter) <span className="text-error">*</span>
-              </Label>
-              <Controller
-                name="chapterId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!selectedSubjectId}
-                  >
-                    <SelectTrigger className="w-full bg-white border border-outline-variant disabled:opacity-50">
-                      <SelectValue
-                        placeholder={
-                          selectedSubjectId ? "অধ্যায় নির্বাচন করুন" : "প্রথমে বিষয় নির্বাচন করুন"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {chapters.map((ch) => (
-                        <SelectItem key={ch.id} value={ch.id}>
-                          {ch.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.chapterId && (
-                <p className="text-xs text-error">{errors.chapterId.message}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 2-Column Matching Inputs */}
-        <Card className="rounded-xl border border-outline-variant/30 bg-surface shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-base font-bold text-on-surface flex items-center gap-2">
-                <ArrowRightLeft className="size-4 text-primary" />
-                মিলকরণ কলামসমূহ (Columns Data)
-              </CardTitle>
-              <p className="text-xs text-on-surface-variant mt-1">
-                প্রতিটি সারির বাম ও ডান পাশের তথ্য লিখুন। LaTeX ম্যাথ লিখলে `$...$` ব্যবহার করতে পারেন।
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddRow}
-              className="flex items-center gap-1.5 h-8 text-xs font-semibold cursor-pointer border-outline-variant"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              সারি যোগ করুন
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-12 gap-2 text-xs font-bold text-on-surface-variant px-1">
-              <div className="col-span-5 sm:col-span-5">বাম পাশ (Left Column)</div>
-              <div className="col-span-5 sm:col-span-6">ডান পাশ (Right Column)</div>
-              <div className="col-span-2 sm:col-span-1 text-right">অ্যাকশন</div>
-            </div>
-
-            {rows.map((row, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-12 gap-2 items-center bg-surface-container-lowest/50 p-2 rounded-lg border border-outline-variant/20"
-              >
-                <div className="col-span-5 sm:col-span-5 flex items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-primary/70 shrink-0 select-none w-5">
-                    ({index + 1})
-                  </span>
-                  <Input
-                    placeholder={`বাম পাশের তথ্য ${index + 1}`}
-                    value={row.left}
-                    onChange={(e) => handleRowChange(index, "left", e.target.value)}
-                    className="bg-white border-outline-variant h-9 text-xs"
-                  />
-                </div>
-                <div className="col-span-5 sm:col-span-6 flex items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-secondary/70 shrink-0 select-none w-5">
-                    ({String.fromCharCode(0x0995 + index)})
-                  </span>
-                  <Input
-                    placeholder={`ডান পাশের তথ্য ${index + 1}`}
-                    value={row.right}
-                    onChange={(e) => handleRowChange(index, "right", e.target.value)}
-                    className="bg-white border-outline-variant h-9 text-xs"
-                  />
-                </div>
-                <div className="col-span-2 sm:col-span-1 flex justify-end">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveRow(index)}
-                    disabled={rows.length <= 1}
-                    className="h-8 w-8 text-outline hover:text-error hover:bg-error/10 disabled:opacity-30 cursor-pointer"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
               </div>
-            ))}
 
-            {/* Live Preview */}
-            {(leftColumn.length > 0 || rightColumn.length > 0) && (
-              <div className="mt-4 pt-3 border-t border-outline-variant/20">
-                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                  লাইভ প্রিভিউ (Live Preview):
-                </span>
-                <DanBamMilkoronGrid leftColumn={leftColumn} rightColumn={rightColumn} />
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বিষয় (Subject) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="subjectId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`subject-select-${field.value || "empty"}-${combinedSubjects.length}`}
+                      disabled={isSubmitting || !activeClassId}
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        setValue("chapterId", "")
+                      }}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue placeholder={activeClassId ? "বিষয় নির্বাচন করুন..." : "প্রথমে শ্রেণি নির্বাচন করুন"} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl max-h-64">
+                        {combinedSubjects.map((subj) => (
+                          <SelectItem key={subj.id} value={subj.id}>
+                            {subj.nameBn || subj.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.subjectId && (
+                  <p className="text-xs font-medium text-rose-500">{errors.subjectId.message}</p>
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Additional Details */}
-        <Card className="rounded-xl border border-outline-variant/30 bg-surface shadow-xs">
-          <CardHeader>
-            <CardTitle className="text-base font-bold text-on-surface">
-              অতিরিক্ত তথ্য (Additional Details)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Difficulty */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">
-                কঠিনতার স্তর (Difficulty) <span className="text-error">*</span>
-              </Label>
-              <Controller
-                name="difficulty"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full bg-white border border-outline-variant">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value={QUESTION_DIFFICULTY.EASY}>EASY</SelectItem>
-                      <SelectItem value={QUESTION_DIFFICULTY.MEDIUM}>MEDIUM</SelectItem>
-                      <SelectItem value={QUESTION_DIFFICULTY.HARD}>HARD</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  অধ্যায় (Chapter) <span className="text-rose-500">*</span>
+                </Label>
+                <Controller
+                  name="chapterId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      key={`chapter-select-${field.value || "empty"}-${combinedChapters.length}`}
+                      disabled={isSubmitting || !activeSubjectId}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] text-foreground text-sm h-11 px-4 justify-between disabled:opacity-50">
+                        <SelectValue placeholder={activeSubjectId ? "অধ্যায় নির্বাচন করুন..." : "প্রথমে বিষয় নির্বাচন করুন"} />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl max-h-64">
+                        {combinedChapters.map((ch) => (
+                          <SelectItem key={ch.id} value={ch.id}>
+                            {ch.nameBn || ch.nameEn}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.chapterId && (
+                  <p className="text-xs font-medium text-rose-500">{errors.chapterId.message}</p>
                 )}
-              />
+              </div>
             </div>
 
-            {/* Source */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">উৎস (Source)</Label>
-              <Controller
-                name="source"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full bg-white border border-outline-variant">
-                      <SelectValue placeholder="উৎস নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {DAN_BAM_MILKORON_SOURCE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            {/* 2-Column Rows Editor */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  বাম পাশ ও ডান পাশের সারি (Columns) <span className="text-rose-500">*</span>
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addRow}
+                  disabled={isSubmitting}
+                  className="h-8 px-3 rounded-xl text-xs font-semibold gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>সারি যোগ করুন</span>
+                </Button>
+              </div>
+
+              <div className="space-y-2.5">
+                {rows.map((row, idx) => (
+                  <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2.5 items-center">
+                    <Input
+                      disabled={isSubmitting}
+                      value={row.left}
+                      onChange={(e) => handleRowChange(idx, "left", e.target.value)}
+                      placeholder={`বাম পাশ ${idx + 1}...`}
+                      className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4 text-sm"
+                    />
+                    <Input
+                      disabled={isSubmitting}
+                      value={row.right}
+                      onChange={(e) => handleRowChange(idx, "right", e.target.value)}
+                      placeholder={`ডান পাশ ${idx + 1}...`}
+                      className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4 text-sm"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeRow(idx)}
+                      disabled={isSubmitting || rows.length <= 1}
+                      className="h-10 w-10 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0 cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {(previewLeft.length > 0 || previewRight.length > 0) && (
+                <div className="pt-2 space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                    লাইভ গ্রিড প্রিভিউ:
+                  </span>
+                  <DanBamMilkoronGrid leftColumn={previewLeft} rightColumn={previewRight} />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  কঠিনতার স্তর
+                </Label>
+                <Controller
+                  name="difficulty"
+                  control={control}
+                  render={({ field }) => (
+                    <Select key={`difficulty-select-${field.value || "empty"}`} disabled={isSubmitting} value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {difficultyLabels[opt.value] || opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  উৎস (Source)
+                </Label>
+                <Controller
+                  name="source"
+                  control={control}
+                  render={({ field }) => (
+                    <Select key={`source-select-${field.value || "empty"}-${combinedSources.length}`} disabled={isSubmitting} value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {combinedSources.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="session" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  সেশন / বছর
+                </Label>
+                <Input
+                  id="session"
+                  disabled={isSubmitting}
+                  {...register("session")}
+                  className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4 text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="popularityCount" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  জনপ্রিয়তা সংখ্যা
+                </Label>
+                <Input
+                  id="popularityCount"
+                  type="number"
+                  disabled={isSubmitting}
+                  {...register("popularityCount")}
+                  className="rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4 text-sm"
+                />
+                {errors.popularityCount && (
+                  <p className="text-xs font-medium text-rose-500">{errors.popularityCount.message}</p>
                 )}
-              />
+              </div>
             </div>
 
-            {/* Session */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">সেশন (Session)</Label>
-              <Input
-                {...register("session")}
-                placeholder="যেমন: 2024"
-                className="bg-white border border-outline-variant"
-              />
-            </div>
-
-            {/* Reference */}
-            <div className="space-y-1.5 md:col-span-2">
-              <Label className="text-xs font-bold text-on-surface">
-                রেফারেন্স (Reference - কমা দিয়ে আলাদা করুন)
+            <div className="space-y-2">
+              <Label htmlFor="referenceText" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                রেফারেন্স / বোর্ড ট্যাগ (References)
               </Label>
               <Input
+                id="referenceText"
+                type="text"
+                disabled={isSubmitting}
+                placeholder="কমা দিয়ে একাধিক রেফারেন্স লিখুন..."
                 {...register("referenceText")}
-                placeholder="যেমন: ঢাকা বোর্ড ২০২৪, রাজশাহী বোর্ড ২০২৩"
-                className="bg-white border border-outline-variant"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.03] h-11 px-4 text-sm"
               />
             </div>
 
-            {/* Popularity Count */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold text-on-surface">জনপ্রিয়তা (Popularity Count)</Label>
-              <Input
-                type="number"
-                {...register("popularityCount")}
-                placeholder="0"
-                className="bg-white border border-outline-variant"
-              />
+            <div className="flex justify-end gap-3 border-t border-slate-200/80 dark:border-white/[0.08] pt-6">
+              <Button
+                asChild
+                variant="outline"
+                disabled={isSubmitting}
+                className="rounded-xl border border-slate-200 dark:border-white/[0.08] px-5 h-11 text-xs sm:text-sm font-semibold cursor-pointer"
+              >
+                <Link href={listHref}>বাতিল</Link>
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 h-11 text-xs sm:text-sm font-bold text-white shadow-sm shadow-indigo-200 dark:shadow-none transition-all cursor-pointer disabled:opacity-50 gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>আপডেট হচ্ছে...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    <span>আপডেট সংরক্ষণ করুন</span>
+                  </>
+                )}
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Form Actions */}
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <Link href="/dan-bam-milkoron">
-            <Button
-              type="button"
-              variant="outline"
-              className="border-outline-variant cursor-pointer"
-            >
-              বাতিল
-            </Button>
-          </Link>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="bg-primary text-white cursor-pointer px-6"
-          >
-            {isSubmitting ? "আপডেট হচ্ছে..." : "আপডেট করুন"}
-          </Button>
-        </div>
-      </form>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

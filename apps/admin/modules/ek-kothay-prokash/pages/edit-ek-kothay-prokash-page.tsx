@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { EditEkKothayProkashView } from "../components/edit-ek-kothay-prokash-view"
 
 interface EditEkKothayProkashPageProps {
@@ -8,8 +9,8 @@ interface EditEkKothayProkashPageProps {
 
 export function EditEkKothayProkashPage({ id }: EditEkKothayProkashPageProps) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <Suspense>
       <EditEkKothayProkashView id={id} />
-    </div>
+    </Suspense>
   )
 }

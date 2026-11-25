@@ -61,14 +61,6 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
   },
-  AMPLIFICATION: {
-    model: "amplification",
-    searchFields: ["title"],
-    includes: { academicChapter: true, questionType: true },
-    excludedIdField: "amplificationId",
-    hasIsActive: true,
-    fallbackWithoutTypeFilter: true,
-  },
   THOUGHT_EXPANSION: {
     model: "thoughtExpansion",
     searchFields: ["title"],
@@ -420,7 +412,6 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
   [QUESTION_TYPES.SEEN_COMPREHENSION_1]: "SEEN_COMPREHENSION_1",
   [QUESTION_TYPES.SEEN_COMPREHENSION_2]: "SEEN_COMPREHENSION_2",
   [QUESTION_TYPES.THOUGHT_EXPANSION]: "THOUGHT_EXPANSION",
-  [QUESTION_TYPES.AMPLIFICATION]: "AMPLIFICATION",
   [QUESTION_TYPES.LETTER]: "LETTER",
   [QUESTION_TYPES.APPLICATION]: "APPLICATION",
   [QUESTION_TYPES.SUMMARY]: "SUMMARY",
@@ -482,7 +473,6 @@ export async function getAvailableQuestions(
         pbqId: true,
         shortAnswerId: true,
         paragraphId: true,
-        amplificationId: true,
         thoughtExpansionId: true,
         letterId: true,
         applicationId: true,
@@ -606,7 +596,6 @@ export async function getAvailableQuestions(
 
   if (
     effectiveCategory === "PARAGRAPH" ||
-    effectiveCategory === "AMPLIFICATION" ||
     effectiveCategory === "PBQ" ||
     effectiveCategory === "PARTS_OF_SPEECH" ||
     effectiveCategory === "FILL_IN_THE_BLANKS_WITH_CLUES" ||
@@ -798,7 +787,7 @@ export async function getAvailableBoardYears(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "REARRANGE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "REARRANGE", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "THOUGHT_EXPANSION", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId
@@ -871,7 +860,7 @@ export async function getAvailableSources(
   }
 
   if (input.chapterId && input.chapterId !== "all" && input.chapterId !== "All") {
-    if (["PARAGRAPH", "AMPLIFICATION", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
+    if (["PARAGRAPH", "PBQ", "PARTS_OF_SPEECH", "FILL_IN_THE_BLANKS_WITH_CLUES", "FILL_IN_THE_BLANKS_WITHOUT_CLUES", "NUMBER_IN_WORDS", "WORD_MEANING", "MAKE_SENTENCES", "MAKE_QUESTION", "OPPOSITE_WORD", "GENDER_CHANGE", "SYNONYM", "SADHU_TO_CHOLITO", "POD_NIRNOY", "VERB_TENSE", "FORM_FILLUP", "FORM_FILLING", "SHUDDHO_ASHUDDHO", "DAN_BAM_MILKORON", "POEM_ESSENCE", "PROSE_ESSENCE", "SHORT_QUESTION", "DESCRIPTIVE_QUESTION"].includes(effectiveCategory)) {
       where.academicChapterId = input.chapterId
     } else if (!["APPLICATION", "LETTER", "SUMMARY", "ESSENCE", "POEM", "THOUGHT_EXPANSION", "NEWS_REPORT", "ESSAY", "SUBSTITUTION_TABLE", "CHANGING_SENTENCES", "PUNCTUATION"].includes(effectiveCategory)) {
       where.chapterId = input.chapterId

@@ -177,7 +177,6 @@ export async function getQuestionPaperById(
   const shortAnswerIds = allPaperQuestions.map((q) => q.shortAnswerId).filter(Boolean) as string[]
   const pbqIds = allPaperQuestions.map((q: any) => q.pbqId).filter(Boolean) as string[]
   const paragraphIds = allPaperQuestions.map((q) => q.paragraphId).filter(Boolean) as string[]
-  const amplificationIds = allPaperQuestions.map((q) => q.amplificationId).filter(Boolean) as string[]
   const thoughtExpansionIds = allPaperQuestions.map((q: any) => q.thoughtExpansionId).filter(Boolean) as string[]
   const letterIds = allPaperQuestions.map((q: any) => q.letterId).filter(Boolean) as string[]
   const applicationIds = allPaperQuestions.map((q: any) => q.applicationId).filter(Boolean) as string[]
@@ -230,7 +229,6 @@ export async function getQuestionPaperById(
     shortAnswers,
     pbqs,
     paragraphs,
-    amplifications,
     thoughtExpansions,
     letters,
     applications,
@@ -326,15 +324,6 @@ export async function getQuestionPaperById(
     paragraphIds.length > 0
       ? db.paragraph.findMany({
         where: { id: { in: paragraphIds } },
-        include: {
-          academicChapter: true,
-          questionType: true,
-        },
-      })
-      : [],
-    amplificationIds.length > 0
-      ? db.amplification.findMany({
-        where: { id: { in: amplificationIds } },
         include: {
           academicChapter: true,
           questionType: true,
@@ -699,7 +688,6 @@ export async function getQuestionPaperById(
   const shortMap = new Map(shortAnswers.map((s) => [s.id, s]))
   const pbqMap = new Map(pbqs.map((p: any) => [p.id, { ...p, chapter: p.academicChapter }]))
   const paragraphMap = new Map(paragraphs.map((p) => [p.id, { ...p, chapter: p.academicChapter }]))
-  const amplificationMap = new Map(amplifications.map((a) => [a.id, { ...a, chapter: a.academicChapter }]))
   const thoughtExpansionMap = new Map(thoughtExpansions.map((t: any) => [t.id, t]))
   const letterMap = new Map(letters.map((l: any) => [l.id, l]))
   const applicationMap = new Map(applications.map((a: any) => [a.id, a]))
@@ -763,7 +751,6 @@ export async function getQuestionPaperById(
     let resolvedShort = q.shortAnswerId ? shortMap.get(q.shortAnswerId) || null : null
     let resolvedPbq = q.pbqId ? pbqMap.get(q.pbqId) || null : null
     let resolvedParagraph = q.paragraphId ? paragraphMap.get(q.paragraphId) || null : null
-    let resolvedAmplification = q.amplificationId ? amplificationMap.get(q.amplificationId) || null : null
     let resolvedThoughtExpansion = q.thoughtExpansionId ? thoughtExpansionMap.get(q.thoughtExpansionId) || null : null
     let resolvedLetter = q.letterId ? letterMap.get(q.letterId) || null : null
     let resolvedApplication = q.applicationId ? applicationMap.get(q.applicationId) || null : null
@@ -822,9 +809,6 @@ export async function getQuestionPaperById(
     }
     if (!resolvedParagraph && q.paragraphId && q.contentSnapshot) {
       resolvedParagraph = q.contentSnapshot as any
-    }
-    if (!resolvedAmplification && q.amplificationId && q.contentSnapshot) {
-      resolvedAmplification = q.contentSnapshot as any
     }
     if (!resolvedThoughtExpansion && q.thoughtExpansionId && q.contentSnapshot) {
       resolvedThoughtExpansion = q.contentSnapshot as any
@@ -996,7 +980,6 @@ export async function getQuestionPaperById(
       (resolvedLetter as any)?.questionTypeId ||
       (resolvedApplication as any)?.questionTypeId ||
       (resolvedThoughtExpansion as any)?.questionTypeId ||
-      (resolvedAmplification as any)?.questionTypeId ||
       (resolvedPbq as any)?.questionTypeId ||
       (resolvedCq as any)?.questionTypeId ||
       (resolvedShort as any)?.questionTypeId
@@ -1042,7 +1025,6 @@ export async function getQuestionPaperById(
           (resolvedLetter && (dist.questionTypeName?.includes("চিঠি") || dist.questionTypeName?.includes("পত্র") || dist.questionTypeName?.toLowerCase().includes("letter"))) ||
           (resolvedApplication && (dist.questionTypeName?.includes("আবেদন") || dist.questionTypeName?.includes("দরখাস্ত") || dist.questionTypeName?.toLowerCase().includes("application"))) ||
           (resolvedThoughtExpansion && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("thought expansion") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
-          (resolvedAmplification && (dist.questionTypeName?.includes("ভাব-সম্প্রসারণ") || dist.questionTypeName?.toLowerCase().includes("amplification"))) ||
           (resolvedPbq && (dist.questionTypeName?.includes("অনুচ্ছেদভিত্তিক") || dist.questionTypeName?.toLowerCase().includes("pbq") || dist.questionTypeName?.toLowerCase().includes("passage"))) ||
           (resolvedShort && (dist.questionTypeName?.includes("সংক্ষিপ্ত") || dist.questionTypeName?.toLowerCase().includes("short"))) ||
           (resolvedCq && (dist.questionTypeName?.includes("সৃজনশীল") || dist.questionTypeName?.toLowerCase().includes("cq")))
@@ -1064,7 +1046,6 @@ export async function getQuestionPaperById(
       shortAnswer: resolvedShort,
       pbq: resolvedPbq,
       paragraph: resolvedParagraph,
-      amplification: resolvedAmplification,
       thoughtExpansion: resolvedThoughtExpansion,
       letter: resolvedLetter,
       application: resolvedApplication,
@@ -1624,7 +1605,6 @@ const QUESTION_BANK_FK_FIELDS = [
   "pbqId",
   "shortAnswerId",
   "paragraphId",
-  "amplificationId",
   "thoughtExpansionId",
   "letterId",
   "applicationId",

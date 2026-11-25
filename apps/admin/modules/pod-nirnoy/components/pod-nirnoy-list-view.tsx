@@ -1,141 +1,171 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { Plus, Upload, FileText } from "lucide-react"
+import { toast } from "@workspace/ui/components/sonner"
+import { Button } from "@workspace/ui/components/button"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { usePodNirnoySearchParams } from "../hooks/use-pod-nirnoy-search-params"
 import {
   usePodNirnoysList,
   usePodNirnoyStats,
-  useAcademicClassesForSelection,
-  useSubjectsForSelection,
-  useChaptersForSelection,
+  useDeletePodNirnoy,
+  useBulkDeletePodNirnoys,
 } from "../services/use-pod-nirnoy"
-import { useDeletePodNirnoyModalStore } from "../store/use-delete-pod-nirnoy-modal-store"
-import { PodNirnoyListHeader } from "./pod-nirnoy-list-header"
 import { PodNirnoyStatsCards } from "./pod-nirnoy-stats-cards"
 import { PodNirnoyFilters } from "./pod-nirnoy-filters"
 import { PodNirnoyTable } from "./pod-nirnoy-table"
-import { DeletePodNirnoyModal } from "./delete-pod-nirnoy-modal"
-import { usePodNirnoySearchParams } from "../hooks/use-pod-nirnoy-search-params"
 
 export function PodNirnoyListView() {
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const [params, setParams] = usePodNirnoySearchParams()
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState("All")
 
-  const [
-    {
-      query: searchQuery,
-      subjectId: selectedSubjectId,
-      chapterId: selectedChapterId,
-      difficulty: selectedDifficulty,
-      sort: selectedSort,
-      page: currentPage,
-      limit,
-    },
-    setSearchParams,
-  ] = usePodNirnoySearchParams()
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string | null
+    ids?: string[]
+    title: string
+  } | null>(null)
 
-  const handleAcademicClassChange = (classId: string) => {
-    setSelectedAcademicClassId(classId)
-    setSearchParams({
-      subjectId: "All",
-      chapterId: "All",
-      page: 1,
-    })
-  }
+  const deleteMutation = useDeletePodNirnoy()
+  const bulkDeleteMutation = useBulkDeletePodNirnoys()
 
-  const handleSubjectChange = (subjectId: string) => {
-    setSearchParams({
-      subjectId,
-      chapterId: "All",
-      page: 1,
-    })
-  }
-
-  const openDeleteModal = useDeletePodNirnoyModalStore((state) => state.openModal)
-  const openBulkDeleteModal = useDeletePodNirnoyModalStore((state) => state.openBulkModal)
-
-  // Query Pod Nirnoys list with search & filters
-  const { data: podNirnoyData, isLoading, isError } = usePodNirnoysList({
-    limit,
-    page: currentPage,
-    query: searchQuery || undefined,
-    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-    academicChapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-    difficulty: selectedDifficulty !== "All" ? selectedDifficulty : undefined,
-    sort: selectedSort,
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    isError: isListError,
+  } = usePodNirnoysList({
+    page: params.page,
+    limit: params.limit,
+    query: params.query || undefined,
+    subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
+    academicChapterId: params.chapterId !== "All" ? params.chapterId : undefined,
+    difficulty: params.difficulty !== "All" ? params.difficulty : undefined,
+    sort: params.sort !== "All" ? (params.sort as any) : "newest",
   })
 
-  // Query Pod Nirnoy stats
-  const { data: statsData } = usePodNirnoyStats(
-    selectedSubjectId !== "All" || selectedChapterId !== "All"
+  const { data: statsData, isLoading: isStatsLoading } = usePodNirnoyStats(
+    params.subjectId !== "All" || params.chapterId !== "All"
       ? {
-          subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-          academicChapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+          subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
+          academicChapterId: params.chapterId !== "All" ? params.chapterId : undefined,
         }
       : undefined
   )
 
-  // Query subjects for dropdown filters
-  const { data: subjects = [] } = useSubjectsForSelection(
-    selectedAcademicClassId !== "All" ? { academicClassId: selectedAcademicClassId } : undefined
-  )
+  const items = listData?.items || []
+  const totalItems = listData?.totalItems || 0
 
-  // Query chapters for dropdown filters
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
-  )
+  const handleReset = () => {
+    setSelectedAcademicClassId("All")
+    setParams({
+      query: "",
+      subjectId: "All",
+      chapterId: "All",
+      difficulty: "All",
+      sort: "All",
+      page: 1,
+    })
+  }
 
-  const items = podNirnoyData?.items ?? []
-  const totalItems = podNirnoyData?.totalItems ?? items.length
-  const totalPages = podNirnoyData?.totalPages ?? 1
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+
+    try {
+      if (deleteTarget.ids && deleteTarget.ids.length > 0) {
+        await bulkDeleteMutation.mutateAsync({ ids: deleteTarget.ids })
+        toast.success(`${deleteTarget.ids.length} টি পদ নির্ণয় সফলভাবে মুছে ফেলা হয়েছে।`)
+      } else if (deleteTarget.id) {
+        await deleteMutation.mutateAsync({ id: deleteTarget.id })
+        toast.success("পদ নির্ণয় সফলভাবে মুছে ফেলা হয়েছে।")
+      }
+      setDeleteTarget(null)
+    } catch (error: any) {
+      toast.error(error?.message || "মুছে ফেলতে সমস্যা হয়েছে।")
+    }
+  }
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <PodNirnoyListHeader />
+    <div className="space-y-6">
+      <PageHeader
+        title="পদ নির্ণয় প্রশ্ন ব্যাংক"
+        description="বিভিন্ন শ্রেণি ও অধ্যায়ের পদ নির্ণয় প্রশ্নসমূহ পরিচালনা, সম্পাদনা এবং নতুন প্রশ্ন যোগ করুন।"
+        icon={FileText}
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button asChild variant="outline" size="sm" className="h-9 gap-2 rounded-lg font-medium">
+            <Link href="/pod-nirnoy/import">
+              <Upload className="size-4" />
+              <span>ইমপোর্ট করুন</span>
+            </Link>
+          </Button>
+          <Button asChild size="sm" className="h-9 gap-2 rounded-lg font-semibold shadow-xs">
+            <Link href="/pod-nirnoy/create">
+              <Plus className="size-4" />
+              <span>নতুন যোগ করুন</span>
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
-      {/* Stats Cards */}
-      <PodNirnoyStatsCards
-        totalCount={statsData?.totalCount}
-        difficultyCounts={statsData?.difficultyCounts}
-        isLoading={isLoading}
-      />
+      <PodNirnoyStatsCards stats={statsData} isLoading={isStatsLoading} />
 
-      {/* Filters */}
       <PodNirnoyFilters
-        searchQuery={searchQuery}
-        onSearchChange={(query) => setSearchParams({ query, page: 1 })}
-        selectedAcademicClassId={selectedAcademicClassId}
-        onAcademicClassChange={handleAcademicClassChange}
-        academicClasses={academicClasses}
-        selectedSubjectId={selectedSubjectId}
-        onSubjectChange={handleSubjectChange}
-        subjects={subjects}
-        selectedChapterId={selectedChapterId}
-        onChapterChange={(chapterId) => setSearchParams({ chapterId, page: 1 })}
-        chapters={chapters}
-        selectedDifficulty={selectedDifficulty}
-        onDifficultyChange={(difficulty) => setSearchParams({ difficulty, page: 1 })}
-        selectedSort={selectedSort}
-        onSortChange={(sort) => setSearchParams({ sort: sort as any, page: 1 })}
+        searchQuery={params.query}
+        onSearchChange={(val) => setParams({ query: val, page: 1 })}
+        classId={selectedAcademicClassId}
+        onClassChange={(val) => {
+          setSelectedAcademicClassId(val)
+          setParams({ subjectId: "All", chapterId: "All", page: 1 })
+        }}
+        subjectId={params.subjectId}
+        onSubjectChange={(val) => setParams({ subjectId: val, chapterId: "All", page: 1 })}
+        chapterId={params.chapterId}
+        onChapterChange={(val) => setParams({ chapterId: val, page: 1 })}
+        difficulty={params.difficulty}
+        onDifficultyChange={(val) => setParams({ difficulty: val, page: 1 })}
+        sort={params.sort}
+        onSortChange={(val) => setParams({ sort: val as any, page: 1 })}
+        onReset={handleReset}
       />
 
-      {/* Data Table */}
       <PodNirnoyTable
-        items={items as any}
-        isLoading={isLoading}
-        isError={isError}
-        onDelete={(id, titleSnippet) => openDeleteModal(id, titleSnippet)}
-        onBulkDelete={(ids) => openBulkDeleteModal(ids)}
-        currentPage={currentPage}
-        itemsPerPage={limit}
+        items={items}
+        isLoading={isListLoading}
+        isError={isListError}
+        onDelete={(id, snippet) =>
+          setDeleteTarget({
+            id,
+            title: snippet.length > 60 ? `${snippet.slice(0, 60)}...` : snippet,
+          })
+        }
+        onBulkDelete={(selectedIds) =>
+          setDeleteTarget({
+            id: null,
+            ids: selectedIds,
+            title: `নির্বাচিত ${selectedIds.length} টি পদ নির্ণয়`,
+          })
+        }
+        currentPage={params.page}
+        itemsPerPage={params.limit}
         totalItems={totalItems}
-        totalPages={totalPages}
-        onPageChange={(page) => setSearchParams({ page })}
-        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+        onPageChange={(p) => setParams({ page: p })}
+        onLimitChange={(l) => setParams({ limit: l, page: 1 })}
       />
 
-      {/* Delete Confirmation Modal */}
-      <DeletePodNirnoyModal />
+      <ConfirmDeleteDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title={deleteTarget?.ids ? "একাধিক পদ নির্ণয় মুছুন" : "পদ নির্ণয় মুছুন"}
+        description={
+          deleteTarget?.ids
+            ? `আপনি কি নিশ্চিত যে আপনি নির্বাচিত ${deleteTarget.ids.length} টি পদ নির্ণয় স্থায়ীভাবে মুছে ফেলতে চান?`
+            : `আপনি কি নিশ্চিত যে আপনি "${deleteTarget?.title}" প্রশ্নটি স্থায়ীভাবে মুছে ফেলতে চান?`
+        }
+        isLoading={deleteMutation.isPending || bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }

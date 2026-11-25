@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { EditChangingSentenceView } from "../components/edit-changing-sentence-view"
 
 interface EditChangingSentencePageProps {
@@ -6,5 +7,9 @@ interface EditChangingSentencePageProps {
 
 export async function EditChangingSentencePage({ params }: EditChangingSentencePageProps) {
   const { id } = await params
-  return <EditChangingSentenceView id={id} />
+  return (
+    <Suspense>
+      <EditChangingSentenceView id={id} />
+    </Suspense>
+  )
 }

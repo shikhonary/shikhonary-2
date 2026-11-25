@@ -1,11 +1,12 @@
 "use client"
 
+import { Suspense } from "react"
 import { EditFillInTheBlanksWithCluesView } from "../components/edit-fill-in-the-blanks-with-clues-view"
 
 export function EditFillInTheBlanksWithCluesPage({ id }: { id?: string }) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <Suspense>
       <EditFillInTheBlanksWithCluesView id={id} />
-    </div>
+    </Suspense>
   )
 }

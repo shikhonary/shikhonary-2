@@ -40,7 +40,6 @@ export async function addQuestionPaperQuestion(
     input.csId,
     input.pbqId,
     input.paragraphId,
-    input.amplificationId,
     input.thoughtExpansionId,
     input.letterId,
     input.applicationId,
@@ -125,12 +124,6 @@ export async function addQuestionPaperQuestion(
     if (!item) throw notFound("Paragraph")
     resolvedQuestionTypeId = item.questionTypeId ?? null
     questionLabel = "Paragraph: " + item.id
-    if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
-  } else if (input.amplificationId) {
-    const item = await db.amplification.findUnique({ where: { id: input.amplificationId } })
-    if (!item) throw notFound("Amplification")
-    resolvedQuestionTypeId = item.questionTypeId ?? null
-    questionLabel = "Amplification: " + item.id
     if (paper.status === "Published") contentSnapshot = JSON.parse(JSON.stringify(item))
   } else if (input.thoughtExpansionId) {
     const item = await (db as any).thoughtExpansion.findUnique({ where: { id: input.thoughtExpansionId } })
@@ -405,7 +398,6 @@ export async function addQuestionPaperQuestion(
       csId: input.csId,
       pbqId: input.pbqId,
       paragraphId: input.paragraphId,
-      amplificationId: input.amplificationId,
       thoughtExpansionId: input.thoughtExpansionId,
       letterId: input.letterId,
       applicationId: input.applicationId,
@@ -489,7 +481,6 @@ export async function removeQuestionPaperQuestion(
     SA: "shortAnswerId",
     PBQ: "pbqId",
     PARAGRAPH: "paragraphId",
-    AMPLIFICATION: "amplificationId",
     THOUGHT_EXPANSION: "thoughtExpansionId",
     LETTER: "letterId",
     APPLICATION: "applicationId",
@@ -717,19 +708,6 @@ export async function bulkAssignQuestions(
       recordsToCreate.push({
         questionPaperId: input.questionPaperId,
         paragraphId,
-        distributionId: input.distributionId,
-        sectionId: finalSectionId,
-        subSectionId: finalSubSectionId,
-        orderIndex: nextOrder++,
-      })
-    }
-  }
-
-  if (input.amplificationIds && input.amplificationIds.length > 0) {
-    for (const amplificationId of input.amplificationIds) {
-      recordsToCreate.push({
-        questionPaperId: input.questionPaperId,
-        amplificationId,
         distributionId: input.distributionId,
         sectionId: finalSectionId,
         subSectionId: finalSubSectionId,
@@ -1300,8 +1278,6 @@ export async function bulkAssignQuestions(
         record.contentSnapshot = (await db.shortAnswer.findUnique({ where: { id: record.shortAnswerId } })) as any
       } else if (record.paragraphId) {
         record.contentSnapshot = (await db.paragraph.findUnique({ where: { id: record.paragraphId } })) as any
-      } else if (record.amplificationId) {
-        record.contentSnapshot = (await db.amplification.findUnique({ where: { id: record.amplificationId } })) as any
       } else if (record.thoughtExpansionId) {
         record.contentSnapshot = (await (db as any).thoughtExpansion.findUnique({ where: { id: record.thoughtExpansionId } })) as any
       } else if (record.letterId) {
@@ -1399,8 +1375,6 @@ export async function bulkAssignQuestions(
       whereCondition = { questionPaperId_shortAnswerId: { questionPaperId: input.questionPaperId, shortAnswerId: record.shortAnswerId } }
     } else if (record.paragraphId) {
       whereCondition = { questionPaperId_paragraphId: { questionPaperId: input.questionPaperId, paragraphId: record.paragraphId } }
-    } else if (record.amplificationId) {
-      whereCondition = { questionPaperId_amplificationId: { questionPaperId: input.questionPaperId, amplificationId: record.amplificationId } }
     } else if (record.thoughtExpansionId) {
       whereCondition = { questionPaperId_thoughtExpansionId: { questionPaperId: input.questionPaperId, thoughtExpansionId: record.thoughtExpansionId } }
     } else if (record.letterId) {
@@ -1535,7 +1509,6 @@ export async function bulkRemoveQuestions(
         { pbqId: { in: input.questionIds } },
         { shortAnswerId: { in: input.questionIds } },
         { paragraphId: { in: input.questionIds } },
-        { amplificationId: { in: input.questionIds } },
         { thoughtExpansionId: { in: input.questionIds } },
         { letterId: { in: input.questionIds } },
         { applicationId: { in: input.questionIds } },

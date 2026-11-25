@@ -46,7 +46,6 @@ export async function addAlternativeQuestion(
     PBQ: "pbqId",
     SA: "shortAnswerId",
     PARAGRAPH: "paragraphId",
-    AMPLIFICATION: "amplificationId",
     THOUGHT_EXPANSION: "thoughtExpansionId",
     LETTER: "letterId",
     APPLICATION: "applicationId",
@@ -110,8 +109,6 @@ export async function addAlternativeQuestion(
     altContent = await db.shortAnswer.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "PARAGRAPH") {
     altContent = await db.paragraph.findUnique({ where: { id: input.questionId } })
-  } else if (input.questionType === "AMPLIFICATION") {
-    altContent = await db.amplification.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "THOUGHT_EXPANSION") {
     altContent = await (db as any).thoughtExpansion.findUnique({ where: { id: input.questionId } })
   } else if (input.questionType === "LETTER") {
@@ -385,7 +382,7 @@ export async function swapAlternativeQuestion(
   }
 
   const fkFields = [
-    "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "amplificationId", "thoughtExpansionId",
+    "mcqId", "cqId", "csId", "pbqId", "shortAnswerId", "paragraphId", "thoughtExpansionId",
     "letterId", "applicationId", "summaryId", "essenceId", "poemEssenceId", "proseEssenceId", "poemId", "essayId", "newsReportId", "partsOfSpeechId", "rightFormOfVerbId", "changingSentenceId", "fillInTheBlanksWithCluesId", "fillInTheBlanksWithoutCluesId", "substitutionTableId", "punctuationId", "shortCompositionId",
     "descriptiveQuestionId", "shortQuestionId", "makeQuestionId", "wordMeaningId", "numberInWordsId", "makeSentencesId", "oppositeWordId", "genderChangeId", "juktobornoId", "ekKothayProkashId", "synonymId", "sadhuToCholitoId", "podNirnoyId", "verbTenseId", "formFillupId", "shuddhoAshuddhoId", "danBamMilkoronId", "mathQuestionId", "grammarQuestionId", "rearrangeId", "seenComprehensionId"
   ] as const

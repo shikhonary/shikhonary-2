@@ -1,24 +1,21 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { ArrowLeft, Save, FileText, AlertCircle } from "lucide-react"
 import { toast } from "@workspace/ui/components/sonner"
-import {
-  useFormFillingById,
-  useUpdateFormFilling,
-  useAcademicClassesForSelection,
-  useSubjectsForSelection,
-  useChaptersForSelection,
-} from "../services/use-form-filling"
-import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Label } from "@workspace/ui/components/label"
+import { Checkbox } from "@workspace/ui/components/checkbox"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import {
   Select,
   SelectContent,
@@ -26,53 +23,123 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { ChevronRightIcon, Loader2 } from "lucide-react"
-import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { FORM_FILLING_SOURCE_OPTIONS } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
+import { FORM_FILLING_SOURCE_OPTIONS, type FormFillingSource } from "../constants"
+import {
+  useFormFillingById,
+  useUpdateFormFilling,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+} from "../services/use-form-filling"
 
-import { Checkbox } from "@workspace/ui/components/checkbox"
-
-const editFormFillingFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
-  scenario: z.string().min(1, "Scenario description is required"),
+const editFormFillingSchema = z.object({
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করুন"),
+  scenario: z.string().min(1, "উদ্দীপক লিখুন"),
   institution: z.string().optional(),
   title: z.string().optional(),
   description: z.string().optional(),
   hasPhoto: z.boolean(),
   declaration: z.string().optional(),
   signaturesText: z.string().optional(),
-  formDataText: z.string().min(1, "Form Data JSON is required"),
+  formDataText: z.string().min(1, "Form Data JSON আবশ্যক"),
   solutionText: z.string().optional(),
-  difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
+  difficulty: z.enum([
+    QUESTION_DIFFICULTY.EASY,
+    QUESTION_DIFFICULTY.MEDIUM,
+    QUESTION_DIFFICULTY.HARD,
+  ]),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
 })
 
-type EditFormFillingFormData = z.infer<typeof editFormFillingFormSchema>
+type EditFormFillingFormData = z.infer<typeof editFormFillingSchema>
 
-interface EditFormFillingViewProps {
-  id: string
+const difficultyLabels: Record<string, string> = {
+  EASY: "সহজ (Easy)",
+  MEDIUM: "মাঝারি (Medium)",
+  HARD: "কঠিন (Hard)",
 }
 
-export function EditFormFillingView({ id }: EditFormFillingViewProps) {
+export function EditFormFillingView({ id }: { id: string }) {
   const router = useRouter()
-  const { data: item, isLoading, isError } = useFormFillingById(id)
-  const updateMutation = useUpdateFormFilling()
+  const searchParams = useSearchParams()
+  const qs = searchParams.toString()
+  const listHref = qs ? `/form-filling?${qs}` : "/form-filling"
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { data: item, isLoading: isItemLoading, isError: isItemError } = useFormFillingById(id)
+  const updateMutation = useUpdateFormFilling()
+
+  const initialClassId =
+    item?.subject?.classSubjects?.[0]?.classId ||
+    (item as any)?.subject?.academicClassId ||
+    (item as any)?.academicChapter?.academicClassId ||
+    ""
+
+  const formValues = useMemo<EditFormFillingFormData | undefined>(() => {
+    if (!item) return undefined
+
+    let formDataStr = ""
+    if (item.formData) {
+      try {
+        formDataStr =
+          typeof item.formData === "string" ? item.formData : JSON.stringify(item.formData, null, 2)
+      } catch {
+        formDataStr = String(item.formData)
+      }
+    }
+
+    let solutionStr = ""
+    if (item.solution) {
+      try {
+        solutionStr =
+          typeof item.solution === "string" ? item.solution : JSON.stringify(item.solution, null, 2)
+      } catch {
+        solutionStr = String(item.solution)
+      }
+    }
+
+    const itemAny = item as any
+    const rawDifficulty = item.difficulty as string
+    const validDifficulty =
+      rawDifficulty === QUESTION_DIFFICULTY.EASY ||
+      rawDifficulty === QUESTION_DIFFICULTY.MEDIUM ||
+      rawDifficulty === QUESTION_DIFFICULTY.HARD
+        ? rawDifficulty
+        : QUESTION_DIFFICULTY.MEDIUM
+
+    return {
+      classId: initialClassId,
+      subjectId: item.subjectId || "",
+      chapterId: item.academicChapterId || itemAny.chapterId || "",
+      scenario: item.scenario || "",
+      institution: itemAny.institution || "",
+      title: itemAny.title || "",
+      description: itemAny.description || "",
+      hasPhoto: Boolean(itemAny.hasPhoto),
+      declaration: itemAny.declaration || "",
+      signaturesText: Array.isArray(itemAny.signatures) ? itemAny.signatures.join(", ") : "",
+      formDataText: formDataStr,
+      solutionText: solutionStr,
+      difficulty: validDifficulty,
+      referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
+      source: item.source || "গাইড বুক",
+      session: item.session || new Date().getFullYear().toString(),
+    }
+  }, [item, initialClassId])
 
   const {
     register,
     handleSubmit,
-    control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditFormFillingFormData>({
-    resolver: zodResolver(editFormFillingFormSchema),
+    resolver: zodResolver(editFormFillingSchema),
     defaultValues: {
       classId: "",
       subjectId: "",
@@ -91,69 +158,67 @@ export function EditFormFillingView({ id }: EditFormFillingViewProps) {
       source: "গাইড বুক",
       session: new Date().getFullYear().toString(),
     },
+    values: formValues,
+    resetOptions: { keepDirtyValues: true },
   })
 
   const selectedClassId = watch("classId")
   const selectedSubjectId = watch("subjectId")
+  const selectedChapterId = watch("chapterId")
+  const selectedDifficulty = watch("difficulty")
+  const selectedSource = watch("source")
+  const hasPhoto = watch("hasPhoto")
 
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
-  const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+  const activeClassId = selectedClassId || formValues?.classId || ""
+  const activeSubjectId = selectedSubjectId || formValues?.subjectId || ""
+
+  const { data: classesData } = useAcademicClassesForSelection()
+  const { data: subjectsData } = useSubjectsForSelection(
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
+  const { data: chaptersData } = useChaptersForSelection(
+    activeSubjectId ? { subjectId: activeSubjectId } : undefined
   )
 
-  useEffect(() => {
-    if (item) {
-      const subject = item.subject as any
-      const chapter = item.academicChapter as any
-
-      let classId = ""
-      if (subject?.classSubjects && subject.classSubjects.length > 0) {
-        classId = subject.classSubjects[0].academicClassId || ""
-      }
-
-      let formDataStr = ""
-      if (item.formData) {
-        try {
-          formDataStr = typeof item.formData === "string" ? item.formData : JSON.stringify(item.formData, null, 2)
-        } catch {
-          formDataStr = String(item.formData)
-        }
-      }
-
-      let solutionStr = ""
-      if (item.solution) {
-        try {
-          solutionStr = typeof item.solution === "string" ? item.solution : JSON.stringify(item.solution, null, 2)
-        } catch {
-          solutionStr = String(item.solution)
-        }
-      }
-
-      const itemAny = item as any
-
-      reset({
-        classId,
-        subjectId: item.subjectId || "",
-        chapterId: item.academicChapterId || "",
-        scenario: item.scenario || "",
-        institution: itemAny.institution || "",
-        title: itemAny.title || "",
-        description: itemAny.description || "",
-        hasPhoto: Boolean(itemAny.hasPhoto),
-        declaration: itemAny.declaration || "",
-        signaturesText: Array.isArray(itemAny.signatures) ? itemAny.signatures.join(", ") : "",
-        formDataText: formDataStr,
-        solutionText: solutionStr,
-        difficulty: (item.difficulty as any) || QUESTION_DIFFICULTY.MEDIUM,
-        referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
-        source: item.source || "গাইড বুক",
-        session: item.session || new Date().getFullYear().toString(),
-      })
+  const combinedClasses = useMemo(() => {
+    const list = Array.isArray(classesData) ? [...classesData] : []
+    const itemCls = (item as any)?.subject?.academicClass
+    if (activeClassId && itemCls && !list.some((c: any) => c.id === activeClassId)) {
+      list.unshift(itemCls)
     }
-  }, [item, reset])
+    return list
+  }, [classesData, activeClassId, item])
+
+  const combinedSubjects = useMemo(() => {
+    const list = Array.isArray(subjectsData) ? [...subjectsData] : []
+    const itemSub = item?.subject
+    if (activeSubjectId && itemSub && !list.some((s: any) => s.id === activeSubjectId)) {
+      list.unshift(itemSub as any)
+    }
+    return list
+  }, [subjectsData, activeSubjectId, item])
+
+  const combinedChapters = useMemo(() => {
+    const list = Array.isArray(chaptersData) ? [...chaptersData] : []
+    const activeChapterId = selectedChapterId || formValues?.chapterId || ""
+    const itemCh = item?.academicChapter || (item as any)?.chapter
+    if (activeChapterId && itemCh && !list.some((ch: any) => ch.id === activeChapterId)) {
+      list.unshift(itemCh as any)
+    }
+    return list
+  }, [chaptersData, selectedChapterId, formValues?.chapterId, item])
+
+  const combinedSources = useMemo(() => {
+    const list: { label: string; value: string }[] = FORM_FILLING_SOURCE_OPTIONS.map((opt) => ({
+      label: opt.label,
+      value: opt.value,
+    }))
+    const currentSource = selectedSource || formValues?.source
+    if (currentSource && !list.some((opt) => opt.value === currentSource)) {
+      list.unshift({ label: currentSource, value: currentSource })
+    }
+    return list
+  }, [selectedSource, formValues?.source])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -164,16 +229,16 @@ export function EditFormFillingView({ id }: EditFormFillingViewProps) {
       let parsedFormData: any
       try {
         parsedFormData = JSON.parse(data.formDataText)
-      } catch (e: any) {
-        throw new Error("Form Data JSON is invalid. Please ensure valid JSON format.")
+      } catch {
+        throw new Error("Form Data JSON ফরম্যাট সঠিক নয়। অনুগ্রহ করে সঠিক JSON দিন।")
       }
 
       let parsedSolution: any = null
       if (data.solutionText && data.solutionText.trim() !== "") {
         try {
           parsedSolution = JSON.parse(data.solutionText)
-        } catch (e: any) {
-          throw new Error("Solution JSON is invalid. Please ensure valid JSON format.")
+        } catch {
+          throw new Error("Solution JSON ফরম্যাট সঠিক নয়। অনুগ্রহ করে সঠিক JSON দিন।")
         }
       }
 
@@ -207,407 +272,310 @@ export function EditFormFillingView({ id }: EditFormFillingViewProps) {
         solution: parsedSolution,
         difficulty: data.difficulty,
         reference: referenceArray,
-        source: data.source?.trim() || null,
+        source: (data.source?.trim() as FormFillingSource) || null,
         session: data.session?.trim() || null,
       })
 
-      toast.success("Form Filling entry updated successfully.")
-      setTimeout(() => {
-        router.push("/form-filling")
-      }, 1000)
+      toast.success("ফর্ম পূরণ প্রশ্ন সফলভাবে আপডেট করা হয়েছে।")
+      router.push(listHref)
     } catch (err: any) {
-      const msg = err.message || "Failed to update form filling entry"
+      const msg = err?.message || "ফর্ম পূরণ প্রশ্ন আপডেট করতে সমস্যা হয়েছে।"
       setErrorMessage(msg)
       toast.error(msg)
     }
   }
 
-  if (isLoading) {
+  if (isItemLoading) {
     return (
-      <div className="py-20 text-center flex flex-col items-center justify-center gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="text-sm font-semibold text-on-surface-variant">Loading Form Filling details...</span>
+      <div className="space-y-6">
+        <Skeleton className="h-16 w-full rounded-xl" />
+        <Skeleton className="h-44 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-xl" />
       </div>
     )
   }
 
-  if (isError || !item) {
+  if (isItemError || !item) {
     return (
-      <div className="py-20 text-center text-error space-y-4">
-        <p className="text-lg font-bold">Failed to load Form Filling entry.</p>
-        <Link href="/form-filling" className="text-xs font-bold underline text-primary">
-          Back to Form Filling Bank
-        </Link>
+      <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-10 text-center space-y-4">
+        <AlertCircle className="size-10 text-destructive mx-auto" />
+        <h3 className="text-lg font-bold text-destructive">প্রশ্নটি খুঁজে পাওয়া যায়নি</h3>
+        <Button asChild variant="outline">
+          <Link href={listHref}>তালিকায় ফিরে যান</Link>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end justify-between">
-        <div className="max-w-2xl">
-          <nav className="mb-4 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/form-filling"
-              className="font-label-sm hover:text-primary transition-colors cursor-pointer text-xs"
-            >
-              Form Filling
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm font-bold text-primary text-xs">Edit Entry</span>
-          </nav>
-          <h2 className="mb-2 font-headline-md text-3xl font-extrabold text-primary">
-            Edit Form Filling Entry
-          </h2>
-          <p className="font-body-md text-on-surface-variant leading-relaxed text-sm">
-            Modify scenario, form data structure, answer key, taxonomy, and board references.
-          </p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="ফর্ম পূরণ প্রশ্ন সম্পাদনা"
+        description="প্রশ্নটির উদ্দীপক, ফর্মের কাঠামো, সমাধান এবং মেটাডেটা আপডেট করুন।"
+        icon={FileText}
+        breadcrumbs={[
+          { label: "ফর্ম পূরণ", href: listHref },
+          { label: "সম্পাদনা" },
+        ]}
+      >
+        <Button asChild variant="outline" size="sm" className="h-9 gap-2 rounded-lg">
+          <Link href={listHref}>
+            <ArrowLeft className="size-4" />
+            <span>ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {errorMessage && (
-        <div className="mb-6 rounded-lg bg-error/10 border border-error/20 p-4 text-xs font-semibold text-error">
-          {errorMessage}
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
+          <AlertCircle className="size-5 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Academic Context */}
-        <Card className="rounded-2xl border border-outline-variant/60 shadow-xs bg-white">
-          <CardHeader className="border-b border-outline-variant/40 bg-surface-container-low/50 px-6 py-4">
-            <CardTitle className="text-base font-bold text-primary">
-              1. Academic Taxonomy & Classification
-            </CardTitle>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">শ্রেণি, বিষয় ও অধ্যায়</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Class */}
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Class *</Label>
-              <Controller
-                name="classId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("subjectId", "")
-                      setValue("chapterId", "")
-                    }}
-                  >
-                    <SelectTrigger className="rounded-xl border-outline-variant/60 bg-white">
-                      <SelectValue placeholder="Select class" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                      {academicClasses.map((cls) => (
-                        <SelectItem key={cls.id} value={cls.id}>
-                          {cls.nameBn || cls.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.classId && (
-                <p className="text-xs text-error">{errors.classId.message}</p>
-              )}
+              <Label>
+                শ্রেণি <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                key={`cls-${activeClassId || "empty"}-${combinedClasses.length}`}
+                value={activeClassId}
+                onValueChange={(val) => {
+                  setValue("classId", val, { shouldValidate: true, shouldDirty: true })
+                  setValue("subjectId", "", { shouldDirty: true })
+                  setValue("chapterId", "", { shouldDirty: true })
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="শ্রেণি নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedClasses.map((cls: any) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.classId && <p className="text-xs text-destructive">{errors.classId.message}</p>}
             </div>
 
-            {/* Subject */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Subject *</Label>
-              <Controller
-                name="subjectId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    disabled={!selectedClassId}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("chapterId", "")
-                    }}
-                  >
-                    <SelectTrigger className="rounded-xl border-outline-variant/60 bg-white">
-                      <SelectValue placeholder={selectedClassId ? "Select subject" : "Select class first"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                      {subjects.map((subj) => (
-                        <SelectItem key={subj.id} value={subj.id}>
-                          {subj.nameBn || subj.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.subjectId && (
-                <p className="text-xs text-error">{errors.subjectId.message}</p>
-              )}
+              <Label>
+                বিষয় <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                key={`sub-${activeSubjectId || "empty"}-${combinedSubjects.length}`}
+                value={activeSubjectId}
+                disabled={!activeClassId}
+                onValueChange={(val) => {
+                  setValue("subjectId", val, { shouldValidate: true, shouldDirty: true })
+                  setValue("chapterId", "", { shouldDirty: true })
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="বিষয় নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedSubjects.map((sub: any) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.subjectId && <p className="text-xs text-destructive">{errors.subjectId.message}</p>}
             </div>
 
-            {/* Chapter */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Chapter *</Label>
-              <Controller
-                name="chapterId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    disabled={!selectedSubjectId}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger className="rounded-xl border-outline-variant/60 bg-white">
-                      <SelectValue placeholder={selectedSubjectId ? "Select chapter" : "Select subject first"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                      {chapters.map((chap) => (
-                        <SelectItem key={chap.id} value={chap.id}>
-                          {chap.nameBn || chap.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.chapterId && (
-                <p className="text-xs text-error">{errors.chapterId.message}</p>
-              )}
+              <Label>
+                অধ্যায় <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                key={`ch-${selectedChapterId || formValues?.chapterId || "empty"}-${combinedChapters.length}`}
+                value={selectedChapterId || formValues?.chapterId || ""}
+                disabled={!activeSubjectId}
+                onValueChange={(val) =>
+                  setValue("chapterId", val, { shouldValidate: true, shouldDirty: true })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="অধ্যায় নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedChapters.map((ch: any) => (
+                    <SelectItem key={ch.id} value={ch.id}>
+                      {ch.nameBn || ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.chapterId && <p className="text-xs text-destructive">{errors.chapterId.message}</p>}
             </div>
           </CardContent>
         </Card>
 
-        {/* Content */}
-        <Card className="rounded-2xl border border-outline-variant/60 shadow-xs bg-white">
-          <CardHeader className="border-b border-outline-variant/40 bg-surface-container-low/50 px-6 py-4">
-            <CardTitle className="text-base font-bold text-primary">
-              2. Form Header, Scenario & Data Structure
-            </CardTitle>
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">উদ্দীপক ও ফর্মের শিরোনাম</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            {/* Form Header / Institution Name, Title & Subtitle */}
-            <div className="space-y-4 bg-surface-container-low/30 p-4 rounded-xl border border-outline-variant/40">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-bold text-on-surface">Institution Name (প্রতিষ্ঠানের নাম / উৎস)</Label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. কোকিল সরকারি প্রাথমিক বিদ্যালয়, ঠাকুরগাঁও"
-                    {...register("institution")}
-                    className="rounded-xl border-outline-variant/60 bg-white font-solaiman text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-bold text-on-surface">Form Title (ফরমের শিরোনাম)</Label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. ভর্তির আবেদন ফরম"
-                    {...register("title")}
-                    className="rounded-xl border-outline-variant/60 bg-white font-solaiman text-sm"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-bold text-on-surface">Form Subtitle / Description (বিষয়/উপশিরোনাম)</Label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. গ্রন্থাগার সদস্যপদ ফরম / সঞ্চয়ী হিসাব"
-                    {...register("description")}
-                    className="rounded-xl border-outline-variant/60 bg-white font-solaiman text-sm"
-                  />
-                </div>
-              </div>
-
-              {/* Has Photo Box Toggle */}
-              <div className="flex items-center gap-3 pt-2 border-t border-outline-variant/30">
-                <Controller
-                  name="hasPhoto"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="editHasPhoto"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                      <label
-                        htmlFor="editHasPhoto"
-                        className="text-xs font-semibold text-on-surface cursor-pointer select-none"
-                      >
-                        Include Photo Box (ডানদিকের কোণায় &ldquo;ছবি&rdquo; ঘর প্রদর্শন করুন)
-                      </label>
-                    </div>
-                  )}
-                />
-              </div>
-            </div>
-
-            {/* Scenario */}
+          <CardContent className="pt-6 space-y-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Scenario / উদ্দীপক *</Label>
-              <Textarea
-                rows={4}
-                placeholder="Scenario description..."
-                {...register("scenario")}
-                className="rounded-xl border-outline-variant/60 font-solaiman text-base leading-relaxed"
-              />
-              {errors.scenario && (
-                <p className="text-xs text-error">{errors.scenario.message}</p>
-              )}
+              <Label htmlFor="scenario">
+                উদ্দীপক / প্রশ্ন <span className="text-destructive">*</span>
+              </Label>
+              <Textarea id="scenario" rows={3} {...register("scenario")} />
+              {errors.scenario && <p className="text-xs text-destructive">{errors.scenario.message}</p>}
             </div>
 
-            {/* Form Data JSON */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label className="text-xs font-bold text-on-surface">Form Data Structure (JSON) *</Label>
-                <span className="text-[11px] text-outline font-mono">Valid JSON Object or Array</span>
-              </div>
-              <Textarea
-                rows={6}
-                placeholder={`{\n  "১. প্রার্থীর নাম": "",\n  "২. শ্রেণি": "",\n  "৩. পিতার নাম": ""\n}`}
-                {...register("formDataText")}
-                className="rounded-xl border-outline-variant/60 font-mono text-xs leading-relaxed"
-              />
-              {errors.formDataText && (
-                <p className="text-xs text-error">{errors.formDataText.message}</p>
-              )}
-            </div>
-
-            {/* Solution JSON */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label className="text-xs font-bold text-on-surface">Solution Answer Key (Optional JSON)</Label>
-                <span className="text-[11px] text-outline font-mono font-normal">Optional JSON</span>
-              </div>
-              <Textarea
-                rows={5}
-                placeholder={`{\n  "১. প্রার্থীর নাম": "সায়িদা",\n  "২. শ্রেণি": "পঞ্চম"\n}`}
-                {...register("solutionText")}
-                className="rounded-xl border-outline-variant/60 font-mono text-xs leading-relaxed"
-              />
-            </div>
-
-            {/* Declaration & Signatures */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low/30 p-4 rounded-xl border border-outline-variant/40">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Declaration / Undertaking (অঙ্গীকার / ঘোষণা)</Label>
+                <Label htmlFor="institution">প্রতিষ্ঠানের নাম</Label>
+                <Input id="institution" {...register("institution")} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="title">ফর্মের শিরোনাম</Label>
+                <Input id="title" {...register("title")} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">উপ-শিরোনাম / বিবরণ (ঐচ্ছিক)</Label>
+              <Input id="description" {...register("description")} />
+            </div>
+
+            <div className="flex items-center gap-2.5 pt-1">
+              <Checkbox
+                id="hasPhoto"
+                checked={hasPhoto}
+                onCheckedChange={(checked) => setValue("hasPhoto", checked === true, { shouldDirty: true })}
+              />
+              <Label htmlFor="hasPhoto" className="cursor-pointer font-medium">
+                ফর্মের ডানপাশে ছবির ঘর ("ছবি") থাকবে
+              </Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">ফর্মের ফিল্ড ও সমাধান (JSON)</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="formDataText">
+                  Form Data (JSON) <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
-                  rows={3}
-                  placeholder="e.g. উপরে বর্ণিত সকল তথ্য সত্য। আমি এই প্রতিষ্ঠানের প্রতি আনুগত্যের নীতিমালা মেনে চলব।"
-                  {...register("declaration")}
-                  className="rounded-xl border-outline-variant/60 bg-white font-solaiman text-sm"
+                  id="formDataText"
+                  rows={10}
+                  className="font-mono text-xs"
+                  {...register("formDataText")}
                 />
+                {errors.formDataText && (
+                  <p className="text-xs text-destructive">{errors.formDataText.message}</p>
+                )}
               </div>
+
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Signatures / স্বাক্ষরকারীগণ (Comma separated)</Label>
-                <Input
-                  type="text"
-                  placeholder="e.g. প্রার্থীর স্বাক্ষর, অভিভাবকের স্বাক্ষর"
-                  {...register("signaturesText")}
-                  className="rounded-xl border-outline-variant/60 bg-white font-solaiman text-sm"
+                <Label htmlFor="solutionText">Solution (JSON - ঐচ্ছিক)</Label>
+                <Textarea
+                  id="solutionText"
+                  rows={10}
+                  className="font-mono text-xs"
+                  {...register("solutionText")}
                 />
-                <span className="text-[11px] text-outline block">
-                  Multiple signatures separated by comma (e.g. প্রার্থীর স্বাক্ষর, অভিভাবকের স্বাক্ষর)
-                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="declaration">অঙ্গীকারনামা / ঘোষণা (ঐচ্ছিক)</Label>
+                <Input id="declaration" {...register("declaration")} />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signaturesText">স্বাক্ষরসমূহ (কমা দিয়ে আলাদা করুন)</Label>
+                <Input id="signaturesText" {...register("signaturesText")} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Metadata & Tagging */}
-        <Card className="rounded-2xl border border-outline-variant/60 shadow-xs bg-white">
-          <CardHeader className="border-b border-outline-variant/40 bg-surface-container-low/50 px-6 py-4">
-            <CardTitle className="text-base font-bold text-primary">
-              3. Metadata, Tags & Sources
-            </CardTitle>
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">মেটাডেটা ও রেফারেন্স</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Difficulty */}
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Difficulty Level *</Label>
-              <Controller
-                name="difficulty"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="rounded-xl border-outline-variant/60 bg-white">
-                      <SelectValue placeholder="Select difficulty" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                      <SelectItem value={QUESTION_DIFFICULTY.EASY}>Easy</SelectItem>
-                      <SelectItem value={QUESTION_DIFFICULTY.MEDIUM}>Medium</SelectItem>
-                      <SelectItem value={QUESTION_DIFFICULTY.HARD}>Hard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+              <Label>কঠিন্য</Label>
+              <Select
+                key={`diff-${selectedDifficulty || formValues?.difficulty || "MEDIUM"}`}
+                value={selectedDifficulty || formValues?.difficulty || QUESTION_DIFFICULTY.MEDIUM}
+                onValueChange={(val) =>
+                  setValue("difficulty", val as any, { shouldDirty: true })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="কঠিন্য নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {difficultyLabels[opt.value] || opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Source */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Source</Label>
-              <Controller
-                name="source"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value || "গাইড বুক"} onValueChange={field.onChange}>
-                    <SelectTrigger className="rounded-xl border-outline-variant/60 bg-white">
-                      <SelectValue placeholder="Select source" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                      {FORM_FILLING_SOURCE_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
+              <Label>উৎস (Source)</Label>
+              <Select
+                key={`src-${selectedSource || formValues?.source || "empty"}`}
+                value={selectedSource || formValues?.source || ""}
+                onValueChange={(val) => setValue("source", val, { shouldDirty: true })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedSources.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Session */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Session / Year</Label>
-              <Input
-                type="text"
-                placeholder="e.g. 2026"
-                {...register("session")}
-                className="rounded-xl border-outline-variant/60 bg-white"
-              />
+              <Label htmlFor="session">সাল / সেশন</Label>
+              <Input id="session" {...register("session")} />
             </div>
 
-            {/* Reference Tags */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Board References (Comma separated)</Label>
-              <Input
-                type="text"
-                placeholder="e.g. ঢাকা বোর্ড ২০২৪, রাজশাহী বোর্ড ২০২৩"
-                {...register("referenceText")}
-                className="rounded-xl border-outline-variant/60 bg-white"
-              />
+              <Label htmlFor="referenceText">রেফারেন্স (কমা দিয়ে আলাদা করুন)</Label>
+              <Input id="referenceText" {...register("referenceText")} />
             </div>
           </CardContent>
         </Card>
 
-        {/* Footer Buttons */}
-        <div className="flex items-center justify-end gap-4 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSubmitting}
-            onClick={() => router.push("/form-filling")}
-            className="rounded-xl border-outline-variant px-6 py-2.5 font-bold cursor-pointer"
-          >
-            Cancel
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button asChild type="button" variant="outline" className="rounded-lg">
+            <Link href={listHref}>বাতিল করুন</Link>
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-xl bg-primary text-white hover:bg-primary/90 px-8 py-2.5 font-bold cursor-pointer"
-          >
-            {isSubmitting ? "Saving..." : "Update Form Filling"}
+          <Button type="submit" disabled={isSubmitting} className="gap-2 rounded-lg font-semibold">
+            <Save className="size-4" />
+            <span>{isSubmitting ? "আপডেট হচ্ছে..." : "আপডেট করুন"}</span>
           </Button>
         </div>
       </form>

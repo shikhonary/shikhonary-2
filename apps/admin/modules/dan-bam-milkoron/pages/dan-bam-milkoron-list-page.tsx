@@ -1,7 +1,12 @@
 "use client"
 
+import { Suspense } from "react"
 import { DanBamMilkoronListView } from "../components/dan-bam-milkoron-list-view"
 
 export function DanBamMilkoronListPage() {
-  return <DanBamMilkoronListView />
+  return (
+    <Suspense>
+      <DanBamMilkoronListView />
+    </Suspense>
+  )
 }

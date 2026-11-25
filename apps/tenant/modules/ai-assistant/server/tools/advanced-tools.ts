@@ -80,7 +80,6 @@ export function getAdvancedTools(ctx: AssistantToolContext): ToolSet {
             "SA",
             "PBQ",
             "PARAGRAPH",
-            "AMPLIFICATION",
             "THOUGHT_EXPANSION",
             "LETTER",
             "APPLICATION",

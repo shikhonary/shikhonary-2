@@ -1,5 +1,4 @@
-"use client"
-
+import { Suspense } from "react"
 import { EditGenderChangeView } from "../components/edit-gender-change-view"
 
 interface EditGenderChangePageProps {
@@ -8,8 +7,8 @@ interface EditGenderChangePageProps {
 
 export function EditGenderChangePage({ id }: EditGenderChangePageProps) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">লোড হচ্ছে...</div>}>
       <EditGenderChangeView id={id} />
-    </div>
+    </Suspense>
   )
 }

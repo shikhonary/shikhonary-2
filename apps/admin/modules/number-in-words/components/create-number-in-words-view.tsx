@@ -1,23 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { ArrowLeft, Save, FileText, AlertCircle } from "lucide-react"
 import { toast } from "@workspace/ui/components/sonner"
-import {
-  useCreateNumberInWords,
-  useAcademicClassesForSelection,
-  useSubjectsForSelection,
-  useChaptersForSelection,
-} from "../services/use-number-in-words"
-import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Textarea } from "@workspace/ui/components/textarea"
 import { Label } from "@workspace/ui/components/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import {
   Select,
   SelectContent,
@@ -25,38 +21,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { ChevronRightIcon } from "lucide-react"
-import { QUESTION_DIFFICULTY } from "@workspace/utils"
-import { NUMBER_IN_WORDS_SOURCE_OPTIONS, DEFAULT_SOURCE } from "../constants"
+import { PageHeader } from "@/components/shared/page-header"
+import {
+  NUMBER_IN_WORDS_SOURCE_OPTIONS,
+  DEFAULT_SOURCE,
+  type NumberInWordsSource,
+} from "../constants"
+import {
+  useCreateNumberInWords,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+  useChaptersForSelection,
+} from "../services/use-number-in-words"
 
-const createNumberInWordsFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  chapterId: z.string().min(1, "Please select a chapter"),
-  number: z.string().min(1, "Number is required"),
-  inWords: z.string().min(1, "Number in words is required"),
-  difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
+const createNumberInWordsSchema = z.object({
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  chapterId: z.string().min(1, "অধ্যায় নির্বাচন করুন"),
+  number: z.string().min(1, "সংখ্যা লিখুন"),
+  inWords: z.string().min(1, "কথায় লেখা আবশ্যক"),
+  difficulty: z.enum([
+    QUESTION_DIFFICULTY.EASY,
+    QUESTION_DIFFICULTY.MEDIUM,
+    QUESTION_DIFFICULTY.HARD,
+  ]),
   referenceText: z.string().optional(),
   source: z.string().optional(),
   session: z.string().optional(),
 })
 
-type CreateNumberInWordsFormData = z.infer<typeof createNumberInWordsFormSchema>
+type CreateNumberInWordsFormData = z.infer<typeof createNumberInWordsSchema>
+
+const difficultyLabels: Record<string, string> = {
+  EASY: "সহজ (Easy)",
+  MEDIUM: "মাঝারি (Medium)",
+  HARD: "কঠিন (Hard)",
+}
 
 export function CreateNumberInWordsView() {
   const router = useRouter()
-  const createMutation = useCreateNumberInWords()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const createMutation = useCreateNumberInWords()
 
   const {
     register,
     handleSubmit,
-    control,
     watch,
     setValue,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<CreateNumberInWordsFormData>({
-    resolver: zodResolver(createNumberInWordsFormSchema),
+    resolver: zodResolver(createNumberInWordsSchema),
     defaultValues: {
       classId: "",
       subjectId: "",
@@ -72,14 +86,21 @@ export function CreateNumberInWordsView() {
 
   const selectedClassId = watch("classId")
   const selectedSubjectId = watch("subjectId")
+  const selectedChapterId = watch("chapterId")
+  const selectedDifficulty = watch("difficulty")
+  const selectedSource = watch("source")
 
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
-  const { data: subjects = [] } = useSubjectsForSelection(
+  const { data: classesData } = useAcademicClassesForSelection()
+  const { data: subjectsData } = useSubjectsForSelection(
     selectedClassId ? { academicClassId: selectedClassId } : undefined
   )
-  const { data: chapters = [] } = useChaptersForSelection(
+  const { data: chaptersData } = useChaptersForSelection(
     selectedSubjectId ? { subjectId: selectedSubjectId } : undefined
   )
+
+  const classes = Array.isArray(classesData) ? classesData : []
+  const subjects = Array.isArray(subjectsData) ? subjectsData : []
+  const chapters = Array.isArray(chaptersData) ? chaptersData : []
 
   const isSubmitting = createMutation.isPending || isFormSubmitting
 
@@ -102,279 +123,222 @@ export function CreateNumberInWordsView() {
         inWords: data.inWords.trim(),
         difficulty: data.difficulty,
         reference: referenceArray,
-        source: data.source?.trim() || null,
+        source: (data.source?.trim() as NumberInWordsSource) || null,
         session: data.session?.trim() || null,
       })
 
-      toast.success("Number in words entry created successfully.")
-      setTimeout(() => {
-        router.push("/number-in-words")
-      }, 1000)
+      toast.success("কথায় লেখা প্রশ্ন সফলভাবে যোগ করা হয়েছে।")
+      router.push("/number-in-words")
     } catch (err: any) {
-      const msg = err.message || "Failed to create number in words entry"
+      const msg = err?.message || "কথায় লেখা প্রশ্ন তৈরি করতে সমস্যা হয়েছে।"
       setErrorMessage(msg)
       toast.error(msg)
     }
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end justify-between">
-        <div className="max-w-2xl">
-          <nav className="mb-4 flex items-center space-x-2 text-on-surface-variant">
-            <Link
-              href="/number-in-words"
-              className="font-label-sm hover:text-primary transition-colors cursor-pointer text-xs"
-            >
-              Number in Words
-            </Link>
-            <ChevronRightIcon className="size-3 text-on-surface-variant/70" />
-            <span className="font-label-sm font-bold text-primary text-xs">Create Entry</span>
-          </nav>
-          <h2 className="mb-2 font-headline-md text-3xl font-extrabold text-primary">
-            Create Number in Words Entry
-          </h2>
-          <p className="font-body-md text-on-surface-variant leading-relaxed text-sm">
-            Add a new number and its textual representation in words (কথায় প্রকাশ) to the chapter-based question bank.
-          </p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="নতুন কথায় লেখা প্রশ্ন যোগ করুন"
+        description="প্রশ্ন ব্যাংকের জন্য নতুন সংখ্যা থেকে কথায় লেখা প্রশ্ন তৈরি করুন।"
+        icon={FileText}
+        breadcrumbs={[
+          { label: "কথায় লেখা", href: "/number-in-words" },
+          { label: "নতুন যোগ করুন" },
+        ]}
+      >
+        <Button asChild variant="outline" size="sm" className="h-9 gap-2 rounded-lg">
+          <Link href="/number-in-words">
+            <ArrowLeft className="size-4" />
+            <span>ফিরে যান</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {errorMessage && (
-        <div className="mb-6 rounded-lg bg-error/10 border border-error/20 p-4 text-xs font-semibold text-error">
-          {errorMessage}
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
+          <AlertCircle className="size-5 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Academic Context */}
-        <Card className="border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs rounded-xl">
-          <CardHeader className="p-0 pb-6">
-            <CardTitle className="text-base font-bold text-on-surface">
-              Academic Context
-            </CardTitle>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">শ্রেণি, বিষয় ও অধ্যায়</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Class */}
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Class *</Label>
-              <Controller
-                name="classId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("subjectId", "")
-                      setValue("chapterId", "")
-                    }}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select Class" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {academicClasses.map((cls) => (
-                        <SelectItem key={cls.id} value={cls.id}>
-                          {cls.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.classId && (
-                <p className="text-[11px] font-medium text-error">{errors.classId.message}</p>
-              )}
+              <Label>
+                শ্রেণি <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={selectedClassId}
+                onValueChange={(val) => {
+                  setValue("classId", val, { shouldValidate: true })
+                  setValue("subjectId", "")
+                  setValue("chapterId", "")
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="শ্রেণি নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.map((cls: any) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.classId && <p className="text-xs text-destructive">{errors.classId.message}</p>}
             </div>
 
-            {/* Subject */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Subject *</Label>
-              <Controller
-                name="subjectId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val)
-                      setValue("chapterId", "")
-                    }}
-                    disabled={!selectedClassId}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder={!selectedClassId ? "Select Class First" : "Select Subject"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {subjects.map((sub) => (
-                        <SelectItem key={sub.id} value={sub.id}>
-                          {sub.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.subjectId && (
-                <p className="text-[11px] font-medium text-error">{errors.subjectId.message}</p>
-              )}
+              <Label>
+                বিষয় <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={selectedSubjectId}
+                disabled={!selectedClassId}
+                onValueChange={(val) => {
+                  setValue("subjectId", val, { shouldValidate: true })
+                  setValue("chapterId", "")
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="বিষয় নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subjects.map((sub: any) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.subjectId && <p className="text-xs text-destructive">{errors.subjectId.message}</p>}
             </div>
 
-            {/* Chapter */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Chapter *</Label>
-              <Controller
-                name="chapterId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!selectedSubjectId}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder={!selectedSubjectId ? "Select Subject First" : "Select Chapter"} />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {chapters.map((ch) => (
-                        <SelectItem key={ch.id} value={ch.id}>
-                          {ch.nameEn}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.chapterId && (
-                <p className="text-[11px] font-medium text-error">{errors.chapterId.message}</p>
-              )}
+              <Label>
+                অধ্যায় <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                value={selectedChapterId}
+                disabled={!selectedSubjectId}
+                onValueChange={(val) => setValue("chapterId", val, { shouldValidate: true })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="অধ্যায় নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {chapters.map((ch: any) => (
+                    <SelectItem key={ch.id} value={ch.id}>
+                      {ch.nameBn || ch.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.chapterId && <p className="text-xs text-destructive">{errors.chapterId.message}</p>}
             </div>
           </CardContent>
         </Card>
 
-        {/* Number & Words Content */}
-        <Card className="border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xs rounded-xl">
-          <CardHeader className="p-0 pb-6">
-            <CardTitle className="text-base font-bold text-on-surface">
-              Number & In Words Content
-            </CardTitle>
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">সংখ্যা ও কথায় লেখা</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 space-y-6">
-            {/* Number Input */}
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">Number / সংখ্যা (অংকে) *</Label>
-              <Input
-                {...register("number")}
-                placeholder="Enter number (e.g. 25, 100, ২৫, ১০০)..."
-                className="bg-white font-mono text-base font-semibold"
-              />
-              {errors.number && (
-                <p className="text-[11px] font-medium text-error">{errors.number.message}</p>
-              )}
+              <Label htmlFor="number">
+                সংখ্যা <span className="text-destructive">*</span>
+              </Label>
+              <Input id="number" placeholder="যেমন: ১২৫ বা 125" {...register("number")} />
+              {errors.number && <p className="text-xs text-destructive">{errors.number.message}</p>}
             </div>
 
-            {/* In Words Input */}
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-on-surface">In Words / কথায় *</Label>
+              <Label htmlFor="inWords">
+                কথায় লেখা <span className="text-destructive">*</span>
+              </Label>
               <Textarea
+                id="inWords"
+                rows={2}
+                placeholder="যেমন: একশত পঁচিশ বা One hundred twenty-five"
                 {...register("inWords")}
-                placeholder="Enter number in words (e.g. Twenty five, একশত পঁচিশ)..."
-                rows={3}
-                className="bg-white font-solaiman text-sm"
               />
-              {errors.inWords && (
-                <p className="text-[11px] font-medium text-error">{errors.inWords.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Difficulty */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Difficulty</Label>
-                <Controller
-                  name="difficulty"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="EASY">EASY</SelectItem>
-                        <SelectItem value="MEDIUM">MEDIUM</SelectItem>
-                        <SelectItem value="HARD">HARD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              {/* Reference */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Board Reference (Comma-separated)</Label>
-                <Input
-                  {...register("referenceText")}
-                  placeholder="e.g. ঢাকা বোর্ড ২০২৪, সমাপনী পরীক্ষা"
-                  className="bg-white"
-                />
-              </div>
-
-              {/* Source */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Source (উৎস)</Label>
-                <Controller
-                  name="source"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value || DEFAULT_SOURCE} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Select Source" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md">
-                        {NUMBER_IN_WORDS_SOURCE_OPTIONS.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value} className="text-neutral-900 text-xs">
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              {/* Session */}
-              <div className="space-y-2">
-                <Label className="text-xs font-bold text-on-surface">Session / Year (Optional)</Label>
-                <Input
-                  {...register("session")}
-                  placeholder="e.g. 2026, 2025-26..."
-                  className="bg-white"
-                />
-              </div>
+              {errors.inWords && <p className="text-xs text-destructive">{errors.inWords.message}</p>}
             </div>
           </CardContent>
         </Card>
 
-        {/* Submit Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4">
-          <Link href="/number-in-words">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isSubmitting}
-              className="rounded-lg border-outline-variant px-6 py-2.5 text-xs font-bold"
-            >
-              Cancel
-            </Button>
-          </Link>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-lg bg-primary px-6 py-2.5 text-xs font-bold text-white hover:bg-primary/90"
-          >
-            {isSubmitting ? "Creating..." : "Save Number in Words"}
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">মেটাডেটা ও রেফারেন্স</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label>কঠিন্য</Label>
+              <Select
+                value={selectedDifficulty}
+                onValueChange={(val) => setValue("difficulty", val as any)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="কঠিন্য নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {difficultyLabels[opt.value] || opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>উৎস (Source)</Label>
+              <Select
+                value={selectedSource || ""}
+                onValueChange={(val) => setValue("source", val)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="উৎস নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NUMBER_IN_WORDS_SOURCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="session">সাল / সেশন</Label>
+              <Input id="session" placeholder="যেমন: 2025" {...register("session")} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="referenceText">রেফারেন্স (কমা দিয়ে আলাদা করুন)</Label>
+              <Input
+                id="referenceText"
+                placeholder="যেমন: ঢাকা বোর্ড ২০২৪"
+                {...register("referenceText")}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button asChild type="button" variant="outline" className="rounded-lg">
+            <Link href="/number-in-words">বাতিল করুন</Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="gap-2 rounded-lg font-semibold">
+            <Save className="size-4" />
+            <span>{isSubmitting ? "সংরক্ষণ হচ্ছে..." : "সংরক্ষণ করুন"}</span>
           </Button>
         </div>
       </form>

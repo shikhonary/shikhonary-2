@@ -1,5 +1,4 @@
-"use client"
-
+import { Suspense } from "react"
 import { EditNumberInWordsView } from "../components/edit-number-in-words-view"
 
 interface EditNumberInWordsPageProps {
@@ -8,8 +7,8 @@ interface EditNumberInWordsPageProps {
 
 export function EditNumberInWordsPage({ id }: EditNumberInWordsPageProps) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">লোড হচ্ছে...</div>}>
       <EditNumberInWordsView id={id} />
-    </div>
+    </Suspense>
   )
 }

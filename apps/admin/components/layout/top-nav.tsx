@@ -74,7 +74,6 @@ const navGroups = [
       { href: "/pbqs", label: "PBQs", icon: HelpCircle },
       { href: "/cs", label: "CS", icon: HelpCircle },
       { href: "/paragraphs", label: "Paragraphs", icon: HelpCircle },
-      { href: "/amplifications", label: "Amplification", icon: HelpCircle },
       { href: "/letters", label: "Letters", icon: HelpCircle },
       { href: "/applications", label: "Applications", icon: HelpCircle },
       { href: "/summaries", label: "Summaries", icon: HelpCircle },

@@ -1,10 +1,13 @@
 {
-  "chapterTitle": "মানববসতি",
+  "chapterTitle": "মালিকানার ভিত্তিতে ব্যবসায়",
   "questions": [
     {
-      "question": "বসতি স্থাপনের নিয়ামকসমূহ ব্যাখ্যা করো।",
+      "question": "একমালিকানা ব্যবসায় জনপ্রিয়তার কারণ কী? অথবা, একমালিকানা ব্যবসায় সবচেয়ে জনপ্রিয় কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "যশোর বোর্ড ২০২৬",
+        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -12,9 +15,13 @@
       "attachmentDescription": null
     },
     {
-      "question": "দিনাজপুরের তুলনায় পার্বত্য চট্টগ্রামে বসতির ঘনত্ব কম হওয়ার কারণ ব্যাখ্যা করো।",
+      "question": "কোন ব্যবসায়কে প্রাচীনতম ব্যবসায় সংগঠন বলা হয় ও কেন? অথবা, পৃথিবীর প্রাচীনতম ব্যবসায় সংগঠন কোনটি? ব্যাখ্যা করো। অথবা, একমালিকানা ব্যবসায়কে প্রাচীনতম ব্যবসায় সংগঠন বলা হয় কেন?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "বরিশাল বোর্ড ২০২৬",
+        "চট্টগ্রাম বোর্ড ২০২৬",
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -22,9 +29,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "নদীর তীরে কোন ধরনের বসতি গড়ে ওঠে- ব্যাখ্যা করো।",
+      "question": "একমালিকানা ব্যবসায়কে প্রাচীনতম ও জনপ্রিয় ব্যবসায় বলা হয় কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -32,9 +41,13 @@
       "attachmentDescription": null
     },
     {
-      "question": "সংখ্যাগরিষ্ঠ অধিবাসী প্রথম পর্যায়ের অর্থনৈতিক কর্মকাণ্ডে জড়িত এমন বসতির একটি বৈশিষ্ট্য বর্ণনা করো।",
+      "question": "একমালিকানা ব্যবসায়ে 'মালিকের দায় অসীম' কথাটি ব্যাখ্যা করো। অথবা, একমালিকানা ব্যবসায়ের দায় অসীম কেন? অথবা, একমালিকানা ব্যবসায়ের দায়ের ধরন ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬",
+        "বরিশাল জিলা স্কুল",
+        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -42,9 +55,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "কৃষি জমির নিকট জনবসতি গড়ে ওঠে কেন? ব্যাখ্যা করো।",
+      "question": "কোন ব্যবসায়ের গঠন সহজ এবং কেন? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -52,9 +67,147 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোন নিয়ামকের প্রভাবে প্রাচীনকাল থেকে নদী তীরবর্তী অঞ্চলে বিভিন্ন সভ্যতা গড়ে উঠেছে?",
+      "question": "কোন ধরনের ব্যবসায়ে গোপনীয়তা রক্ষা পায় বেশি? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের সামগ্রিক অবস্থা বিবেচনায় কোন ব্যবসায় সংগঠন বেশি উপযোগী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "স্বর্ণকারের দোকান কোন ধরনের মালিকানায় হওয়া উচিত? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সবজি দোকানিকে একাই ঝুঁকি বহন করতে হয় কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ময়মনসিংহ বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "একমালিকানা ব্যবসায়ের সীমাবদ্ধতা দূর করার জন্য কোন ব্যবসায়ের উদ্ভব হয়েছে? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অংশীদারদের অসীম দায়ের ধারণা দাও।",
+      "answer": null,
+      "reference": [
+        "বরিশাল জিলা স্কুল; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'চুক্তিই অংশীদারি ব্যবসায়ের মূলভিত্তি'— ব্যাখ্যা করো। অথবা, চুক্তিই অংশীদারি ব্যবসায়ের মূলভিত্তি কেন?",
+      "answer": null,
+      "reference": [
+        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৫",
+        "চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অংশীদারি ব্যবসায়ের চুক্তি কীরূপ হওয়া উত্তম? ব্যাখ্যা করো। অথবা, অংশীদারি ব্যবসায়ের চুক্তি লিখিত হওয়া উত্তম কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ময়মনসিংহ বোর্ড ২০২৬",
+        "বীরশ্রেষ্ঠ মুন্সী আব্দুর রউফ পাবলিক কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "“অংশীদারি সম্পর্ক সৃষ্টি হয় চুক্তি থেকে, মর্যাদা থেকে নয়”— যুক্তি দাও।",
+      "answer": null,
+      "reference": [
+        "যশোর জিলা স্কুল",
+        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "চুক্তিপত্রের বিষয়বস্তু লেখো।",
+      "answer": null,
+      "reference": [
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অংশীদারি ব্যবসায় নিবন্ধিত হওয়া উত্তম কেন? ব্যাখ্যা করো। অথবা, অনিবন্ধিত অংশীদারি ব্যবসায়ের চেয়ে নিবন্ধিত অংশীদারি ব্যবসায় উত্তম কেন?",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬",
+        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ঘুমন্ত অংশীদার কাদেরকে বলা হয়?",
+      "answer": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
       "difficulty": "EASY",
       "isMath": false,
       "hasAttachment": false,
@@ -62,9 +215,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "গ্রামীণ পরিবেশে বসতি গড়ে ওঠার নিয়ামকগুলো ব্যাখ্যা করো।",
+      "question": "ঘুমন্ত অংশীদারের বৈশিষ্ট্যগুলো বর্ণনা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "সিলেট বোর্ড ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -72,9 +227,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "বাংলাদেশের অর্থনীতি প্রধানত কৃষির উপর নির্ভরশীল। এদেশের অর্থনীতিতে গ্রামীণ অঞ্চলের ভূমিকা ব্যাখ্যা করো।",
+      "question": "নামমাত্র অংশীদার বলতে কী বোঝায়? অথবা, নামমাত্র অংশীদার কে? বর্ণনা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "বরিশাল বোর্ড ২০২৬",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -82,9 +240,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "উন্নত জীবনযাপনের লক্ষ্যে মানুষ শহর অঞ্চলে বসতি স্থাপন করে কেন ব্যাখ্যা করো।",
+      "question": "আচরণে অনুমিত অংশীদার বলতে কী বোঝায়? অথবা, আচরণে অনুমিত অংশীদারের ধারণা ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "সিলেট বোর্ড ২০২৬",
+        "চট্টগ্রাম বোর্ড ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -92,9 +253,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "সংঘবদ্ধ বসতি বলতে কী বোঝ?",
+      "question": "কীভাবে অংশীদারি ব্যবসায়ের বিলোপসাধন হয়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট",
+        "বরিশাল জিলা স্কুল; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -102,9 +266,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "গ্রামীণ বসতির ধরন ও বিন্যাস ব্যাখ্যা করো।",
+      "question": "বাধ্যতামূলক বিলোপসাধন কী? ব্যাখ্যা করো।",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "যশোর বোর্ড ২০২৬"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -112,9 +278,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "গোষ্ঠীবদ্ধ বসতি কীভাবে নগরে রূপান্তরিত হয়?",
+      "question": "কোন কোন কারণে বিশেষ ঘটনাসাপেক্ষে অংশীদারি ব্যবসায়ের বিলোপসাধন হয়?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -122,9 +290,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "বাংলাদেশের বন্যাপ্রবণ অঞ্চলে কোন ধরনের বসতি গড়ে উঠে? ব্যাখ্যা করো।",
+      "question": "কোনো অংশীদারের মস্তিষ্ক বিকৃত হলে ব্যবসায়ের কোন ধরনের বিলোপসাধন হবে?",
       "answer": null,
-      "reference": [],
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
+      ],
       "difficulty": "MEDIUM",
       "isMath": false,
       "hasAttachment": false,
@@ -132,49 +302,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "গ্রাম্য বসতিতে পথঘাট কম থাকে কেন?",
+      "question": "যৌথমূলধনি কোম্পানি বলতে কী বোঝ?",
       "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বিক্ষিপ্ত বসতি বন্ধুর ভূপ্রাকৃতিক অঞ্চলে গড়ে উঠে কেন?",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "নগরায়ণ কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বাংলাদেশের কক্সবাজার কোন ধরনের নগর? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ফ্রান্সের প্যারিসে চিত্রকলা কোন ধরনের নগর স্থাপনে সহায়তা করেছে?",
-      "answer": null,
-      "reference": [],
+      "reference": [
+        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, চট্টগ্রাম",
+        "পুলিশ লাইন্স স্কুল এন্ড কলেজ, রংপুর; নি. প. ২৫"
+      ],
       "difficulty": "EASY",
       "isMath": false,
       "hasAttachment": false,
@@ -182,7 +315,121 @@
       "attachmentDescription": null
     },
     {
-      "question": "শহরের লোকজন নিজ নিজ পরিমণ্ডলের লোকদের সঙ্গে প্রত্যক্ষ সম্পর্ক বজায় রাখতে পারে না কেন?",
+      "question": "কোম্পানি ব্যবসায়কে স্বেচ্ছামূলক প্রতিষ্ঠান বলা হয় কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "যৌথমূলধনি কোম্পানিকে কৃত্রিম ব্যক্তিসত্তার অধিকারী বলা হয় কেন?",
+      "answer": null,
+      "reference": [
+        "ময়মনসিংহ বোর্ড",
+        "রাজশাহী বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "চিরন্তন অস্তিত্ব কথাটি বুঝিয়ে লেখো।",
+      "answer": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কোম্পানির কৃত্রিম ব্যক্তিসত্তা বলতে কী বোঝায়? ব্যাখ্যা করো। অথবা, কৃত্রিম ব্যক্তিসত্তা সম্পর্কে ধারণা দাও।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬",
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
+        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা",
+        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কোম্পানি নিজ নামে চুক্তি ও লেনদেন করতে পারে কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "শেয়ার কী?",
+      "answer": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "প্রাইভেট লিমিটেড কোম্পানি কাকে বলে?",
+      "answer": null,
+      "reference": [
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কীভাবে প্রাইভেট লিমিটেড কোম্পানি থেকে পাবলিক লিমিটেড কোম্পানি ভিন্ন? ব্যাখ্যা দাও। অথবা, “প্রাইভেট লিমিটেড কোম্পানি ও পাবলিক লিমিটেড কোম্পানি এক নয়”— ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬",
+        "রাজশাহী বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "প্রাইভেট ও পাবলিক লিমিটেড কোম্পানির মধ্যে দুটি পার্থক্য লেখো।",
+      "answer": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
+        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মূলধন গঠনে যৌথমূলধনি ব্যবসায়ের ভূমিকা উল্লেখ করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -192,7 +439,56 @@
       "attachmentDescription": null
     },
     {
-      "question": "মানুষের ধর্মীয় বিশ্বাস নগরায়ণকে প্রভাবিত করে। এর ফলে কোন বসতির বিস্তার দেখা যায় তা ব্যাখ্যা করো।",
+      "question": "কোম্পানির নিবন্ধনপত্র সংগ্রহের উপায় কী?",
+      "answer": null,
+      "reference": [
+        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "স্মারকলিপি কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "স্মারকলিপিকে কোম্পানির মূল দলিল বলা হয় কেন? অথবা, “স্মারকলিপি কোম্পানির মূল্যবান দলিল” ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "যশোর বোর্ড ২০২৬",
+        "যশোর জিলা স্কুল; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কোন ব্যবসায়ের জন্য কার্যারম্ভের অনুমতিপত্র প্রয়োজন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সমবায় সংগঠন গড়ে ওঠার কারণ কী? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -202,7 +498,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "নগরায়ণের ফলে সৃষ্ট প্রভাবসমূহ ব্যাখ্যা করো।",
+      "question": "প্রাথমিক সমবায় সমিতি বলতে কী বোঝায়? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -212,7 +508,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "নগরায়ণের প্রভাবগুলোর মধ্যে বাংলাদেশের জন্য সবচেয়ে ক্ষতিকর দিকটি ব্যাখ্যা করো।",
+      "question": "কেন প্রাথমিক সমবায় সমিতি কেন্দ্রীয় সমবায় সমিতি থেকে ভিন্ন?",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -222,7 +518,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "শহরে অপরাধ বেশি সংঘটিত হয় কেন?",
+      "question": "সমবায় গঠনের মুখ্য উদ্দেশ্য কী? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -232,7 +528,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "বড় বড় শহরগুলোতে বস্তি বেশি কেন?",
+      "question": "‘সমবায় সমিতির গঠনতন্ত্র হলো উপবিধি’— যুক্তি দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -242,7 +538,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "নগরে বায়ুবাহিত রোগের মাত্রা বেড়ে যাওয়ার কারণ কী?",
+      "question": "সমবায়ের মূলমন্ত্র কোনটি এবং কেন? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -252,7 +548,29 @@
       "attachmentDescription": null
     },
     {
-      "question": "পরিকল্পিত নগরায়ণের জন্য পয়ঃনিষ্কাশন ব্যবস্থা উন্নত হওয়া প্রয়োজন কেন?",
+      "question": "সমবায় সমিতি কীভাবে মধ্যস্বত্বভোগীদের দৌরাত্ম্য কমাতে ভূমিকা রাখে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রাষ্ট্রীয় ব্যবসায় কাকে বলে?",
+      "answer": null,
+      "reference": [
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "‘রাষ্ট্রীয় ব্যবসায়ের মূল উদ্দেশ্য জনকল্যাণ’— যুক্তি দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -262,6 +580,6 @@
       "attachmentDescription": null
     }
   ],
-  "subjectId": "cmwrmhge900000gto9rooxt4v",
+  "subjectId": "cmwrfqgr70000n0tovr0v3183",
   "className": "Nine"
 }

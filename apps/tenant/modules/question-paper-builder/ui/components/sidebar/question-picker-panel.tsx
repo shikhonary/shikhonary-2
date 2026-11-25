@@ -177,8 +177,6 @@ export const QuestionPickerPanel: React.FC = () => {
         await assignQuestion({ ...payloadBase, poemIds: [questionId] });
       } else if (category === "SUMMARY") {
         await assignQuestion({ ...payloadBase, summaryIds: [questionId] });
-      } else if (category === "AMPLIFICATION") {
-        await assignQuestion({ ...payloadBase, amplificationIds: [questionId] });
       } else if (category === "THOUGHT_EXPANSION") {
         await assignQuestion({ ...payloadBase, thoughtExpansionIds: [questionId] });
       } else if (category === "LETTER") {
@@ -692,7 +690,7 @@ export const QuestionPickerPanel: React.FC = () => {
                           </span>
                         )}
                       </div>
-                    ) : category === "SUMMARY" || category === "AMPLIFICATION" || category === "THOUGHT_EXPANSION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" || category === "SHORT_COMPOSITION" ? (
+                    ) : category === "SUMMARY" || category === "THOUGHT_EXPANSION" || category === "LETTER" || category === "APPLICATION" || category === "NEWS_REPORT" || category === "ESSAY" || category === "SHORT_COMPOSITION" ? (
                       <div className="flex flex-col gap-1">
                         <RenderMath text={q.title || q.name || ""} />
                         {q.wordLimit ? (

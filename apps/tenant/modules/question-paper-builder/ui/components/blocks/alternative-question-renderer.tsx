@@ -178,7 +178,7 @@ export const AlternativeQuestionRenderer: React.FC<AlternativeQuestionRendererPr
         const proseEssence = alt.proseEssence;
         const poem = alt.poem;
         const summary = alt.summary;
-        const amplification = alt.thoughtExpansion || alt.amplification;
+        const amplification = alt.thoughtExpansion;
         const letter = alt.letter;
         const application = alt.application;
         const newsReport = alt.newsReport;

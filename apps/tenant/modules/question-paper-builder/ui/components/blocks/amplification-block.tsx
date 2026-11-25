@@ -121,7 +121,7 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
     params.set("mode", "exchange");
     params.set("questionPaperQuestionId", item.id);
     if (data.id) params.set("currentQuestionId", data.id);
-    params.set("category", "AMPLIFICATION");
+    params.set("category", "THOUGHT_EXPANSION");
     const mNum = item.masterNumber || (item.orderIndex !== undefined ? item.orderIndex + 1 : 1);
     if (mNum) params.set("masterNumber", String(mNum));
     if (item.sectionId) params.set("sectionId", item.sectionId);
@@ -215,7 +215,7 @@ export const AmplificationBlock = ({ item }: { item: any }) => {
     ? (rawLabel.trim().endsWith(":") || rawLabel.trim().endsWith("।") ? rawLabel.trim() : `${rawLabel.trim()}:`)
     : "ভাব-সম্প্রসারণ করো:";
 
-  const resolvedQuestionType = item.type || "AMPLIFICATION";
+  const resolvedQuestionType = item.type || "THOUGHT_EXPANSION";
 
   const handleRemove = () => {
     if (!paperId) return;

@@ -1,19 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@workspace/ui/components/button"
+import { useSearchParams } from "next/navigation"
+import { Trash2, FileText, AlertCircle } from "lucide-react"
 import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Checkbox } from "@workspace/ui/components/checkbox"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Edit3, Trash2 } from "lucide-react"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
 
 export interface FormFillingItem {
   id: string
@@ -26,36 +26,38 @@ export interface FormFillingItem {
   signatures?: string[]
   formData: any
   solution?: any | null
-  difficulty: string
   reference: string[]
-  popularityCount: number
   source?: string | null
   session?: string | null
-  isActive: boolean
-  createdAt: Date | string
-  updatedAt: Date | string
+  difficulty: string
+  popularityCount: number
+  subjectId: string
+  chapterId?: string | null
+  academicChapterId?: string | null
   subject?: {
     id: string
+    nameBn: string
     nameEn: string
-    nameBn?: string
-  } | null
+  }
   academicChapter?: {
     id: string
+    nameBn: string
     nameEn: string
-    nameBn?: string
   } | null
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
-interface ParsedFormField {
-  sl?: string
+interface ParsedField {
+  sl: string
   label: string
-  solutionValue?: string
+  solutionValue: string
 }
 
-function parseFormFields(formData: any, solutionData?: any): ParsedFormField[] {
-  if (!formData) return []
+function parseFormFields(formData: any, solution: any): ParsedField[] {
+  let formObj: any = formData
+  let solObj: any = solution
 
-  let formObj = formData
   if (typeof formData === "string") {
     try {
       formObj = JSON.parse(formData)
@@ -64,10 +66,9 @@ function parseFormFields(formData: any, solutionData?: any): ParsedFormField[] {
     }
   }
 
-  let solObj = solutionData
-  if (typeof solutionData === "string") {
+  if (typeof solution === "string") {
     try {
-      solObj = JSON.parse(solutionData)
+      solObj = JSON.parse(solution)
     } catch {
       solObj = null
     }
@@ -82,13 +83,19 @@ function parseFormFields(formData: any, solutionData?: any): ParsedFormField[] {
         return {
           sl: defaultSl,
           label: item,
-          solutionValue: Array.isArray(solObj) ? String(solObj[idx] ?? "") : (solObj && typeof solObj === "object" ? String(solObj[item] ?? "") : "")
+          solutionValue: Array.isArray(solObj)
+            ? String(solObj[idx] ?? "")
+            : solObj && typeof solObj === "object"
+              ? String(solObj[item] ?? "")
+              : "",
         }
       }
       return {
         sl: item.sl || defaultSl,
         label: item.label || item.name || item.key || `Field ${idx + 1}`,
-        solutionValue: item.value || (solObj && typeof solObj === "object" ? String(solObj[item.key || item.label] ?? "") : "")
+        solutionValue:
+          item.value ||
+          (solObj && typeof solObj === "object" ? String(solObj[item.key || item.label] ?? "") : ""),
       }
     })
   }
@@ -128,6 +135,7 @@ function FormFillingCardItem({
   isSelected,
   onSelectOne,
   onDelete,
+  editHref,
   renderJsonPretty,
 }: {
   item: FormFillingItem
@@ -135,6 +143,7 @@ function FormFillingCardItem({
   isSelected: boolean
   onSelectOne: (id: string, checked: boolean) => void
   onDelete: (id: string, snippet: string) => void
+  editHref: string
   renderJsonPretty: (val: any) => string | null
 }) {
   const [viewMode, setViewMode] = useState<"exam" | "solution" | "raw">("exam")
@@ -145,263 +154,214 @@ function FormFillingCardItem({
   return (
     <div
       className={cn(
-        "bg-white border rounded-2xl p-5 sm:p-7 transition-all hover:border-primary/50 hover:shadow-md relative group",
-        isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
+        "bg-card border rounded-2xl p-5 sm:p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
+        isSelected ? "border-primary ring-2 ring-primary/15 bg-primary/5" : "border-border"
       )}
     >
-      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-        {/* Selection Checkbox & Main Content */}
+      <div className="flex flex-col md:flex-row justify-between items-start gap-5">
         <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={(e) => onSelectOne(item.id, e.target.checked)}
-            className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
+            className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
           />
 
-          <div className="flex-1 space-y-5 min-w-0">
-            {/* Header Controls & Badges Row */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pl-7 md:pl-0 border-b border-outline-variant/30 pb-3">
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Global Index Badge */}
-                <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                  #{globalIndex}
-                </span>
-
-                {/* Subject Badge */}
-                {item.subject && (
-                  <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                    {item.subject.nameBn || item.subject.nameEn}
-                  </span>
-                )}
-
-                {/* Chapter Badge */}
-                {item.academicChapter && (
-                  <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                    {item.academicChapter.nameBn || item.academicChapter.nameEn}
-                  </span>
-                )}
-
-                {/* Popularity Badge */}
-                <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded font-label-sm text-[11px] font-bold border border-blue-100 uppercase">
+          <div className="flex-1 space-y-4 min-w-0">
+            {/* Header Row */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pl-7 md:pl-0">
+              <QuestionCardHeader
+                globalIndex={globalIndex}
+                subjectName={item.subject?.nameBn || item.subject?.nameEn}
+                chapterName={item.academicChapter?.nameBn || item.academicChapter?.nameEn}
+              >
+                <span className="px-2 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 rounded-lg text-[11px] font-bold border border-blue-200/60 dark:border-blue-800/40">
                   👁️ {item.popularityCount} Views
                 </span>
-
-                {/* Difficulty Badge */}
-                <span className={cn(
-                  "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                  item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                  item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                  item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                )}>
+                <span
+                  className={cn(
+                    "px-2 py-0.5 rounded-lg text-[11px] font-bold border uppercase",
+                    item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                    item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
+                    item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
+                  )}
+                >
                   {item.difficulty}
                 </span>
-              </div>
+              </QuestionCardHeader>
 
               {/* View Mode Switcher Pills */}
-              <div className="inline-flex items-center rounded-lg border border-outline-variant/40 bg-surface-container-low p-0.5 text-xs font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("exam")}
-                  className={cn(
-                    "rounded-md px-2.5 py-1 transition-all cursor-pointer font-label-sm text-xs",
-                    viewMode === "exam" ? "bg-white text-primary shadow-xs font-bold" : "text-on-surface-variant hover:text-on-surface"
-                  )}
-                >
-                  📄 প্রশ্নপত্র (Exam)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("solution")}
-                  className={cn(
-                    "rounded-md px-2.5 py-1 transition-all cursor-pointer font-label-sm text-xs",
-                    viewMode === "solution" ? "bg-white text-primary shadow-xs font-bold" : "text-on-surface-variant hover:text-on-surface"
-                  )}
-                >
-                  ✨ সমাধান (Solution)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("raw")}
-                  className={cn(
-                    "rounded-md px-2.5 py-1 transition-all cursor-pointer font-label-sm text-xs",
-                    viewMode === "raw" ? "bg-white text-primary shadow-xs font-bold" : "text-on-surface-variant hover:text-on-surface"
-                  )}
-                >
-                  ⚙️ JSON
-                </button>
+            <div className="inline-flex items-center rounded-lg border border-border bg-muted/40 p-0.5 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setViewMode("exam")}
+                className={cn(
+                  "rounded-md px-2.5 py-1 transition-all cursor-pointer text-xs",
+                  viewMode === "exam"
+                    ? "bg-background text-primary shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                📄 প্রশ্নপত্র (Exam)
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("solution")}
+                className={cn(
+                  "rounded-md px-2.5 py-1 transition-all cursor-pointer text-xs",
+                  viewMode === "solution"
+                    ? "bg-background text-primary shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                ✨ সমাধান (Solution)
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("raw")}
+                className={cn(
+                  "rounded-md px-2.5 py-1 transition-all cursor-pointer text-xs",
+                  viewMode === "raw"
+                    ? "bg-background text-primary shadow-xs font-bold"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                ⚙️ JSON
+              </button>
+            </div>
+          </div>
+
+          {/* 1. SCENARIO / উদ্দীপক */}
+          <div className="pl-0 md:pl-7">
+            <div className="font-solaiman text-base sm:text-lg font-bold text-foreground leading-relaxed flex items-start gap-2">
+              <span className="shrink-0">{bengaliIndex}।</span>
+              <div className="flex-1">
+                <RenderMath text={item.scenario} isMath={true} />
               </div>
             </div>
+          </div>
 
-            {/* 1. SCENARIO / উদ্দীপক (Top question text) */}
-            <div className="pl-7 md:pl-0">
-              <div className="font-solaiman text-base sm:text-lg font-bold text-neutral-900 leading-relaxed flex items-start gap-2">
-                <span className="shrink-0">{bengaliIndex}।</span>
-                <div className="flex-1">
-                  <RenderMath text={item.scenario} isMath={true} />
-                </div>
-              </div>
-            </div>
+          {/* 2. AUTHENTIC FORM BOX */}
+          {viewMode !== "raw" ? (
+            <div className="pl-0 md:pl-7">
+              <div className="border-2 border-neutral-900 rounded-sm bg-white p-5 sm:p-8 shadow-xs space-y-6 text-neutral-900 font-solaiman relative">
+                {item.hasPhoto && (
+                  <div className="absolute right-4 sm:right-6 top-4 sm:top-6 w-16 h-20 sm:w-20 sm:h-24 border-2 border-neutral-900 rounded-xs flex items-center justify-center bg-white text-neutral-900 font-bold text-sm sm:text-base select-none z-10">
+                    ছবি
+                  </div>
+                )}
 
-            {/* 2. AUTHENTIC FORM BOX (Matching Attachment) */}
-            {viewMode !== "raw" ? (
-              <div className="pl-7 md:pl-0">
-                <div className="border-2 border-neutral-900 rounded-sm bg-white p-5 sm:p-8 shadow-xs space-y-6 text-neutral-900 font-solaiman relative">
-                  {/* Photo Slot (Top Right Corner) */}
-                  {item.hasPhoto && (
-                    <div className="absolute right-4 sm:right-6 top-4 sm:top-6 w-16 h-20 sm:w-20 sm:h-24 border-2 border-neutral-900 rounded-xs flex items-center justify-center bg-white text-neutral-900 font-bold text-sm sm:text-base select-none z-10">
-                      ছবি
-                    </div>
-                  )}
-
-                  {/* Header Title & Institution */}
-                  <div className={cn(
+                <div
+                  className={cn(
                     "text-center space-y-1 pb-2",
                     item.hasPhoto ? "pr-20 sm:pr-28 pl-4" : "px-4"
-                  )}>
-                    {item.institution && (
-                      <h3 className="text-base sm:text-xl font-bold tracking-tight text-neutral-900 leading-snug">
-                        {item.institution}
-                      </h3>
-                    )}
-                    {item.title && (
-                      <h4 className="text-sm sm:text-lg font-bold text-neutral-900">
-                        {item.title}
-                      </h4>
-                    )}
-                    {item.description && (
-                      <p className="text-xs sm:text-sm font-semibold text-neutral-700">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
+                  )}
+                >
+                  {item.institution && (
+                    <h3 className="text-base sm:text-xl font-bold tracking-tight text-neutral-900 leading-snug">
+                      {item.institution}
+                    </h3>
+                  )}
+                  {item.title && (
+                    <h4 className="text-sm sm:text-lg font-bold text-neutral-900">{item.title}</h4>
+                  )}
+                  {item.description && (
+                    <p className="text-xs sm:text-sm font-semibold text-neutral-700">{item.description}</p>
+                  )}
+                </div>
 
-                  {/* Form Fields with Dotted Lines */}
-                  <div className="space-y-3 sm:space-y-4 pt-2">
-                    {fields.length > 0 ? (
-                      fields.map((field, fIdx) => (
-                        <div key={fIdx} className="flex items-baseline text-sm sm:text-base leading-relaxed group/field">
-                          {/* Label with serial and colon */}
-                          <div className="flex items-baseline shrink-0 gap-1.5 min-w-[130px] sm:min-w-[170px]">
-                            {field.sl && <span className="font-bold">{field.sl}</span>}
-                            <span className="font-bold">{field.label}</span>
-                            <span className="font-bold ml-auto mr-2">:</span>
-                          </div>
-
-                          {/* Dotted underline fill area */}
-                          <div className="flex-1 relative min-h-[1.4rem] flex items-baseline">
-                            {viewMode === "solution" && field.solutionValue ? (
-                              <div className="w-full flex items-baseline border-b border-dotted border-neutral-700 pb-0.5">
-                                <span className="font-bold text-primary px-2 text-sm sm:text-base">
-                                  {field.solutionValue}
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="w-full border-b-2 border-dotted border-neutral-700 translate-y-[-4px]" />
-                            )}
-                          </div>
+                <div className="space-y-3 sm:space-y-4 pt-2">
+                  {fields.length > 0 ? (
+                    fields.map((field, fIdx) => (
+                      <div key={fIdx} className="flex items-baseline text-sm sm:text-base leading-relaxed group/field">
+                        <div className="flex items-baseline shrink-0 gap-1.5 min-w-[130px] sm:min-w-[170px]">
+                          {field.sl && <span className="font-bold">{field.sl}</span>}
+                          <span className="font-bold">{field.label}</span>
+                          <span className="font-bold ml-auto mr-2">:</span>
                         </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-4 text-xs font-mono text-outline">
-                        {renderJsonPretty(item.formData)}
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Declaration Note */}
-                  {item.declaration && (
-                    <div className="pt-4 text-xs sm:text-sm text-neutral-900 leading-relaxed font-semibold">
-                      {item.declaration}
+                        <div className="flex-1 relative min-h-[1.4rem] flex items-baseline">
+                          {viewMode === "solution" && field.solutionValue ? (
+                            <div className="w-full flex items-baseline border-b border-dotted border-neutral-700 pb-0.5">
+                              <span className="font-bold text-primary px-2 text-sm sm:text-base">
+                                {field.solutionValue}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="w-full border-b-2 border-dotted border-neutral-700 translate-y-[-4px]" />
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-xs font-mono text-muted-foreground">
+                      {renderJsonPretty(item.formData)}
                     </div>
                   )}
+                </div>
 
-                  {/* Signatures */}
-                  <div className="pt-6 sm:pt-8 flex flex-wrap items-end justify-end gap-6 sm:gap-10">
-                    {(item.signatures && item.signatures.length > 0
-                      ? item.signatures
-                      : ["প্রার্থীর স্বাক্ষর"]
-                    ).map((sig, sIdx) => (
-                      <div key={sIdx} className="text-center min-w-[130px] sm:min-w-[160px]">
-                        <div className="w-full border-b-2 border-neutral-900 mb-1" />
-                        <span className="text-xs sm:text-sm font-bold text-neutral-900">{sig}</span>
-                      </div>
-                    ))}
+                {item.declaration && (
+                  <div className="pt-4 text-xs sm:text-sm text-neutral-900 leading-relaxed font-semibold">
+                    {item.declaration}
                   </div>
+                )}
+
+                <div className="pt-6 sm:pt-8 flex flex-wrap items-end justify-end gap-6 sm:gap-10">
+                  {(item.signatures && item.signatures.length > 0
+                    ? item.signatures
+                    : ["প্রার্থীর স্বাক্ষর"]
+                  ).map((sig, sIdx) => (
+                    <div key={sIdx} className="text-center min-w-[130px] sm:min-w-[160px]">
+                      <div className="w-full border-b-2 border-neutral-900 mb-1" />
+                      <span className="text-xs sm:text-sm font-bold text-neutral-900">{sig}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ) : (
-              /* RAW JSON VIEW */
-              <div className="pl-7 md:pl-0 space-y-3">
-                {item.formData && (
-                  <div className="text-xs font-mono bg-neutral-50 p-4 rounded-xl border border-outline-variant/60 space-y-1">
-                    <span className="font-bold text-outline text-[10px] uppercase tracking-wider block font-sans">Form Data (JSON):</span>
-                    <pre className="whitespace-pre-wrap font-mono text-neutral-900 overflow-x-auto">
-                      {renderJsonPretty(item.formData)}
-                    </pre>
-                  </div>
-                )}
-                {item.solution && (
-                  <div className="text-xs font-mono bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 space-y-1">
-                    <span className="font-bold text-emerald-800 text-[10px] uppercase tracking-wider block font-sans">Solution (JSON):</span>
-                    <pre className="whitespace-pre-wrap font-mono text-emerald-900 overflow-x-auto">
-                      {renderJsonPretty(item.solution)}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Reference Tags & ID Footer */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3 pl-7 md:pl-0">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {(item.source || item.session) && (
-                  <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                    📚 {item.source || "N/A"}{item.session ? ` (${item.session})` : ""}
+            </div>
+          ) : (
+            <div className="pl-0 md:pl-7 space-y-3">
+              {item.formData && (
+                <div className="text-xs font-mono bg-muted/40 p-4 rounded-xl border border-border space-y-1">
+                  <span className="font-bold text-muted-foreground text-[10px] uppercase tracking-wider block font-sans">
+                    Form Data (JSON):
                   </span>
-                )}
-                {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                  item.reference.map((ref, rIdx) => (
-                    <span
-                      key={rIdx}
-                      className="px-2 py-0.5 bg-neutral-100 text-neutral-700 rounded text-[11px] font-medium border border-neutral-200"
-                    >
-                      🏷️ {ref}
-                    </span>
-                  ))
-                ) : (
-                  !(item.source || item.session) && (
-                    <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                  )
-                )}
-              </div>
+                  <pre className="whitespace-pre-wrap font-mono text-foreground overflow-x-auto">
+                    {renderJsonPretty(item.formData)}
+                  </pre>
+                </div>
+              )}
+              {item.solution && (
+                <div className="text-xs font-mono bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 space-y-1">
+                  <span className="font-bold text-emerald-800 text-[10px] uppercase tracking-wider block font-sans">
+                    Solution (JSON):
+                  </span>
+                  <pre className="whitespace-pre-wrap font-mono text-emerald-900 overflow-x-auto">
+                    {renderJsonPretty(item.solution)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
 
-              <span className="text-[11px] font-mono text-outline/60">
-                ID: {item.id}
-              </span>
+            {/* Footer Meta */}
+            <div className="pl-0 md:pl-7">
+              <QuestionCardFooter
+                source={item.source}
+                session={item.session}
+                references={item.reference}
+              />
             </div>
           </div>
         </div>
 
         {/* Actions Column */}
-        <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-          <Link
-            href={`/form-filling/${item.id}/edit`}
-            className="p-2.5 hover:bg-neutral-100 rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-            title="Edit Form Fillup"
-          >
-            <Edit3 className="size-5 mx-auto" />
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => onDelete(item.id, item.scenario)}
-            className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-            title="Delete Form Fillup"
-          >
-            <Trash2 className="size-5 mx-auto" />
-          </button>
-        </div>
+        <QuestionCardActions
+          editHref={editHref}
+          onDelete={() => onDelete(item.id, item.scenario)}
+          editTitle="Edit Form Fillup"
+          deleteTitle="Delete Form Fillup"
+        />
       </div>
     </div>
   )
@@ -416,9 +376,8 @@ interface FormFillingTableProps {
   currentPage: number
   itemsPerPage: number
   totalItems: number
-  totalPages: number
   onPageChange: (page: number) => void
-  onLimitChange?: (limit: number) => void
+  onLimitChange: (limit: number) => void
 }
 
 export function FormFillingTable({
@@ -430,13 +389,16 @@ export function FormFillingTable({
   currentPage,
   itemsPerPage,
   totalItems,
-  totalPages,
   onPageChange,
   onLimitChange,
 }: FormFillingTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const searchParams = useSearchParams()
+
+  const buildEditHref = (id: string) => {
+    const qs = searchParams.toString()
+    return qs ? `/form-filling/${id}/edit?${qs}` : `/form-filling/${id}/edit`
+  }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -454,177 +416,140 @@ export function FormFillingTable({
     }
   }
 
-  const allSelected =
-    items.length > 0 && items.every((item) => selectedIds.includes(item.id))
+  const isAllSelected = items.length > 0 && selectedIds.length === items.length
 
   const renderJsonPretty = (val: any) => {
-    if (val === null || val === undefined) return null
-    if (typeof val === "string") return val
+    if (!val) return null
     try {
-      return JSON.stringify(val, null, 2)
+      const obj = typeof val === "string" ? JSON.parse(val) : val
+      return JSON.stringify(obj, null, 2)
     } catch {
       return String(val)
     }
   }
 
-  return (
-    <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
-              </span>
-              <Button
-                type="button"
-                onClick={() => {
-                  onBulkDelete(selectedIds)
-                  setSelectedIds([])
-                }}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto"
-              >
-                <Trash2 className="size-3.5" />
-                <span>Delete Selected</span>
-              </Button>
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-16 rounded-md" />
+                <Skeleton className="h-5 w-24 rounded-md" />
+                <Skeleton className="h-5 w-20 rounded-md" />
+              </div>
+              <Skeleton className="h-8 w-20 rounded-lg" />
             </div>
-          )}
+            <Skeleton className="h-6 w-3/4 rounded-md" />
+            <Skeleton className="h-44 w-full rounded-xl" />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-10 text-center space-y-3">
+        <div className="p-3 bg-destructive/10 text-destructive rounded-full w-fit mx-auto">
+          <AlertCircle className="size-8" />
+        </div>
+        <h3 className="text-lg font-bold text-destructive">তথ্য লোড করতে সমস্যা হয়েছে</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          দুঃখিত, ফর্ম পূরণের তালিকা লোড করা সম্ভব হয়নি। অনুগ্রহ করে পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।
+        </p>
+      </div>
+    )
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-12 text-center space-y-4">
+        <div className="p-4 bg-muted text-muted-foreground rounded-full w-fit mx-auto">
+          <FileText className="size-10 opacity-40" />
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-lg font-bold text-foreground">কোনো ফর্ম পূরণ পাওয়া যায়নি</h3>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            আপনার অনুসন্ধান বা ফিল্টার অনুযায়ী কোনো প্রশ্ন খুঁজে পাওয়া যায়নি। নতুন ফর্ম পূরণ যোগ করুন অথবা ফিল্টার পরিবর্তন করুন।
+          </p>
         </div>
       </div>
+    )
+  }
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="animate-spin text-primary text-sm font-bold">
-              Loading...
+  return (
+    <div className="space-y-4">
+      {/* Selection & Bulk Action Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-card px-4 py-2.5 rounded-xl border border-border shadow-xs">
+        <div className="flex items-center gap-3">
+          <Checkbox
+            id="select-all-form-filling"
+            checked={isAllSelected}
+            onCheckedChange={(checked) => handleSelectAll(checked === true)}
+          />
+          <label
+            htmlFor="select-all-form-filling"
+            className="text-xs font-semibold text-foreground cursor-pointer select-none"
+          >
+            সবগুলো নির্বাচন করুন ({items.length})
+          </label>
+          {selectedIds.length > 0 && (
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+              {selectedIds.length} টি নির্বাচিত
             </span>
-            <span className="font-body-md text-sm font-medium">Loading Form Fillups...</span>
-          </div>
+          )}
         </div>
-      )}
 
-      {/* Error State */}
-      {isError && !isLoading && (
-        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-xl font-bold">⚠️ Error</span>
-            <span className="font-body-md text-sm font-medium">
-              Error loading form fillups. Please try refreshing.
-            </span>
-          </div>
-        </div>
-      )}
+        {selectedIds.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              onBulkDelete(selectedIds)
+              setSelectedIds([])
+            }}
+            className="h-8 gap-1.5 text-xs font-bold rounded-lg cursor-pointer"
+          >
+            <Trash2 className="size-3.5" />
+            নির্বাচিতগুলো মুছুন ({selectedIds.length})
+          </Button>
+        )}
+      </div>
 
-      {/* Empty State */}
-      {!isLoading && !isError && items.length === 0 && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="text-2xl">📋</span>
-            <p className="font-headline-md text-xl font-bold text-on-surface">
-              No Form Fillups Found
-            </p>
-            <p className="font-body-md text-sm text-outline max-w-md">
-              Try adjusting filters or add a new form fillup entry to the bank.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Cards List */}
+      <div className="space-y-4">
+        {items.map((item, idx) => {
+          const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+          const isSelected = selectedIds.includes(item.id)
 
-      {/* CARD VIEW LAYOUT */}
-      {!isLoading && !isError && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-6">
-          {items.map((item, idx) => (
+          return (
             <FormFillingCardItem
               key={item.id}
               item={item}
-              globalIndex={(currentPage - 1) * itemsPerPage + idx + 1}
-              isSelected={selectedIds.includes(item.id)}
+              globalIndex={globalIndex}
+              isSelected={isSelected}
               onSelectOne={handleSelectOne}
               onDelete={onDelete}
+              editHref={buildEditHref(item.id)}
               renderJsonPretty={renderJsonPretty}
             />
-          ))}
-        </div>
-      )}
+          )
+        })}
+      </div>
 
-      {/* Pagination Footer */}
-      {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> form fillups
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                    <SelectItem value="100" className="text-neutral-900">100</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? "default" : "ghost"}
-                onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary"
-                    : "hover:bg-surface-container-high text-on-surface"
-                }`}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer animate-fade-in"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Pagination */}
+      <DataTablePagination
+        page={currentPage}
+        limit={itemsPerPage}
+        totalItems={totalItems}
+        onPageChange={onPageChange}
+        onLimitChange={onLimitChange}
+        pageSizeOptions={[10, 20, 50, 100]}
+        entityName="টি প্রশ্ন"
+        isLoading={isLoading}
+      />
     </div>
   )
 }

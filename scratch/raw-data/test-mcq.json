@@ -1,40 +1,19 @@
 {
-  "chapterTitle": "মানববসতি",
+  "chapterTitle": "মালিকানার ভিত্তিতে ব্যবসায়",
   "questions": [
     {
       "type": "SINGLE",
-      "question": "প্রকৃতির সঙ্গে নিজেকে উপযোগী করে চলার প্রথম অবস্থা কোনটি?",
+      "question": "পৃথিবীতে বিভিন্ন প্রকারের ব্যবসায় সংগঠন গড়ে ওঠার কারণ কী?",
       "options": [
-        "নগর",
-        "গ্রাম",
-        "বসতি",
-        "সমাজ"
+        "সহজে মুনাফা অর্জনে",
+        "আইনগত কারণে",
+        "বিভিন্নমুখী চাহিদা পূরণে",
+        "উৎপাদন বাড়াতে"
       ],
-      "answer": "বসতি",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিচের কোনটি বসতি স্থাপনের নিয়ামক?",
-      "options": [
-        "তাপ",
-        "বায়ুপ্রবাহ",
-        "পার্ক",
-        "প্রতিরক্ষা"
-      ],
-      "answer": "প্রতিরক্ষা",
+      "answer": "বিভিন্নমুখী চাহিদা পূরণে",
       "explanation": null,
       "reference": [
-        "চ. বো. ২০২৪"
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -47,474 +26,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কী কারণে পৃথিবীর বিভিন্ন অঞ্চলে বিভিন্ন ধরনের বসতি গড়ে উঠেছে?",
+      "question": "মালিকানার ভিত্তিতে ব্যবসায় সংগঠন কত প্রকার?",
       "options": [
-        "প্রাকৃতিক",
-        "অর্থনৈতিক",
-        "সামাজিক",
-        "রাজনৈতিক"
-      ],
-      "answer": "প্রাকৃতিক",
-      "explanation": null,
-      "reference": [
-        "সামসুল হক খান স্কুল অ্যান্ড কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোনো নির্দিষ্ট স্থানে মানুষ একত্রিত হয়ে স্থায়ীভাবে বসবাস করলে তাকে কী বলে?",
-      "options": [
-        "সমাজ",
-        "পরিবার",
-        "বসতি",
-        "মানব বসতি"
-      ],
-      "answer": "মানব বসতি",
-      "explanation": null,
-      "reference": [
-        "বিদ্যাময়ী সরকারি বালিকা উচ্চ বিদ্যালয়, ময়মনসিংহ"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনবসতি গড়ে ওঠার পেছনে কোনটি ব্যাপকভাবে প্রভাব বিস্তার করে?",
-      "options": [
-        "যোগাযোগ",
-        "ভূপ্রকৃতি",
-        "প্রতিরক্ষা",
-        "পশুচারণ"
-      ],
-      "answer": "ভূপ্রকৃতি",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পানীয় জলের প্রাপ্যতার উপর নির্ভর করে গড়ে ওঠা বসতিকে কী বলে?",
-      "options": [
-        "জলবসতি",
-        "শীতল বসতি",
-        "পানীয় বসতি",
-        "আর্দ্র বসতি"
-      ],
-      "answer": "পানীয় বসতি",
-      "explanation": null,
-      "reference": [
-        "শ্রীমঙ্গল সরকারি বালিকা উচ্চ বিদ্যালয়",
-        "নীলফামারী সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জীবনধারণের জন্য মানুষের প্রথম চাহিদা কোনটি?",
-      "options": [
-        "অর্থ",
-        "খাদ্য",
-        "মাটি",
-        "বিশুদ্ধ পানি"
-      ],
-      "answer": "বিশুদ্ধ পানি",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "উর্বর মাটিতে কী ধরনের বসতি গড়ে ওঠে?",
-      "options": [
-        "বিক্ষিপ্ত",
-        "গোষ্ঠীবদ্ধ",
-        "পুঞ্জিভূত",
-        "বিচ্ছিন্ন"
-      ],
-      "answer": "পুঞ্জিভূত",
-      "explanation": null,
-      "reference": [
-        "বীরশ্রেষ্ঠ মুন্সী আব্দুর রউফ পাবলিক কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জলের প্রাপ্তির উপর ভিত্তি করে গড়ে ওঠে—",
-      "options": [
-        "রৈখিক বসতি",
-        "পুঞ্জিভূত বসতি",
-        "সংঘবদ্ধ বসতি",
-        "বিচ্ছিন্ন বসতি"
-      ],
-      "answer": "পুঞ্জিভূত বসতি",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "প্রতিরক্ষা সুবিধার জন্য কোন ধরনের বসতি গড়ে ওঠে?",
-      "options": [
-        "রৈখিক",
-        "বিক্ষিপ্ত",
-        "পুঞ্জিভূত",
-        "গোষ্ঠীবদ্ধ"
-      ],
-      "answer": "গোষ্ঠীবদ্ধ",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পশুচারণ এলাকায় সাধারণত কোন ধরনের বসতি দেখা যায়?",
-      "options": [
-        "পুঞ্জিভূত",
-        "ছড়ানো",
-        "অনুকেন্দ্রিক",
-        "সবকটি"
-      ],
-      "answer": "ছড়ানো",
-      "explanation": null,
-      "reference": [
-        "বর্ডার গার্ড পাবলিক স্কুল এন্ড কলেজ, রংপুর"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "প্রাচীনকালে মানব বসতি পুঞ্জিভূত ছিল কেন?",
-      "options": [
-        "প্রতিরক্ষার জন্য",
-        "পানীয় জলের প্রাপ্যতার জন্য",
-        "বনাঞ্চলের জন্য",
-        "ভূপ্রকৃতির জন্য"
-      ],
-      "answer": "প্রতিরক্ষার জন্য",
-      "explanation": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কৃষির উপর নির্ভরশীল কোন ধরনের বসতি?",
-      "options": [
-        "গ্রামীণ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "নগর"
-      ],
-      "answer": "গ্রামীণ",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রাম্য বসতি কোনটির ওপর নির্ভরশীল?",
-      "options": [
-        "ব্যবসা",
-        "শিল্প",
-        "কৃষি",
-        "পেশাজীবী"
-      ],
-      "answer": "কৃষি",
-      "explanation": null,
-      "reference": [
-        "সকল বোর্ড ২০১৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "খাদ্য উৎপাদনের কেন্দ্রবিন্দু কোনটি?",
-      "options": [
-        "গ্রামাঞ্চল",
-        "শহরাঞ্চল",
-        "বাজার",
-        "রাজধানী"
-      ],
-      "answer": "গ্রামাঞ্চল",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যাতায়াতের সুবিধা থাকা অঞ্চলে কী ধরনের বসতি গড়ে ওঠে?",
-      "options": [
-        "ছড়ানো",
-        "পুঞ্জিভূত",
-        "বিক্ষিপ্ত",
-        "বিচ্ছিন্ন"
-      ],
-      "answer": "বিচ্ছিন্ন",
-      "explanation": null,
-      "reference": [
-        "বগুড়া সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রামের বসতিতে কীসের প্রাধান্য কম থাকে?",
-      "options": [
-        "উঠান",
-        "পথঘাট",
-        "রান্নাঘর",
-        "গোয়ালঘর"
-      ],
-      "answer": "পথঘাট",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রাম প্রধানত কোন ধরনের অঞ্চল হিসেবে পরিচিত?",
-      "options": [
-        "শিল্পাঞ্চল",
-        "খাদ্য উৎপাদক",
-        "খাদ্য আমদানিকারক",
-        "ব্যবসা প্রধান"
-      ],
-      "answer": "খাদ্য উৎপাদক",
-      "explanation": null,
-      "reference": [
-        "লালমনিরহাট সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রামে শোয়ার ঘর, রান্না ঘর, গোয়াল ঘর কোথায় তৈরি হয়?",
-      "options": [
-        "পুকুর পাড়ে",
-        "উঠানের মাঝখানে",
-        "উঠানের চারপাশে",
-        "উঠানের এক কোণে"
-      ],
-      "answer": "উঠানের চারপাশে",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কাজের প্রকৃতি ও বসতির ধরন অনুসারে মানুষ কত প্রকার?",
-      "options": [
-        "১",
-        "২",
         "৩",
-        "৪"
-      ],
-      "answer": "২",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জেলে গ্রাম, কুমারপাড়া, কামারপাড়া ইত্যাদি নাম চিহ্নিত করা হয় কীসের ভিত্তিতে?",
-      "options": [
-        "গ্রামীণ বসতি",
-        "বসতির ধরন",
-        "বসতির বিন্যাস",
-        "জীবিকার প্রধান উৎস"
-      ],
-      "answer": "জীবিকার প্রধান উৎস",
-      "explanation": null,
-      "reference": [
-        "বিদ্যাময়ী সরকারি বালিকা উচ্চ বিদ্যালয়, ময়মনসিংহ"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "অবস্থান ও বাসগৃহের ব্যবধানের ভিত্তিতে গ্রামীণ বসতিকে কয় ভাগে ভাগ করা যায়?",
-      "options": [
-        "৬",
-        "৫",
         "৪",
-        "৩"
-      ],
-      "answer": "৩",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রামীণ বসতিকে কয় ভাগে ভাগ করা হয়েছে?",
-      "options": [
         "৫",
-        "৪",
-        "৩",
-        "২"
+        "৬"
       ],
-      "answer": "৩",
+      "answer": "৫",
       "explanation": null,
       "reference": [
-        "চ. বো., য. বো. ২০২১"
+        "চ. বো., ব. বো. ২৩; ম. বো., কু. বো. ২২; রা. বো., দি. বো. ২১; সকল বোর্ড ১৭; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; পটুয়াখালী সরকারি জুবিলী উচ্চ বিদ্যালয়; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -527,38 +49,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ছোট গ্রাম বা পৌর এলাকায় কোন ধরনের বসতি গড়ে ওঠে?",
+      "question": "সবচেয়ে প্রাচীনতম ব্যবসায় সংগঠন বলা হয় কোনটিকে?",
       "options": [
-        "গোষ্ঠীবদ্ধ",
-        "রৈখিক",
-        "বিক্ষিপ্ত",
-        "বিচ্ছিন্ন"
+        "একমালিকানা",
+        "অংশীদারি",
+        "প্রাইভেট লি.",
+        "সমবায় সমিতি"
       ],
-      "answer": "গোষ্ঠীবদ্ধ",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "পাহাড়ি অঞ্চলে কোন বসতি দেখা যায়?",
-      "options": [
-        "গোষ্ঠীবদ্ধ",
-        "বিক্ষিপ্ত",
-        "সংঘবদ্ধ",
-        "রৈখিক"
-      ],
-      "answer": "বিক্ষিপ্ত",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "রা. বো. ২০১৯"
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -570,21 +71,21 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে উল্লিখিত রাজুর দেখা বসতিটি কোন বসতি?",
+      "type": "SINGLE",
+      "question": "জনপ্রিয় ব্যবসায় সংগঠন কোনটি?",
       "options": [
-        "গ্রামীণ বসতি",
-        "নগর বসতি",
-        "সংঘবদ্ধ বসতি",
-        "বিক্ষিপ্ত বসতি"
+        "একমালিকানা",
+        "অংশীদারি",
+        "সমবায় সমিতি",
+        "কোম্পানি সংগঠন"
       ],
-      "answer": "বিক্ষিপ্ত বসতি",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "দি. বো. ২০১৯"
+        "সি. বো. ২২"
       ],
       "statements": [],
-      "context": "রাজু নেপালের পার্বত্য অঞ্চলে বেড়াতে গেল। সেখানে দেখল অতি ক্ষুদ্র বসতি বিদ্যমান। এক বসতি থেকে অন্য বসতি দেখা যায় না।",
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -594,17 +95,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বিক্ষিপ্ত বসতি গড়ে উঠার অন্যতম কারণ কোনটি?",
+      "question": "শহরে একমালিকানা ব্যবসায় করতে হলে কোথা থেকে ট্রেড লাইসেন্স সংগ্রহ করতে হয়?",
       "options": [
-        "নদীর প্রাকৃতিক বাঁধ",
-        "নদীর কিনারা",
-        "বনভূমি",
-        "উর্বর মাটি"
+        "পৌরসভা",
+        "জেলা প্রশাসক",
+        "উপজেলা পরিষদ",
+        "ইউনিয়ন পরিষদ"
       ],
-      "answer": "বনভূমি",
+      "answer": "পৌরসভা",
       "explanation": null,
       "reference": [
-        "ম. বো. ২০২৫"
+        "চ. বো. ২৪; ম. বো. ২১"
       ],
       "statements": [],
       "context": null,
@@ -617,17 +118,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "হিমালয়ের বন্ধুর পার্বত্য অঞ্চলে কোন ধরনের বসতি দেখা যায়?",
+      "question": "কোন কোন দেশে প্রায় ৮০% ব্যবসায় একমালিকানাভিত্তিক?",
       "options": [
-        "সংঘবদ্ধ",
-        "বিক্ষিপ্ত ও বিচ্ছিন্ন",
-        "রৈখিক বা দণ্ডাকৃতি",
-        "ছাড়ানো"
+        "ইউরোপ ও আফ্রিকা",
+        "ইউরোপ ও আমেরিকা",
+        "আমেরিকা ও এশিয়া",
+        "ইউরোপ ও অস্ট্রেলিয়া"
       ],
-      "answer": "বিক্ষিপ্ত ও বিচ্ছিন্ন",
+      "answer": "ইউরোপ ও আমেরিকা",
       "explanation": null,
       "reference": [
-        "জামালপুর জিলা স্কুল"
+        "য. বো., ব. বো. ২৩; কু. বো. ২১; ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -640,17 +141,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "নগরের উৎপত্তিলগ্নে অর্থনৈতিক কারণে নীল নদের অববাহিকায় কোন নগরের উৎপত্তি ঘটেছিল?",
+      "question": "একমালিকানা ব্যবসায় যেসব দেশে স্বীকৃত—",
       "options": [
-        "মহেঞ্জদারো",
-        "হরপ্পা",
-        "মালাক্কা",
-        "মেমফিস"
+        "উন্নত",
+        "অনুন্নত",
+        "উন্নয়নশীল",
+        "সবগুলোই"
       ],
-      "answer": "মেমফিস",
+      "answer": "সবগুলোই",
       "explanation": null,
       "reference": [
-        "সি. বো. ২০১৯"
+        "চ. বো. ২২"
       ],
       "statements": [],
       "context": null,
@@ -663,17 +164,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "রৈখিক বসতি কীভাবে গড়ে ওঠে?",
+      "question": "আমেনা বেগম পড়াশোনা শেষ করে চাকরি না নিয়ে নিজ বাড়িতে স্বল্প পুঁজি নিয়ে ব্যবসায় শুরু করে এলাকার বাজারে বিক্রি করেন। আমেনা বেগমের ব্যবসায়টি কোন ধরনের?",
       "options": [
-        "সরলরেখায়",
-        "বক্ররেখায়",
-        "তির্যকভাবে",
-        "বিক্ষিপ্তভাবে"
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনী",
+        "সমবায়"
       ],
-      "answer": "সরলরেখায়",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "সদর সরকারি পাইলট উচ্চ বিদ্যালয়, রাজশাহী"
+        "ব. বো. ২৬"
       ],
       "statements": [],
       "context": null,
@@ -686,17 +187,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বুড়িগঙ্গা নদীর কিনারায় কোন ধরনের বসতি গড়ে ওঠে?",
+      "question": "আইনগত ঝামেলা না থাকায় যে কেউ ইচ্ছে করলে ও উদ্যোগ নিলে কোন ধরনের ব্যবসায় শুরু করা যায়?",
       "options": [
-        "সংঘবদ্ধ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "গোষ্ঠীবদ্ধ"
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনী",
+        "সমবায়"
       ],
-      "answer": "রৈখিক",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "দি. বো. ২০২৫"
+        "য. বো. ২৩; ব. বো. ২১"
       ],
       "statements": [],
       "context": null,
@@ -709,17 +210,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "রৈখিক বসতি কোথায় দেখতে পাওয়া যায়?",
+      "question": "একমালিকানা ব্যবসায়ে কত সালের আইন প্রচলিত?",
       "options": [
-        "বাস স্টেশনে",
-        "পাহাড়ি অঞ্চলে",
-        "নদীর তীরে",
-        "মসজিদের পাশে"
+        "১৯৯৪ সালের",
+        "১৯৩২ সালের",
+        "১৯১৮ সালের",
+        "আইন নেই"
       ],
-      "answer": "নদীর তীরে",
+      "answer": "আইন নেই",
       "explanation": null,
       "reference": [
-        "সি. বো. ২০২১"
+        "কু. বো. ২২"
       ],
       "statements": [],
       "context": null,
@@ -731,21 +232,21 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "এটি কোন ধরনের বসতি?",
+      "type": "SINGLE",
+      "question": "জনাব করিমের পর্যাপ্ত অর্থ নেই। অথচ ব্যবসায় করতে আগ্রহী। তার জন্য ব্যবসায়ের উপযুক্ত ক্ষেত্র কোনটি?",
       "options": [
-        "রৈখিক",
-        "গোষ্ঠীবদ্ধ",
-        "বিচ্ছিন্ন",
-        "গ্রামীণ"
+        "অংশীদারি",
+        "একমালিকানা",
+        "যৌথমূলধনি",
+        "সমবায়"
       ],
-      "answer": "রৈখিক",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "সকল বোর্ড ২০১৮"
+        "য. বো. ২৫"
       ],
       "statements": [],
-      "context": "সজলের বসতিটি সরলরেখায় গড়ে উঠেছে।",
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -755,17 +256,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "অনুর্বর মাটিতে কী ধরনের বসতি গড়ে উঠে?",
+      "question": "একমালিকানা ব্যবসায়ের স্থায়িত্ব নির্ভরশীল—",
       "options": [
-        "পুঞ্জীভূত",
-        "গোষ্ঠীবদ্ধ",
-        "বিক্ষিপ্ত",
-        "বিচ্ছিন্ন"
+        "সরকারের ইচ্ছার ওপর",
+        "মালিকের ইচ্ছার ওপর",
+        "স্থানীয় প্রশাসনের ইচ্ছার ওপর",
+        "ভোক্তাদের ইচ্ছার ওপর"
       ],
-      "answer": "বিক্ষিপ্ত",
+      "answer": "মালিকের ইচ্ছার ওপর",
       "explanation": null,
       "reference": [
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
+        "চ. বো., ব. বো. ২২; রা. বো. ২১"
       ],
       "statements": [],
       "context": null,
@@ -778,17 +279,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোন নগরী নীলনদের অববাহিকায় গড়ে উঠে?",
+      "question": "পচনশীল জাতীয় পণ্যের জন্য কোন ধরনের ব্যবসায় সংগঠন উপযোগী?",
       "options": [
-        "মহেঞ্জোদারো",
-        "হরপ্পা",
-        "মেমফিস",
-        "মালাক্কা"
+        "অংশীদারি",
+        "সমবায় সমিতি",
+        "একমালিকানা",
+        "প্রাইভেট লি."
       ],
-      "answer": "মেমফিস",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "উইলস্ লিটল ফ্লাওয়ার স্কুল এন্ড কলেজ, ঢাকা"
+        "ব. বো. ২৪; রা. বো., দি. বো. ২১"
       ],
       "statements": [],
       "context": null,
@@ -801,17 +302,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোন নদীর অববাহিকায় মেমফিস ও থেবস নগর গড়ে উঠেছিল?",
+      "question": "যেসব পণ্যের চাহিদা বিশেষ বিশেষ এলাকায় সীমাবদ্ধ সেসব পণ্যের জন্য উপযুক্ত কোনটি?",
       "options": [
-        "টাইগ্রিস",
-        "ইউফ্রেটিস",
-        "নীলনদের",
-        "সিন্ধু"
+        "অংশীদারি ব্যবসায়",
+        "একমালিকানা ব্যবসায়",
+        "সমবায় ব্যবসায়",
+        "রাষ্ট্রীয় ব্যবসায়"
       ],
-      "answer": "নীলনদের",
+      "answer": "একমালিকানা ব্যবসায়",
       "explanation": null,
       "reference": [
-        "রাজশাহী সরকারি বালিকা উচ্চ বিদ্যালয়"
+        "ব. বো. ২৬"
       ],
       "statements": [],
       "context": null,
@@ -824,17 +325,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "নদীর বাঁধ, খালের কিনারা, রাস্তার পাশে কী ধরনের বসতি দেখা যায়?",
+      "question": "কোন ব্যবসায় ক্রেতাদের পরিবর্তনশীল রুচি, আগ্রহ ও ফ্যাশনের ওপর নির্ভরশীল?",
       "options": [
-        "রৈখিক",
-        "বিক্ষিপ্ত",
-        "সংঘবদ্ধ",
-        "গোষ্ঠীবদ্ধ"
+        "সবজির দোকান",
+        "চালের দোকান",
+        "দরজির দোকান",
+        "ওষুধের দোকান"
       ],
-      "answer": "রৈখিক",
+      "answer": "দরজির দোকান",
       "explanation": null,
       "reference": [
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
+        "রা. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -847,17 +348,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "সারিবদ্ধ বসতি সর্বদাই কোথায় দেখা যায়?",
+      "question": "কোন ধরনের ব্যবসায় আইনি জটিলতা মুক্ত ও কম ঝুঁকিপূর্ণ?",
       "options": [
-        "সমতল ভূমিতে",
-        "নদীর তীরে",
-        "পাহাড়ের পাদদেশে",
-        "বনাঞ্চলে"
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "রাষ্ট্রীয় ব্যবসায়"
       ],
-      "answer": "নদীর তীরে",
+      "answer": "একমালিকানা",
       "explanation": null,
       "reference": [
-        "বিএএফ শাহীন কলেজ, ঢাকা"
+        "য. বো. ২৩; কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -870,19 +371,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "প্রাচীনকালে সর্বাপেক্ষা শক্তিশালী নগরী ছিল কোনটি?",
+      "question": "একমালিকানা ব্যবসায়ের ক্ষেত্রে কোনটি সংগ্রহ করতে হয়?",
       "options": [
-        "মহেঞ্জোদারো",
-        "হরপ্পা",
-        "ফিলাডেলফিয়া",
-        "রোম"
+        "ট্রেড লাইসেন্স",
+        "অনুমতিপত্র",
+        "প্রত্যয়নপত্র",
+        "আমদানি লাইসেন্স"
       ],
-      "answer": "রোম",
+      "answer": "ট্রেড লাইসেন্স",
       "explanation": null,
       "reference": [
-        "ঢা. বো. ২০২৫",
-        "ঢা. বো. ২০২১",
-        "ব. বো. ২০২১, ২০১৮"
+        "কু. বো., য. বো. ২৬"
       ],
       "statements": [],
       "context": null,
@@ -895,17 +394,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "নগরায়ন নতুন মাত্রা পায় কবে?",
+      "question": "বাংলাদেশের অংশীদারি ব্যবসায় কত সালের আইন দ্বারা পরিচালিত হয়?",
       "options": [
-        "শিল্প বিপ্লবের পর",
-        "ফরাসি বিপ্লবের পর",
-        "রুশ বিপ্লবের পর",
-        "ইউরোপীয়দের সাম্রাজ্য বিস্তারের পর"
+        "১৯৩২",
+        "২০০১",
+        "১৯৯৪",
+        "১৯১৩"
       ],
-      "answer": "শিল্প বিপ্লবের পর",
+      "answer": "১৯৩২",
       "explanation": null,
       "reference": [
-        "সামসুল হক খান স্কুল অ্যান্ড কলেজ, ঢাকা"
+        "সি. বো. ২৬, ২২; ম. বো. ২৪; য. বো. ২২; রা. বো., দি. বো. ২১; সকল বোর্ড ১৮; ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -918,18 +417,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "'এডিনবরা' কোন ধরনের নগর?",
+      "question": "দেশের আইন অনুযায়ী অংশীদারি ব্যবসায় শুরু করার জন্য ট্রেড লাইসেন্স কোথা থেকে সংগ্রহ করতে হয়?",
       "options": [
-        "সামরিক ক্রিয়াকলাপভিত্তিক",
-        "শিল্পভিত্তিক",
-        "বাণিজ্যভিত্তিক",
-        "প্রশাসনিক"
+        "ইউনিয়ন পরিষদ",
+        "জেলা পরিষদ",
+        "পৌরসভা",
+        "উপজেলা পরিষদ"
       ],
-      "answer": "সামরিক ক্রিয়াকলাপভিত্তিক",
+      "answer": "পৌরসভা",
       "explanation": null,
       "reference": [
-        "য. বো. ২০২৩",
-        "সকল বোর্ড ২০১৭"
+        "সি. বো. ২৩; পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -942,17 +440,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "জিব্রাল্টার কোন শ্রেণির নগর?",
+      "question": "কোনটি অংশীদারি ব্যবসায়ের বৈশিষ্ট্য?",
       "options": [
-        "প্রশাসনিক",
-        "শিল্পভিত্তিক",
-        "সামরিক ক্রিয়াকলাপ ভিত্তিক",
-        "সাংস্কৃতিক ক্রিয়াকলাপ ভিত্তিক"
+        "গঠন সহজ",
+        "সমান মূলধন সরবরাহ",
+        "নিজের আস্থা ও বিশ্বাস",
+        "বাধ্যতামূলক নিবন্ধন"
       ],
-      "answer": "সামরিক ক্রিয়াকলাপ ভিত্তিক",
+      "answer": "গঠন সহজ",
       "explanation": null,
       "reference": [
-        "য. বো. ২০২১"
+        "রা. বো. ২৩"
       ],
       "statements": [],
       "context": null,
@@ -965,17 +463,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "লা হাভার কোন দেশের সামরিক ঘাঁটি?",
+      "question": "\"অংশীদারি সম্পর্ক সৃষ্টি হয় চুক্তি থেকে মর্যাদা থেকে নয়\"- উক্তিটি কত সালের অংশীদারি আইনে বলা আছে?",
       "options": [
-        "ইংল্যান্ড",
-        "রাশিয়া",
-        "ফ্রান্স",
-        "স্পেন"
+        "১৮৫০",
+        "১৯১৩",
+        "১৯৩২",
+        "১৯৯৪"
       ],
-      "answer": "ফ্রান্স",
+      "answer": "১৯৩২",
       "explanation": null,
       "reference": [
-        "ম. বো. ২০২১"
+        "কু. বো. ২৫; রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -988,17 +486,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটি প্রশাসনিক নগর নয়?",
+      "question": "অংশীদারি ব্যবসায়ের মূলভিত্তি কী?",
       "options": [
-        "ঢাকা",
-        "নয়াদিল্লি",
-        "চট্টগ্রাম",
-        "ক্যানবেরা"
+        "নিবন্ধন",
+        "চুক্তি",
+        "অভিজ্ঞতা",
+        "মূলধন"
       ],
-      "answer": "চট্টগ্রাম",
+      "answer": "চুক্তি",
       "explanation": null,
       "reference": [
-        "সকল বোর্ড ২০১৬"
+        "য. বো. ২৫; ব. বো. ২২"
       ],
       "statements": [],
       "context": null,
@@ -1011,17 +509,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ইতালির পিসা কোন ধরনের নগরের উদাহরণ?",
+      "question": "অংশীদারি ব্যবসায়ের সফলতা নির্ভর করে কীসের ওপর?",
       "options": [
-        "প্রশাসনিক",
-        "বাণিজ্যিক",
-        "শিল্পভিত্তিক",
-        "সাংস্কৃতিক"
+        "অংশীদারদের অভিজ্ঞতার ওপর",
+        "মূলধনের ওপর",
+        "পারস্পরিক আস্থা ও বিশ্বাসের ওপর",
+        "সুনামের ওপর"
       ],
-      "answer": "সাংস্কৃতিক",
+      "answer": "পারস্পরিক আস্থা ও বিশ্বাসের ওপর",
       "explanation": null,
       "reference": [
-        "বাংলাদেশ নৌবাহিনী স্কুল ও কলেজ, চট্টগ্রাম"
+        "সি. বো. ২৬"
       ],
       "statements": [],
       "context": null,
@@ -1034,18 +532,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটি শিল্পভিত্তিক নগর?",
+      "question": "কোন ব্যবসায়ে নিবন্ধন বাধ্যতামূলক নয়?",
       "options": [
-        "ক্যানবেরা",
-        "পেনসিলভানিয়া",
-        "পিটার্সবার্গ",
-        "জিব্রাল্টার"
+        "অংশীদারি",
+        "সমবায় সমিতি",
+        "যৌথমূলধনি",
+        "রাষ্ট্রীয়"
       ],
-      "answer": "পেনসিলভানিয়া",
+      "answer": "অংশীদারি",
       "explanation": null,
       "reference": [
-        "চ. বো. ২০২৫",
-        "দি. বো. ২০২০"
+        "চ. বো. ২৩; ঢা. বো., কু. বো. ২৫; উদয়ন মাধ্যমিক বিদ্যালয়, বরিশাল; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -1058,522 +555,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "অস্ট্রেলিয়ার ক্যানবেরা কোন ধরনের নগর?",
+      "question": "অংশীদারি ব্যবসায়ে সর্বোচ্চ সদস্য সংখ্যা কত জন?",
       "options": [
-        "শিল্পভিত্তিক নগর",
-        "সামরিক কার্যকলাপভিত্তিক নগর",
-        "বাণিজ্যভিত্তিক নগর",
-        "প্রশাসনিক নগর"
-      ],
-      "answer": "প্রশাসনিক নগর",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যুক্তরাষ্ট্রের পেনসিলভেনিয়া কোন ধরনের নগরী?",
-      "options": [
-        "প্রশাসনিক",
-        "বাণিজ্য",
-        "সামরিক",
-        "খনি নগর"
-      ],
-      "answer": "খনি নগর",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিচের কোনটি বাণিজ্যভিত্তিক নগর?",
-      "options": [
-        "ভারতের রাণীগঞ্জ",
-        "মরক্কোর ফেজ",
-        "সৌদি আরবের মদিনা",
-        "ফ্রান্সের প্যারিস"
-      ],
-      "answer": "মরক্কোর ফেজ",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "চট্টগ্রাম কোন ধরনের নগর?",
-      "options": [
-        "সাংস্কৃতিক",
-        "শিল্পভিত্তিক",
-        "বাণিজ্যিক",
-        "প্রশাসনিক"
-      ],
-      "answer": "বাণিজ্যিক",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "শহর ও নগর বিকাশের ক্ষেত্রে প্রাচীনকাল থেকে বর্তমানে অত্যন্ত ক্রিয়াশীল ভূমিকা পালন করে কোনটি?",
-      "options": [
-        "কৃষিভূমি",
-        "বাজার",
-        "নদী",
-        "বিনোদনকেন্দ্র"
-      ],
-      "answer": "বাজার",
-      "explanation": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিচের কোনটি সামরিক কার্যকলাপ ভিত্তিক নগর?",
-      "options": [
-        "ক্যানবেরা",
-        "এডিনবরা",
-        "ক্যামব্রিজ",
-        "পেনসিলভানিয়া"
-      ],
-      "answer": "এডিনবরা",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সাংস্কৃতিক ক্রিয়াকলাপভিত্তিক নগর কোনটি?",
-      "options": [
-        "পেনসিলভানিয়া",
-        "আলেকজান্দ্রিয়া",
-        "কক্সবাজার",
-        "অক্সফোর্ড"
-      ],
-      "answer": "অক্সফোর্ড",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যুক্তরাষ্ট্রের হনলুলু বিনোদন কেন্দ্র গড়ে উঠেছে কেন?",
-      "options": [
-        "সমুদ্রের নৈকট্যের কারণে",
-        "প্রাকৃতিক বৃক্ষরাজির আধিক্যের কারণে",
-        "চলচ্চিত্র শিল্প বিকাশ লাভ করার কারণে",
-        "চিত্রকলা বিকাশ লাভের জন্য"
-      ],
-      "answer": "সমুদ্রের নৈকট্যের কারণে",
-      "explanation": null,
-      "reference": [
-        "চ. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভারতের মুম্বাই কী ধরনের নগর?",
-      "options": [
-        "প্রশাসনিক নগর",
-        "শিল্পভিত্তিক নগর",
-        "বাণিজ্যভিত্তিক নগর",
-        "সাংস্কৃতিক কার্যকলাপভিত্তিক নগর"
-      ],
-      "answer": "সাংস্কৃতিক কার্যকলাপভিত্তিক নগর",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভারতের মুম্বাই নগর গড়ে উঠেছিল কীসের জন্য?",
-      "options": [
-        "চিত্রকলা",
-        "চলচ্চিত্র",
-        "শিক্ষা",
-        "শিল্প"
-      ],
-      "answer": "চলচ্চিত্র",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বৃহৎ জনসংখ্যাবিশিষ্ট এবং ঘনবসতিপূর্ণ হয়ে থাকে কোন ধরনের বসতি?",
-      "options": [
-        "শহর",
-        "গ্রাম",
-        "গোষ্ঠীবদ্ধ",
-        "রৈখিক"
-      ],
-      "answer": "শহর",
-      "explanation": null,
-      "reference": [],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনসংখ্যার ঘনত্ব সর্বনিম্ন কত হলে কোনো বসতিকে শহর বলা যায়?",
-      "options": [
-        "৫০০০",
-        "১৫০০",
-        "১১১৬",
-        "১০১৫"
-      ],
-      "answer": "১৫০০",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বাংলাদেশে কোনো বসতিকে শহর হিসেবে স্বীকৃতি পেতে হলে প্রতি বর্গকিলোমিটারে কতজনের বসবাস থাকতে হয়?",
-      "options": [
-        "৫০০০",
-        "৩০০০",
-        "২০০০",
-        "১৫০০"
-      ],
-      "answer": "১৫০০",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "গ্রামের মানুষের সামাজিক অবস্থা কী দ্বারা নির্ধারিত হয়?",
-      "options": [
-        "সম্পদ",
-        "জন্মসূত্র",
-        "বংশমর্যাদা",
-        "শিক্ষা"
-      ],
-      "answer": "বংশমর্যাদা",
-      "explanation": null,
-      "reference": [
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সর্বাপেক্ষা প্রাচীন সামাজিক প্রতিষ্ঠান কী?",
-      "options": [
-        "সমাজ",
-        "বসতি",
-        "পরিবার",
-        "রাষ্ট্র"
-      ],
-      "answer": "পরিবার",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
-        "বি কে জি সি সরকারি বালিকা উচ্চ বিদ্যালয়, হবিগঞ্জ"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বাংলাদেশে জনপ্রতি কৃষিজমির পরিমাণ কত একর?",
-      "options": [
-        "০.০৫",
-        "০.১৫",
-        "০.১৮",
-        "০.২৮"
-      ],
-      "answer": "০.০৫",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০২৪",
-        "কু. বো. ২০২১",
-        "ঢা. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বিশ্বস্বাস্থ্য সংস্থার মতে বিভিন্ন কাজে একজন মানুষের গড়ে দৈনিক কত গ্যালন পানি প্রয়োজন?",
-      "options": [
-        "৬",
-        "৪",
-        "৭",
-        "৫"
-      ],
-      "answer": "৭",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ঢাকা মহানগরীতে বর্তমানে প্রতিদিন কী পরিমাণ পানি প্রয়োজন?",
-      "options": [
-        "৩.৫০ কোটি গ্যালন",
-        "১৫ কোটি গ্যালন",
-        "১৮ কোটি গ্যালন",
-        "২৮.৫ কোটি গ্যালন"
-      ],
-      "answer": "২৮.৫ কোটি গ্যালন",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বৃষ্টির সময় ঢাকায় জলাবদ্ধতার সৃষ্টি হয়। এর কারণ—",
-      "options": [
-        "ভূমিকম্প",
-        "অপরিকল্পিত নগরায়ন",
-        "ভৌগোলিক অবস্থান",
-        "নদীর গভীরতা হ্রাস"
-      ],
-      "answer": "অপরিকল্পিত নগরায়ন",
-      "explanation": null,
-      "reference": [
-        "সকল বোর্ড ২০১৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "অপরিকল্পিত নগরায়ণের ফলে কোনটি সৃষ্টি হতে পারে?",
-      "options": [
-        "বসতির সৃষ্টি",
-        "কৃষিজমির হ্রাস পাওয়া",
-        "বস্তির সৃষ্টি",
-        "উপরে সবকটি"
-      ],
-      "answer": "বস্তির সৃষ্টি",
-      "explanation": null,
-      "reference": [
-        "দি এইডেড হাই স্কুল, সিলেট"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "একজন মানুষের দৈনিক কত গ্যালন পানি প্রয়োজন?",
-      "options": [
-        "৫",
-        "৬",
-        "৭",
-        "৮"
-      ],
-      "answer": "৭",
-      "explanation": null,
-      "reference": [
-        "পুলিশ লাইন্স স্কুল ও কলেজ, বগুড়া"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রাজনৈতিক ও সামাজিক সংগঠন কোথায় বেশি সক্রিয়?",
-      "options": [
-        "বন্দরে",
-        "নগরে",
-        "গ্রামে",
-        "শহরে"
-      ],
-      "answer": "নগরে",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বিশ্বের জনসংখ্যার কত শতাংশ শহরে বাস করে?",
-      "options": [
+        "২০",
         "৩০",
-        "৪০",
         "৫০",
-        "৬০"
+        "অসংখ্য"
       ],
-      "answer": "৪০",
+      "answer": "২০",
       "explanation": null,
       "reference": [
-        "পুলিশ লাইন্স স্কুল অ্যান্ড কলেজ, রংপুর"
+        "ম. বো. ২২; পটুয়াখালী সরকারি জুবিলী উচ্চ বিদ্যালয়; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -1586,17 +578,1443 @@
     },
     {
       "type": "SINGLE",
-      "question": "'ঢাকা ওয়াসা' কোন নদীর পানি চাঁদনীঘাট থেকে আহরণ করে?",
+      "question": "অংশীদারি ব্যবসায়ের সর্বনিম্ন সদস্য সংখ্যা কত?",
       "options": [
-        "ব্রহ্মপুত্র",
-        "করতোয়া",
-        "বুড়িগঙ্গা",
-        "আত্রাই"
+        "২ জন",
+        "৭ জন",
+        "১০ জন",
+        "২০ জন"
       ],
-      "answer": "বুড়িগঙ্গা",
+      "answer": "২ জন",
       "explanation": null,
       "reference": [
-        "দি. বো. ২০২১"
+        "ম. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ব্যাংকিং অংশীদারি ব্যবসায়ের সদস্য সীমা কত?",
+      "options": [
+        "২-১০",
+        "২-২০",
+        "২-৫০",
+        "৭-৫০"
+      ],
+      "answer": "২-১০",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৪; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যাংকিং সংক্রান্ত ব্যবসায়ে সদস্য সংখ্যা কত জনের বেশি হতে পারবে না?",
+      "options": [
+        "৩০ জন",
+        "২০ জন",
+        "১৫ জন",
+        "১০ জন"
+      ],
+      "answer": "১০ জন",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ের মূলধন সরবরাহ হয়—",
+      "options": [
+        "সামর্থ্য অনুযায়ী",
+        "চুক্তি অনুযায়ী",
+        "বয়স অনুযায়ী",
+        "অভিজ্ঞতা অনুযায়ী"
+      ],
+      "answer": "চুক্তি অনুযায়ী",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ে লাভ-লোকসান বণ্টন পদ্ধতি কোথায় উল্লেখ থাকে?",
+      "options": [
+        "দলিলপত্রে",
+        "আবেদনপত্রে",
+        "চুক্তিপত্রে",
+        "আইনে"
+      ],
+      "answer": "চুক্তিপত্রে",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৩; ব. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ের লাভ-লোকসান কী অনুযায়ী বণ্টিত হয়?",
+      "options": [
+        "চুক্তি",
+        "মূলধন",
+        "নিবন্ধন",
+        "স্মারকলিপি"
+      ],
+      "answer": "চুক্তি",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৩; সকল বোর্ড ১৯; কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "পারস্পরিক আস্থা ও বিশ্বাস কথাটি কোন ব্যবসায়ের ক্ষেত্রে প্রযোজ্য?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনী",
+        "রাষ্ট্রীয়"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "চূড়ান্ত সদ্বিশ্বাস কথাটি কোন ব্যবসায়ে প্রযোজ্য?",
+      "options": [
+        "সমবায় সমিতিতে",
+        "যৌথমূলধনি কারবারে",
+        "অংশীদারি কারবারে",
+        "রাষ্ট্রীয় কারবারে"
+      ],
+      "answer": "অংশীদারি কারবারে",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২২; আল-আমিন একাডেমী স্কুল এন্ড কলেজ, চাঁদপুর; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ে কখন আস্থা সংকট দেখা দেয়?",
+      "options": [
+        "পারস্পরিক বিশ্বাসযোগ্যতা হারালে",
+        "সিদ্ধান্ত গ্রহণে বিলম্ব হলে",
+        "চুক্তি লিখিত না হলে",
+        "মুনাফা কম হলে"
+      ],
+      "answer": "পারস্পরিক বিশ্বাসযোগ্যতা হারালে",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৪; আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অরুণ ও বরুণ সম-অংশীদারের ভিত্তিতে ২,০০,০০০ টাকা এবং ১,০০,০০০ টাকা বিনিয়োগ করেন। বরুণের ব্যবসায়িক অভিজ্ঞতা থাকায় তা মূলধনরূপে গণ্য হয়। অরুণ মুনাফার কত ভাগ পাবে?",
+      "options": [
+        "৪০%",
+        "৫০%",
+        "৬০%",
+        "৭০%"
+      ],
+      "answer": "৫০%",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ব্যবসায়ে চুক্তি সম্পাদনে কমপক্ষে কত জন ব্যক্তি প্রয়োজন?",
+      "options": [
+        "দুই জন",
+        "তিন জন",
+        "চার জন",
+        "পাঁচ জন"
+      ],
+      "answer": "দুই জন",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৩; পটুয়াখালী সরকারি জুবিলী উচ্চ বিদ্যালয়; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ের চুক্তি কত প্রকার?",
+      "options": [
+        "দুই",
+        "তিন",
+        "চার",
+        "পাঁচ"
+      ],
+      "answer": "তিন",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ইনু, মিনু, দিনু চুক্তিবদ্ধ হয়ে ব্যবসায় করতে চায়। তাদের ব্যবসায়ের ধরন হলো—",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "সমবায়",
+        "রাষ্ট্রীয়"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২২; সকল বোর্ড ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যবসায়ে সম্পর্ক সৃষ্টি হয় চুক্তি থেকে মর্যাদা থেকে নয়?",
+      "options": [
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "রাষ্ট্রীয়",
+        "সমবায় সমিতি"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি কারবারে চুক্তিপত্রের বিষয়বস্তু কতটি?",
+      "options": [
+        "৮টি",
+        "১২টি",
+        "১৭টি",
+        "২০টি"
+      ],
+      "answer": "১৭টি",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন প্রকারের অংশীদারের দায় অসীম?",
+      "options": [
+        "ঘুমন্ত অংশীদার",
+        "নামমাত্র অংশীদার",
+        "সাধারণ অংশীদার",
+        "আচরণে অনুমিত অংশীদার"
+      ],
+      "answer": "ঘুমন্ত অংশীদার",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪; সকল বোর্ড ২০; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; খুলনা জিলা স্কুল; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অনিবন্ধিত অংশীদারি প্রতিষ্ঠান সর্বোচ্চ কত টাকা পাওনা আদায়ের মামলা করতে পারে?",
+      "options": [
+        "১,০০,০০০",
+        "১০,০০০",
+        "১,০০০",
+        "১০০"
+      ],
+      "answer": "১০০",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন অংশীদার সক্রিয়ভাবে ব্যবসায় পরিচালনায় অংশগ্রহণ করে না?",
+      "options": [
+        "ঘুমন্ত অংশীদার",
+        "নামমাত্র অংশীদার",
+        "সীমিত অংশীদার",
+        "সাধারণ অংশীদার"
+      ],
+      "answer": "ঘুমন্ত অংশীদার",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২২; কৃষি বিশ্ববিদ্যালয় হাই স্কুল, ময়মনসিংহ; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "আঠারো বছরের কম বয়স্ক ব্যক্তিও অংশীদারি ব্যবসায়ে কোন ধরনের অংশীদার হতে পারে?",
+      "options": [
+        "সাধারণ অংশীদার",
+        "ঘুমন্ত অংশীদার",
+        "আপাতদৃষ্টিতে অংশীদার",
+        "সীমিত অংশীদার"
+      ],
+      "answer": "সীমিত অংশীদার",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন অংশীদারের দায় ব্যবসায়ের মূলধন দ্বারা সীমাবদ্ধ?",
+      "options": [
+        "আচরণে অনুমিত",
+        "নামমাত্র",
+        "সাধারণ",
+        "সীমিত"
+      ],
+      "answer": "সীমিত",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৩; উদয়ন মাধ্যমিক বিদ্যালয়, বরিশাল; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন অংশীদার ব্যবসায়ের কোনো কাজের জন্য তৃতীয় পক্ষের নিকট দায়বদ্ধ নয়?",
+      "options": [
+        "আপাতদৃষ্টিতে",
+        "নামমাত্র",
+        "সীমিত",
+        "ঘুমন্ত"
+      ],
+      "answer": "ঘুমন্ত",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি নামমাত্র অংশীদারের বৈশিষ্ট্য?",
+      "options": [
+        "ব্যবসায়ে অর্থ সরবরাহ করে",
+        "ব্যবসায় কার্যক্রম সম্পাদন করে",
+        "নিজের খ্যাতি ব্যবহার করে",
+        "ব্যবসায়ে এর দায় অসীম"
+      ],
+      "answer": "নিজের খ্যাতি ব্যবহার করে",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নামমাত্র অংশীদারের বৈশিষ্ট্য কোনটি?",
+      "options": [
+        "দায় অসীম",
+        "মূলধন বিনিয়োগ করে",
+        "তৃতীয় পক্ষের নিকট দায়বদ্ধ নয়",
+        "পরিচালনায় অংশগ্রহণ করে না"
+      ],
+      "answer": "পরিচালনায় অংশগ্রহণ করে না",
+      "explanation": null,
+      "reference": [
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "১৯৩২ সালের অংশীদারি আইনের কত ধারায় অংশীদারি ব্যবসায়ের বিলোপসাধন সম্পর্কে বলা হয়েছে?",
+      "options": [
+        "৪২",
+        "৪১",
+        "৪০",
+        "৩৯"
+      ],
+      "answer": "৩৯",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি প্রতিষ্ঠানে ন্যূনতম সদস্য ২ জন রাখা সম্ভব না হলে কীভাবে বিলোপসাধন হবে?",
+      "options": [
+        "বাধ্যতামূলকভাবে",
+        "আদালত কর্তৃক",
+        "বিজ্ঞপ্তি দ্বারা",
+        "বিশেষ ঘটনার প্রেক্ষিতে"
+      ],
+      "answer": "বাধ্যতামূলকভাবে",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায় বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন কখন ঘটে?",
+      "options": [
+        "ব্যবসায়ের নির্দিষ্ট সময় শেষ হয়ে গেলে",
+        "কোনো অংশীদারের মস্তিষ্ক বিকৃতি ঘটলে",
+        "কোনো কার্য দ্বারা ব্যবসায়টি আইন বিরুদ্ধ হলে",
+        "কোনো অংশীদারের দায়িত্ব পালনে অসমর্থ হলে"
+      ],
+      "answer": "ব্যবসায়ের নির্দিষ্ট সময় শেষ হয়ে গেলে",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারি ব্যবসায়ের বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন অংশীদারি আইনের কত ধারায় হয়?",
+      "options": [
+        "৪০ ধারা",
+        "৪১ ধারা",
+        "৪২ ধারা",
+        "৪৩ ধারা"
+      ],
+      "answer": "৪২ ধারা",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২১; সরকারি করোনেশন বালিকা উচ্চ বিদ্যালয়, খুলনা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+{
+      "type": "SINGLE",
+      "question": "আদালত কর্তৃক কোনো অংশীদার দেউলিয়া ঘোষিত হলে কোন ধরনের বিলোপসাধন ঘটবে?",
+      "options": [
+        "বিজ্ঞপ্তি দ্বারা বিলোপসাধন",
+        "সকলে একমত হয়ে বিলোপসাধন",
+        "বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন",
+        "বাধ্যতামূলক বিলোপসাধন"
+      ],
+      "answer": "বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন",
+      "explanation": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "\"কোনো অংশীদার লিখিত বিজ্ঞপ্তি দিলে\"—আইনের কোন ধারা মতে অংশীদারি ব্যবসায়ের বিলোপসাধন হয়?",
+      "options": [
+        "৪১",
+        "৪২",
+        "৪৩",
+        "৪৪"
+      ],
+      "answer": "৪৩",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৩; মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; বাংলাদেশ নৌবাহিনী স্কুল ও কলেজ, চট্টগ্রাম; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন কারণে আদালত অংশীদারি ব্যবসায়ের বিলুপ্তি ঘটাতে পারে?",
+      "options": [
+        "কোনো অংশীদারের মৃত্যু হলে",
+        "আদালত কর্তৃক কোনো অংশীদার দেউলিয়া ঘোষিত হলে",
+        "কোনো অংশীদার দায়িত্ব পালনে চিরতরে অসমর্থ হলে",
+        "ব্যবসায়ের নির্দিষ্ট সময় শেষ হয়ে গেলে"
+      ],
+      "answer": "কোনো অংশীদার দায়িত্ব পালনে চিরতরে অসমর্থ হলে",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৩; কু. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সানি ও মাহিনের ব্যবসায় প্রতিষ্ঠানটি লোকসান ব্যতীত পরিচালনা করা সম্ভব হচ্ছে না। নিচের কোন প্রক্রিয়ায় তাদের ব্যবসায়ের বিলুপ্তি হতে পারে?",
+      "options": [
+        "বাধ্যতামূলক",
+        "আদালতের নির্দেশে",
+        "সকলে একমত হয়ে",
+        "বিশেষ ঘটনাসাপেক্ষে"
+      ],
+      "answer": "আদালতের নির্দেশে",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অংশীদারের মস্তিষ্ক বিকৃত হওয়াতে ব্যবসায়ে কোন ধরনের বিলোপসাধন ঘটে?",
+      "options": [
+        "বাধ্যতামূলক",
+        "সম্মতিক্রমে",
+        "আদালতের নির্দেশে",
+        "বিজ্ঞপ্তি দ্বারা"
+      ],
+      "answer": "আদালতের নির্দেশে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "আনোয়ার ও সানোয়ার দুই বন্ধু সফলভাবে ব্যবসায় পরিচালনা করছিলেন। হঠাৎ সানোয়ার পাগল হয়ে যাওয়ায় তাদের ব্যবসায়ের বিলোপসাধন ঘটে। আনোয়ার ও সানোয়ারের ব্যবসায়ের কীরূপ বিলোপসাধন ঘটে?",
+      "options": [
+        "বাধ্যতামূলক",
+        "বিশেষ ঘটনা সাপেক্ষে",
+        "সকলে একমত হলে",
+        "আদালতের নির্দেশে"
+      ],
+      "answer": "আদালতের নির্দেশে",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কৃত্রিম সত্তার অধিকারী কোন ব্যবসায় সংগঠনকে বলা হয়?",
+      "options": [
+        "সমবায়",
+        "একমালিকানা",
+        "যৌথমূলধনি",
+        "অংশীদারি"
+      ],
+      "answer": "যৌথমূলধনি",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "প্রাইভেট লিমিটেড কোম্পানির সদস্য সংখ্যা কতজনের মধ্যে সীমাবদ্ধ?",
+      "options": [
+        "৮০",
+        "৭০",
+        "৬০",
+        "৫০"
+      ],
+      "answer": "৫০",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৫; চ. বো., য. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "১৯৯৪ সালের আইন দ্বারা সৃষ্ট ব্যবসায় কোনটি?",
+      "options": [
+        "একমালিকানা ব্যবসায়",
+        "রাষ্ট্রীয় ব্যবসায়",
+        "অংশীদারি ব্যবসায়",
+        "যৌথমূলধনি ব্যবসায়"
+      ],
+      "answer": "যৌথমূলধনি ব্যবসায়",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "উন্নত প্রযুক্তিসমৃদ্ধ শিল্পকারখানা গড়ে তুলতে উপযুক্ত সংগঠন কোনটি?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "কোম্পানি",
+        "সমবায় সমিতি"
+      ],
+      "answer": "কোম্পানি",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোম্পানির সকল দলিলপত্রে কোনটির ব্যবহার বাধ্যতামূলক?",
+      "options": [
+        "কোম্পানির সিল",
+        "নিবন্ধকের স্বাক্ষর",
+        "পরিচালকদের স্বাক্ষর",
+        "আইন উপদেষ্টার স্বাক্ষর"
+      ],
+      "answer": "কোম্পানির সিল",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪; হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "G.M কোম্পানির অনুমোদিত মূলধন ৫,০০,০০,০০০ টাকা। রিমুন উক্ত কোম্পানির ৭০ টাকা মূল্যের ১,০০,০০০টি শেয়ার ক্রয় করেছেন। রিমুনের দায় কত টাকার মধ্যে সীমাবদ্ধ থাকবে?",
+      "options": [
+        "৫,০০,০০,০০০ টাকা",
+        "৭০,০০,০০০ টাকা",
+        "৫,৭০,০০,০০০ টাকা",
+        "৪,৩০,০০,০০০ টাকা"
+      ],
+      "answer": "৭০,০০,০০০ টাকা",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "প্রাইভেট লি. কোম্পানির সদস্য সংখ্যা হবে—",
+      "options": [
+        "২ থেকে ২০ জন",
+        "৭ থেকে ৫০ জন",
+        "২ থেকে ১০ জন",
+        "২ থেকে ৫০ জন"
+      ],
+      "answer": "২ থেকে ৫০ জন",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "প্রাইভেট লি. কোম্পানির ন্যূনতম পরিচালক সংখ্যা কতজন?",
+      "options": [
+        "২ জন",
+        "৩ জন",
+        "৫ জন",
+        "৭ জন"
+      ],
+      "answer": "২ জন",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "আইন অনুযায়ী পাবলিক লিমিটেড কোম্পানির ন্যূনতম পরিচালকের সংখ্যা কত?",
+      "options": [
+        "৭ জন",
+        "৫ জন",
+        "৩ জন",
+        "২ জন"
+      ],
+      "answer": "৩ জন",
+      "explanation": null,
+      "reference": [
+        "ম. বো., রা. বো. ২১; সকল বোর্ড ১৮; রাজউক উত্তরা মডেল কলেজ, ঢাকা; বাংলাদেশ নৌবাহিনী স্কুল ও কলেজ, চট্টগ্রাম; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন ব্যবসায় সংগঠনের ক্ষেত্রে ব্যবসায়ের পরিধি বৃদ্ধির সুযোগ সবচেয়ে বেশি?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "প্রাইভেট লিমিটেড",
+        "পাবলিক লিমিটেড"
+      ],
+      "answer": "পাবলিক লিমিটেড",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৪; ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বিপুল সংখ্যক কর্মসংস্থানের সুযোগ সৃষ্টির জন্য কোন ব্যবসায় সবচেয়ে বেশি উপযোগী?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "সমবায় সমিতি"
+      ],
+      "answer": "যৌথমূলধনি",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোম্পানির গঠন প্রক্রিয়ার ধারাবাহিক পর্যায় কয়টি?",
+      "options": [
+        "২টি",
+        "৩টি",
+        "৪টি",
+        "৭টি"
+      ],
+      "answer": "৪টি",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২১; সরকারি করোনেশন বালিকা উচ্চ বিদ্যালয়, খুলনা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোম্পানির মূল দলিল কোনটি?",
+      "options": [
+        "স্মারকলিপি",
+        "পরিমেল নিয়মাবলি",
+        "নিবন্ধনপত্র",
+        "কার্যারম্ভের অনুমতিপত্র"
+      ],
+      "answer": "স্মারকলিপি",
+      "explanation": null,
+      "reference": [
+        "ম. বো., রা. বো. ২৫; কু. বো. ২১; লায়ন্স স্কুল এন্ড কলেজ, রংপুর; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটিকে কোম্পানি ব্যবসায়ের সংবিধান বলা হয়?",
+      "options": [
+        "ট্রেড লাইসেন্স",
+        "পরিমেল নিয়মাবলি",
+        "নিবন্ধিত চুক্তিপত্র",
+        "স্মারকলিপি"
+      ],
+      "answer": "স্মারকলিপি",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৬; আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটিকে কোম্পানি সংগঠনের গঠনতন্ত্র বলা হয়?",
+      "options": [
+        "নিবন্ধনপত্র",
+        "সংঘস্মারক",
+        "বিবরণপত্র",
+        "সংঘবিধি"
+      ],
+      "answer": "সংঘস্মারক",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোম্পানির পরিচালকদের দায়দায়িত্ব লিপিবদ্ধ থাকে কোনটিতে?",
+      "options": [
+        "নিবন্ধনপত্র",
+        "স্মারকলিপি",
+        "পরিমেল নিয়মাবলি",
+        "চুক্তিপত্র"
+      ],
+      "answer": "পরিমেল নিয়মাবলি",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন দলিলে কোম্পানির অভ্যন্তরীণ পরিচালনার সকল বিষয় লিপিবদ্ধ থাকে?",
+      "options": [
+        "স্মারকলিপি",
+        "পরিমেল নিয়মাবলি",
+        "নিবন্ধনপত্র",
+        "চুক্তিপত্র"
+      ],
+      "answer": "পরিমেল নিয়মাবলি",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যবসায় সংগঠনকে কার্যারম্ভের অনুমতিপত্র সংগ্রহ করতে হয়?",
+      "options": [
+        "একমালিকানা",
+        "প্রাইভেট লিমিটেড কোম্পানি",
+        "অংশীদারি",
+        "পাবলিক লিমিটেড কোম্পানি"
+      ],
+      "answer": "পাবলিক লিমিটেড কোম্পানি",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২২"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সমবায়ের শাব্দিক অর্থ কী?",
+      "options": [
+        "সম্মিলিত উদ্যোগে কাজ করা",
+        "যৌথভাবে মূলধন সরবরাহ করা",
+        "একতাবদ্ধভাবে ব্যবসায় করা",
+        "মিলেমিশে সিদ্ধান্ত গ্রহণ করা"
+      ],
+      "answer": "সম্মিলিত উদ্যোগে কাজ করা",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সমবায় সমিতি সর্বপ্রথম কোথায় প্রতিষ্ঠিত হয়?",
+      "options": [
+        "ইংল্যান্ডে",
+        "জাপানে",
+        "যুক্তরাষ্ট্রে",
+        "থাইল্যান্ডে"
+      ],
+      "answer": "ইংল্যান্ডে",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বিশ্বের সর্বপ্রথম সমবায় সমিতি 'রচডেল সমিতি' কোন সালে প্রতিষ্ঠিত হয়?",
+      "options": [
+        "১৮১২",
+        "১৮৪৪",
+        "১৯০৪",
+        "১৯৫৯"
+      ],
+      "answer": "১৮৪৪",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জাতীয় সমবায় ব্যাংক লিমিটেড কত সালে বাংলাদেশে কার্যক্রম শুরু করে?",
+      "options": [
+        "১৯৭১ সালে",
+        "১৯৭২ সালে",
+        "১৯৭৩ সালে",
+        "১৯৭৪ সালে"
+      ],
+      "answer": "১৯৭২ সালে",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সমবায় সমিতির প্রধান উদ্দেশ্য—",
+      "options": [
+        "মুনাফা অর্জন",
+        "জনকল্যাণ করা",
+        "আত্মনির্ভরশীল করা",
+        "মূলধন বৃদ্ধি করা"
+      ],
+      "answer": "আত্মনির্ভরশীল করা",
+      "explanation": null,
+      "reference": [
+        "ম. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "বাংলাদেশের সমবায় আইন কত সালের?",
+      "options": [
+        "১৯১৩",
+        "১৯৩২",
+        "২০০১",
+        "২০০০"
+      ],
+      "answer": "২০০১",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "প্রাথমিক সমবায় সমিতি নিবন্ধন করতে ন্যূনতম কত টাকার ট্রেজারি চালান জমা দিতে হয়?",
+      "options": [
+        "৫০",
+        "৩০০",
+        "১০০০",
+        "৩০০০"
+      ],
+      "answer": "৫০",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় সমবায় সমিতি নিবন্ধনের জন্য কত টাকার ট্রেজারি চালান লাগে?",
+      "options": [
+        "৫০",
+        "৩০০",
+        "১০০০",
+        "৫০০০"
+      ],
+      "answer": "১০০০",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২১"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "রাষ্ট্রীয় ব্যবসায়ের প্রধান উদ্দেশ্য কী?",
+      "options": [
+        "মুনাফা অর্জন",
+        "জনকল্যাণ",
+        "কর আদায়",
+        "সেবা প্রদান"
+      ],
+      "answer": "জনকল্যাণ",
+      "explanation": null,
+      "reference": [
+        "রা. বো., ব. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "“অস্ত্র নির্মাণ শিল্প” কোন ধরনের ব্যবসায় সংগঠনের অন্তর্ভুক্ত?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "রাষ্ট্রীয় ব্যবসায়"
+      ],
+      "answer": "রাষ্ট্রীয় ব্যবসায়",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জীবন বিমা কর্পোরেশন কোন ধরনের ব্যবসায় সংগঠনের অন্তর্গত?",
+      "options": [
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "সমবায়",
+        "রাষ্ট্রীয়"
+      ],
+      "answer": "রাষ্ট্রীয়",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "জীবন বিমা কর্পোরেশন কোন মন্ত্রণালয়ের অধীন?",
+      "options": [
+        "বাণিজ্য",
+        "শিল্প",
+        "অর্থ",
+        "পাট ও বস্ত্র"
+      ],
+      "answer": "অর্থ",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -1609,22 +2027,49 @@
     },
     {
       "type": "MULTIPLE",
-      "question": "বাংলাদেশের অধিকাংশ গ্রামীণ বসতি —",
+      "question": "একমালিকানা ব্যবসায়ের মালিক হলো—\nনিচের কোনটি সঠিক?",
       "options": [
         "i ও ii",
-        "ii ও iii",
         "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৩"
+      ],
+      "statements": [
+        "পরিচালক",
+        "অর্থের জোগানদাতা",
+        "সিদ্ধান্ত গ্রহণকারী"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "একমালিকানা ব্যবসায়ের বৈশিষ্ট্য হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
         "i, ii ও iii"
       ],
       "answer": "i ও iii",
       "explanation": null,
       "reference": [
-        "বগুড়া সরকারি বালিকা উচ্চ বিদ্যালয়"
+        "য. বো. ২২"
       ],
       "statements": [
-        "দোচালা ধরনের",
-        "পাকা ইটের তৈরি",
-        "চৌচালা ধরনের"
+        "মালিক সবসময় একজন ব্যক্তি হয়",
+        "চুক্তির মাধ্যমে গঠিত হয়",
+        "মালিককে একা সকল ঝুঁকি বহন করতে হয়"
       ],
       "context": null,
       "isMath": false,
@@ -1636,404 +2081,7 @@
     },
     {
       "type": "MULTIPLE",
-      "question": "বসতি স্থাপনের নিয়ামক—\nকোনটি সঠিক?",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "জয়পুরহাট সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [
-        "ভূপ্রকৃতি",
-        "পানীয় জলের সহজলভ্যতা",
-        "বনাঞ্চল"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "এক সঙ্গে অনেক মানুষ একত্রে বসবাস করার কারণ হলো—",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২০"
-      ],
-      "statements": [
-        "অসমতল ভূমি",
-        "মাটির উর্বরতা",
-        "উন্নত যোগাযোগ"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "গ্রামীণ বসতি ও শহুরে বসতির মধ্যে পার্থক্য থাকে-",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "সামসুল হক খান স্কুল অ্যান্ড কলেজ, ঢাকা"
-      ],
-      "statements": [
-        "নির্মাণ সামগ্রীর",
-        "রান্নাঘর, শোবার ঘরের",
-        "পথঘাটের"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "গ্রামীণ বসতিতে —",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০২০"
-      ],
-      "statements": [
-        "রাস্তার প্রাধান্য কম",
-        "প্রকৃতি নির্ভর অর্থনৈতিক কর্মকাণ্ড অধিক",
-        "দ্বিতীয় এবং তৃতীয় পর্যায়ের অর্থনৈতিক কার্যক্রম বেশি"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বিক্ষিপ্ত বসতি গড়ে উঠে-",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২০২৪"
-      ],
-      "statements": [
-        "অনুর্বর ভূমিতে",
-        "পশুচারণ এলাকায়",
-        "নদীর তীরবর্তী অঞ্চলে"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "গোষ্ঠীবদ্ধ বসতি স্থাপন নির্ভর করে —",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "ভূপ্রকৃতির উপর",
-        "উর্বর মাটির উপর",
-        "জলের উৎসের উপর"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "গ্রামীণ বসতিতে দেখা যায়-",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, লালমনিরহাট"
-      ],
-      "statements": [
-        "গোলাবাড়ি",
-        "গোয়ালঘর",
-        "ঘরের ভিতরে উঠান"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "রৈখিক বসতির বৈশিষ্ট্য হলো-",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২০২১"
-      ],
-      "statements": [
-        "বসতিগুলোর মধ্যস্থলে খামার দেখা যায়",
-        "বাঁধ এলাকা বসতির জন্য উপযোগী",
-        "বাড়িগুলো এলোমেলোভাবে গড়ে উঠে"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "শিক্ষা ও সংস্কৃতির শ্রেষ্ঠ পাদপীঠে পরিণত হয়েছে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০২১"
-      ],
-      "statements": [
-        "টলিডো",
-        "কর্ডোভা",
-        "সেভিল"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বাণিজ্যভিত্তিক নগর হলো—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০২০"
-      ],
-      "statements": [
-        "মিসরের আলেকজান্দ্রিয়া",
-        "বাংলাদেশের চট্টগ্রাম",
-        "ভারতের রাণিগঞ্জ"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "ঢাকায় জনসংখ্যা বেশি হওয়ার কারণ—\nকোনটি সঠিক?",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "শিল্পায়ন ও নগরায়ন",
-        "সুলভ পরিবহন",
-        "মনোরম পরিবেশ"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "অপরিকল্পিত নগর গড়ে ওঠার ফলে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০২০"
-      ],
-      "statements": [
-        "যানজটের সৃষ্টি হয়",
-        "ফসলের জমি হ্রাস পায়",
-        "পানিবাহিত রোগ বৃদ্ধি পায়"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "বাংলাদেশে পরিকল্পনাহীন নগরায়নের ফলে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০২১"
-      ],
-      "statements": [
-        "ফসলী জমি হ্রাস পাচ্ছে",
-        "ময়লা আবর্জনা অপসারণে বিঘ্ন সৃষ্টি হচ্ছে",
-        "উন্মুক্ত স্থান ও শিশুদের খেলাধুলায় ব্যাঘাত ঘটছে"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "অপরিকল্পিত নগরায়নের ফলে নেতিবাচক যে যে প্রভাব পড়ে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২০২৪"
-      ],
-      "statements": [
-        "বাসস্থানের তীব্র সংকট সৃষ্টি হয়",
-        "সৃষ্টি হচ্ছে বস্তি",
-        "ব্যাপক পরিবেশ অবক্ষয় ঘটে থাকে"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "চিত্রে প্রদর্শিত বসতি কোন ধরনের?",
-      "options": [
-        "সংঘবদ্ধ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "গোষ্ঠীবদ্ধ"
-      ],
-      "answer": "বিক্ষিপ্ত",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: বিক্ষিপ্তভাবে ছড়িয়ে থাকা বসতির ঘর",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "চিত্রের বসতির ক্ষেত্রে প্রযোজ্য—",
+      "question": "একমালিকানা ব্যবসায়ের বৈশিষ্ট্য হলো—\nনিচের কোনটি সঠিক?",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2043,37 +2091,14 @@
       "answer": "ii ও iii",
       "explanation": null,
       "reference": [
-        "ঢা. বো. ২০২৫"
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
       ],
       "statements": [
-        "বন্ধুর পার্বত্য অঞ্চলে গড়ে উঠে",
-        "অনেকগুলো পরিবার একত্রে বসবাস করে",
-        "বসতিটি পরবর্তীতে উন্নত শহর বা নগরীতে পরিণত হতে পারে"
+        "আইনসৃষ্ট প্রতিষ্ঠান",
+        "স্বল্প মূলধন",
+        "একক ঝুঁকি"
       ],
       "context": null,
-      "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: পথের মিলনস্থল ও নদীর তীরে গড়ে ওঠা গোষ্ঠীবদ্ধ বসতি",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "মনিরা কোথায় বেড়াতে এসেছে?",
-      "options": [
-        "গ্রামে",
-        "শহরে",
-        "উপকূলীয় এলাকায়",
-        "পাহাড়ি এলাকায়"
-      ],
-      "answer": "শহরে",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী সরকারি বালিকা উচ্চ বিদ্যালয়"
-      ],
-      "statements": [],
-      "context": "মাহমুদ সাহেবের মেয়ে মনিরা বাবার কাছে বেড়াতে এসে দেখতে পেল এখানে শুধু বড় বড় বাড়ি আর বাড়ি।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2082,104 +2107,8 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "এরূপ বসতি এলাকায় আছে—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "প্রশস্ত রাজপথ",
-        "পার্ক",
-        "কৃত্রিম লেক"
-      ],
-      "context": "মাহমুদ সাহেবের মেয়ে মনিরা বাবার কাছে বেড়াতে এসে দেখতে পেল এখানে শুধু বড় বড় বাড়ি আর বাড়ি।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "চিত্রে প্রদর্শিত বসতি কোন ধরনের?",
-      "options": [
-        "সংঘবদ্ধ বসতি",
-        "বিক্ষিপ্ত বসতি",
-        "সংঘবদ্ধ ও বিক্ষিপ্ত বসতি",
-        "সংঘবদ্ধ ও রৈখিক বসতি"
-      ],
-      "answer": "বিক্ষিপ্ত বসতি",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: দূরবর্তী অবস্থানে ছড়িয়ে থাকা বিক্ষিপ্ত বসতি",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "চিত্রে প্রদর্শিত বসতির বৈশিষ্ট্য হলো —",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "দুটি বাসগৃহ বা বসতির মধ্যে যথেষ্ট ব্যবধান",
-        "অতিক্ষুদ্র পরিবারভুক্ত বসতি",
-        "অধিবাসীদের সামাজিক ও অর্থনৈতিক বিচ্ছিন্নতা"
-      ],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: দূরবর্তী অবস্থানে ছড়িয়ে থাকা বিক্ষিপ্ত বসতি",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "আবিদ এর ভ্রমণ এলাকার বসতি কেমন?",
-      "options": [
-        "সংঘবদ্ধ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "পুঞ্জিভূত"
-      ],
-      "answer": "বিক্ষিপ্ত",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": "বাংলাদেশের আবিদ বৃহত্তম পর্বতমালা ভ্রমণ করে দেখতে পেলেন যে, সেখানকার বসতিগুলো তার এলাকার মতো নয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "রৈখিক বসতি দেখা যায়—",
+      "type": "MULTIPLE",
+      "question": "একমালিকানা ব্যবসায়ের বৈশিষ্ট্য হলো—\nনিচের কোনটি সঠিক?",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2188,165 +2117,25 @@
       ],
       "answer": "i ও ii",
       "explanation": null,
-      "reference": [],
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
+      ],
       "statements": [
-        "রাস্তার কিনারায়",
-        "নদীর কিনারায়",
-        "পাহাড়ের উপরে"
+        "মালিক ও ব্যবসায় অভিন্নতা",
+        "অসীম দায়",
+        "আস্থা ও বিশ্বাস"
       ],
-      "context": "বাংলাদেশের আবিদ বৃহত্তম পর্বতমালা ভ্রমণ করে দেখতে পেলেন যে, সেখানকার বসতিগুলো তার এলাকার মতো নয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "রিতার বাবার বাড়ির বসতির প্রকৃতি কোন ধরনের?",
-      "options": [
-        "গোষ্ঠীবদ্ধ বসতি",
-        "বিক্ষিপ্ত বসতি",
-        "রৈখিক বসতি",
-        "সংঘবদ্ধ বসতি"
-      ],
-      "answer": "রৈখিক বসতি",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": "রিতার বাবার বাড়ি পদ্মা নদীর তীরে অবস্থিত। অন্যদিকে তার শ্বশুর বাড়ি ঢাকা শহরে অবস্থিত।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "রিতার শ্বশুর বাড়ি এলাকার বসতির বৈশিষ্ট্য-",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "এক বাড়ি থেকে অন্য বাড়ির দূরত্ব কম",
-        "বাসগৃহের একত্রে সমাবেশ",
-        "বন্ধুর যোগাযোগ ব্যবস্থা"
-      ],
-      "context": "রিতার বাবার বাড়ি পদ্মা নদীর তীরে অবস্থিত। অন্যদিকে তার শ্বশুর বাড়ি ঢাকা শহরে অবস্থিত।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "“দৃশ্যপট-১” এ বর্ণিত বসতির প্রকৃতি কোন ধরনের?",
-      "options": [
-        "গোষ্ঠীবদ্ধ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "সংঘবদ্ধ"
-      ],
-      "answer": "রৈখিক",
-      "explanation": null,
-      "reference": [
-        "রা. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": "দৃশ্যপট-১: 'P' এর বাড়ি যমুনা নদীর তীরে অবস্থিত।\nদৃশ্যপট-২: 'Q' এর বাড়ি চট্টগ্রাম শহরে অবস্থিত।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "“দৃশ্যপট-২” এর এলাকার বসতির বৈশিষ্ট্য—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "বন্ধুর যোগাযোগ ব্যবস্থা",
-        "বাসগৃহের একত্রে সমাবেশ",
-        "এক বাড়ি থেকে অন্য বাড়ির দূরত্ব কম"
-      ],
-      "context": "দৃশ্যপট-১: 'P' এর বাড়ি যমুনা নদীর তীরে অবস্থিত।\nদৃশ্যপট-২: 'Q' এর বাড়ি চট্টগ্রাম শহরে অবস্থিত।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের আলোকে শেরপার বসতি নির্ধারণ করো।",
-      "options": [
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "নগর",
-        "সংঘবদ্ধ"
-      ],
-      "answer": "বিক্ষিপ্ত",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": "শেরপা এমন একটি বসতিতে বেড়ে উঠেছে, যেখানকার অধিবাসীদের পরস্পরের মধ্যে যোগাযোগ নেই বললেই চলে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "বসতিটি কোন ধরনের?",
-      "options": [
-        "সংঘবদ্ধ",
-        "বিক্ষিপ্ত",
-        "রৈখিক",
-        "নগর"
-      ],
-      "answer": "রৈখিক",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০১৯"
-      ],
-      "statements": [],
       "context": null,
       "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: মনু নদীর তীর ঘেঁষে গড়ে ওঠা রৈখিক বসতি",
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
       "table": null,
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "এ ধরনের বসতির সুবিধা হলো—",
+      "type": "MULTIPLE",
+      "question": "একমালিকানা ব্যবসায় জনপ্রিয় হিসেবে স্বীকৃত—\nনিচের কোনটি সঠিক?",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2355,37 +2144,16 @@
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
-      "reference": [],
+      "reference": [
+        "ঢা. বো. ২৩"
+      ],
       "statements": [
-        "বন্যা থেকে মুক্ত থাকা যায়",
-        "খালি জায়গায় গবাদিপশু পালন করা যায়",
-        "বসতিগুলোর মাঝখানে ফাঁকা থাকে"
+        "উন্নত দেশসমূহে",
+        "উন্নয়নশীল দেশসমূহে",
+        "অনুন্নত দেশসমূহে"
       ],
       "context": null,
       "isMath": false,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: মনু নদীর তীর ঘেঁষে গড়ে ওঠা রৈখিক বসতি",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "'ক' এর বসতিটি কোন ধরনের?",
-      "options": [
-        "নগর",
-        "বিচ্ছিন্ন",
-        "রৈখিক",
-        "সংঘবদ্ধ"
-      ],
-      "answer": "সংঘবদ্ধ",
-      "explanation": null,
-      "reference": [
-        "চ. বো. ২০২৫"
-      ],
-      "statements": [],
-      "context": "'ক' এমন একটা বসতিতে বাস করে যেখানে এক বাড়ি থেকে অন্য বাড়ির দূরত্ব কম এবং বাসগৃহের একত্রে সমাবেশ ঘটে।",
-      "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null,
@@ -2393,223 +2161,8 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "উল্লিখিত বসতি গড়ে উঠার কারণ—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "ভূপ্রকৃতি",
-        "উর্বর মাটি",
-        "জলের উৎস"
-      ],
-      "context": "'ক' এমন একটা বসতিতে বাস করে যেখানে এক বাড়ি থেকে অন্য বাড়ির দূরত্ব কম এবং বাসগৃহের একত্রে সমাবেশ ঘটে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "কল্পনা কোন ধরনের বসতিতে বাস করে?",
-      "options": [
-        "নগর বসতি",
-        "সংঘবদ্ধ বসতি",
-        "রৈখিক বসতি",
-        "বিক্ষিপ্ত বসতি"
-      ],
-      "answer": "বিক্ষিপ্ত বসতি",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": "কল্পনা এমন স্থানে বাস করে যেখানকার বসতিতে একটি পরিবার অন্য পরিবার থেকে ছড়ানো ছিটানো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "কল্পনার বসতির বৈশিষ্ট্য হলো—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "জলের উৎসের উপর নির্ভর করে গড়ে ওঠে",
-        "অতিক্ষুদ্র পরিবারভুক্ত বসতি",
-        "অধিবাসীদের সামাজিক ও অর্থনৈতিক বিচ্ছিন্নতা"
-      ],
-      "context": "কল্পনা এমন স্থানে বাস করে যেখানকার বসতিতে একটি পরিবার অন্য পরিবার থেকে ছড়ানো ছিটানো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "রিমার জানা বসতি কোন ধরনের?",
-      "options": [
-        "গোষ্ঠীবদ্ধ",
-        "সংঘবদ্ধ",
-        "রৈখিক",
-        "বিচ্ছিন্ন"
-      ],
-      "answer": "রৈখিক",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": "রিমা গ্রামীণ বসতি সম্পর্কে পড়তে গিয়ে জানতে পারল যে, এর মধ্যে এক ধরনের বসতি আছে যেটা একই সরলরেখায় গড়ে উঠে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উক্ত বসতি গড়ে ওঠে—",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "রাস্তার পাশে",
-        "নদীর কিনারায়",
-        "জলের উৎসের উপর"
-      ],
-      "context": "রিমা গ্রামীণ বসতি সম্পর্কে পড়তে গিয়ে জানতে পারল যে, এর মধ্যে এক ধরনের বসতি আছে যেটা একই সরলরেখায় গড়ে উঠে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "নাফিসার বসবাসকৃত শহরের জনসংখ্যার ঘনত্ব কত?",
-      "options": [
-        "৮৬",
-        "৭৬",
-        "৬৬",
-        "৫৬"
-      ],
-      "answer": "৮৬",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০২৪"
-      ],
-      "statements": [],
-      "context": "নাফিসা যে শহরে বাস করে সেখানকার জনসংখ্যা ৩৮,৭০০ জন এবং ঐ শহরের আয়তন ৪৫০ বর্গকিলোমিটার।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে কোন ধরনের নগরের কথা বলা হয়েছে?",
-      "options": [
-        "প্রশাসনিক",
-        "শিল্পভিত্তিক",
-        "বাণিজ্যভিত্তিক",
-        "সাংস্কৃতিক ক্রিয়াকলাপভিত্তিক"
-      ],
-      "answer": "সাংস্কৃতিক ক্রিয়াকলাপভিত্তিক",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০২১"
-      ],
-      "statements": [],
-      "context": "পৃথিবীর বিভিন্ন দেশের নগরগুলি গড়ে উঠেছে ধর্মীয় শিক্ষাসহ অন্যান্য কারণে। আবার বিখ্যাত ব্যক্তিদের জন্মস্থান কিংবা সমাধিকে কেন্দ্র করে নগরের বিকাশ ঘটে থাকে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে বর্ণিত বৈশিষ্ট্য অনুসারে কোন নগরগুলোর সাদৃশ্য রয়েছে?",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [],
-      "statements": [
-        "মক্কা, ক্যামব্রিজ",
-        "মুম্বাই, হলিউড",
-        "ফেজ, আলেকজান্দ্রিয়া"
-      ],
-      "context": "পৃথিবীর বিভিন্ন দেশের নগরগুলি গড়ে উঠেছে ধর্মীয় শিক্ষাসহ অন্যান্য কারণে। আবার বিখ্যাত ব্যক্তিদের জন্মস্থান কিংবা সমাধিকে কেন্দ্র করে নগরের বিকাশ ঘটে থাকে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে উল্লিখিত শহরটি কোন ধরনের নগর?",
-      "options": [
-        "শিল্পভিত্তিক",
-        "বাণিজ্যভিত্তিক",
-        "সাংস্কৃতিক ক্রিয়াকলাপভিত্তিক",
-        "স্বাস্থ্য নিবাস ও বিনোদনের কেন্দ্র"
-      ],
-      "answer": "স্বাস্থ্য নিবাস ও বিনোদনের কেন্দ্র",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০২০"
-      ],
-      "statements": [],
-      "context": "জনাব সামাদ পরিবার নিয়ে ভারতের পুরী শহরে বেড়াতে গেলেন। তারা শহরের প্রাকৃতিক সৌন্দর্য উপভোগ করলেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের শহরটি গড়ে উঠার কারণ —",
+      "type": "MULTIPLE",
+      "question": "একমালিকানা ব্যবসায়ের প্রধান অসুবিধা হলো—\nনিচের কোনটি সঠিক?",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2618,13 +2171,15 @@
       ],
       "answer": "i ও iii",
       "explanation": null,
-      "reference": [],
-      "statements": [
-        "কর্মক্লান্ত মানুষের ক্লান্তি দূর",
-        "নগরের প্রতি শিল্পের অধিক আকর্ষণ",
-        "অবসর ও বিনোদন"
+      "reference": [
+        "রা. বো. ২৬"
       ],
-      "context": "জনাব সামাদ পরিবার নিয়ে ভারতের পুরী শহরে বেড়াতে গেলেন। তারা শহরের প্রাকৃতিক সৌন্দর্য উপভোগ করলেন।",
+      "statements": [
+        "অসীম দায়",
+        "দ্রুত সিদ্ধান্ত গ্রহণ",
+        "সীমিত আয়তন"
+      ],
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2633,21 +2188,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "উদ্দীপকে কোন বসতির কথা বলা হয়েছে?",
+      "type": "MULTIPLE",
+      "question": "নিজস্ব তহবিলের মাধ্যমে ব্যবসায় পরিচালনা অধিকতর সহজ—\nনিচের কোনটি সঠিক",
       "options": [
-        "সংঘবদ্ধ",
-        "রৈখিক",
-        "বিক্ষিপ্ত",
-        "নগর"
+        "i ও ii",
+        "ii ও iii",
+        "i ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "নগর",
+      "answer": "ii ও iii",
       "explanation": null,
       "reference": [
-        "ব. বো. ২০২১"
+        "ব. বো. ২৫"
       ],
-      "statements": [],
-      "context": "শিল্পকারখানা, ব্যবসা বাণিজ্য প্রভৃতি কর্মকাণ্ডকে ভিত্তি করে এক বিশেষ ধরনের বসতি গড়ে ওঠে। বিশেষজ্ঞগণ ধারণা করেন, এই গঠন প্রক্রিয়ার মাধ্যমে ভবিষ্যতে বেশিরভাগ মানুষ উক্ত বসতির অন্তর্ভুক্ত হবে।",
+      "statements": [
+        "কোম্পানি",
+        "একমালিকানা",
+        "অংশীদারি"
+      ],
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2656,8 +2215,62 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "উদ্দীপকের প্রক্রিয়াটি অপরিকল্পিতভাবে হলে—",
+      "type": "MULTIPLE",
+      "question": "প্রায় ৮০% ব্যবসায় একমালিকানাভিত্তিক—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i",
+        "ii",
+        "i ও ii",
+        "i ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৩"
+      ],
+      "statements": [
+        "ইউরোপ",
+        "জাপান",
+        "আমেরিকা"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "একমালিকানা ব্যবসায়ের জনপ্রিয়তার কারণ হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [
+        "যেকোনো সময় ব্যবসায় আরম্ভ করতে পারে",
+        "লাভ-লোকসান একাই বহন করে",
+        "একক নিয়ন্ত্রণাধীন"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "লাউ, আলু, শিম, ফুলকপি ইত্যাদি পণ্যের ক্ষেত্রে একমালিকানা ব্যবসায় উপযোগী। কারণ—\nনিচের কোনটি সঠিক",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2666,13 +2279,815 @@
       ],
       "answer": "i ও iii",
       "explanation": null,
-      "reference": [],
-      "statements": [
-        "সামাজিক বিশৃঙ্খলা সৃষ্টি হয়",
-        "মহামারির প্রাদুর্ভাব হ্রাস পায়",
-        "কৃষি উৎপাদন ব্যাহত হয়"
+      "reference": [
+        "দি. বো. ২৬; চ. বো. ২৫; ঢা. বো. ২২"
       ],
-      "context": "শিল্পকারখানা, ব্যবসা বাণিজ্য প্রভৃতি কর্মকাণ্ডকে ভিত্তি করে এক বিশেষ ধরনের বসতি গড়ে ওঠে। বিশেষজ্ঞগণ ধারণা করেন, এই গঠন প্রক্রিয়ার মাধ্যমে ভবিষ্যতে বেশিরভাগ মানুষ উক্ত বসতির অন্তর্ভুক্ত হবে।",
+      "statements": [
+        "পণ্যগুলোর জন্য বেশি অর্থের প্রয়োজন হয় না",
+        "পণ্যগুলোর চাহিদা দ্রুত পরিবর্তনশীল",
+        "পণ্যগুলো তাড়াতাড়ি পচে যায়"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "অংশীদারি ব্যবসায়ের চুক্তি হতে পারে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "সি. বো., য. বো. ২৩"
+      ],
+      "statements": [
+        "মৌখিক",
+        "লিখিত",
+        "নিবন্ধিত"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "বাংলাদেশে অংশীদারি আইনে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "ii ও iii",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৩"
+      ],
+      "statements": [
+        "ব্যবসায়ের নিবন্ধনকে বাধ্যতামূলক করা হয়েছে",
+        "ব্যবসায়ের নিবন্ধনকে বাধ্যতামূলক করা হয়নি",
+        "নিবন্ধিত ব্যবসায়কে কিছু সুবিধা দেওয়া হয়েছে"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন হতে পারে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৬"
+      ],
+      "statements": [
+        "কোনো অংশীদারের মৃত্যু হলে",
+        "আদালত কর্তৃক কোনো অংশীদার দেউলিয়া ঘোষিত হলে",
+        "কোনো অংশীদারের মস্তিষ্ক বিকৃতি ঘটলে"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "একটি কোম্পানির স্মারকলিপিতে অন্তর্ভুক্ত থাকে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "ii ও iii",
+      "explanation": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [
+        "পরিচালকদের নাম",
+        "নিবন্ধিত ঠিকানা",
+        "মূলধনের পরিমাণ"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+{
+      "type": "MULTIPLE",
+      "question": "প্রাইভেট লিমিটেড কোম্পানির—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৬"
+      ],
+      "statements": [
+        "শেয়ার অবাধে হস্তান্তর করা যায় না",
+        "শেয়ারহোল্ডারদের দায় অসীম",
+        "সদস্য সংখ্যা ২-৫০ জনের মধ্যে সীমাবদ্ধ"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "কোম্পানি ব্যবসায়ের ক্ষেত্রে প্রযোজ্য হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৬"
+      ],
+      "statements": [
+        "সদস্যদের স্বেচ্ছায় গঠিত সংগঠন",
+        "গঠন জটিল ও আনুষ্ঠানিকতাপূর্ণ",
+        "মালিকানা এবং ব্যবস্থাপনা একই"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "রাষ্ট্রীয় ব্যবসায় গঠনের উদ্দেশ্য হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২১"
+      ],
+      "statements": [
+        "অধিক শিল্পায়ন ও কর্মসংস্থান সৃষ্টি",
+        "মুদ্রা ও ব্যাংকিং ব্যবসায় নিয়ন্ত্রণ",
+        "সম্পদের সুষম বণ্টন"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "অর্থ মন্ত্রণালয়ের অধীনে রাষ্ট্রীয় ব্যবসায়গুলো হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "ম. বো., ব. বো. ২১"
+      ],
+      "statements": [
+        "বাংলাদেশ ব্যাংক",
+        "বাংলাদেশ রেলওয়ে",
+        "জীবন বিমা কর্পোরেশন"
+      ],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের প্রথম পর্যায়ের ব্যবসায়ের ধরন কী?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "প্রাইভেট লি. কোম্পানি",
+        "পাবলিক লি. কোম্পানি"
+      ],
+      "answer": "একমালিকানা",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "মুনতারিন নিজ অর্থ দিয়ে একটি আইটি সেন্টার চালু করেন। উন্নত সেবার কারণে তার প্রতিষ্ঠানের সুনাম ও গ্রাহক দিন দিন বৃদ্ধি পাচ্ছে। এখন তিনি প্রতিষ্ঠানের আয়তন বৃদ্ধির জন্য সারা মনিকে অংশীদার হিসাবে নেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের দ্বিতীয় পর্যায়ের সিদ্ধান্ত বাস্তবায়নে প্রয়োজন—",
+      "options": [
+        "নিবন্ধনপত্র",
+        "চুক্তিপত্র",
+        "স্মারকলিপি",
+        "পরিমেল নিয়মাবলি"
+      ],
+      "answer": "চুক্তিপত্র",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "মুনতারিন নিজ অর্থ দিয়ে একটি আইটি সেন্টার চালু করেন। উন্নত সেবার কারণে তার প্রতিষ্ঠানের সুনাম ও গ্রাহক দিন দিন বৃদ্ধি পাচ্ছে। এখন তিনি প্রতিষ্ঠানের আয়তন বৃদ্ধির জন্য সারা মনিকে অংশীদার হিসাবে নেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "সাজু কোন ধরনের অংশীদার?",
+      "options": [
+        "নামমাত্র",
+        "সাধারণ",
+        "ঘুমন্ত",
+        "সীমিত"
+      ],
+      "answer": "ঘুমন্ত",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "রফিক, মিজান, সাজু তিনজন মিলে একটি অংশীদারি ব্যবসায় গঠন করে। চুক্তির মাধ্যমে তারা মূলধন বিনিয়োগ করে এবং মুনাফা বণ্টন করে কিন্তু সাজু ইচ্ছে করেই ব্যবসায় পরিচালনায় অংশগ্রহণ করে না।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের রফিক ও মিজানের ক্ষেত্রে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৬"
+      ],
+      "statements": [
+        "দায় অসীম",
+        "চুক্তি অনুযায়ী মুনাফা পায়",
+        "ব্যবসায় পরিচালনার জন্য পারিশ্রমিক পায়"
+      ],
+      "context": "রফিক, মিজান, সাজু তিনজন মিলে একটি অংশীদারি ব্যবসায় গঠন করে। চুক্তির মাধ্যমে তারা মূলধন বিনিয়োগ করে এবং মুনাফা বণ্টন করে কিন্তু সাজু ইচ্ছে করেই ব্যবসায় পরিচালনায় অংশগ্রহণ করে না।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "পিংকির ব্যবসায়টি কোন ধরনের?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "সমবায়",
+        "প্রাইভেট লি."
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪; খুলনা জিলা স্কুল; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": "পিংকি একজন ফ্যাশন ডিজাইনার। তিনি ১,০০,০০০ টাকা বিনিয়োগ করে ভালো আয় করেন। কোনো নিবন্ধন ছাড়া তার বান্ধবী আয়েশা তার সাথে শেয়ারে ব্যবসায় করার জন্য অলিখিত চুক্তি করেন। কিন্তু আয়েশা প্রতিষ্ঠানে কোনো কাজ করতেন না। পরবর্তীতে আয়েশা লাভের অংশ নিয়ে বিদেশে চলে যান।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "আয়েশা উক্ত প্রতিষ্ঠানের কোন ধরনের অংশীদার ছিলেন?",
+      "options": [
+        "সাধারণ",
+        "ঘুমন্ত",
+        "নামমাত্র",
+        "সীমিত"
+      ],
+      "answer": "ঘুমন্ত",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪; খুলনা জিলা স্কুল; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": "পিংকি একজন ফ্যাশন ডিজাইনার। তিনি ১,০০,০০০ টাকা বিনিয়োগ করে ভালো আয় করেন। কোনো নিবন্ধন ছাড়া তার বান্ধবী আয়েশা তার সাথে শেয়ারে ব্যবসায় করার জন্য অলিখিত চুক্তি করেন। কিন্তু আয়েশা প্রতিষ্ঠানে কোনো কাজ করতেন না। পরবর্তীতে আয়েশা লাভের অংশ নিয়ে বিদেশে চলে যান।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে সুমন ও তার বন্ধুদের সংগঠনটি কোন ধরনের সংগঠন?",
+      "options": [
+        "অংশীদারি",
+        "প্রাইভেট লি.",
+        "সমবায় সমিতি",
+        "একমালিকানা"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": "সুমন, আরিফ ও জামান তিন বন্ধু মিলে 'সানরাইজ' নামে একটি ব্যবসায় সংগঠন করে। তারা চুক্তির ভিত্তিতে লাভ-লোকসান বণ্টনের সিদ্ধান্ত নেয়। ২ বছর পর আরিফ আদালত কর্তৃক দেউলিয়া ঘোষিত হয়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের ব্যবসায়টির বিলোপসাধন কীভাবে হবে?",
+      "options": [
+        "আদালতের নির্দেশে বিলোপসাধন",
+        "বিজ্ঞপ্তির দ্বারা বিলোপসাধন",
+        "বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন",
+        "সকলে একমত হয়ে বিলোপসাধন"
+      ],
+      "answer": "বিশেষ ঘটনাসাপেক্ষে বিলোপসাধন",
+      "explanation": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": "সুমন, আরিফ ও জামান তিন বন্ধু মিলে 'সানরাইজ' নামে একটি ব্যবসায় সংগঠন করে। তারা চুক্তির ভিত্তিতে লাভ-লোকসান বণ্টনের সিদ্ধান্ত নেয়। ২ বছর পর আরিফ আদালত কর্তৃক দেউলিয়া ঘোষিত হয়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "সাফিন ও রাফিনের ব্যবসায়ের ধরন কী?",
+      "options": [
+        "অংশীদারি",
+        "প্রাইভেট লি.",
+        "পাবলিক লি.",
+        "সমবায়"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫"
+      ],
+      "statements": [],
+      "context": "সাফিন ও রাফিন দীর্ঘদিন মৌখিক আলোচনার ভিত্তিতে ব্যবসায় করে আসছেন। সম্প্রতি সাফিন স্বাধীনভাবে ব্যবসায় করে একাই ব্যবসায়ের সকল লাভ ভোগ করতে চান।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "সাফিনের সিদ্ধান্ত গ্রহণের ক্ষেত্রে যৌক্তিকতা হলো—\nনিচের কোনটি সঠিক",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "ii ও iii",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫"
+      ],
+      "statements": [
+        "ব্যবসায়ের আকার বৃদ্ধি",
+        "সহজ পরিচালনা",
+        "মূলধনের পরিমাণ কম"
+      ],
+      "context": "সাফিন ও রাফিন দীর্ঘদিন মৌখিক আলোচনার ভিত্তিতে ব্যবসায় করে আসছেন। সম্প্রতি সাফিন স্বাধীনভাবে ব্যবসায় করে একাই ব্যবসায়ের সকল লাভ ভোগ করতে চান।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "জনাব শাহিদের স্থাপিত কারখানাটি মালিকানার ভিত্তিতে কোন ধরনের ব্যবসায় সংগঠন?",
+      "options": [
+        "একমালিকানা",
+        "অংশীদারি",
+        "যৌথমূলধনি",
+        "সমবায়"
+      ],
+      "answer": "অংশীদারি",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৪; ম. বো. ২১"
+      ],
+      "statements": [],
+      "context": "জনাব শাহিদ ও তার বন্ধু রাজশাহীতে একটি বেকারির কারখানা স্থাপন করেন। সেখানে তিনি ২০ জন শ্রমিক নিয়োগ করেন এবং কারখানাটি ১৯৩২ সালের আইন দ্বারা পরিচালিত হয়ে আসছে।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "জনাব শাহিদ ও তার বন্ধুর কারখানা স্থাপনের ক্ষেত্রে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২৪; ম. বো. ২১"
+      ],
+      "statements": [
+        "নিবন্ধন বাধ্যতামূলক নয়",
+        "আইনগত সত্তার সৃষ্টি হয় না",
+        "নিজস্ব নামে পরিচালিত হতে পারে না"
+      ],
+      "context": "জনাব শাহিদ ও তার বন্ধু রাজশাহীতে একটি বেকারির কারখানা স্থাপন করেন। সেখানে তিনি ২০ জন শ্রমিক নিয়োগ করেন এবং কারখানাটি ১৯৩২ সালের আইন দ্বারা পরিচালিত হয়ে আসছে।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে রাহাত কোন ধরনের অংশীদার?",
+      "options": [
+        "নামমাত্র",
+        "আপাতদৃষ্টিতে",
+        "সীমিত",
+        "আচরণে অনুমিত"
+      ],
+      "answer": "সীমিত",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "রাকিব, রাশেদ ও রায়হান তিন বন্ধু সমঝোতার ভিত্তিতে একটি ব্যবসায় গঠন করেন। ব্যবসায় শুরুর কিছুদিন পর রায়হান সড়ক দুর্ঘটনায় মৃত্যুবরণ করেন। এমতাবস্থায় তার নাবালক শিশু রাহাতকে ব্যবসায় নিযুক্ত করা হয়। অন্যদিকে, রাকিব বিদেশে স্থায়ীভাবে বসবাস করবেন বলে সকল সদস্যকে জানিয়ে দেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকে বর্ণিত ব্যবসায়টি বিলোপসাধনের প্রক্রিয়াটি হলো—",
+      "options": [
+        "বিশেষ ঘটনাসাপেক্ষে",
+        "আদালতের নির্দেশে",
+        "বাধ্যতামূলক",
+        "বিজ্ঞপ্তি দ্বারা"
+      ],
+      "answer": "বিজ্ঞপ্তি দ্বারা",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "রাকিব, রাশেদ ও রায়হান তিন বন্ধু সমঝোতার ভিত্তিতে একটি ব্যবসায় গঠন করেন। ব্যবসায় শুরুর কিছুদিন পর রায়হান সড়ক দুর্ঘটনায় মৃত্যুবরণ করেন। এমতাবস্থায় তার নাবালক শিশু রাহাতকে ব্যবসায় নিযুক্ত করা হয়। অন্যদিকে, রাকিব বিদেশে স্থায়ীভাবে বসবাস করবেন বলে সকল সদস্যকে জানিয়ে দেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের প্রতিষ্ঠানটির ক্ষেত্রে বিলোপসাধনের কোন পদ্ধতি প্রযোজ্য হবে?",
+      "options": [
+        "বাধ্যতামূলক",
+        "বিশেষ ঘটনাসাপেক্ষে",
+        "আদালতের নির্দেশে",
+        "বিজ্ঞপ্তির মাধ্যমে"
+      ],
+      "answer": "বিশেষ ঘটনাসাপেক্ষে",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৬"
+      ],
+      "statements": [],
+      "context": "পলি, মলি ও ডলি তাদের বন্ধু জলির খ্যাতি ব্যবহার করে চুক্তিবদ্ধ হয়ে একটি ব্যবসায় গঠন করেন। তাদের মধ্যে ডলি ব্যবসায় পরিচালনায় অংশগ্রহণ করেন না। কিছুদিন পর মলি সড়ক দুর্ঘটনায় মৃত্যুবরণ করেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের প্রতিষ্ঠানে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৬"
+      ],
+      "statements": [
+        "পলির দায় অসীম",
+        "জলি নামমাত্র অংশীদার",
+        "ডলি সাধারণ অংশীদার"
+      ],
+      "context": "পলি, মলি ও ডলি তাদের বন্ধু জলির খ্যাতি ব্যবহার করে চুক্তিবদ্ধ হয়ে একটি ব্যবসায় গঠন করেন। তাদের মধ্যে ডলি ব্যবসায় পরিচালনায় অংশগ্রহণ করেন না। কিছুদিন পর মলি সড়ক দুর্ঘটনায় মৃত্যুবরণ করেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "প্রতিষ্ঠানটি অনিবন্ধিত হলে নজরুল কত টাকা পর্যন্ত পাওনা আদায়ে মামলা করতে পারত?",
+      "options": [
+        "১০০ টাকার বেশি",
+        "১০০ টাকার কম",
+        "১০০ টাকা",
+        "মামলা করা যেত না"
+      ],
+      "answer": "১০০ টাকা",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": "নজরুল একটি জুয়েলারি শপের অংশীদার। প্রতিষ্ঠানটি নিবন্ধিত। তারপরও একজন অংশীদার চুক্তির শর্ত ভেঙে প্রতারণার আশ্রয় নিয়েছে।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের প্রতিষ্ঠানটি সুবিধা পাবে—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও ii",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [
+        "চুক্তি ভঙ্গ করার মামলা করতে পারবে",
+        "তৃতীয় পক্ষের বিরুদ্ধে মামলা করতে পারবে",
+        "উদ্বৃত্ত অর্থ আদায় করতে পারবে"
+      ],
+      "context": "নজরুল একটি জুয়েলারি শপের অংশীদার। প্রতিষ্ঠানটি নিবন্ধিত। তারপরও একজন অংশীদার চুক্তির শর্ত ভেঙে প্রতারণার আশ্রয় নিয়েছে।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উক্ত সমবায় সমিতির প্রধান উদ্দেশ্য কী?",
+      "options": [
+        "মুনাফা অর্জন",
+        "আত্মনির্ভরশীলতা অর্জন",
+        "সমাজকল্যাণ",
+        "অর্থনৈতিক ভারসাম্য রক্ষা"
+      ],
+      "answer": "আত্মনির্ভরশীলতা অর্জন",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪"
+      ],
+      "statements": [],
+      "context": "পতেঙ্গা এলাকায় ৩০ লক্ষ কৃষক মিলিত হয়ে আইন অনুযায়ী পতেঙ্গা কৃষক সমবায় সমিতি গঠন করেন। সদস্যগণ পারস্পরিক সহযোগিতার মাধ্যমে ও গণতান্ত্রিক রীতি-নীতি অনুসারে সমিতি পরিচালনা করেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "পতেঙ্গা কৃষক সমবায় সমিতির ক্ষেত্রে প্রযোজ্য—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪"
+      ],
+      "statements": [
+        "একজন সদস্যের একটিমাত্র ভোটাধিকার থাকবে",
+        "কোনো সদস্য যেকোনো সংখ্যক শেয়ার ক্রয় করতে পারবে",
+        "নিজ নামে সম্পদ অর্জন করতে পারবে"
+      ],
+      "context": "পতেঙ্গা এলাকায় ৩০ লক্ষ কৃষক মিলিত হয়ে আইন অনুযায়ী পতেঙ্গা কৃষক সমবায় সমিতি গঠন করেন। সদস্যগণ পারস্পরিক সহযোগিতার মাধ্যমে ও গণতান্ত্রিক রীতি-নীতি অনুসারে সমিতি পরিচালনা করেন।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "জনাব মেহের আলীর সংগঠন কোন ধরনের?",
+      "options": [
+        "অংশীদারি",
+        "সমবায় সমিতি",
+        "যৌথমূলধনি কোম্পানি",
+        "রাষ্ট্রীয় ব্যবসায়"
+      ],
+      "answer": "সমবায় সমিতি",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২১"
+      ],
+      "statements": [],
+      "context": "নিজেদের উৎপাদিত আলু ও অন্যান্য শাকসবজি বাজারজাতকরণের লক্ষ্যে জনাব মেহের আলী জয়পুরহাট এলাকায় ৪০ জন সমমনা চাষীকে নিয়ে নিজেদের মঙ্গলের লক্ষ্যে একটি সংগঠন গড়ে তোলেন। তারা মোট মুনাফার ২০% সঞ্চিতি তহবিলে জমা রেখে বাকিটা সমভাবে নিজেদের মধ্যে বণ্টন করে নেয়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উক্ত সংগঠনটির বৈশিষ্ট্য হলো—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "ii ও iii",
+        "i ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i, ii ও iii",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২১"
+      ],
+      "statements": [
+        "গণতান্ত্রিক পরিচালনা",
+        "ন্যায়সঙ্গতভাবে ঝুঁকি ও সুযোগ-সুবিধা ভোগ",
+        "পারস্পরিক কল্যাণ সাধন"
+      ],
+      "context": "নিজেদের উৎপাদিত আলু ও অন্যান্য শাকসবজি বাজারজাতকরণের লক্ষ্যে জনাব মেহের আলী জয়পুরহাট এলাকায় ৪০ জন সমমনা চাষীকে নিয়ে নিজেদের মঙ্গলের লক্ষ্যে একটি সংগঠন গড়ে তোলেন। তারা মোট মুনাফার ২০% সঞ্চিতি তহবিলে জমা রেখে বাকিটা সমভাবে নিজেদের মধ্যে বণ্টন করে নেয়।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "উদ্দীপকের ব্যবসায়ে সাফল্য ও ব্যর্থতার জন্য কার কাছে জবাবদিহি করতে হয়?",
+      "options": [
+        "সরকার",
+        "জনগণ",
+        "চেয়ারম্যান",
+        "জাতীয় সংসদ"
+      ],
+      "answer": "জাতীয় সংসদ",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৫"
+      ],
+      "statements": [],
+      "context": "“গন্তব্য” একটি জনপ্রিয় পরিবহন সংস্থা। সড়ক পথে প্রতিদিন যাত্রীদের সেবা দিয়ে যাচ্ছে। এ ধরনের ব্যবসায়ে মূলধন সরবরাহ করে সরকার এবং জনগণ।",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "COMBINED",
+      "question": "“গন্তব্য” এর ক্ষেত্রে প্রযোজ্য—\nনিচের কোনটি সঠিক?",
+      "options": [
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৫"
+      ],
+      "statements": [
+        "কৃত্রিম সত্তার অধিকারী",
+        "মুনাফা অর্জনই মূখ্য লক্ষ্য",
+        "অধিক কর্মসংস্থান সৃষ্টি"
+      ],
+      "context": "“গন্তব্য” একটি জনপ্রিয় পরিবহন সংস্থা। সড়ক পথে প্রতিদিন যাত্রীদের সেবা দিয়ে যাচ্ছে। এ ধরনের ব্যবসায়ে মূলধন সরবরাহ করে সরকার এবং জনগণ।",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2680,7 +3095,5 @@
       "table": null,
       "bottomContent": null
     }
-  ],
-  "subjectId": "cmwrmhge900000gto9rooxt4v",
-  "className": "Nine"
+  ]
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { EditDanBamMilkoronView } from "../components/edit-dan-bam-milkoron-view"
 
 interface EditDanBamMilkoronPageProps {
@@ -8,8 +9,8 @@ interface EditDanBamMilkoronPageProps {
 
 export function EditDanBamMilkoronPage({ id }: EditDanBamMilkoronPageProps) {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
+    <Suspense>
       <EditDanBamMilkoronView id={id} />
-    </div>
+    </Suspense>
   )
 }

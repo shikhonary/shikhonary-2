@@ -12,7 +12,9 @@ export type FillInTheBlanksWithoutCluesSortOption = (typeof fillInTheBlanksWitho
 
 export const fillInTheBlanksWithoutCluesSearchParamsParsers = {
   query: parseAsString.withDefault(""),
+  classId: parseAsString.withDefault("All"),
   subjectId: parseAsString.withDefault("All"),
+  chapterId: parseAsString.withDefault("All"),
   difficulty: parseAsString.withDefault("All"),
   sort: parseAsStringEnum<FillInTheBlanksWithoutCluesSortOption>(Array.from(fillInTheBlanksWithoutCluesSortOptions)).withDefault("All"),
   page: parseAsInteger.withDefault(1),

@@ -303,10 +303,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       category = QUESTION_TYPE_CODES.ESSENCE;
     } else if (lowerName.includes("poem") || lowerName.includes("কবিতা")) {
       category = QUESTION_TYPE_CODES.POEM;
-    } else if (lowerName.includes("thought expansion") || lowerName.includes("thought_expansion") || lowerName.includes("ভাব-সম্প্রসারণ") || lowerName.includes("ভাবসম্প্রসারণ")) {
+    } else if (lowerName.includes("thought expansion") || lowerName.includes("thought_expansion") || lowerName.includes("amplification") || lowerName.includes("ভাব-সম্প্রসারণ") || lowerName.includes("ভাবসম্প্রসারণ")) {
       category = QUESTION_TYPE_CODES.THOUGHT_EXPANSION;
-    } else if (lowerName.includes("amplification")) {
-      category = QUESTION_TYPE_CODES.AMPLIFICATION;
     } else if (lowerName.includes("summary") || lowerName.includes("সারাংশ")) {
       category = QUESTION_TYPE_CODES.SUMMARY;
     }
@@ -597,8 +595,6 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
         await bulkAssign({ ...payloadBase, poemIds: selectedIds });
       } else if (category === "SUMMARY") {
         await bulkAssign({ ...payloadBase, summaryIds: selectedIds });
-      } else if (category === "AMPLIFICATION") {
-        await bulkAssign({ ...payloadBase, amplificationIds: selectedIds });
       } else if (category === "THOUGHT_EXPANSION") {
         await bulkAssign({ ...payloadBase, thoughtExpansionIds: selectedIds });
       } else if (category === "LETTER") {
