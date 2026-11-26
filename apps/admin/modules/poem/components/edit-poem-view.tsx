@@ -1,19 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useMemo, useState } from "react"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { ArrowLeft, Save, BookOpen, AlertCircle } from "lucide-react"
 import { toast } from "@workspace/ui/components/sonner"
-import { usePoemById, useUpdatePoem, useSubjectsForSelection, useAcademicClassesForSelection } from "../services/use-poem"
-import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/components/card"
+import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
-import { Label } from "@workspace/ui/components/label"
 import { Textarea } from "@workspace/ui/components/textarea"
-import { BookOpen, ArrowLeft, Loader2 } from "lucide-react"
+import { Label } from "@workspace/ui/components/label"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import {
   Select,
   SelectContent,
@@ -21,42 +22,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select"
-import { QUESTION_DIFFICULTY, QUESTION_DIFFICULTY_OPTIONS } from "@workspace/utils"
+import { PageHeader } from "@/components/shared/page-header"
+import {
+  usePoemById,
+  useUpdatePoem,
+  useAcademicClassesForSelection,
+  useSubjectsForSelection,
+} from "../services/use-poem"
 
-const editPoemFormSchema = z.object({
-  classId: z.string().min(1, "Please select an academic class"),
-  subjectId: z.string().min(1, "Please select a subject"),
-  title: z.string().min(1, "Poem lines / text prompt is required"),
+const editPoemSchema = z.object({
+  classId: z.string().min(1, "শ্রেণি নির্বাচন করুন"),
+  subjectId: z.string().min(1, "বিষয় নির্বাচন করুন"),
+  title: z.string().min(1, "কবিতার চরণ / টেক্সট আবশ্যক"),
   referenceText: z.string().optional(),
-  difficulty: z.nativeEnum(QUESTION_DIFFICULTY),
+  difficulty: z.enum([
+    QUESTION_DIFFICULTY.EASY,
+    QUESTION_DIFFICULTY.MEDIUM,
+    QUESTION_DIFFICULTY.HARD,
+  ]),
   popularityCount: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Popularity count must be a number",
+    message: "জনপ্রিয়তা সংখ্যা হতে হবে",
   }),
 })
 
-type EditPoemFormData = z.infer<typeof editPoemFormSchema>
+type EditPoemFormData = z.infer<typeof editPoemSchema>
+
+const difficultyLabels: Record<string, string> = {
+  EASY: "সহজ (Easy)",
+  MEDIUM: "মাঝারি (Medium)",
+  HARD: "কঠিন (Hard)",
+}
 
 export function EditPoemView() {
   const router = useRouter()
-  const params = useParams()
-  const poemId = params.id as string
+  const routeParams = useParams()
+  const poemId = routeParams?.id as string
+  const searchParams = useSearchParams()
+  const qs = searchParams.toString()
+  const listHref = qs ? `/poems?${qs}` : "/poems"
 
-  const { data: poemData, isLoading: isPoemLoading, isError } = usePoemById(poemId)
-  const updateMutation = useUpdatePoem()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { data: item, isLoading: isItemLoading, isError: isItemError } = usePoemById(poemId)
+  const updateMutation = useUpdatePoem()
 
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const initialClassId =
+    (item as any)?.subject?.classSubjects?.[0]?.classId ||
+    (item as any)?.subject?.academicClassId ||
+    ""
+
+  const formValues = useMemo<EditPoemFormData | undefined>(() => {
+    if (!item) return undefined
+
+    const rawDifficulty = item.difficulty as string
+    const validDifficulty =
+      rawDifficulty === QUESTION_DIFFICULTY.EASY ||
+      rawDifficulty === QUESTION_DIFFICULTY.MEDIUM ||
+      rawDifficulty === QUESTION_DIFFICULTY.HARD
+        ? rawDifficulty
+        : QUESTION_DIFFICULTY.MEDIUM
+
+    return {
+      classId: initialClassId,
+      subjectId: item.subjectId || "",
+      title: item.title || "",
+      referenceText: Array.isArray(item.reference) ? item.reference.join(", ") : "",
+      difficulty: validDifficulty,
+      popularityCount: String(item.popularityCount ?? 0),
+    }
+  }, [item, initialClassId])
 
   const {
     register,
     handleSubmit,
-    control,
     watch,
     setValue,
-    reset,
     formState: { errors, isSubmitting: isFormSubmitting },
   } = useForm<EditPoemFormData>({
-    resolver: zodResolver(editPoemFormSchema),
+    resolver: zodResolver(editPoemSchema),
     defaultValues: {
       classId: "",
       subjectId: "",
@@ -65,26 +107,39 @@ export function EditPoemView() {
       difficulty: QUESTION_DIFFICULTY.MEDIUM,
       popularityCount: "0",
     },
+    values: formValues,
+    resetOptions: { keepDirtyValues: true },
   })
 
-  // Load existing data
-  useEffect(() => {
-    if (poemData) {
-      reset({
-        classId: (poemData as any).subject?.classSubjects?.[0]?.classId || "",
-        subjectId: poemData.subjectId,
-        title: poemData.title,
-        referenceText: poemData.reference?.join(", ") || "",
-        difficulty: poemData.difficulty as any,
-        popularityCount: String(poemData.popularityCount),
-      })
-    }
-  }, [poemData, reset])
-
   const selectedClassId = watch("classId")
-  const { data: subjects = [] } = useSubjectsForSelection(
-    selectedClassId ? { academicClassId: selectedClassId } : undefined
+  const selectedSubjectId = watch("subjectId")
+  const selectedDifficulty = watch("difficulty")
+
+  const activeClassId = selectedClassId || formValues?.classId || ""
+  const activeSubjectId = selectedSubjectId || formValues?.subjectId || ""
+
+  const { data: classesData } = useAcademicClassesForSelection()
+  const { data: subjectsData } = useSubjectsForSelection(
+    activeClassId ? { academicClassId: activeClassId } : undefined
   )
+
+  const combinedClasses = useMemo(() => {
+    const list = Array.isArray(classesData) ? [...classesData] : []
+    const itemCls = (item as any)?.subject?.academicClass
+    if (activeClassId && itemCls && !list.some((c: any) => c.id === activeClassId)) {
+      list.unshift(itemCls)
+    }
+    return list
+  }, [classesData, activeClassId, item])
+
+  const combinedSubjects = useMemo(() => {
+    const list = Array.isArray(subjectsData) ? [...subjectsData] : []
+    const itemSub = item?.subject
+    if (activeSubjectId && itemSub && !list.some((s: any) => s.id === activeSubjectId)) {
+      list.unshift(itemSub as any)
+    }
+    return list
+  }, [subjectsData, activeSubjectId, item])
 
   const isSubmitting = updateMutation.isPending || isFormSubmitting
 
@@ -108,277 +163,190 @@ export function EditPoemView() {
         reference: referenceArray,
       })
 
-      toast.success("Poem updated successfully.")
-      setTimeout(() => {
-        router.push("/poems")
-      }, 500)
+      toast.success("কবিতা সফলভাবে আপডেট করা হয়েছে।")
+      router.push(listHref)
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update Poem")
-      toast.error(err.message || "Failed to update Poem")
+      const msg = err?.message || "কবিতা আপডেট করতে সমস্যা হয়েছে।"
+      setErrorMessage(msg)
+      toast.error(msg)
     }
   }
 
-  if (isPoemLoading) {
+  if (isItemLoading) {
     return (
-      <div className="py-24 text-center">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <p className="mt-3 font-body-md text-sm text-outline">Loading poem details...</p>
+      <div className="space-y-6">
+        <Skeleton className="h-16 w-full rounded-xl" />
+        <Skeleton className="h-44 w-full rounded-xl" />
+        <Skeleton className="h-44 w-full rounded-xl" />
       </div>
     )
   }
 
-  if (isError || !poemData) {
+  if (isItemError || !item) {
     return (
-      <div className="py-24 text-center max-w-md mx-auto space-y-4">
-        <p className="text-xl font-bold text-error">Poem Not Found</p>
-        <p className="text-sm text-outline">
-          The requested poem could not be loaded or may have been deleted.
-        </p>
+      <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-10 text-center space-y-4">
+        <AlertCircle className="size-10 text-destructive mx-auto" />
+        <h3 className="text-lg font-bold text-destructive">কবিতাটি খুঁজে পাওয়া যায়নি</h3>
         <Button asChild variant="outline">
-          <Link href="/poems">Back to Poems</Link>
+          <Link href={listHref}>তালিকায় ফিরে যান</Link>
         </Button>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Back Link */}
-      <div className="flex items-center gap-2">
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-on-surface-variant hover:text-on-surface gap-1.5"
-        >
-          <Link href="/poems">
+    <div className="space-y-6">
+      <PageHeader
+        title="কবিতা সম্পাদনা"
+        description="কবিতার চরণ এবং মেটাডেটা আপডেট করুন।"
+        icon={BookOpen}
+        breadcrumbs={[
+          { label: "কবিতা", href: listHref },
+          { label: "সম্পাদনা" },
+        ]}
+      >
+        <Button asChild variant="outline" size="sm" className="h-9 gap-2 rounded-lg">
+          <Link href={listHref}>
             <ArrowLeft className="size-4" />
-            <span>Back to Poems</span>
+            <span>ফিরে যান</span>
           </Link>
         </Button>
-      </div>
+      </PageHeader>
 
-      <Card className="rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-sm overflow-hidden">
-        <CardHeader className="bg-surface-container-low/50 border-b border-outline-variant/30 p-6">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-              <BookOpen className="size-5" />
-            </div>
-            <div>
-              <CardTitle className="font-headline-md text-xl font-bold text-on-surface">
-                Edit Poem
-              </CardTitle>
-              <p className="font-body-md text-xs sm:text-sm text-on-surface-variant mt-0.5">
-                Update poem verses, reference tags, or difficulty level.
-              </p>
-            </div>
-          </div>
-        </CardHeader>
+      {errorMessage && (
+        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium">
+          <AlertCircle className="size-5 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
-        <CardContent className="p-6">
-          {errorMessage && (
-            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
-              {errorMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Academic Classification */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Academic Association
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Academic Class */}
-                <div className="space-y-2">
-                  <Label htmlFor="classId" className="text-sm font-bold text-on-surface">
-                    Academic Class <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="classId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={(val) => {
-                          field.onChange(val)
-                          setValue("subjectId", "")
-                        }}
-                      >
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Select Academic Class" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {academicClasses.map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-neutral-900">
-                              {c.nameEn} {c.nameBn ? `(${c.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.classId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.classId.message}</p>
-                  )}
-                </div>
-
-                {/* Academic Subject */}
-                <div className="space-y-2">
-                  <Label htmlFor="subjectId" className="text-sm font-bold text-on-surface">
-                    Academic Subject <span className="text-red-500">*</span>
-                  </Label>
-                  <Controller
-                    name="subjectId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={!selectedClassId}
-                      >
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto disabled:opacity-50 disabled:cursor-not-allowed">
-                          <SelectValue placeholder={selectedClassId ? "Select Subject" : "Select Class First"} />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg max-h-64">
-                          {subjects.map((s) => (
-                            <SelectItem key={s.id} value={s.id} className="text-neutral-900">
-                              {s.nameEn} {s.nameBn ? `(${s.nameBn})` : ""}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.subjectId && (
-                    <p className="text-xs font-semibold text-red-500">{errors.subjectId.message}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Poem / Text Prompt */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">শ্রেণি ও বিষয়</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="title" className="text-sm font-bold text-on-surface">
-                  Poem Verses / Text Prompt <span className="text-red-500">*</span>
-                </Label>
-                <span className="text-[11px] text-muted-foreground italic">
-                  Press Enter between lines to preserve poem verses & stanzas
-                </span>
-              </div>
-              <Textarea
-                id="title"
-                rows={7}
-                placeholder="আমাদের ছোট নদী চলে বাঁকে বাঁকে..."
-                {...register("title")}
-                className="w-full rounded-xl border border-outline-variant bg-white p-3.5 font-solaiman text-base leading-relaxed outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10"
-              />
-              {errors.title && (
-                <p className="text-xs font-semibold text-red-500">{errors.title.message}</p>
+              <Label>
+                শ্রেণি <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                key={`cls-${activeClassId || "empty"}-${combinedClasses.length}`}
+                value={activeClassId}
+                onValueChange={(val) => {
+                  setValue("classId", val, { shouldValidate: true, shouldDirty: true })
+                  setValue("subjectId", "", { shouldDirty: true })
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="শ্রেণি নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedClasses.map((cls: any) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.nameBn || cls.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.classId && <p className="text-xs text-destructive">{errors.classId.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label>
+                বিষয় <span className="text-destructive">*</span>
+              </Label>
+              <Select
+                key={`sub-${activeSubjectId || "empty"}-${combinedSubjects.length}`}
+                value={activeSubjectId}
+                disabled={!activeClassId}
+                onValueChange={(val) =>
+                  setValue("subjectId", val, { shouldValidate: true, shouldDirty: true })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="বিষয় নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {combinedSubjects.map((sub: any) => (
+                    <SelectItem key={sub.id} value={sub.id}>
+                      {sub.nameBn || sub.nameEn}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.subjectId && <p className="text-xs text-destructive">{errors.subjectId.message}</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">কবিতার চরণ / বিষয়বস্তু</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">
+                কবিতার চরণ <span className="text-destructive">*</span>
+              </Label>
+              <Textarea id="title" rows={6} {...register("title")} />
+              {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-xs">
+          <CardHeader className="border-b border-border/60 pb-4">
+            <CardTitle className="text-base font-bold">মেটাডেটা ও রেফারেন্স</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>কঠিন্য</Label>
+              <Select
+                key={`diff-${selectedDifficulty || formValues?.difficulty || "MEDIUM"}`}
+                value={selectedDifficulty || formValues?.difficulty || QUESTION_DIFFICULTY.MEDIUM}
+                onValueChange={(val) =>
+                  setValue("difficulty", val as any, { shouldDirty: true })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="কঠিন্য নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {difficultyLabels[opt.value] || opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="popularityCount">জনপ্রিয়তা</Label>
+              <Input id="popularityCount" type="number" {...register("popularityCount")} />
+              {errors.popularityCount && (
+                <p className="text-xs text-destructive">{errors.popularityCount.message}</p>
               )}
             </div>
 
-            {/* Reference Tags & Metadata */}
-            <div className="space-y-4">
-              <h3 className="font-headline-sm text-sm font-bold uppercase tracking-wider text-outline">
-                Metadata & Classification
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Reference Citations */}
-                <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="referenceText" className="text-sm font-bold text-on-surface">
-                    Reference Tags / Exam Citations
-                  </Label>
-                  <Input
-                    id="referenceText"
-                    placeholder="e.g. Dhaka Board 2024, Rajshahi Board 2023, SSC 2022"
-                    {...register("referenceText")}
-                    className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                  />
-                  <p className="text-xs text-outline">
-                    Separate multiple citations with commas.
-                  </p>
-                </div>
-
-                {/* Difficulty */}
-                <div className="space-y-2">
-                  <Label htmlFor="difficulty" className="text-sm font-bold text-on-surface">
-                    Difficulty Level
-                  </Label>
-                  <Controller
-                    name="difficulty"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:ring-2 focus:ring-primary/10 h-auto">
-                          <SelectValue placeholder="Difficulty" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-outline-variant shadow-md rounded-lg">
-                          {QUESTION_DIFFICULTY_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.difficulty && (
-                    <p className="text-xs font-semibold text-red-500">{errors.difficulty.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Popularity Count */}
-              <div className="w-full sm:w-1/3 space-y-2">
-                <Label htmlFor="popularityCount" className="text-sm font-bold text-on-surface">
-                  Popularity / Views
-                </Label>
-                <Input
-                  id="popularityCount"
-                  type="number"
-                  min="0"
-                  {...register("popularityCount")}
-                  className="w-full rounded-xl border border-outline-variant bg-white py-2.5 px-4 font-body-md text-sm outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/10 h-auto"
-                />
-                {errors.popularityCount && (
-                  <p className="text-xs font-semibold text-red-500">{errors.popularityCount.message}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="referenceText">রেফারেন্স (কমা দিয়ে আলাদা করুন)</Label>
+              <Input id="referenceText" {...register("referenceText")} />
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-outline-variant/30">
-              <Button
-                asChild
-                type="button"
-                variant="outline"
-                className="rounded-xl border-outline-variant font-bold text-on-surface hover:bg-surface-container-high px-5 h-11"
-              >
-                <Link href="/poems">Cancel</Link>
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold px-6 h-11 gap-2 shadow-sm"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    <span>Updating Poem...</span>
-                  </>
-                ) : (
-                  <span>Update Poem</span>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button asChild type="button" variant="outline" className="rounded-lg">
+            <Link href={listHref}>বাতিল করুন</Link>
+          </Button>
+          <Button type="submit" disabled={isSubmitting} className="gap-2 rounded-lg font-semibold">
+            <Save className="size-4" />
+            <span>{isSubmitting ? "আপডেট হচ্ছে..." : "আপডেট করুন"}</span>
+          </Button>
+        </div>
+      </form>
     </div>
   )
 }

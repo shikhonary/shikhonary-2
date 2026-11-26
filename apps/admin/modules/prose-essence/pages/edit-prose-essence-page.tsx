@@ -1,5 +1,4 @@
-"use client"
-
+import { Suspense } from "react"
 import { EditProseEssenceView } from "../components/edit-prose-essence-view"
 
 interface EditProseEssencePageProps {
@@ -7,5 +6,9 @@ interface EditProseEssencePageProps {
 }
 
 export function EditProseEssencePage({ id }: EditProseEssencePageProps) {
-  return <EditProseEssenceView id={id} />
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">লোড হচ্ছে...</div>}>
+      <EditProseEssenceView id={id} />
+    </Suspense>
+  )
 }

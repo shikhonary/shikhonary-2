@@ -1,12 +1,70 @@
 {
-  "chapterTitle": "মালিকানার ভিত্তিতে ব্যবসায়",
+  "chapterTitle": "অর্থের সময়মূল্য",
   "questions": [
     {
-      "question": "একমালিকানা ব্যবসায় জনপ্রিয়তার কারণ কী? অথবা, একমালিকানা ব্যবসায় সবচেয়ে জনপ্রিয় কেন? ব্যাখ্যা করো।",
+      "question": "একজন বিনিয়োগকারী হিসেবে তুমি কীভাবে অর্থের সময়মূল্যের ধারণাটি ব্যবহার করবে?",
       "answer": null,
       "reference": [
+        "ময়মনসিংহ বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থের বর্তমান ও ভবিষ্যৎ মূল্যের পার্থক্যকারী উপাদানটি ব্যাখ্যা করো। অথবা, সময়ের পরিবর্তনের সাথে অর্থের মূল্যের পরিবর্তনের মূল কারণ কী? যুক্তি দাও।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "আজকের ১ টাকা আগামী দিনের ১ টাকার সমান না হওয়ার কারণ কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ব্লু বার্ড স্কুল এন্ড কলেজ, সিলেট"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থের সময়মূল্য কাকে বলে? অথবা, অর্থের সময়মূল্যের ধারণা দাও।",
+      "answer": null,
+      "reference": [
+        "সিলেট বোর্ড ২০২৬",
+        "রংপুর জিলা স্কুল"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "দুটি প্রকল্পের মধ্যে একটি গ্রহণ করে অন্যটির সুবিধা ত্যাগ করাকে কী বলে? অথবা, সুযোগ ব্যয় কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "কুমিল্লা বোর্ড ২০২৬",
         "যশোর বোর্ড ২০২৬",
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম; নি. প. ২৫"
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ",
+        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
+        "ইবনে তাইমিয়া স্কুল এন্ড কলেজ, কুমিল্লা",
+        "নবাব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা",
+        "চিটাগাং আইডিয়াল হাই স্কুল",
+        "যশোর জিলা স্কুল"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -15,12 +73,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোন ব্যবসায়কে প্রাচীনতম ব্যবসায় সংগঠন বলা হয় ও কেন? অথবা, পৃথিবীর প্রাচীনতম ব্যবসায় সংগঠন কোনটি? ব্যাখ্যা করো। অথবা, একমালিকানা ব্যবসায়কে প্রাচীনতম ব্যবসায় সংগঠন বলা হয় কেন?",
+      "question": "সুযোগ ব্যয় সৃষ্টি হওয়ার কারণ লেখো।",
       "answer": null,
       "reference": [
-        "বরিশাল বোর্ড ২০২৬",
-        "চট্টগ্রাম বোর্ড ২০২৬",
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+        "সেন্ট প্লাসিডস স্কুল এন্ড কলেজ, চট্টগ্রাম",
+        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -29,7 +86,45 @@
       "attachmentDescription": null
     },
     {
-      "question": "একমালিকানা ব্যবসায়কে প্রাচীনতম ও জনপ্রিয় ব্যবসায় বলা হয় কেন? ব্যাখ্যা করো।",
+      "question": "বার্ষিক চক্রবৃদ্ধিতে বিনিয়োগকৃত অর্থ দ্বিগুণ করার ধারণাটি লেখো।",
+      "answer": null,
+      "reference": [
+        "নারায়ণগঞ্জ সরকারি বালিকা উচ্চ বিদ্যালয়",
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "রুল '৭২' কেন ব্যবহার করা হয়? অথবা, বিনিয়োগ সিদ্ধান্তে 'রুল-৭২'-এর ভূমিকা ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "ঢাকা বোর্ড ২০২৬",
+        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "প্রকল্প মূল্যায়নে অর্থের সময়মূল্য গুরুত্বপূর্ণ কেন?",
+      "answer": null,
+      "reference": [
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ঋণ গ্রহণ সিদ্ধান্তের বিবেচ্য বিষয়সমূহ ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
         "রাজশাহী বোর্ড ২০২৬"
@@ -41,12 +136,11 @@
       "attachmentDescription": null
     },
     {
-      "question": "একমালিকানা ব্যবসায়ে 'মালিকের দায় অসীম' কথাটি ব্যাখ্যা করো। অথবা, একমালিকানা ব্যবসায়ের দায় অসীম কেন? অথবা, একমালিকানা ব্যবসায়ের দায়ের ধরন ব্যাখ্যা করো।",
+      "question": "উপযুক্ত ঋণ সিদ্ধান্ত গ্রহণে কীভাবে অর্থের সময়মূল্য সাহায্য করে? ব্যাখ্যা করো। অথবা, আর্থিক প্রতিষ্ঠান থেকে ঋণ গ্রহণের ক্ষেত্রে কেন অর্থের সময়মূল্য বিবেচনা করা হয়?",
       "answer": null,
       "reference": [
-        "ঢাকা বোর্ড ২০২৬",
-        "বরিশাল জিলা স্কুল",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
+        "দিনাজপুর বোর্ড ২০২৬",
+        "বরিশাল বোর্ড ২০২৬"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -55,10 +149,10 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোন ব্যবসায়ের গঠন সহজ এবং কেন? ব্যাখ্যা করো।",
+      "question": "ঋণের কিস্তি পরিশোধে অর্থের সময়মূল্যের গুরুত্ব ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০২৬"
+        "সরকারি মুসলিম উচ্চ বিদ্যালয়, চট্টগ্রাম"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -67,10 +161,10 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোন ধরনের ব্যবসায়ে গোপনীয়তা রক্ষা পায় বেশি? ব্যাখ্যা করো।",
+      "question": "'উপযুক্ত বিনিয়োগ খাত নির্বাচনে অর্থের সময়মূল্যের ধারণা গুরুত্বপূর্ণ' – যুক্তি দাও।",
       "answer": null,
       "reference": [
-        "চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২৫"
+        "ব্লু বার্ড স্কুল এন্ড কলেজ, সিলেট"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -79,10 +173,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "বাংলাদেশের সামগ্রিক অবস্থা বিবেচনায় কোন ব্যবসায় সংগঠন বেশি উপযোগী? ব্যাখ্যা করো।",
+      "question": "অর্থের সময়মূল্যের ধারণা ব্যবসায়ের ক্ষেত্রে কেন গুরুত্বপূর্ণ?",
       "answer": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৬"
+        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা",
+        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
+        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -91,122 +187,15 @@
       "attachmentDescription": null
     },
     {
-      "question": "স্বর্ণকারের দোকান কোন ধরনের মালিকানায় হওয়া উচিত? ব্যাখ্যা করো।",
+      "question": "রুল-৭২ কী?",
       "answer": null,
       "reference": [
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সবজি দোকানিকে একাই ঝুঁকি বহন করতে হয় কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "একমালিকানা ব্যবসায়ের সীমাবদ্ধতা দূর করার জন্য কোন ব্যবসায়ের উদ্ভব হয়েছে? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অংশীদারদের অসীম দায়ের ধারণা দাও।",
-      "answer": null,
-      "reference": [
-        "বরিশাল জিলা স্কুল; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "'চুক্তিই অংশীদারি ব্যবসায়ের মূলভিত্তি'— ব্যাখ্যা করো। অথবা, চুক্তিই অংশীদারি ব্যবসায়ের মূলভিত্তি কেন?",
-      "answer": null,
-      "reference": [
-        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৫",
-        "চিটাগাং আইডিয়াল হাই স্কুল; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অংশীদারি ব্যবসায়ের চুক্তি কীরূপ হওয়া উত্তম? ব্যাখ্যা করো। অথবা, অংশীদারি ব্যবসায়ের চুক্তি লিখিত হওয়া উত্তম কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬",
-        "বীরশ্রেষ্ঠ মুন্সী আব্দুর রউফ পাবলিক কলেজ, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "“অংশীদারি সম্পর্ক সৃষ্টি হয় চুক্তি থেকে, মর্যাদা থেকে নয়”— যুক্তি দাও।",
-      "answer": null,
-      "reference": [
-        "যশোর জিলা স্কুল",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চুক্তিপত্রের বিষয়বস্তু লেখো।",
-      "answer": null,
-      "reference": [
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অংশীদারি ব্যবসায় নিবন্ধিত হওয়া উত্তম কেন? ব্যাখ্যা করো। অথবা, অনিবন্ধিত অংশীদারি ব্যবসায়ের চেয়ে নিবন্ধিত অংশীদারি ব্যবসায় উত্তম কেন?",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬",
-        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ঘুমন্ত অংশীদার কাদেরকে বলা হয়?",
-      "answer": null,
-      "reference": [
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২৫"
+        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
+        "ইবনে তাইমিয়া স্কুল এন্ড কলেজ, কুমিল্লা",
+        "বাকলিয়া সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম",
+        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
+        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
       ],
       "difficulty": "EASY",
       "isMath": false,
@@ -215,10 +204,22 @@
       "attachmentDescription": null
     },
     {
-      "question": "ঘুমন্ত অংশীদারের বৈশিষ্ট্যগুলো বর্ণনা করো।",
+      "question": "মি. আসাদ ১৫,০০০ টাকা ৮ বছরের জন্য সোনালী ব্যাংকে জমা রাখল। কত % হার সুদে উক্ত টাকা দ্বিগুণ হবে?",
       "answer": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৬"
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
+      "difficulty": "HARD",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থের বর্তমান মূল্য ও ভবিষ্যৎ মূল্য সমান নয় কেন? ব্যাখ্যা করো। অথবা, আজকের ১০০ টাকা ১০ বছর পর সমান মূল্য ধারণ করে না কেন?",
+      "answer": null,
+      "reference": [
+        "নৌবাহিনী কলেজ, ঢাকা"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -227,11 +228,10 @@
       "attachmentDescription": null
     },
     {
-      "question": "নামমাত্র অংশীদার বলতে কী বোঝায়? অথবা, নামমাত্র অংশীদার কে? বর্ণনা করো।",
+      "question": "অর্থের সময়মূল্য অনুসারে ঋণ গ্রহণের সিদ্ধান্ত ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "বরিশাল বোর্ড ২০২৬",
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী; নি. প. ২৫"
+        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -240,11 +240,12 @@
       "attachmentDescription": null
     },
     {
-      "question": "আচরণে অনুমিত অংশীদার বলতে কী বোঝায়? অথবা, আচরণে অনুমিত অংশীদারের ধারণা ব্যাখ্যা করো।",
+      "question": "চক্রবৃদ্ধিকরণ পদ্ধতিটি ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
         "সিলেট বোর্ড ২০২৬",
-        "চট্টগ্রাম বোর্ড ২০২৬"
+        "নবাব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা",
+        "বাকলিয়া সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -253,11 +254,10 @@
       "attachmentDescription": null
     },
     {
-      "question": "কীভাবে অংশীদারি ব্যবসায়ের বিলোপসাধন হয়?",
+      "question": "একটি উদাহরণের সাহায্যে চক্রবৃদ্ধিকরণ প্রক্রিয়াটি ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "সরকারি অগ্রগামী বালিকা উচ্চ বিদ্যালয় ও কলেজ, সিলেট",
-        "বরিশাল জিলা স্কুল; নি. প. ২৫"
+        "ময়মনসিংহ বোর্ড ২০২৬"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -266,22 +266,238 @@
       "attachmentDescription": null
     },
     {
-      "question": "বাধ্যতামূলক বিলোপসাধন কী? ব্যাখ্যা করো।",
+      "question": "বছরে একাধিকবার চক্রবৃদ্ধি বিষয়টি উদাহরণসহ ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "চক্রবৃদ্ধিকরণ প্রয়োজন কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "যশোর জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "উদাহরণসহ সরল সুদের ধারণা দাও।",
+      "answer": null,
+      "reference": [
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "চক্রবৃদ্ধি সুদ কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা",
+        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সরল মুনাফা ও চক্রবৃদ্ধি মুনাফার মধ্যে দুটি পার্থক্য লেখো।",
+      "answer": null,
+      "reference": [
+        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বিনিয়োগকারীদের কাছে সরল সুদ অপেক্ষা চক্রবৃদ্ধি সুদ কেন বেশি গ্রহণযোগ্য? অথবা, কেন অনেক গ্রাহক চক্রবৃদ্ধি সুদকে সরল সুদের চেয়ে ভালো মনে করে?",
+      "answer": null,
+      "reference": [
+        "দিনাজপুর বোর্ড ২০২৬",
+        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ভবিষ্যতে প্রাপ্ত অর্থের আজকের মূল্য কী নামে পরিচিত? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাট্টাকরণ প্রক্রিয়াটি কী? ব্যাখ্যা করো। অথবা, বাট্টাকরণ পদ্ধতি কাকে বলে?",
+      "answer": null,
+      "reference": [
+        "রাজশাহী বোর্ড ২০২৬",
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
+        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা",
+        "সরকারি মুসলিম উচ্চ বিদ্যালয়, চট্টগ্রাম",
+        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম",
+        "চিটাগাং আইডিয়াল হাই স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "একটি নতুন প্রকল্পে বিনিয়োগের সময় বাট্টাকরণ প্রক্রিয়া কেন ব্যবহার করা হয়?",
+      "answer": null,
+      "reference": [
+        "বরিশাল বোর্ড ২০২৬"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "১ বছর পর ৫০ টাকার চেয়ে বর্তমান ৫০ টাকা অধিক মূল্য বহন করার কারণ কী?",
+      "answer": null,
+      "reference": [
+        "বি এ এফ শাহীন কলেজ, তেজগাঁও, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বর্তমান মূল্য নির্ণয়ের প্রক্রিয়াটি লেখো।",
+      "answer": null,
+      "reference": [
+        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা"
+      ],
+      "difficulty": "EASY",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থের বর্তমান মূল্যের সাথে সুদের হারের সম্পর্ক কীরূপ? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাট্টাকরণ ও চক্রবৃদ্ধিকরণের মধ্যে পার্থক্য কী?",
+      "answer": null,
+      "reference": [
+        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থের বর্তমান মূল্য ও ভবিষ্যৎ মূল্যের মধ্যে দুটি পার্থক্য লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সুদের হার বলতে কী বোঝায়? বর্ণনা করো।",
+      "answer": null,
+      "reference": [
+        "রংপুর জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "প্রকৃত সুদের হার কী? ব্যাখ্যা দাও।",
+      "answer": null,
+      "reference": [
+        "সিলেট বোর্ড ২০২৬",
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
+        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
+        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
+        "বি এ এফ শাহীন কলেজ, তেজগাঁও, ঢাকা",
+        "নারায়ণগঞ্জ সরকারি বালিকা উচ্চ বিদ্যালয়",
+        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
+        "রংপুর জিলা স্কুল"
+      ],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মাসিক ৪% হারে চক্রবৃদ্ধি মুনাফায় ঋণ গ্রহণ করলে প্রকৃত সুদের হার কত হবে তা নির্ণয় করো।",
+      "answer": null,
+      "reference": [
+        "চট্টগ্রাম বোর্ড ২০২৬"
+      ],
+      "difficulty": "HARD",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "করিম সাহেব গ্রাম্য মহাজন থেকে মাসিক ১% চক্রবৃদ্ধি হারে ঋণ গ্রহণ করে। এক্ষেত্রে প্রকৃত সুদের হার নির্ণয় করো।",
       "answer": null,
       "reference": [
         "যশোর বোর্ড ২০২৬"
       ],
-      "difficulty": "MEDIUM",
+      "difficulty": "HARD",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
       "attachmentDescription": null
     },
     {
-      "question": "কোন কোন কারণে বিশেষ ঘটনাসাপেক্ষে অংশীদারি ব্যবসায়ের বিলোপসাধন হয়?",
+      "question": "প্রকৃত সুদের হার এবং নামিক সুদের হার কখন ভিন্ন হয়? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [
-        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ"
       ],
       "difficulty": "MEDIUM",
       "isMath": false,
@@ -290,146 +506,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোনো অংশীদারের মস্তিষ্ক বিকৃত হলে ব্যবসায়ের কোন ধরনের বিলোপসাধন হবে?",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "যৌথমূলধনি কোম্পানি বলতে কী বোঝ?",
-      "answer": null,
-      "reference": [
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, চট্টগ্রাম",
-        "পুলিশ লাইন্স স্কুল এন্ড কলেজ, রংপুর; নি. প. ২৫"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোম্পানি ব্যবসায়কে স্বেচ্ছামূলক প্রতিষ্ঠান বলা হয় কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "যৌথমূলধনি কোম্পানিকে কৃত্রিম ব্যক্তিসত্তার অধিকারী বলা হয় কেন?",
-      "answer": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড",
-        "রাজশাহী বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চিরন্তন অস্তিত্ব কথাটি বুঝিয়ে লেখো।",
-      "answer": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোম্পানির কৃত্রিম ব্যক্তিসত্তা বলতে কী বোঝায়? ব্যাখ্যা করো। অথবা, কৃত্রিম ব্যক্তিসত্তা সম্পর্কে ধারণা দাও।",
-      "answer": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোম্পানি নিজ নামে চুক্তি ও লেনদেন করতে পারে কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "শেয়ার কী?",
-      "answer": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রাইভেট লিমিটেড কোম্পানি কাকে বলে?",
-      "answer": null,
-      "reference": [
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কীভাবে প্রাইভেট লিমিটেড কোম্পানি থেকে পাবলিক লিমিটেড কোম্পানি ভিন্ন? ব্যাখ্যা দাও। অথবা, “প্রাইভেট লিমিটেড কোম্পানি ও পাবলিক লিমিটেড কোম্পানি এক নয়”— ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২৬",
-        "রাজশাহী বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রাইভেট ও পাবলিক লিমিটেড কোম্পানির মধ্যে দুটি পার্থক্য লেখো।",
-      "answer": null,
-      "reference": [
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মূলধন গঠনে যৌথমূলধনি ব্যবসায়ের ভূমিকা উল্লেখ করো।",
+      "question": "নামিক ও প্রকৃত সুদের হারের মধ্যে দুটি পার্থক্য লেখো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -439,138 +516,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কোম্পানির নিবন্ধনপত্র সংগ্রহের উপায় কী?",
-      "answer": null,
-      "reference": [
-        "বিএএফ শাহীন কলেজ, তেজগাঁও, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্মারকলিপি কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "স্মারকলিপিকে কোম্পানির মূল দলিল বলা হয় কেন? অথবা, “স্মারকলিপি কোম্পানির মূল্যবান দলিল” ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৬",
-        "যশোর জিলা স্কুল; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কোন ব্যবসায়ের জন্য কার্যারম্ভের অনুমতিপত্র প্রয়োজন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২৫"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সমবায় সংগঠন গড়ে ওঠার কারণ কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রাথমিক সমবায় সমিতি বলতে কী বোঝায়? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "কেন প্রাথমিক সমবায় সমিতি কেন্দ্রীয় সমবায় সমিতি থেকে ভিন্ন?",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সমবায় গঠনের মুখ্য উদ্দেশ্য কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "‘সমবায় সমিতির গঠনতন্ত্র হলো উপবিধি’— যুক্তি দাও।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সমবায়ের মূলমন্ত্র কোনটি এবং কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সমবায় সমিতি কীভাবে মধ্যস্বত্বভোগীদের দৌরাত্ম্য কমাতে ভূমিকা রাখে?",
-      "answer": null,
-      "reference": [],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "রাষ্ট্রীয় ব্যবসায় কাকে বলে?",
-      "answer": null,
-      "reference": [
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ; নি. প. ২৫"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "‘রাষ্ট্রীয় ব্যবসায়ের মূল উদ্দেশ্য জনকল্যাণ’— যুক্তি দাও।",
+      "question": "সুদ ও মুনাফা কি একই অর্থ বহন করে না? ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -580,6 +526,6 @@
       "attachmentDescription": null
     }
   ],
-  "subjectId": "cmwrfqgr70000n0tovr0v3183",
+  "subjectId": "cmwxhwt2a00006ctoeigqqb3a",
   "className": "Nine"
 }

@@ -1575,10 +1575,6 @@ export async function deleteQuestionPaper(
     throw notFound("QuestionPaper")
   }
 
-  if (existing.status === "Published") {
-    throw badRequest("একবার প্রকাশিত প্রশ্নপত্র ডিলিট করা সম্ভব নয়।")
-  }
-
   const updated = await tenantDb.questionPaper.update({
     where: { id: input.id },
     data: {
@@ -1658,20 +1654,25 @@ function remapSettingsIds(
   rawSettings: Record<string, any>,
   idMap: Map<string, string>
 ): Record<string, any> {
+  const sortedEntries = Array.from(idMap.entries()).sort(
+    (a, b) => b[0].length - a[0].length
+  )
+
+  const remapKey = (key: string): string => {
+    let currentKey = key
+    for (const [oldId, newId] of sortedEntries) {
+      if (currentKey.includes(oldId)) {
+        currentKey = currentKey.replaceAll(oldId, newId)
+      }
+    }
+    return currentKey
+  }
+
   const remapRecordKeys = (obj: any) => {
     if (!obj || typeof obj !== "object" || Array.isArray(obj)) return obj
     const next: Record<string, any> = {}
     for (const [k, v] of Object.entries(obj)) {
-      let mappedKey = idMap.get(k)
-      if (!mappedKey) {
-        for (const [oldId, newId] of idMap.entries()) {
-          if (k.startsWith(`${oldId}-`)) {
-            mappedKey = `${newId}${k.slice(oldId.length)}`
-            break
-          }
-        }
-      }
-      next[mappedKey || k] = v
+      next[remapKey(k)] = v
     }
     return next
   }
@@ -1691,6 +1692,32 @@ function remapSettingsIds(
   if (result.dismissedSubSectionIds) {
     result.dismissedSubSectionIds = remapIdArray(result.dismissedSubSectionIds)
   }
+  if (result.hiddenSectionTitleIds) {
+    result.hiddenSectionTitleIds = remapIdArray(result.hiddenSectionTitleIds)
+  }
+  if (result.hiddenSectionInstructionIds) {
+    result.hiddenSectionInstructionIds = remapIdArray(result.hiddenSectionInstructionIds)
+  }
+  if (Array.isArray(result.blocks)) {
+    result.blocks = result.blocks.map((b: any) => {
+      if (!b || typeof b !== "object") return b
+      const nextB = { ...b, id: remapKey(b.id) }
+      if (nextB.data && typeof nextB.data === "object") {
+        nextB.data = { ...nextB.data }
+        if (nextB.data.id && idMap.has(nextB.data.id)) {
+          nextB.data.id = idMap.get(nextB.data.id)
+        }
+        if (nextB.data.item && typeof nextB.data.item === "object") {
+          nextB.data.item = {
+            ...nextB.data.item,
+            id: idMap.get(nextB.data.item.id) || nextB.data.item.id,
+            distributionId: idMap.get(nextB.data.item.distributionId) || nextB.data.item.distributionId,
+          }
+        }
+      }
+      return nextB
+    })
+  }
   return result
 }
 
@@ -1708,13 +1735,18 @@ async function cloneQuestionPaper(
     where: { id: sourceId },
     include: {
       subjects: {
+        orderBy: { orderIndex: "asc" },
         include: {
-          distributions: true,
+          distributions: {
+            orderBy: { orderIndex: "asc" },
+          },
         },
       },
       sections: {
+        orderBy: { orderIndex: "asc" },
         include: {
           subSections: {
+            orderBy: { orderIndex: "asc" },
             include: {
               distributions: true,
             },
@@ -1723,8 +1755,11 @@ async function cloneQuestionPaper(
       },
       questions: {
         where: { parentQuestionId: null },
+        orderBy: { orderIndex: "asc" },
         include: {
-          alternatives: true,
+          alternatives: {
+            orderBy: { orOrder: "asc" },
+          },
         },
       },
     },
@@ -1749,7 +1784,9 @@ async function cloneQuestionPaper(
       settings: baseSettings,
       instructions: source.instructions ?? [],
       isTemplate: false,
-      status: "Draft",
+      status: source.status,
+      publishedAt: source.status === "Published" ? (source.publishedAt ?? new Date()) : null,
+      publishedBy: source.status === "Published" ? (source.publishedBy ?? actorId) : null,
       total: source.total,
       timeInMinutes: source.timeInMinutes,
       createdBy: actorId,
@@ -1759,6 +1796,7 @@ async function cloneQuestionPaper(
   const remappedIds = new Map<string, string>()
   const sectionIdMap = new Map<string, string>()
   const subSectionIdMap = new Map<string, string>()
+  const subjectIdMap = new Map<string, string>()
 
   for (const section of source.sections) {
     const newSection = await tenantDb.questionPaperSection.create({
@@ -1798,8 +1836,11 @@ async function cloneQuestionPaper(
         subjectId: subject.subjectId,
         subjectName: subject.subjectName,
         subjectTotal: subject.subjectTotal,
+        orderIndex: subject.orderIndex,
       },
     })
+    subjectIdMap.set(subject.id, newSubject.id)
+    remappedIds.set(subject.id, newSubject.id)
 
     for (const dist of subject.distributions) {
       const newDist = await tenantDb.questionPaperSubjectMarkDistribution.create({
@@ -1820,6 +1861,7 @@ async function cloneQuestionPaper(
         },
       })
       distIdMap.set(dist.id, newDist.id)
+      remappedIds.set(dist.id, newDist.id)
     }
   }
 

@@ -561,6 +561,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
     const savedSettings = dbSettings && typeof dbSettings === 'object' ? (dbSettings as any) : {};
     const hasSavedExamName = typeof savedSettings.examName === 'string' && savedSettings.examName.trim().length > 0;
     const hasSavedClassName = typeof savedSettings.className === 'string' && savedSettings.className.trim().length > 0;
+    const hasSavedSubjectName = typeof savedSettings.subjectName === 'string' && savedSettings.subjectName.trim().length > 0;
 
     if (paperData) {
       if (!hasSavedExamName && (paperData.examName || paperData.title)) {
@@ -569,8 +570,13 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
       if (!hasSavedClassName && (paperData.academicClass?.nameBn || paperData.academicClass?.nameEn)) {
         finalSettings.className = paperData.academicClass.nameBn || paperData.academicClass.nameEn;
       }
-      if (paperData.subjects?.length > 0) {
-        finalSettings.subjectName = paperData.subjects.map((s: any) => s.subject?.nameBn || s.subject?.nameEn).join(", ");
+      if (!hasSavedSubjectName && paperData.subjects?.length > 0) {
+        const resolvedSubjects = paperData.subjects
+          .map((s: any) => s.subjectName || s.subject?.nameBn || s.subject?.nameEn)
+          .filter(Boolean);
+        if (resolvedSubjects.length > 0) {
+          finalSettings.subjectName = resolvedSubjects.join(", ");
+        }
       }
       
       const englishToBengali: Record<string, string> = {

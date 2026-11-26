@@ -424,34 +424,45 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
           )}
           
           <div className={`grid gap-x-2 gap-y-0 ${gridClass}`}>
-            {(item.overrides?.shuffledOptions || data.options || []).map((opt: string, i: number) => {
-              const label = ["ক", "খ", "গ", "ঘ"][i] || "";
-              const isFilledAnswer = isAnswerMode && isCorrectMcqOption(data, opt, i);
-              const optItemKey = `${item.id}-opt-${i}`;
-              const optCustomStyle = settings.itemStyles?.[optItemKey];
-              const baseFontSize = optCustomStyle?.fontSize ?? settings.fontSize ?? 13;
-              const indicatorFontSize = getIndicatorFontSize(baseFontSize);
-              const effectiveFontFamily = optCustomStyle?.fontFamily || settings.fontFamily;
-              
-              return (
-                <div key={i} className="flex gap-1.5 items-start w-full">
-                  <McqOptionLabel
-                    label={label}
-                    optionStyle={settings.optionStyle}
-                    isFilledAnswer={isFilledAnswer}
-                    fontSize={indicatorFontSize}
-                    fontFamily={effectiveFontFamily}
-                  />
-                  <span className="w-full">
-                    <EditableItem 
-                      content={<RenderMath text={opt} />}
-                      itemKey={optItemKey}
-                      defaultStyle={questionStyle}
+            {(() => {
+              const displayOptions = item.overrides?.shuffledOptions || data.options || item.contentSnapshot?.options || [];
+              const mcqPayload = {
+                answer: item.overrides?.answer ?? data.answer ?? item.contentSnapshot?.answer ?? item.answer,
+                options: data.options ?? item.contentSnapshot?.options ?? [],
+                shuffledOptions: item.overrides?.shuffledOptions,
+                overrides: item.overrides,
+                contentSnapshot: item.contentSnapshot,
+              };
+
+              return displayOptions.map((opt: string, i: number) => {
+                const label = ["ক", "খ", "গ", "ঘ"][i] || "";
+                const isFilledAnswer = isAnswerMode && isCorrectMcqOption(mcqPayload, opt, i);
+                const optItemKey = `${item.id}-opt-${i}`;
+                const optCustomStyle = settings.itemStyles?.[optItemKey];
+                const baseFontSize = optCustomStyle?.fontSize ?? settings.fontSize ?? 13;
+                const indicatorFontSize = getIndicatorFontSize(baseFontSize);
+                const effectiveFontFamily = optCustomStyle?.fontFamily || settings.fontFamily;
+                
+                return (
+                  <div key={i} className="flex gap-1.5 items-start w-full">
+                    <McqOptionLabel
+                      label={label}
+                      optionStyle={settings.optionStyle}
+                      isFilledAnswer={isFilledAnswer}
+                      fontSize={indicatorFontSize}
+                      fontFamily={effectiveFontFamily}
                     />
-                  </span>
-                </div>
-              );
-            })}
+                    <span className="w-full">
+                      <EditableItem 
+                        content={<RenderMath text={opt} />}
+                        itemKey={optItemKey}
+                        defaultStyle={questionStyle}
+                      />
+                    </span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>

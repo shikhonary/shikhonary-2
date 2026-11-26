@@ -3,61 +3,191 @@ import type { PaperSettings } from "../../../types";
 import { cn } from "@workspace/ui/lib/utils";
 
 const OPTION_LETTER_INDEX_MAP: Record<string, number> = {
-  "1": 0,
-  "১": 0,
+  // Bengali letters
   "ক": 0,
-  a: 0,
-  "2": 1,
-  "২": 1,
   "খ": 1,
-  b: 1,
-  "3": 2,
-  "৩": 2,
   "গ": 2,
-  c: 2,
-  "4": 3,
-  "৪": 3,
   "ঘ": 3,
-  d: 3,
-  "5": 4,
-  "৫": 4,
   "ঙ": 4,
-  e: 4,
-  "6": 5,
-  "৬": 5,
   "চ": 5,
+
+  // English letters
+  a: 0,
+  b: 1,
+  c: 2,
+  d: 3,
+  e: 4,
   f: 5,
+
+  // Bengali digits
+  "১": 0,
+  "২": 1,
+  "৩": 2,
+  "৪": 3,
+  "৫": 4,
+  "৬": 5,
+
+  // English digits
+  "1": 0,
+  "2": 1,
+  "3": 2,
+  "4": 3,
+  "5": 4,
+  "6": 5,
+
+  // Roman numerals
+  i: 0,
+  ii: 1,
+  iii: 2,
+  iv: 3,
+  v: 4,
+  vi: 5,
 };
+
+/** Strips HTML tags, trims, and normalizes whitespace */
+function normalizeText(text: string | null | undefined): string {
+  if (!text) return "";
+  return String(text)
+    .replace(/<[^>]*>/g, " ")
+    .replace(/[\u00a0\u200b\u200e\u200f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Strips leading option prefixes like "ক)", "(ক)", "ক.", "ক।", "1.", "A)", "(a)", etc.
+ * Only strips if there is actual remaining text after the prefix.
+ */
+function stripOptionPrefix(text: string | null | undefined): string {
+  if (!text) return "";
+  const clean = normalizeText(text);
+  const prefixMatch = clean.match(
+    /^[\s([（{<]*([কখগঘঙচabcdefABCDEF১২৩৪৫৬123456]|(?:i{1,3}|iv|v|vi))[\s)\]）}>.:\-–—|।]*(.+)$/i
+  );
+  if (prefixMatch && prefixMatch[2] && prefixMatch[2].trim().length > 0) {
+    return prefixMatch[2].trim();
+  }
+  return clean;
+}
+
+/** Normalizes an answer indicator like "(ক)", "Ans: B", "উত্তর: ৩।" into a clean key */
+function cleanAnswerIndicator(text: string | null | undefined): string {
+  if (!text) return "";
+  let cleaned = normalizeText(text);
+  cleaned = cleaned.replace(/^(উত্তর|সঠিক উত্তর|ans|answer)[\s:：\-–—]*/i, "").trim();
+  cleaned = cleaned.replace(/^[\(\[\{（<'"“‘]+|[\)\]\}）>'"”’]+$/g, "").trim();
+  cleaned = cleaned.replace(/[\.:\-–—\)\]\s|।]+$/, "").trim();
+  return cleaned.toLowerCase();
+}
 
 /** Determines whether a displayed MCQ option corresponds to the question's correct answer. */
 export function isCorrectMcqOption(
-  mcqData: { answer?: string | null; options?: string[] | null } | null | undefined,
+  mcqData: {
+    answer?: string | null;
+    options?: string[] | null;
+    shuffledOptions?: string[] | null;
+    overrides?: { answer?: string | null; shuffledOptions?: string[] | null } | null;
+    contentSnapshot?: { answer?: string | null; options?: string[] | null } | null;
+  } | null | undefined,
   displayedOption: string,
   displayedIndex: number
 ): boolean {
-  const rawAnswer = String(mcqData?.answer ?? "").trim();
+  if (!mcqData) return false;
+
+  const rawAnswer = String(
+    mcqData.overrides?.answer ??
+    mcqData.answer ??
+    mcqData.contentSnapshot?.answer ??
+    ""
+  ).trim();
+
   if (!rawAnswer) return false;
 
-  const optText = String(displayedOption ?? "").trim();
-  if (optText && rawAnswer === optText) {
+  const rawOpt = String(displayedOption ?? "").trim();
+  const normOpt = normalizeText(rawOpt);
+  const normAnswer = normalizeText(rawAnswer);
+
+  // 1. Direct text equality
+  if (normOpt && normAnswer && normOpt.toLowerCase() === normAnswer.toLowerCase()) {
     return true;
   }
 
-  const normalizedKey = rawAnswer
-    .replace(/^\(+|\)+$/g, "")
-    .replace(/\.$/, "")
-    .trim()
-    .toLowerCase();
-
-  const mappedIdx = OPTION_LETTER_INDEX_MAP[normalizedKey];
-  if (mappedIdx === undefined) return false;
-
-  // Match against the original options array when present so shuffledOptions stay accurate
-  if (Array.isArray(mcqData?.options) && mcqData.options[mappedIdx] !== undefined) {
-    return String(mcqData.options[mappedIdx]).trim() === optText;
+  // 2. Text equality after stripping prefixes (e.g. "ক) ঢাকা" vs "ঢাকা")
+  const strippedOpt = stripOptionPrefix(rawOpt);
+  const strippedAnswer = stripOptionPrefix(rawAnswer);
+  if (strippedOpt && strippedAnswer && strippedOpt.toLowerCase() === strippedAnswer.toLowerCase()) {
+    return true;
+  }
+  if (strippedOpt && normAnswer && strippedOpt.toLowerCase() === normAnswer.toLowerCase()) {
+    return true;
+  }
+  if (strippedAnswer && normOpt && strippedAnswer.toLowerCase() === normOpt.toLowerCase()) {
+    return true;
   }
 
-  return displayedIndex === mappedIdx;
+  // 3. Answer expressed as an indicator (letter / numeral / label)
+  const cleanedIndicator = cleanAnswerIndicator(rawAnswer);
+  const mappedIdx = OPTION_LETTER_INDEX_MAP[cleanedIndicator];
+
+  const originalOptions: string[] =
+    mcqData.options ??
+    mcqData.contentSnapshot?.options ??
+    [];
+
+  const isShuffled = Array.isArray(mcqData.shuffledOptions) && mcqData.shuffledOptions.length > 0;
+
+  if (mappedIdx !== undefined) {
+    if (isShuffled && originalOptions[mappedIdx] !== undefined) {
+      const origTarget = originalOptions[mappedIdx];
+      const normOrig = normalizeText(origTarget).toLowerCase();
+      const strippedOrig = stripOptionPrefix(origTarget).toLowerCase();
+
+      if (
+        normOpt.toLowerCase() === normOrig ||
+        strippedOpt.toLowerCase() === strippedOrig ||
+        strippedOpt.toLowerCase() === normOrig
+      ) {
+        return true;
+      }
+    } else {
+      // Natural unshuffled order: match by index
+      if (displayedIndex === mappedIdx) {
+        return true;
+      }
+    }
+  }
+
+  // 4. If rawAnswer matches text of an option in originalOptions
+  if (originalOptions.length > 0) {
+    const matchedOriginalIdx = originalOptions.findIndex((opt) => {
+      const nOpt = normalizeText(opt).toLowerCase();
+      const sOpt = stripOptionPrefix(opt).toLowerCase();
+      const nAns = normAnswer.toLowerCase();
+      const sAns = strippedAnswer.toLowerCase();
+      return nOpt === nAns || sOpt === sAns || sOpt === nAns || nOpt === sAns;
+    });
+
+    if (matchedOriginalIdx !== -1) {
+      if (isShuffled) {
+        const origTarget = originalOptions[matchedOriginalIdx];
+        const normOrig = normalizeText(origTarget).toLowerCase();
+        const strippedOrig = stripOptionPrefix(origTarget).toLowerCase();
+        if (
+          normOpt.toLowerCase() === normOrig ||
+          strippedOpt.toLowerCase() === strippedOrig ||
+          strippedOpt.toLowerCase() === normOrig
+        ) {
+          return true;
+        }
+      } else {
+        if (displayedIndex === matchedOriginalIdx) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 export interface McqOptionLabelProps {

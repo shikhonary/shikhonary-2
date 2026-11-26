@@ -1,21 +1,22 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { useToggleRearrangeActive } from "../services/use-rearrange"
+import { Trash2, ClipboardList, AlertCircle, Eye, EyeOff } from "lucide-react"
 import { toast } from "@workspace/ui/components/sonner"
-import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+import { Button } from "@workspace/ui/components/button"
+import { Skeleton } from "@workspace/ui/components/skeleton"
+import { Checkbox } from "@workspace/ui/components/checkbox"
 import { RenderMath } from "@workspace/ui/components/render-math"
-import "katex/dist/katex.min.css"
-import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react"
+import { DataTablePagination } from "@/components/shared/data-table-pagination"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
+  QuestionCardHeader,
+  QuestionCardFooter,
+  QuestionCardActions,
+} from "@/components/shared"
+import { useToggleRearrangeActive } from "../services/use-rearrange"
 
 export interface RearrangeItem {
   id: string
@@ -49,9 +50,8 @@ interface RearrangeTableProps {
   currentPage: number
   itemsPerPage: number
   totalItems: number
-  totalPages: number
   onPageChange: (page: number) => void
-  onLimitChange?: (limit: number) => void
+  onLimitChange: (limit: number) => void
 }
 
 const ROW_LABELS_EN = ["(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)"]
@@ -66,15 +66,18 @@ export function RearrangeTable({
   currentPage,
   itemsPerPage,
   totalItems,
-  totalPages,
   onPageChange,
   onLimitChange,
 }: RearrangeTableProps) {
-  const displayStart = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0
-  const displayEnd = Math.min(currentPage * itemsPerPage, totalItems)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({})
   const toggleActiveMutation = useToggleRearrangeActive()
+  const searchParams = useSearchParams()
+
+  const buildEditHref = (id: string) => {
+    const qs = searchParams.toString()
+    return qs ? `/rearrange/${id}/edit?${qs}` : `/rearrange/${id}/edit`
+  }
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -98,170 +101,158 @@ export function RearrangeTable({
         id,
         isActive: !currentActive,
       })
-      toast.success(!currentActive ? "Rearrange activated." : "Rearrange deactivated.")
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update Rearrange status")
+      toast.success(!currentActive ? "প্রশ্নটি সক্রিয় করা হয়েছে।" : "প্রশ্নটি নিষ্ক্রিয় করা হয়েছে।")
+    } catch (error: any) {
+      toast.error(error?.message || "স্ট্যাটাস পরিবর্তন করতে সমস্যা হয়েছে।")
     }
   }
 
-  const toggleAnswerExpand = (id: string) => {
-    setExpandedAnswers((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
+  const isAllSelected = items.length > 0 && selectedIds.length === items.length
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-16 rounded-md" />
+                <Skeleton className="h-5 w-24 rounded-md" />
+                <Skeleton className="h-5 w-20 rounded-md" />
+              </div>
+              <Skeleton className="h-8 w-20 rounded-lg" />
+            </div>
+            <Skeleton className="h-28 w-full rounded-xl" />
+          </div>
+        ))}
+      </div>
+    )
   }
 
-  const allSelected =
-    items.length > 0 && items.every((item) => selectedIds.includes(item.id))
+  if (isError) {
+    return (
+      <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-10 text-center space-y-3">
+        <div className="p-3 bg-destructive/10 text-destructive rounded-full w-fit mx-auto">
+          <AlertCircle className="size-8" />
+        </div>
+        <h3 className="text-lg font-bold text-destructive">তথ্য লোড করতে সমস্যা হয়েছে</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          দুঃখিত, রিঅ্যারেঞ্জের তালিকা লোড করা সম্ভব হয়নি। অনুগ্রহ করে পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।
+        </p>
+      </div>
+    )
+  }
 
-  return (
-    <div className="w-full space-y-6">
-      {/* Selection Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-surface-container-low p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(e) => handleSelectAll(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer"
-            />
-            <span className="font-label-sm text-xs font-bold uppercase tracking-wider text-outline">
-              Select All ({items.length})
-            </span>
-          </div>
-
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 pl-4 border-l border-outline-variant">
-              <span className="font-label-sm text-xs font-semibold text-primary">
-                {selectedIds.length} items selected
-              </span>
-              <Button
-                type="button"
-                onClick={() => onBulkDelete(selectedIds)}
-                className="flex items-center gap-1.5 rounded-lg bg-error px-3 py-1 text-xs font-bold text-white shadow-xs hover:bg-error/90 cursor-pointer h-auto animate-fade-in"
-              >
-                <span className="material-symbols-outlined text-base">delete</span>
-                <span>Delete Selected</span>
-              </Button>
-            </div>
-          )}
+  if (items.length === 0) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-12 text-center space-y-4">
+        <div className="p-4 bg-muted text-muted-foreground rounded-full w-fit mx-auto">
+          <ClipboardList className="size-10 opacity-40" />
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-lg font-bold text-foreground">কোনো রিঅ্যারেঞ্জ প্রশ্ন পাওয়া যায়নি</h3>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            আপনার অনুসন্ধান বা ফিল্টার অনুযায়ী কোনো প্রশ্ন খুঁজে পাওয়া যায়নি। নতুন প্রশ্ন যোগ করুন অথবা ফিল্টার পরিবর্তন করুন।
+          </p>
         </div>
       </div>
+    )
+  }
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="material-symbols-outlined animate-spin text-4xl text-primary">
-              progress_activity
+  return (
+    <div className="space-y-4">
+      {/* Selection & Bulk Action Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-card px-4 py-2.5 rounded-xl border border-border shadow-xs">
+        <div className="flex items-center gap-3">
+          <Checkbox
+            id="select-all-rearrange"
+            checked={isAllSelected}
+            onCheckedChange={(checked) => handleSelectAll(checked === true)}
+          />
+          <label
+            htmlFor="select-all-rearrange"
+            className="text-xs font-semibold text-foreground cursor-pointer select-none"
+          >
+            সবগুলো নির্বাচন করুন ({items.length})
+          </label>
+          {selectedIds.length > 0 && (
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
+              {selectedIds.length} টি নির্বাচিত
             </span>
-            <span className="font-body-md text-sm font-medium">Loading Rearrange question bank...</span>
-          </div>
+          )}
         </div>
-      )}
 
-      {/* Error State */}
-      {isError && !isLoading && (
-        <div className="py-16 text-center text-error rounded-xl border border-error/30 bg-error-container/20">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-4xl">error</span>
-            <span className="font-body-md text-sm font-medium">
-              Error loading Rearrange questions. Please try refreshing.
-            </span>
-          </div>
-        </div>
-      )}
+        {selectedIds.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              onBulkDelete(selectedIds)
+              setSelectedIds([])
+            }}
+            className="h-8 gap-1.5 text-xs font-bold rounded-lg cursor-pointer"
+          >
+            <Trash2 className="size-3.5" />
+            নির্বাচিতগুলো মুছুন ({selectedIds.length})
+          </Button>
+        )}
+      </div>
 
-      {/* Empty State */}
-      {!isLoading && !isError && items.length === 0 && (
-        <div className="py-16 text-center text-on-surface-variant rounded-xl border border-outline-variant bg-white">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <span className="material-symbols-outlined text-5xl text-outline">
-              quiz
-            </span>
-            <p className="font-headline-md text-xl font-bold text-on-surface">
-              No Rearrange Questions Found
-            </p>
-            <p className="font-body-md text-sm text-outline max-w-md">
-              Try adjusting filters or add a new rearrange question to the bank.
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Cards List */}
+      <div className="space-y-4">
+        {items.map((item, idx) => {
+          const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
+          const isSelected = selectedIds.includes(item.id)
+          const firstSentence = item.options?.[0] || "Rearrange Question"
+          const isBengali = item.options.some((opt) => /[\u0980-\u09FF]/.test(opt))
+          const labelSet = isBengali ? ROW_LABELS_BN : ROW_LABELS_EN
+          const isAnswerVisible = Boolean(expandedAnswers[item.id])
 
-      {/* CARD VIEW LAYOUT */}
-      {!isLoading && !isError && items.length > 0 && (
-        <div className="grid grid-cols-1 gap-6">
-          {items.map((item, idx) => {
-            const isSelected = selectedIds.includes(item.id)
-            const globalIndex = (currentPage - 1) * itemsPerPage + idx + 1
-            const isAnswerExpanded = !!expandedAnswers[item.id]
-            const isBengali = item.options.some((opt) => /[\u0980-\u09FF]/.test(opt))
-            const labelSet = isBengali ? ROW_LABELS_BN : ROW_LABELS_EN
-            const firstSnippet = item.options[0] || `Rearrange #${item.id.slice(0, 6)}`
+          return (
+            <div
+              key={item.id}
+              className={cn(
+                "bg-card border rounded-2xl p-5 sm:p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
+                isSelected ? "border-primary ring-2 ring-primary/15 bg-primary/5" : "border-border"
+              )}
+            >
+              <div className="flex flex-col md:flex-row justify-between items-start gap-5">
+                <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={(e) => handleSelectOne(item.id, e.target.checked)}
+                    className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500/20 cursor-pointer shrink-0"
+                  />
 
-            return (
-              <div
-                key={item.id}
-                className={cn(
-                  "bg-surface-container-lowest border rounded-2xl p-6 transition-all hover:border-primary/40 hover:shadow-md relative group",
-                  isSelected ? "border-primary ring-2 ring-primary/20 bg-primary-container/5" : "border-outline-variant/60"
-                )}
-              >
-                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                  {/* Selection Checkbox & Main Info */}
-                  <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0 w-full relative md:static">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={(e) => handleSelectOne(item.id, e.target.checked)}
-                      className="absolute top-[6px] left-0 md:relative md:top-0 md:left-0 md:mt-1 h-4 w-4 rounded-sm border-outline-variant text-primary focus:ring-primary cursor-pointer shrink-0"
-                    />
-
-                    <div className="flex-1 space-y-4 min-w-0">
-                      {/* Badges Row */}
-                      <div className="flex flex-wrap items-center gap-2 pl-7 md:pl-0">
-                        {/* Global Index Badge */}
-                        <span className="px-2 py-0.5 bg-surface-container-high font-mono text-[11px] font-bold text-on-surface-variant rounded">
-                          #{globalIndex}
-                        </span>
-
-                        {/* Subject Badge */}
-                        {item.subject && (
-                          <span className="px-2.5 py-0.5 bg-primary/10 text-primary rounded font-label-sm text-xs font-bold border border-primary/20">
-                            {item.subject.nameBn || item.subject.nameEn}
-                          </span>
-                        )}
-
-                        {/* Chapter Badge */}
-                        {item.academicChapter && (
-                          <span className="px-2.5 py-0.5 bg-surface-container-high text-on-surface-variant rounded font-label-sm text-xs font-semibold">
-                            {item.academicChapter.nameBn || item.academicChapter.nameEn}
-                          </span>
-                        )}
-
-                        {/* Sentences Count Badge */}
-                        <span className="px-2.5 py-0.5 bg-secondary-container/40 text-on-secondary-container rounded font-label-sm text-[11px] font-bold border border-secondary/20">
+                  <div className="flex-1 space-y-4 min-w-0">
+                    {/* Header Row */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pl-7 md:pl-0">
+                      <QuestionCardHeader
+                        globalIndex={globalIndex}
+                        subjectName={item.subject?.nameBn || item.subject?.nameEn}
+                        chapterName={item.academicChapter?.nameBn || item.academicChapter?.nameEn}
+                      >
+                        <span className="px-2 py-0.5 bg-secondary/40 text-secondary-foreground rounded-lg text-[11px] font-bold border border-border">
                           {item.options.length} Sentences
                         </span>
-
-                        {/* Difficulty Badge */}
-                        <span className={cn(
-                          "px-2.5 py-0.5 rounded font-label-sm text-[11px] font-bold border uppercase",
-                          item.difficulty === "EASY" && "bg-emerald-50 text-emerald-700 border-emerald-200",
-                          item.difficulty === "MEDIUM" && "bg-amber-50 text-amber-700 border-amber-200",
-                          item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
-                        )}>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded-lg text-[11px] font-bold border uppercase",
+                            item.difficulty === "EASY" &&
+                              "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            item.difficulty === "MEDIUM" &&
+                              "bg-amber-50 text-amber-700 border-amber-200",
+                            item.difficulty === "HARD" && "bg-red-50 text-red-700 border-red-200"
+                          )}
+                        >
                           {item.difficulty}
                         </span>
-
-                        {/* Active Status Badge Toggle */}
                         <button
                           type="button"
                           onClick={() => handleToggleActive(item.id, item.isActive)}
                           className={cn(
-                            "px-2.5 py-0.5 rounded font-label-sm text-xs font-bold transition-all cursor-pointer",
+                            "px-2.5 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer",
                             item.isActive
                               ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                               : "bg-gray-100 text-gray-600 border border-gray-200"
@@ -269,210 +260,109 @@ export function RearrangeTable({
                         >
                           {item.isActive ? "Active" : "Inactive"}
                         </button>
-                      </div>
+                      </QuestionCardHeader>
+                    </div>
 
-                      {/* Options / Sentences Segment */}
-                      <div className="space-y-3.5 pl-4 border-l-2 border-primary/40 py-1 bg-surface-container-low/30 rounded-r-2xl p-4">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-outline block mb-1">
-                          Jumbled Sentences to Rearrange ({item.options.length}):
-                        </span>
-
-                        <div className="space-y-2">
-                          {item.options.map((opt, oIdx) => {
-                            const label = labelSet[oIdx] || `(${oIdx + 1})`
-                            return (
-                              <div
-                                key={oIdx}
-                                className="flex items-start gap-2.5 text-xs text-on-surface font-medium leading-relaxed"
-                              >
-                                <span className="font-mono font-bold text-primary shrink-0 min-w-[28px]">
-                                  {label}
-                                </span>
-                                <div className={cn("flex-1", isBengali && "font-solaiman text-[13px]")}>
-                                  <RenderMath text={opt} />
-                                </div>
+                    {/* Sentences List */}
+                    <Link
+                      href={buildEditHref(item.id)}
+                      className="block space-y-2.5 pl-4 border-l-2 border-primary/40 bg-muted/30 rounded-r-xl p-4 hover:border-primary transition-colors"
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                        Jumbled Sentences to Rearrange ({item.options.length}):
+                      </span>
+                      <div className="space-y-2">
+                        {item.options.map((opt, oIdx) => {
+                          const label = labelSet[oIdx] || `(${oIdx + 1})`
+                          return (
+                            <div
+                              key={oIdx}
+                              className="flex items-start gap-2.5 text-xs text-foreground font-medium leading-relaxed"
+                            >
+                              <span className="font-mono font-bold text-primary shrink-0 min-w-[28px]">
+                                {label}
+                              </span>
+                              <div className={cn("flex-1", isBengali && "font-solaiman text-[13px]")}>
+                                <RenderMath text={opt} />
                               </div>
-                            )
-                          })}
-                        </div>
+                            </div>
+                          )
+                        })}
                       </div>
+                    </Link>
 
-                      {/* Optional Year/Source badges */}
-                      {(item.source || item.session) && (
-                        <div className="flex items-center gap-1.5 pl-7 md:pl-0 text-[10px] font-bold text-outline-variant uppercase tracking-wider select-none">
-                          <span>Source:</span>
-                          <span className="px-2 py-0.5 bg-surface-container-low text-on-surface-variant rounded text-[10px] font-bold">
-                            {item.source || "N/A"} {item.session ? `(${item.session})` : ""}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Expand Answer Button */}
-                      <div>
+                    {/* Expand Answer Button & Box */}
+                    {item.answerKey && (
+                      <div className="pl-7 md:pl-0 space-y-2">
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => toggleAnswerExpand(item.id)}
-                          className="text-xs font-bold text-primary flex items-center gap-1.5 h-auto py-1 px-3 hover:bg-primary/10 rounded-lg cursor-pointer"
+                          onClick={() =>
+                            setExpandedAnswers((prev) => ({
+                              ...prev,
+                              [item.id]: !prev[item.id],
+                            }))
+                          }
+                          className="h-7 px-2.5 text-xs gap-1.5 text-primary hover:text-primary"
                         >
-                          {isAnswerExpanded ? (
+                          {isAnswerVisible ? (
                             <>
-                              <EyeOff className="size-4" />
-                              <span>Hide Answer Key</span>
+                              <EyeOff className="size-3.5" />
+                              <span>উত্তর লুকান</span>
                             </>
                           ) : (
                             <>
-                              <Eye className="size-4" />
-                              <span>Show Answer Key</span>
+                              <Eye className="size-3.5" />
+                              <span>সঠিক ক্রম দেখুন</span>
                             </>
                           )}
                         </Button>
+
+                        {isAnswerVisible && (
+                          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-3 text-xs font-semibold text-emerald-800">
+                            <span className="font-bold mr-2">Answer Key:</span>
+                            <span className="font-mono">{item.answerKey}</span>
+                          </div>
+                        )}
                       </div>
+                    )}
 
-                      {/* Collapsible Answer & Explanation Sheets */}
-                      {isAnswerExpanded && (
-                        <div className="space-y-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-xs text-on-surface-variant animate-fade-in">
-                          <h4 className="font-bold text-emerald-800 text-xs flex items-center gap-1.5 mb-1 uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-sm">assignment_turned_in</span>
-                            Model Answer & Sequence Key:
-                          </h4>
-
-                          {item.answerKey ? (
-                            <div className="pl-2 space-y-2">
-                              <div className="inline-block bg-white border border-emerald-200/80 px-3 py-1.5 rounded-lg font-mono text-xs font-bold text-emerald-900 shadow-2xs">
-                                {item.answerKey}
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic pl-2">
-                              No answer key specified for this question.
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Reference Tags & ID Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {((item as any).source || (item as any).session) && (
-                            <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[11px] font-semibold border border-primary/20">
-                              📚 {(item as any).source || "N/A"}{(item as any).session ? ` (${(item as any).session})` : ""}
-                            </span>
-                          )}
-                          {Array.isArray(item.reference) && item.reference.length > 0 ? (
-                            item.reference.map((ref, rIdx) => (
-                              <span
-                                key={rIdx}
-                                className="px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded text-[11px] font-medium"
-                              >
-                                🏷️ {ref}
-                              </span>
-                            ))
-                          ) : (
-                            !((item as any).source || (item as any).session) && (
-                              <span className="text-[11px] text-muted-foreground italic">No reference tags</span>
-                            )
-                          )}
-                        </div>
-
-                        <span className="text-[11px] font-mono text-outline/60">
-                          ID: {item.id}
-                        </span>
-                      </div>
+                    {/* Footer Meta */}
+                    <div className="pl-7 md:pl-0">
+                      <QuestionCardFooter
+                        source={item.source}
+                        session={item.session}
+                        references={item.reference}
+                      />
                     </div>
                   </div>
-
-                  {/* Actions Column */}
-                  <div className="flex md:flex-col justify-end items-center gap-2 shrink-0 border-t md:border-t-0 border-outline-variant/40 pt-3 md:pt-0 w-full md:w-auto">
-                    <Link
-                      href={`/rearranges/${item.id}/edit`}
-                      className="p-2.5 hover:bg-surface-container-high rounded-xl text-primary transition-all cursor-pointer border border-outline-variant/40 hover:border-primary/40 text-center flex-1 md:flex-initial"
-                      title="Edit Rearrange Question"
-                    >
-                      <span className="material-symbols-outlined text-xl block">edit</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => onDelete(item.id, firstSnippet)}
-                      className="p-2.5 hover:bg-error-container/30 rounded-xl text-error transition-all cursor-pointer border border-outline-variant/40 hover:border-error/40 flex-1 md:flex-initial"
-                      title="Delete Rearrange Question"
-                    >
-                      <span className="material-symbols-outlined text-xl block">delete</span>
-                    </button>
-                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
 
-      {/* Pagination Footer */}
-      {!isLoading && !isError && totalItems > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border border-outline-variant bg-surface-container-low rounded-xl p-4">
-          <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
-            <p className="font-body-md text-xs sm:text-sm text-on-surface-variant">
-              Showing <span className="font-bold">{displayStart}-{displayEnd}</span> of <span className="font-bold">{totalItems}</span> questions
-            </p>
-            {onLimitChange && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-outline font-medium">Rows per page:</span>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(val) => onLimitChange(Number(val) || 10)}
-                >
-                  <SelectTrigger className="h-8 rounded-lg border border-outline-variant bg-white px-2.5 font-body-md text-xs outline-hidden focus:ring-2 focus:ring-primary/10 w-auto gap-1 cursor-pointer">
-                    <SelectValue placeholder="Per Page" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-neutral-900 border border-outline-variant shadow-md rounded-lg min-w-[80px]">
-                    <SelectItem value="5" className="text-neutral-900">5</SelectItem>
-                    <SelectItem value="10" className="text-neutral-900">10</SelectItem>
-                    <SelectItem value="20" className="text-neutral-900">20</SelectItem>
-                    <SelectItem value="50" className="text-neutral-900">50</SelectItem>
-                  </SelectContent>
-                </Select>
+                {/* Actions Column */}
+                <QuestionCardActions
+                  editHref={buildEditHref(item.id)}
+                  onDelete={() => onDelete(item.id, firstSentence)}
+                  editTitle="Edit Rearrange"
+                  deleteTitle="Delete Rearrange"
+                />
               </div>
-            )}
-          </div>
+            </div>
+          )
+        })}
+      </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage <= 1}
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant={currentPage === pageNum ? "default" : "ghost"}
-                onClick={() => onPageChange(pageNum)}
-                className={`size-8 sm:size-10 rounded-lg font-body-md text-xs sm:text-sm transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-primary font-bold text-white hover:bg-primary"
-                    : "hover:bg-surface-container-high text-on-surface"
-                }`}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={currentPage >= totalPages}
-              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-              className="size-8 sm:size-10 rounded-lg border border-outline-variant bg-white transition-colors hover:bg-surface-container-high disabled:opacity-30 cursor-pointer"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Pagination */}
+      <DataTablePagination
+        page={currentPage}
+        limit={itemsPerPage}
+        totalItems={totalItems}
+        onPageChange={onPageChange}
+        onLimitChange={onLimitChange}
+        pageSizeOptions={[10, 20, 50, 100]}
+        entityName="টি প্রশ্ন"
+        isLoading={isLoading}
+      />
     </div>
   )
 }

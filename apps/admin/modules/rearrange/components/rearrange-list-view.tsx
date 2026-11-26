@@ -1,161 +1,192 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { Plus, Upload, ClipboardList } from "lucide-react"
+import { toast } from "@workspace/ui/components/sonner"
+import { Button } from "@workspace/ui/components/button"
+import { PageHeader } from "@/components/shared/page-header"
+import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
+import { useRearrangeSearchParams } from "../hooks/use-rearrange-search-params"
 import {
   useRearrangeList,
   useRearrangeStats,
-  useRearrangeBoardYears,
-  useAcademicClassesForSelection,
-  useSubjectsForSelection,
-  useChaptersForSelection,
+  useDeleteRearrange,
+  useBulkDeleteRearrange,
 } from "../services/use-rearrange"
-import { RearrangeListHeader } from "./rearrange-list-header"
 import { RearrangeStatsCards } from "./rearrange-stats-cards"
 import { RearrangeFilters } from "./rearrange-filters"
 import { RearrangeTable } from "./rearrange-table"
-import { DeleteRearrangeModal } from "./delete-rearrange-modal"
-import { useRearrangeSearchParams } from "../hooks/use-rearrange-search-params"
-import { useDeleteRearrangeModalStore } from "../store/use-delete-rearrange-modal-store"
 
 export function RearrangeListView() {
-  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState<string>("All")
-  const { data: academicClasses = [] } = useAcademicClassesForSelection()
+  const [params, setParams] = useRearrangeSearchParams()
+  const [selectedAcademicClassId, setSelectedAcademicClassId] = useState("All")
 
-  const [
-    {
-      query: searchQuery,
-      subjectId: selectedSubjectId,
-      chapterId: selectedChapterId,
-      board: selectedBoard,
-      difficulty: selectedDifficulty,
-      sort: selectedSort,
-      page: currentPage,
-      limit,
-    },
-    setSearchParams,
-  ] = useRearrangeSearchParams()
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string | null
+    ids?: string[]
+    title: string
+  } | null>(null)
 
-  const handleAcademicClassChange = (classId: string) => {
-    setSelectedAcademicClassId(classId)
-    setSearchParams({
-      subjectId: "All",
-      chapterId: "All",
-      board: "All",
-      page: 1,
-    })
-  }
+  const deleteMutation = useDeleteRearrange()
+  const bulkDeleteMutation = useBulkDeleteRearrange()
 
-  const openDeleteModal = useDeleteRearrangeModalStore((state) => state.openModal)
-  const openBulkDeleteModal = useDeleteRearrangeModalStore((state) => state.openBulkModal)
-
-  // Parse filters
   let boardSource: string | undefined = undefined
   let boardYear: number | undefined = undefined
-  if (selectedBoard && selectedBoard !== "All") {
-    const parts = selectedBoard.split("-")
+  if (params.board && params.board !== "All") {
+    const parts = params.board.split("-")
     const yearPart = parts[parts.length - 1]
     const sourcePart = parts.slice(0, parts.length - 1).join("-")
     if (sourcePart && yearPart && !isNaN(Number(yearPart))) {
       boardSource = sourcePart
       boardYear = Number(yearPart)
     } else {
-      boardSource = selectedBoard
+      boardSource = params.board
     }
   }
 
-  const { data: rearrangeData, isLoading, isError } = useRearrangeList({
-    limit,
-    page: currentPage,
-    query: searchQuery || undefined,
-    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    isError: isListError,
+  } = useRearrangeList({
+    page: params.page,
+    limit: params.limit,
+    query: params.query || undefined,
+    subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
+    chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
     source: boardSource,
     year: boardYear,
-    difficulty: selectedDifficulty !== "All" ? (selectedDifficulty as any) : undefined,
-    sort: selectedSort as any,
+    difficulty: params.difficulty !== "All" ? (params.difficulty as any) : undefined,
+    sort: params.sort as any,
   })
 
-  // Fetch Board + Year combinations for this subject / chapter if selected
-  const { data: boardYears = [] } = useRearrangeBoardYears({
-    subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-    chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
-  })
-
-  // Query stats
   const { data: statsData, isLoading: isStatsLoading } = useRearrangeStats(
-    selectedSubjectId !== "All" || selectedChapterId !== "All"
+    params.subjectId !== "All" || params.chapterId !== "All"
       ? {
-          subjectId: selectedSubjectId !== "All" ? selectedSubjectId : undefined,
-          chapterId: selectedChapterId !== "All" ? selectedChapterId : undefined,
+          subjectId: params.subjectId !== "All" ? params.subjectId : undefined,
+          chapterId: params.chapterId !== "All" ? params.chapterId : undefined,
         }
       : undefined
   )
 
-  // Query subjects & chapters for dropdown filters
-  const { data: subjects = [] } = useSubjectsForSelection(
-    selectedAcademicClassId !== "All" ? { academicClassId: selectedAcademicClassId } : undefined
-  )
-  const { data: chapters = [] } = useChaptersForSelection(
-    selectedSubjectId !== "All" ? { subjectId: selectedSubjectId } : undefined
-  )
+  const items = listData?.items || []
+  const totalItems = listData?.totalItems || 0
 
-  const items = rearrangeData?.items ?? []
-  const totalItems = rearrangeData?.totalItems ?? items.length
-  const totalPages = rearrangeData?.totalPages ?? 1
+  const handleReset = () => {
+    setSelectedAcademicClassId("All")
+    setParams({
+      query: "",
+      subjectId: "All",
+      chapterId: "All",
+      board: "All",
+      difficulty: "All",
+      sort: "createdAt_desc",
+      page: 1,
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return
+
+    try {
+      if (deleteTarget.ids && deleteTarget.ids.length > 0) {
+        await bulkDeleteMutation.mutateAsync({ ids: deleteTarget.ids })
+        toast.success(`${deleteTarget.ids.length} টি রিঅ্যারেঞ্জ প্রশ্ন সফলভাবে মুছে ফেলা হয়েছে।`)
+      } else if (deleteTarget.id) {
+        await deleteMutation.mutateAsync({ id: deleteTarget.id })
+        toast.success("রিঅ্যারেঞ্জ প্রশ্নটি সফলভাবে মুছে ফেলা হয়েছে।")
+      }
+      setDeleteTarget(null)
+    } catch (error: any) {
+      toast.error(error?.message || "মুছে ফেলতে সমস্যা হয়েছে।")
+    }
+  }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-      {/* Page Header */}
-      <RearrangeListHeader />
+    <div className="space-y-6">
+      <PageHeader
+        title="রিঅ্যারেঞ্জ প্রশ্ন ব্যাংক"
+        description="বিভিন্ন শ্রেণি ও অধ্যায়ের এলোমেলো বাক্য সাজানো (Rearrange) প্রশ্নসমূহ পরিচালনা ও সম্পাদনা করুন।"
+        icon={ClipboardList}
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button asChild variant="outline" size="sm" className="h-9 gap-2 rounded-lg font-medium">
+            <Link href="/rearrange/import">
+              <Upload className="size-4" />
+              <span>ইমপোর্ট করুন</span>
+            </Link>
+          </Button>
+          <Button asChild size="sm" className="h-9 gap-2 rounded-lg font-semibold shadow-xs">
+            <Link href="/rearrange/create">
+              <Plus className="size-4" />
+              <span>নতুন যোগ করুন</span>
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
-      {/* Summary Counts Cards */}
-      <RearrangeStatsCards
-        totalCount={statsData?.totalCount}
-        activeCount={statsData?.activeCount}
-        inactiveCount={statsData?.inactiveCount}
-        difficultyCounts={statsData?.difficultyCounts}
-        isLoading={isLoading || isStatsLoading}
-      />
+      <RearrangeStatsCards stats={statsData} isLoading={isStatsLoading} />
 
-      {/* Filters Form */}
       <RearrangeFilters
-        searchQuery={searchQuery}
-        onSearchChange={(query) => setSearchParams({ query, page: 1 })}
-        selectedAcademicClassId={selectedAcademicClassId}
-        onAcademicClassChange={handleAcademicClassChange}
-        academicClasses={academicClasses}
-        selectedSubjectId={selectedSubjectId}
-        onSubjectChange={(subjectId) => setSearchParams({ subjectId, chapterId: "All", board: "All", page: 1 })}
-        subjects={subjects}
-        selectedChapterId={selectedChapterId}
-        onChapterChange={(chapterId) => setSearchParams({ chapterId, board: "All", page: 1 })}
-        chapters={chapters}
-        selectedBoard={selectedBoard}
-        onBoardChange={(board) => setSearchParams({ board, page: 1 })}
-        boardYears={boardYears}
-        selectedDifficulty={selectedDifficulty}
-        onDifficultyChange={(difficulty) => setSearchParams({ difficulty, page: 1 })}
-        selectedSort={selectedSort}
-        onSortChange={(sort) => setSearchParams({ sort, page: 1 })}
+        searchQuery={params.query}
+        onSearchChange={(val) => setParams({ query: val, page: 1 })}
+        classId={selectedAcademicClassId}
+        onClassChange={(val) => {
+          setSelectedAcademicClassId(val)
+          setParams({ subjectId: "All", chapterId: "All", board: "All", page: 1 })
+        }}
+        subjectId={params.subjectId}
+        onSubjectChange={(val) =>
+          setParams({ subjectId: val, chapterId: "All", board: "All", page: 1 })
+        }
+        chapterId={params.chapterId}
+        onChapterChange={(val) => setParams({ chapterId: val, board: "All", page: 1 })}
+        board={params.board}
+        onBoardChange={(val) => setParams({ board: val, page: 1 })}
+        difficulty={params.difficulty}
+        onDifficultyChange={(val) => setParams({ difficulty: val, page: 1 })}
+        sort={params.sort}
+        onSortChange={(val) => setParams({ sort: val, page: 1 })}
+        onReset={handleReset}
       />
 
-      {/* Questions List Cards & Table */}
       <RearrangeTable
         items={items as any}
-        isLoading={isLoading}
-        isError={isError}
-        onDelete={(id, snippet) => openDeleteModal(id, snippet)}
-        onBulkDelete={(selectedIds) => openBulkDeleteModal(selectedIds)}
-        currentPage={currentPage}
-        itemsPerPage={limit}
+        isLoading={isListLoading}
+        isError={isListError}
+        onDelete={(id, snippet) =>
+          setDeleteTarget({
+            id,
+            title: snippet.length > 60 ? `${snippet.slice(0, 60)}...` : snippet,
+          })
+        }
+        onBulkDelete={(selectedIds) =>
+          setDeleteTarget({
+            id: null,
+            ids: selectedIds,
+            title: `নির্বাচিত ${selectedIds.length} টি প্রশ্ন`,
+          })
+        }
+        currentPage={params.page}
+        itemsPerPage={params.limit}
         totalItems={totalItems}
-        totalPages={totalPages}
-        onPageChange={(page) => setSearchParams({ page })}
-        onLimitChange={(newLimit) => setSearchParams({ limit: newLimit, page: 1 })}
+        onPageChange={(p) => setParams({ page: p })}
+        onLimitChange={(l) => setParams({ limit: l, page: 1 })}
       />
 
-      {/* Confirm Deletion Modal */}
-      <DeleteRearrangeModal />
+      <ConfirmDeleteDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title={deleteTarget?.ids ? "একাধিক প্রশ্ন মুছুন" : "প্রশ্ন মুছুন"}
+        description={
+          deleteTarget?.ids
+            ? `আপনি কি নিশ্চিত যে আপনি নির্বাচিত ${deleteTarget.ids.length} টি রিঅ্যারেঞ্জ প্রশ্ন স্থায়ীভাবে মুছে ফেলতে চান?`
+            : `আপনি কি নিশ্চিত যে আপনি "${deleteTarget?.title}" প্রশ্নটি স্থায়ীভাবে মুছে ফেলতে চান?`
+        }
+        isLoading={deleteMutation.isPending || bulkDeleteMutation.isPending}
+      />
     </div>
   )
 }
