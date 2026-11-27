@@ -155,6 +155,28 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
   const subLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ", "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন"];
   const label = subLabels[item.orderIndex] || "";
 
+  const passageAttachment = Array.isArray(data.attachments)
+    ? data.attachments.find(
+        (a: any) =>
+          (a.type || "").toUpperCase() === "PASSAGE" ||
+          (a.type || "").toUpperCase() === "CONTEXT"
+      )
+    : null;
+  const contextText =
+    data.context ||
+    data.stimulus ||
+    data.scenario ||
+    passageAttachment?.content ||
+    null;
+
+  const mediaAttachments = Array.isArray(data.attachments)
+    ? data.attachments.filter(
+        (a: any) =>
+          (a.type || "").toUpperCase() !== "PASSAGE" &&
+          (a.type || "").toUpperCase() !== "CONTEXT"
+      )
+    : [];
+
   const renderSubQuestionLabel = (labelStr: string) => {
     const cleanLabel = (labelStr || "").replace(/^\(+|\)+$/g, "").trim();
     if (!cleanLabel) return null;
@@ -224,6 +246,19 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
             <div className="flex gap-2 items-start w-full">
               {(totalQuestions > 1 || !isFirst) && renderSubQuestionLabel(label)}
               <div className="flex-1 w-full min-w-0">
+                {/* Stimulus / Context (if present) */}
+                {contextText && (
+                  <div className="text-xs text-foreground/90 mb-1.5 p-2 rounded-r-lg border-l-2 border-foreground/60 bg-muted/20 whitespace-pre-wrap font-body">
+                    <span className="font-bold text-foreground block mb-0.5 text-[11px]">উদ্দীপক:</span>
+                    <RenderMath text={contextText} isMath={data.isMath} />
+                  </div>
+                )}
+                {contextText && mediaAttachments.length > 0 && (
+                  <div className="mb-1">
+                    <QuestionAttachments attachments={mediaAttachments} isMath={data.isMath} />
+                  </div>
+                )}
+
                 <ShortAnswerEditableText 
                   text={data.question}
                   itemKey={`${item.id}-question`}
@@ -244,7 +279,9 @@ export const ShortAnswerBlock = ({ item }: { item: any }) => {
                     })}
                   </div>
                 )}
-                <QuestionAttachments attachments={data.attachments} isMath={data.isMath} />
+                {!contextText && mediaAttachments.length > 0 && (
+                  <QuestionAttachments attachments={mediaAttachments} isMath={data.isMath} />
+                )}
               </div>
             </div>
           </div>

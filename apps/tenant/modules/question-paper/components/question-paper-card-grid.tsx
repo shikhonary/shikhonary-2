@@ -7,7 +7,8 @@ import {
   Clock,
   Sparkles,
   Pen,
-  Copy,
+  Pencil,
+  Globe,
   Trash,
   MoreVertical,
   CheckCircle,
@@ -16,6 +17,7 @@ import {
   ArrowRight,
   BookOpen,
   Loader2,
+  BookmarkPlus,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
@@ -55,7 +57,9 @@ interface QuestionPaperCardGridProps {
   items: QuestionPaperItem[]
   isLoading?: boolean
   onEdit?: (item: QuestionPaperItem) => void
-  onDuplicate: (id: string, title: string) => void
+  onRename?: (id: string, title: string) => void
+  onPublish?: (id: string, title: string) => void
+  onSaveAsTemplate?: (id: string, title: string) => void
   onGenerateAnswer?: (id: string, title: string) => void
   generatingAnswerId?: string | null
   onDelete: (id: string, title: string) => void
@@ -64,7 +68,9 @@ interface QuestionPaperCardGridProps {
 export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
   items,
   isLoading,
-  onDuplicate,
+  onRename,
+  onPublish,
+  onSaveAsTemplate,
   onGenerateAnswer,
   generatingAnswerId,
   onDelete,
@@ -106,9 +112,12 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
             </div>
 
             {/* Bottom Card Footer Action Bar Skeleton */}
-            <div className="px-6 py-3.5 bg-slate-50/60 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between">
-              <div className="h-3.5 w-20 bg-slate-200/60 dark:bg-white/[0.04] rounded" />
-              <div className="h-4 w-24 bg-indigo-200/60 dark:bg-primary/20 rounded-md" />
+            <div className="px-5 py-3 bg-slate-50/60 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className="h-8 w-8 bg-slate-200/60 dark:bg-white/[0.04] rounded-lg" />
+                <div className="h-8 w-16 bg-slate-200/60 dark:bg-white/[0.04] rounded-lg" />
+              </div>
+              <div className="h-8 w-24 bg-indigo-200/60 dark:bg-primary/20 rounded-lg" />
             </div>
           </div>
         ))}
@@ -200,13 +209,33 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                         <span>এডিট করুন</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDuplicate(item.id, item.title)}
-                      className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>ডুপ্লিকেট করুন</span>
-                    </DropdownMenuItem>
+                    {onRename && (
+                      <DropdownMenuItem
+                        onClick={() => onRename(item.id, item.title)}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        <span>নাম পরিবর্তন করুন</span>
+                      </DropdownMenuItem>
+                    )}
+                    {item.status !== "Published" && onPublish && (
+                      <DropdownMenuItem
+                        onClick={() => onPublish(item.id, item.title)}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                      >
+                        <Globe className="h-3.5 w-3.5" />
+                        <span>পাবলিশ করুন</span>
+                      </DropdownMenuItem>
+                    )}
+                    {onSaveAsTemplate && (
+                      <DropdownMenuItem
+                        onClick={() => onSaveAsTemplate(item.id, item.title)}
+                        className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                      >
+                        <BookmarkPlus className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>টেমপ্লেট হিসেবে সংরক্ষণ</span>
+                      </DropdownMenuItem>
+                    )}
                     {onGenerateAnswer && (
                       <DropdownMenuItem
                         disabled={generatingAnswerId === item.id}
@@ -303,16 +332,40 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
               </div>
             </div>
 
-            {/* Bottom Footer CTA Button */}
-            <div className="px-6 py-3 bg-slate-50/60 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between text-xs font-body">
-              <span className="text-slate-400 dark:text-muted-foreground font-medium">
-                প্রশ্নপত্র প্রণেতা
-              </span>
+            {/* Bottom Footer Actions */}
+            <div className="px-5 py-3 bg-slate-50/60 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between gap-2 text-xs font-body">
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  asChild
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 cursor-pointer"
+                  title="এডিট করুন"
+                >
+                  <Link href={`/question-papers/${item.id}/edit`}>
+                    <Pen className="w-3.5 h-3.5" />
+                  </Link>
+                </Button>
+
+                {!isPublished && onPublish && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onPublish(item.id, item.title)}
+                    className="h-8 px-2.5 rounded-lg border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-xs font-bold font-headline gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                    title="প্রশ্নপত্রটি পাবলিশ করুন"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>পাবলিশ</span>
+                  </Button>
+                )}
+              </div>
+
               <Button
                 size="sm"
-                variant="ghost"
                 asChild
-                className="h-8 px-3 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 hover:text-primary gap-1.5 group-hover:translate-x-0.5 transition-all cursor-pointer font-headline"
+                className="h-8 px-3.5 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground font-bold font-headline text-xs gap-1.5 cursor-pointer shadow-xs transition-all active:scale-98"
               >
                 <Link href={`/question-papers/${item.id}/builder`}>
                   <Sparkles className="w-3.5 h-3.5" />

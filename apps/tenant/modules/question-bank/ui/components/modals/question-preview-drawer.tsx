@@ -21,10 +21,12 @@ import {
   Sparkles,
   ExternalLink,
   BookOpen,
+  Flag,
 } from "lucide-react"
 import { toast } from "@workspace/ui/components/sonner"
 import { cn } from "@workspace/ui/lib/utils"
 import { useQuestionPreviewStore } from "@/modules/question-bank/store/use-question-preview-store"
+import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store"
 
 const optionLetters = ["ক", "খ", "গ", "ঘ"]
 
@@ -96,24 +98,46 @@ export const QuestionPreviewDrawer: React.FC = () => {
               )}
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="h-8 text-xs border-white/[0.08] hover:bg-white/[0.04] text-muted-foreground hover:text-foreground cursor-pointer"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 mr-1 text-primary" />
-                  <span>কপি হয়েছে</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5 mr-1" />
-                  <span>কপি করুন</span>
-                </>
-              )}
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  useQuestionReportStore.getState().openReport({
+                    entityType: question.category || "MCQ",
+                    entityId: question.id,
+                    questionSnippet: question.questionText || question.context,
+                    chapterName: question.chapterNameBn,
+                    subjectName: question.subjectNameBn,
+                    categoryLabel: question.categoryLabelBn || question.category,
+                  })
+                }}
+                className="h-8 text-xs border-white/[0.08] hover:text-rose-500 hover:border-rose-500/30 hover:bg-rose-500/10 text-muted-foreground cursor-pointer gap-1"
+                title="প্রশ্নে ত্রুটি রিপোর্ট করুন"
+              >
+                <Flag className="w-3.5 h-3.5 text-rose-500" />
+                <span>রিপোর্ট</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCopy}
+                className="h-8 text-xs border-white/[0.08] hover:bg-white/[0.04] text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 mr-1 text-primary" />
+                    <span>কপি হয়েছে</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 mr-1" />
+                    <span>কপি করুন</span>
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           <SheetTitle className="text-base font-bold font-headline text-foreground text-left">

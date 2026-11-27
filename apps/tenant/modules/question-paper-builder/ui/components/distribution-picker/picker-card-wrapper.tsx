@@ -3,9 +3,10 @@
 import React from "react";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
-import { CheckCircle2, Check, Plus, ArrowRight, X, BookOpen, Tag, Calculator, Bookmark } from "lucide-react";
+import { CheckCircle2, Check, Plus, ArrowRight, X, BookOpen, Tag, Calculator, Bookmark, Flag, Sparkles } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { QuestionAnswerAccordion } from "@/modules/question-bank/ui/components/cards/question-answer-accordion";
+import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store";
 
 export interface PickerContextType {
   isExchangeMode?: boolean;
@@ -32,6 +33,7 @@ interface PickerCardWrapperProps {
   typeLabel?: string | null;
   difficulty?: string | null;
   isMath?: boolean;
+  isGlobal?: boolean | null;
   marks?: number | string | null;
   referenceTags?: string[] | null;
   source?: string | null;
@@ -70,6 +72,7 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   typeLabel,
   difficulty,
   isMath,
+  isGlobal,
   marks,
   referenceTags,
   source,
@@ -91,6 +94,8 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
     hasSubscription,
     getQuestion,
   } = usePickerContext();
+  const questionFromContext = getQuestion ? getQuestion(id) : null;
+  const isCustom = isGlobal === false || question?.isGlobal === false || questionFromContext?.isGlobal === false;
   const isCurrentQuestion = currentQuestionId === id;
   const isBlocked = isExchangeMode ? false : Boolean(isAssigned);
   const bookmarked = checkBookmarked ? checkBookmarked(id) : false;
@@ -98,6 +103,31 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
   const refList = Array.isArray(referenceTags) ? referenceTags.filter(Boolean) : [];
   const refString = refList.join(", ");
   const sourceText = source ? `${source}${session ? ` (${toBengaliDigits(session)})` : ""}` : "";
+
+  const handleOpenReport = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rawSnippet =
+      question?.question ||
+      question?.stem ||
+      question?.passage ||
+      question?.stimulus ||
+      question?.text ||
+      question?.title ||
+      "";
+    const entityType =
+      question?.questionType?.nameEn ||
+      question?.category ||
+      question?.type ||
+      typeLabel ||
+      "MCQ";
+    useQuestionReportStore.getState().openReport({
+      entityType: String(entityType),
+      entityId: id,
+      questionSnippet: typeof rawSnippet === "string" ? rawSnippet : null,
+      chapterName,
+      categoryLabel: typeLabel,
+    });
+  };
 
   if (isBankMode) {
     const finalRef = refString || sourceText || "শিখনারী প্রশ্নভাণ্ডার";
@@ -131,6 +161,12 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
                   {chapterName}
                 </span>
               )}
+              {isCustom && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 rounded-md text-[10px] font-bold font-headline shadow-2xs">
+                  <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                  <span>নিজস্ব প্রশ্ন</span>
+                </span>
+              )}
               {extraBadges}
             </div>
           </div>
@@ -162,6 +198,16 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleOpenReport}
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium font-headline transition-all cursor-pointer text-muted-foreground/75 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 active:scale-95"
+              title="প্রশ্নে ত্রুটি রিপোর্ট করুন"
+            >
+              <Flag className="w-3.5 h-3.5 text-rose-500/80" />
+              <span className="hidden sm:inline">রিপোর্ট</span>
+            </button>
+
             {handleToggleBookmark && (
               <button
                 type="button"
@@ -205,7 +251,9 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
             ? "border-amber-400 dark:border-amber-500/60 ring-2 ring-amber-400/20 bg-amber-500/[0.03] dark:bg-amber-950/[0.1] shadow-md cursor-pointer"
             : isSelected
               ? "border-emerald-600 dark:border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-500/[0.025] dark:bg-emerald-950/[0.06] shadow-md -translate-y-0.5 cursor-pointer"
-              : "bg-card border-border/70 hover:border-emerald-500/40 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+              : isCustom
+                ? "bg-purple-50/[0.03] dark:bg-purple-950/[0.06] border-purple-300/70 dark:border-purple-800/40 hover:border-purple-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
+                : "bg-card border-border/70 hover:border-emerald-500/40 hover:shadow-md hover:-translate-y-0.5 cursor-pointer"
       )}
     >
       {/* Top Container */}
@@ -227,10 +275,26 @@ export const PickerCardWrapper: React.FC<PickerCardWrapperProps> = ({
                 {chapterName}
               </span>
             )}
+            {isCustom && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/40 rounded-md text-[10px] font-bold font-headline shadow-2xs">
+                <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                <span>নিজস্ব প্রশ্ন</span>
+              </span>
+            )}
           </div>
 
           {/* Right Group: Checkbox */}
           <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleOpenReport}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium font-headline transition-all cursor-pointer text-muted-foreground/70 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 active:scale-95"
+              title="প্রশ্নে ত্রুটি রিপোর্ট করুন"
+            >
+              <Flag className="w-3.5 h-3.5 text-rose-500/80" />
+              <span className="hidden sm:inline">রিপোর্ট</span>
+            </button>
+
             {isBlocked ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/[0.06] border border-slate-200/80 dark:border-white/[0.08] text-slate-700 dark:text-muted-foreground text-[11px] font-bold font-headline">
                 <Check className="w-3 h-3 text-slate-500 dark:text-muted-foreground shrink-0" />

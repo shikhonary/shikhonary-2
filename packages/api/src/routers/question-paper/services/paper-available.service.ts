@@ -224,7 +224,7 @@ export const CATEGORY_QUERY_CONFIG: Record<string, CategoryQueryConfig> = {
   DESCRIPTIVE_QUESTION: {
     model: "descriptiveQuestion",
     searchFields: ["question", "answer", "reference"],
-    includes: { questionType: true, subject: true, chapter: true },
+    includes: { questionType: true, subject: true, chapter: true, attachments: true },
     excludedIdField: "descriptiveQuestionId",
     hasIsActive: true,
     fallbackWithoutTypeFilter: true,
@@ -454,9 +454,12 @@ export const NORMALIZED_TO_CATEGORY: Record<string, string> = {
 export async function getAvailableQuestions(
   db: PrismaClient,
   tenantDb: TenantPrismaClient,
-  input: GetAvailableQuestionsInput
+  input: GetAvailableQuestionsInput,
+  actorId?: string,
+  tenantId?: string
 ) {
   const { subjectId, chapterId, questionTypeId, category, difficulty, search, board, source, excludePaperId, page, limit, cursor, sort, mcqType } = input
+  const ownership = input.ownership || "ALL"
 
   const sortOrder: "asc" | "desc" = sort === "oldest" ? "asc" : "desc"
 
@@ -566,7 +569,13 @@ export async function getAvailableQuestions(
   const config = CATEGORY_QUERY_CONFIG[effectiveCategory] || CATEGORY_QUERY_CONFIG.MCQ!
 
   // 3. Build common where clause
-  const whereCommon: any = { subjectId, isGlobal: true, deletedAt: null }
+  const whereCommon: any = {
+    subjectId,
+    deletedAt: null,
+    OR: tenantId
+      ? [{ isGlobal: true }, { tenantId, isGlobal: false }]
+      : [{ isGlobal: true }],
+  }
   if (config.hasIsActive) whereCommon.isActive = true
   if (chapterId && chapterId !== "all" && chapterId !== "All") whereCommon.chapterId = chapterId
   if (difficulty && difficulty !== "all" && difficulty !== "All") whereCommon.difficulty = difficulty
@@ -652,27 +661,49 @@ export async function getAvailableQuestions(
       relatedIds.push(questionTypeId)
       where.questionTypeId = { in: Array.from(new Set(relatedIds)) }
     }
-  } else if (questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
+  } else if (!config.fallbackWithoutTypeFilter && questionTypeId && questionTypeId !== "all" && questionTypeId !== "All") {
     where.questionTypeId = questionTypeId
   }
 
-  // 4. Build search filter
+  // 4. Build search filter and scope conditions safely using AND
+  let scopeCondition: any
+  if (ownership === "OWN") {
+    scopeCondition = tenantId
+      ? { isGlobal: false, tenantId }
+      : { isGlobal: false }
+  } else if (ownership === "GLOBAL") {
+    scopeCondition = { isGlobal: true }
+  } else {
+    scopeCondition = tenantId
+      ? { OR: [{ isGlobal: true }, { tenantId, isGlobal: false }] }
+      : { isGlobal: true }
+  }
+
+  const andClauses: any[] = [scopeCondition]
+  delete where.OR
+
   if (search && search.trim()) {
     const trimmed = search.trim()
     if (config.model === "rearrange") {
-      where.OR = [
-        { options: { has: trimmed } },
-        { answerKey: { contains: trimmed, mode: "insensitive" } },
-        { source: { contains: trimmed, mode: "insensitive" } },
-      ]
+      andClauses.push({
+        OR: [
+          { options: { has: trimmed } },
+          { answerKey: { contains: trimmed, mode: "insensitive" } },
+          { source: { contains: trimmed, mode: "insensitive" } },
+        ],
+      })
     } else if (config.searchFields.length === 1) {
       where[config.searchFields[0]!] = { contains: trimmed, mode: "insensitive" }
     } else {
-      where.OR = config.searchFields.map((field) => ({
-        [field]: { contains: trimmed, mode: "insensitive" },
-      }))
+      andClauses.push({
+        OR: config.searchFields.map((field) => ({
+          [field]: { contains: trimmed, mode: "insensitive" },
+        })),
+      })
     }
   }
+
+  where.AND = andClauses
 
   // 5. Execute query using the config model
   const resolvedPage = page && page > 0 ? page : 1
@@ -761,7 +792,9 @@ export async function getAvailableBoardYears(
     chapterId?: string
     questionTypeId?: string
     category?: string
-  }
+  },
+  actorId?: string,
+  tenantId?: string
 ) {
   let effectiveCategory = input.category || "MCQ"
   if ((!effectiveCategory || effectiveCategory === QUESTION_TYPE_CODES.MCQ) && input.questionTypeId && input.questionTypeId !== "all" && input.questionTypeId !== "All") {
@@ -780,7 +813,9 @@ export async function getAvailableBoardYears(
   const where: any = {
     subjectId: input.subjectId,
     deletedAt: null,
-    isGlobal: true,
+    OR: tenantId
+      ? [{ isGlobal: true }, { tenantId, isGlobal: false }]
+      : [{ isGlobal: true }],
   }
   if (config.hasIsActive) {
     where.isActive = true
@@ -833,7 +868,9 @@ export async function getAvailableSources(
     chapterId?: string
     questionTypeId?: string
     category?: string
-  }
+  },
+  actorId?: string,
+  tenantId?: string
 ) {
   let effectiveCategory = input.category || "MCQ"
   if ((!effectiveCategory || effectiveCategory === QUESTION_TYPE_CODES.MCQ) && input.questionTypeId && input.questionTypeId !== "all" && input.questionTypeId !== "All") {
@@ -852,8 +889,10 @@ export async function getAvailableSources(
   const where: any = {
     subjectId: input.subjectId,
     deletedAt: null,
-    isGlobal: true,
     source: { not: null },
+    OR: tenantId
+      ? [{ isGlobal: true }, { tenantId, isGlobal: false }]
+      : [{ isGlobal: true }],
   }
   if (config.hasIsActive) {
     where.isActive = true

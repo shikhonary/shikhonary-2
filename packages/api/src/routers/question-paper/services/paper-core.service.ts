@@ -11,6 +11,9 @@ import type {
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
+  SaveAsTemplateInput,
+  CreateFromTemplateInput,
+  ListTemplatesInput,
   GenerateAnswerPaperInput,
   UpdateQuestionPaperSettingsInput,
   PatchQuestionPaperSettingsInput,
@@ -35,6 +38,8 @@ export async function listQuestionPapers(
 
   if (input.isTemplate !== undefined) {
     where.isTemplate = input.isTemplate
+  } else {
+    where.isTemplate = false
   }
 
   if (input.search && input.search.trim() !== "") {
@@ -1726,8 +1731,16 @@ async function cloneQuestionPaper(
   sourceId: string,
   options: {
     buildTitle: (sourceTitle: string) => string
+    examName?: string
+    description?: string | null
     settingsOverrides?: Record<string, any>
     historyChanges: Record<string, any>
+    isTemplate?: boolean
+    status?: string
+    includeQuestions?: boolean
+    stripSubject?: boolean
+    targetSubjectId?: string | null
+    targetSubjectName?: string | null
   },
   actorId?: string
 ) {
@@ -1769,22 +1782,36 @@ async function cloneQuestionPaper(
     throw notFound("QuestionPaper")
   }
 
-  const baseSettings = {
+  const shouldIncludeQuestions = options.includeQuestions ?? true
+
+  const baseSettings: Record<string, any> = {
     ...((source.settings as Record<string, any>) || {}),
     ...(options.settingsOverrides || {}),
+  }
+
+  if (!shouldIncludeQuestions) {
+    delete baseSettings.items
+    delete baseSettings.itemStyles
+    delete baseSettings.itemPositions
+  }
+
+  if (options.targetSubjectName) {
+    baseSettings.subjectName = options.targetSubjectName
+  } else if (options.stripSubject) {
+    delete baseSettings.subjectName
   }
 
   const cloned = await tenantDb.questionPaper.create({
     data: {
       title: options.buildTitle(source.title),
-      examName: source.examName,
-      description: source.description,
+      examName: options.examName ?? source.examName,
+      description: options.description !== undefined ? options.description : source.description,
       classId: source.classId,
       className: source.className,
       settings: baseSettings,
       instructions: source.instructions ?? [],
-      isTemplate: false,
-      status: source.status,
+      isTemplate: options.isTemplate ?? false,
+      status: options.status ?? (options.isTemplate ? "Draft" : source.status),
       publishedAt: source.status === "Published" ? (source.publishedAt ?? new Date()) : null,
       publishedBy: source.status === "Published" ? (source.publishedBy ?? actorId) : null,
       total: source.total,
@@ -1830,11 +1857,22 @@ async function cloneQuestionPaper(
 
   const distIdMap = new Map<string, string>()
   for (const subject of source.subjects) {
+    let effectiveSubjectId = subject.subjectId
+    let effectiveSubjectName = subject.subjectName
+
+    if (options.targetSubjectId) {
+      effectiveSubjectId = options.targetSubjectId
+      effectiveSubjectName = options.targetSubjectName || subject.subjectName
+    } else if (options.stripSubject) {
+      effectiveSubjectId = "generic"
+      effectiveSubjectName = "সাধারণ / বিষয় ছাড়া"
+    }
+
     const newSubject = await tenantDb.questionPaperSubject.create({
       data: {
         questionPaperId: cloned.id,
-        subjectId: subject.subjectId,
-        subjectName: subject.subjectName,
+        subjectId: effectiveSubjectId,
+        subjectName: effectiveSubjectName,
         subjectTotal: subject.subjectTotal,
         orderIndex: subject.orderIndex,
       },
@@ -1882,6 +1920,7 @@ async function cloneQuestionPaper(
     }
   }
 
+  if (shouldIncludeQuestions) {
   for (const question of source.questions) {
     const newDistId = distIdMap.get(question.distributionId)
     if (!newDistId) continue
@@ -1932,8 +1971,19 @@ async function cloneQuestionPaper(
       }
     }
   }
+  }
 
   const remappedSettings = remapSettingsIds(baseSettings, remappedIds)
+  if (options.targetSubjectName) {
+    remappedSettings.subjectName = options.targetSubjectName
+  } else if (options.stripSubject) {
+    delete remappedSettings.subjectName
+  }
+  if (!shouldIncludeQuestions) {
+    delete remappedSettings.items
+    delete remappedSettings.itemStyles
+    delete remappedSettings.itemPositions
+  }
   const finalPaper = await tenantDb.questionPaper.update({
     where: { id: cloned.id },
     data: { settings: remappedSettings },
@@ -2082,4 +2132,104 @@ export async function patchQuestionPaperSettings(
     paper: updated,
     patch: patchData,
   }
+}
+
+
+export async function saveAsTemplate(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: SaveAsTemplateInput,
+  actorId?: string
+) {
+  return cloneQuestionPaper(
+    tenantDb,
+    input.paperId,
+    {
+      buildTitle: () => input.templateTitle.trim(),
+      description: input.description?.trim() || null,
+      historyChanges: { templateOf: input.paperId },
+      isTemplate: true,
+      status: "Draft",
+      includeQuestions: false,
+      stripSubject: input.stripSubject,
+    },
+    actorId
+  )
+}
+
+export async function createFromTemplate(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: CreateFromTemplateInput,
+  actorId?: string
+) {
+  const source = await tenantDb.questionPaper.findUnique({
+    where: { id: input.templateId },
+    select: { title: true, examName: true },
+  })
+
+  return cloneQuestionPaper(
+    tenantDb,
+    input.templateId,
+    {
+      buildTitle: (templateTitle) => input.title?.trim() || `${templateTitle} (কপি)`,
+      examName: input.examName?.trim() || source?.examName || "পরীক্ষা",
+      historyChanges: { createdFromTemplate: input.templateId },
+      isTemplate: false,
+      status: "Draft",
+      includeQuestions: false,
+      targetSubjectId: input.targetSubjectId,
+      targetSubjectName: input.targetSubjectName,
+    },
+    actorId
+  )
+}
+
+export async function listTemplates(
+  tenantDb: TenantPrismaClient,
+  input: ListTemplatesInput
+) {
+  const where: any = {
+    deletedAt: null,
+    isTemplate: true,
+  }
+
+  if (input.classId && input.classId !== "All") {
+    where.classId = input.classId
+  }
+
+  if (input.search && input.search.trim() !== "") {
+    where.OR = [
+      { title: { contains: input.search.trim(), mode: "insensitive" } },
+      { description: { contains: input.search.trim(), mode: "insensitive" } },
+    ]
+  }
+
+  const templates = await tenantDb.questionPaper.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+    include: {
+      subjects: {
+        orderBy: { orderIndex: "asc" },
+        include: {
+          distributions: {
+            orderBy: { orderIndex: "asc" },
+          },
+        },
+      },
+      sections: {
+        orderBy: { orderIndex: "asc" },
+        include: {
+          subSections: true,
+        },
+      },
+      _count: {
+        select: {
+          questions: true,
+        },
+      },
+    },
+  })
+
+  return { templates }
 }

@@ -346,17 +346,17 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
             variant="outline"
             size="sm"
             asChild
-            className="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
+            className="h-8.5 sm:h-9 px-2 sm:px-3 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1 sm:gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
           >
             <Link href="/question-papers" title="প্রশ্নপত্র তালিকায় ফিরে যান">
               <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="hidden sm:inline">তালিকায় ফিরুন</span>
-              <span className="inline sm:hidden text-[11px]">ফিরে যান</span>
+              <span className="inline sm:hidden">তালিকা</span>
             </Link>
           </Button>
 
           <div className="flex flex-col justify-center min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
               <h1
                 className="font-headline font-bold text-xs xs:text-sm sm:text-base text-foreground truncate max-w-[110px] xs:max-w-[150px] sm:max-w-[220px] md:max-w-[300px] lg:max-w-md leading-tight"
                 title={paperQuery.title}
@@ -415,10 +415,11 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
                   variant="outline"
                   size="sm"
                   onClick={handleGenerateSetsClick}
-                  className="h-8.5 w-8.5 sm:w-auto p-0 sm:px-3 sm:h-9 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60"
+                  className="h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer gap-1 sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60"
                 >
                   <Copy className={cn("w-3.5 h-3.5", !isPaperComplete ? "text-amber-500" : "text-muted-foreground")} />
                   <span className="hidden sm:inline">সেট তৈরি</span>
+                  <span className="inline sm:hidden">সেট</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center" className="rounded-xl shadow-lg border border-border/20 px-3 py-2 text-xs font-body max-w-xs z-50">
@@ -447,7 +448,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
                   onClick={handleDownloadClick}
                   disabled={isDownloading}
                   className={cn(
-                    "h-8.5 w-8.5 sm:w-auto p-0 sm:px-3 sm:h-9 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60",
+                    "h-8.5 sm:h-9 px-2.5 sm:px-3 rounded-xl border-slate-200 dark:border-white/10 text-xs font-bold text-foreground cursor-pointer gap-1 sm:gap-1.5 font-headline shrink-0 transition-all hover:bg-muted/60",
                     isDownloading && "opacity-70 cursor-not-allowed"
                   )}
                 >
@@ -457,6 +458,7 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
                     <Download className={cn("w-3.5 h-3.5", !isPaperComplete ? "text-amber-500" : "text-muted-foreground")} />
                   )}
                   <span className="hidden sm:inline">PDF ডাউনলোড</span>
+                  <span className="inline sm:hidden">ডাউনলোড</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" align="center" className="rounded-xl shadow-lg border border-border/20 px-3 py-2 text-xs font-body max-w-xs z-50">

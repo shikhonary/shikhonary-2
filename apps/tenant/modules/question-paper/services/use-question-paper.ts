@@ -8,6 +8,9 @@ import type {
   UpdateQuestionPaperInput,
   DeleteQuestionPaperInput,
   DuplicateQuestionPaperInput,
+  SaveAsTemplateInput,
+  CreateFromTemplateInput,
+  ListTemplatesInput,
   AddQuestionPaperQuestionInput,
   RemoveQuestionPaperQuestionInput,
   ReorderQuestionPaperQuestionsInput,
@@ -17,6 +20,7 @@ import type {
   DeleteQuestionPaperSubjectInput,
   UpsertQuestionPaperDistributionInput,
   DeleteQuestionPaperDistributionInput,
+  QuickCreateQuestionInput,
 } from "@workspace/api"
 
 export function useQuestionPapersList(input: ListQuestionPapersInput = { limit: 10 }) {
@@ -79,6 +83,31 @@ export function useDeleteQuestionPaper() {
       queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
     },
   })
+}
+
+
+export function useSaveAsTemplate() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.saveAsTemplate.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useCreateFromTemplate() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.createFromTemplate.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}
+
+export function useTemplatesList(input?: ListTemplatesInput) {
+  return useQuery(trpc.questionPaper.listTemplates.queryOptions(input))
 }
 
 export function useDuplicateQuestionPaper() {
@@ -251,6 +280,7 @@ export function useAvailableQuestions(
     cursor?: string
     sort?: "newest" | "oldest"
     mcqType?: string
+    ownership?: "ALL" | "OWN" | "GLOBAL"
   },
   enabled = true
 ) {
@@ -381,3 +411,14 @@ export function useUpdateQuestionPaperQuestion() {
   })
 }
 
+
+
+export function useQuickCreateQuestion() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    ...trpc.questionPaper.quickCreateQuestion.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+    },
+  })
+}

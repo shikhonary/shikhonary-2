@@ -9,6 +9,7 @@ import { QuestionCardWrapper } from "./question-card-wrapper"
 import { QuestionCardHeader } from "./question-card-header"
 import { QuestionCardFooter } from "./question-card-footer"
 import { QuestionAnswerAccordion } from "./question-answer-accordion"
+import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store"
 
 export interface McqBankCardProps {
   question: any
@@ -177,6 +178,15 @@ export const McqBankCard: React.FC<McqBankCardProps> = ({
         reference={finalReference}
         isBookmarked={isBookmarked}
         onToggleBookmark={onToggleBookmark ? () => onToggleBookmark() : undefined}
+        onReport={() => {
+          useQuestionReportStore.getState().openReport({
+            entityType: "MCQ",
+            entityId: q.id,
+            questionSnippet: q.question,
+            chapterName,
+            categoryLabel: mcqTypeLabel,
+          })
+        }}
       />
     </QuestionCardWrapper>
   )

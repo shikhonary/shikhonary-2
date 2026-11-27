@@ -29,12 +29,28 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
     q.chapter?.nameBn ||
     q.chapter?.nameEn;
 
+  const passageAttachment = Array.isArray(q.attachments)
+    ? q.attachments.find(
+        (att: any) =>
+          ((att.type || "").toUpperCase() === "PASSAGE" || (att.type || "").toUpperCase() === "TEXT") &&
+          Boolean(att.content?.trim())
+      )
+    : null;
+
   const combinedContext =
     q.type === "COMBINED" && Array.isArray(q.attachments)
       ? q.attachments.find((att: any) => att.caption)?.caption
       : null;
 
-  const contextText = q.questionContext?.text || q.context || combinedContext;
+  const contextText = q.questionContext?.text || q.context || passageAttachment?.content || combinedContext;
+
+  const mediaAttachments = Array.isArray(q.attachments)
+    ? q.attachments.filter((att: any) => {
+        const t = (att.type || "").toUpperCase();
+        if (t === "PASSAGE" || (t === "TEXT" && !att.url && !att.table)) return false;
+        return Boolean(att.url || att.table || att.caption);
+      })
+    : [];
 
   const mcqType = q.type || (q.statements && q.statements.length > 0 ? "MULTIPLE" : "SINGLE");
   const mcqTypeMatch = MCQ_TYPE_OPTIONS.find(
@@ -74,12 +90,14 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
         )}
 
         {/* Attachments */}
-        {Array.isArray(q.attachments) && q.attachments.length > 0 && (
+        {mediaAttachments.length > 0 && (
           <div className="space-y-1">
-            <span className="font-bold text-primary block text-[11px] font-headline">
-              উদ্দীপক:
-            </span>
-            <QuestionAttachments attachments={q.attachments} isMath={q.isMath} compact />
+            {!contextText && q.type === "COMBINED" && (
+              <span className="font-bold text-primary block text-[11px] font-headline">
+                উদ্দীপক (চিত্র / ছক):
+              </span>
+            )}
+            <QuestionAttachments attachments={mediaAttachments} isMath={q.isMath} compact />
           </div>
         )}
 

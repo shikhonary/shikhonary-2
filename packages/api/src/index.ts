@@ -100,12 +100,20 @@ export type {
   GeneratePaperSetsInput,
   AutoFillDistributionInput,
   ReplaceQuestionInput,
+  SaveAsTemplateInput,
+  CreateFromTemplateInput,
+  ListTemplatesInput,
+  QuickCreateQuestionInput,
 } from "./routers/question-paper/question-paper.schema"
 
 export {
   patchQuestionPaperSettingsSchema,
   autoFillDistributionSchema,
   replaceQuestionSchema,
+  saveAsTemplateSchema,
+  createFromTemplateSchema,
+  listTemplatesSchema,
+  quickCreateQuestionSchema,
 } from "./routers/question-paper/question-paper.schema"
 
 // ── Academic Setup Exports ───────────────────────────────────

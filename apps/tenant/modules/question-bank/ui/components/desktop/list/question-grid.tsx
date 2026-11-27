@@ -1,13 +1,14 @@
 "use client"
 
 import React from "react"
-import { Eye, Plus, Sparkles, Image as ImageIcon, CheckCircle2, Bookmark } from "lucide-react"
+import { Eye, Plus, Sparkles, Image as ImageIcon, CheckCircle2, Bookmark, Flag } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import { cn } from "@workspace/ui/lib/utils"
 import type { QuestionBankItem } from "@/modules/question-bank/types"
 import { useQuestionPreviewStore } from "@/modules/question-bank/store/use-question-preview-store"
+import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store"
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return ""
@@ -208,15 +209,38 @@ export const DesktopQuestionGrid: React.FC<DesktopQuestionGridProps> = ({
                 )}
               </div>
 
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => openPreview(q)}
-                className="h-7 px-2.5 text-xs text-primary hover:bg-primary/10 hover:text-primary rounded-md font-bold cursor-pointer shrink-0"
-              >
-                <Eye className="w-3.5 h-3.5 mr-1" />
-                <span>বিস্তারিত</span>
-              </Button>
+              <div className="flex items-center gap-1 shrink-0">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    useQuestionReportStore.getState().openReport({
+                      entityType: q.category || "MCQ",
+                      entityId: q.id,
+                      questionSnippet: q.questionText || q.context,
+                      chapterName: q.chapterNameBn || q.chapterNameEn,
+                      subjectName: q.subjectNameBn || q.subjectNameEn,
+                      categoryLabel: q.categoryLabelBn || q.category,
+                    })
+                  }}
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-md font-medium cursor-pointer"
+                  title="প্রশ্নে ত্রুটি রিপোর্ট করুন"
+                >
+                  <Flag className="w-3.5 h-3.5 text-rose-500" />
+                  <span className="hidden sm:inline">রিপোর্ট</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => openPreview(q)}
+                  className="h-7 px-2.5 text-xs text-primary hover:bg-primary/10 hover:text-primary rounded-md font-bold cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 mr-1" />
+                  <span>বিস্তারিত</span>
+                </Button>
+              </div>
             </div>
           </div>
         )

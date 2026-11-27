@@ -28,7 +28,7 @@ import { AddAlternativeModal } from "../modals/add-alternative-modal";
 import { EditableSectionLabel } from "./editable-section-label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@workspace/ui/components/dialog";
 import { Button } from "@workspace/ui/components/button";
-import { getIndicatorFontSize } from "./mcq-option-label";
+import { getIndicatorFontSize, getMcqOptionGridClass } from "./mcq-option-label";
 import { Badge } from "@workspace/ui/components/badge";
 import { cn } from "@workspace/ui/lib/utils";
 import { toast } from "sonner";
@@ -965,7 +965,7 @@ export const SeenComprehensionBlock = ({ item }: { item: any }) => {
                   const rawOptions = typeof sq.options === "string" ? JSON.parse(sq.options || "[]") : sq.options || [];
                   const optionsList = Array.isArray(rawOptions) ? rawOptions : [];
                   const columns = settings.mcqOptionLayouts?.[sq.id] || settings.mcqOptionColumns || (optionsList.length > 2 ? 2 : optionsList.length);
-                  const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
+                  const gridClass = getMcqOptionGridClass(columns, optionsList);
 
                   return (
                     <div key={sq.id || sIdx} className="flex items-start gap-2 w-full group/item relative">

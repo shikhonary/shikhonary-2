@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { RenderMath } from "@workspace/ui/components/render-math";
+import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, Split } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
@@ -259,6 +260,7 @@ export const DescriptiveQuestionBlock = ({ item }: { item: any }) => {
                 defaultStyle={questionStyle}
                 className="m-0 w-full whitespace-pre-wrap"
               />
+              <QuestionAttachments attachments={data.attachments} isMath={data.isMath} />
               {answerText && (
                 <div className="mt-1 text-xs text-muted-foreground/80 italic font-mono border-l-2 border-primary/20 pl-2">
                   <RenderMath text={`উত্তর: ${answerText}`} />

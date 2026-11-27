@@ -1,19 +1,19 @@
 {
-  "chapterTitle": "অর্থের সময়মূল্য",
+  "chapterTitle": "মুদ্রা, ব্যাংক ও ব্যাংকিং",
   "questions": [
     {
       "type": "SINGLE",
-      "question": "অর্থায়নে প্রতিটি সিদ্ধান্ত কীসের ভিত্তিতে গৃহীত হয়?",
+      "question": "'দ্রব্যের বিনিময়ে দ্রব্য' একে কী বলে?",
       "options": [
-        "অর্থের সময়মূল্য",
-        "সাংগঠনিক কাঠামো",
-        "মানবসম্পদ-দক্ষতা",
-        "আর্থিক পরিকল্পনা"
+        "Barter system",
+        "Debtor",
+        "Creditor",
+        "Sales"
       ],
-      "answer": "অর্থের সময়মূল্য",
+      "answer": "Barter system",
       "explanation": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০১৯"
+        "য. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -26,17 +26,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যবসায়ের কোনটির সাথে আন্তঃপ্রবাহ ও বহিঃপ্রবাহ জড়িত থাকে?",
+      "question": "দ্রব্য বিনিময় প্রথার সমস্যা কোনটি?",
       "options": [
-        "বিনিয়োগের সাথে",
-        "সিদ্ধান্তের সাথে",
-        "মূলধনের সাথে",
-        "মুনাফার সাথে"
+        "সঞ্চয়ের অভাব",
+        "উপযোগের অভাব",
+        "প্রয়োজনীয়তার অভাব",
+        "মিলের অভাব"
       ],
-      "answer": "সিদ্ধান্তের সাথে",
+      "answer": "সঞ্চয়ের অভাব",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৫"
+        "কু. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -49,23 +49,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "অর্থের সময়মূল্যের মূল কারণ কোনটি?",
+      "question": "দ্রব্য বিনিময় প্রথার অসুবিধা দূর করে কোনটি?",
       "options": [
-        "সুদের হার",
-        "নগদ আন্তঃপ্রবাহ",
-        "বাট্টার হার",
-        "নগদ বহিঃপ্রবাহ"
+        "ব্যাংক",
+        "পণ্য",
+        "চেক",
+        "মুদ্রা"
       ],
-      "answer": "সুদের হার",
+      "answer": "মুদ্রা",
       "explanation": null,
       "reference": [
-        "ময়মনসিংহ বোর্ড, চট্টগ্রাম বোর্ড ২০২৬",
-        "রাজশাহী বোর্ড ২০২৫, ২০২২",
-        "কুমিল্লা বোর্ড ২০২৪, ২০২৩",
-        "ঢাকা বোর্ড ২০২৩, ২০২১",
-        "বরিশাল বোর্ড ২০২২",
-        "সিলেট বোর্ড ২০২১",
-        "সামসুল হক খান স্কুল এন্ড কলেজ, ঢাকা; চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২০২৫"
+        "ঢা. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -78,17 +72,86 @@
     },
     {
       "type": "SINGLE",
-      "question": "অর্থের আন্তঃপ্রবাহের সাথে জড়িত—",
+      "question": "কাগজি মুদ্রার প্রচলন হয় কখন?",
       "options": [
-        "পণ্য ক্রয়",
-        "পণ্য বিক্রয়",
-        "বেতন পরিশোধ",
+        "পঞ্চদশ শতাব্দীতে",
+        "অষ্টাদশ শতাব্দীতে",
+        "ঊনবিংশ শতাব্দীতে",
+        "বিংশ শতাব্দীতে"
+      ],
+      "answer": "ঊনবিংশ শতাব্দীতে",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন শতাব্দীতে কাগজি মুদ্রার প্রচলন শুরু হয়?",
+      "options": [
+        "ঊনবিংশ",
+        "বিংশ",
+        "একবিংশ",
+        "দ্বাবিংশ"
+      ],
+      "answer": "ঊনবিংশ",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সকলের নিকট গ্রহণীয় বিনিময় মাধ্যম কোনটি?",
+      "options": [
+        "চেক",
+        "ব্যাংক ড্রাফট",
+        "মুদ্রা",
+        "ডেবিট কার্ড"
+      ],
+      "answer": "মুদ্রা",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মুদ্রার সবচেয়ে প্রধান কাজ কোনটি?",
+      "options": [
+        "বিনিময়ের মাধ্যম",
+        "সঞ্চয়ের ভাণ্ডার",
+        "মূল্যের পরিমাপক",
         "ঋণ পরিশোধ"
       ],
-      "answer": "পণ্য বিক্রয়",
+      "answer": "বিনিময়ের মাধ্যম",
       "explanation": null,
       "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৫"
+        "দি. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -101,40 +164,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বিদ্যমান দুটি প্রকল্পের একটিতে বিনিয়োগ করলে অন্যটি থেকে প্রত্যাশিত আয়কে কী বলে?",
+      "question": "মুদ্রা কী হিসেবে কাজ করে?",
       "options": [
-        "প্রত্যাশিত আয়",
-        "প্রত্যাশিত ব্যয়",
-        "সুযোগ ব্যয়",
-        "উৎপাদন ব্যয়"
-      ],
-      "answer": "সুযোগ ব্যয়",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৫"
+        "মূল্যের পরিমাপক",
+        "মান নিয়ন্ত্রক",
+        "দ্রব্য সংরক্ষক",
+        "সম্মান বর্ধক"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "একাধিক প্রকল্পের যেকোনো একটিতে অর্থ বিনিয়োগ করলে কোনটি সৃষ্টি হয়?",
-      "options": [
-        "মুনাফা",
-        "চলতি ব্যয়",
-        "সুযোগ ব্যয়",
-        "দায়"
-      ],
-      "answer": "সুযোগ ব্যয়",
+      "answer": "মূল্যের পরিমাপক",
       "explanation": null,
       "reference": [
-        "যশোর বোর্ড ২০২৬"
+        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -147,44 +187,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "প্রতিটি বিনিয়োগের সাথে জড়িত থাকে কোনটি?",
+      "question": "রফিক তার উপার্জন থেকে প্রতি মাসে ১,০০০ টাকা ভবিষ্যতের জন্য জমা রাখেন। এখানে অর্থ কী হিসেবে কাজ করছে?",
       "options": [
-        "মোট ব্যয়",
-        "মুখ্য ব্যয়",
-        "সুযোগ ব্যয়",
-        "উৎপাদন ব্যয়"
-      ],
-      "answer": "সুযোগ ব্যয়",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৩",
-        "ময়মনসিংহ বোর্ড ২০২১"
+        "সঞ্চয়ের বাহন",
+        "মূল্যের পরিমাপক",
+        "বিনিময়ের মাধ্যম",
+        "অর্থ স্থানান্তরের বাহন"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "অর্থ বিনিয়োগ না করলে কোনটি সৃষ্টি হয়?",
-      "options": [
-        "সুযোগ ব্যয়",
-        "মুনাফা",
-        "চলতি ব্যয়",
-        "দায়"
-      ],
-      "answer": "সুযোগ ব্যয়",
+      "answer": "সঞ্চয়ের বাহন",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৩",
-        "কুমিল্লা বোর্ড ২০২৫",
-        "রাজশাহী বোর্ড ২০১৯",
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; মাইলস্টোন কলেজ, ঢাকা; জালালাবাদ ক্যান্টনমেন্ট বোর্ড হাই স্কুল, সিলেট; নি. প. ২০২৫"
+        "ম. বো. ২৪",
+        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -197,43 +211,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "অর্থায়নের সুযোগ ব্যয় কোনটি?",
+      "question": "মুদ্রা প্রচলনের পরপরই কিসের প্রয়োজনীয়তা দেখা দেয়?",
       "options": [
-        "নগদ প্রবাহ",
-        "নগদ বহিঃপ্রবাহ",
-        "সময়",
-        "বিনিয়োগ"
-      ],
-      "answer": "বিনিয়োগ",
-      "explanation": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৫"
+        "ব্যাংক ব্যবস্থার",
+        "ঋণ ব্যবস্থার",
+        "বিমা ব্যবস্থার",
+        "লেনদেন ব্যবস্থার"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "৭২-কে প্রকল্পের মেয়াদ দিয়ে ভাগ করলে কী পাওয়া যায়?",
-      "options": [
-        "ঋণের পরিমাণ",
-        "সুদের হার",
-        "বর্তমান মূল্য",
-        "ভবিষ্যৎ মূল্য"
-      ],
-      "answer": "সুদের হার",
+      "answer": "ব্যাংক ব্যবস্থার",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৫, ২০২২",
-        "চট্টগ্রাম বোর্ড ২০২৪",
-        "কুমিল্লা বোর্ড ২০২১, ২০২০",
-        "শহীদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; নি. প. ২০২৫"
+        "ব. বো. ২৪",
+        "চ. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -246,40 +235,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "রুল-৭২ অনুযায়ী নিচের কোনটিকে সুদের হার দিয়ে ভাগ করলে মেয়াদ পাওয়া যাবে?",
+      "question": "কোনটি ছাড়া মুদ্রার ব্যবহার সীমিত?",
       "options": [
-        "সুদাসল",
-        "৭২",
-        "আসল",
-        "দ্বিগুণ হার"
-      ],
-      "answer": "৭২",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৪, ২০২১"
+        "লেনদেন",
+        "বিমা",
+        "ব্যাংক",
+        "শেয়ার বাজার"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "“রুল-৭২” অনুযায়ী ৭২ কে সুদের হার দ্বারা ভাগ করলে কী পাওয়া যায়?",
-      "options": [
-        "মোট সুদ",
-        "আসল",
-        "সুদ আসল",
-        "মেয়াদ"
-      ],
-      "answer": "মেয়াদ",
+      "answer": "ব্যাংক",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৬"
+        "চ. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -292,43 +258,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "বিধি-৭২ কী?",
+      "question": "কোনটিকে ব্যাংক ব্যবস্থার জননী বলা হয়?",
       "options": [
-        "বিনিয়োগকৃত অর্থ দ্বিগুণ করার হিসাব",
-        "বিনিয়োগকৃত অর্থ বহুগুণ করার হিসাব",
-        "বিনিয়োগকৃত অর্থ তিনগুণ করার হিসাব",
-        "দ্বিগুণকৃত অর্থে বিনিয়োগের হিসাব"
-      ],
-      "answer": "বিনিয়োগকৃত অর্থ দ্বিগুণ করার হিসাব",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৫",
-        "দিনাজপুর বোর্ড ২০২১"
+        "বিনিয়োগ বিলকে",
+        "চেককে",
+        "মুদ্রাকে",
+        "ব্যাংক ড্রাফটকে"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "‘রুল-৭২’ ব্যবহার করে নিচের কোনটি জানা যায়?",
-      "options": [
-        "সুযোগ ব্যয়",
-        "অর্থের বর্তমান মূল্য",
-        "মেয়াদ",
-        "অর্থের ভবিষ্যৎ মূল্য"
-      ],
-      "answer": "মেয়াদ",
+      "answer": "মুদ্রাকে",
       "explanation": null,
       "reference": [
-        "ময়মনসিংহ বোর্ড, দিনাজপুর বোর্ড ২০২৪",
-        "রাজশাহী বোর্ড ২০২২",
-        "জালালাবাদ ক্যান্টনমেন্ট বোর্ড হাই স্কুল, সিলেট; নি. প. ২০২৫"
+        "রা. বো. ২৫",
+        "কু. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -341,41 +282,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "৯% সুদে ৭,০০,০০০ টাকা ‘রুল ৭২’ অনুসারে কত বছরে ১৪,০০,০০০ টাকা হবে?",
+      "question": "ব্যাংক ব্যবসায়ের প্রধান উপাদান কী?",
       "options": [
-        "৭ বছর",
-        "৮ বছর",
-        "৯ বছর",
-        "১৪ বছর"
-      ],
-      "answer": "৮ বছর",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৫, ২০২৩",
-        "সিলেট বোর্ড ২০২৪"
+        "মুদ্রা",
+        "দলিল",
+        "শেয়ার",
+        "ঋণ"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কত বছরে ৮% সুদে ৫০,০০০ টাকা দ্বিগুণ হবে?",
-      "options": [
-        "৬ বছর",
-        "৯ বছর",
-        "১২ বছর",
-        "১৫ বছর"
-      ],
-      "answer": "৯ বছর",
+      "answer": "মুদ্রা",
       "explanation": null,
       "reference": [
-        "রাজশাহী বোর্ড ২০২৬"
+        "দি. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -388,45 +305,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "৬ বছর পর ৫ লক্ষ টাকা দ্বিগুণ হলে সুদের হার কত?",
+      "question": "'Banco' কী ধরনের শব্দ?",
       "options": [
-        "১২%",
-        "১০%",
-        "৮%",
-        "৬%"
-      ],
-      "answer": "১২%",
-      "explanation": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬",
-        "রাজশাহী বোর্ড ২০২৫, ২০২২",
-        "ময়মনসিংহ বোর্ড, বরিশাল বোর্ড ২০২৩",
-        "ঢাকা বোর্ড ২০২২",
-        "কুমিল্লা বোর্ড ২০২৩"
+        "ইতালিয়ান",
+        "মেক্সিকান",
+        "প্রাচীন ল্যাটিন",
+        "ফরাসি"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'X' ব্যাংক ৮ বছরে দ্বিগুণ হওয়ার শর্তে জনগণের কাছ থেকে আমানত গ্রহণ করলে সুদের হার কত হবে?",
-      "options": [
-        "৮%",
-        "৯%",
-        "১০%",
-        "১২%"
-      ],
-      "answer": "৯%",
+      "answer": "প্রাচীন ল্যাটিন",
       "explanation": null,
       "reference": [
-        "ঢাকা বোর্ড ২০২৬",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+        "য. বো. ২৪",
+        "চ. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -439,40 +329,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "‘শাপলা’ ব্যাংকে কিছু টাকা জমা রাখলে ১০ বছরে দ্বিগুণ হয়। মুনাফার হার কত?",
+      "question": "ব্যাংক শব্দটির ল্যাটিন উৎপত্তির পেছনে বেশি সমর্থন পাওয়া যায় কোনটির?",
       "options": [
-        "৬.৮০%",
-        "৭.১০%",
-        "৭.২০%",
-        "৭.৫০%"
-      ],
-      "answer": "৭.২০%",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৬"
+        "বস্তু বিশেষের স্তূপ",
+        "কোষাগার",
+        "লম্বা টুল",
+        "ধন ভাণ্ডার"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "দীর্ঘমেয়াদি প্রকল্প মূল্যায়নে ভবিষ্যৎ আয়ের সাথে কোনটির তুলনা করতে হয়?",
-      "options": [
-        "ভবিষ্যৎ আয়",
-        "বর্তমান আয়",
-        "বর্তমান ব্যয়",
-        "শ্রমিকের মজুরি"
-      ],
-      "answer": "বর্তমান ব্যয়",
+      "answer": "লম্বা টুল",
       "explanation": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০২৪"
+        "কু. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -485,44 +352,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "বিনিয়োগকারীর নিকট প্রকল্প মূল্যায়নে গুরুত্বপূর্ণ ভূমিকা পালন করে—",
+      "question": "কোন প্রাচীন ভাষা থেকে ব্যাংক শব্দের উৎপত্তি?",
       "options": [
-        "প্রকৃত সুদের হার",
-        "অর্থের সময়মূল্য",
-        "সুযোগ ব্যয়",
-        "মূলধন ব্যয়"
-      ],
-      "answer": "অর্থের সময়মূল্য",
-      "explanation": null,
-      "reference": [
-        "কুমিল্লা বোর্ড, চট্টগ্রাম বোর্ড ২০২৩",
-        "জালালাবাদ ক্যান্টনমেন্ট বোর্ড হাই স্কুল, সিলেট; নি. প. ২০২৫"
+        "গ্রিক",
+        "ল্যাটিন",
+        "ফরাসি",
+        "জার্মান"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোনটির ক্ষেত্রে অর্থের সময়মূল্যের গুরুত্ব অপরিসীম?",
-      "options": [
-        "সুদের হার নির্ধারণে",
-        "আর্থিক অবস্থা নিরূপণে",
-        "বিনিয়োগ সিদ্ধান্ত গ্রহণে",
-        "ঋণের কিস্তি হ্রাসকরণে"
-      ],
-      "answer": "বিনিয়োগ সিদ্ধান্ত গ্রহণে",
+      "answer": "ল্যাটিন",
       "explanation": null,
       "reference": [
-        "বরিশাল বোর্ড ২০২৪, ২০২৩",
-        "রাজশাহী বোর্ড ২০২৩",
-        "চট্টগ্রাম বোর্ড ২০২২",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+        "সকল বোর্ড ১৫",
+        "সৃষ্টি একাডেমিক স্কুল, টাঙ্গাইল; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -535,45 +376,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংক বা যেকোনো আর্থিক প্রতিষ্ঠান থেকে ঋণ গ্রহণের আগে কী বিবেচনা করতে হয়?",
+      "question": "ব্যাংক শব্দের ল্যাটিন অর্থ কী?",
       "options": [
-        "সুদের পরিমাণ",
-        "কিস্তি পরিশোধ ক্ষমতা",
-        "অর্থ বিনিয়োগ ক্ষমতা",
-        "প্রকল্প নির্বাচন"
-      ],
-      "answer": "কিস্তি পরিশোধ ক্ষমতা",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২৬",
-        "কুমিল্লা বোর্ড ২০২৪, ২০২২",
-        "যশোর বোর্ড ২০২৪, ২০২৩, ২০২২",
-        "সিলেট বোর্ড ২০২২",
-        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ; নি. প. ২০২৫"
+        "সঞ্চয়",
+        "চেয়ার",
+        "লম্বা টেবিল",
+        "বিনিয়োগ"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভবিষ্যৎ মূল্য নির্ধারণের জন্য নিচের কোন প্রক্রিয়াটি ব্যবহার করতে হবে?",
-      "options": [
-        "বার্ষিক বাট্টাকরণ",
-        "বার্ষিক চক্রবৃদ্ধিকরণ",
-        "সরল সুদ নির্ণয়",
-        "প্রকৃত সুদের হার"
-      ],
-      "answer": "বার্ষিক চক্রবৃদ্ধিকরণ",
+      "answer": "লম্বা টেবিল",
       "explanation": null,
       "reference": [
-        "বরিশাল বোর্ড ২০২৫",
-        "কুমিল্লা বোর্ড ২০২৩"
+        "সকল বোর্ড ১৭",
+        "পটুয়াখালী সরকারি জুবিলী উচ্চ বিদ্যালয়; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -586,43 +400,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "চক্রবৃদ্ধির সংখ্যার সাথে ভবিষ্যৎ মূল্যের সম্পর্ক কীরূপ?",
+      "question": "ব্যাংককে কী বলা হয়?",
       "options": [
-        "ধনাত্মক",
-        "বিপরীতমুখী",
-        "আনুপাতিক",
-        "নিরপেক্ষ"
-      ],
-      "answer": "ধনাত্মক",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৬"
+        "অর্থ ভাণ্ডার",
+        "ঋণদাতা",
+        "ঋণের ব্যবসায়ী",
+        "বিপদের বন্ধু"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "চক্রবৃদ্ধি সুদ প্রদান করা হয় কীসের ওপর?",
-      "options": [
-        "মূলধনের ওপর",
-        "বিনিয়োগের ওপর",
-        "সুদাসলের ওপর",
-        "আসলের ওপর"
-      ],
-      "answer": "সুদাসলের ওপর",
+      "answer": "ঋণের ব্যবসায়ী",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৬",
-        "ময়মনসিংহ বোর্ড ২০২৪",
-        "রাজশাহী বোর্ড ২০২৩, ২০২১",
-        "কুমিল্লা বোর্ড, যশোর বোর্ড ২০২১"
+        "ব. বো. ২৩"
       ],
       "statements": [],
       "context": null,
@@ -635,44 +423,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কেবল আসলের ওপর কোনটি প্রদান করা হয়?",
+      "question": "ব্যাংকের কার্যাবলির বিস্তৃত ধারণাকে কী বলে?",
       "options": [
-        "নিট সুদ",
-        "মোট সুদ",
-        "চক্রবৃদ্ধির সুদ",
-        "সরল সুদ"
-      ],
-      "answer": "সরল সুদ",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড, বরিশাল বোর্ড ২০২৬",
-        "কুমিল্লা বোর্ড, চট্টগ্রাম বোর্ড ২০২৫",
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; কুমিল্লা মডার্ন হাই স্কুল; নি. প. ২০২৫"
+        "ব্যাংক",
+        "ব্যাংকার",
+        "ব্যাংকিং",
+        "আমানত"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "আসলের ওপর প্রত্যেক বছর সুদ গণনা করা হয় কোন ক্ষেত্রে?",
-      "options": [
-        "সরল সুদের ক্ষেত্রে",
-        "চক্রবৃদ্ধি সুদের ক্ষেত্রে",
-        "প্রকৃত সুদের হার নির্ণয়ের ক্ষেত্রে",
-        "প্রকল্প মূল্যায়নের ক্ষেত্রে"
-      ],
-      "answer": "সরল সুদের ক্ষেত্রে",
+      "answer": "ব্যাংকিং",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৬, ২০২৩",
-        "কুমিল্লা বোর্ড ২০২৩",
-        "ঢাকা বোর্ড, রাজশাহী বোর্ড ২০২১"
+        "উদয়ন উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -685,42 +446,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "মাজিদ ৫০ হাজার টাকা ৩ বছরের জন্য বার্ষিক ১১% চক্রবৃদ্ধি সুদে বিনিয়োগ করলে সময় শেষে কত টাকা পাবেন?",
+      "question": "ব্যাংকিং বলতে কী বোঝায়?",
       "options": [
-        "৬৮,৩৮১.৫৫ টাকা",
-        "৬৮,৫৮১.৫৫ টাকা",
-        "৬৮,৭৮১.৫৫ টাকা",
-        "৬৮,৯৮১.৫৫ টাকা"
-      ],
-      "answer": "৬৮,৩৮১.৫৫ টাকা",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২৪",
-        "উত্তরা হাই স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
+        "ব্যাংকের শাখা",
+        "ব্যাংকের নিয়ম-নীতি",
+        "ব্যাংকের আইনসঙ্গত কার্যাবলি",
+        "ব্যাংকের হিসাব-নিকাশ"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সুদের হার ৫% হলে বর্তমান ৫০,০০০ টাকার ৫ বছর পর ভবিষ্যৎ মূল্য কত?",
-      "options": [
-        "৬৩,৫১৪ টাকা",
-        "৬৩,৬১৪ টাকা",
-        "৬৩,৭১৪ টাকা",
-        "৬৩,৮১৪ টাকা"
-      ],
-      "answer": "৬৩,৮১৪ টাকা",
+      "answer": "ব্যাংকের আইনসঙ্গত কার্যাবলি",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২২",
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
+        "সি. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -733,40 +469,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "সুদের হার ৪% হলে বর্তমানে ৪০,০০০ টাকার ৫ বছর পর ভবিষ্যৎ মূল্য কত?",
+      "question": "ব্যাংকিং ব্যবসায় পরিচালনার সাথে সরাসরি জড়িত ব্যক্তিবর্গকে কী বলে?",
       "options": [
-        "৪৮,৬৬৬ টাকা",
-        "৪৫,৬৬৬ টাকা",
-        "৫২,৬৬৬ টাকা",
-        "৪৩,৬৬৬ টাকা"
-      ],
-      "answer": "৪৮,৬৬৬ টাকা",
-      "explanation": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬"
+        "ব্যাংক",
+        "ব্যাংকিং",
+        "ব্যাংক গ্রাহক",
+        "ব্যাংকার"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনাব মাসুদ ১০% হার মুনাফায় ৫০,০০০ টাকা ব্যাংকে জমা রাখতে চান। ৩ বছর পর তিনি ব্যাংক থেকে কত টাকা পাবেন?",
-      "options": [
-        "৬০,৫০০ টাকা",
-        "৬৬,৫৫০ টাকা",
-        "৭০,৫০০ টাকা",
-        "৭৫,৫৫০ টাকা"
-      ],
-      "answer": "৬৬,৫৫০ টাকা",
+      "answer": "ব্যাংকার",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৬"
+        "ম. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -779,42 +492,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "জনাব নাফিজ ১০% হার মুনাফায় ২০,০০০ টাকা ব্যাংকে জমা রাখতে চান। ৩ বছর পর তিনি কত টাকা পাবেন?",
+      "question": "নিচের কোন সভ্যতাটি খ্রিস্টপূর্ব চারশত সাল পর্যন্ত ব্যাংকিং ব্যবসায়ের উন্নয়নে অবদান রাখে?",
       "options": [
-        "২৬,৬১৫ টাকা",
-        "২৬,৬২০ টাকা",
-        "২৬,৬০০ টাকা",
-        "২৬,৬৩৫ টাকা"
-      ],
-      "answer": "২৬,৬২০ টাকা",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৪",
-        "চট্টগ্রাম বোর্ড ২০২৩",
-        "সামসুল হক খান স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
+        "সিন্ধু",
+        "মিশরীয়",
+        "আর্য",
+        "গ্রিক"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মি. আবিদ ৫০,০০০ টাকা ৩ বছরের জন্য বার্ষিক ১১% চক্রবৃদ্ধি সুদে বিনিয়োগ করলে সময় শেষে কত টাকা পাবেন?",
-      "options": [
-        "৬৮,৬৮১.৫৫ টাকা",
-        "৬৮,৫৮১.৫৫ টাকা",
-        "৬৮,৪৮১.৫৫ টাকা",
-        "৬৮,৩৮১.৫৫ টাকা"
-      ],
-      "answer": "৬৮,৩৮১.৫৫ টাকা",
+      "answer": "গ্রিক",
       "explanation": null,
       "reference": [
-        "রাজশাহী বোর্ড ২০২৬"
+        "ব. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -827,40 +515,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "জনাব শফিক ৫০,০০০ টাকা ৫ বছরের জন্য বার্ষিক ১০% চক্রবৃদ্ধি সুদে বিনিয়োগ করলে সময় শেষে কত টাকা পাবেন?",
+      "question": "ভারত অঞ্চলে প্রতিষ্ঠিত প্রথম আধুনিক ব্যাংকের নাম কী?",
       "options": [
-        "৮০,৫২৫.৫০ টাকা",
-        "৮৮,৫০০.২৫ টাকা",
-        "৮৪,৫২৫.৫০ টাকা",
-        "৮৬,৬৭৫.৫০ টাকা"
-      ],
-      "answer": "৮০,৫২৫.৫০ টাকা",
-      "explanation": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+        "ব্যাংক অব ইন্ডিয়া",
+        "দি ক্যালকাটা ব্যাংক",
+        "ব্যাংক অব কাশ্মীর",
+        "দি হিন্দুস্থান ব্যাংক"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "তুমি ১২% হারে ত্রৈমাসিক চক্রবৃদ্ধিতে ১ লক্ষ টাকা ব্যাংকে ৫ বছরের জন্য জমা রাখলে কত টাকা পাবে?",
-      "options": [
-        "১,০৬,১৭৪ টাকা (প্রায়)",
-        "১,১৫,৯২৭ টাকা (প্রায়)",
-        "১,৭৬,২৩৪ টাকা (প্রায়)",
-        "১,৮০,৬১১ টাকা (প্রায়)"
-      ],
-      "answer": "১,৮০,৬১১ টাকা (প্রায়)",
+      "answer": "দি হিন্দুস্থান ব্যাংক",
       "explanation": null,
       "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
+        "য. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -873,17 +538,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "১৫% সুদের হারে ৫,০০,০০০ টাকা ঋণ গ্রহণের জন্য ঋণগ্রহীতাকে আগামী ১২ বছর পর কত টাকা প্রদান করতে হবে?",
+      "question": "রিজার্ভ ব্যাংক অব ইন্ডিয়া কত সালে প্রতিষ্ঠিত হয়?",
       "options": [
-        "২,২২,৯২৭ টাকা",
-        "২৬,৭৫,১২৫ টাকা",
-        "৩০,২৪,০৫০ টাকা",
-        "২১,৭৫,১২৫ টাকা"
-      ],
-      "answer": "২৬,৭৫,১২৫ টাকা",
+        "১৯৩০",
+        "১৯৩৫",
+        "১৯৪০",
+        "১৯৬০"
+      ],
+      "answer": "১৯৩৫",
       "explanation": null,
       "reference": [
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
+        "দি. বো. ২৪",
+        "রা. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -896,18 +562,18 @@
     },
     {
       "type": "SINGLE",
-      "question": "বাট্টাকরণের মাধ্যমে আমরা কোনটি নির্ণয় করতে পারি?",
+      "question": "বাংলাদেশ ব্যাংক কত সালে প্রতিষ্ঠিত হয়?",
       "options": [
-        "সুদের হার",
-        "সুদাসল",
-        "বর্তমান মূল্য",
-        "ভবিষ্যৎ মূল্য"
-      ],
-      "answer": "বর্তমান মূল্য",
+        "১৯৭৫ সালে",
+        "১৯৭৪ সালে",
+        "১৯৭২ সালে",
+        "১৯৭১ সালে"
+      ],
+      "answer": "১৯৭২ সালে",
       "explanation": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০২১",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ; নি. প. ২০২৫"
+        "সি. বো. ২৫, ২৪",
+        "কুমিল্লা হাই স্কুল; নি. প. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -920,17 +586,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বাট্টার হার বাড়লে বর্তমান মূল্যের ওপর কীরূপ প্রভাব পড়বে?",
+      "question": "রাষ্ট্রপতির আদেশে বাংলাদেশ ব্যাংক কবে প্রতিষ্ঠিত হয়?",
       "options": [
-        "কমবে",
-        "বাড়বে",
-        "দ্বিগুণ হবে",
-        "অপরিবর্তিত থাকবে"
-      ],
-      "answer": "কমবে",
+        "১৯৭১ সালের ১৬ই ডিসেম্বর",
+        "১৯৭১ সালের ২৬শে মার্চ",
+        "১৯৭২ সালের ২৬শে মার্চ",
+        "১৯৭২ সালের ৭ই এপ্রিল"
+      ],
+      "answer": "১৯৭১ সালের ১৬ই ডিসেম্বর",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৬"
+        "সি. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -943,18 +609,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "সুদাসলকে সুদের হার দিয়ে ভাগ করে কী পাওয়া যায়?",
+      "question": "বাংলাদেশ ব্যাংককে কত সালে কার্যকর কেন্দ্রীয় ব্যাংক হিসেবে ঘোষণা করা হয়?",
       "options": [
-        "কিস্তি",
-        "ভবিষ্যৎ মূল্য",
-        "বর্তমান মূল্য",
-        "মেয়াদ"
-      ],
-      "answer": "বর্তমান মূল্য",
+        "১৬ ডিসেম্বর ১৯৭১",
+        "২৬ মার্চ ১৯৭২",
+        "১৬ ডিসেম্বর ১৯৭২",
+        "৭ মার্চ ১৯৭২"
+      ],
+      "answer": "১৬ ডিসেম্বর ১৯৭১",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০১৯",
-        "মাইলস্টোন কলেজ, ঢাকা; নি. প. ২০২৫"
+        "য. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -967,17 +632,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "একাধিক বাট্টাকরণের মাধ্যমে কী নির্ণয় করা হয়?",
+      "question": "মুক্তিযুদ্ধের পরবর্তী সময়ে বাংলাদেশে বিভিন্ন ব্যাংকের মোট কতটি শাখা কর্মরত ছিল?",
       "options": [
-        "ভবিষ্যৎ মূল্য",
-        "বর্তমান মূল্য",
-        "সাধারণ সুদ",
-        "চক্রবৃদ্ধি সুদ"
-      ],
-      "answer": "বর্তমান মূল্য",
+        "১০৯০টি",
+        "১১৯০টি",
+        "১২৯০টি",
+        "১৩৯০টি"
+      ],
+      "answer": "১০৯০টি",
       "explanation": null,
       "reference": [
-        "দিনাজপুর বোর্ড ২০২৫"
+        "য. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -990,17 +655,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "একাধিকবার চক্রবৃদ্ধির ক্ষেত্রে কোনটির মাধ্যমে বর্তমান মূল্য নির্ধারণ করা হয়?",
+      "question": "কোন ব্যাংকটি বিরাষ্ট্রীয়করণ করা হয়েছে?",
       "options": [
-        "সুদ",
-        "আসল",
-        "সুদাসল",
-        "বাট্টাকরণ"
-      ],
-      "answer": "বাট্টাকরণ",
+        "জনতা ব্যাংক",
+        "পূবালী ব্যাংক",
+        "রূপালী ব্যাংক",
+        "সবগুলো"
+      ],
+      "answer": "পূবালী ব্যাংক",
       "explanation": null,
       "reference": [
-        "ঢাকা বোর্ড ১৯"
+        "ঢা. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -1013,41 +678,20 @@
     },
     {
       "type": "SINGLE",
-      "question": "একাধিকবার বাট্টাকরণের বর্তমান মূল্য নির্ণয়ের সূত্র কোনটি?",
+      "question": "বিরাষ্ট্রীয়করণ প্রক্রিয়া কখন শুরু হয়?",
       "options": [
-        "$PV = FV\\left(1 + \\frac{i}{m}\\right)^{m\\times n}$",
-        "$PV = \\frac{FV}{\\left(1 + \\frac{i}{m}\\right)^{m\\times n}}$",
-        "$FV = \\frac{PV}{\\left(1 + \\frac{i}{m}\\right)^{m\\times n}}$",
-        "$FV = PV\\left(1 + \\frac{i}{m}\\right)^{m\\times n}$"
-      ],
-      "answer": "$PV = \\frac{FV}{\\left(1 + \\frac{i}{m}\\right)^{m\\times n}}$",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৫"
+        "পঞ্চাশের দশকে",
+        "ষাটের দশকে",
+        "সত্তরের দশকে",
+        "আশির দশকে"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভবিষ্যৎ মূল্য থেকে অর্থের বর্তমান মূল্য নির্ণয়ের প্রক্রিয়াকে কী বলে?",
-      "options": [
-        "চক্রবৃদ্ধিকরণ পদ্ধতি",
-        "বাট্টাকরণ পদ্ধতি",
-        "রুল ৭২",
-        "লভ্যাংশ নীতি"
-      ],
-      "answer": "বাট্টাকরণ পদ্ধতি",
+      "answer": "আশির দশকে",
       "explanation": null,
       "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৩",
-        "বরিশাল বোর্ড ২০২০"
+        "চ. বো. ২৫, ২৪",
+        "সি. বো. ২৪",
+        "দি. বো., য. বো. ২০",
+        "রা. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -1060,700 +704,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বর্তমান মূল্য বের করার সূত্র কোনটি?",
+      "question": "বর্তমানে দেশে সরকারি ব্যাংক কতটি?",
       "options": [
-        "$FV = PV(1 + i)^n$",
-        "$PV = \\frac{FV}{(1 + i)^n}$",
-        "$FV = \\frac{PV}{(1 + i)^n}$",
-        "$FV = PV + (PV \\times i \\times N)$"
-      ],
-      "answer": "$PV = \\frac{FV}{(1 + i)^n}$",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২২"
+        "২টি",
+        "৪টি",
+        "৬টি",
+        "৮টি"
       ],
-      "statements": [],
-      "context": null,
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভবিষ্যতে নির্দিষ্ট পরিমাণ টাকা পাওয়ার জন্য নিচের কোন সূত্রটি প্রয়োগ করতে হবে?",
-      "options": [
-        "$FV = PV(1 + i)^n$",
-        "$FV = PV(1 + mi)^{m\\times n}$",
-        "$PV = \\frac{FV}{(1 + i)^n}$",
-        "$PV = \\frac{FV}{\\left(1 + \\frac{i}{m}\\right)^{m\\times n}}$"
-      ],
-      "answer": "$PV = \\frac{FV}{(1 + i)^n}$",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৩",
-        "চট্টগ্রাম বোর্ড ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বার্ষিক সুদের হার ৫% হলে ১ বছর পরে ১,০০০ টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "৯৫২.৩৮ টাকা",
-        "৬৬৬.৬৭ টাকা",
-        "১,০৫০ টাকা",
-        "১,৫০০ টাকা"
-      ],
-      "answer": "৯৫২.৩৮ টাকা",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "১০ বছর পরের ১০ টাকার ১০% মুনাফায় বর্তমান মূল্য কত হবে?",
-      "options": [
-        "২.৮৫ টাকা",
-        "৩.৮৬ টাকা",
-        "৪.৮৫ টাকা",
-        "৫.৮৬ টাকা"
-      ],
-      "answer": "৩.৮৬ টাকা",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২২"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জামাল ২ বছর পরে কামালের কাছ থেকে ২০০ টাকা পাবে। মুনাফার হার ২০% হলে ঐ টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "১৩৯ টাকা (প্রায়)",
-        "১৬৭ টাকা (প্রায়)",
-        "১৯২ টাকা (প্রায়)",
-        "১৯৬ টাকা (প্রায়)"
-      ],
-      "answer": "১৩৯ টাকা (প্রায়)",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সুদের হার ৮% হলে ১ বছর পরের ১০৮ টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "৯২ টাকা",
-        "১০০ টাকা",
-        "১০৮ টাকা",
-        "১১৬ টাকা"
-      ],
-      "answer": "১০০ টাকা",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২২"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সুদের হার বার্ষিক ৭.৫০% হলে ২ বছর পরের ৫,০০০ টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "৪,৩২৬.৬৬ টাকা",
-        "৩,৩২৬.৬৬ টাকা",
-        "২,৩২৬.৬৬ টাকা",
-        "১,৩২৬.৬৬ টাকা"
-      ],
-      "answer": "৪,৩২৬.৬৬ টাকা",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নেহা ৪ বছর পর বিমা কোম্পানি থেকে ২ লক্ষ টাকা পাবেন। ৯% ষান্মাসিক বাট্টার হারে উক্ত টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "১,২৫,২৮২ টাকা",
-        "১,৪০,৬৩৭ টাকা",
-        "১,৪৬,২৩২ টাকা",
-        "১,৫৯,২৩৪ টাকা"
-      ],
-      "answer": "১,৪০,৬৩৭ টাকা",
-      "explanation": null,
-      "reference": [
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নেহা ৪ বছর পর বিমা কোম্পানি থেকে ২ লক্ষ টাকা পাবেন। ৯% ষান্মাসিক বাট্টার হারে উক্ত টাকার বর্তমান মূল্য কত?",
-      "options": [
-        "১,২৫,২৮২ টাকা",
-        "১,৪০,৬৩৭ টাকা",
-        "১,৪৬,২৩২ টাকা",
-        "১,৫৯,২৩৪ টাকা"
-      ],
-      "answer": "১,৪০,৬৩৭ টাকা",
-      "explanation": null,
-      "reference": [
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'A' ১ বছর পরে 'B'-এর কাছ থেকে ১০০ টাকা পাবে। সুদের হার ১০% তাহলে ঐ টাকার বর্তমান মূল্য কত হবে?",
-      "options": [
-        "৯০ টাকা",
-        "৯০.৯১ টাকা",
-        "৯৫ টাকা",
-        "৯৫.৯১ টাকা"
-      ],
-      "answer": "৯০.৯১ টাকা",
-      "explanation": null,
-      "reference": [
-        "সকল বোর্ড ২০১৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "'m' দিয়ে কী প্রকাশ করা হয়?",
-      "options": [
-        "সুদের হার",
-        "মেয়াদ",
-        "বছরে চক্রবৃদ্ধির সংখ্যা",
-        "প্রকৃত সুদের হার"
-      ],
-      "answer": "বছরে চক্রবৃদ্ধির সংখ্যা",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২২"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মাসিক চক্র বৃদ্ধির ক্ষেত্রে 'm'-এর মান কত?",
-      "options": [
-        "৭",
-        "১২",
-        "৫২",
-        "৭২"
-      ],
-      "answer": "১২",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মি. বাশার “নদীয়া ব্যাংক”-এ অর্ধ-বার্ষিক চক্রবৃদ্ধিতে ৫ লক্ষ টাকা জমা রাখেন। এক্ষেত্রে m-এর মান কত?",
-      "options": [
-        "২",
-        "৩",
-        "৪",
-        "৫"
-      ],
-      "answer": "২",
-      "explanation": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৪",
-        "রাজশাহী বোর্ড ২০২৩"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ষান্মাসিক চক্রবৃদ্ধির ক্ষেত্রে m-এর মান কত?",
-      "options": [
-        "২",
-        "৩",
-        "৪",
-        "৬"
-      ],
-      "answer": "২",
-      "explanation": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬",
-        "সামসুল হক খান স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ত্রৈমাসিক চক্রবৃদ্ধিতে m-এর মান কত?",
-      "options": [
-        "৩",
-        "৪",
-        "৬",
-        "১২"
-      ],
-      "answer": "৪",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৩",
-        "ময়মনসিংহ বোর্ড ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ত্রৈমাসিক চক্রবৃদ্ধি হলে ২ বছরে কতবার চক্রবৃদ্ধি হবে?",
-      "options": [
-        "২",
-        "৪",
-        "৬",
-        "৮"
-      ],
-      "answer": "৮",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৫",
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; উত্তরা হাই স্কুল এন্ড কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোন ধরনের চক্রবৃদ্ধিতে বিনিয়োগ করলে ভবিষ্যৎ মূল্য সর্বাধিক হবে?",
-      "options": [
-        "মাসিক",
-        "ত্রৈমাসিক",
-        "ষান্মাসিক",
-        "বার্ষিক"
-      ],
-      "answer": "মাসিক",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৬",
-        "যশোর বোর্ড ২০২৪, ২০২৩",
-        "দিনাজপুর বোর্ড, চট্টগ্রাম বোর্ড ২০২৩",
-        "ঢাকা বোর্ড, ময়মনসিংহ বোর্ড ২০২১",
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মাসিক চক্রবৃদ্ধির ক্ষেত্রে m-এর মান কত?",
-      "options": [
-        "৭",
-        "১২",
-        "৫২",
-        "৭২"
-      ],
-      "answer": "১২",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনাব শিমুল একজন ব্যবসায়ী। তিনি মাসিক ৩% সুদে ২,০০০ টাকা ২ বছরের জন্য ব্যাংকে জমা করেন। এখানে 'm'-এর মান কত?",
-      "options": [
-        "৬",
-        "১২",
-        "১৮",
-        "২৪"
-      ],
-      "answer": "১২",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভবিষ্যৎ মূল্যকে বর্তমান মূল্যে রূপান্তরের ক্ষেত্রে m-এর মান যত বেশি হবে, বর্তমান মূল্য তত—",
-      "options": [
-        "বেশি হবে",
-        "কম হবে",
-        "সমান হবে",
-        "দ্বিগুণ হবে"
-      ],
-      "answer": "কম হবে",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৩",
-        "রাজশাহী বোর্ড ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "প্রকৃত সুদের হার নির্দেশ করে কোনটি?",
-      "options": [
-        "FV",
-        "PV",
-        "EAR",
-        "IRR"
-      ],
-      "answer": "EAR",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৫",
-        "দিনাজপুর বোর্ড ২০২৪",
-        "চট্টগ্রাম বোর্ড, সিলেট বোর্ড ২০২১",
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা; শহীদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "EAR-এর পূর্ণরূপ কোনটি?",
-      "options": [
-        "Equal Annual Rate",
-        "Effective Annuity Rate",
-        "Effective Annual Rate",
-        "Excess Annual Rate"
-      ],
-      "answer": "Effective Annual Rate",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড, রাজশাহী বোর্ড ২০২৬",
-        "ঢাকা বোর্ড ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "EAR নির্ণয়ের সূত্র কোনটি?",
-      "options": [
-        "$\\left(1 + \\frac{i}{m}\\right)^m + 1$",
-        "$\\left(1 + \\frac{i}{m}\\right)^n + 1$",
-        "$\\left(1 + \\frac{i}{m}\\right)^m - 1$",
-        "$\\left(1 + \\frac{i}{m}\\right) + 1$"
-      ],
-      "answer": "$\\left(1 + \\frac{i}{m}\\right)^m - 1$",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৪",
-        "চট্টগ্রাম বোর্ড, সিলেট বোর্ড ২০২২",
-        "যশোর বোর্ড ২০২১"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোন চক্রবৃদ্ধি পদ্ধতিতে প্রকৃত সুদের হার সর্বাধিক হয়?",
-      "options": [
-        "সাপ্তাহিক",
-        "মাসিক",
-        "ত্রৈমাসিক",
-        "বার্ষিক"
-      ],
-      "answer": "সাপ্তাহিক",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মেঘনা ব্যাংক লিমিটেড ৭% হারে ত্রৈমাসিক চক্রবৃদ্ধিতে সুদ প্রদান করে। তাহলে প্রকৃত সুদের হার কত হবে?",
-      "options": [
-        "৭.১৯%",
-        "১৭.২৯%",
-        "২৮.১৯%",
-        "৩১.০৮%"
-      ],
-      "answer": "৭.১৯%",
-      "explanation": null,
-      "reference": [
-        "মাইলস্টোন কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "“বাংলা ব্যাংক” ৮% হারে ষান্মাসিক চক্রবৃদ্ধিতে মুনাফা প্রদান করলে, ব্যাংকের প্রকৃত সুদের হার কত?",
-      "options": [
-        "১.১১%",
-        "৮.১৬%",
-        "৮.২৭%",
-        "৯.৬০%"
-      ],
-      "answer": "৮.১৬%",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনাব রহিম ত্রৈমাসিক ২৪% হার সুদে ১২ বছরের জন্য একটি প্রতিষ্ঠান থেকে ২ লক্ষ টাকা ঋণ নিতে চান। এর প্রকৃত সুদের হার কত হবে?",
-      "options": [
-        "২১৩.৮৪%",
-        "২২০.২৪%",
-        "১৩৬.৪২%",
-        "২৩৬.৪২%"
-      ],
-      "answer": "২১৩.৮৪%",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "যদি সুদ দ্বি-মাসিক চক্রবৃদ্ধি করা হয়, তবে তিন বছরে কতবার চক্রবৃদ্ধি হবে?",
-      "options": [
-        "৬",
-        "১২",
-        "১৮",
-        "২৪"
-      ],
-      "answer": "১৮",
-      "explanation": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সাপ্তাহিক ১% হারে সুদ নিলে বার্ষিক সুদ কত হবে?",
-      "options": [
-        "৭%",
-        "১২%",
-        "৫২%",
-        "৬৫%"
-      ],
-      "answer": "৫২%",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "জনাব সালাম ত্রৈমাসিক ৭% চক্রবৃদ্ধি সুদে ৫ বছরের ঋণ গ্রহণ করলে, প্রকৃত সুদের হার কত হবে?",
-      "options": [
-        "৩০.৮০%",
-        "৩১.০৭%",
-        "২০.৮০%",
-        "২১.০৭%"
-      ],
-      "answer": "৩১.০৭%",
+      "answer": "৪টি",
       "explanation": null,
       "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
+        "ব. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -1771,242 +732,20 @@
         "i ও ii",
         "i ও iii",
         "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৩",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "অর্থের পরিমাণ",
-        "সুদের হার",
-        "সময়"
-      ],
-      "context": "অর্থের সময়মূল্য নির্ণয়ে প্রভাব বিস্তারকারী উপাদান হলো—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
-      ],
-      "statements": [
-        "অর্থের বহিঃপ্রবাহ",
-        "অর্থের উপযোগিতা",
-        "অর্থের আন্তঃপ্রবাহ"
-      ],
-      "context": "ব্যবসায়ের প্রতিটি আর্থিক সিদ্ধান্তের সাথে যুক্ত থাকে —",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬"
-      ],
-      "statements": [
-        "প্রকল্প মূল্যায়ন",
-        "শেয়ার বিক্রি",
-        "সুযোগ ব্যয় নির্ধারণ"
-      ],
-      "context": "জমির উদ্দিন দুইটি প্রকল্পের মধ্যে যেকোনো একটি গ্রহণ করতে চান। এক্ষেত্রে তাকে যেসব কাজ করতে হবে—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২২"
-      ],
-      "statements": [
-        "অভ্যন্তরীণ মুনাফার হার",
-        "সুদের হার",
-        "বাট্টার হার"
-      ],
-      "context": "অর্থের বর্তমান ও ভবিষ্যৎ মূল্যের পার্থক্যকারী উপাদান হলো—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৪",
-        "কুমিল্লা বোর্ড ২০২৩",
-        "দিনাজপুর বোর্ড ২০২৩",
-        "শহীদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "ঋণের টাকা পরিশোধ করা বাধ্যতামূলক",
-        "এতে ব্যবসায়িক ঝুঁকি বৃদ্ধি পায়",
-        "ঋণ পরিশোধে ব্যর্থ হলে প্রতিষ্ঠান দেউলিয়া হতে পারে"
-      ],
-      "context": "ঋণ গ্রহণের আগে পরিশোধ ক্ষমতা যাচাই করে নিতে হয়, কারণ—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২১"
-      ],
-      "statements": [
-        "প্রতিষ্ঠানের আর্থিক স্বচ্ছলতা বজায় থাকে",
-        "ঋণ পরিশোধ সহজ হয়",
-        "অধিক মুনাফা হয়"
-      ],
-      "context": "কিস্তি পরিশোধের সক্ষমতা বিবেচনা করে ঋণ গ্রহণ করলে—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২২",
-        "দিনাজপুর বোর্ড ২০২১"
-      ],
-      "statements": [
-        "অর্থের ভবিষ্যৎ মূল্য নির্ধারণ",
-        "সুদাসলের ওপর সুদ ধার্যকরণ",
-        "অর্থের বর্তমান মূল্য নির্ধারণ"
-      ],
-      "context": "চক্রবৃদ্ধি প্রক্রিয়া হলো—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৬, ২০২৩",
-        "সিলেট বোর্ড ২০১৯",
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [
-        "বাট্টার পরিমাণ নির্ধারণ প্রক্রিয়া",
-        "অর্থের বর্তমান মূল্য নির্ধারণ প্রক্রিয়া",
-        "সুদাসলকে সুদের হার দ্বারা ভাগের প্রক্রিয়া"
-      ],
-      "context": "বাট্টাকরণ প্রক্রিয়া বলতে বোঝায়—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
         "i, ii ও iii"
       ],
       "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২০২৫"
+        "চ. বো. ২০",
+        "সি. বো. ১৯"
       ],
       "statements": [
-        "ভবিষ্যৎ মূল্য",
-        "সুদের হার",
-        "মেয়াদ"
+        "চাহিদা ও যোগানের অসামঞ্জস্যতা",
+        "সংরক্ষণের অসুবিধা",
+        "পণ্যের মূল্য নির্ধারণে অসুবিধা"
       ],
-      "context": "বর্তমান মূল্য নির্ণয়ে প্রয়োজন হয়—",
+      "context": "দ্রব্য বিনিময় প্রথার সমস্যা হলো—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2015,230 +754,8 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "জনাব রাতুলের জমি ক্রয়ের সুযোগ ব্যয় কত?",
-      "options": [
-        "৯%",
-        "৮%",
-        "৭%",
-        "৬%"
-      ],
-      "answer": "৬%",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৩"
-      ],
-      "statements": [],
-      "context": "জনাব রাতুল তার সঞ্চিত ৫ লক্ষ টাকা বার্ষিক ৬% হার সুদে ব্যাংকে বিনিয়োগ করতে চাইলে বন্ধুর পরামর্শে নিজ এলাকায় জমি ক্রয় করেন, যার মূল্য ৮ বছর পর দ্বিগুণ হয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব রাতুলের—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৩"
-      ],
-      "statements": [
-        "সিদ্ধান্ত গ্রহণে রুল ৭২ এর প্রয়োগ হয়েছে",
-        "ব্যাংকে টাকা রাখা অধিক লাভজনক ছিল",
-        "বন্ধুর পরামর্শ যুক্তিযুক্ত ছিল"
-      ],
-      "context": "জনাব রাতুল তার সঞ্চিত ৫ লক্ষ টাকা বার্ষিক ৬% হার সুদে ব্যাংকে বিনিয়োগ করতে চাইলে বন্ধুর পরামর্শে নিজ এলাকায় জমি ক্রয় করেন, যার মূল্য ৮ বছর পর দ্বিগুণ হয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "১,০০,০০০ টাকা 'SR' ব্যাংকে জমা রাখলে ২ বছর পর কত টাকা মুনাফা পাওয়া যাবে?",
-      "options": [
-        "২১,০০০ টাকা",
-        "৩১,০০০ টাকা",
-        "১,২১,০০০ টাকা",
-        "১,৩১,০০০ টাকা"
-      ],
-      "answer": "২১,০০০ টাকা",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": "অনন্যা আবাসিক এলাকায় জমির মূল্য ৮ বছরে দ্বিগুণ হয়। পক্ষান্তরে, 'SR' ব্যাংকে টাকা জমা রাখলে বার্ষিক ১০% চক্রবৃদ্ধি মুনাফা পাওয়া যায়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপক অনুযায়ী—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬"
-      ],
-      "statements": [
-        "জমি ক্রয়ের ক্ষেত্রে সুযোগ ব্যয় ১০%",
-        "জমি ক্রয়ের ক্ষেত্রে সুদের হার ৮%",
-        "জমি ক্রয় না করে ব্যাংকে জমা রাখা যুক্তিযুক্ত"
-      ],
-      "context": "অনন্যা আবাসিক এলাকায় জমির মূল্য ৮ বছরে দ্বিগুণ হয়। পক্ষান্তরে, 'SR' ব্যাংকে টাকা জমা রাখলে বার্ষিক ১০% চক্রবৃদ্ধি মুনাফা পাওয়া যায়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব মাহিম ৬ বছর পর কত টাকা মুনাফা পাবে?",
-      "options": [
-        "৮,৮৫,৭৮০",
-        "৩,৮৫,৭৮০",
-        "৫,০০,০০০",
-        "১০,০০,০০০"
-      ],
-      "answer": "৩,৮৫,৭৮০",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৩"
-      ],
-      "statements": [],
-      "context": "জনাব মাহিম বার্ষিক ১০% মুনাফায় ৫,০০,০০০ টাকা ABC ব্যাংকে জমা রাখতে চান। তার বন্ধুর প্রস্তাব ছিল ঐ টাকার জমি কিনলে ৬ বছর পর তার বিনিয়োগকৃত টাকা দ্বিগুণ হবে। তিনি তার বন্ধুর প্রস্তাবটি গ্রহণ করেছেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপক অনুযায়ী—",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "ii ও iii",
-      "explanation": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৩"
-      ],
-      "statements": [
-        "জমি ক্রয়ের ক্ষেত্রে সুদের হার ৯%",
-        "জনাব মাহিমের সুযোগ ব্যয় ১০%",
-        "জনাব মাহিমের বিনিয়োগ সিদ্ধান্ত সঠিক"
-      ],
-      "context": "জনাব মাহিম বার্ষিক ১০% মুনাফায় ৫,০০,০০০ টাকা ABC ব্যাংকে জমা রাখতে চান। তার বন্ধুর প্রস্তাব ছিল ঐ টাকার জমি কিনলে ৬ বছর পর তার বিনিয়োগকৃত টাকা দ্বিগুণ হবে। তিনি তার বন্ধুর প্রস্তাবটি গ্রহণ করেছেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব কাসেম প্রাইম ব্যাংক থেকে ২ বছর পর কত টাকা পাবেন?",
-      "options": [
-        "২,৭২,০০০ টাকা",
-        "২,৬২,০০০ টাকা",
-        "২,৫২,০০০ টাকা",
-        "২,৪২,০০০ টাকা"
-      ],
-      "answer": "২,৪২,০০০ টাকা",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড, দিনাজপুর বোর্ড, বরিশাল বোর্ড ২০২৩",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব কাসেম তার সঞ্চিত ২,০০,০০০ টাকা ১০% মুনাফায় ৬ বছরের জন্য প্রাইম ব্যাংকে জমা রাখলেন। তার মামা পরামর্শ দিয়েছিল ঐ টাকার জমি কিনলে ৬ বছরে তার বিনিয়োগকৃত টাকা দ্বিগুণ হতো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপক অনুযায়ী জনাব কাসেমের সুযোগ ব্যয় কত?",
-      "options": [
-        "১৪%",
-        "১২%",
-        "১০%",
-        "২%"
-      ],
-      "answer": "১২%",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড, দিনাজপুর বোর্ড, বরিশাল বোর্ড ২০২৩",
-        "চট্টগ্রাম সরকারি উচ্চ বিদ্যালয়; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব কাসেম তার সঞ্চিত ২,০০,০০০ টাকা ১০% মুনাফায় ৬ বছরের জন্য প্রাইম ব্যাংকে জমা রাখলেন। তার মামা পরামর্শ দিয়েছিল ঐ টাকার জমি কিনলে ৬ বছরে তার বিনিয়োগকৃত টাকা দ্বিগুণ হতো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব সানি বর্তমানে কত টাকা ব্যাংকে জমা রাখেন?",
-      "options": [
-        "১,৫৬,২৬৩ টাকা",
-        "১,৫৪,২৬৩ টাকা",
-        "১,৫২,২৬৩ টাকা",
-        "১,৫০,২৬৩ টাকা"
-      ],
-      "answer": "১,৫০,২৬৩ টাকা",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৪",
-        "শহীদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব সানি ৩ বছর পর ২,০০,০০০ টাকা পাওয়ার আশায় ১০% সুদে ব্যাংকে টাকা জমা রাখেন। তার এক আত্মীয় প্রস্তাব দিল ঐ টাকা তার ব্যাংকে জমা রাখলে ৮ বছর পর দ্বিগুণ টাকা পেতেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব সানির—",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
         "i ও ii",
         "i ও iii",
@@ -2248,15 +765,17 @@
       "answer": "i ও ii",
       "explanation": null,
       "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৪",
-        "শহীদ বীর-উত্তম লে. আনোয়ার গার্লস কলেজ, ঢাকা; ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২০২৫"
+        "চ. বো., ব. বো. ২৪",
+        "ব. বো. ২৩",
+        "রা. বো. ১৯",
+        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৪"
       ],
       "statements": [
-        "সুযোগ ব্যয় ৯%",
-        "বিনিয়োগ সিদ্ধান্ত সঠিক",
-        "আত্মীয়ের পরামর্শ গ্রহণ করা উচিত ছিল"
+        "ধাতুর বিকল্প ব্যবহার",
+        "ধাতব পদার্থের দুষ্প্রাপ্যতা",
+        "ধাতব মুদ্রার দীর্ঘ স্থায়িত্ব"
       ],
-      "context": "জনাব সানি ৩ বছর পর ২,০০,০০০ টাকা পাওয়ার আশায় ১০% সুদে ব্যাংকে টাকা জমা রাখেন। তার এক আত্মীয় প্রস্তাব দিল ঐ টাকা তার ব্যাংকে জমা রাখলে ৮ বছর পর দ্বিগুণ টাকা পেতেন।",
+      "context": "ধাতব মুদ্রার ব্যবহার ক্রমশ সীমিত হয়ে আসার কারণ—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2265,21 +784,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "মুক্তা ৫ বছর পর কত টাকা পাবেন?",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
-        "২০,০৩৬ টাকা",
-        "১৯,৩২৬ টাকা",
-        "১৮,৪৭৭ টাকা",
-        "১৭,৬১৫ টাকা"
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "১৯,৩২৬ টাকা",
+      "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৩"
+        "কু. বো. ২৫"
       ],
-      "statements": [],
-      "context": "মুক্তা ১২,০০০ টাকা ৫ বছরের জন্য ১০% চক্রবৃদ্ধি সুদে একটি প্রকল্পে বিনিয়োগ করেন। তিনি ৫ বছর পর যে টাকা পান তা ১২ বছরের জন্য ১৫% চক্রবৃদ্ধি সুদে আরেকটি প্রকল্পে বিনিয়োগ করেন।",
+      "statements": [
+        "সোনার",
+        "রুপার",
+        "তামার"
+      ],
+      "context": "জনসংখ্যা বৃদ্ধির ফলে মুদ্রা হিসেবে ব্যবহার ক্রমশ হ্রাস পায়—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2288,21 +811,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "১৭ বছর পর মুক্তা সর্বমোট কত টাকা পাবেন?",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
-        "১,০০,০০০ টাকা",
-        "১,০১,৪০০ টাকা",
-        "১,০৩,০০০ টাকা",
-        "১,০৩,৪০০ টাকা"
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "১,০৩,৪০০ টাকা",
+      "answer": "i ও iii",
       "explanation": null,
       "reference": [
-        "সিলেট বোর্ড ২০২৩"
+        "য. বো. ২৫"
       ],
-      "statements": [],
-      "context": "মুক্তা ১২,০০০ টাকা ৫ বছরের জন্য ১০% চক্রবৃদ্ধি সুদে একটি প্রকল্পে বিনিয়োগ করেন। তিনি ৫ বছর পর যে টাকা পান তা ১২ বছরের জন্য ১৫% চক্রবৃদ্ধি সুদে আরেকটি প্রকল্পে বিনিয়োগ করেন।",
+      "statements": [
+        "নিরাপত্তা নিশ্চিত হওয়া",
+        "ধাতব মুদ্রার দীর্ঘস্থায়িত্ব",
+        "কাগজের সহজলভ্যতা"
+      ],
+      "context": "কাগজি মুদ্রার ব্যাপক প্রসারের কারণ—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2311,21 +838,26 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "উদ্দীপক অনুযায়ী চক্রবৃদ্ধির সংখ্যা কত?",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
-        "৬",
-        "১২",
-        "১৮",
-        "২৪"
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "১২",
+      "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০২০"
+        "চ. বো. ১৯",
+        "উদয়ন উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; নি. প. ২৪"
       ],
-      "statements": [],
-      "context": "জনাব আরমান একজন মুদি ব্যবসায়ী। তিনি মাসিক ১২% সুদে ২,০০০ টাকা ২ বছরের জন্য ব্যাংকে জমা রাখেন।",
+      "statements": [
+        "দ্রব্যের মান",
+        "দ্রব্যের ওজন",
+        "দ্রব্যের মজুদযোগ্যতা"
+      ],
+      "context": "কাগজি মুদ্রা প্রচলনের কারণ ছিল—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2334,21 +866,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "জনাব আরমান ২ বছর পর ব্যাংক থেকে কত টাকা পাবেন?",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
-        "২,৫০০ টাকা",
-        "২,৫৮০ টাকা",
-        "২,৫৩৯ টাকা",
-        "২,৫৫০ টাকা"
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "২,৫৩৯ টাকা",
+      "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "কুমিল্লা বোর্ড ২০২০"
+        "ম. বো. ২৫"
       ],
-      "statements": [],
-      "context": "জনাব আরমান একজন মুদি ব্যবসায়ী। তিনি মাসিক ১২% সুদে ২,০০০ টাকা ২ বছরের জন্য ব্যাংকে জমা রাখেন।",
+      "statements": [
+        "ধাতব পদার্থের দুষ্প্রাপ্যতা",
+        "সহজে বহনযোগ্য",
+        "সংরক্ষণে সুবিধা"
+      ],
+      "context": "কাগজি মুদ্রা প্রচলনের কারণ হলো—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2357,21 +893,26 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "২ বছর পর মি. নাইমের প্রাপ্ত অর্থের পরিমাণ কত হবে?",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
-        "১১,২১১ টাকা",
-        "১১,৮০২ টাকা",
-        "১২,০০২ টাকা",
-        "১২,১৮৪ টাকা"
+        "i ও ii",
+        "i ও iii",
+        "ii ও iii",
+        "i, ii ও iii"
       ],
-      "answer": "১২,১৮৪ টাকা",
+      "answer": "i, ii ও iii",
       "explanation": null,
       "reference": [
-        "যশোর বোর্ড ২০২৩"
+        "ব. বো. ২৩",
+        "সকল বোর্ড ১৬"
       ],
-      "statements": [],
-      "context": "মি. নাইম সঞ্চয় সুযোগ সম্পর্কে অনুসন্ধান চালিয়ে দেখলেন যে একটি আর্থিক প্রতিষ্ঠান ত্রৈমাসিক ভিত্তিতে শতকরা ১০ টাকা হারে চক্রবৃদ্ধি সুদ দিবে। এতে আকৃষ্ট হয়ে তিনি ১০,০০০ টাকা ২ বছরের জন্য জমা রাখলেন।",
+      "statements": [
+        "একটি বিনিময় মাধ্যম",
+        "মূল্যের পরিমাপক",
+        "সঞ্চয়ের বাহন"
+      ],
+      "context": "মুদ্রা—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2380,48 +921,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "যদি প্রতিষ্ঠানটি মাসিক ভিত্তিতে ১২% হারে চক্রবৃদ্ধি সুদ দেয়, তাহলে ৫ বছর পর মি. নাইম প্রাপ্ত অর্থের পরিমাণ কত হবে?",
-      "options": [
-        "১৮,১৬৭",
-        "১,৮৫৫",
-        "১৯,১৬১",
-        "১৯,৫৫০"
-      ],
-      "answer": "১৮,১৬৭",
-      "explanation": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৩"
-      ],
-      "statements": [],
-      "context": "মি. নাইম সঞ্চয় সুযোগ সম্পর্কে অনুসন্ধান চালিয়ে দেখলেন যে একটি আর্থিক প্রতিষ্ঠান ত্রৈমাসিক ভিত্তিতে শতকরা ১০ টাকা হারে চক্রবৃদ্ধি সুদ দিবে। এতে আকৃষ্ট হয়ে তিনি ১০,০০০ টাকা ২ বছরের জন্য জমা রাখলেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "মি. ইশরাকের ফ্ল্যাট ক্রয়ের সিদ্ধান্ত গ্রহণে সহায়ক হবে—",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
         "i",
         "ii",
-        "iii",
-        "i, ii ও iii"
+        "i ও ii",
+        "i ও iii"
       ],
-      "answer": "i",
+      "answer": "i ও ii",
       "explanation": null,
       "reference": [
-        "বরিশাল বোর্ড ২০২১"
+        "কু. বো. ২৪"
       ],
       "statements": [
-        "FV নির্ণয়",
-        "PV নির্ণয়",
-        "রুল-৭২ এর প্রয়োগ"
+        "পণ্যের মূল্য নির্ধারণ",
+        "সেবার মূল্য নির্ধারণ",
+        "সামরিক স্থিতিশীলতা আনয়ন"
       ],
-      "context": "মি. ইশরাক ৮% মুনাফায় ১৫ লক্ষ টাকা ১০ বছরের জন্য ব্যাংকে রাখতে চান। কিন্তু উক্ত অর্থ দ্বারা তিনি একটি ফ্ল্যাটও কিনতে পারেন। ধারণা করা হয়, ফ্ল্যাটটির মূল্য দশ বছর পর ৩০ লক্ষ টাকা হবে।",
+      "context": "মুদ্রার কাজ হলো—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2431,116 +949,48 @@
     },
     {
       "type": "COMBINED",
-      "question": "মি. ইশরাক ফ্ল্যাট খরিদ করলে সুযোগ ব্যয় কত হবে?",
-      "options": [
-        "২,৩৮,৩৮৭ টাকা",
-        "১৫,০০,০০০ টাকা",
-        "৩০,০০,০০০ টাকা",
-        "৩২,৩৮,৩৮৭ টাকা"
-      ],
-      "answer": "৩২,৩৮,৩৮৭ টাকা",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২১"
-      ],
-      "statements": [],
-      "context": "মি. ইশরাক ৮% মুনাফায় ১৫ লক্ষ টাকা ১০ বছরের জন্য ব্যাংকে রাখতে চান। কিন্তু উক্ত অর্থ দ্বারা তিনি একটি ফ্ল্যাটও কিনতে পারেন। ধারণা করা হয়, ফ্ল্যাটটির মূল্য দশ বছর পর ৩০ লক্ষ টাকা হবে।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "জনাব হাফিজকে বর্তমানে কত টাকা ব্যাংকে জমা রাখতে হবে?",
-      "options": [
-        "৩,৩৯,৪৫৬ টাকা",
-        "৩,৪২,৯৯৪ টাকা",
-        "৪,৮০,৩১৮ টাকা",
-        "৫,৫০,৪৪৯ টাকা"
-      ],
-      "answer": "৫,৫০,৪৪৯ টাকা",
-      "explanation": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব হাফিজ ৫ বছর পর ১০ লক্ষ টাকা পাওয়ার আশায় জনতা ব্যাংকে কিছু টাকা জমা রাখতে চাইলে ব্যাংক তাকে মাসিক ১২% চক্রবৃদ্ধির প্রস্তাব দেয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "আমিনা বেগমকে 'X' ব্যাংকে বর্তমানে কত টাকা জমা রাখতে হবে?",
-      "options": [
-        "১,১৬,৬৯৪",
-        "১,১৮,৬৯৪",
-        "১,২০,৬৯৪",
-        "১,২১,৬৯৪"
-      ],
-      "answer": "১,১৮,৬৯৪",
-      "explanation": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": "৫ বছর পর ২,০০,০০০ টাকা পাওয়ার আশায় আমিনা বেগম কিছু টাকা ব্যাংকে জমা করতে চায়। 'X' ব্যাংক বার্ষিক ১১% মুনাফা প্রদানের প্রস্তাব দেয় এবং 'Y' ব্যাংক ১০% মাসিক চক্র বৃদ্ধিতে প্রস্তাব দেয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "ব্যাংক দুইটির ক্ষেত্রে—",
+      "question": "চিত্র $A$ ও $B$ এর মধ্যে প্রকাশ পায়—\ni. বিনিময় মাধ্যম\nii. সঞ্চয়ের ভাণ্ডার\niii. মূল্যের পরিমাপক",
       "options": [
         "i ও ii",
-        "i ও iii",
         "ii ও iii",
+        "i ও iii",
+        "i, ii ও iii"
+      ],
+      "answer": "i ও iii",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": true,
+      "hasAttachment": true,
+      "attachmentType": "DIAGRAM",
+      "attachmentDescription": "চিত্র: A (জামা) এবং B (নোট/টাকা) এর পারস্পরিক বিনিময়",
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "MULTIPLE",
+      "question": "",
+      "options": [
+        "i ও ii",
+        "ii ও iii",
+        "i ও iii",
         "i, ii ও iii"
       ],
       "answer": "i ও ii",
       "explanation": null,
       "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
+        "ঢা. বো. ২৫, ২০",
+        "দি. বো. ২০"
       ],
       "statements": [
-        "$FV = ২,০০,০০০$",
-        "$n = ৫$",
-        "$m = ২$"
+        "বিনিময়ের মাধ্যম হিসেবে",
+        "মূল্যের পরিমাপক হিসেবে",
+        "সঞ্চয়ের ভাণ্ডার হিসেবে"
       ],
-      "context": "৫ বছর পর ২,০০,০০০ টাকা পাওয়ার আশায় আমিনা বেগম কিছু টাকা ব্যাংকে জমা করতে চায়। 'X' ব্যাংক বার্ষিক ১১% মুনাফা প্রদানের প্রস্তাব দেয় এবং 'Y' ব্যাংক ১০% মাসিক চক্র বৃদ্ধিতে প্রস্তাব দেয়।",
-      "isMath": true,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "গ্রামীণ ব্যাংক থেকে গৃহীত মিস মল্লিকার EAR-এর পরিমাণ কত?",
-      "options": [
-        "১২.৬৮%",
-        "৬৭.৭৭%",
-        "৬৬.৬৮%",
-        "১৩.৭৭%"
-      ],
-      "answer": "১২.৬৮%",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৫"
-      ],
-      "statements": [],
-      "context": "গ্রামীণ ব্যাংক থেকে মিস মল্লিকা মাসিক ১% হারে চক্রবৃদ্ধি সুদে ঋণ গ্রহণ করেন। এতে বার্ষিক সুদ হয় ১২%।",
+      "context": "মিস জিনিয়া ৫,০০০ টাকা দিয়ে একটি জামা কিনলেন। এতে মুদ্রা কাজ করেছে—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -2549,165 +999,25 @@
       "bottomContent": null
     },
     {
-      "type": "COMBINED",
-      "question": "মিস মল্লিকার গৃহীত ঋণ মাসিক ১% হারে চক্রবৃদ্ধির পরিবর্তে সাপ্তাহিক ১% হারে চক্রবৃদ্ধি হলে কী হত?",
-      "options": [
-        "মিস মল্লিকা লাভবান হতো",
-        "মিস মল্লিকার ক্ষতি হতো",
-        "এতে সুদের হার পরিবর্তন হতো না",
-        "গ্রামীণ ব্যাংকের লোকসান হতো"
-      ],
-      "answer": "মিস মল্লিকা লাভবান হতো",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৫"
-      ],
-      "statements": [],
-      "context": "গ্রামীণ ব্যাংক থেকে মিস মল্লিকা মাসিক ১% হারে চক্রবৃদ্ধি সুদে ঋণ গ্রহণ করেন। এতে বার্ষিক সুদ হয় ১২%।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "মি. আশিককে ৫ বছর পর কত টাকা ফেরত দিতে হবে?",
-      "options": [
-        "৫,৬০০.১১",
-        "৫,৬৫০.১১",
-        "৫,৬৫৯.১১",
-        "৫,৬৯৫.১১"
-      ],
-      "answer": "৫,৬৫৯.১১",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": "মি. আশিক তিস্তা ব্যাংক থেকে ৭% হারে ত্রৈমাসিক চক্রবৃদ্ধিতে ৪,০০০ টাকা ঋণ নিলো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "মি. আশিকের প্রকৃত সুদের হার কত হবে?",
-      "options": [
-        "৭.১৯",
-        "১৮.৫৯",
-        "২৪.০১",
-        "২৮"
-      ],
-      "answer": "৭.১৯",
-      "explanation": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৬"
-      ],
-      "statements": [],
-      "context": "মি. আশিক তিস্তা ব্যাংক থেকে ৭% হারে ত্রৈমাসিক চক্রবৃদ্ধিতে ৪,০০০ টাকা ঋণ নিলো।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "উদ্দীপক অনুযায়ী 'm' এর মান কত হবে?",
-      "options": [
-        "১২",
-        "২৪",
-        "৩৮",
-        "৫২"
-      ],
-      "answer": "৫২",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২২",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব শাহজাহান একজন সরকারি চাকরিজীবী। তিনি সাপ্তাহিক ২% হারে চক্রবৃদ্ধি সুদে ৫০,০০০ টাকা ১ বছরের জন্য সিটিজেন ব্যাংকে রাখার সিদ্ধান্ত গ্রহণ করলেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "সিটিজেন ব্যাংকের ক্ষেত্রে প্রকৃত সুদের হার কত হবে?",
-      "options": [
-        "১৮.০৫%",
-        "২৮.০৫%",
-        "১৮০.০৩%",
-        "২৮০.০৩%"
-      ],
-      "answer": "১৮০.০৩%",
-      "explanation": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২২",
-        "ইস্পাহানী পাবলিক স্কুল ও কলেজ, কুমিল্লা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব শাহজাহান একজন সরকারি চাকরিজীবী। তিনি সাপ্তাহিক ২% হারে চক্রবৃদ্ধি সুদে ৫০,০০০ টাকা ১ বছরের জন্য সিটিজেন ব্যাংকে রাখার সিদ্ধান্ত গ্রহণ করলেন।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "পাঁচ বছর পর জনাব হাসিব মোট কত টাকা সুদ পাবেন?",
-      "options": [
-        "৭,৫০০ টাকা",
-        "১০,২৫০ টাকা",
-        "৮,৩৩৩ টাকা",
-        "৯,৩৩৩ টাকা"
-      ],
-      "answer": "৭,৫০০ টাকা",
-      "explanation": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৫"
-      ],
-      "statements": [],
-      "context": "জনাব হাসিব ৫ বছরের জন্য কর্ণফুলী ব্যাংকে ১৫,০০০ টাকা ১০% হার সুদে জমা রাখেন। ব্যাংক তাকে প্রতি বছর আসল টাকার ওপর সরল সুদ দিতে সম্মত হয়।",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "যদি চক্রবৃদ্ধি পদ্ধতিতে সুদ দেওয়া হয়—",
+      "type": "MULTIPLE",
+      "question": "",
       "options": [
         "i ও ii",
-        "i ও iii",
         "ii ও iii",
+        "i ও iii",
         "i, ii ও iii"
       ],
-      "answer": "i, ii ও iii",
+      "answer": "i ও ii",
       "explanation": null,
       "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা; নি. প. ২০২৫"
+        "ঢা. বো. ২৩"
       ],
       "statements": [
-        "লাভ দ্রুত বৃদ্ধি পাবে",
-        "দীর্ঘমেয়াদে বেশি লাভজনক হবে",
-        "আমানত বৃদ্ধির একটি কার্যকর উপায়"
+        "ব্যাংক ব্যবস্থার ওপর",
+        "আর্থিক প্রতিষ্ঠানের ওপর",
+        "সামাজিক প্রতিষ্ঠানের ওপর"
       ],
-      "context": "জনাব হাসিব ৫ বছরের জন্য কর্ণফুলী ব্যাংকে ১৫,০০০ টাকা ১০% হার সুদে জমা রাখেন। ব্যাংক তাকে প্রতি বছর আসল টাকার ওপর সরল সুদ দিতে সম্মত হয়।",
+      "context": "একটি দেশের অর্থনৈতিক কর্মকাণ্ড নির্ভর করে—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,

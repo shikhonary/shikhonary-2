@@ -7,6 +7,8 @@ import DashboardHeader from "./dashboard-header";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 
 import { AssistantProvider, SpeedDialAssistant } from "@/modules/ai-assistant";
+import { QuestionReportModal } from "@/modules/question-bank/ui/components/modals/question-report-modal";
+import { SaveAsTemplateModal } from "@/modules/question-paper/components/save-as-template-modal";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -93,6 +95,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       {/* Speed Dial AI Assistant - Hidden on studio routes since builder has its own drawer and picker has dedicated workspace */}
       {!isStudioRoute && <SpeedDialAssistant />}
+
+      {/* Global Question Error Report Modal */}
+      <QuestionReportModal />
+
+      {/* Global Save as Blueprint Template Modal */}
+      <SaveAsTemplateModal />
     </AssistantProvider>
   );
 };

@@ -604,6 +604,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
 
     const paperStatus = paperData?.status || "Draft";
     const isPublished = paperStatus === "Published";
+    const isSamePaper = state.paperId === id;
 
     return {
       paperId: id,
@@ -612,7 +613,11 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
       settings: finalSettings,
       dismissedSectionIds,
       dismissedSubSectionIds,
-      items: overrideItems ? overrideItems : state.items,
+      items: overrideItems ? overrideItems : (isSamePaper ? state.items : []),
+      calculatedBlocks: isSamePaper ? state.calculatedBlocks : [],
+      selectedItemId: isSamePaper ? state.selectedItemId : null,
+      activeSectionId: isSamePaper ? state.activeSectionId : null,
+      activeSubSectionId: isSamePaper ? state.activeSubSectionId : null,
       hasUnsavedChanges: false,
       saveStatus: "idle",
       past: [],

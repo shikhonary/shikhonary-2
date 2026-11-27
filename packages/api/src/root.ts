@@ -74,8 +74,10 @@ import { danBamMilkoronRouter } from "./routers/dan-bam-milkoron/dan-bam-milkoro
 import { seenComprehensionRouter } from "./routers/seen-comprehension/seen-comprehension.router"
 import { numberInWordsRouter } from "./routers/number-in-words/number-in-words.router"
 import { contentTrackerRouter } from "./routers/content-tracker/content-tracker.router"
+import { questionReportRouter } from "./routers/question-report/question-report.router"
 
 export const appRouter = createTRPCRouter({
+  questionReport: questionReportRouter,
   contentTracker: contentTrackerRouter,
   health: healthRouter,
   user: userRouter,

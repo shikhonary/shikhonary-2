@@ -1,11 +1,12 @@
 "use client"
 
 import React from "react"
-import { Eye, ChevronRight, Image as ImageIcon } from "lucide-react"
+import { Eye, ChevronRight, Image as ImageIcon, Flag } from "lucide-react"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import { cn } from "@workspace/ui/lib/utils"
 import type { QuestionBankItem } from "@/modules/question-bank/types"
 import { useQuestionPreviewStore } from "@/modules/question-bank/store/use-question-preview-store"
+import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store"
 
 interface MobileCardProps {
   question: QuestionBankItem
@@ -82,16 +83,36 @@ export const MobileCard: React.FC<MobileCardProps> = ({ question: q }) => {
 
       {/* Footer */}
       <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[11px] text-muted-foreground font-body">
-        <span className="truncate max-w-[200px]">
+        <span className="truncate max-w-[160px]">
           {q.reference && q.reference.length > 0
             ? q.reference[0]
             : "শিখনারী ভাণ্ডার"}
         </span>
 
-        <span className="text-primary font-bold flex items-center gap-0.5 text-xs">
-          <span>বিস্তারিত</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              useQuestionReportStore.getState().openReport({
+                entityType: q.category || "MCQ",
+                entityId: q.id,
+                questionSnippet: q.questionText,
+                chapterName: q.chapterNameBn || q.chapterNameEn,
+                categoryLabel: q.categoryLabelBn || q.category,
+              })
+            }}
+            className="p-1 rounded text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
+            title="রিপোর্ট করুন"
+          >
+            <Flag className="w-3.5 h-3.5" />
+          </button>
+
+          <span className="text-primary font-bold flex items-center gap-0.5 text-xs">
+            <span>বিস্তারিত</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </span>
+        </div>
       </div>
     </div>
   )

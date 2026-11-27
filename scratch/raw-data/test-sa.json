@@ -1,435 +1,8 @@
 {
-  "chapterTitle": "অর্থের সময়মূল্য",
+  "chapterTitle": "মুদ্রা, ব্যাংক ও ব্যাংকিং",
   "questions": [
     {
-      "question": "একজন বিনিয়োগকারী হিসেবে তুমি কীভাবে অর্থের সময়মূল্যের ধারণাটি ব্যবহার করবে?",
-      "answer": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের বর্তমান ও ভবিষ্যৎ মূল্যের পার্থক্যকারী উপাদানটি ব্যাখ্যা করো। অথবা, সময়ের পরিবর্তনের সাথে অর্থের মূল্যের পরিবর্তনের মূল কারণ কী? যুক্তি দাও।",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬",
-        "ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ, রংপুর"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "আজকের ১ টাকা আগামী দিনের ১ টাকার সমান না হওয়ার কারণ কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ব্লু বার্ড স্কুল এন্ড কলেজ, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের সময়মূল্য কাকে বলে? অথবা, অর্থের সময়মূল্যের ধারণা দাও।",
-      "answer": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৬",
-        "রংপুর জিলা স্কুল"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "দুটি প্রকল্পের মধ্যে একটি গ্রহণ করে অন্যটির সুবিধা ত্যাগ করাকে কী বলে? অথবা, সুযোগ ব্যয় কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "কুমিল্লা বোর্ড ২০২৬",
-        "যশোর বোর্ড ২০২৬",
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা",
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ",
-        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
-        "ইবনে তাইমিয়া স্কুল এন্ড কলেজ, কুমিল্লা",
-        "নবাব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা",
-        "চিটাগাং আইডিয়াল হাই স্কুল",
-        "যশোর জিলা স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সুযোগ ব্যয় সৃষ্টি হওয়ার কারণ লেখো।",
-      "answer": null,
-      "reference": [
-        "সেন্ট প্লাসিডস স্কুল এন্ড কলেজ, চট্টগ্রাম",
-        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বার্ষিক চক্রবৃদ্ধিতে বিনিয়োগকৃত অর্থ দ্বিগুণ করার ধারণাটি লেখো।",
-      "answer": null,
-      "reference": [
-        "নারায়ণগঞ্জ সরকারি বালিকা উচ্চ বিদ্যালয়",
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "রুল '৭২' কেন ব্যবহার করা হয়? অথবা, বিনিয়োগ সিদ্ধান্তে 'রুল-৭২'-এর ভূমিকা ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ঢাকা বোর্ড ২০২৬",
-        "চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রকল্প মূল্যায়নে অর্থের সময়মূল্য গুরুত্বপূর্ণ কেন?",
-      "answer": null,
-      "reference": [
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ঋণ গ্রহণ সিদ্ধান্তের বিবেচ্য বিষয়সমূহ ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "উপযুক্ত ঋণ সিদ্ধান্ত গ্রহণে কীভাবে অর্থের সময়মূল্য সাহায্য করে? ব্যাখ্যা করো। অথবা, আর্থিক প্রতিষ্ঠান থেকে ঋণ গ্রহণের ক্ষেত্রে কেন অর্থের সময়মূল্য বিবেচনা করা হয়?",
-      "answer": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬",
-        "বরিশাল বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ঋণের কিস্তি পরিশোধে অর্থের সময়মূল্যের গুরুত্ব ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "সরকারি মুসলিম উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "'উপযুক্ত বিনিয়োগ খাত নির্বাচনে অর্থের সময়মূল্যের ধারণা গুরুত্বপূর্ণ' – যুক্তি দাও।",
-      "answer": null,
-      "reference": [
-        "ব্লু বার্ড স্কুল এন্ড কলেজ, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের সময়মূল্যের ধারণা ব্যবসায়ের ক্ষেত্রে কেন গুরুত্বপূর্ণ?",
-      "answer": null,
-      "reference": [
-        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা",
-        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
-        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "রুল-৭২ কী?",
-      "answer": null,
-      "reference": [
-        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
-        "ইবনে তাইমিয়া স্কুল এন্ড কলেজ, কুমিল্লা",
-        "বাকলিয়া সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম",
-        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়",
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মি. আসাদ ১৫,০০০ টাকা ৮ বছরের জন্য সোনালী ব্যাংকে জমা রাখল। কত % হার সুদে উক্ত টাকা দ্বিগুণ হবে?",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
-      ],
-      "difficulty": "HARD",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের বর্তমান মূল্য ও ভবিষ্যৎ মূল্য সমান নয় কেন? ব্যাখ্যা করো। অথবা, আজকের ১০০ টাকা ১০ বছর পর সমান মূল্য ধারণ করে না কেন?",
-      "answer": null,
-      "reference": [
-        "নৌবাহিনী কলেজ, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের সময়মূল্য অনুসারে ঋণ গ্রহণের সিদ্ধান্ত ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চক্রবৃদ্ধিকরণ পদ্ধতিটি ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৬",
-        "নবাব ফয়জুন্নেছা সরকারি বালিকা উচ্চ বিদ্যালয়, কুমিল্লা",
-        "বাকলিয়া সরকারি উচ্চ বিদ্যালয়, চট্টগ্রাম"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "একটি উদাহরণের সাহায্যে চক্রবৃদ্ধিকরণ প্রক্রিয়াটি ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ময়মনসিংহ বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বছরে একাধিকবার চক্রবৃদ্ধি বিষয়টি উদাহরণসহ ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "রাজশাহী ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চক্রবৃদ্ধিকরণ প্রয়োজন কেন? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "যশোর জিলা স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "উদাহরণসহ সরল সুদের ধারণা দাও।",
-      "answer": null,
-      "reference": [
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "চক্রবৃদ্ধি সুদ কী? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "আদমজী ক্যান্টনমেন্ট পাবলিক স্কুল, ঢাকা",
-        "চট্টগ্রাম সিটি কর্পোরেশন আন্তঃ বিদ্যালয়"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "সরল মুনাফা ও চক্রবৃদ্ধি মুনাফার মধ্যে দুটি পার্থক্য লেখো।",
-      "answer": null,
-      "reference": [
-        "ক্যান্টনমেন্ট পাবলিক স্কুল এন্ড কলেজ, মোমেনশাহী"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বিনিয়োগকারীদের কাছে সরল সুদ অপেক্ষা চক্রবৃদ্ধি সুদ কেন বেশি গ্রহণযোগ্য? অথবা, কেন অনেক গ্রাহক চক্রবৃদ্ধি সুদকে সরল সুদের চেয়ে ভালো মনে করে?",
-      "answer": null,
-      "reference": [
-        "দিনাজপুর বোর্ড ২০২৬",
-        "হলি ক্রস উচ্চ বালিকা বিদ্যালয়, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "ভবিষ্যতে প্রাপ্ত অর্থের আজকের মূল্য কী নামে পরিচিত? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "পুলিশ লাইনস উচ্চ বিদ্যালয়, সিলেট"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বাট্টাকরণ প্রক্রিয়াটি কী? ব্যাখ্যা করো। অথবা, বাট্টাকরণ পদ্ধতি কাকে বলে?",
-      "answer": null,
-      "reference": [
-        "রাজশাহী বোর্ড ২০২৬",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
-        "মতিঝিল সরকারি বালিকা উচ্চ বিদ্যালয়, ঢাকা",
-        "সরকারি মুসলিম উচ্চ বিদ্যালয়, চট্টগ্রাম",
-        "ডাঃ খাস্তগীর সরকারি বালিকা উচ্চ বিদ্যালয়, চট্টগ্রাম",
-        "চিটাগাং আইডিয়াল হাই স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "একটি নতুন প্রকল্পে বিনিয়োগের সময় বাট্টাকরণ প্রক্রিয়া কেন ব্যবহার করা হয়?",
-      "answer": null,
-      "reference": [
-        "বরিশাল বোর্ড ২০২৬"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "১ বছর পর ৫০ টাকার চেয়ে বর্তমান ৫০ টাকা অধিক মূল্য বহন করার কারণ কী?",
-      "answer": null,
-      "reference": [
-        "বি এ এফ শাহীন কলেজ, তেজগাঁও, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বর্তমান মূল্য নির্ণয়ের প্রক্রিয়াটি লেখো।",
-      "answer": null,
-      "reference": [
-        "বীরশ্রেষ্ঠ নূর মোহাম্মদ পাবলিক কলেজ, ঢাকা"
-      ],
-      "difficulty": "EASY",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের বর্তমান মূল্যের সাথে সুদের হারের সম্পর্ক কীরূপ? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "বাট্টাকরণ ও চক্রবৃদ্ধিকরণের মধ্যে পার্থক্য কী?",
-      "answer": null,
-      "reference": [
-        "রাজউক উত্তরা মডেল কলেজ, ঢাকা"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "অর্থের বর্তমান মূল্য ও ভবিষ্যৎ মূল্যের মধ্যে দুটি পার্থক্য লেখো।",
+      "question": "বিনিময় প্রথা বিলুপ্তির কারণ ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -439,74 +12,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "সুদের হার বলতে কী বোঝায়? বর্ণনা করো।",
-      "answer": null,
-      "reference": [
-        "রংপুর জিলা স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রকৃত সুদের হার কী? ব্যাখ্যা দাও।",
-      "answer": null,
-      "reference": [
-        "সিলেট বোর্ড ২০২৬",
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা",
-        "ভিকারুননিসা নূন স্কুল এন্ড কলেজ, ঢাকা",
-        "মণিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা",
-        "বি এ এফ শাহীন কলেজ, তেজগাঁও, ঢাকা",
-        "নারায়ণগঞ্জ সরকারি বালিকা উচ্চ বিদ্যালয়",
-        "বগুড়া ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ",
-        "রংপুর জিলা স্কুল"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "মাসিক ৪% হারে চক্রবৃদ্ধি মুনাফায় ঋণ গ্রহণ করলে প্রকৃত সুদের হার কত হবে তা নির্ণয় করো।",
-      "answer": null,
-      "reference": [
-        "চট্টগ্রাম বোর্ড ২০২৬"
-      ],
-      "difficulty": "HARD",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "করিম সাহেব গ্রাম্য মহাজন থেকে মাসিক ১% চক্রবৃদ্ধি হারে ঋণ গ্রহণ করে। এক্ষেত্রে প্রকৃত সুদের হার নির্ণয় করো।",
-      "answer": null,
-      "reference": [
-        "যশোর বোর্ড ২০২৬"
-      ],
-      "difficulty": "HARD",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "প্রকৃত সুদের হার এবং নামিক সুদের হার কখন ভিন্ন হয়? ব্যাখ্যা করো।",
-      "answer": null,
-      "reference": [
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ"
-      ],
-      "difficulty": "MEDIUM",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null
-    },
-    {
-      "question": "নামিক ও প্রকৃত সুদের হারের মধ্যে দুটি পার্থক্য লেখো।",
+      "question": "কীভাবে মুদ্রার প্রয়োজনীয়তা মুদ্রা সৃষ্টিতে ব্যাপক ভূমিকা রাখে?",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -516,7 +22,147 @@
       "attachmentDescription": null
     },
     {
-      "question": "সুদ ও মুনাফা কি একই অর্থ বহন করে না? ব্যাখ্যা করো।",
+      "question": "কাগজি মুদ্রা বলতে কী বোঝায়?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কাগজি মুদ্রার প্রচলন ও প্রসারতার কারণ কী? বুঝিয়ে লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুদ্রা সম্পর্কে লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কীভাবে মুদ্রা অর্থনৈতিক ক্রিয়াকলাপ সহজসাধ্য করে?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "সঞ্চয়ের ভান্ডার হিসেবে মুদ্রার কাজ ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুদ্রাকে বিনিময়ের মাধ্যম বলা হয় কেন? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুদ্রা ও ব্যাংকের মধ্যে সম্পর্ক লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "‘মুদ্রাই ব্যাংক ব্যবসায়ের প্রধান উপাদান’— আলোচনা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "মুদ্রাকে ব্যাংক ব্যবস্থার জননী বলা হয় কেন?",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "‘ব্যাংক শব্দের উৎপত্তি সম্পর্কে সুনির্দিষ্ট ইতিহাস খুঁজে পাওয়া কঠিন’— মতামত দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "‘ব্যাংক একটি আর্থিক প্রতিষ্ঠান’— যুক্তি দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "অর্থ জমা, তোলা ও ঋণ দেওয়ার নিরাপদ প্রতিষ্ঠানটি সম্পর্কে লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ব্যাংক, ব্যাংকিং ও ব্যাংকারের মধ্যে সম্পর্ক লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "ব্যাংক ব্যবস্থার ইতিহাস ও ক্রমবিকাশের ধারণা দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের ব্যাংক ব্যবস্থার ইতিহাস সম্পর্কে লেখো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",

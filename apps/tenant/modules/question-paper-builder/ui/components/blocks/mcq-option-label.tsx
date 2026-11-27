@@ -349,3 +349,52 @@ export const McqOptionLabel: React.FC<McqOptionLabelProps> = ({
       );
   }
 };
+
+
+/**
+ * Computes smart adaptive grid classes for MCQ options:
+ * - On desktop & print, respects the exact configured column layout (1, 2, or 4 cols).
+ * - On mobile (< sm):
+ *   - If any option is long (> 14 chars) or contains Math formulas, collapses to 1 column so content never blows out.
+ *   - If options are short (e.g. single numbers or short words), keeps 2 columns on mobile.
+ */
+export function getMcqOptionGridClass(
+  columns: number,
+  options?: (string | null | undefined)[]
+): string {
+  if (columns === 1) {
+    return "grid-cols-1";
+  }
+
+  const opts = options || [];
+  const hasFormulasOrMath = opts.some((opt) => {
+    if (!opt || typeof opt !== "string") return false;
+    return (
+      opt.includes("$") ||
+      opt.includes("\\") ||
+      opt.includes("frac") ||
+      opt.includes("sqrt")
+    );
+  });
+
+  const maxOptionLength = opts.reduce((max, opt) => {
+    if (!opt || typeof opt !== "string") return max;
+    const cleanText = opt.replace(/<[^>]*>/g, "").replace(/[$_^{}]/g, "").trim();
+    return Math.max(max, cleanText.length);
+  }, 0);
+
+  const isComplexOrLong = hasFormulasOrMath || maxOptionLength > 14;
+
+  if (columns === 4) {
+    if (isComplexOrLong) {
+      return "grid-cols-1 sm:grid-cols-4 print:!grid-cols-4";
+    }
+    return "grid-cols-2 sm:grid-cols-4 print:!grid-cols-4";
+  }
+
+  // columns === 2
+  if (isComplexOrLong) {
+    return "grid-cols-1 sm:grid-cols-2 print:!grid-cols-2";
+  }
+  return "grid-cols-2 print:!grid-cols-2";
+}

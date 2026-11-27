@@ -73,9 +73,11 @@ export const CqPickerCard: React.FC<CqPickerCardProps> = ({
         {/* Attachments */}
         {Array.isArray(q.attachments) && q.attachments.length > 0 && (
           <div className="space-y-1">
-            <span className="font-bold text-primary block text-[11px] font-headline">
-              উদ্দীপক:
-            </span>
+            {!stimulus && (
+              <span className="font-bold text-primary block text-[11px] font-headline">
+                উদ্দীপক (চিত্র / ছক):
+              </span>
+            )}
             <QuestionAttachments attachments={q.attachments} compact />
           </div>
         )}

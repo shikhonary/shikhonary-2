@@ -5,7 +5,7 @@ import { QuestionAttachments } from "@workspace/ui/components/question-attachmen
 import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2, ArrowLeftRight } from "lucide-react";
 import { useRemoveQuestion } from "@/modules/question-paper/services/use-question-paper";
-import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
+import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize, getMcqOptionGridClass } from "./mcq-option-label";
 import { BlockBreakButton, BlockBreakIndicator } from "./block-break-control";
 import { QuestionPositionControl } from "./question-position-control";
 
@@ -149,8 +149,9 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
       ? "break-after-column"
       : "";
 
+  const displayOptions = item.overrides?.shuffledOptions || data.options || item.contentSnapshot?.options || [];
   const columns = settings.mcqOptionLayouts?.[item.id] || settings.mcqOptionColumns || 2;
-  const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
+  const gridClass = getMcqOptionGridClass(columns, displayOptions);
 
   const hasStatements = Boolean(data.statements && data.statements.length > 0);
   const stmtColumns = settings.mcqStatementLayouts?.[item.id] || settings.mcqStatementColumns || 1;
@@ -184,10 +185,32 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
   const questionStyle = getQuestionStyle();
   const contextStyle = getContextStyle();
   const isCombined = (data.type || "").toUpperCase() === "COMBINED";
-  const hasStimulusBanner = isCombined || Boolean(contextInstruction);
   const effectiveAttachments = (Array.isArray(data.attachments) && data.attachments.length > 0)
     ? data.attachments
     : (data.questionUrl ? [{ type: "image", url: data.questionUrl }] : []);
+
+  const passageAttachment = Array.isArray(effectiveAttachments)
+    ? effectiveAttachments.find((att: any) => {
+        const t = (att.type || "").toUpperCase();
+        return (t === "PASSAGE" || t === "TEXT") && Boolean(att.content?.trim());
+      })
+    : null;
+
+  const combinedContextCaption = isCombined && Array.isArray(effectiveAttachments)
+    ? effectiveAttachments.find((att: any) => att.caption)?.caption
+    : null;
+
+  const contextText = data.questionContext?.text || data.context || passageAttachment?.content || combinedContextCaption;
+
+  const mediaAttachments = Array.isArray(effectiveAttachments)
+    ? effectiveAttachments.filter((att: any) => {
+        const t = (att.type || "").toUpperCase();
+        if (t === "PASSAGE" || (t === "TEXT" && !att.url && !att.table)) return false;
+        return Boolean(att.url || att.table || att.caption);
+      })
+    : [];
+
+  const hasStimulusBanner = isCombined || Boolean(contextInstruction) || Boolean(contextText);
   const isAnswerMode = Boolean(settings.isAnswerMode);
   const isFirst = item.orderIndex === 0;
   
@@ -311,17 +334,19 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
                 {contextInstruction}
               </div>
             )}
-            {(data.questionContext?.text || data.context) && (
+            {contextText && (
               <div className="italic opacity-80 whitespace-pre-wrap w-full mb-0.5">
                 <EditableItem 
-                  content={<RenderMath text={data.questionContext?.text || data.context} />}
+                  content={<RenderMath text={contextText} />}
                   itemKey={`${item.id}-context`}
                   defaultStyle={contextStyle}
                 />
               </div>
             )}
             {/* Shared Attachments for COMBINED / shared stimulus questions */}
-            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
+            {mediaAttachments.length > 0 && (
+              <QuestionAttachments attachments={mediaAttachments} isMath={data.isMath ?? true} />
+            )}
           </div>
         </div>
       )}
@@ -357,8 +382,8 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
           </div>
 
           {/* Attachments for standalone questions rendered directly below question (hidden if question has a top stimulus banner or is a child question) */}
-          {!hasStimulusBanner && !hideContext && effectiveAttachments.length > 0 && (
-            <QuestionAttachments attachments={effectiveAttachments} isMath={data.isMath ?? true} />
+          {!hasStimulusBanner && !hideContext && mediaAttachments.length > 0 && (
+            <QuestionAttachments attachments={mediaAttachments} isMath={data.isMath ?? true} />
           )}
               
           {hasStatements && (
@@ -419,7 +444,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
                 const effectiveFontFamily = optCustomStyle?.fontFamily || settings.fontFamily;
                 
                 return (
-                  <div key={i} className="flex gap-1.5 items-start w-full">
+                  <div key={i} className="flex gap-1.5 items-start w-full min-w-0">
                     <McqOptionLabel
                       label={label}
                       optionStyle={settings.optionStyle}
@@ -427,7 +452,7 @@ export const MCQBlock = ({ item, hideContext = false, contextInstruction = "" }:
                       fontSize={indicatorFontSize}
                       fontFamily={effectiveFontFamily}
                     />
-                    <span className="w-full">
+                    <span className="w-full min-w-0">
                       <EditableItem 
                         content={<RenderMath text={opt} />}
                         itemKey={optItemKey}

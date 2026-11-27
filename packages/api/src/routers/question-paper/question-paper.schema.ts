@@ -100,6 +100,33 @@ export const duplicateQuestionPaperSchema = idSchema
 
 export type DuplicateQuestionPaperInput = z.infer<typeof duplicateQuestionPaperSchema>
 
+
+export const saveAsTemplateSchema = z.object({
+  paperId: z.string().min(1, "Paper ID is required"),
+  templateTitle: z.string().min(2, "টেমপ্লেটের নাম আবশ্যক"),
+  description: z.string().optional().nullable(),
+  stripSubject: z.boolean().default(true),
+})
+
+export type SaveAsTemplateInput = z.infer<typeof saveAsTemplateSchema>
+
+export const createFromTemplateSchema = z.object({
+  templateId: z.string().min(1, "Template ID is required"),
+  title: z.string().optional(),
+  examName: z.string().optional(),
+  targetSubjectId: z.string().optional().nullable(),
+  targetSubjectName: z.string().optional().nullable(),
+})
+
+export type CreateFromTemplateInput = z.infer<typeof createFromTemplateSchema>
+
+export const listTemplatesSchema = z.object({
+  classId: z.string().optional(),
+  search: z.string().optional(),
+})
+
+export type ListTemplatesInput = z.infer<typeof listTemplatesSchema>
+
 export const generateAnswerPaperSchema = idSchema
 
 export type GenerateAnswerPaperInput = z.infer<typeof generateAnswerPaperSchema>
@@ -360,6 +387,7 @@ export const getAvailableQuestionsSchema = z.object({
   cursor: z.string().optional(),
   sort: z.enum(["newest", "oldest"]).optional(),
   mcqType: z.string().optional(),
+  ownership: z.enum(["ALL", "OWN", "GLOBAL"]).optional(),
 })
 
 export type GetAvailableQuestionsInput = z.infer<typeof getAvailableQuestionsSchema>
@@ -569,3 +597,98 @@ export const generatePaperSetsSchema = z.object({
 export type GeneratePaperSetsInput = z.infer<typeof generatePaperSetsSchema>
 
 
+
+
+// ---------------------------------------------------------------------------
+// Quick Create Custom Question Schema (Zero Friction for Teacher)
+// ---------------------------------------------------------------------------
+
+export const quickCreateQuestionSchema = z.object({
+  questionPaperId: z.string().min(1),
+  distributionId: z.string().min(1),
+  sectionId: z.string().optional().nullable(),
+  subSectionId: z.string().optional().nullable(),
+  subjectId: z.string().min(1),
+  chapterId: z.string().optional().nullable(),
+  questionTypeId: z.string().optional().nullable(),
+  category: questionTypeCategorySchema,
+
+  // MCQ specific
+  mcqData: z
+    .object({
+      type: z.enum(["SINGLE", "MULTIPLE", "COMBINED"]).optional().default("SINGLE"),
+      statements: z.array(z.string()).optional(),
+      context: z.string().optional().nullable(),
+      contextCaption: z.string().optional().nullable(),
+      question: z.string().min(1, "প্রশ্ন আবশ্যক"),
+      options: z.array(z.string()).min(2, "কমপক্ষে ২টি অপশন আবশ্যক"),
+      answer: z.string().min(1, "সঠিক উত্তর আবশ্যক"),
+      explanation: z.string().optional().nullable(),
+      attachments: z
+        .array(
+          z.object({
+            type: z.string(),
+            url: z.string().optional().nullable(),
+            caption: z.string().optional().nullable(),
+            content: z.string().optional().nullable(),
+            table: z.any().optional().nullable(),
+            tableBorder: z.boolean().optional().nullable(),
+          })
+        )
+        .optional(),
+    })
+    .optional(),
+
+  // CQ specific
+  cqData: z
+    .object({
+      context: z.string().optional().nullable(),
+      attachments: z
+        .array(
+          z.object({
+            type: z.string(),
+            url: z.string().optional().nullable(),
+            caption: z.string().optional().nullable(),
+            content: z.string().optional().nullable(),
+            table: z.any().optional().nullable(),
+            tableBorder: z.boolean().optional().nullable(),
+          })
+        )
+        .optional(),
+      questionA: z.string().min(1, "ক প্রশ্ন আবশ্যক"),
+      questionB: z.string().min(1, "খ প্রশ্ন আবশ্যক"),
+      questionC: z.string().optional().nullable(),
+      questionD: z.string().optional().nullable(),
+      answerA: z.string().optional().nullable(),
+      answerB: z.string().optional().nullable(),
+      answerC: z.string().optional().nullable(),
+      answerD: z.string().optional().nullable(),
+    })
+    .optional(),
+
+  // Text specific (Short answer, descriptive, etc.)
+  textData: z
+    .object({
+      question: z.string().min(1, "প্রশ্ন আবশ্যক"),
+      answer: z.string().optional().nullable(),
+      context: z.string().optional().nullable(),
+      contextCaption: z.string().optional().nullable(),
+      attachments: z
+        .array(
+          z.object({
+            type: z.string(),
+            url: z.string().optional().nullable(),
+            caption: z.string().optional().nullable(),
+            content: z.string().optional().nullable(),
+            table: z.any().optional().nullable(),
+            tableBorder: z.boolean().optional().nullable(),
+          })
+        )
+        .optional(),
+    })
+    .optional(),
+
+  autoAssign: z.boolean().default(true),
+})
+
+export type QuickCreateQuestionInput = z.infer<typeof quickCreateQuestionSchema>

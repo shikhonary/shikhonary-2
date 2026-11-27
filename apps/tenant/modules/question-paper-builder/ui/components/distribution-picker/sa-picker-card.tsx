@@ -25,6 +25,29 @@ export const SaPickerCard: React.FC<SaPickerCardProps> = ({
     q.chapter?.nameBn ||
     q.chapter?.nameEn;
 
+  const passageAttachment = Array.isArray(q.attachments)
+    ? q.attachments.find(
+        (a: any) =>
+          (a.type || "").toUpperCase() === "PASSAGE" ||
+          (a.type || "").toUpperCase() === "CONTEXT"
+      )
+    : null;
+  const contextText =
+    q.context ||
+    q.stimulus ||
+    q.scenario ||
+    q.questionContext?.text ||
+    passageAttachment?.content ||
+    null;
+
+  const mediaAttachments = Array.isArray(q.attachments)
+    ? q.attachments.filter(
+        (a: any) =>
+          (a.type || "").toUpperCase() !== "PASSAGE" &&
+          (a.type || "").toUpperCase() !== "CONTEXT"
+      )
+    : [];
+
   return (
     <PickerCardWrapper
       id={q.id}
@@ -41,14 +64,34 @@ export const SaPickerCard: React.FC<SaPickerCardProps> = ({
       session={q.session}
     >
       <div className="flex flex-col gap-2 font-body">
+        {/* Stimulus / Context (উদ্দীপক অনুচ্ছেদ) at Top if present */}
+        {contextText && (
+          <div className="text-xs text-foreground/90 bg-muted/30 p-2.5 rounded-r-xl border-l-2 border-primary whitespace-pre-wrap font-body">
+            <span className="font-semibold text-primary block mb-1 text-[11px] font-headline">উদ্দীপক:</span>
+            <RenderMath text={contextText} isMath={q.isMath} />
+          </div>
+        )}
+
+        {/* If contextText was present, show mediaAttachments under it */}
+        {contextText && mediaAttachments.length > 0 && (
+          <QuestionAttachments attachments={mediaAttachments} isMath={q.isMath} compact />
+        )}
+
+        {/* Question Text */}
         <div className="text-xs sm:text-sm font-semibold text-foreground leading-relaxed">
-          <RenderMath text={q.question || q.name || q.title || ""} />
+          <RenderMath text={q.question || q.name || q.title || ""} isMath={q.isMath} />
         </div>
-        <QuestionAttachments attachments={q.attachments} compact />
+
+        {/* If no contextText, show media attachments directly under the question */}
+        {!contextText && mediaAttachments.length > 0 && (
+          <QuestionAttachments attachments={mediaAttachments} isMath={q.isMath} compact />
+        )}
+
+        {/* Answer preview */}
         {!isBankMode && q.answer && (
           <div className="text-xs text-muted-foreground mt-0.5 bg-muted/20 p-2 rounded-xl border border-border/40">
             <span className="font-semibold text-primary block mb-0.5 text-[11px] font-headline">উত্তর:</span>
-            <RenderMath text={q.answer} />
+            <RenderMath text={q.answer} isMath={q.isMath} />
           </div>
         )}
       </div>

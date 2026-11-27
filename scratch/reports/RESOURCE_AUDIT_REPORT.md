@@ -421,3 +421,10 @@
 | MCQ ID | Question Clue | Missing Asset Type | Description | Reference |
 | :--- | :--- | :--- | :--- | :--- |
 | `cmwxf1ykn0006hgtomeresugk` | বোধক চিহ্নিত স্থানে কোনটি বসবে?... | **DIAGRAM** | চিত্র: ক্রয়, বিক্রয়, গুদামজাতকরণ ও পরিবহনের সাথে সম্পর্কিত প্রশ্নবোধক চিহ্ন সংবলিত চিত্র | চ. বো. ২৩ |
+
+### Audit for Chapter: মুদ্রা, ব্যাংক ও ব্যাংকিং (11/27/2026)
+
+| MCQ ID | Question Clue | Missing Asset Type | Description | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `cmwytath8001b1gtouz2b4d2q` | চিত্র $A$ ও $B$ এর মধ্যে প্রকাশ পায়—
+i. বিনি... | **DIAGRAM** | চিত্র: A (জামা) এবং B (নোট/টাকা) এর পারস্পরিক বিনিময় | কু. বো. ২০ |

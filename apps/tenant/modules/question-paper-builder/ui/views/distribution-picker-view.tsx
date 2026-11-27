@@ -49,10 +49,14 @@ import {
   ArrowLeftRight,
   HelpCircle,
   Lock,
+  PlusCircle,
+  Sparkles,
+  Filter,
 } from "lucide-react";
 import Link from "next/link";
 import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionGrid } from "../components/distribution-picker/question-grid";
+import { QuickCreateQuestionModal } from "../components/modals/quick-create-question-modal";
 import { useBookmarkedQuestionsStore } from "@/modules/question-bank/store/use-bookmarked-questions-store";
 
 const toBengaliDigits = (num: number | string): string => {
@@ -97,6 +101,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const [isCustomQuestionModalOpen, setIsCustomQuestionModalOpen] = useState(false);
 
   // 500ms Debounce to give ample time while typing phrases before fetching
   React.useEffect(() => {
@@ -131,6 +136,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const [selectedSource, setSelectedSource] = useState<string>("All");
   const [selectedSort, setSelectedSort] = useState<"newest" | "oldest">("newest");
   const [selectedMcqType, setSelectedMcqType] = useState<string>("All");
+  const [ownershipFilter, setOwnershipFilter] = useState<"ALL" | "OWN" | "GLOBAL">("ALL");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [onlyBookmarked, setOnlyBookmarked] = useState<boolean>(false);
@@ -384,6 +390,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
       source: selectedSource !== "All" ? selectedSource : undefined,
       sort: selectedSort,
       mcqType: selectedMcqType !== "All" ? selectedMcqType : undefined,
+      ownership: ownershipFilter,
       excludePaperId: paperId,
       page,
       limit,
@@ -486,9 +493,11 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
   const hasActiveSource = Boolean(selectedSource && selectedSource !== "All");
   const hasActiveSort = Boolean(selectedSort && selectedSort !== "newest");
   const hasActiveBookmarked = Boolean(onlyBookmarked);
+  const hasActiveOwnership = ownershipFilter !== "ALL";
 
-  const hasAnyFilter = hasActiveBookmarked || hasActiveChapter || hasActiveMcqType || hasActiveBoard || hasActiveSource || hasActiveSort || hasActiveQuery;
+  const hasAnyFilter = hasActiveOwnership || hasActiveBookmarked || hasActiveChapter || hasActiveMcqType || hasActiveBoard || hasActiveSource || hasActiveSort || hasActiveQuery;
   const activeFilterCount =
+    (hasActiveOwnership ? 1 : 0) +
     (hasActiveBookmarked ? 1 : 0) +
     (hasActiveChapter ? 1 : 0) +
     (hasActiveMcqType ? 1 : 0) +
@@ -505,6 +514,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
     setSelectedSource("All");
     setSelectedSort("newest");
     setSelectedMcqType("All");
+    setOwnershipFilter("ALL");
     setOnlyBookmarked(false);
     setPage(1);
   };
@@ -1140,6 +1150,46 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 </div>
               )}
 
+              {/* Ownership Filter Group (Right above Sort Order) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                    <span>প্রশ্নের উৎস</span>
+                  </label>
+                  {hasActiveOwnership && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 font-semibold font-headline">
+                      সক্রিয়
+                    </span>
+                  )}
+                </div>
+                <div
+                  onClick={() => {
+                    setOwnershipFilter(ownershipFilter === "OWN" ? "ALL" : "OWN");
+                    setPage(1);
+                  }}
+                  className={cn(
+                    "p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all active:scale-[0.98]",
+                    ownershipFilter === "OWN"
+                      ? "bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300 shadow-2xs"
+                      : "bg-background border-border/70 hover:bg-muted/50 text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className={cn("w-4 h-4", ownershipFilter === "OWN" ? "text-purple-600 dark:text-purple-400" : "text-muted-foreground")} />
+                    <span className="font-headline font-semibold text-xs">প্রতিষ্ঠানের নিজস্ব প্রশ্ন</span>
+                  </div>
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded-full text-[10px] font-bold font-headline transition-colors",
+                      ownershipFilter === "OWN" ? "bg-purple-600 text-white" : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    {ownershipFilter === "OWN" ? "সক্রিয়" : "সব"}
+                  </span>
+                </div>
+              </div>
+
               {/* Sort Order Group */}
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-foreground flex items-center gap-1.5 font-headline">
@@ -1290,6 +1340,20 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                   </div>
                 )}
 
+                {/* Create Custom Question Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCustomQuestionModalOpen(true)}
+                  disabled={isPublished}
+                  className="h-9.5 px-3 rounded-xl border-purple-200 dark:border-purple-800/40 bg-purple-50/70 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-xs font-bold font-headline gap-1.5 cursor-pointer shrink-0 shadow-2xs transition-all active:scale-95"
+                  title="নিজস্ব প্রশ্ন তৈরি করুন"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">নিজস্ব প্রশ্ন</span>
+                  <span className="sm:hidden">প্রশ্ন তৈরি</span>
+                </Button>
+
                 {/* Mobile Bookmarked Filter Pill */}
                 <button
                   type="button"
@@ -1298,7 +1362,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     setPage(1);
                   }}
                   className={cn(
-                    "md:hidden h-9.5 px-3 rounded-xl border inline-flex items-center gap-1.5 text-xs font-bold font-headline transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs",
+                    "md:hidden h-9 px-2.5 rounded-lg border inline-flex items-center gap-1 text-xs font-bold font-headline transition-all cursor-pointer shrink-0 active:scale-95 shadow-2xs",
                     onlyBookmarked
                       ? "bg-rose-600 text-white border-rose-600 shadow-xs"
                       : "bg-card border-border/70 text-foreground hover:bg-muted/50"
@@ -1320,17 +1384,17 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     <button
                       type="button"
                       className={cn(
-                        "md:hidden h-9.5 px-2.5 sm:px-3 rounded-xl border flex items-center gap-1.5 text-xs font-bold font-headline transition-all shrink-0 cursor-pointer active:scale-95 shadow-2xs",
+                        "md:hidden h-9 px-2.5 rounded-lg border inline-flex items-center gap-1.5 text-xs font-bold font-headline transition-all shrink-0 cursor-pointer active:scale-95 shadow-2xs",
                         activeFilterCount > 0
                           ? "bg-primary text-primary-foreground border-primary shadow-xs"
                           : "bg-card border-border/70 text-foreground hover:bg-muted/50"
                       )}
-                      title="সার্চ ও ফিল্টারসমূহ খুলুন"
+                      title="ফিল্টারসমূহ খুলুন"
                     >
-                      <SlidersHorizontal className="w-3.5 h-3.5" />
-                      <span className="hidden xs:inline">সার্চ ও ফিল্টার</span>
+                      <Filter className="w-3.5 h-3.5 shrink-0" />
+                      <span>ফিল্টার</span>
                       {activeFilterCount > 0 && (
-                        <span className="w-4 h-4 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center ml-0.5">
+                        <span className="min-w-4 h-4 px-1 rounded-full bg-white text-primary text-[10px] font-bold flex items-center justify-center font-headline ml-0.5">
                           {toBengaliDigits(activeFilterCount)}
                         </span>
                       )}
@@ -1342,25 +1406,25 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     className="rounded-t-3xl max-h-[88vh] flex flex-col p-0 border-t border-border/60 bg-card text-foreground shadow-2xl focus:outline-hidden overflow-hidden"
                   >
                     {/* Grab Handle */}
-                    <div className="w-12 h-1.5 rounded-full bg-muted-foreground/25 mx-auto mt-3 mb-1 shrink-0" />
+                    <div className="w-10 h-1 rounded-full bg-muted-foreground/25 mx-auto mt-2 mb-0.5 shrink-0" />
 
                     {/* Sheet Header */}
-                    <SheetHeader className="px-4 py-3 border-b border-border/40 text-left shrink-0">
-                      <SheetTitle className="text-base font-bold font-headline flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                            <SlidersHorizontal className="w-4 h-4" />
+                    <SheetHeader className="px-3.5 py-2 border-b border-border/40 text-left shrink-0">
+                      <SheetTitle className="text-sm font-bold font-headline flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <SlidersHorizontal className="w-3.5 h-3.5" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               <span>সার্চ ও ফিল্টার</span>
                               {activeFilterCount > 0 && (
-                                <span className="px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                                <span className="px-1.5 py-0.2 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                                   {toBengaliDigits(activeFilterCount)}
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] font-normal text-muted-foreground font-body leading-none mt-0.5">
+                            <p className="text-[10px] font-normal text-muted-foreground font-body leading-none mt-0.5">
                               {activeFilterCount > 0
                                 ? `${toBengaliDigits(activeFilterCount)}টি ফিল্টার সক্রিয় রয়েছে`
                                 : "সার্চ ও ফিল্টার সিলেক্ট করুন"}
@@ -1372,7 +1436,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                           <button
                             type="button"
                             onClick={handleResetAll}
-                            className="text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 font-body cursor-pointer transition-all active:scale-95"
+                            className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-2 py-1 rounded-lg flex items-center gap-1 font-body cursor-pointer transition-all active:scale-95"
                           >
                             <RotateCcw className="w-3 h-3" />
                             <span>সব রিসেট</span>
@@ -1382,14 +1446,14 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     </SheetHeader>
 
                     {/* Sheet Body */}
-                    <div className="flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3.5 font-body text-xs">
+                    <div className="flex-1 overflow-y-auto px-3 py-2.5 space-y-2 font-body text-xs">
                       {/* Active Filter Chips Strip inside Drawer */}
                       {activeFilterCount > 0 && (
-                        <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-border/40">
+                        <div className="flex items-center gap-1 flex-wrap pb-1.5 border-b border-border/40">
                           <span className="text-[10px] font-semibold text-muted-foreground">সক্রিয়:</span>
                           {hasActiveQuery && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
-                              <Search className="w-3 h-3 text-primary shrink-0" />
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
+                              <Search className="w-2.5 h-2.5 text-primary shrink-0" />
                               <span>সার্চ: &quot;{search}&quot;</span>
                               <button
                                 type="button"
@@ -1400,13 +1464,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
                           {hasActiveMcqType && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
-                              <HelpCircle className="w-3 h-3 text-primary shrink-0" />
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
+                              <HelpCircle className="w-2.5 h-2.5 text-primary shrink-0" />
                               <span>ধরন: {MCQ_TYPE_OPTIONS.find((t) => t.value === selectedMcqType)?.labelBn || selectedMcqType}</span>
                               <button
                                 type="button"
@@ -1416,12 +1480,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
                           {hasActiveChapter && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
                               <span>
                                 অধ্যায়: {chapters.find((ch: any) => ch.id === selectedChapterId)?.nameBn ||
                                   chapters.find((ch: any) => ch.id === selectedChapterId)?.nameEn}
@@ -1434,12 +1498,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
                           {hasActiveBoard && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
                               <span>রেফারেন্স: {selectedBoard}</span>
                               <button
                                 type="button"
@@ -1449,12 +1513,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
                           {hasActiveSource && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
                               <span>উৎস: {selectedSource}</span>
                               <button
                                 type="button"
@@ -1464,12 +1528,28 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
+                              </button>
+                            </span>
+                          )}
+                          {hasActiveOwnership && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-700 dark:text-purple-300 font-medium text-[10px] border border-purple-500/25">
+                              <Sparkles className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                              <span>নিজস্ব প্রশ্ন</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOwnershipFilter("ALL");
+                                  setPage(1);
+                                }}
+                                className="hover:opacity-75 cursor-pointer ml-0.5"
+                              >
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
                           {hasActiveSort && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-medium text-[11px] border border-primary/25">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary font-medium text-[10px] border border-primary/25">
                               <span>সাজান: {selectedSort === "oldest" ? "পুরাতনগুলো আগে" : "নতুনগুলো আগে"}</span>
                               <button
                                 type="button"
@@ -1479,7 +1559,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 }}
                                 className="hover:opacity-75 cursor-pointer ml-0.5"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </span>
                           )}
@@ -1487,9 +1567,9 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                       )}
 
                       {/* Primary Search Bar in Sheet (First Item) */}
-                      <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                      <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <label className="font-bold text-foreground flex items-center gap-2 font-headline">
+                          <label className="font-bold text-foreground flex items-center gap-1.5 font-headline text-xs">
                             <Search className="w-3.5 h-3.5 text-primary" />
                             <span>প্রশ্ন সার্চ করুন</span>
                           </label>
@@ -1509,13 +1589,13 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                           )}
                         </div>
                         <div className="relative">
-                          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                           <Input
                             type="text"
                             placeholder="প্রশ্ন, উদ্দীপক বা কী-ওয়ার্ড লিখে সার্চ..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-8.5 pr-8 h-11 rounded-xl border border-border/60 bg-background text-xs font-body shadow-2xs focus-visible:ring-1 focus-visible:ring-primary"
+                            className="w-full pl-8 pr-7 h-9 rounded-lg border border-border/60 bg-background text-xs font-body shadow-2xs focus-visible:ring-1 focus-visible:ring-primary"
                           />
                           {hasActiveQuery && (
                             <button
@@ -1525,10 +1605,10 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                                 setDebouncedSearch("");
                                 setPage(1);
                               }}
-                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors cursor-pointer"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors cursor-pointer"
                               title="সার্চ ক্লিয়ার করুন"
                             >
-                              <X className="w-3.5 h-3.5" />
+                              <X className="w-3 h-3" />
                             </button>
                           )}
                         </div>
@@ -1536,14 +1616,14 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
                       {/* MCQ Type Filter in Sheet (Mobile) */}
                       {isMcqCategory && (
-                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                        <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <label className="font-bold text-foreground flex items-center gap-2 font-headline">
+                            <label className="font-bold text-foreground flex items-center gap-1.5 font-headline text-xs">
                               <HelpCircle className="w-3.5 h-3.5 text-primary" />
                               <span>MCQ ধরন</span>
                             </label>
                             {hasActiveMcqType && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold font-headline">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-semibold font-headline">
                                 সক্রিয়
                               </span>
                             )}
@@ -1555,8 +1635,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                               setPage(1);
                             }}
                           >
-                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary font-body">
-                              <div className="flex items-center gap-2 truncate pl-1">
+                            <SelectTrigger className="w-full h-9 px-3 rounded-lg bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary font-body">
+                              <div className="flex items-center gap-2 truncate pl-0.5">
                                 <HelpCircle className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                                 <SelectValue placeholder="সকল প্রকার" />
                               </div>
@@ -1575,14 +1655,14 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
                       {/* Reference / Board in Sheet */}
                       {boardYears.length > 0 && (
-                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                        <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <label className="font-bold text-foreground flex items-center gap-2">
+                            <label className="font-bold text-foreground flex items-center gap-1.5 text-xs">
                               <Tag className="w-3.5 h-3.5 text-primary" />
                               <span>রেফারেন্স / বোর্ড</span>
                             </label>
                             {hasActiveBoard && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-semibold">
                                 সক্রিয়
                               </span>
                             )}
@@ -1594,8 +1674,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                               setPage(1);
                             }}
                           >
-                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
-                              <div className="flex items-center gap-2 truncate pl-1">
+                            <SelectTrigger className="w-full h-9 px-3 rounded-lg bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
+                              <div className="flex items-center gap-2 truncate pl-0.5">
                                 <Tag className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                                 <SelectValue placeholder="সকল রেফারেন্স" />
                               </div>
@@ -1614,14 +1694,14 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
 
                       {/* Source in Sheet */}
                       {sources.length > 0 && (
-                        <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2">
+                        <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
                           <div className="flex items-center justify-between">
-                            <label className="font-bold text-foreground flex items-center gap-2">
+                            <label className="font-bold text-foreground flex items-center gap-1.5 text-xs">
                               <FileText className="w-3.5 h-3.5 text-primary" />
                               <span>উৎস</span>
                             </label>
                             {hasActiveSource && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-semibold">
                                 সক্রিয়
                               </span>
                             )}
@@ -1633,8 +1713,8 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                               setPage(1);
                             }}
                           >
-                            <SelectTrigger className="w-full h-11 px-3.5 rounded-xl bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
-                              <div className="flex items-center gap-2 truncate pl-1">
+                            <SelectTrigger className="w-full h-9 px-3 rounded-lg bg-background border border-border/60 text-xs shadow-2xs focus:ring-1 focus:ring-primary">
+                              <div className="flex items-center gap-2 truncate pl-0.5">
                                 <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                                 <SelectValue placeholder="সকল উৎস" />
                               </div>
@@ -1651,15 +1731,67 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                         </div>
                       )}
 
-                      {/* Sort Order in Sheet */}
-                      <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
+                      {/* Ownership Filter in Sheet (Mobile) - Right above Sort Order */}
+                      <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <label className="font-bold text-foreground flex items-center gap-2">
+                          <label className="font-bold text-foreground flex items-center gap-1.5 font-headline text-xs">
+                            <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                            <span>প্রশ্নের উৎস</span>
+                          </label>
+                          {hasActiveOwnership && (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 font-semibold font-headline">
+                              সক্রিয়
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            type="button"
+                            variant={ownershipFilter === "ALL" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              setOwnershipFilter("ALL");
+                              setPage(1);
+                            }}
+                            className={cn(
+                              "h-8.5 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer",
+                              ownershipFilter === "ALL"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-card border-border/70 text-foreground"
+                            )}
+                          >
+                            সকল প্রশ্ন
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={ownershipFilter === "OWN" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              setOwnershipFilter(ownershipFilter === "OWN" ? "ALL" : "OWN");
+                              setPage(1);
+                            }}
+                            className={cn(
+                              "h-8.5 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer flex items-center gap-1.5",
+                              ownershipFilter === "OWN"
+                                ? "bg-purple-600 text-white hover:bg-purple-700"
+                                : "bg-card border-purple-200 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/30"
+                            )}
+                          >
+                            <Sparkles className="w-3 h-3" />
+                            <span>নিজস্ব প্রশ্ন</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Sort Order in Sheet */}
+                      <div className="p-2.5 rounded-xl bg-muted/15 border border-border/40 space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="font-bold text-foreground flex items-center gap-1.5 text-xs">
                             <ArrowUpDown className="w-3.5 h-3.5 text-primary" />
                             <span>সাজান</span>
                           </label>
                           {hasActiveSort && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-semibold">
                               সক্রিয়
                             </span>
                           )}
@@ -1671,7 +1803,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                               setSelectedSort("newest");
                               setPage(1);
                             }}
-                            className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                            className={`py-1.5 px-2.5 rounded-lg text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
                               selectedSort === "newest"
                                 ? "bg-primary text-primary-foreground shadow-xs"
                                 : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
@@ -1685,7 +1817,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                               setSelectedSort("oldest");
                               setPage(1);
                             }}
-                            className={`py-2.5 px-3 rounded-xl text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
+                            className={`py-1.5 px-2.5 rounded-lg text-xs font-bold text-center transition-all cursor-pointer active:scale-95 ${
                               selectedSort === "oldest"
                                 ? "bg-primary text-primary-foreground shadow-xs"
                                 : "bg-background text-muted-foreground border border-border/60 hover:bg-muted/60"
@@ -1698,24 +1830,24 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     </div>
 
                     {/* Sticky Action Footer */}
-                    <div className="px-3.5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] bg-background/95 backdrop-blur-md border-t border-border/50 flex items-center gap-2.5 shrink-0">
+                    <div className="px-3.5 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] bg-background/95 backdrop-blur-md border-t border-border/50 flex items-center gap-2 shrink-0">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={handleResetAll}
                         disabled={activeFilterCount === 0}
-                        className="h-11 px-4 rounded-xl font-bold flex items-center gap-1.5 border-border text-foreground shrink-0 disabled:opacity-40 cursor-pointer font-headline"
+                        className="h-9 px-3 rounded-lg font-bold flex items-center gap-1.5 border-border text-foreground shrink-0 disabled:opacity-40 cursor-pointer font-headline text-xs"
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
+                        <RotateCcw className="w-3 h-3" />
                         <span>রিসেট</span>
                       </Button>
 
                       <Button
                         type="button"
                         onClick={() => setMobileFilterOpen(false)}
-                        className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-transform cursor-pointer font-headline"
+                        className="flex-1 h-9 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold flex items-center justify-center gap-2 shadow-xs active:scale-[0.99] transition-transform cursor-pointer font-headline text-xs"
                       >
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5" />
                         <span>ফলাফল দেখুন</span>
                       </Button>
                     </div>
@@ -1766,6 +1898,25 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                           }}
                           className="rounded-full p-0.5 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer ml-0.5 shrink-0"
                           title="বুকমার্ক ফিল্টার বাদ দিন"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    )}
+
+                    {/* Ownership / Own Question Filter Pill */}
+                    {hasActiveOwnership && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25 text-xs font-medium font-body shadow-2xs animate-in fade-in duration-150 shrink-0">
+                        <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
+                        <span>নিজস্ব প্রশ্ন</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOwnershipFilter("ALL");
+                            setPage(1);
+                          }}
+                          className="rounded-full p-0.5 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 transition-colors cursor-pointer ml-0.5 shrink-0"
+                          title="নিজস্ব প্রশ্ন ফিল্টার বাদ দিন"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -1892,18 +2043,18 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               {/* Alternative Mode Notification Banner */}
               {isAlternativeMode && (
                 <div className="bg-primary/5 border border-primary/25 rounded-2xl p-3 sm:px-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs font-display">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
                       <Split className="w-4.5 h-4.5" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2 flex-wrap">
                         <span>বিকল্প প্রশ্ন যোগ মোড</span>
                         <Badge className="bg-primary text-primary-foreground text-[10px] py-0 px-2 font-headline">
                           {orLabel}
                         </Badge>
                       </div>
-                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 truncate">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 leading-relaxed break-words whitespace-normal">
                         {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর জন্য ` : ""}
                         বিকল্প হিসেবে ১টি প্রশ্ন সিলেক্ট করুন।
                         {primaryMarksParam ? ` (মান: ${toBengaliDigits(primaryMarksParam)})` : ""}
@@ -1914,7 +2065,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     variant="outline"
                     size="sm"
                     asChild
-                    className="text-xs border-primary/30 text-primary hover:bg-primary/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
+                    className="w-full sm:w-auto text-xs border-primary/30 text-primary hover:bg-primary/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
                   >
                     <Link href={`/question-papers/${paperId}/builder`}>
                       বাতিল ও ক্যানভাসে ফিরুন
@@ -1926,12 +2077,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
               {/* Exchange Mode Notification Banner */}
               {isExchangeMode && (
                 <div className="bg-amber-500/5 border border-amber-500/25 rounded-2xl p-3 sm:px-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs font-display">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
                       <ArrowLeftRight className="w-4.5 h-4.5" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs sm:text-sm font-bold text-foreground font-headline flex items-center gap-2 flex-wrap">
                         <span>প্রশ্ন পরিবর্তন মোড</span>
                         {masterNumberParam && (
                           <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-300/40 text-[10px] py-0 px-2 font-headline">
@@ -1939,7 +2090,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                           </Badge>
                         )}
                       </div>
-                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 truncate">
+                      <p className="text-[11px] sm:text-xs text-muted-foreground font-body mt-0.5 leading-relaxed break-words whitespace-normal">
                         {masterNumberParam ? `প্রশ্ন নং ${toBengaliDigits(masterNumberParam)}-এর স্থলে ` : ""}
                         একই পজিশনে পরিবর্তন করতে তালিকা থেকে ১টি নতুন প্রশ্ন সিলেক্ট করুন।
                       </p>
@@ -1949,7 +2100,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                     variant="outline"
                     size="sm"
                     asChild
-                    className="text-xs border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
+                    className="w-full sm:w-auto text-xs border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer shrink-0 rounded-xl font-bold font-headline h-8 px-3"
                   >
                     <Link href={`/question-papers/${paperId}/builder`}>
                       বাতিল ও ক্যানভাসে ফিরুন
@@ -1990,6 +2141,7 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 source={selectedSource}
                 sort={selectedSort}
                 mcqType={selectedMcqType}
+                ownership={ownershipFilter}
                 excludePaperId={paperId}
                 distributionId={(isAlternativeMode || isExchangeMode) ? undefined : distributionId}
                 selectedIds={selectedIds}
@@ -2004,7 +2156,12 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
                 bookmarkedIds={bookmarkedIds}
                 isExchangeMode={isExchangeMode}
                 currentQuestionId={currentQuestionId}
+                onCreateCustomQuestion={() => setIsCustomQuestionModalOpen(true)}
                 onResetFilters={handleResetAll}
+                onResetOwnership={() => {
+                  setOwnershipFilter("ALL");
+                  setPage(1);
+                }}
                 onClearSearch={() => {
                   setSearch("");
                   setDebouncedSearch("");
@@ -2126,6 +2283,33 @@ export const DistributionPickerView: React.FC<Props> = ({ paperId, distributionI
           )}
         </div>
       )}
+
+      {/* Quick Create Custom Question Modal */}
+      <QuickCreateQuestionModal
+        open={isCustomQuestionModalOpen}
+        onOpenChange={setIsCustomQuestionModalOpen}
+        paperId={paperId}
+        distributionId={distributionId}
+        subjectId={distStatus?.subjectId || ""}
+        subjectName={distStatus?.subjectName}
+        className={paperQuery?.className}
+        category={category}
+        defaultChapterId={selectedChapterId !== "All" ? selectedChapterId : undefined}
+        defaultSearchText={debouncedSearch || search}
+        sectionId={urlSectionId}
+        subSectionId={urlSubSectionId}
+        autoAssign={true}
+        onSuccess={(newQuestionId, wasAutoAssigned) => {
+          if (newQuestionId && !wasAutoAssigned) {
+            setSelectedIds((prev) => [newQuestionId, ...prev.filter((id) => id !== newQuestionId)]);
+          }
+          if (search || debouncedSearch) {
+            setSearch("");
+            setDebouncedSearch("");
+            setPage(1);
+          }
+        }}
+      />
     </div>
   );
 };

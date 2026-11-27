@@ -1,13 +1,14 @@
 "use client"
 
 import React from "react"
-import { Bookmark, Tag } from "lucide-react"
+import { Bookmark, Tag, Flag } from "lucide-react"
 import { cn } from "@workspace/ui/lib/utils"
 
 export interface QuestionCardFooterProps {
   reference?: string | string[] | null
   isBookmarked?: boolean
   onToggleBookmark?: (e: React.MouseEvent) => void
+  onReport?: (e: React.MouseEvent) => void
   bookmarkText?: string
   bookmarkedText?: string
   leftContent?: React.ReactNode
@@ -19,6 +20,7 @@ export const QuestionCardFooter: React.FC<QuestionCardFooterProps> = ({
   reference,
   isBookmarked = false,
   onToggleBookmark,
+  onReport,
   bookmarkText = "বুকমার্কে যোগ করুন",
   bookmarkedText = "বুকমার্কে সংরক্ষিত",
   leftContent,
@@ -54,35 +56,52 @@ export const QuestionCardFooter: React.FC<QuestionCardFooterProps> = ({
         )}
       </div>
 
-      {/* Right Side: Only "Add to bookmark" action button */}
+      {/* Right Side: Report and Bookmark buttons */}
       <div className="flex items-center gap-1.5 shrink-0">
         {rightContent ? (
           rightContent
         ) : (
-          onToggleBookmark && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                onToggleBookmark(e)
-              }}
-              className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer active:scale-95",
-                isBookmarked
-                  ? "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400"
-                  : "bg-white dark:bg-card border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 shadow-2xs hover:bg-rose-50/50 dark:hover:bg-rose-950/20"
-              )}
-              title={isBookmarked ? "বুকমার্ক থেকে মুছুন" : "বুকমার্কে সংরক্ষণ করুন"}
-            >
-              <Bookmark
+          <>
+            {onReport && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onReport(e)
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium font-headline transition-all cursor-pointer text-muted-foreground/75 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 active:scale-95"
+                title="প্রশ্নে ত্রুটি রিপোর্ট করুন"
+              >
+                <Flag className="w-3.5 h-3.5 text-rose-500/80" />
+                <span className="hidden sm:inline">রিপোর্ট</span>
+              </button>
+            )}
+
+            {onToggleBookmark && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleBookmark(e)
+                }}
                 className={cn(
-                  "w-3.5 h-3.5",
-                  isBookmarked ? "fill-rose-500 text-rose-500" : "text-slate-500"
+                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer active:scale-95",
+                  isBookmarked
+                    ? "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400"
+                    : "bg-white dark:bg-card border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 shadow-2xs hover:bg-rose-50/50 dark:hover:bg-rose-950/20"
                 )}
-              />
-              <span>{isBookmarked ? bookmarkedText : bookmarkText}</span>
-            </button>
-          )
+                title={isBookmarked ? "বুকমার্ক থেকে মুছুন" : "বুকমার্কে সংরক্ষণ করুন"}
+              >
+                <Bookmark
+                  className={cn(
+                    "w-3.5 h-3.5",
+                    isBookmarked ? "fill-rose-500 text-rose-500" : "text-slate-500"
+                  )}
+                />
+                <span>{isBookmarked ? bookmarkedText : bookmarkText}</span>
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

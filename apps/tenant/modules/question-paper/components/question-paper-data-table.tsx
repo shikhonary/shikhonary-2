@@ -21,9 +21,10 @@ import {
 import {
   MoreVertical,
   Pen,
+  Pencil,
+  Globe,
   Trash,
   Clock,
-  Copy,
   CheckCircle,
   CheckCircle2,
   AlertTriangle,
@@ -31,6 +32,7 @@ import {
   FileQuestion,
   Plus,
   Loader2,
+  BookmarkPlus,
 } from "lucide-react"
 import { QuestionPaperCardGrid } from "./question-paper-card-grid"
 import type { QuestionPaperViewMode } from "../hooks/use-question-paper-search-params"
@@ -80,7 +82,9 @@ interface QuestionPaperDataTableProps {
   isError: boolean
   viewMode?: QuestionPaperViewMode
   onEdit?: (item: QuestionPaperItem) => void
-  onDuplicate: (id: string, title: string) => void
+  onRename?: (id: string, title: string) => void
+  onPublish?: (id: string, title: string) => void
+  onSaveAsTemplate?: (id: string, title: string) => void
   onGenerateAnswer?: (id: string, title: string) => void
   generatingAnswerId?: string | null
   onDelete: (id: string, title: string) => void
@@ -92,7 +96,9 @@ export function QuestionPaperDataTable({
   isError,
   viewMode = "table",
   onEdit,
-  onDuplicate,
+  onRename,
+  onPublish,
+  onSaveAsTemplate,
   onGenerateAnswer,
   generatingAnswerId,
   onDelete,
@@ -121,7 +127,8 @@ export function QuestionPaperDataTable({
         <QuestionPaperCardGrid
           items={[]}
           isLoading={true}
-          onDuplicate={onDuplicate}
+          onRename={onRename}
+          onPublish={onPublish}
           onDelete={onDelete}
         />
       )
@@ -142,7 +149,9 @@ export function QuestionPaperDataTable({
         items={items}
         isLoading={false}
         onEdit={onEdit}
-        onDuplicate={onDuplicate}
+        onRename={onRename}
+        onPublish={onPublish}
+        onSaveAsTemplate={onSaveAsTemplate}
         onGenerateAnswer={onGenerateAnswer}
         generatingAnswerId={generatingAnswerId}
         onDelete={onDelete}
@@ -158,7 +167,8 @@ export function QuestionPaperDataTable({
           <QuestionPaperCardGrid
             items={[]}
             isLoading={true}
-            onDuplicate={onDuplicate}
+            onRename={onRename}
+            onPublish={onPublish}
             onDelete={onDelete}
           />
         </div>
@@ -237,7 +247,9 @@ export function QuestionPaperDataTable({
               items={items}
               isLoading={false}
               onEdit={onEdit}
-              onDuplicate={onDuplicate}
+              onRename={onRename}
+              onPublish={onPublish}
+              onSaveAsTemplate={onSaveAsTemplate}
               onGenerateAnswer={onGenerateAnswer}
               generatingAnswerId={generatingAnswerId}
               onDelete={onDelete}
@@ -368,13 +380,33 @@ export function QuestionPaperDataTable({
                                   <span>এডিট করুন</span>
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => onDuplicate(item.id, item.title)}
-                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
-                              >
-                                <Copy className="h-3.5 w-3.5" />
-                                <span>ডুপ্লিকেট করুন</span>
-                              </DropdownMenuItem>
+                              {onRename && (
+                                <DropdownMenuItem
+                                  onClick={() => onRename(item.id, item.title)}
+                                  className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                  <span>নাম পরিবর্তন করুন</span>
+                                </DropdownMenuItem>
+                              )}
+                              {item.status !== "Published" && onPublish && (
+                                <DropdownMenuItem
+                                  onClick={() => onPublish(item.id, item.title)}
+                                  className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                >
+                                  <Globe className="h-3.5 w-3.5" />
+                                  <span>পাবলিশ করুন</span>
+                                </DropdownMenuItem>
+                              )}
+                              {onSaveAsTemplate && (
+                                <DropdownMenuItem
+                                  onClick={() => onSaveAsTemplate(item.id, item.title)}
+                                  className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                                >
+                                  <BookmarkPlus className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                                  <span>টেমপ্লেট হিসেবে সংরক্ষণ</span>
+                                </DropdownMenuItem>
+                              )}
                               {onGenerateAnswer && (
                                 <DropdownMenuItem
                                   disabled={generatingAnswerId === item.id}

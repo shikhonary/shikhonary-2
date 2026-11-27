@@ -9,6 +9,7 @@ import type {
   BulkAssignQuestionsInput,
   BulkRemoveQuestionsInput,
   UpdateQuestionPaperQuestionInput,
+  QuickCreateQuestionInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
 import {
@@ -1639,4 +1640,356 @@ export async function updateQuestionPaperQuestion(
   })
 
   return updated
+}
+
+
+export async function quickCreateQuestion(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: QuickCreateQuestionInput,
+  actorId?: string,
+  tenantId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.questionPaperId },
+  })
+  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+  if (paper.status === "Published") {
+    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  }
+
+  // 1. Resolve chapterId if not provided or "All"
+  let resolvedChapterId = input.chapterId
+  if (!resolvedChapterId || resolvedChapterId === "All" || resolvedChapterId === "all" || resolvedChapterId === "none") {
+    let firstChapter = await db.academicChapter.findFirst({
+      where: { subjectId: input.subjectId, isActive: true },
+      orderBy: { position: "asc" },
+      select: { id: true },
+    })
+    if (!firstChapter) {
+      firstChapter = await db.academicChapter.create({
+        data: {
+          subjectId: input.subjectId,
+          nameBn: "সাধারণ",
+          nameEn: "General",
+          position: 1,
+          isActive: true,
+        },
+        select: { id: true },
+      })
+    }
+    resolvedChapterId = firstChapter.id
+  }
+
+  // 2. Resolve questionTypeId if not provided
+  let resolvedTypeId = input.questionTypeId
+  if (!resolvedTypeId) {
+    const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
+      where: { id: input.distributionId },
+      select: { questionTypeId: true },
+    })
+    if (dist?.questionTypeId) {
+      resolvedTypeId = dist.questionTypeId
+    }
+  }
+
+  // 3. Create question based on category
+  let createdId: string
+  const category = (input.category as string) || "MCQ"
+
+  if (category === "MCQ") {
+    if (!input.mcqData) throw badRequest("MCQ এর তথ্য প্রদান করুন")
+    const resolvedType =
+      input.mcqData.type ||
+      (input.mcqData.statements && input.mcqData.statements.length > 0
+        ? "MULTIPLE"
+        : "SINGLE")
+
+    const created = await db.mcq.create({
+      data: {
+        subjectId: input.subjectId,
+        chapterId: resolvedChapterId,
+        questionTypeId: resolvedTypeId || undefined,
+        question: input.mcqData.question,
+        options: input.mcqData.options,
+        statements: input.mcqData.statements || [],
+        answer: input.mcqData.answer,
+        explanation: input.mcqData.explanation || null,
+        type: resolvedType,
+        isGlobal: false,
+        tenantId: tenantId || null,
+        createdById: actorId || null,
+        isActive: true,
+      },
+    })
+    createdId = created.id
+
+    // Save Context / Passage as attachment if present (for COMBINED or stimulus MCQ)
+    let currentPosition = 0
+    if (input.mcqData.context && input.mcqData.context.trim()) {
+      await db.questionAttachment.create({
+        data: {
+          mcqId: created.id,
+          type: "PASSAGE",
+          content: input.mcqData.context.trim(),
+          caption: input.mcqData.contextCaption?.trim() || null,
+          position: currentPosition++,
+        },
+      })
+    }
+
+    // Save MCQ media attachments if present (Images, Tables, etc.)
+    if (input.mcqData.attachments && Array.isArray(input.mcqData.attachments) && input.mcqData.attachments.length > 0) {
+      for (const att of input.mcqData.attachments) {
+        if (!att) continue
+        const normalizedType = (att.type || "IMAGE").toUpperCase()
+        await db.questionAttachment.create({
+          data: {
+            mcqId: created.id,
+            type: normalizedType,
+            caption: att.caption || null,
+            content: att.content || null,
+            url: att.url || null,
+            table: att.table || null,
+            tableBorder: att.tableBorder ?? true,
+            position: currentPosition++,
+          },
+        })
+      }
+    }
+  } else if (category === "CQ") {
+    if (!input.cqData) throw badRequest("সৃজনশীল প্রশ্নের তথ্য প্রদান করুন")
+    const created = await db.cq.create({
+      data: {
+        subjectId: input.subjectId,
+        chapterId: resolvedChapterId,
+        questionTypeId: resolvedTypeId || undefined,
+        context: input.cqData.context || null,
+        questionA: input.cqData.questionA,
+        questionB: input.cqData.questionB,
+        questionC: input.cqData.questionC || null,
+        questionD: input.cqData.questionD || null,
+        isGlobal: false,
+        tenantId: tenantId || null,
+        createdById: actorId || null,
+        isActive: true,
+        ...(input.cqData.answerA || input.cqData.answerB || input.cqData.answerC || input.cqData.answerD
+          ? {
+              answer: {
+                create: {
+                  answerA: input.cqData.answerA || null,
+                  answerB: input.cqData.answerB || null,
+                  answerC: input.cqData.answerC || null,
+                  answerD: input.cqData.answerD || null,
+                },
+              },
+            }
+          : {}),
+      },
+    })
+    createdId = created.id
+
+    // Save CQ attachments if present (Images, Tables, etc.)
+    if (input.cqData.attachments && Array.isArray(input.cqData.attachments) && input.cqData.attachments.length > 0) {
+      for (let idx = 0; idx < input.cqData.attachments.length; idx++) {
+        const att = input.cqData.attachments[idx]
+        if (!att) continue
+        const normalizedType = (att.type || "IMAGE").toUpperCase()
+        await db.questionAttachment.create({
+          data: {
+            cqId: created.id,
+            type: normalizedType,
+            caption: att.caption || null,
+            url: att.url || null,
+            table: att.table || null,
+            tableBorder: att.tableBorder ?? true,
+            position: idx,
+          },
+        })
+      }
+    }
+  } else if (category === "SA" || category === "SHORT_ANSWER") {
+    if (!input.textData) throw badRequest("প্রশ্নের তথ্য প্রদান করুন")
+    const created = await db.shortAnswer.create({
+      data: {
+        subjectId: input.subjectId,
+        chapterId: resolvedChapterId,
+        questionTypeId: resolvedTypeId || undefined,
+        question: input.textData.question,
+        answer: input.textData.answer || null,
+        isGlobal: false,
+        tenantId: tenantId || null,
+        createdById: actorId || null,
+      },
+    })
+    createdId = created.id
+
+    // Save ShortAnswer attachments if present (Passage, Images, Tables)
+    const contextText = input.textData.context?.trim() || null
+    let currentPosition = 0
+
+    if (contextText) {
+      await db.questionAttachment.create({
+        data: {
+          shortAnswerId: created.id,
+          type: "PASSAGE",
+          caption: input.textData.contextCaption || null,
+          content: contextText,
+          position: currentPosition++,
+        },
+      })
+    }
+
+    if (input.textData.attachments && Array.isArray(input.textData.attachments) && input.textData.attachments.length > 0) {
+      for (const att of input.textData.attachments) {
+        if (!att) continue
+        const normalizedType = (att.type || "IMAGE").toUpperCase()
+        await db.questionAttachment.create({
+          data: {
+            shortAnswerId: created.id,
+            type: normalizedType,
+            caption: att.caption || null,
+            content: att.content || null,
+            url: att.url || null,
+            table: att.table || null,
+            tableBorder: att.tableBorder ?? true,
+            position: currentPosition++,
+          },
+        })
+      }
+    }
+  } else if (category === "DESCRIPTIVE" || category === "DESCRIPTIVE_QUESTION") {
+    if (!input.textData) throw badRequest("প্রশ্নের তথ্য প্রদান করুন")
+    const created = await db.descriptiveQuestion.create({
+      data: {
+        subjectId: input.subjectId,
+        chapterId: resolvedChapterId,
+        questionTypeId: resolvedTypeId || undefined,
+        question: input.textData.question,
+        answer: input.textData.answer || null,
+        isGlobal: false,
+        tenantId: tenantId || null,
+        createdById: actorId || null,
+      },
+    })
+    createdId = created.id
+
+    // Save Descriptive attachments if present (Passage, Images, Tables)
+    const contextText = input.textData.context?.trim() || null
+    let currentPosition = 0
+
+    if (contextText) {
+      await db.questionAttachment.create({
+        data: {
+          descriptiveQuestionId: created.id,
+          type: "PASSAGE",
+          caption: input.textData.contextCaption || null,
+          content: contextText,
+          position: currentPosition++,
+        },
+      })
+    }
+
+    if (input.textData.attachments && Array.isArray(input.textData.attachments) && input.textData.attachments.length > 0) {
+      for (const att of input.textData.attachments) {
+        if (!att) continue
+        const normalizedType = (att.type || "IMAGE").toUpperCase()
+        await db.questionAttachment.create({
+          data: {
+            descriptiveQuestionId: created.id,
+            type: normalizedType,
+            caption: att.caption || null,
+            content: att.content || null,
+            url: att.url || null,
+            table: att.table || null,
+            tableBorder: att.tableBorder ?? true,
+            position: currentPosition++,
+          },
+        })
+      }
+    }
+  } else {
+    // Default fallback to shortAnswer
+    if (!input.textData) throw badRequest("প্রশ্নের তথ্য প্রদান করুন")
+    const created = await db.shortAnswer.create({
+      data: {
+        subjectId: input.subjectId,
+        chapterId: resolvedChapterId,
+        questionTypeId: resolvedTypeId || undefined,
+        question: input.textData.question,
+        answer: input.textData.answer || null,
+        isGlobal: false,
+        tenantId: tenantId || null,
+        createdById: actorId || null,
+      },
+    })
+    createdId = created.id
+
+    // Save fallback ShortAnswer attachments if present
+    const contextText = input.textData.context?.trim() || null
+    let currentPosition = 0
+
+    if (contextText) {
+      await db.questionAttachment.create({
+        data: {
+          shortAnswerId: created.id,
+          type: "PASSAGE",
+          caption: input.textData.contextCaption || null,
+          content: contextText,
+          position: currentPosition++,
+        },
+      })
+    }
+
+    if (input.textData.attachments && Array.isArray(input.textData.attachments) && input.textData.attachments.length > 0) {
+      for (const att of input.textData.attachments) {
+        if (!att) continue
+        const normalizedType = (att.type || "IMAGE").toUpperCase()
+        await db.questionAttachment.create({
+          data: {
+            shortAnswerId: created.id,
+            type: normalizedType,
+            caption: att.caption || null,
+            content: att.content || null,
+            url: att.url || null,
+            table: att.table || null,
+            tableBorder: att.tableBorder ?? true,
+            position: currentPosition++,
+          },
+        })
+      }
+    }
+  }
+
+  // 4. Auto-assign to question paper if requested
+  if (input.autoAssign) {
+    await bulkAssignQuestions(
+      db,
+      tenantDb,
+      {
+        questionPaperId: input.questionPaperId,
+        distributionId: input.distributionId,
+        sectionId: input.sectionId || undefined,
+        subSectionId: input.subSectionId || undefined,
+        ...(category === "MCQ" ? { mcqIds: [createdId] } : {}),
+        ...(category === "CQ" ? { cqIds: [createdId] } : {}),
+        ...(category === "SA" || category === "SHORT_ANSWER" ? { shortAnswerIds: [createdId] } : {}),
+        ...(category === "DESCRIPTIVE" || category === "DESCRIPTIVE_QUESTION"
+          ? { descriptiveQuestionIds: [createdId] }
+          : {}),
+        ...(!["MCQ", "CQ", "SA", "SHORT_ANSWER", "DESCRIPTIVE", "DESCRIPTIVE_QUESTION"].includes(category)
+          ? { shortAnswerIds: [createdId] }
+          : {}),
+      },
+      actorId,
+      tenantId
+    )
+  }
+
+  return {
+    success: true,
+    questionId: createdId,
+    category,
+    isGlobal: false,
+  }
 }

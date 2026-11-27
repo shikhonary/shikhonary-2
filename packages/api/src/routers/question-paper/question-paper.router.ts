@@ -7,6 +7,9 @@ import {
   updateQuestionPaperSchema,
   deleteQuestionPaperSchema,
   duplicateQuestionPaperSchema,
+  saveAsTemplateSchema,
+  createFromTemplateSchema,
+  listTemplatesSchema,
   generateAnswerPaperSchema,
   addQuestionPaperQuestionSchema,
   removeQuestionPaperQuestionSchema,
@@ -36,6 +39,7 @@ import {
   autoFillDistributionSchema,
   replaceQuestionSchema,
   updateQuestionPaperQuestionSchema,
+  quickCreateQuestionSchema,
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
@@ -46,6 +50,9 @@ import {
   updateQuestionPaper,
   deleteQuestionPaper,
   duplicateQuestionPaper,
+  saveAsTemplate,
+  createFromTemplate,
+  listTemplates,
   generateAnswerQuestionPaper,
   addQuestionPaperQuestion,
   updateQuestionPaperQuestion,
@@ -76,6 +83,7 @@ import {
   updateAlternativeQuestion,
   autoFillDistribution,
   replaceQuestion,
+  quickCreateQuestion,
 } from "./question-paper.service"
 
 export const questionPaperRouter = createTRPCRouter({
@@ -104,19 +112,19 @@ export const questionPaperRouter = createTRPCRouter({
   getAvailableQuestions: tenantMemberProcedure
     .input(getAvailableQuestionsSchema)
     .query(({ ctx, input }) =>
-      getAvailableQuestions(ctx.db, ctx.tenantDb, input)
+      getAvailableQuestions(ctx.db, ctx.tenantDb, input, ctx.session?.user?.id, ctx.tenant?.id)
     ),
 
   getAvailableBoardYears: tenantMemberProcedure
     .input(getAvailableBoardYearsSchema)
     .query(({ ctx, input }) =>
-      getAvailableBoardYears(ctx.db, input)
+      getAvailableBoardYears(ctx.db, input, ctx.session?.user?.id, ctx.tenant?.id)
     ),
 
   getAvailableSources: tenantMemberProcedure
     .input(getAvailableSourcesSchema)
     .query(({ ctx, input }) =>
-      getAvailableSources(ctx.db, input)
+      getAvailableSources(ctx.db, input, ctx.session?.user?.id, ctx.tenant?.id)
     ),
 
   // Mutations
@@ -154,6 +162,25 @@ export const questionPaperRouter = createTRPCRouter({
     .input(deleteQuestionPaperSchema)
     .mutation(({ ctx, input }) =>
       deleteQuestionPaper(ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+
+  saveAsTemplate: tenantMemberProcedure
+    .input(saveAsTemplateSchema)
+    .mutation(({ ctx, input }) =>
+      saveAsTemplate(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  createFromTemplate: tenantMemberProcedure
+    .input(createFromTemplateSchema)
+    .mutation(({ ctx, input }) =>
+      createFromTemplate(ctx.db, ctx.tenantDb, input, ctx.session.user.id)
+    ),
+
+  listTemplates: tenantMemberProcedure
+    .input(listTemplatesSchema.optional())
+    .query(({ ctx, input }) =>
+      listTemplates(ctx.tenantDb, input ?? {})
     ),
 
   duplicate: tenantMemberProcedure
@@ -298,6 +325,18 @@ export const questionPaperRouter = createTRPCRouter({
     .input(replaceQuestionSchema)
     .mutation(({ ctx, input }) =>
       replaceQuestion(ctx.db, ctx.tenantDb, input, ctx.session.user.id, ctx.tenant.id)
+    ),
+
+  quickCreateQuestion: tenantMemberProcedure
+    .input(quickCreateQuestionSchema)
+    .mutation(({ ctx, input }) =>
+      quickCreateQuestion(
+        ctx.db,
+        ctx.tenantDb,
+        input,
+        ctx.session.user.id,
+        ctx.tenant.id
+      )
     ),
 })
 

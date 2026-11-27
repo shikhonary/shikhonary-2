@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, FileQuestion, SearchX, FilterX, BookmarkX, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Loader2, FileQuestion, SearchX, FilterX, BookmarkX, RotateCcw, PlusCircle, Sparkles } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
@@ -93,6 +93,7 @@ export interface QuestionGridProps {
   source?: string;
   sort?: "newest" | "oldest";
   mcqType?: string;
+  ownership?: "ALL" | "OWN" | "GLOBAL";
   excludePaperId: string;
   distributionId?: string;
   selectedIds: string[];
@@ -111,6 +112,8 @@ export interface QuestionGridProps {
   onResetFilters?: () => void;
   onClearSearch?: () => void;
   onResetBookmarks?: () => void;
+  onResetOwnership?: () => void;
+  onCreateCustomQuestion?: () => void;
 }
 
 export const QuestionGrid: React.FC<QuestionGridProps> = ({
@@ -123,6 +126,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   source,
   sort,
   mcqType,
+  ownership = "ALL",
   excludePaperId,
   distributionId,
   selectedIds,
@@ -141,6 +145,8 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   onResetFilters,
   onClearSearch,
   onResetBookmarks,
+  onResetOwnership,
+  onCreateCustomQuestion,
 }) => {
   const { data: result, isLoading } = useAvailableQuestions({
     subjectId,
@@ -152,6 +158,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     source: source && source !== "All" ? source : undefined,
     sort,
     mcqType: mcqType && mcqType !== "All" ? mcqType : undefined,
+    ownership,
     excludePaperId,
     distributionId,
     page,
@@ -175,6 +182,12 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
 
   const gridTopRef = React.useRef<HTMLDivElement>(null);
   const [jumpPage, setJumpPage] = React.useState<string>("");
+
+  const questionMap = React.useMemo(() => {
+    const map = new Map<string, any>();
+    questions.forEach((q: any) => map.set(q.id, q));
+    return map;
+  }, [questions]);
 
   const handlePageChange = (newPage: number) => {
     onPageChange?.(newPage);
@@ -206,6 +219,44 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
   if (!questions || questions.length === 0) {
     const hasSearch = Boolean(search && search.trim() !== "");
     const hasFilters = (chapterId && chapterId !== "All") || (board && board !== "All") || (source && source !== "All");
+
+    if (ownership === "OWN") {
+      return (
+        <div className="w-full py-10 sm:py-20 rounded-3xl border border-purple-200/50 dark:border-purple-900/30 bg-purple-500/[0.03] dark:bg-purple-950/[0.05] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 ring-8 ring-purple-500/5 border border-purple-500/20 shadow-2xs">
+              <Sparkles className="w-7 h-7" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">কোনো নিজস্ব প্রশ্ন পাওয়া যায়নি</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            এই বিষয়ে আপনার প্রতিষ্ঠানের কোনো নিজস্ব প্রশ্ন এখনো তৈরি করা হয়নি। আপনি চাইলে সরাসরি নতুন প্রশ্ন যোগ করতে পারেন।
+          </p>
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>নতুন নিজস্ব প্রশ্ন তৈরি করুন</span>
+              </Button>
+            )}
+            {onResetOwnership && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onResetOwnership}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <span>সকল প্রশ্ন দেখুন</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
 
     if (onlyBookmarked) {
       return (
@@ -248,6 +299,16 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
             বানান যাচাই করুন অথবা ভিন্ন কোনো প্রাসঙ্গিক কী-ওয়ার্ড দিয়ে সার্চ করুন।
           </p>
           <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+              </Button>
+            )}
             {onClearSearch && (
               <Button
                 type="button"
@@ -288,17 +349,29 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
           <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
             অন্য অধ্যায় বা বোর্ড সিলেক্ট করুন অথবা বর্তমান ফিল্টারগুলো রিসেট করুন।
           </p>
-          {onResetFilters && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onResetFilters}
-              className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>ফিল্টার রিসেট করুন</span>
-            </Button>
-          )}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+              </Button>
+            )}
+            {onResetFilters && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onResetFilters}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>ফিল্টার রিসেট করুন</span>
+              </Button>
+            )}
+          </div>
         </div>
       );
     }
@@ -311,9 +384,19 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
           </div>
         </div>
         <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">প্রশ্ন তালিকা ফাঁকা</h3>
-        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto">
+        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
           এই বিভাগ বা বিষয়ের জন্য প্রশ্ন ব্যাংকে এখনো কোনো প্রশ্ন প্রস্তুত নেই।
         </p>
+        {onCreateCustomQuestion && (
+          <Button
+            type="button"
+            onClick={onCreateCustomQuestion}
+            className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+          </Button>
+        )}
       </div>
     );
   }
@@ -435,7 +518,13 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
       {/* Top anchor for smooth scrolling on page change */}
       <div ref={gridTopRef} className="scroll-mt-6" />
 
-      <PickerContext.Provider value={{ isExchangeMode, currentQuestionId }}>
+      <PickerContext.Provider
+        value={{
+          isExchangeMode,
+          currentQuestionId,
+          getQuestion: (id: string) => questionMap.get(id),
+        }}
+      >
         <div
           className={`grid gap-4 ${
             category === "CQ" || category === "SEEN_COMPREHENSION_1" || category === "SEEN_COMPREHENSION_2"

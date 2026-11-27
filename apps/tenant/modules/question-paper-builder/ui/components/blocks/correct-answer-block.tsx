@@ -5,7 +5,7 @@ import { useBuilderStore } from "../../../store/use-builder-store";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Bold, Trash2, Loader2 } from "lucide-react";
 import { useRemoveQuestion, useQuestionPaperDistributionStatuses } from "@/modules/question-paper/services/use-question-paper";
 import { EditableSectionLabel } from "./editable-section-label";
-import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize } from "./mcq-option-label";
+import { McqOptionLabel, isCorrectMcqOption, getIndicatorFontSize, getMcqOptionGridClass } from "./mcq-option-label";
 
 const toBengaliDigits = (num?: number | string | null): string => {
   if (num === null || num === undefined || num === "") return "";
@@ -153,8 +153,9 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
       ? "break-after-column"
       : "";
 
+  const displayOptions = item.overrides?.shuffledOptions || data.options || item.contentSnapshot?.options || [];
   const columns = settings.mcqOptionLayouts?.[item.id] || settings.mcqOptionColumns || 2;
-  const gridClass = columns === 1 ? "grid-cols-1" : columns === 4 ? "grid-cols-4" : "grid-cols-2";
+  const gridClass = getMcqOptionGridClass(columns, displayOptions);
 
   const hasStatements = Boolean(data.statements && data.statements.length > 0);
   const stmtColumns = settings.mcqStatementLayouts?.[item.id] || settings.mcqStatementColumns || 1;
@@ -444,7 +445,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                 const effectiveFontFamily = optCustomStyle?.fontFamily || settings.fontFamily;
                 
                 return (
-                  <div key={i} className="flex gap-1.5 items-start w-full">
+                  <div key={i} className="flex gap-1.5 items-start w-full min-w-0">
                     <McqOptionLabel
                       label={label}
                       optionStyle={settings.optionStyle}
@@ -452,7 +453,7 @@ export const CorrectAnswerBlock = ({ item, hideContext = false, contextInstructi
                       fontSize={indicatorFontSize}
                       fontFamily={effectiveFontFamily}
                     />
-                    <span className="w-full">
+                    <span className="w-full min-w-0">
                       <EditableItem 
                         content={<RenderMath text={opt} />}
                         itemKey={optItemKey}
