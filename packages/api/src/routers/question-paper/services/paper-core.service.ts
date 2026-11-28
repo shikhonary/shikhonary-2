@@ -17,6 +17,7 @@ import type {
   GenerateAnswerPaperInput,
   UpdateQuestionPaperSettingsInput,
   PatchQuestionPaperSettingsInput,
+  GetQuestionPaperCostBreakdownInput,
 } from "../question-paper.schema"
 import { logHistory } from "./helpers/history-logger"
 import { syncMarkDistribution } from "./helpers/totals-calculator"
@@ -1525,8 +1526,16 @@ export async function updateQuestionPaper(
     throw notFound("QuestionPaper")
   }
 
-  if (existing.status === "Published" && data.status && data.status !== "Published") {
-    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের স্ট্যাটাস পরিবর্তন বা ড্রাফট করা সম্ভব নয়।")
+  if (existing.status === "Published") {
+    if (data.status && data.status !== "Published") {
+      throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের স্ট্যাটাস পরিবর্তন বা ড্রাফট করা সম্ভব নয়।")
+    }
+    if (data.classId !== undefined && data.classId !== existing.classId) {
+      throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের শ্রেণি পরিবর্তন করা সম্ভব নয়।")
+    }
+    if (data.examName !== undefined && data.examName !== existing.examName) {
+      throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের পরীক্ষার নাম পরিবর্তন করা সম্ভব নয়।")
+    }
   }
 
   const updateData: any = {}
@@ -2232,4 +2241,180 @@ export async function listTemplates(
   })
 
   return { templates }
+}
+export async function getQuestionPaperCostBreakdown(
+  db: PrismaClient,
+  tenantDb: TenantPrismaClient,
+  input: GetQuestionPaperCostBreakdownInput,
+  tenantId?: string
+) {
+  const paper = await tenantDb.questionPaper.findUnique({
+    where: { id: input.id },
+    include: {
+      subjects: {
+        orderBy: { orderIndex: "asc" },
+        include: {
+          distributions: {
+            orderBy: { orderIndex: "asc" },
+          },
+        },
+      },
+      questions: {
+        where: { parentQuestionId: null },
+        select: {
+          id: true,
+          distributionId: true,
+        },
+      },
+    },
+  })
+
+  if (!paper || paper.deletedAt) {
+    throw notFound("QuestionPaper")
+  }
+
+  // 1. Get Tenant Wallet Balance
+  let creditBalance = 0
+  if (tenantId) {
+    const tenant = await db.tenant.findUnique({
+      where: { id: tenantId },
+      select: { creditBalance: true },
+    })
+    creditBalance = tenant?.creditBalance ?? 0
+  }
+
+  // 2. Resolve question type credit costs
+  const dists = paper.subjects.flatMap((s) =>
+    s.distributions.map((d) => ({
+      ...d,
+      subjectName: s.subjectName,
+    }))
+  )
+
+  const uniqueTypeIds = Array.from(
+    new Set(dists.map((d) => d.questionTypeId).filter(Boolean))
+  )
+  const qTypes = await db.questionType.findMany({
+    where: { id: { in: uniqueTypeIds } },
+    select: { id: true, nameEn: true, nameBn: true, creditCost: true },
+  })
+
+  const typeCostMap = new Map<string, number>()
+  const typeNameMap = new Map<string, { nameEn: string; nameBn: string }>()
+  for (const qt of qTypes) {
+    typeCostMap.set(qt.id, (qt as any).creditCost ?? 1)
+    typeNameMap.set(qt.id, { nameEn: qt.nameEn, nameBn: qt.nameBn })
+  }
+
+  // 3. Distribution breakdown calculation
+  let totalEstimatedCredits = 0
+  let netCreditsSpent = 0
+  let totalTargetQuestions = 0
+
+  const distributionBreakdown = dists.map((d) => {
+    const unitCreditCost = typeCostMap.get(d.questionTypeId) ?? 1
+    const targetCount = d.questionCount || 0
+    const addedCount = paper.questions.filter((q) => q.distributionId === d.id).length
+    const estimatedCredits = targetCount * unitCreditCost
+    const spentCredits = addedCount * unitCreditCost
+    const isFilled = targetCount > 0 ? addedCount >= targetCount : true
+
+    totalEstimatedCredits += estimatedCredits
+    netCreditsSpent += spentCredits
+    totalTargetQuestions += targetCount
+
+    const typeNames = typeNameMap.get(d.questionTypeId)
+
+    return {
+      distributionId: d.id,
+      subjectName: d.subjectName,
+      questionTypeId: d.questionTypeId,
+      questionTypeName: typeNames?.nameEn || d.questionTypeName,
+      questionTypeNameBn: typeNames?.nameBn || d.questionTypeNameBn || d.questionTypeName,
+      questionTypeLabel: d.questionTypeLabel ?? undefined,
+      unitCreditCost,
+      targetCount,
+      addedCount,
+      estimatedCredits,
+      spentCredits,
+      isFilled,
+    }
+  })
+
+  const remainingCreditsNeeded = Math.max(0, totalEstimatedCredits - netCreditsSpent)
+  const hasSufficientBalance = creditBalance >= remainingCreditsNeeded
+
+  // 4. Fetch Question Paper Credit Transactions from Ledger
+  let paperTransactions: Array<{
+    id: string
+    type: string
+    amount: number
+    balance: number
+    description: string
+    createdAt: Date
+  }> = []
+
+  let totalChargedCredits = 0
+  let totalRefundedCredits = 0
+
+  if (tenantId) {
+    const allTenantTransactions = await db.creditTransaction.findMany({
+      where: { tenantId },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    })
+
+    const filtered = allTenantTransactions.filter((tx) => {
+      const meta = (tx.metadata ?? {}) as any
+      if (meta?.questionPaperId === input.id) return true
+      if (typeof tx.description === "string" && tx.description.includes(input.id)) return true
+      return false
+    })
+
+    paperTransactions = filtered.map((tx) => ({
+      id: tx.id,
+      type: tx.type,
+      amount: tx.amount,
+      balance: tx.balance,
+      description: tx.description,
+      createdAt: tx.createdAt,
+    }))
+
+    for (const tx of paperTransactions) {
+      if (tx.type === "USAGE") totalChargedCredits += Math.abs(tx.amount)
+      if (tx.type === "REFUND") totalRefundedCredits += tx.amount
+    }
+  }
+
+  if (paperTransactions.length === 0) {
+    totalChargedCredits = netCreditsSpent
+    totalRefundedCredits = 0
+  }
+
+  return {
+    paper: {
+      id: paper.id,
+      title: paper.title,
+      examName: paper.examName,
+      className: paper.className,
+      status: paper.status,
+      totalMarks: paper.total,
+      timeInMinutes: paper.timeInMinutes,
+    },
+    wallet: {
+      creditBalance,
+      hasSufficientBalance,
+    },
+    summary: {
+      totalEstimatedCredits,
+      totalChargedCredits,
+      totalRefundedCredits,
+      netCreditsSpent,
+      remainingCreditsNeeded,
+      totalTargetQuestions,
+      totalAddedQuestions: paper.questions.length,
+    },
+    distributionBreakdown,
+    transactions: paperTransactions,
+  }
 }

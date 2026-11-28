@@ -371,8 +371,8 @@ function QuestionAttachmentsEditor({
 interface QuickCreateQuestionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  paperId: string
-  distributionId: string
+  paperId?: string
+  distributionId?: string
   subjectId: string
   subjectName?: string
   className?: string
@@ -408,6 +408,11 @@ export function QuickCreateQuestionModal({
   const queryClient = useQueryClient()
   const quickCreateMutation = useQuickCreateQuestion()
 
+  const isAllCategory = !category || category === "ALL" || category === "All"
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    isAllCategory ? "MCQ" : (category as string)
+  )
+
   // Academic chapters for this subject
   const { data: chaptersData } = useQuery({
     ...trpc.academicChapter.list.queryOptions({ subjectId, limit: 100 }),
@@ -418,7 +423,7 @@ export function QuickCreateQuestionModal({
   const chapters = (chaptersData?.academicChapters ?? []) as Array<{ id: string; nameBn: string; nameEn: string }>
 
   const [selectedChapterId, setSelectedChapterId] = useState<string>("")
-  const [shouldAutoAssign, setShouldAutoAssign] = useState<boolean>(autoAssign ?? true)
+  const [shouldAutoAssign, setShouldAutoAssign] = useState<boolean>(Boolean(paperId && autoAssign))
 
   // Form states
   // MCQ state
@@ -442,13 +447,15 @@ export function QuickCreateQuestionModal({
 
   useEffect(() => {
     if (open) {
-      setShouldAutoAssign(autoAssign ?? true)
+      const initialCat = category && category !== "ALL" && category !== "All" ? (category as string) : "MCQ"
+      setSelectedCategory(initialCat)
+      setShouldAutoAssign(Boolean(paperId && autoAssign))
       setMcqType("SINGLE")
       setMcqStatements(["", "", ""])
       setMcqOptions(["", "", "", ""])
       setMcqCorrectIndex(0)
 
-      if (category === "CQ") {
+      if (initialCat === "CQ") {
         setAttachments([
           {
             id: Math.random().toString(36).substring(2, 9),
@@ -475,7 +482,7 @@ export function QuickCreateQuestionModal({
         setTextQuestion("")
       }
     }
-  }, [open, category, defaultChapterId, defaultSearchText, autoAssign])
+  }, [open, category, defaultChapterId, defaultSearchText, autoAssign, paperId])
 
   const handleTypeChange = (nextType: "SINGLE" | "MULTIPLE" | "COMBINED") => {
     setMcqType(nextType)
@@ -616,8 +623,8 @@ export function QuickCreateQuestionModal({
     const chapterToUse = (selectedChapterId && selectedChapterId !== "none")
       ? selectedChapterId
       : undefined
-    const isMcq = category === "MCQ"
-    const isCq = category === "CQ"
+    const isMcq = selectedCategory === "MCQ"
+    const isCq = selectedCategory === "CQ"
 
     const cleanedAttachments = attachments
       .filter((att) => {
@@ -648,6 +655,7 @@ export function QuickCreateQuestionModal({
 
     try {
       let res: any = null
+      const effectiveAutoAssign = Boolean(paperId && distributionId && shouldAutoAssign)
 
       if (isMcq) {
         const effectiveQuestion =
@@ -674,8 +682,8 @@ export function QuickCreateQuestionModal({
         const correctAnswerText = filledOptions[mcqCorrectIndex] ?? filledOptions[0] ?? ""
 
         res = await quickCreateMutation.mutateAsync({
-          questionPaperId: paperId,
-          distributionId,
+          questionPaperId: paperId || undefined,
+          distributionId: distributionId || undefined,
           sectionId,
           subSectionId,
           subjectId,
@@ -691,7 +699,7 @@ export function QuickCreateQuestionModal({
             answer: correctAnswerText,
             attachments: nonPassageAttachments.length > 0 ? nonPassageAttachments : undefined,
           },
-          autoAssign: shouldAutoAssign,
+          autoAssign: effectiveAutoAssign,
         })
       } else if (isCq) {
         if (!cqQuestionA.trim() || !cqQuestionB.trim()) {
@@ -700,8 +708,8 @@ export function QuickCreateQuestionModal({
         }
 
         res = await quickCreateMutation.mutateAsync({
-          questionPaperId: paperId,
-          distributionId,
+          questionPaperId: paperId || undefined,
+          distributionId: distributionId || undefined,
           sectionId,
           subSectionId,
           subjectId,
@@ -715,7 +723,7 @@ export function QuickCreateQuestionModal({
             questionC: cqQuestionC.trim() || undefined,
             questionD: cqQuestionD.trim() || undefined,
           },
-          autoAssign: shouldAutoAssign,
+          autoAssign: effectiveAutoAssign,
         })
       } else {
         if (!textQuestion.trim()) {
@@ -724,38 +732,39 @@ export function QuickCreateQuestionModal({
         }
 
         res = await quickCreateMutation.mutateAsync({
-          questionPaperId: paperId,
-          distributionId,
+          questionPaperId: paperId || undefined,
+          distributionId: distributionId || undefined,
           sectionId,
           subSectionId,
           subjectId,
           chapterId: chapterToUse,
-          category: category as any,
+          category: (selectedCategory === "ALL" ? "SA" : selectedCategory) as any,
           textData: {
             question: textQuestion.trim(),
             context: contextToPass,
             contextCaption: contextCaptionToPass,
             attachments: nonPassageAttachments.length > 0 ? nonPassageAttachments : undefined,
           },
-          autoAssign: shouldAutoAssign,
+          autoAssign: effectiveAutoAssign,
         })
       }
 
       toast.success(
-        shouldAutoAssign
+        effectiveAutoAssign
           ? "নিজস্ব প্রশ্ন সফলভাবে তৈরি ও প্রশ্নপত্রে যুক্ত করা হয়েছে!"
-          : "নিজস্ব প্রশ্ন তৈরি হয়েছে এবং তালিকায় নির্বাচন করা হয়েছে!"
+          : "নতুন প্রশ্ন সফলভাবে আপনার প্রতিষ্ঠানের প্রশ্নব্যাংকে যুক্ত করা হয়েছে!"
       )
       onOpenChange(false)
-      onSuccess?.(res?.questionId || "", shouldAutoAssign)
+      onSuccess?.(res?.questionId || "", effectiveAutoAssign)
       queryClient.invalidateQueries(trpc.questionPaper.pathFilter())
+      queryClient.invalidateQueries(trpc.questionBank.pathFilter())
     } catch (err: any) {
       toast.error(err?.message || "প্রশ্ন তৈরি করা যায়নি")
     }
   }
 
-  const isMcq = category === "MCQ"
-  const isCq = category === "CQ"
+  const isMcq = selectedCategory === "MCQ"
+  const isCq = selectedCategory === "CQ"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -779,19 +788,69 @@ export function QuickCreateQuestionModal({
             <p className="text-xs text-outline mt-0.5 font-body truncate">
               {className && `${className} • `}
               {subjectName && `${subjectName} • `}
-              ধরণ: {category}
+              ধরণ: {selectedCategory === "MCQ" ? "বহুনির্বাচনী" : selectedCategory === "CQ" ? "সৃজনশীল" : selectedCategory === "SA" ? "সংক্ষিপ্ত" : selectedCategory === "DESCRIPTIVE_QUESTION" ? "বর্ণনামূলক" : selectedCategory}
             </p>
           </div>
         </div>
 
         <DialogHeader className="pt-1 font-body shrink-0">
           <DialogDescription className="text-xs leading-relaxed text-on-surface-variant">
-            প্রশ্নটি শুধুমাত্র আপনার প্রতিষ্ঠানের প্রশ্নব্যাংকে যুক্ত হবে এবং সরাসরি বর্তমান প্রশ্নপত্রে সিলেক্ট হয়ে যাবে।
+            {paperId
+              ? "প্রশ্নটি আপনার প্রতিষ্ঠানের প্রশ্নব্যাংকে যুক্ত হবে এবং সরাসরি বর্তমান প্রশ্নপত্রে সিলেক্ট হয়ে যাবে।"
+              : "প্রশ্নটি আপনার প্রতিষ্ঠানের প্রশ্নব্যাংকে সংরক্ষিত হবে এবং যেকোনো প্রশ্নপত্রে ব্যবহার করা যাবে।"}
           </DialogDescription>
         </DialogHeader>
 
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="space-y-4 font-body overflow-y-auto pr-1 flex-1">
+          {/* Question Type Selector when opened from "ALL" or Question Bank */}
+          {isAllCategory && (
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-on-surface flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-primary" />
+                  <span>প্রশ্নের ধরন নির্বাচন করুন</span>
+                </span>
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-muted/40 rounded-xl border border-outline-variant/60">
+                {[
+                  { value: "MCQ", label: "MCQ" },
+                  { value: "CQ", label: "সৃজনশীল" },
+                  { value: "SA", label: "সংক্ষিপ্ত" },
+                  { value: "DESCRIPTIVE_QUESTION", label: "বর্ণনামূলক" },
+                ].map((cat) => (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(cat.value)
+                      if (cat.value === "CQ") {
+                        setAttachments([
+                          {
+                            id: Math.random().toString(36).substring(2, 9),
+                            type: "PASSAGE",
+                            content: "",
+                            caption: "",
+                          },
+                        ])
+                      } else {
+                        setAttachments([])
+                      }
+                    }}
+                    className={cn(
+                      "h-8 px-2 rounded-lg text-xs font-bold font-headline transition-all cursor-pointer flex items-center justify-center",
+                      selectedCategory === cat.value
+                        ? "bg-primary text-white shadow-xs"
+                        : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-white/60 dark:hover:bg-white/10"
+                    )}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Chapter Selector (Optional) */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-on-surface flex items-center justify-between">
@@ -1267,23 +1326,25 @@ export function QuickCreateQuestionModal({
             </div>
           )}
 
-          {/* Auto-assign Checkbox Option */}
-          <label className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-on-surface font-body shrink-0 cursor-pointer select-none hover:bg-primary/10 transition-colors">
-            <Checkbox
-              id="auto-assign-check"
-              checked={shouldAutoAssign}
-              onCheckedChange={(checked) => setShouldAutoAssign(Boolean(checked))}
-              className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-            />
-            <div className="flex flex-col gap-0.5">
-              <span className="font-bold text-foreground">সরাসরি প্রশ্নপত্রে যুক্ত করুন</span>
-              <span className="text-[11px] text-muted-foreground font-normal leading-relaxed">
-                {shouldAutoAssign
-                  ? "তৈরি হওয়ার সাথে সাথে প্রশ্নটি বর্তমান প্রশ্নপত্রের স্লটে সরাসরি বসে যাবে।"
-                  : "শুধুমাত্র স্কুলের নিজস্ব প্রশ্নব্যাংক ও পিকার তালিকায় যুক্ত থাকবে, পরবর্তীতে পছন্দমতো নির্বাচন করতে পারবেন।"}
-              </span>
-            </div>
-          </label>
+          {/* Auto-assign Checkbox Option - only shown if paperId is present */}
+          {paperId && (
+            <label className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3 text-xs text-on-surface font-body shrink-0 cursor-pointer select-none hover:bg-primary/10 transition-colors">
+              <Checkbox
+                id="auto-assign-check"
+                checked={shouldAutoAssign}
+                onCheckedChange={(checked) => setShouldAutoAssign(Boolean(checked))}
+                className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+              />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-bold text-foreground">সরাসরি প্রশ্নপত্রে যুক্ত করুন</span>
+                <span className="text-[11px] text-muted-foreground font-normal leading-relaxed">
+                  {shouldAutoAssign
+                    ? "তৈরি হওয়ার সাথে সাথে প্রশ্নটি বর্তমান প্রশ্নপত্রের স্লটে সরাসরি বসে যাবে।"
+                    : "শুধুমাত্র স্কুলের নিজস্ব প্রশ্নব্যাংক ও পিকার তালিকায় যুক্ত থাকবে, পরবর্তীতে পছন্দমতো নির্বাচন করতে পারবেন।"}
+                </span>
+              </div>
+            </label>
+          )}
 
           {/* Modal Footer Buttons */}
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2 shrink-0">
@@ -1309,7 +1370,7 @@ export function QuickCreateQuestionModal({
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  <span>{shouldAutoAssign ? "সংরক্ষণ ও প্রশ্নপত্রে যুক্ত করুন" : "প্রশ্নব্যাংকে সংরক্ষণ করুন"}</span>
+                  <span>{paperId && shouldAutoAssign ? "সংরক্ষণ ও প্রশ্নপত্রে যুক্ত করুন" : "প্রশ্নব্যাংকে সংরক্ষণ করুন"}</span>
                 </>
               )}
             </Button>

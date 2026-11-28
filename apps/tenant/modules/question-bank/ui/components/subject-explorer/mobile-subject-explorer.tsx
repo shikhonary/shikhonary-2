@@ -76,6 +76,9 @@ interface MobileSubjectExplorerProps {
   onToggleBookmarkedOnly: () => void
   page: number
   onPageChange: (page: number) => void
+  selectedOwnership?: "ALL" | "OWN" | "GLOBAL"
+  onOwnershipChange?: (val: "ALL" | "OWN" | "GLOBAL") => void
+  onCreateCustomQuestion?: () => void
 }
 
 export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
@@ -104,6 +107,9 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
   onToggleBookmarkedOnly,
   page,
   onPageChange,
+  selectedOwnership = "ALL",
+  onOwnershipChange,
+  onCreateCustomQuestion,
 }) => {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
 
@@ -147,18 +153,33 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
             </div>
           </div>
 
-          <Button
-            asChild
-            size="sm"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-8.5 px-3 rounded-xl shadow-xs shrink-0 active:scale-95 transition-all"
-          >
-            <Link
-              href={`/question-papers/create?classId=${encodeURIComponent(classId)}&subjectId=${encodeURIComponent(subjectId)}`}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={onCreateCustomQuestion}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs h-8.5 px-2.5 rounded-xl shadow-xs shrink-0 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                title="নিজস্ব প্রশ্ন তৈরি করুন"
+              >
+                <PlusCircle className="w-3.5 h-3.5 stroke-[2]" />
+                <span className="hidden xs:inline">নিজস্ব প্রশ্ন</span>
+              </Button>
+            )}
+
+            <Button
+              asChild
+              size="sm"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-8.5 px-2.5 rounded-xl shadow-xs shrink-0 active:scale-95 transition-all"
             >
-              <PlusCircle className="w-3.5 h-3.5 mr-1 stroke-[2]" />
-              <span>প্রশ্ন তৈরি</span>
-            </Link>
-          </Button>
+              <Link
+                href={`/question-papers/create?classId=${encodeURIComponent(classId)}&subjectId=${encodeURIComponent(subjectId)}`}
+              >
+                <PlusCircle className="w-3.5 h-3.5 mr-1 stroke-[2]" />
+                <span>প্রশ্নপত্র</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Row 2: Question Types Select & Bookmark Toggle */}
@@ -348,6 +369,18 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                         </button>
                       </span>
                     )}
+                    {selectedOwnership !== "ALL" && onOwnershipChange && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-medium text-[11px] border border-purple-200 dark:border-purple-800/60">
+                        <span>মালিকানা: {selectedOwnership === "OWN" ? "প্রতিষ্ঠানের নিজস্ব" : "শিখনারী ব্যাংক"}</span>
+                        <button
+                          type="button"
+                          onClick={() => onOwnershipChange("ALL")}
+                          className="hover:opacity-75 cursor-pointer ml-0.5"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
                     {selectedChapterId !== "All" && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
                         <span>অধ্যায়: {chapters.find((c) => c.id === selectedChapterId)?.nameBn || "নির্বাচিত"}</span>
@@ -384,7 +417,17 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                         </button>
                       </span>
                     )}
-                    {selectedSort !== "newest" && (
+                    {selectedOwnership !== "ALL" && onOwnershipChange && (
+              <button
+                type="button"
+                onClick={() => onOwnershipChange("ALL")}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[10px] font-medium shrink-0 border border-purple-500/20 cursor-pointer transition-colors"
+              >
+                <span>{selectedOwnership === "OWN" ? "প্রতিষ্ঠানের নিজস্ব" : "শিখনারী ব্যাংক"}</span>
+                <X className="w-2.5 h-2.5 opacity-70" />
+              </button>
+            )}
+            {selectedSort !== "newest" && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-medium text-[11px] border border-indigo-200 dark:border-indigo-800/60">
                         <span>পূর্ববর্তী আগে</span>
                         <button
@@ -512,6 +555,46 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+
+                {/* Section: Ownership Filter */}
+                {onOwnershipChange && (
+                  <div className="p-3.5 rounded-2xl bg-muted/20 border border-border/40 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-foreground flex items-center gap-2">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                        <span>মালিকানা</span>
+                      </label>
+                      {selectedOwnership !== "ALL" && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold">
+                          সক্রিয়
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5 p-1 bg-background rounded-xl border border-border/60">
+                      {[
+                        { value: "ALL", label: "সকল প্রশ্ন" },
+                        { value: "OWN", label: "নিজস্ব" },
+                        { value: "GLOBAL", label: "শিখনারী" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => onOwnershipChange(opt.value as any)}
+                          className={`py-2 px-2 rounded-lg text-xs font-bold text-center transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1 ${
+                            selectedOwnership === opt.value
+                              ? opt.value === "OWN"
+                                ? "bg-purple-600 text-white shadow-xs"
+                                : "bg-indigo-600 text-white shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {opt.value === "OWN" && <Sparkles className="w-3 h-3 shrink-0" />}
+                          <span>{opt.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -662,6 +745,11 @@ export const MobileSubjectExplorer: React.FC<MobileSubjectExplorerProps> = ({
           board={selectedBoard}
           source={selectedSource}
           sort={selectedSort}
+          ownership={selectedOwnership}
+          onResetOwnership={() => onOwnershipChange?.("ALL")}
+          onResetFilters={onResetFilters}
+          onClearSearch={() => onSearchChange("")}
+          onCreateCustomQuestion={onCreateCustomQuestion}
           page={page}
           limit={15}
           onPageChange={onPageChange}

@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@workspace/db/main"
 import type { TenantPrismaClient } from "@workspace/db/tenant"
-import { notFound } from "../../../utils/errors"
+import { notFound, badRequest } from "../../../utils/errors"
 import type {
   UpsertQuestionPaperDistributionInput,
   DeleteQuestionPaperDistributionInput,
@@ -18,8 +18,17 @@ export async function upsertQuestionPaperDistribution(
 ) {
   const subject = await tenantDb.questionPaperSubject.findUnique({
     where: { id: input.paperSubjectId },
+    include: {
+      questionPaper: {
+        select: { status: true },
+      },
+    },
   })
   if (!subject) throw notFound("QuestionPaperSubject")
+
+  if (subject.questionPaper?.status === "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের নম্বর বণ্টন পরিবর্তন করা সম্ভব নয়।")
+  }
 
   let sectionId: string | null = null
   let subSectionId: string | null = null
@@ -272,12 +281,27 @@ export async function deleteQuestionPaperDistribution(
   const existing = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
     where: { id: input.id },
     include: {
-      paperSubject: true,
+      paperSubject: {
+        include: {
+          questionPaper: {
+            select: { status: true },
+          },
+        },
+      },
     },
   })
   if (!existing || existing.paperSubject.questionPaperId !== input.questionPaperId) {
     throw notFound("QuestionPaperSubjectMarkDistribution")
   }
+
+  if (existing.paperSubject.questionPaper?.status === "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের নম্বর বণ্টন মুছে ফেলা সম্ভব নয়।")
+  }
+
+  // Delete all questions assigned to this distribution so they don't linger as unlinked orphans
+  await tenantDb.questionPaperQuestion.deleteMany({
+    where: { distributionId: input.id },
+  })
 
   await tenantDb.questionPaperSubjectMarkDistribution.delete({
     where: { id: input.id },

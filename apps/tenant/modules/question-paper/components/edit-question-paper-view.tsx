@@ -10,6 +10,7 @@ import { toast } from "@workspace/ui/components/sonner"
 import {
   useQuestionPaperById,
   useUpdateQuestionPaper,
+  useDuplicateQuestionPaper,
   useAddQuestion,
   useRemoveQuestion,
   useUpsertSubject,
@@ -41,7 +42,8 @@ import {
   BookOpen,
   ListTodo,
   Save,
-  Sparkles
+  Sparkles,
+  Lock
 } from "lucide-react"
 
 import type { WizardData, WizardSubject, WizardDistribution } from "../types/create-wizard"
@@ -107,6 +109,7 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
 
   // Mutations
   const updatePaperMutation = useUpdateQuestionPaper()
+  const duplicateMutation = useDuplicateQuestionPaper()
   const upsertSubjectMutation = useUpsertSubject()
   const deleteSubjectMutation = useDeleteSubject()
   const upsertDistMutation = useUpsertDistribution()
@@ -177,6 +180,112 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
     )
   }
 
+  // Handle duplication for published papers
+  const handleDuplicate = async () => {
+    try {
+      const res = await duplicateMutation.mutateAsync({ id: paper.id })
+      toast.success("প্রশ্নপত্রের একটি নতুন ড্রাফট কপি তৈরি করা হয়েছে।")
+      router.push(`/question-papers/${res.id}/edit`)
+    } catch (err: any) {
+      toast.error(err.message || "কপি তৈরি করতে ব্যর্থ হয়েছে")
+    }
+  }
+
+  // Guard: If question paper is published, structure editing is locked
+  if (paper.status === "Published") {
+    return (
+      <div className="w-full max-w-4xl mx-auto py-8 px-4 font-body space-y-6">
+        {/* Top Navigation */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1.5"
+          >
+            <Link href="/question-papers">
+              <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+              <span>তালিকায় ফিরে যান</span>
+            </Link>
+          </Button>
+          <Badge
+            variant="outline"
+            className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-headline font-bold text-xs gap-1.5 py-1 px-3"
+          >
+            <Lock className="w-3 h-3" /> প্রকাশিত প্রশ্নপত্র (Published)
+          </Badge>
+        </div>
+
+        {/* Lock Announcement Card */}
+        <Card className="rounded-2xl border border-amber-200/80 dark:border-amber-500/20 bg-amber-50/40 dark:bg-amber-950/10 p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+            <div className="flex size-14 sm:size-16 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 shrink-0">
+              <Lock className="h-7 w-7 sm:h-8 sm:w-8" />
+            </div>
+            <div className="space-y-1.5 flex-1">
+              <h2 className="font-headline text-lg sm:text-xl font-bold text-foreground">
+                এই প্রশ্নপত্রটি ইতিমধ্যে প্রকাশিত হয়েছে
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                প্রশ্নপত্রের নির্ভরযোগ্যতা ও ফলাফলের সামঞ্জস্য বজায় রাখতে প্রকাশিত প্রশ্নপত্রের শ্রেণি, বিষয় ও নম্বর বণ্টন সরাসরি পরিবর্তন করা যায় না। আপনি চাইলে এটিকে ডুপ্লিকেট করে একটি নতুন ড্রাফট কপি তৈরি করতে পারেন এবং প্রয়োজনমতো সম্পাদনা করতে পারেন।
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-5 border-t border-amber-200/60 dark:border-amber-500/20 flex flex-wrap items-center gap-3">
+            <Button
+              onClick={handleDuplicate}
+              disabled={duplicateMutation.isPending}
+              className="rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs sm:text-sm gap-2 h-10 px-4 cursor-pointer shadow-xs"
+            >
+              {duplicateMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>কপি তৈরি হচ্ছে...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  <span>ডুপ্লিকেট করে নতুন কপি তৈরি করুন</span>
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              asChild
+              className="rounded-xl border-border bg-card hover:bg-muted text-xs sm:text-sm font-bold font-headline h-10 px-4 cursor-pointer gap-2"
+            >
+              <Link href={`/question-papers/${paper.id}/builder`}>
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span>বিল্ডারে প্রশ্নপত্র দেখুন</span>
+              </Link>
+            </Button>
+          </div>
+        </Card>
+
+        {/* Read-only Current Summary Card */}
+        <Card className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-card p-6 shadow-xs space-y-4">
+          <h3 className="font-headline font-bold text-base text-foreground">প্রশ্নপত্রের বর্তমান বিবরণ</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm">
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/40">
+              <span className="text-muted-foreground block text-xs mb-1 font-body">পরীক্ষার নাম</span>
+              <span className="font-bold text-foreground font-headline">{paper.examName}</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/40">
+              <span className="text-muted-foreground block text-xs mb-1 font-body">শ্রেণি</span>
+              <span className="font-bold text-foreground font-headline">{paper.className}</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border/40">
+              <span className="text-muted-foreground block text-xs mb-1 font-body">সময় ও পূর্ণমান</span>
+              <span className="font-bold text-foreground font-headline">{formatDurationBn(paper.timeInMinutes)} | {paper.total} নম্বর</span>
+            </div>
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
   // Validation functions
   const validateStep = (stepIdx: number): Record<string, string> => {
     const e: Record<string, string> = {}
@@ -212,11 +321,20 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
     try {
       const selectedClass = classes.find((c: any) => c.id === wizardData.classId)
       const className = selectedClass ? (selectedClass.nameBn || selectedClass.nameEn) : ""
-      const dynamicTitle = buildQuestionPaperTitle({
-        className,
-        examName: wizardData.examName,
-        subjects: wizardData.subjects,
+      // Preserve custom title if user has explicitly renamed the paper
+      const defaultOldTitle = buildQuestionPaperTitle({
+        className: paper.className,
+        examName: paper.examName,
+        subjects: paper.subjects || [],
       })
+      const isCustomTitle = Boolean(paper.title && paper.title !== defaultOldTitle)
+      const dynamicTitle = isCustomTitle
+        ? paper.title
+        : buildQuestionPaperTitle({
+            className,
+            examName: wizardData.examName,
+            subjects: wizardData.subjects,
+          })
 
       await updatePaperMutation.mutateAsync({
         id: paper.id,
@@ -246,9 +364,34 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
 
     try {
       const dbSubjects = paper.subjects ?? []
+      const existingQuestions = paper.questions || []
+      const currentSubjectIds = new Set(wizardData.subjects.map((s) => s.subjectId))
+
+      // Check for questions in distributions or subjects that will be deleted
+      const removedDistIds = new Set<string>()
+      for (const dbSub of dbSubjects) {
+        if (!currentSubjectIds.has(dbSub.subjectId)) {
+          dbSub.distributions?.forEach((d: any) => removedDistIds.add(d.id))
+        } else {
+          const localSub = wizardData.subjects.find((s) => s.subjectId === dbSub.subjectId)
+          const localTypeIds = new Set(localSub?.distributions.map((d) => d.questionTypeId))
+          dbSub.distributions?.forEach((d: any) => {
+            if (!localTypeIds.has(d.questionTypeId)) {
+              removedDistIds.add(d.id)
+            }
+          })
+        }
+      }
+      const affectedQuestionsCount = existingQuestions.filter(
+        (q: any) => q.distributionId && removedDistIds.has(q.distributionId)
+      ).length
+      if (affectedQuestionsCount > 0) {
+        toast.warning(
+          `সতর্কতা: বাদ দেওয়া বিভাগসমূহ থেকে ${affectedQuestionsCount}টি যুক্ত প্রশ্ন মুছে ফেলা হয়েছে।`
+        )
+      }
 
       // 1. Delete subjects that are no longer in wizardData
-      const currentSubjectIds = new Set(wizardData.subjects.map(s => s.subjectId))
       for (const dbSub of dbSubjects) {
         if (!currentSubjectIds.has(dbSub.subjectId)) {
           await deleteSubjectMutation.mutateAsync({ questionPaperId: paper.id, id: dbSub.id })
@@ -302,16 +445,24 @@ export function EditQuestionPaperView({ id }: EditQuestionPaperViewProps) {
         }
       }
 
-      // Sync updated title with the latest subject configuration
-      const updatedTitle = buildQuestionPaperTitle({
-        className: wizardData.className || paper.className,
-        examName: wizardData.examName || paper.examName,
-        subjects: wizardData.subjects,
+      // Sync updated title with the latest subject configuration if not custom
+      const defaultOldTitle = buildQuestionPaperTitle({
+        className: paper.className,
+        examName: paper.examName,
+        subjects: paper.subjects || [],
       })
-      await updatePaperMutation.mutateAsync({
-        id: paper.id,
-        title: updatedTitle,
-      })
+      const isCustomTitle = Boolean(paper.title && paper.title !== defaultOldTitle)
+      if (!isCustomTitle) {
+        const updatedTitle = buildQuestionPaperTitle({
+          className: wizardData.className || paper.className,
+          examName: wizardData.examName || paper.examName,
+          subjects: wizardData.subjects,
+        })
+        await updatePaperMutation.mutateAsync({
+          id: paper.id,
+          title: updatedTitle,
+        })
+      }
 
       toast.success("বিষয় ও নম্বর বণ্টন সফলভাবে সংরক্ষণ করা হয়েছে।")
       return true

@@ -44,6 +44,16 @@ function buildTrustedOrigins(): string[] {
     const rootDomain = appUrl.replace(/^https?:\/\//, "")
     origins.push(`https://*.${rootDomain}`)
   }
+  const tenantUrl = process.env.NEXT_PUBLIC_TENANT_URL
+  if (tenantUrl && !origins.includes(tenantUrl)) {
+    origins.push(tenantUrl)
+    const rootDomain = tenantUrl.replace(/^https?:\/\//, "")
+    origins.push(`https://*.${rootDomain}`)
+  }
+  const betterAuthUrl = process.env.BETTER_AUTH_URL
+  if (betterAuthUrl && !origins.includes(betterAuthUrl)) {
+    origins.push(betterAuthUrl)
+  }
   if (process.env.TRUSTED_ORIGINS) {
     process.env.TRUSTED_ORIGINS.split(",").forEach((o) => {
       const trimmed = o.trim()
@@ -261,13 +271,49 @@ export const auth = betterAuth({
         return
       }
 
-      // Modify callback URL to redirect to /auth/sign-in?verified=true upon successful validation
+      // Resolve the target origin so email verification stays in the requesting app (tenant vs admin)
       const redirectUrl = new URL(url)
-      const appUrl = redirectUrl.origin || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      redirectUrl.searchParams.set(
-        "callbackURL",
-        `${appUrl}/auth/sign-in?verified=true`
-      )
+      const existingCallback = redirectUrl.searchParams.get("callbackURL")
+
+      let targetOrigin = ""
+      if (existingCallback) {
+        try {
+          const parsed = new URL(existingCallback)
+          targetOrigin = parsed.origin
+        } catch {
+          // relative path
+        }
+      }
+
+      if (!targetOrigin) {
+        targetOrigin =
+          process.env.BETTER_AUTH_URL ||
+          process.env.NEXT_PUBLIC_TENANT_URL ||
+          process.env.NEXT_PUBLIC_APP_URL ||
+          "http://localhost:3001"
+      }
+
+      // Align verification URL's protocol & host with target app
+      try {
+        const targetUrlObj = new URL(targetOrigin)
+        redirectUrl.protocol = targetUrlObj.protocol
+        redirectUrl.host = targetUrlObj.host
+      } catch (e) {
+        // ignore parsing error
+      }
+
+      // Set callbackURL so that upon email verification, user is redirected back to that app's sign-in
+      const finalCallbackUrl =
+        existingCallback && existingCallback.startsWith("http")
+          ? existingCallback
+          : `${targetOrigin.replace(/\/$/, "")}/auth/sign-in?verified=true`
+
+      redirectUrl.searchParams.set("callbackURL", finalCallbackUrl)
+
+      console.log(`\n============================================================`)
+      console.log(`[Better Auth DEV] Email Verification Link for ${user.email}:`)
+      console.log(`${redirectUrl.toString()}`)
+      console.log(`============================================================\n`)
 
       console.log(`[Better Auth/Email] Dispatching verification email to ${user.email} with URL: ${redirectUrl.toString()}`)
 

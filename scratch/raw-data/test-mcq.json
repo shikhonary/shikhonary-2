@@ -1,154 +1,18 @@
 {
-  "chapterTitle": "মুদ্রা, ব্যাংক ও ব্যাংকিং",
+  "subjectId": "cmwxhwt2a00006ctoeigqqb3a",
+  "className": "Nine",
+  "chapterTitle": "কেন্দ্রীয় ব্যাংক",
   "questions": [
     {
       "type": "SINGLE",
-      "question": "'দ্রব্যের বিনিময়ে দ্রব্য' একে কী বলে?",
+      "question": "কেন্দ্রীয় ব্যাংক কী জাতীয় প্রতিষ্ঠান?",
       "options": [
-        "Barter system",
-        "Debtor",
-        "Creditor",
-        "Sales"
+        "অমুনাফাভোগী",
+        "মুনাফাভোগী",
+        "সুদের প্রতিষ্ঠান",
+        "ঋণদানকারী প্রতিষ্ঠান"
       ],
-      "answer": "Barter system",
-      "explanation": null,
-      "reference": [
-        "য. বো. ২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "দ্রব্য বিনিময় প্রথার সমস্যা কোনটি?",
-      "options": [
-        "সঞ্চয়ের অভাব",
-        "উপযোগের অভাব",
-        "প্রয়োজনীয়তার অভাব",
-        "মিলের অভাব"
-      ],
-      "answer": "সঞ্চয়ের অভাব",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "দ্রব্য বিনিময় প্রথার অসুবিধা দূর করে কোনটি?",
-      "options": [
-        "ব্যাংক",
-        "পণ্য",
-        "চেক",
-        "মুদ্রা"
-      ],
-      "answer": "মুদ্রা",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কাগজি মুদ্রার প্রচলন হয় কখন?",
-      "options": [
-        "পঞ্চদশ শতাব্দীতে",
-        "অষ্টাদশ শতাব্দীতে",
-        "ঊনবিংশ শতাব্দীতে",
-        "বিংশ শতাব্দীতে"
-      ],
-      "answer": "ঊনবিংশ শতাব্দীতে",
-      "explanation": null,
-      "reference": [
-        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "কোন শতাব্দীতে কাগজি মুদ্রার প্রচলন শুরু হয়?",
-      "options": [
-        "ঊনবিংশ",
-        "বিংশ",
-        "একবিংশ",
-        "দ্বাবিংশ"
-      ],
-      "answer": "ঊনবিংশ",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "সকলের নিকট গ্রহণীয় বিনিময় মাধ্যম কোনটি?",
-      "options": [
-        "চেক",
-        "ব্যাংক ড্রাফট",
-        "মুদ্রা",
-        "ডেবিট কার্ড"
-      ],
-      "answer": "মুদ্রা",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "মুদ্রার সবচেয়ে প্রধান কাজ কোনটি?",
-      "options": [
-        "বিনিময়ের মাধ্যম",
-        "সঞ্চয়ের ভাণ্ডার",
-        "মূল্যের পরিমাপক",
-        "ঋণ পরিশোধ"
-      ],
-      "answer": "বিনিময়ের মাধ্যম",
+      "answer": "অমুনাফাভোগী",
       "explanation": null,
       "reference": [
         "দি. বো. ১৯"
@@ -164,17 +28,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "মুদ্রা কী হিসেবে কাজ করে?",
+      "question": "সুসংগঠিত মুদ্রা বাজার গঠন কোন ব্যাংকের অন্যতম উদ্দেশ্য?",
       "options": [
-        "মূল্যের পরিমাপক",
-        "মান নিয়ন্ত্রক",
-        "দ্রব্য সংরক্ষক",
-        "সম্মান বর্ধক"
+        "বাংলাদেশ ব্যাংক",
+        "সোনালী ব্যাংক",
+        "জনতা ব্যাংক",
+        "অগ্রণী ব্যাংক"
       ],
-      "answer": "মূল্যের পরিমাপক",
+      "answer": "বাংলাদেশ ব্যাংক",
       "explanation": null,
       "reference": [
-        "ঢাকা রেসিডেনসিয়াল মডেল কলেজ; নি. প. ২৪"
+        "চ. বো. ২৫; সকল বোর্ড ১৬"
       ],
       "statements": [],
       "context": null,
@@ -187,18 +51,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "রফিক তার উপার্জন থেকে প্রতি মাসে ১,০০০ টাকা ভবিষ্যতের জন্য জমা রাখেন। এখানে অর্থ কী হিসেবে কাজ করছে?",
+      "question": "নিচের কোন প্রতিষ্ঠান নোট ও মুদ্রা প্রচলন করে?",
       "options": [
-        "সঞ্চয়ের বাহন",
-        "মূল্যের পরিমাপক",
-        "বিনিময়ের মাধ্যম",
-        "অর্থ স্থানান্তরের বাহন"
+        "বাংলাদেশ ডেভেলপমেন্ট ব্যাংক লি.",
+        "বাংলাদেশ ব্যাংক",
+        "সোনালী ব্যাংক লি.",
+        "জনতা ব্যাংক লি."
       ],
-      "answer": "সঞ্চয়ের বাহন",
+      "answer": "বাংলাদেশ ব্যাংক",
       "explanation": null,
       "reference": [
-        "ম. বো. ২৪",
-        "গভর্নমেন্ট ল্যাবরেটরি হাই স্কুল, ঢাকা; নি. প. ২৪"
+        "দি. বো. ২৩"
       ],
       "statements": [],
       "context": null,
@@ -211,18 +74,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "মুদ্রা প্রচলনের পরপরই কিসের প্রয়োজনীয়তা দেখা দেয়?",
+      "question": "দেশের অর্থনৈতিক স্থিতিশীলতা নিশ্চিতকরণ ও মুদ্রাস্ফীতি নিয়ন্ত্রণের জন্য কোনটি একান্ত জরুরি?",
       "options": [
-        "ব্যাংক ব্যবস্থার",
-        "ঋণ ব্যবস্থার",
-        "বিমা ব্যবস্থার",
-        "লেনদেন ব্যবস্থার"
+        "কর্মসংস্থান",
+        "শিল্পোন্নয়ন",
+        "ঋণ নিয়ন্ত্রণ",
+        "বৈদেশিক বিনিময়"
       ],
-      "answer": "ব্যাংক ব্যবস্থার",
+      "answer": "ঋণ নিয়ন্ত্রণ",
       "explanation": null,
       "reference": [
-        "ব. বো. ২৪",
-        "চ. বো. ১৯"
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -235,14 +97,244 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটি ছাড়া মুদ্রার ব্যবহার সীমিত?",
+      "question": "মুদ্রা প্রচলন করে কোন ব্যাংক?",
       "options": [
-        "লেনদেন",
-        "বিমা",
-        "ব্যাংক",
-        "শেয়ার বাজার"
+        "কেন্দ্রীয় ব্যাংক",
+        "বাণিজ্যিক ব্যাংক",
+        "বিনিয়োগ ব্যাংক",
+        "শিল্প ব্যাংক"
       ],
-      "answer": "ব্যাংক",
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "সকল বোর্ড ১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যাংক বৈদেশিক মুদ্রার আগমন ও নির্গমন নিয়ন্ত্রণ করে?",
+      "options": [
+        "বাণিজ্যিক ব্যাংক",
+        "আমদানি ও রপ্তানি ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "বিনিময় ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪; চ. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংক দেশীয় মুদ্রার মান অক্ষুণ্ণ রাখতে চেষ্টা করে কীভাবে?",
+      "options": [
+        "বৈদেশিক মুদ্রার আগমন নিয়ন্ত্রণ করে",
+        "চাহিদা অনুযায়ী মুদ্রা প্রচলন করে",
+        "আমদানি ও রপ্তানিকে দেশের অনুকূলে রেখে",
+        "বৈদেশিক বিনিময় নিয়ন্ত্রণ করে"
+      ],
+      "answer": "বৈদেশিক বিনিময় নিয়ন্ত্রণ করে",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৪; ঢা. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিকাশ ঘরের দায়িত্ব পালন করে কোন ব্যাংক?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "জনতা ব্যাংক",
+        "রূপালী ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৫; ম. বো. ২৫, ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংক বাণিজ্যিক ব্যাংকসমূহের মধ্যকার লেনদেন নিষ্পত্তি করে কেন?",
+      "options": [
+        "অর্থনৈতিক উন্নয়নকে ত্বরান্বিত করতে",
+        "অতিরিক্ত ঋণ প্রদানকে রহিত করতে",
+        "অর্থ বাজারকে স্থিতিশীল করতে",
+        "পুরো ব্যাংকিং ব্যবস্থায় সমন্বয় বজায় রাখতে"
+      ],
+      "answer": "পুরো ব্যাংকিং ব্যবস্থায় সমন্বয় বজায় রাখতে",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন মন্তব্যটি সঠিক?",
+      "options": [
+        "মুনাফা অর্জনের উদ্দেশ্যে কেন্দ্রীয় ব্যাংক গঠিত",
+        "মুদ্রাবাজারের অভিভাবক হলো বাণিজ্যিক ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক মুদ্রাবাজারে ঋণ নিয়ন্ত্রণ করে",
+        "বাণিজ্যিক ব্যাংকগুলো নিকাশ ঘরের দায়িত্ব পালন করে"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক মুদ্রাবাজারে ঋণ নিয়ন্ত্রণ করে",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটির মাধ্যমে কেন্দ্রীয় ব্যাংক বিনিময় মাধ্যম সৃষ্টি করে?",
+      "options": [
+        "খোলাবাজার নীতি",
+        "হুন্ডি",
+        "ব্যাংক হার নীতি",
+        "ঋণ"
+      ],
+      "answer": "হুন্ডি",
+      "explanation": null,
+      "reference": [
+        "র. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংকের উদ্দেশ্য কোনটি?",
+      "options": [
+        "বিনিময়ের মাধ্যমে",
+        "মূল্যস্তর স্থিতিশীল রাখা",
+        "কর্মসংস্থান সৃষ্টি",
+        "সঞ্চয়ের প্রবণতা সৃষ্টি"
+      ],
+      "answer": "মূল্যস্তর স্থিতিশীল রাখা",
+      "explanation": null,
+      "reference": [
+        "কুমিল্লা হাই স্কুল; নি. প. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দ্রব্যমূল্য বা মুদ্রাস্ফীতি নিয়ন্ত্রণে রাখার জন্য সর্বদা কী নিয়ন্ত্রণে রাখতে হয়?",
+      "options": [
+        "ঋণ নিয়ন্ত্রণ",
+        "বিনিয়োগ নিয়ন্ত্রণ",
+        "মুদ্রাবাজার নিয়ন্ত্রণ",
+        "জনসংখ্যা নিয়ন্ত্রণ"
+      ],
+      "answer": "মুদ্রাবাজার নিয়ন্ত্রণ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি বাংলাদেশের মুদ্রাবাজারের অভিভাবক?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "জনতা ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "অগ্রণী ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৪; সকল বোর্ড ১৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দেশে ঋণ নিয়ন্ত্রণের দায়িত্ব কোন ব্যাংকের?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "অগ্রণী ব্যাংক",
+        "সীমান্ত ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
       "explanation": null,
       "reference": [
         "চ. বো. ২৫"
@@ -258,17 +350,16 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোনটিকে ব্যাংক ব্যবস্থার জননী বলা হয়?",
+      "question": "ঋণ নিয়ন্ত্রণ কেন্দ্রীয় ব্যাংকের কোন ধরনের কাজ?",
       "options": [
-        "বিনিয়োগ বিলকে",
-        "চেককে",
-        "মুদ্রাকে",
-        "ব্যাংক ড্রাফটকে"
+        "সাধারণ কাজ",
+        "সরকারের ব্যাংক হিসেবে কাজ",
+        "অন্যান্য ব্যাংকের ব্যাংকার হিসেবে কাজ",
+        "বিবিধ কাজ"
       ],
-      "answer": "মুদ্রাকে",
+      "answer": "সাধারণ কাজ",
       "explanation": null,
       "reference": [
-        "রা. বো. ২৫",
         "কু. বো. ১৯"
       ],
       "statements": [],
@@ -282,17 +373,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংক ব্যবসায়ের প্রধান উপাদান কী?",
+      "question": "ঋণ নিয়ন্ত্রণ করার জন্য কেন্দ্রীয় ব্যাংক কী কাজ করে?",
       "options": [
-        "মুদ্রা",
-        "দলিল",
-        "শেয়ার",
-        "ঋণ"
+        "সুদের হার হ্রাস করে",
+        "সুদের হার বৃদ্ধি করে",
+        "জমার হার হ্রাস-বৃদ্ধি করে",
+        "সবগুলো"
       ],
-      "answer": "মুদ্রা",
+      "answer": "সবগুলো",
       "explanation": null,
       "reference": [
-        "দি. বো. ২৪"
+        "ম. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -305,18 +396,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "'Banco' কী ধরনের শব্দ?",
+      "question": "নিচের কোন নীতি ব্যবহার করে কেন্দ্রীয় ব্যাংক বাণিজ্যিক ব্যাংকসমূহের ঋণ নিয়ন্ত্রণ করে?",
       "options": [
-        "ইতালিয়ান",
-        "মেক্সিকান",
-        "প্রাচীন ল্যাটিন",
-        "ফরাসি"
+        "তারল্য",
+        "ব্যাংক হার",
+        "বিনিয়োগ",
+        "নিরাপত্তার"
       ],
-      "answer": "প্রাচীন ল্যাটিন",
+      "answer": "ব্যাংক হার",
       "explanation": null,
       "reference": [
-        "য. বো. ২৪",
-        "চ. বো. ১৯"
+        "রা. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -329,17 +419,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংক শব্দটির ল্যাটিন উৎপত্তির পেছনে বেশি সমর্থন পাওয়া যায় কোনটির?",
+      "question": "কোনটি কেন্দ্রীয় ব্যাংকের কাজ?",
       "options": [
-        "বস্তু বিশেষের স্তূপ",
-        "কোষাগার",
-        "লম্বা টুল",
-        "ধন ভাণ্ডার"
+        "ঋণ আমানত সৃষ্টি",
+        "মুদ্রার ক্রয়ক্ষমতা নিয়ন্ত্রণ",
+        "ঋণ মঞ্জুর",
+        "বিনিময় বিল ভাঙানো"
       ],
-      "answer": "লম্বা টুল",
+      "answer": "মুদ্রার ক্রয়ক্ষমতা নিয়ন্ত্রণ",
       "explanation": null,
       "reference": [
-        "কু. বো. ২৫"
+        "দি. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -352,18 +442,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোন প্রাচীন ভাষা থেকে ব্যাংক শব্দের উৎপত্তি?",
+      "question": "নিচের কোন ব্যাংক মুদ্রার ক্রয়ক্ষমতা সংরক্ষণ করে?",
       "options": [
-        "গ্রিক",
-        "ল্যাটিন",
-        "ফরাসি",
-        "জার্মান"
+        "বাণিজ্যিক ব্যাংক",
+        "বিশেষায়িত ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক",
+        "সমবায় ব্যাংক"
       ],
-      "answer": "ল্যাটিন",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
-        "সকল বোর্ড ১৫",
-        "সৃষ্টি একাডেমিক স্কুল, টাঙ্গাইল; নি. প. ২৪"
+        "ম. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -376,18 +465,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংক শব্দের ল্যাটিন অর্থ কী?",
+      "question": "দেশের মুদ্রার বিনিময় হার কীসের ওপর নির্ভর করে?",
       "options": [
-        "সঞ্চয়",
-        "চেয়ার",
-        "লম্বা টেবিল",
-        "বিনিয়োগ"
+        "বৈদেশিক মোট অর্থের ওপর",
+        "মোট স্বর্ণের পরিমাণের ওপর",
+        "বৈদেশিক মুদ্রা রিজার্ভের ওপর",
+        "স্বর্ণ রিজার্ভের ওপর"
       ],
-      "answer": "লম্বা টেবিল",
+      "answer": "বৈদেশিক মুদ্রা রিজার্ভের ওপর",
       "explanation": null,
       "reference": [
-        "সকল বোর্ড ১৭",
-        "পটুয়াখালী সরকারি জুবিলী উচ্চ বিদ্যালয়; নি. প. ২৪"
+        "য. বো. ২৫"
       ],
       "statements": [],
       "context": null,
@@ -400,17 +488,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংককে কী বলা হয়?",
+      "question": "কোন ব্যাংক মূল্যস্তরকে স্থিতিশীল রাখে?",
       "options": [
-        "অর্থ ভাণ্ডার",
-        "ঋণদাতা",
-        "ঋণের ব্যবসায়ী",
-        "বিপদের বন্ধু"
+        "কর্মসংস্থান ব্যাংক",
+        "একক ব্যাংক",
+        "স্বায়ত্তশাসিত ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
       ],
-      "answer": "ঋণের ব্যবসায়ী",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
-        "ব. বো. ২৩"
+        "য. বো. ২৪; সি. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -423,17 +511,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংকের কার্যাবলির বিস্তৃত ধারণাকে কী বলে?",
+      "question": "কোনটি কেন্দ্রীয় ব্যাংকের সাধারণ কাজ?",
       "options": [
-        "ব্যাংক",
-        "ব্যাংকার",
-        "ব্যাংকিং",
-        "আমানত"
+        "সরকারি ঋণের তদারকি করা",
+        "ব্যাংক ব্যবস্থার উন্নয়ন করা",
+        "শিল্প উন্নয়নে নীতি নির্ধারণ করা",
+        "ঋণের ব্যবহার নিশ্চিত করা"
       ],
-      "answer": "ব্যাংকিং",
+      "answer": "ব্যাংক ব্যবস্থার উন্নয়ন করা",
       "explanation": null,
       "reference": [
-        "উদয়ন উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; নি. প. ২৪"
+        "ঢা. বো. ১৯"
       ],
       "statements": [],
       "context": null,
@@ -446,154 +534,14 @@
     },
     {
       "type": "SINGLE",
-      "question": "ব্যাংকিং বলতে কী বোঝায়?",
+      "question": "'Handle Government Transaction' কথাটি কোন ব্যাংকের জন্য প্রযোজ্য?",
       "options": [
-        "ব্যাংকের শাখা",
-        "ব্যাংকের নিয়ম-নীতি",
-        "ব্যাংকের আইনসঙ্গত কার্যাবলি",
-        "ব্যাংকের হিসাব-নিকাশ"
+        "কেন্দ্রীয় ব্যাংক",
+        "বাণিজ্যিক ব্যাংক",
+        "গ্রামীণ ব্যাংক",
+        "বাংলাদেশ কৃষি ব্যাংক"
       ],
-      "answer": "ব্যাংকের আইনসঙ্গত কার্যাবলি",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ব্যাংকিং ব্যবসায় পরিচালনার সাথে সরাসরি জড়িত ব্যক্তিবর্গকে কী বলে?",
-      "options": [
-        "ব্যাংক",
-        "ব্যাংকিং",
-        "ব্যাংক গ্রাহক",
-        "ব্যাংকার"
-      ],
-      "answer": "ব্যাংকার",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২৫"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "নিচের কোন সভ্যতাটি খ্রিস্টপূর্ব চারশত সাল পর্যন্ত ব্যাংকিং ব্যবসায়ের উন্নয়নে অবদান রাখে?",
-      "options": [
-        "সিন্ধু",
-        "মিশরীয়",
-        "আর্য",
-        "গ্রিক"
-      ],
-      "answer": "গ্রিক",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "ভারত অঞ্চলে প্রতিষ্ঠিত প্রথম আধুনিক ব্যাংকের নাম কী?",
-      "options": [
-        "ব্যাংক অব ইন্ডিয়া",
-        "দি ক্যালকাটা ব্যাংক",
-        "ব্যাংক অব কাশ্মীর",
-        "দি হিন্দুস্থান ব্যাংক"
-      ],
-      "answer": "দি হিন্দুস্থান ব্যাংক",
-      "explanation": null,
-      "reference": [
-        "য. বো. ১৯"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রিজার্ভ ব্যাংক অব ইন্ডিয়া কত সালে প্রতিষ্ঠিত হয়?",
-      "options": [
-        "১৯৩০",
-        "১৯৩৫",
-        "১৯৪০",
-        "১৯৬০"
-      ],
-      "answer": "১৯৩৫",
-      "explanation": null,
-      "reference": [
-        "দি. বো. ২৪",
-        "রা. বো. ২০"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "বাংলাদেশ ব্যাংক কত সালে প্রতিষ্ঠিত হয়?",
-      "options": [
-        "১৯৭৫ সালে",
-        "১৯৭৪ সালে",
-        "১৯৭২ সালে",
-        "১৯৭১ সালে"
-      ],
-      "answer": "১৯৭২ সালে",
-      "explanation": null,
-      "reference": [
-        "সি. বো. ২৫, ২৪",
-        "কুমিল্লা হাই স্কুল; নি. প. ২৪"
-      ],
-      "statements": [],
-      "context": null,
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "SINGLE",
-      "question": "রাষ্ট্রপতির আদেশে বাংলাদেশ ব্যাংক কবে প্রতিষ্ঠিত হয়?",
-      "options": [
-        "১৯৭১ সালের ১৬ই ডিসেম্বর",
-        "১৯৭১ সালের ২৬শে মার্চ",
-        "১৯৭২ সালের ২৬শে মার্চ",
-        "১৯৭২ সালের ৭ই এপ্রিল"
-      ],
-      "answer": "১৯৭১ সালের ১৬ই ডিসেম্বর",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
         "সি. বো. ২৪"
@@ -609,17 +557,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বাংলাদেশ ব্যাংককে কত সালে কার্যকর কেন্দ্রীয় ব্যাংক হিসেবে ঘোষণা করা হয়?",
+      "question": "অর্থের মান নির্ধারণে ভূমিকা পালন করে—",
       "options": [
-        "১৬ ডিসেম্বর ১৯৭১",
-        "২৬ মার্চ ১৯৭২",
-        "১৬ ডিসেম্বর ১৯৭২",
-        "৭ মার্চ ১৯৭২"
+        "শিল্প ব্যাংক",
+        "জনতা ব্যাংক লিমিটেড",
+        "ঢাকা ব্যাংক লিমিটেড",
+        "বাংলাদেশ ব্যাংক"
       ],
-      "answer": "১৬ ডিসেম্বর ১৯৭১",
+      "answer": "বাংলাদেশ ব্যাংক",
       "explanation": null,
       "reference": [
-        "য. বো. ২৫"
+        "রা. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -632,17 +580,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "মুক্তিযুদ্ধের পরবর্তী সময়ে বাংলাদেশে বিভিন্ন ব্যাংকের মোট কতটি শাখা কর্মরত ছিল?",
+      "question": "Banker of all Banks হিসেবে কোন ব্যাংক কাজ করে?",
       "options": [
-        "১০৯০টি",
-        "১১৯০টি",
-        "১২৯০টি",
-        "১৩৯০টি"
+        "বাণিজ্যিক ব্যাংক",
+        "আন্তর্জাতিক ব্যাংক",
+        "চেইন ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
       ],
-      "answer": "১০৯০টি",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
-        "য. বো. ১৯"
+        "দি. বো. ২৪"
       ],
       "statements": [],
       "context": null,
@@ -655,17 +603,454 @@
     },
     {
       "type": "SINGLE",
-      "question": "কোন ব্যাংকটি বিরাষ্ট্রীয়করণ করা হয়েছে?",
+      "question": "দেশের বাণিজ্যিক ব্যাংকগুলোকে তাদের আমানতের একটি নির্দিষ্ট অংশ কোথায় জমা রাখতে হয়?",
       "options": [
+        "বাংলাদেশ ব্যাংকে",
+        "সোনালী ব্যাংকে",
+        "ট্রাস্ট ব্যাংকে",
+        "অগ্রণী ব্যাংকে"
+      ],
+      "answer": "বাংলাদেশ ব্যাংকে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যাংক আমানতের একটি অংশ বাধ্যতামূলকভাবে কেন্দ্রীয় ব্যাংকে রিজার্ভ হিসেবে জমা রাখে?",
+      "options": [
+        "বাণিজ্যিক ব্যাংক",
+        "সমবায় ব্যাংক",
+        "বিনিময় ব্যাংক",
+        "শিল্প ব্যাংক"
+      ],
+      "answer": "বাণিজ্যিক ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "একটি ব্যাংকের চেক অন্য আরেকটি ব্যাংকে জমা করে চেকের অর্থ সংগ্রহ করলে নিচের কোন কাজটি সম্পন্ন হবে?",
+      "options": [
+        "ঋণ নিয়ন্ত্রণ",
+        "নিকাশ ঘর",
+        "জনকল্যাণ",
+        "প্রতিনিধিত্ব"
+      ],
+      "answer": "নিকাশ ঘর",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংক কী জাতীয় প্রতিষ্ঠান?",
+      "options": [
+        "অমুনাফাভোগী",
+        "মুনাফাভোগী",
+        "সুদের প্রতিষ্ঠান",
+        "ঋণদানকারী প্রতিষ্ঠান"
+      ],
+      "answer": "অমুনাফাভোগী",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "সুসংগঠিত মুদ্রা বাজার গঠন কোন ব্যাংকের অন্যতম উদ্দেশ্য?",
+      "options": [
+        "বাংলাদেশ ব্যাংক",
+        "সোনালী ব্যাংক",
         "জনতা ব্যাংক",
-        "পূবালী ব্যাংক",
+        "অগ্রণী ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫; সকল বোর্ড ১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন প্রতিষ্ঠান নোট ও মুদ্রা প্রচলন করে?",
+      "options": [
+        "বাংলাদেশ ডেভেলপমেন্ট ব্যাংক লি.",
+        "বাংলাদেশ ব্যাংক",
+        "সোনালী ব্যাংক লি.",
+        "জনতা ব্যাংক লি."
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দেশের অর্থনৈতিক স্থিতিশীলতা নিশ্চিতকরণ ও মুদ্রাস্ফীতি নিয়ন্ত্রণের জন্য কোনটি একান্ত জরুরি?",
+      "options": [
+        "কর্মসংস্থান",
+        "শিল্পোন্নয়ন",
+        "ঋণ নিয়ন্ত্রণ",
+        "বৈদেশিক বিনিময়"
+      ],
+      "answer": "ঋণ নিয়ন্ত্রণ",
+      "explanation": null,
+      "reference": [
+        "আইডিয়াল স্কুল অ্যান্ড কলেজ, মতিঝিল, ঢাকা; নি. প. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "মুদ্রা প্রচলন করে কোন ব্যাংক?",
+      "options": [
+        "কেন্দ্রীয় ব্যাংক",
+        "বাণিজ্যিক ব্যাংক",
+        "বিনিয়োগ ব্যাংক",
+        "শিল্প ব্যাংক"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "সকল বোর্ড ১৬"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যাংক বৈদেশিক মুদ্রার আগমন ও নির্গমন নিয়ন্ত্রণ করে?",
+      "options": [
+        "বাণিজ্যিক ব্যাংক",
+        "আমদানি ও রপ্তানি ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "বিনিময় ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৪; চ. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংক দেশীয় মুদ্রার মান অক্ষুণ্ণ রাখতে চেষ্টা করে কীভাবে?",
+      "options": [
+        "বৈদেশিক মুদ্রার আগমন নিয়ন্ত্রণ করে",
+        "চাহিদা অনুযায়ী মুদ্রা প্রচলন করে",
+        "আমদানি ও রপ্তানিকে দেশের অনুকূলে রেখে",
+        "বৈদেশিক বিনিময় নিয়ন্ত্রণ করে"
+      ],
+      "answer": "বৈদেশিক বিনিময় নিয়ন্ত্রণ করে",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৪; ঢা. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিকাশ ঘরের দায়িত্ব পালন করে কোন ব্যাংক?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "জনতা ব্যাংক",
         "রূপালী ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৫; ম. বো. ২৫, ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংক বাণিজ্যিক ব্যাংকসমূহের মধ্যকার লেনদেন নিষ্পত্তি করে কেন?",
+      "options": [
+        "অর্থনৈতিক উন্নয়নকে ত্বরান্বিত করতে",
+        "অতিরিক্ত ঋণ প্রদানকে রহিত করতে",
+        "অর্থ বাজারকে স্থিতিশীল করতে",
+        "পুরো ব্যাংকিং ব্যবস্থায় সমন্বয় বজায় রাখতে"
+      ],
+      "answer": "পুরো ব্যাংকিং ব্যবস্থায় সমন্বয় বজায় রাখতে",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোন মন্তব্যটি সঠিক?",
+      "options": [
+        "মুনাফা অর্জনের উদ্দেশ্যে কেন্দ্রীয় ব্যাংক গঠিত",
+        "মুদ্রাবাজারের অভিভাবক হলো বাণিজ্যিক ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক মুদ্রাবাজারে ঋণ নিয়ন্ত্রণ করে",
+        "বাণিজ্যিক ব্যাংকগুলো নিকাশ ঘরের দায়িত্ব পালন করে"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক মুদ্রাবাজারে ঋণ নিয়ন্ত্রণ করে",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২০"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটির মাধ্যমে কেন্দ্রীয় ব্যাংক বিনিময় মাধ্যম সৃষ্টি করে?",
+      "options": [
+        "খোলাবাজার নীতি",
+        "হুন্ডি",
+        "ব্যাংক হার নীতি",
+        "ঋণ"
+      ],
+      "answer": "হুন্ডি",
+      "explanation": null,
+      "reference": [
+        "র. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কেন্দ্রীয় ব্যাংকের উদ্দেশ্য কোনটি?",
+      "options": [
+        "বিনিময়ের মাধ্যমে",
+        "মূল্যস্তর স্থিতিশীল রাখা",
+        "কর্মসংস্থান সৃষ্টি",
+        "সঞ্চয়ের প্রবণতা সৃষ্টি"
+      ],
+      "answer": "মূল্যস্তর স্থিতিশীল রাখা",
+      "explanation": null,
+      "reference": [
+        "কুমিল্লা হাই স্কুল; নি. প. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দ্রব্যমূল্য বা মুদ্রাস্ফীতি নিয়ন্ত্রণে রাখার জন্য সর্বদা কী নিয়ন্ত্রণে রাখতে হয়?",
+      "options": [
+        "ঋণ নিয়ন্ত্রণ",
+        "বিনিয়োগ নিয়ন্ত্রণ",
+        "মুদ্রাবাজার নিয়ন্ত্রণ",
+        "জনসংখ্যা নিয়ন্ত্রণ"
+      ],
+      "answer": "মুদ্রাবাজার নিয়ন্ত্রণ",
+      "explanation": null,
+      "reference": [
+        "য. বো. ২৩"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "নিচের কোনটি বাংলাদেশের মুদ্রাবাজারের অভিভাবক?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "জনতা ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "অগ্রণী ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "ব. বো. ২৪; সকল বোর্ড ১৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দেশে ঋণ নিয়ন্ত্রণের দায়িত্ব কোন ব্যাংকের?",
+      "options": [
+        "সোনালী ব্যাংক",
+        "বাংলাদেশ ব্যাংক",
+        "অগ্রণী ব্যাংক",
+        "সীমান্ত ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ঋণ নিয়ন্ত্রণ কেন্দ্রীয় ব্যাংকের কোন ধরনের কাজ?",
+      "options": [
+        "সাধারণ কাজ",
+        "সরকারের ব্যাংক হিসেবে কাজ",
+        "অন্যান্য ব্যাংকের ব্যাংকার হিসেবে কাজ",
+        "বিবিধ কাজ"
+      ],
+      "answer": "সাধারণ কাজ",
+      "explanation": null,
+      "reference": [
+        "কু. বো. ১৯"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "ঋণ নিয়ন্ত্রণ করার জন্য কেন্দ্রীয় ব্যাংক কী কাজ করে?",
+      "options": [
+        "সুদের হার হ্রাস করে",
+        "সুদের হার বৃদ্ধি করে",
+        "জমার হার হ্রাস-বৃদ্ধি করে",
         "সবগুলো"
       ],
-      "answer": "পূবালী ব্যাংক",
+      "answer": "সবগুলো",
       "explanation": null,
       "reference": [
-        "ঢা. বো. ২০"
+        "ম. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -678,19 +1063,16 @@
     },
     {
       "type": "SINGLE",
-      "question": "বিরাষ্ট্রীয়করণ প্রক্রিয়া কখন শুরু হয়?",
+      "question": "নিচের কোন নীতি ব্যবহার করে কেন্দ্রীয় ব্যাংক বাণিজ্যিক ব্যাংকসমূহের ঋণ নিয়ন্ত্রণ করে?",
       "options": [
-        "পঞ্চাশের দশকে",
-        "ষাটের দশকে",
-        "সত্তরের দশকে",
-        "আশির দশকে"
+        "তারল্য",
+        "ব্যাংক হার",
+        "বিনিয়োগ",
+        "নিরাপত্তার"
       ],
-      "answer": "আশির দশকে",
+      "answer": "ব্যাংক হার",
       "explanation": null,
       "reference": [
-        "চ. বো. ২৫, ২৪",
-        "সি. বো. ২৪",
-        "দি. বো., য. বো. ২০",
         "রা. বো. ১৯"
       ],
       "statements": [],
@@ -704,17 +1086,17 @@
     },
     {
       "type": "SINGLE",
-      "question": "বর্তমানে দেশে সরকারি ব্যাংক কতটি?",
+      "question": "কোনটি কেন্দ্রীয় ব্যাংকের কাজ?",
       "options": [
-        "২টি",
-        "৪টি",
-        "৬টি",
-        "৮টি"
+        "ঋণ আমানত সৃষ্টি",
+        "মুদ্রার ক্রয়ক্ষমতা নিয়ন্ত্রণ",
+        "ঋণ মঞ্জুর",
+        "বিনিময় বিল ভাঙানো"
       ],
-      "answer": "৪টি",
+      "answer": "মুদ্রার ক্রয়ক্ষমতা নিয়ন্ত্রণ",
       "explanation": null,
       "reference": [
-        "ব. বো. ১৯"
+        "দি. বো. ২০"
       ],
       "statements": [],
       "context": null,
@@ -726,26 +1108,21 @@
       "bottomContent": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "",
+      "type": "SINGLE",
+      "question": "নিচের কোন ব্যাংক মুদ্রার ক্রয়ক্ষমতা সংরক্ষণ করে?",
       "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
+        "বাণিজ্যিক ব্যাংক",
+        "বিশেষায়িত ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক",
+        "সমবায় ব্যাংক"
       ],
-      "answer": "i, ii ও iii",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
-        "চ. বো. ২০",
-        "সি. বো. ১৯"
+        "ম. বো. ২০"
       ],
-      "statements": [
-        "চাহিদা ও যোগানের অসামঞ্জস্যতা",
-        "সংরক্ষণের অসুবিধা",
-        "পণ্যের মূল্য নির্ধারণে অসুবিধা"
-      ],
-      "context": "দ্রব্য বিনিময় প্রথার সমস্যা হলো—",
+      "statements": [],
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -754,82 +1131,21 @@
       "bottomContent": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "",
+      "type": "SINGLE",
+      "question": "দেশের মুদ্রার বিনিময় হার কীসের ওপর নির্ভর করে?",
       "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
+        "বৈদেশিক মোট অর্থের ওপর",
+        "মোট স্বর্ণের পরিমাণের ওপর",
+        "বৈদেশিক মুদ্রা রিজার্ভের ওপর",
+        "স্বর্ণ রিজার্ভের ওপর"
       ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "চ. বো., ব. বো. ২৪",
-        "ব. বো. ২৩",
-        "রা. বো. ১৯",
-        "মনিপুর উচ্চ বিদ্যালয় ও কলেজ, ঢাকা; নি. প. ২৪"
-      ],
-      "statements": [
-        "ধাতুর বিকল্প ব্যবহার",
-        "ধাতব পদার্থের দুষ্প্রাপ্যতা",
-        "ধাতব মুদ্রার দীর্ঘ স্থায়িত্ব"
-      ],
-      "context": "ধাতব মুদ্রার ব্যবহার ক্রমশ সীমিত হয়ে আসার কারণ—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২৫"
-      ],
-      "statements": [
-        "সোনার",
-        "রুপার",
-        "তামার"
-      ],
-      "context": "জনসংখ্যা বৃদ্ধির ফলে মুদ্রা হিসেবে ব্যবহার ক্রমশ হ্রাস পায়—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
+      "answer": "বৈদেশিক মুদ্রা রিজার্ভের ওপর",
       "explanation": null,
       "reference": [
         "য. বো. ২৫"
       ],
-      "statements": [
-        "নিরাপত্তা নিশ্চিত হওয়া",
-        "ধাতব মুদ্রার দীর্ঘস্থায়িত্ব",
-        "কাগজের সহজলভ্যতা"
-      ],
-      "context": "কাগজি মুদ্রার ব্যাপক প্রসারের কারণ—",
+      "statements": [],
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -838,159 +1154,21 @@
       "bottomContent": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "",
+      "type": "SINGLE",
+      "question": "কোন ব্যাংক মূল্যস্তরকে স্থিতিশীল রাখে?",
       "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
+        "কর্মসংস্থান ব্যাংক",
+        "একক ব্যাংক",
+        "স্বায়ত্তশাসিত ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
       ],
-      "answer": "i, ii ও iii",
+      "answer": "কেন্দ্রীয় ব্যাংক",
       "explanation": null,
       "reference": [
-        "চ. বো. ১৯",
-        "উদয়ন উচ্চ মাধ্যমিক বিদ্যালয়, ঢাকা; নি. প. ২৪"
-      ],
-      "statements": [
-        "দ্রব্যের মান",
-        "দ্রব্যের ওজন",
-        "দ্রব্যের মজুদযোগ্যতা"
-      ],
-      "context": "কাগজি মুদ্রা প্রচলনের কারণ ছিল—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "ম. বো. ২৫"
-      ],
-      "statements": [
-        "ধাতব পদার্থের দুষ্প্রাপ্যতা",
-        "সহজে বহনযোগ্য",
-        "সংরক্ষণে সুবিধা"
-      ],
-      "context": "কাগজি মুদ্রা প্রচলনের কারণ হলো—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "i ও iii",
-        "ii ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i, ii ও iii",
-      "explanation": null,
-      "reference": [
-        "ব. বো. ২৩",
-        "সকল বোর্ড ১৬"
-      ],
-      "statements": [
-        "একটি বিনিময় মাধ্যম",
-        "মূল্যের পরিমাপক",
-        "সঞ্চয়ের বাহন"
-      ],
-      "context": "মুদ্রা—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i",
-        "ii",
-        "i ও ii",
-        "i ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২৪"
-      ],
-      "statements": [
-        "পণ্যের মূল্য নির্ধারণ",
-        "সেবার মূল্য নির্ধারণ",
-        "সামরিক স্থিতিশীলতা আনয়ন"
-      ],
-      "context": "মুদ্রার কাজ হলো—",
-      "isMath": false,
-      "hasAttachment": false,
-      "attachmentType": null,
-      "attachmentDescription": null,
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "COMBINED",
-      "question": "চিত্র $A$ ও $B$ এর মধ্যে প্রকাশ পায়—\ni. বিনিময় মাধ্যম\nii. সঞ্চয়ের ভাণ্ডার\niii. মূল্যের পরিমাপক",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও iii",
-      "explanation": null,
-      "reference": [
-        "কু. বো. ২০"
+        "য. বো. ২৪; সি. বো. ২০"
       ],
       "statements": [],
       "context": null,
-      "isMath": true,
-      "hasAttachment": true,
-      "attachmentType": "DIAGRAM",
-      "attachmentDescription": "চিত্র: A (জামা) এবং B (নোট/টাকা) এর পারস্পরিক বিনিময়",
-      "table": null,
-      "bottomContent": null
-    },
-    {
-      "type": "MULTIPLE",
-      "question": "",
-      "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
-      ],
-      "answer": "i ও ii",
-      "explanation": null,
-      "reference": [
-        "ঢা. বো. ২৫, ২০",
-        "দি. বো. ২০"
-      ],
-      "statements": [
-        "বিনিময়ের মাধ্যম হিসেবে",
-        "মূল্যের পরিমাপক হিসেবে",
-        "সঞ্চয়ের ভাণ্ডার হিসেবে"
-      ],
-      "context": "মিস জিনিয়া ৫,০০০ টাকা দিয়ে একটি জামা কিনলেন। এতে মুদ্রা কাজ করেছে—",
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -999,25 +1177,159 @@
       "bottomContent": null
     },
     {
-      "type": "MULTIPLE",
-      "question": "",
+      "type": "SINGLE",
+      "question": "কোনটি কেন্দ্রীয় ব্যাংকের সাধারণ কাজ?",
       "options": [
-        "i ও ii",
-        "ii ও iii",
-        "i ও iii",
-        "i, ii ও iii"
+        "সরকারি ঋণের তদারকি করা",
+        "ব্যাংক ব্যবস্থার উন্নয়ন করা",
+        "শিল্প উন্নয়নে নীতি নির্ধারণ করা",
+        "ঋণের ব্যবহার নিশ্চিত করা"
       ],
-      "answer": "i ও ii",
+      "answer": "ব্যাংক ব্যবস্থার উন্নয়ন করা",
       "explanation": null,
       "reference": [
-        "ঢা. বো. ২৩"
+        "ঢা. বো. ১৯"
       ],
-      "statements": [
-        "ব্যাংক ব্যবস্থার ওপর",
-        "আর্থিক প্রতিষ্ঠানের ওপর",
-        "সামাজিক প্রতিষ্ঠানের ওপর"
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "'Handle Government Transaction' কথাটি কোন ব্যাংকের জন্য প্রযোজ্য?",
+      "options": [
+        "কেন্দ্রীয় ব্যাংক",
+        "বাণিজ্যিক ব্যাংক",
+        "গ্রামীণ ব্যাংক",
+        "বাংলাদেশ কৃষি ব্যাংক"
       ],
-      "context": "একটি দেশের অর্থনৈতিক কর্মকাণ্ড নির্ভর করে—",
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "সি. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "অর্থের মান নির্ধারণে ভূমিকা পালন করে—",
+      "options": [
+        "শিল্প ব্যাংক",
+        "জনতা ব্যাংক লিমিটেড",
+        "ঢাকা ব্যাংক লিমিটেড",
+        "বাংলাদেশ ব্যাংক"
+      ],
+      "answer": "বাংলাদেশ ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "রা. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "Banker of all Banks হিসেবে কোন ব্যাংক কাজ করে?",
+      "options": [
+        "বাণিজ্যিক ব্যাংক",
+        "আন্তর্জাতিক ব্যাংক",
+        "চেইন ব্যাংক",
+        "কেন্দ্রীয় ব্যাংক"
+      ],
+      "answer": "কেন্দ্রীয় ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৪"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "দেশের বাণিজ্যিক ব্যাংকগুলোকে তাদের আমানতের একটি নির্দিষ্ট অংশ কোথায় জমা রাখতে হয়?",
+      "options": [
+        "বাংলাদেশ ব্যাংকে",
+        "সোনালী ব্যাংকে",
+        "ট্রাস্ট ব্যাংকে",
+        "অগ্রণী ব্যাংকে"
+      ],
+      "answer": "বাংলাদেশ ব্যাংকে",
+      "explanation": null,
+      "reference": [
+        "চ. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "কোন ব্যাংক আমানতের একটি অংশ বাধ্যতামূলকভাবে কেন্দ্রীয় ব্যাংকে রিজার্ভ হিসেবে জমা রাখে?",
+      "options": [
+        "বাণিজ্যিক ব্যাংক",
+        "সমবায় ব্যাংক",
+        "বিনিময় ব্যাংক",
+        "শিল্প ব্যাংক"
+      ],
+      "answer": "বাণিজ্যিক ব্যাংক",
+      "explanation": null,
+      "reference": [
+        "দি. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null,
+      "table": null,
+      "bottomContent": null
+    },
+    {
+      "type": "SINGLE",
+      "question": "একটি ব্যাংকের চেক অন্য আরেকটি ব্যাংকে জমা করে চেকের অর্থ সংগ্রহ করলে নিচের কোন কাজটি সম্পন্ন হবে?",
+      "options": [
+        "ঋণ নিয়ন্ত্রণ",
+        "নিকাশ ঘর",
+        "জনকল্যাণ",
+        "প্রতিনিধিত্ব"
+      ],
+      "answer": "নিকাশ ঘর",
+      "explanation": null,
+      "reference": [
+        "ঢা. বো. ২৫"
+      ],
+      "statements": [],
+      "context": null,
       "isMath": false,
       "hasAttachment": false,
       "attachmentType": null,
@@ -1025,7 +1337,5 @@
       "table": null,
       "bottomContent": null
     }
-  ],
-  "subjectId": "cmwxhwt2a00006ctoeigqqb3a",
-  "className": "Nine"
+  ]
 }

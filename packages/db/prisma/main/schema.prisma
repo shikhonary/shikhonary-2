@@ -130,6 +130,7 @@ model User {
   // ── Moderation / Reports ──
   reportedQuestions QuestionReport[] @relation("ReportedQuestions")
   resolvedReports   QuestionReport[] @relation("ResolvedReports")
+  onboardingApplications OnboardingApplication[]
 
   @@index([deletedAt])
   @@map("user")
@@ -292,6 +293,15 @@ model Tenant {
   fiscalYears        FiscalYear[]
   invoices           Invoice[]
 
+  // ── Referral Hierarchy ───────────────────────────────────
+  referredByTenantId String?
+  referredByTenant   Tenant?        @relation("TenantHierarchy", fields: [referredByTenantId], references: [id], onDelete: SetNull)
+  referredTenants    Tenant[]       @relation("TenantHierarchy")
+
+  referralCodes      ReferralCode[] @relation("TenantReferralCodes")
+  referralsMade      Referral[]     @relation("ReferrerTenants")
+  referralReceived   Referral?      @relation("ReferredTenants")
+
   // ── Question Bank Resources ──────────────────────────────
   mcqs                        Mcq[]
   cqs                         Cq[]
@@ -373,20 +383,21 @@ model TenantMember {
 }
 
 model TenantInvitation {
-  id         String    @id @default(cuid())
-  tenantId   String
-  email      String
-  role       String    @default("STAFF")
-  token      String    @unique
-  expiresAt  DateTime
-  invitedBy  String
-  acceptedAt DateTime?
-  acceptedBy String?
-  message    String?
-  name       String?
-  status     String    @default("PENDING")
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  tenantId     String
+  email        String
+  role         String    @default("STAFF")
+  token        String    @unique
+  expiresAt    DateTime
+  invitedBy    String
+  acceptedAt   DateTime?
+  acceptedBy   String?
+  message      String?
+  name         String?
+  status       String    @default("PENDING")
+  referralCode String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -394,6 +405,99 @@ model TenantInvitation {
   @@index([status])
   @@index([tenantId])
   @@map("tenant_invitation")
+}
+
+// ── Referral Program Models ──────────────────────────────────────
+model ReferralCode {
+  id                 String     @id @default(cuid())
+  code               String     @unique
+  referrerTenantId   String
+  referrerTenant     Tenant     @relation("TenantReferralCodes", fields: [referrerTenantId], references: [id], onDelete: Cascade)
+
+  clickCount         Int        @default(0)
+  totalConverted     Int        @default(0)
+  totalEarnedCredits Int        @default(0)
+
+  isActive           Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  referrals          Referral[]
+
+  @@index([referrerTenantId])
+  @@map("referral_code")
+}
+
+model Referral {
+  id                      String       @id @default(cuid())
+  referralCodeId          String
+  referralCode            ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+
+  referrerTenantId        String
+  referrerTenant          Tenant       @relation("ReferrerTenants", fields: [referrerTenantId], references: [id], onDelete: Cascade)
+
+  referredTenantId        String?      @unique
+  referredTenant          Tenant?      @relation("ReferredTenants", fields: [referredTenantId], references: [id], onDelete: SetNull)
+
+  // Prospective / Invited institution info
+  referredInstitutionName String?
+  referredEmail           String?
+  referredPhone           String?
+
+  // PENDING -> ACTIVATED -> REWARDED -> EXPIRED
+  status                  String       @default("PENDING")
+  referrerBonusCredits    Int          @default(0)
+  refereeBonusCredits     Int          @default(0)
+  rewardedAt              DateTime?
+
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  @@index([referralCodeId])
+  @@index([referrerTenantId])
+  @@index([status])
+  @@map("referral")
+}
+
+// ── Standalone Onboarding Application (Independent of Tenant) ──
+model OnboardingApplication {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Entity Type: SCHOOL | COACHING | TUTOR | COLLEGE | MADRASAH | OTHER
+  type             String    @default("SCHOOL")
+
+  // Single Name Field
+  name             String
+
+  // Primary Contact Phone
+  phone            String
+
+  // Optional Location (Only Division & District)
+  divisionId       String?
+  division         Division? @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  districtId       String?
+  district         District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
+
+  // Optional Referral Code (+100 credits for applicant, +300 for referrer)
+  referralCode     String?
+
+  // Application Status Lifecycle: PENDING | APPROVED | REJECTED
+  status           String    @default("PENDING")
+  rejectionReason  String?
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+
+  // Audit Timestamps
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("onboarding_application")
 }
 
 model SubscriptionPlan {
@@ -597,25 +701,27 @@ model FiscalYear {
 }
 
 model Division {
-  id        String     @id
-  name      String     @unique
-  nameBn    String
-  url       String?
-  districts District[]
-  tenants   Tenant[]
+  id                     String                  @id
+  name                   String                  @unique
+  nameBn                 String
+  url                    String?
+  districts              District[]
+  tenants                Tenant[]
+  onboardingApplications OnboardingApplication[]
 
   @@map("division")
 }
 
 model District {
-  id         String    @id
-  name       String    @unique
-  nameBn     String
-  url        String?
-  divisionId String
-  division   Division  @relation(fields: [divisionId], references: [id], onDelete: Restrict)
-  upazilas   Upazila[]
-  tenants    Tenant[]
+  id                     String                  @id
+  name                   String                  @unique
+  nameBn                 String
+  url                    String?
+  divisionId             String
+  division               Division                @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  upazilas               Upazila[]
+  tenants                Tenant[]
+  onboardingApplications OnboardingApplication[]
 
   @@index([divisionId])
   @@map("district")

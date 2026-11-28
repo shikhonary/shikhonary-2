@@ -22,6 +22,10 @@ export async function upsertQuestionPaperSection(
   })
   if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
 
+  if (paper.status === "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের বিষয় বা কাঠামো পরিবর্তন করা সম্ভব নয়।")
+  }
+
   let section
   let isNew = true
 
@@ -353,8 +357,29 @@ export async function deleteQuestionPaperSubject(
 ) {
   const existing = await tenantDb.questionPaperSubject.findFirst({
     where: { id: input.id, questionPaperId: input.questionPaperId },
+    include: {
+      questionPaper: {
+        select: { status: true },
+      },
+    },
   })
   if (!existing) throw notFound("QuestionPaperSubject")
+
+  if (existing.questionPaper?.status === "Published") {
+    throw badRequest("একবার প্রকাশিত প্রশ্নপত্রের বিষয় মুছে ফেলা সম্ভব নয়।")
+  }
+
+  // Delete all questions belonging to any distribution under this subject
+  const dists = await tenantDb.questionPaperSubjectMarkDistribution.findMany({
+    where: { paperSubjectId: input.id },
+    select: { id: true },
+  })
+  const distIds = dists.map((d) => d.id)
+  if (distIds.length > 0) {
+    await tenantDb.questionPaperQuestion.deleteMany({
+      where: { distributionId: { in: distIds } },
+    })
+  }
 
   await tenantDb.questionPaperSubject.delete({
     where: { id: input.id },

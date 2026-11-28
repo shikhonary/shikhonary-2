@@ -27,6 +27,7 @@ import {
   ArrowLeftRight,
   Hash,
   SlidersHorizontal,
+  Inbox,
   type LucideIcon,
 } from "lucide-react"
 import Image from "next/image"
@@ -54,6 +55,7 @@ const navGroups: NavGroup[] = [
     groupLabel: "Institutions",
     items: [
       { href: "/tenants", label: "Schools & Colleges", icon: GraduationCap },
+      { href: "/tenants/applications", label: "Onboarding Requests", icon: Inbox },
     ],
   },
   {

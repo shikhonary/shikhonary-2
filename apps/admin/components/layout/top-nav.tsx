@@ -24,6 +24,7 @@ import {
   Quote,
   PenTool,
   Shuffle,
+  Inbox,
 } from "lucide-react"
 import {
   Sheet,
@@ -54,6 +55,7 @@ const navGroups = [
     groupLabel: "Institutions",
     items: [
       { href: "/tenants", label: "Schools & Colleges", icon: GraduationCap },
+      { href: "/tenants/applications", label: "Onboarding Requests", icon: Inbox },
     ],
   },
   {

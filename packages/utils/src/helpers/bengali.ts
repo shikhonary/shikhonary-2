@@ -35,6 +35,36 @@ export function toEnglishDigits(str: string | undefined | null): string {
 }
 
 /**
+ * Strict Bangladeshi mobile phone number regex.
+ * Valid prefixes: 013, 014, 015, 016, 017, 018, 019 followed by 8 digits (total 11 digits).
+ */
+export const BD_PHONE_REGEX = /^01[3-9]\d{8}$/
+
+/**
+ * Normalizes a Bangladeshi phone number:
+ * 1. Converts Bengali numerals to English digits
+ * 2. Strips spaces, dashes, brackets, and leading +
+ * 3. Removes leading Bangladesh country code 88 if present
+ */
+export function normalizeBdPhoneNumber(phone: string | undefined | null): string {
+  if (!phone) return ""
+  let normalized = toEnglishDigits(phone)
+  normalized = normalized.replace(/[\s\-()+]/g, "")
+  if (normalized.startsWith("8801")) {
+    normalized = normalized.slice(2)
+  }
+  return normalized
+}
+
+/**
+ * Strictly verifies whether a given phone number is a valid 11-digit Bangladeshi mobile number.
+ */
+export function isValidBdPhoneNumber(phone: string | undefined | null): boolean {
+  const normalized = normalizeBdPhoneNumber(phone)
+  return BD_PHONE_REGEX.test(normalized)
+}
+
+/**
  * Formats a date into natural Bengali string (e.g., "২৪ অক্টোবর, ২০২৬").
  */
 export function formatBengaliDate(dateInput: string | Date | undefined | null): string {

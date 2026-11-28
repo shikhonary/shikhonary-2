@@ -74,6 +74,8 @@ export const createTenantSchema = z.object({
   customTeacherLimit: z.number().int().optional().nullable(),
   customExamLimit: z.number().int().optional().nullable(),
   customStorageLimit: z.number().int().optional().nullable(),
+  referralCode: z.string().optional().nullable(),
+  applicationId: z.string().optional().nullable(),
 })
 
 export type CreateTenantInput = z.infer<typeof createTenantSchema>
@@ -126,6 +128,8 @@ export const updateTenantSchema = z.object({
   customTeacherLimit: z.number().int().optional().nullable(),
   customExamLimit: z.number().int().optional().nullable(),
   customStorageLimit: z.number().int().optional().nullable(),
+  referralCode: z.string().optional().nullable(),
+  applicationId: z.string().optional().nullable(),
 })
 
 export type UpdateTenantInput = z.infer<typeof updateTenantSchema>

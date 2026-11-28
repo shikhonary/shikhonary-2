@@ -113,14 +113,14 @@ export function DashboardHeader() {
     <>
       <header className="w-full min-w-0 h-16 sticky top-0 bg-card border-b border-border flex justify-between items-center px-3 sm:px-6 z-40 shadow-xs">
         
-        {/* Left Side: Mobile Drawer trigger */}
-        <div className="flex items-center gap-2">
+        {/* Left Side: Mobile Drawer trigger + Brand Identity */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <Sheet>
             <SheetTrigger asChild>
               <button
                 id="mobile-navigation-trigger"
                 type="button"
-                className="md:hidden w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors cursor-pointer active:opacity-80"
+                className="md:hidden w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors cursor-pointer active:opacity-80 shrink-0"
                 title="মেনু খুলুন"
               >
                 <Menu className="h-5 w-5" />
@@ -137,13 +137,15 @@ export function DashboardHeader() {
                     <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   )}
                 </div>
-                <div className="text-left min-w-0">
+                <div className="text-left min-w-0 flex-1">
                   <SheetTitle className="font-headline text-sm font-bold text-foreground leading-tight truncate">
                     {unionDisplayName}
                   </SheetTitle>
-                  <SheetDescription className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold leading-none mt-1 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 inline-block animate-pulse"></span>
-                    শিখনারী পোর্টাল
+                  <SheetDescription className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold font-headline border border-indigo-200/50 dark:border-indigo-800/40">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
+                      শিখনারী চালিত পোর্টাল
+                    </span>
                   </SheetDescription>
                 </div>
               </SheetHeader>
@@ -205,6 +207,37 @@ export function DashboardHeader() {
               </div>
             </SheetContent>
           </Sheet>
+
+          {/* Mobile Header Brand Identity (Visible on small screens) */}
+          <div className="flex md:hidden items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-indigo-500/20 flex items-center justify-center bg-indigo-500/10 shadow-2xs">
+              {tenant.logo ? (
+                <img src={tenant.logo} alt={tenant.name} className="w-full h-full object-cover" />
+              ) : (
+                <GraduationCap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-headline text-xs font-bold text-foreground leading-tight truncate max-w-[130px] xs:max-w-[170px] sm:max-w-[220px]">
+                {unionDisplayName}
+              </h2>
+              <span className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold leading-none block font-headline">
+                শিখনারী পোর্টাল
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Left Breadcrumb / Institutional Workspace Identity */}
+          <div className="hidden md:flex items-center gap-2.5 text-xs font-body min-w-0">
+            <span className="font-headline font-bold text-foreground truncate max-w-[280px] lg:max-w-md">
+              {unionDisplayName}
+            </span>
+            <span className="text-border/70">•</span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-headline bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 shrink-0">
+              <Sparkles className="w-3 h-3 text-indigo-500" />
+              <span>অ্যাকাডেমিক ড্যাশবোর্ড</span>
+            </span>
+          </div>
         </div>
 
         {/* Right Side: Credit Balance + Recharge Button + User Profile */}
@@ -269,9 +302,14 @@ export function DashboardHeader() {
                 <div className="flex flex-col text-left">
                   <span className="text-sm font-bold text-foreground truncate">{user?.name || "ব্যবহারকারী"}</span>
                   <span className="text-[11px] font-medium text-muted-foreground truncate mt-0.5">{user?.email}</span>
-                  <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-md uppercase w-max mt-1">
-                    {membership.role === "ADMIN" ? "অ্যাডমিন" : membership.role === "TEACHER" ? "শিক্ষক" : membership.role === "OWNER" ? "মালিক" : membership.role}
-                  </span>
+                  <div className="mt-2 pt-1.5 border-t border-border/50 flex flex-col gap-1">
+                    <span className="text-[11px] font-bold text-foreground font-headline truncate" title={unionDisplayName}>
+                      {unionDisplayName}
+                    </span>
+                    <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[9px] font-bold rounded-md uppercase w-max font-headline">
+                      {membership.role === "ADMIN" ? "প্রতিষ্ঠান প্রশাসক (Admin)" : membership.role === "TEACHER" ? "শিক্ষক" : membership.role === "OWNER" ? "মালিক" : membership.role}
+                    </span>
+                  </div>
                 </div>
               </DropdownMenuLabel>
               

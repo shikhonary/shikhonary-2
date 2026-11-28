@@ -604,8 +604,8 @@ export type GeneratePaperSetsInput = z.infer<typeof generatePaperSetsSchema>
 // ---------------------------------------------------------------------------
 
 export const quickCreateQuestionSchema = z.object({
-  questionPaperId: z.string().min(1),
-  distributionId: z.string().min(1),
+  questionPaperId: z.string().optional().nullable(),
+  distributionId: z.string().optional().nullable(),
   sectionId: z.string().optional().nullable(),
   subSectionId: z.string().optional().nullable(),
   subjectId: z.string().min(1),
@@ -688,7 +688,16 @@ export const quickCreateQuestionSchema = z.object({
     })
     .optional(),
 
-  autoAssign: z.boolean().default(true),
+  autoAssign: z.boolean().default(false),
 })
 
 export type QuickCreateQuestionInput = z.infer<typeof quickCreateQuestionSchema>
+
+
+export const getQuestionPaperCostBreakdownSchema = z.object({
+  id: z.string().min(1),
+})
+
+export type GetQuestionPaperCostBreakdownInput = z.infer<
+  typeof getQuestionPaperCostBreakdownSchema
+>

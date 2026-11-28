@@ -1,8 +1,10 @@
 {
-  "chapterTitle": "মুদ্রা, ব্যাংক ও ব্যাংকিং",
+  "subjectId": "cmwxhwt2a00006ctoeigqqb3a",
+  "className": "Nine",
+  "chapterTitle": "কেন্দ্রীয় ব্যাংক",
   "questions": [
     {
-      "question": "বিনিময় প্রথা বিলুপ্তির কারণ ব্যাখ্যা করো।",
+      "question": "কেন্দ্রীয় ব্যাংকের উৎপত্তির কারণ ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -12,7 +14,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কীভাবে মুদ্রার প্রয়োজনীয়তা মুদ্রা সৃষ্টিতে ব্যাপক ভূমিকা রাখে?",
+      "question": "অর্থ বা মুদ্রা বাজার সম্পর্কে ধারণা দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -22,7 +24,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কাগজি মুদ্রা বলতে কী বোঝায়?",
+      "question": "জনকল্যাণমূলক অমুনাফাভোগী প্রতিষ্ঠান সম্পর্কে লেখো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -32,7 +34,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কাগজি মুদ্রার প্রচলন ও প্রসারতার কারণ কী? বুঝিয়ে লেখো।",
+      "question": "কেন্দ্রীয় ব্যাংকের উদ্দেশ্য ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -42,7 +44,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "মুদ্রা সম্পর্কে লেখো।",
+      "question": "মূলধন বাজার ও মুদ্রা বাজারের মধ্যে পার্থক্য তুলে ধরো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -52,7 +54,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "কীভাবে মুদ্রা অর্থনৈতিক ক্রিয়াকলাপ সহজসাধ্য করে?",
+      "question": "মুদ্রা বাজার নিয়ন্ত্রণ সম্পর্কে লেখো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -62,7 +64,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "সঞ্চয়ের ভান্ডার হিসেবে মুদ্রার কাজ ব্যাখ্যা করো।",
+      "question": "মুদ্রা বাজার নিয়ন্ত্রণের প্রয়োজনীয়তা দেখা দেয় কেন?",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -72,7 +74,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "মুদ্রাকে বিনিময়ের মাধ্যম বলা হয় কেন? ব্যাখ্যা করো।",
+      "question": "'অর্থব্যবস্থার নিয়ন্ত্রক হিসেবে কেন্দ্রীয় ব্যাংক জন্ম লাভ করে'— মতামত দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -82,7 +84,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "মুদ্রা ও ব্যাংকের মধ্যে সম্পর্ক লেখো।",
+      "question": "সম্পদের সুষম বণ্টন কী? ব্যাখ্যা দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -92,7 +94,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "‘মুদ্রাই ব্যাংক ব্যবসায়ের প্রধান উপাদান’— আলোচনা করো।",
+      "question": "কেন্দ্রীয় ব্যাংক কীভাবে মূলধন গঠনে সহায়তা করে?",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -102,7 +104,16 @@
       "attachmentDescription": null
     },
     {
-      "question": "মুদ্রাকে ব্যাংক ব্যবস্থার জননী বলা হয় কেন?",
+      "question": "সুসংগঠিত ব্যাংকিং ব্যবস্থা সম্পর্কে লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কেন্দ্রীয় ব্যাংক কীভাবে সহজ বিনিময় মাধ্যম সৃষ্টি করে?",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -112,7 +123,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "‘ব্যাংক শব্দের উৎপত্তি সম্পর্কে সুনির্দিষ্ট ইতিহাস খুঁজে পাওয়া কঠিন’— মতামত দাও।",
+      "question": "মুদ্রার ক্রয়ক্ষমতা নিয়ন্ত্রণ সম্পর্কে ব্যাখ্যা দাও।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -122,7 +133,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "‘ব্যাংক একটি আর্থিক প্রতিষ্ঠান’— যুক্তি দাও।",
+      "question": "বৈদেশিক মুদ্রার তহবিল সংরক্ষণ সম্পর্কে আলোচনা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -132,7 +143,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "অর্থ জমা, তোলা ও ঋণ দেওয়ার নিরাপদ প্রতিষ্ঠানটি সম্পর্কে লেখো।",
+      "question": "'সরকারের ঋণ গ্রহণে তদারকি করে কেন্দ্রীয় ব্যাংক'— আলোচনা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -142,7 +153,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "ব্যাংক, ব্যাংকিং ও ব্যাংকারের মধ্যে সম্পর্ক লেখো।",
+      "question": "সরকারের উপদেষ্টা হিসেবে কেন্দ্রীয় ব্যাংকের কাজ উল্লেখ করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -152,7 +163,7 @@
       "attachmentDescription": null
     },
     {
-      "question": "ব্যাংক ব্যবস্থার ইতিহাস ও ক্রমবিকাশের ধারণা দাও।",
+      "question": "'কেন্দ্রীয় ব্যাংক ঋণের শেষ আশ্রয়স্থল'— ব্যাখ্যা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -162,7 +173,77 @@
       "attachmentDescription": null
     },
     {
-      "question": "বাংলাদেশের ব্যাংক ব্যবস্থার ইতিহাস সম্পর্কে লেখো।",
+      "question": "শিল্প উন্নয়নে কেন্দ্রীয় ব্যাংকের ভূমিকা উল্লেখ করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "'কেন্দ্রীয় ব্যাংক একটি আন্তর্জাতিক সম্পর্ক স্থাপনকারী প্রতিষ্ঠান'— মতামত দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশের কেন্দ্রীয় ব্যাংকের গঠন সম্পর্কে লেখো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশ ব্যাংকের ব্যবস্থাপনা সম্পর্কিত ধারণা দাও।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাংলাদেশ ব্যাংকের বিভাগসমূহ কী কী? উল্লেখ করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "বাধ্যতামূলক তহবিল সংরক্ষণ কী? ব্যাখ্যা করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "কেন্দ্রীয় ব্যাংক ও বাণিজ্যিক ব্যাংকের মধ্যে দুটি সম্পর্ক উল্লেখ করো।",
+      "answer": null,
+      "reference": [],
+      "difficulty": "MEDIUM",
+      "isMath": false,
+      "hasAttachment": false,
+      "attachmentType": null,
+      "attachmentDescription": null
+    },
+    {
+      "question": "দেশের অর্থনৈতিক উন্নয়নে কেন্দ্রীয় ব্যাংকের ভূমিকা আলোচনা করো।",
       "answer": null,
       "reference": [],
       "difficulty": "MEDIUM",
@@ -171,7 +252,5 @@
       "attachmentType": null,
       "attachmentDescription": null
     }
-  ],
-  "subjectId": "cmwxhwt2a00006ctoeigqqb3a",
-  "className": "Nine"
+  ]
 }

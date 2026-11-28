@@ -17,8 +17,10 @@ import {
   X,
   ChevronRight,
   Calculator,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
+import { useTenant } from "@/modules/layout/ui/components/tenant-provider";
 
 const mobileNavItems = [
   {
@@ -94,6 +96,7 @@ const MORE_SPEED_DIAL_ITEMS = [
 
 export const MobileBottomNav: React.FC = () => {
   const pathname = usePathname();
+  const { tenant } = useTenant();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   // Hide on question paper builder routes (/question-papers/[id]...)
@@ -128,16 +131,21 @@ export const MobileBottomNav: React.FC = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-2.5 border-b border-border/50 px-1">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <LayoutGrid className="w-4 h-4" />
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-indigo-500/20 flex items-center justify-center bg-indigo-500/10 shadow-2xs">
+                  {tenant.logo ? (
+                    <img src={tenant.logo} alt={tenant.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <GraduationCap className="w-4.5 h-4.5 text-indigo-600 dark:text-indigo-400" />
+                  )}
                 </div>
-                <div>
-                  <h3 className="font-headline text-sm font-black text-foreground">
-                    আরও সুবিধাসমূহ
+                <div className="min-w-0">
+                  <h3 className="font-headline text-sm font-bold text-foreground truncate max-w-[200px]">
+                    {tenant.nameBn || tenant.name}
                   </h3>
-                  <p className="text-[10px] text-muted-foreground font-body">
-                    দ্রুত অ্যাক্সেস ও অতিরিক্ত সেবা
+                  <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold font-headline flex items-center gap-1 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
+                    শিখনারী পোর্টাল
                   </p>
                 </div>
               </div>

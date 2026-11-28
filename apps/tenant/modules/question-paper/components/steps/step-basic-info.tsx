@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@workspace/ui/componen
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { GraduationCap, BookOpen, Loader2, Clock, Sparkles } from "lucide-react"
+import { GraduationCap, BookOpen, Loader2, AlertTriangle, Clock, Sparkles } from "lucide-react"
 import { formatDurationBn } from "./step-review"
 import type { StepProps, AcademicClassRef } from "../../types/create-wizard"
 
@@ -158,6 +158,14 @@ export function StepBasicInfo({ data, onChange, errors, classes, isClassesLoadin
               </div>
               {errors.classId && (
                 <p className="text-xs text-rose-600 dark:text-rose-400 font-body mt-1">{errors.classId}</p>
+              )}
+              {data.subjects && data.subjects.length > 0 && (
+                <div className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs mt-1.5 font-body">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <span>
+                    শ্রেণি পরিবর্তন করলে বিষয় ও মানবণ্টনের সামঞ্জস্যতা নষ্ট হতে পারে। অনুগ্রহ করে পরবর্তী ধাপে বিষয়গুলো পুনরায় যাচাই করুন।
+                  </span>
+                </div>
               )}
             </div>
 

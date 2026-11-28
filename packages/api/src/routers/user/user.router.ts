@@ -9,8 +9,10 @@
 import {
   createTRPCRouter,
   protectedProcedure,
+  publicProcedure,
   superAdminProcedure,
 } from "../../trpc"
+import { TRPCError } from "@trpc/server"
 import { db } from "@workspace/db/main"
 import {
   createUserSchema,
@@ -21,6 +23,7 @@ import {
   updateUserRolesSchema,
   updateContactSchema,
   usersForSelectionSchema,
+  devVerifyEmailSchema,
 } from "./user.schema"
 import {
   createUser,
@@ -51,6 +54,31 @@ export const userRouter = createTRPCRouter({
   updateContact: protectedProcedure
     .input(updateContactSchema)
     .mutation(({ ctx, input }) => updateUserContact(db, ctx.session.user.id, input)),
+
+  /**
+   * Development-only helper: instant email verification for testing without waiting for email delivery.
+   */
+  devVerifyEmail: publicProcedure
+    .input(devVerifyEmailSchema)
+    .mutation(async ({ input }) => {
+      if (process.env.NODE_ENV === "production") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only available in development environment",
+        })
+      }
+      const user = await db.user.findUnique({
+        where: { email: input.email.toLowerCase().trim() },
+      })
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" })
+      }
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: true },
+      })
+      return { success: true }
+    }),
 
   /**
    * Fetch summary statistics for users (total count, delta, verified, pending).

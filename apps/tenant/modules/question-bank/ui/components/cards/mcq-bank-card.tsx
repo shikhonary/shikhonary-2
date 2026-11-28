@@ -1,6 +1,8 @@
 "use client"
 
 import React from "react"
+import { Sparkles } from "lucide-react"
+import { cn } from "@workspace/ui/lib/utils"
 import { RenderMath } from "@workspace/ui/components/render-math"
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments"
 import { toBengaliDigits, MCQ_TYPE_OPTIONS } from "@workspace/utils"
@@ -10,6 +12,7 @@ import { QuestionCardHeader } from "./question-card-header"
 import { QuestionCardFooter } from "./question-card-footer"
 import { QuestionAnswerAccordion } from "./question-answer-accordion"
 import { useQuestionReportStore } from "@/modules/question-bank/store/use-question-report-store"
+import { getAdaptiveMcqOptionGridClass } from "@/modules/question-paper-builder/ui/components/blocks/mcq-option-label"
 
 export interface McqBankCardProps {
   question: any
@@ -82,6 +85,14 @@ export const McqBankCard: React.FC<McqBankCardProps> = ({
           index={index}
           chapterName={chapterName}
           typeLabel={mcqTypeLabel}
+          extraBadges={
+            q.isGlobal === false ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 font-headline">
+                <Sparkles className="w-2.5 h-2.5" />
+                <span>নিজস্ব প্রশ্ন</span>
+              </span>
+            ) : null
+          }
         />
 
         {/* Card Body */}
@@ -142,14 +153,14 @@ export const McqBankCard: React.FC<McqBankCardProps> = ({
 
           {/* 4. Options */}
           {Array.isArray(q.options) && q.options.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 pt-1 font-body">
+            <div className={cn("grid gap-x-3 sm:gap-x-5 gap-y-2 pt-1 font-body", getAdaptiveMcqOptionGridClass(q.options))}>
               {q.options.map((opt: string, optIdx: number) => {
                 const letter = OPTION_LETTERS[optIdx] || String(optIdx + 1)
 
                 return (
                   <div
                     key={optIdx}
-                    className="flex items-start gap-2.5 text-xs sm:text-[13px] text-foreground/90 font-body py-0.5"
+                    className="flex items-start gap-2 text-xs sm:text-[13px] text-foreground/90 font-body py-0.5 min-w-0"
                   >
                     <span className="shrink-0 flex items-center justify-center w-5.5 h-5.5 rounded-lg border border-primary/30 bg-primary/10 text-primary font-bold text-xs font-headline mt-0.5">
                       {letter}

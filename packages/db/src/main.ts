@@ -8,6 +8,7 @@ export type {
   Tenant,
   TenantMember,
   TenantInvitation,
+  OnboardingApplication,
   SubscriptionPlan,
   Subscription,
   SubscriptionHistory,
@@ -37,8 +38,17 @@ function createMainDb() {
   return new PrismaClient({ adapter })
 }
 
-export const db = globalForPrisma.mainDb ?? createMainDb()
-
-if (!globalForPrisma.mainDb) {
-  globalForPrisma.mainDb = db
+function getMainDb(): PrismaClient {
+  if (!globalForPrisma.mainDb || !(globalForPrisma.mainDb as any).onboardingApplication) {
+    globalForPrisma.mainDb = createMainDb()
+  }
+  return globalForPrisma.mainDb
 }
+
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const instance = getMainDb()
+    const value = Reflect.get(instance, prop, receiver)
+    return typeof value === "function" ? value.bind(instance) : value
+  },
+})

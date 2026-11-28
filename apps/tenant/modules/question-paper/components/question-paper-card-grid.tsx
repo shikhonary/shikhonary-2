@@ -18,6 +18,7 @@ import {
   BookOpen,
   Loader2,
   BookmarkPlus,
+  Coins,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Badge } from "@workspace/ui/components/badge"
@@ -209,6 +210,15 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                         <span>এডিট করুন</span>
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      asChild
+                      className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                    >
+                      <Link href={`/question-papers/${item.id}/cost`}>
+                        <Coins className="h-3.5 w-3.5 text-amber-500" />
+                        <span>ক্রেডিট খরচের হিসাব</span>
+                      </Link>
+                    </DropdownMenuItem>
                     {onRename && (
                       <DropdownMenuItem
                         onClick={() => onRename(item.id, item.title)}
@@ -344,6 +354,17 @@ export const QuestionPaperCardGrid: React.FC<QuestionPaperCardGridProps> = ({
                 >
                   <Link href={`/question-papers/${item.id}/edit`}>
                     <Pen className="w-3.5 h-3.5" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  asChild
+                  className="h-8 w-8 rounded-lg text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-200/60 dark:hover:bg-white/10 cursor-pointer"
+                  title="ক্রেডিট খরচের হিসাব"
+                >
+                  <Link href={`/question-papers/${item.id}/cost`}>
+                    <Coins className="w-3.5 h-3.5 text-amber-500" />
                   </Link>
                 </Button>
 

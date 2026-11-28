@@ -15,6 +15,7 @@ import { SubjectExplorerFilters } from "../components/subject-explorer/subject-e
 import { SubjectExplorerGrid } from "../components/subject-explorer/subject-explorer-grid"
 import { MobileSubjectExplorer } from "../components/subject-explorer/mobile-subject-explorer"
 import { QuestionPreviewDrawer } from "../components/modals/question-preview-drawer"
+import { QuickCreateQuestionModal } from "@/modules/question-paper-builder/ui/components/modals/quick-create-question-modal"
 import { CurriculumGuideBanner } from "../components/classes/curriculum-guide-banner"
 import type { QuestionTypeCode } from "@workspace/utils"
 
@@ -38,6 +39,9 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
   const urlSort = (searchParams.get("sort") as "newest" | "oldest") || "newest"
   const urlPage = parseInt(searchParams.get("page") || "1", 10)
   const urlBookmarkedOnly = searchParams.get("bookmarked") === "true"
+  const urlOwnership = (searchParams.get("ownership") as "ALL" | "OWN" | "GLOBAL") || "ALL"
+
+  const [isCustomQuestionModalOpen, setIsCustomQuestionModalOpen] = useState(false)
 
   const [search, setSearch] = useState(urlSearch)
   const [debouncedSearch, setDebouncedSearch] = useState(urlSearch)
@@ -95,8 +99,9 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
     if (urlSource !== "All") count++
     if (debouncedSearch.trim() !== "") count++
     if (urlSort !== "newest") count++
+    if (urlOwnership !== "ALL") count++
     return count
-  }, [urlChapterId, urlBoard, urlSource, debouncedSearch, urlSort])
+  }, [urlChapterId, urlBoard, urlSource, debouncedSearch, urlSort, urlOwnership])
 
   const updateUrlParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -130,6 +135,10 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
 
   const handleSortChange = (sort: "newest" | "oldest") => {
     updateUrlParam("sort", sort === "newest" ? null : sort)
+  }
+
+  const handleOwnershipChange = (ownership: "ALL" | "OWN" | "GLOBAL") => {
+    updateUrlParam("ownership", ownership === "ALL" ? null : ownership)
   }
 
   const handlePageChange = (newPage: number) => {
@@ -185,6 +194,7 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
             data={data}
             isLoading={isLoading}
             bookmarkedCount={bookmarkedCount}
+            onCreateCustomQuestion={() => setIsCustomQuestionModalOpen(true)}
           />
 
           {/* Sticky Question Types Horizontal Tabs */}
@@ -216,6 +226,8 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
             onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
             activeFiltersCount={activeFiltersCount}
+            selectedOwnership={urlOwnership}
+            onOwnershipChange={handleOwnershipChange}
             isLoading={isLoading}
           />
 
@@ -228,6 +240,15 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
             board={urlBoard}
             source={urlSource}
             sort={urlSort}
+            ownership={urlOwnership}
+            onResetOwnership={() => handleOwnershipChange("ALL")}
+            onResetFilters={handleResetFilters}
+            onClearSearch={() => {
+              setSearch("")
+              setDebouncedSearch("")
+              updateUrlParam("search", null)
+            }}
+            onCreateCustomQuestion={() => setIsCustomQuestionModalOpen(true)}
             page={urlPage}
             limit={20}
             onPageChange={handlePageChange}
@@ -267,11 +288,32 @@ export const SubjectResourceExplorerView: React.FC<SubjectResourceExplorerViewPr
           onToggleBookmarkedOnly={handleToggleBookmarkedOnly}
           page={urlPage}
           onPageChange={handlePageChange}
+          selectedOwnership={urlOwnership}
+          onOwnershipChange={handleOwnershipChange}
+          onCreateCustomQuestion={() => setIsCustomQuestionModalOpen(true)}
         />
       </div>
 
       {/* ── Question Full Preview Drawer Modal ────────────────────── */}
       <QuestionPreviewDrawer />
+
+      {/* ── Quick Create Custom Question Modal ────────────────────── */}
+      <QuickCreateQuestionModal
+        open={isCustomQuestionModalOpen}
+        onOpenChange={setIsCustomQuestionModalOpen}
+        subjectId={subjectId}
+        subjectName={data?.subject?.nameBn}
+        className={data?.class?.nameBn}
+        category={urlCategory === "ALL" ? "ALL" : (urlCategory as QuestionTypeCode)}
+        defaultChapterId={urlChapterId !== "All" ? urlChapterId : undefined}
+        defaultSearchText={debouncedSearch || search}
+        onSuccess={() => {
+          if (search || debouncedSearch) {
+            setSearch("")
+            setDebouncedSearch("")
+          }
+        }}
+      />
     </>
   )
 }

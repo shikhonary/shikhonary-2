@@ -69,10 +69,12 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
+      const appUrl = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
       const { data, error: authError } = await authClient.signUp.email({
         name: values.name,
         email: values.email,
         password: values.password,
+        callbackURL: `${appUrl.replace(/\/$/, "")}/auth/sign-in?verified=true`,
       });
 
       console.log('Sign up result:', { data, error: authError });

@@ -32,6 +32,7 @@ interface SubjectExplorerHeaderProps {
   data?: SubjectDetailsData | null
   isLoading?: boolean
   bookmarkedCount?: number
+  onCreateCustomQuestion?: () => void
 }
 
 export const SubjectExplorerHeader: React.FC<SubjectExplorerHeaderProps> = ({
@@ -40,6 +41,7 @@ export const SubjectExplorerHeader: React.FC<SubjectExplorerHeaderProps> = ({
   data,
   isLoading,
   bookmarkedCount = 0,
+  onCreateCustomQuestion,
 }) => {
   if (isLoading || !data) {
     return (
@@ -173,7 +175,18 @@ export const SubjectExplorerHeader: React.FC<SubjectExplorerHeaderProps> = ({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          {onCreateCustomQuestion && (
+            <Button
+              type="button"
+              onClick={onCreateCustomQuestion}
+              className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-xs h-10 px-4 rounded-xl shadow-xs cursor-pointer flex items-center gap-2 transition-transform active:scale-95"
+            >
+              <PlusCircle className="w-4 h-4 stroke-[2]" />
+              <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+            </Button>
+          )}
+
           <Button
             asChild
             variant="outline"

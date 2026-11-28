@@ -29,6 +29,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Sparkles,
+  Coins,
   FileQuestion,
   Plus,
   Loader2,
@@ -378,6 +379,15 @@ export function QuestionPaperDataTable({
                                 <Link href={`/question-papers/${item.id}/edit`}>
                                   <Pen className="h-3.5 w-3.5" />
                                   <span>এডিট করুন</span>
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                asChild
+                                className="cursor-pointer gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-foreground hover:bg-slate-100 dark:hover:bg-white/[0.06]"
+                              >
+                                <Link href={`/question-papers/${item.id}/cost`}>
+                                  <Coins className="h-3.5 w-3.5 text-amber-500" />
+                                  <span>ক্রেডিট খরচের হিসাব</span>
                                 </Link>
                               </DropdownMenuItem>
                               {onRename && (

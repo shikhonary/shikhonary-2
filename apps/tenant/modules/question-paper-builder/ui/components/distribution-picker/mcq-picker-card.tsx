@@ -6,6 +6,7 @@ import { RenderMath } from "@workspace/ui/components/render-math";
 import { QuestionAttachments } from "@workspace/ui/components/question-attachments";
 import { toBengaliDigits, MCQ_TYPE_OPTIONS } from "@workspace/utils";
 import { PickerCardWrapper } from "./picker-card-wrapper";
+import { getAdaptiveMcqOptionGridClass } from "../blocks/mcq-option-label";
 
 interface McqPickerCardProps {
   question: any;
@@ -127,14 +128,14 @@ export const McqPickerCard: React.FC<McqPickerCardProps> = ({
 
         {/* 4. Options (No outer box border, styled badge with border) */}
         {Array.isArray(q.options) && q.options.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 pt-1 font-body">
+          <div className={cn("grid gap-x-3 sm:gap-x-5 gap-y-2 pt-1 font-body", getAdaptiveMcqOptionGridClass(q.options))}>
             {q.options.map((opt: string, optIdx: number) => {
               const letter = OPTION_LETTERS[optIdx] || String(optIdx + 1);
 
               return (
                 <div
                   key={optIdx}
-                  className="flex items-start gap-2.5 text-xs sm:text-[13px] text-foreground/90 font-body py-0.5"
+                  className="flex items-start gap-2 text-xs sm:text-[13px] text-foreground/90 font-body py-0.5 min-w-0"
                 >
                   <span className="shrink-0 flex items-center justify-center w-5.5 h-5.5 rounded-lg border border-primary/30 bg-primary/10 text-primary font-bold text-xs font-headline mt-0.5">
                     {letter}

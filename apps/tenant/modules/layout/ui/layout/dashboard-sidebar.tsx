@@ -114,26 +114,47 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       >
         {/* Header */}
         <div className={`h-16 flex items-center px-3.5 border-b border-border/60 shrink-0 relative ${collapsed ? "justify-center" : "justify-between gap-2.5"}`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-indigo-500/20 flex items-center justify-center bg-indigo-500/10 shadow-2xs">
-              {tenant.logo ? (
-                <img src={tenant.logo} alt={tenant.name} className="w-full h-full object-cover" />
-              ) : (
-                <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              )}
-            </div>
-            {!collapsed && (
-              <div className="min-w-0">
-                <h1 className="font-headline text-sm font-bold text-foreground leading-tight truncate">
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-indigo-500/20 flex items-center justify-center bg-indigo-500/10 shadow-2xs cursor-pointer">
+                  {tenant.logo ? (
+                    <img src={tenant.logo} alt={tenant.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="font-headline text-xs font-bold">
+                <p>{tenant.nameBn || tenant.name}</p>
+                <p className="text-[10px] text-muted-foreground font-body font-normal">শিখনারী পোর্টাল</p>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-indigo-500/20 flex items-center justify-center bg-indigo-500/10 shadow-2xs">
+                {tenant.logo ? (
+                  <img src={tenant.logo} alt={tenant.name} className="w-full h-full object-cover" />
+                ) : (
+                  <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1
+                  className="font-headline text-sm font-bold text-foreground leading-tight truncate"
+                  title={tenant.nameBn || tenant.name}
+                >
                   {tenant.nameBn || tenant.name}
                 </h1>
-                <p className="font-body text-indigo-600 dark:text-indigo-400 font-bold text-[10px] tracking-wide flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 inline-block animate-pulse"></span>
-                  শিখনারী পোর্টাল
-                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold font-headline border border-indigo-200/50 dark:border-indigo-800/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
+                    শিখনারী চালিত
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {onToggle && (
             <button

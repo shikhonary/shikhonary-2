@@ -19,10 +19,11 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Check if current route is a specific question paper sub-route (/question-papers/[id]...)
-  // Excludes the list page (/question-papers) and create page (/question-papers/create)
+  // Excludes the list page (/question-papers), create page (/question-papers/create), and cost page (/cost)
   const isQuestionPaperDetailRoute =
     pathname.startsWith("/question-papers/") &&
-    !pathname.startsWith("/question-papers/create");
+    !pathname.startsWith("/question-papers/create") &&
+    !pathname.includes("/cost");
 
   // Check if current route is full-screen studio builder or distribution picker
   const isStudioRoute =

@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Building2, Plus } from "lucide-react"
+import Link from "next/link"
+import { Building2, Plus, Inbox } from "lucide-react"
+import { Button } from "@workspace/ui/components/button"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDeleteDialog } from "@/components/shared/confirm-delete-dialog"
 import { toast } from "@workspace/ui/components/sonner"
@@ -73,7 +75,14 @@ export function TenantsView() {
           href: "/tenants/create",
           icon: Plus,
         }}
-      />
+      >
+        <Button asChild variant="outline" className="border-indigo-200 text-indigo-700 bg-indigo-50/50 hover:bg-indigo-100 gap-1.5 shadow-2xs">
+          <Link href="/tenants/applications">
+            <Inbox className="h-4 w-4 text-indigo-600" />
+            <span>অনবোর্ডিং আবেদনসমূহ</span>
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* KPI Stats Cards */}
       <TenantStatsCards

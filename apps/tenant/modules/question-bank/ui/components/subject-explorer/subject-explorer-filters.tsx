@@ -9,6 +9,7 @@ import {
   Tag,
   Library,
   ArrowUpDown,
+  Sparkles,
 } from "lucide-react"
 import { Input } from "@workspace/ui/components/input"
 import {
@@ -45,6 +46,8 @@ interface SubjectExplorerFiltersProps {
   sources?: { rawSource: string; count: number }[]
   selectedSort: "newest" | "oldest"
   onSortChange: (sort: "newest" | "oldest") => void
+  selectedOwnership?: "ALL" | "OWN" | "GLOBAL"
+  onOwnershipChange?: (ownership: "ALL" | "OWN" | "GLOBAL") => void
   onResetFilters: () => void
   activeFiltersCount: number
   isLoading?: boolean
@@ -64,6 +67,8 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
   sources = [],
   selectedSort,
   onSortChange,
+  selectedOwnership = "ALL",
+  onOwnershipChange,
   onResetFilters,
   activeFiltersCount,
   isLoading,
@@ -88,7 +93,7 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
       <div
         className={cn(
           "grid grid-cols-1 sm:grid-cols-2 gap-3",
-          hasSources ? "md:grid-cols-3 xl:grid-cols-5" : "lg:grid-cols-4"
+          hasSources ? "md:grid-cols-3 xl:grid-cols-6" : "md:grid-cols-3 lg:grid-cols-5"
         )}
       >
         {/* 1. Search Bar */}
@@ -191,7 +196,34 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
           </div>
         )}
 
-        {/* 5. Sort Selector */}
+        {/* 5. Ownership Filter */}
+        {onOwnershipChange && (
+          <div>
+            <Select
+              value={selectedOwnership}
+              onValueChange={(val: any) => onOwnershipChange(val)}
+            >
+              <SelectTrigger className="w-full h-10 px-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-xs font-body">
+                <div className="flex items-center gap-2 truncate pl-1.5 sm:pl-2">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <SelectValue placeholder="মালিকানা" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-card border-slate-200 dark:border-white/[0.08]">
+                <SelectItem value="ALL">সকল প্রশ্ন</SelectItem>
+                <SelectItem value="OWN">
+                  <span className="flex items-center gap-1.5 font-bold text-purple-700 dark:text-purple-400">
+                    <Sparkles className="w-3 h-3" />
+                    <span>প্রতিষ্ঠানের নিজস্ব</span>
+                  </span>
+                </SelectItem>
+                <SelectItem value="GLOBAL">শিখনারী ব্যাংক</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* 6. Sort Selector */}
         <div>
           <Select value={selectedSort} onValueChange={(val: any) => onSortChange(val)}>
             <SelectTrigger className="w-full h-10 px-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border-slate-200 dark:border-white/[0.08] text-xs font-body">
@@ -214,6 +246,18 @@ export const SubjectExplorerFilters: React.FC<SubjectExplorerFiltersProps> = ({
           <span className="text-slate-400 dark:text-muted-foreground font-semibold text-[11px] uppercase tracking-wider mr-1">
             সক্রিয় ফিল্টার:
           </span>
+          {selectedOwnership !== "ALL" && onOwnershipChange && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px] font-medium">
+              <span>{selectedOwnership === "OWN" ? "প্রতিষ্ঠানের নিজস্ব" : "শিখনারী ব্যাংক"}</span>
+              <button
+                type="button"
+                onClick={() => onOwnershipChange("ALL")}
+                className="hover:text-purple-900 dark:hover:text-white cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
           {search.trim() !== "" && (
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-medium">
               <span>খোঁজ: "{search}"</span>

@@ -12,6 +12,11 @@ import {
   Loader2,
   FileText,
   Sparkles,
+  SearchX,
+  FilterX,
+  PlusCircle,
+  RotateCcw,
+  BookmarkX,
 } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { toast } from "@workspace/ui/components/sonner"
@@ -105,6 +110,11 @@ interface SubjectExplorerGridProps {
   limit: number
   onPageChange: (page: number) => void
   isBookmarkedOnly?: boolean
+  ownership?: "ALL" | "OWN" | "GLOBAL"
+  onResetOwnership?: () => void
+  onResetFilters?: () => void
+  onClearSearch?: () => void
+  onCreateCustomQuestion?: () => void
 }
 
 export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
@@ -119,6 +129,11 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   limit,
   onPageChange,
   isBookmarkedOnly = false,
+  ownership = "ALL",
+  onResetOwnership,
+  onResetFilters,
+  onClearSearch,
+  onCreateCustomQuestion,
 }) => {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const isBookmarked = useBookmarkedQuestionsStore((s) => s.isBookmarked)
@@ -141,6 +156,7 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
     board: board !== "All" ? board : undefined,
     source: source && source !== "All" ? source : undefined,
     sort,
+    ownership: ownership && ownership !== "ALL" ? ownership : undefined,
     page,
     limit,
   })
@@ -347,21 +363,249 @@ export const SubjectExplorerGrid: React.FC<SubjectExplorerGridProps> = ({
   }
 
   if (questions.length === 0) {
-    return (
-      <div className="py-20 text-center bg-card rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-8 font-body space-y-3 shadow-xs">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-primary/10 text-indigo-600 dark:text-primary mx-auto flex items-center justify-center">
-          <FileText className="w-6 h-6 stroke-[1.8]" />
+    const hasSearch = Boolean(search && search.trim() !== "");
+    const hasFilters =
+      (chapterId && chapterId !== "All") ||
+      (board && board !== "All") ||
+      (source && source !== "All");
+
+    if (ownership === "OWN") {
+      return (
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-purple-200/50 dark:border-purple-900/30 bg-purple-500/[0.03] dark:bg-purple-950/[0.05] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 ring-8 ring-purple-500/5 border border-purple-500/20 shadow-2xs">
+              <Sparkles className="w-6 h-6" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            কোনো নিজস্ব প্রশ্ন পাওয়া যায়নি
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            এই বিষয়ে আপনার প্রতিষ্ঠানের কোনো নিজস্ব প্রশ্ন এখনো তৈরি করা হয়নি। আপনি চাইলে সরাসরি নতুন প্রশ্ন যোগ করতে পারেন।
+          </p>
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs sm:text-sm cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>নতুন নিজস্ব প্রশ্ন তৈরি করুন</span>
+              </Button>
+            )}
+            {onResetOwnership && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onResetOwnership}
+                className="h-10 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <span>সকল প্রশ্ন দেখুন</span>
+              </Button>
+            )}
+          </div>
         </div>
-        <h3 className="text-base font-bold font-headline text-slate-900 dark:text-foreground">
-          কোনো প্রশ্ন পাওয়া যায়নি
+      );
+    }
+
+    if (isBookmarkedOnly) {
+      return (
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 ring-8 ring-rose-500/5 border border-rose-500/20 shadow-2xs">
+              <BookmarkX className="w-6 h-6" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            কোনো বুকমার্ক পাওয়া যায়নি
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
+            এই বিষয়ের কোনো প্রশ্ন এখনো আপনার বুকমার্ক তালিকায় যুক্ত করা হয়নি।
+          </p>
+          {onCreateCustomQuestion && (
+            <Button
+              type="button"
+              onClick={onCreateCustomQuestion}
+              className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+            </Button>
+          )}
+        </div>
+      );
+    }
+
+    if (hasSearch) {
+      return (
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary ring-8 ring-primary/5 border border-primary/20 shadow-2xs">
+              <SearchX className="w-6 h-6" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            &quot;{search}&quot;-এর কোনো ফলাফল নেই
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+            সার্চের সাথে মিলে এমন কোনো প্রশ্ন প্রশ্নব্যাংকে পাওয়া যায়নি।
+          </p>
+
+          {/* Prominent Custom Question Suggestion Card */}
+          {onCreateCustomQuestion && (
+            <div className="w-full max-w-md my-2 mb-5 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold font-headline text-foreground">
+                    &quot;{search}&quot; নিয়ে নিজস্ব প্রশ্ন তৈরি করবেন?
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                    আপনার সার্চ অনুযায়ী নতুন প্রশ্ন তৈরি করে প্রশ্নব্যাংকে যুক্ত করুন
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>তৈরি করুন</span>
+              </Button>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onClearSearch && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClearSearch}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <span>সার্চ ক্লিয়ার করুন</span>
+              </Button>
+            )}
+            {hasFilters && onResetFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onResetFilters}
+                className="h-9 px-3.5 rounded-xl font-bold font-headline text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 cursor-pointer flex items-center gap-1.5 active:scale-95"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>সব ফিল্টার রিসেট</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (hasFilters) {
+      return (
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 ring-8 ring-amber-500/5 border border-amber-500/20 shadow-2xs">
+              <FilterX className="w-6 h-6" />
+            </div>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+            সিলেক্টেড ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+            বর্তমান ফিল্টারের আওতায় প্রশ্নব্যাংকে কোনো প্রশ্ন মেলেনি।
+          </p>
+
+          {/* Prominent Custom Question Suggestion Card */}
+          {onCreateCustomQuestion && (
+            <div className="w-full max-w-md my-2 mb-5 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold font-headline text-foreground">
+                    কাঙ্ক্ষিত প্রশ্নটি খুঁজে পাচ্ছেন না?
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                    আপনার প্রয়োজনমতো নিজস্ব প্রশ্ন তৈরি করে প্রশ্নব্যাংকে যুক্ত করুন
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>তৈরি করুন</span>
+              </Button>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onResetFilters && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onResetFilters}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>ফিল্টার রিসেট করুন</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+        <div className="relative mb-3 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 ring-8 ring-purple-500/5 border border-purple-500/20 shadow-2xs">
+            <Sparkles className="w-6 h-6" />
+          </div>
+        </div>
+        <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+          প্রশ্ন তালিকা ফাঁকা
         </h3>
-        <p className="text-xs text-slate-500 dark:text-muted-foreground max-w-sm mx-auto">
-          {isBookmarkedOnly
-            ? "আপনার এখনও কোনো প্রশ্ন বুকমার্কে সংরক্ষিত নেই। প্রশ্নের কোণে বুকমার্ক আইকনে ক্লিক করে সংরক্ষণ করতে পারেন।"
-            : "নির্বাচিত ফিল্টার বা অনুসন্ধান শব্দের বিপরীতে কোনো প্রশ্ন পাওয়া যায়নি। ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।"}
+        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+          এই বিভাগ বা বিষয়ের জন্য প্রশ্নব্যাংকে কোনো প্রশ্ন পাওয়া যায়নি। আপনি নিজেই আপনার প্রয়োজনীয় প্রশ্ন তৈরি করে প্রশ্নব্যাংকে সংরক্ষণ করতে পারেন।
         </p>
+
+        {onCreateCustomQuestion && (
+          <div className="w-full max-w-md my-2 mb-3 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold font-headline text-foreground">
+                  নিজস্ব প্রশ্ন তৈরি করুন
+                </div>
+                <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                  নতুন প্রশ্ন তৈরি করে সাথে সাথে আপনার প্রতিষ্ঠানের প্রশ্নব্যাংকে যুক্ত করুন
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={onCreateCustomQuestion}
+              className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>প্রশ্ন তৈরি করুন</span>
+            </Button>
+          </div>
+        )}
       </div>
-    )
+    );
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@workspace/ui/components/button"
-import { FileText, Plus, Sparkles } from "lucide-react"
+import { FileText, Plus, Sparkles, Coins } from "lucide-react"
 
 export function QuestionPaperPageHeader() {
   return (
@@ -29,7 +29,17 @@ export function QuestionPaperPageHeader() {
       </div>
 
       {/* Primary Action Button */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-wrap">
+        <Button
+          variant="outline"
+          asChild
+          className="h-11 px-4 rounded-2xl border-border bg-card hover:bg-muted text-xs sm:text-sm font-bold font-headline text-foreground cursor-pointer flex items-center gap-2"
+        >
+          <Link href="/resource-pricing" title="প্রশ্ন প্রকারভিত্তিক ক্রেডিট রেট চার্ট">
+            <Coins className="w-4 h-4 text-amber-500" />
+            <span>ক্রেডিট রেট চার্ট</span>
+          </Link>
+        </Button>
         <Button
           asChild
           className="group relative h-11 px-5 rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold text-sm shadow-md shadow-primary/25 transition-all active:scale-95 cursor-pointer flex items-center gap-2"

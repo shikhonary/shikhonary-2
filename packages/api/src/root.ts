@@ -75,8 +75,12 @@ import { seenComprehensionRouter } from "./routers/seen-comprehension/seen-compr
 import { numberInWordsRouter } from "./routers/number-in-words/number-in-words.router"
 import { contentTrackerRouter } from "./routers/content-tracker/content-tracker.router"
 import { questionReportRouter } from "./routers/question-report/question-report.router"
+import { referralRouter } from "./routers/referral/referral.router"
+import { tenantApplicationRouter } from "./routers/tenant-application/tenant-application.router"
 
 export const appRouter = createTRPCRouter({
+  referral: referralRouter,
+  tenantApplication: tenantApplicationRouter,
   questionReport: questionReportRouter,
   contentTracker: contentTrackerRouter,
   health: healthRouter,

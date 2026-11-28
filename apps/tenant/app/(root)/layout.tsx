@@ -89,9 +89,9 @@ const Layout = async ({ children }: RootLayoutProps) => {
     },
   });
 
-  // No active admin membership → redirect to no-access page
+  // No active admin membership → redirect to onboarding flow to submit/view application
   if (!membership) {
-    redirect("/no-access");
+    redirect("/onboarding");
   }
 
 

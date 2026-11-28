@@ -40,6 +40,7 @@ import {
   replaceQuestionSchema,
   updateQuestionPaperQuestionSchema,
   quickCreateQuestionSchema,
+  getQuestionPaperCostBreakdownSchema,
 } from "./question-paper.schema"
 import {
   listQuestionPapers,
@@ -84,6 +85,7 @@ import {
   autoFillDistribution,
   replaceQuestion,
   quickCreateQuestion,
+  getQuestionPaperCostBreakdown,
 } from "./question-paper.service"
 
 export const questionPaperRouter = createTRPCRouter({
@@ -98,6 +100,17 @@ export const questionPaperRouter = createTRPCRouter({
   byId: publicTenantProcedure
     .input(getQuestionPaperSchema)
     .query(({ ctx, input }) => getQuestionPaperById(ctx.db, ctx.tenantDb, input)),
+
+  getCostBreakdown: tenantMemberProcedure
+    .input(getQuestionPaperCostBreakdownSchema)
+    .query(({ ctx, input }) =>
+      getQuestionPaperCostBreakdown(
+        ctx.db,
+        ctx.tenantDb,
+        input,
+        ctx.tenant?.id
+      )
+    ),
 
   history: tenantMemberProcedure
     .input(getQuestionPaperSchema)

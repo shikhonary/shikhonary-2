@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -74,6 +75,33 @@ export function TenantProvider({
   user,
   children,
 }: TenantProviderProps) {
+  const pathname = usePathname();
+
+  // Dynamic Browser Tab Branding: Ensures the institution name is displayed alongside page title
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const institutionName = tenant.nameBn || tenant.name;
+    if (!institutionName) return;
+
+    // Small delay to allow Next.js route metadata to set initial document.title
+    const timer = setTimeout(() => {
+      const currentTitle = document.title;
+      if (currentTitle && !currentTitle.includes(institutionName)) {
+        if (currentTitle.includes("| শিখনারী পোর্টাল")) {
+          document.title = currentTitle
+            .replace("| শিখনারী পোর্টাল", `| ${institutionName} - শিখনারী`);
+        } else if (currentTitle.includes("| শিখনারী")) {
+          document.title = currentTitle
+            .replace("| শিখনারী", `| ${institutionName} - শিখনারী`);
+        } else if (currentTitle === "শিখনারী পোর্টাল" || currentTitle === "শিখনারী") {
+          document.title = `${institutionName} - শিখনারী পোর্টাল`;
+        }
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [pathname, tenant.nameBn, tenant.name]);
+
   return (
     <TenantContext.Provider value={{ tenant, membership, user }}>
       {children}

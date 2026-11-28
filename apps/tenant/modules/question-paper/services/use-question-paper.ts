@@ -38,6 +38,13 @@ export function useQuestionPaperById(id: string, enabled = true) {
   })
 }
 
+export function useQuestionPaperCostBreakdown(id: string, enabled = true) {
+  return useQuery({
+    ...trpc.questionPaper.getCostBreakdown.queryOptions({ id }),
+    enabled: Boolean(id) && enabled,
+  })
+}
+
 export function useQuestionPaperHistory(id: string, enabled = true) {
   return useQuery({
     ...trpc.questionPaper.history.queryOptions({ id }),

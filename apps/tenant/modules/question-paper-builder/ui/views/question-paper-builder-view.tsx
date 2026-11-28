@@ -7,7 +7,7 @@ import { BuilderAiPanel } from "../components/sidebar/builder-ai-panel";
 import { BuilderCanvas } from "../components/canvas/builder-canvas";
 import { FloatingFormatToolbar } from "../components/toolbar/floating-format-toolbar";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeft, Loader2, Save, Copy, Download, SlidersHorizontal, Sparkles, Lock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Copy, Download, SlidersHorizontal, Sparkles, Lock, AlertTriangle, Pen, Coins } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
 import {
@@ -352,6 +352,30 @@ export const QuestionPaperBuilderView: React.FC<Props> = ({ paperId }) => {
               <ArrowLeft className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="hidden sm:inline">তালিকায় ফিরুন</span>
               <span className="inline sm:hidden">তালিকা</span>
+            </Link>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="h-8.5 sm:h-9 px-2 sm:px-2.5 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1 sm:gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
+          >
+            <Link href={`/question-papers/${paperId}/edit`} title="প্রশ্নপত্রের বিবরণ ও মানবণ্টন সম্পাদনা করুন">
+              <Pen className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="hidden md:inline">কাঠামো এডিট</span>
+            </Link>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="h-8.5 sm:h-9 px-2 sm:px-2.5 rounded-xl border-border bg-card hover:bg-muted text-xs font-bold font-headline text-foreground cursor-pointer gap-1 sm:gap-1.5 shrink-0 shadow-2xs transition-all active:scale-95"
+          >
+            <Link href={`/question-papers/${paperId}/cost`} title="প্রশ্নপত্রের ক্রেডিট খরচ ও কস্টিং দেখুন">
+              <Coins className="w-3.5 h-3.5 text-amber-500" />
+              <span className="hidden md:inline">ক্রেডিট খরচ</span>
             </Link>
           </Button>
 

@@ -417,6 +417,8 @@ export async function createTenant(
 
   const {
     planId,
+    referralCode,
+    applicationId,
     divisionName,
     districtName,
     upazilaName,
@@ -428,6 +430,16 @@ export async function createTenant(
     ...tenantData
   } = input
 
+  let matchedReferralCode: any = null
+  if (referralCode && referralCode.trim()) {
+    matchedReferralCode = await db.referralCode.findFirst({
+      where: {
+        code: { equals: referralCode.trim(), mode: "insensitive" },
+        isActive: true,
+      },
+    })
+  }
+
   const geoIds = (divisionId || districtId || upazilaId || unionId)
     ? { divisionId, districtId, upazilaId, unionId }
     : await resolveGeographicIds(db, {
@@ -437,12 +449,13 @@ export async function createTenant(
         unionName,
       })
 
-  // 1. Save tenant metadata (+ optional subscription) in main DB via transaction
+  // 1. Save tenant metadata (+ optional subscription + optional referral) in main DB via transaction
   const tenant = await db.$transaction(async (tx) => {
     const createdTenant = await tx.tenant.create({
       data: {
         ...tenantData,
         ...geoIds,
+        referredByTenantId: matchedReferralCode?.referrerTenantId ?? null,
         databaseStatus: "PENDING",
       },
       include: {
@@ -452,6 +465,118 @@ export async function createTenant(
         union: true,
       }
     })
+
+    if (matchedReferralCode) {
+      if (applicationId) {
+        // Immediate dual reward since tenant is active with an admin immediately
+        const REFERRER_BONUS = 300
+        const REFEREE_BONUS = 100
+        const now = new Date()
+
+        const referrer = await tx.tenant.findUnique({
+          where: { id: matchedReferralCode.referrerTenantId },
+          select: { creditBalance: true, name: true, nameBn: true },
+        })
+
+        if (referrer) {
+          const referrerNewBalance = referrer.creditBalance + REFERRER_BONUS
+          await tx.tenant.update({
+            where: { id: matchedReferralCode.referrerTenantId },
+            data: { creditBalance: referrerNewBalance },
+          })
+          await tx.creditTransaction.create({
+            data: {
+              tenantId: matchedReferralCode.referrerTenantId,
+              type: "REFERRAL_BONUS",
+              amount: REFERRER_BONUS,
+              balance: referrerNewBalance,
+              description: `রেফারেল বোনাস: "${createdTenant.nameBn || createdTenant.name}" যোগদানে অর্জিত`,
+              metadata: {
+                referredTenantId: createdTenant.id,
+                applicationId,
+              },
+            },
+          })
+        }
+
+        await tx.tenant.update({
+          where: { id: createdTenant.id },
+          data: { creditBalance: REFEREE_BONUS },
+        })
+        await tx.creditTransaction.create({
+          data: {
+            tenantId: createdTenant.id,
+            type: "REFERRAL_BONUS",
+            amount: REFEREE_BONUS,
+            balance: REFEREE_BONUS,
+            description: `রেফারেল স্বাগতম বোনাস: "${referrer?.nameBn || referrer?.name}"-এর আমন্ত্রণে অর্জিত`,
+            metadata: {
+              referrerTenantId: matchedReferralCode.referrerTenantId,
+              applicationId,
+            },
+          },
+        })
+
+        await tx.referral.create({
+          data: {
+            referralCodeId: matchedReferralCode.id,
+            referrerTenantId: matchedReferralCode.referrerTenantId,
+            referredTenantId: createdTenant.id,
+            referredInstitutionName: createdTenant.nameBn || createdTenant.name,
+            referredEmail: createdTenant.email || null,
+            referredPhone: createdTenant.phone || null,
+            status: "REWARDED",
+            referrerBonusCredits: REFERRER_BONUS,
+            refereeBonusCredits: REFEREE_BONUS,
+            rewardedAt: now,
+          },
+        })
+
+        await tx.referralCode.update({
+          where: { id: matchedReferralCode.id },
+          data: {
+            totalConverted: { increment: 1 },
+            totalEarnedCredits: { increment: REFERRER_BONUS },
+          },
+        })
+      } else {
+        await tx.referral.create({
+          data: {
+            referralCodeId: matchedReferralCode.id,
+            referrerTenantId: matchedReferralCode.referrerTenantId,
+            referredTenantId: createdTenant.id,
+            referredInstitutionName: createdTenant.nameBn || createdTenant.name,
+            referredEmail: createdTenant.email || null,
+            referredPhone: createdTenant.phone || null,
+            status: "PENDING",
+          },
+        })
+      }
+    }
+
+    // If created from an onboarding application, link the applicant user as ADMIN of this tenant
+    if (applicationId) {
+      const app = await tx.onboardingApplication.findUnique({
+        where: { id: applicationId },
+      })
+      if (app) {
+        await tx.tenantMember.create({
+          data: {
+            userId: app.userId,
+            tenantId: createdTenant.id,
+            role: "ADMIN",
+            isActive: true,
+          },
+        })
+        await tx.onboardingApplication.update({
+          where: { id: applicationId },
+          data: {
+            status: "APPROVED",
+            reviewedAt: new Date(),
+          },
+        })
+      }
+    }
 
     if (planId) {
       const plan = await tx.subscriptionPlan.findUnique({

@@ -398,3 +398,50 @@ export function getMcqOptionGridClass(
   }
   return "grid-cols-2 print:!grid-cols-2";
 }
+
+
+/**
+ * Computes adaptive grid classes for MCQ options in card views (Question Bank & Distribution Picker):
+ * - Default: 2 options per row (grid-cols-2) on all screen sizes.
+ * - If option text is large (> 14 chars) or contains math/formulas:
+ *   - On mobile (< sm): collapses to 1 option per row (grid-cols-1).
+ *   - On desktop (sm:): keeps 2 options per row (sm:grid-cols-2).
+ * - If option text is very large (> 28 chars, e.g. long sentences):
+ *   - 1 option per row across all screen sizes (grid-cols-1).
+ */
+export function getAdaptiveMcqOptionGridClass(
+  options?: (string | null | undefined)[]
+): string {
+  const opts = options || [];
+  if (opts.length <= 1) return "grid-cols-1";
+
+  const hasFormulasOrMath = opts.some((opt) => {
+    if (!opt || typeof opt !== "string") return false;
+    return (
+      opt.includes("$") ||
+      opt.includes("\\") ||
+      opt.includes("frac") ||
+      opt.includes("sqrt")
+    );
+  });
+
+  const maxOptionLength = opts.reduce((max, opt) => {
+    if (!opt || typeof opt !== "string") return max;
+    const cleanText = opt.replace(/<[^>]*>/g, "").replace(/[$_^{}]/g, "").trim();
+    return Math.max(max, cleanText.length);
+  }, 0);
+
+  // If option text is very large (> 28 chars): 1 option in a row everywhere
+  if (maxOptionLength > 28) {
+    return "grid-cols-1";
+  }
+
+  // If option text is large (> 14 chars) or contains formulas:
+  // 1 option in a row on mobile (< sm), 2 options in a row on desktop (sm:)
+  if (hasFormulasOrMath || maxOptionLength > 14) {
+    return "grid-cols-1 sm:grid-cols-2";
+  }
+
+  // Standard / short options: 2 options in a row (both mobile and desktop)
+  return "grid-cols-2";
+}

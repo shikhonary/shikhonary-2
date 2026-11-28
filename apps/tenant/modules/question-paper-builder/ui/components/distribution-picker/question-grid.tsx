@@ -218,7 +218,11 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
 
   if (!questions || questions.length === 0) {
     const hasSearch = Boolean(search && search.trim() !== "");
-    const hasFilters = (chapterId && chapterId !== "All") || (board && board !== "All") || (source && source !== "All");
+    const hasFilters =
+      (chapterId && chapterId !== "All") ||
+      (board && board !== "All") ||
+      (source && source !== "All") ||
+      (mcqType && mcqType !== "All");
 
     if (ownership === "OWN") {
       return (
@@ -237,9 +241,9 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
               <Button
                 type="button"
                 onClick={onCreateCustomQuestion}
-                className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+                className="h-10 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs sm:text-sm cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
               >
-                <PlusCircle className="w-3.5 h-3.5" />
+                <PlusCircle className="w-4 h-4" />
                 <span>নতুন নিজস্ব প্রশ্ন তৈরি করুন</span>
               </Button>
             )}
@@ -248,7 +252,7 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
                 type="button"
                 variant="outline"
                 onClick={onResetOwnership}
-                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+                className="h-10 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
               >
                 <span>সকল প্রশ্ন দেখুন</span>
               </Button>
@@ -270,45 +274,75 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
           <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
             এই বিষয়ের কোনো প্রশ্ন এখনো আপনার বুকমার্ক তালিকায় যুক্ত করা হয়নি।
           </p>
-          {onResetBookmarks && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onResetBookmarks}
-              className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
-            >
-              <span>সকল প্রশ্ন দেখুন</span>
-            </Button>
-          )}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            {onResetBookmarks && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onResetBookmarks}
+                className="h-9 px-4 rounded-xl border-border/80 bg-card hover:bg-muted font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-2xs transition-all"
+              >
+                <span>সকল প্রশ্ন দেখুন</span>
+              </Button>
+            )}
+            {onCreateCustomQuestion && (
+              <Button
+                type="button"
+                onClick={onCreateCustomQuestion}
+                className="h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+              </Button>
+            )}
+          </div>
         </div>
       );
     }
 
     if (hasSearch) {
       return (
-        <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
-          <div className="relative mb-4 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary ring-8 ring-primary/5 border border-primary/20 shadow-2xs">
-              <SearchX className="w-7 h-7" />
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary ring-8 ring-primary/5 border border-primary/20 shadow-2xs">
+              <SearchX className="w-6 h-6" />
             </div>
           </div>
           <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
             &quot;{search}&quot;-এর কোনো ফলাফল নেই
           </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
-            বানান যাচাই করুন অথবা ভিন্ন কোনো প্রাসঙ্গিক কী-ওয়ার্ড দিয়ে সার্চ করুন।
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+            সার্চের সাথে মিলে এমন কোনো প্রশ্ন প্রশ্নব্যাংকে পাওয়া যায়নি।
           </p>
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            {onCreateCustomQuestion && (
+
+          {/* Prominent Custom Question Suggestion Card */}
+          {onCreateCustomQuestion && (
+            <div className="w-full max-w-md my-2 mb-5 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold font-headline text-foreground">
+                    &quot;{search}&quot; নিয়ে নিজস্ব প্রশ্ন তৈরি করবেন?
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                    আপনার সার্চ অনুযায়ী নতুন প্রশ্ন তৈরি করে সরাসরি প্রশ্নপত্রে যুক্ত করুন
+                  </p>
+                </div>
+              </div>
               <Button
                 type="button"
                 onClick={onCreateCustomQuestion}
-                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+                <span>তৈরি করুন</span>
               </Button>
-            )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap justify-center">
             {onClearSearch && (
               <Button
                 type="button"
@@ -337,29 +371,47 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
 
     if (hasFilters) {
       return (
-        <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
-          <div className="relative mb-4 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 ring-8 ring-amber-500/5 border border-amber-500/20 shadow-2xs">
-              <FilterX className="w-7 h-7" />
+        <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+          <div className="relative mb-3 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 ring-8 ring-amber-500/5 border border-amber-500/20 shadow-2xs">
+              <FilterX className="w-6 h-6" />
             </div>
           </div>
           <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
-            সিলেক্টেড ফিল্টারে কোনো প্রশ্ন নেই
+            সিলেক্টেড ফিল্টারে কোনো প্রশ্ন পাওয়া যায়নি
           </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
-            অন্য অধ্যায় বা বোর্ড সিলেক্ট করুন অথবা বর্তমান ফিল্টারগুলো রিসেট করুন।
+          <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+            বর্তমান ফিল্টারের আওতায় প্রশ্নব্যাংকে কোনো প্রশ্ন মেলেনি।
           </p>
-          <div className="flex items-center gap-2 flex-wrap justify-center">
-            {onCreateCustomQuestion && (
+
+          {/* Prominent Custom Question Suggestion Card */}
+          {onCreateCustomQuestion && (
+            <div className="w-full max-w-md my-2 mb-5 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold font-headline text-foreground">
+                    কাঙ্ক্ষিত প্রশ্নটি খুঁজে পাচ্ছেন না?
+                  </div>
+                  <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                    আপনার প্রয়োজনমতো নিজস্ব প্রশ্ন তৈরি করে সরাসরি প্রশ্নপত্রে যুক্ত করুন
+                  </p>
+                </div>
+              </div>
               <Button
                 type="button"
                 onClick={onCreateCustomQuestion}
-                className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
+                <span>তৈরি করুন</span>
               </Button>
-            )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap justify-center">
             {onResetFilters && (
               <Button
                 type="button"
@@ -377,25 +429,43 @@ export const QuestionGrid: React.FC<QuestionGridProps> = ({
     }
 
     return (
-      <div className="w-full py-10 sm:py-20 rounded-3xl border border-border/40 bg-muted/[0.08] dark:bg-white/[0.015] flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
-        <div className="relative mb-4 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-muted/70 flex items-center justify-center text-muted-foreground ring-8 ring-muted/30 border border-border/70 shadow-2xs">
-            <FileQuestion className="w-7 h-7" />
+      <div className="w-full py-10 sm:py-16 rounded-3xl border border-border/60 bg-gradient-to-b from-muted/30 to-muted/10 dark:from-white/[0.02] dark:to-transparent flex flex-col items-center justify-center text-center px-4 sm:px-6 select-none animate-in fade-in duration-200 font-display shadow-2xs">
+        <div className="relative mb-3 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 ring-8 ring-purple-500/5 border border-purple-500/20 shadow-2xs">
+            <Sparkles className="w-6 h-6" />
           </div>
         </div>
-        <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">প্রশ্ন তালিকা ফাঁকা</h3>
-        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-sm mx-auto mb-5">
-          এই বিভাগ বা বিষয়ের জন্য প্রশ্ন ব্যাংকে এখনো কোনো প্রশ্ন প্রস্তুত নেই।
+        <h3 className="text-base sm:text-lg font-bold text-foreground font-headline mb-1">
+          প্রশ্ন তালিকা ফাঁকা
+        </h3>
+        <p className="text-xs sm:text-sm text-muted-foreground font-body leading-relaxed max-w-md mx-auto mb-4">
+          এই বিভাগ বা বিষয়ের জন্য প্রশ্নব্যাংকে কোনো প্রশ্ন পাওয়া যায়নি। আপনি নিজেই আপনার প্রয়োজনীয় প্রশ্ন তৈরি করে সরাসরি প্রশ্নপত্রে যুক্ত করতে পারেন।
         </p>
+
         {onCreateCustomQuestion && (
-          <Button
-            type="button"
-            onClick={onCreateCustomQuestion}
-            className="h-9 px-4 rounded-xl bg-primary text-primary-foreground font-bold font-headline text-xs cursor-pointer flex items-center gap-2 active:scale-95 shadow-xs transition-all"
-          >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>নিজস্ব প্রশ্ন তৈরি করুন</span>
-          </Button>
+          <div className="w-full max-w-md my-2 mb-3 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 via-primary/5 to-purple-500/10 border border-purple-500/25 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold font-headline text-foreground">
+                  নিজস্ব প্রশ্ন তৈরি করুন
+                </div>
+                <p className="text-[11px] text-muted-foreground font-body mt-0.5">
+                  নতুন প্রশ্ন তৈরি করে সাথে সাথে এই প্রশ্নপত্রে যুক্ত করে নিন
+                </p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              onClick={onCreateCustomQuestion}
+              className="w-full sm:w-auto h-9 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold font-headline text-xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 shadow-xs shrink-0 transition-transform"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>প্রশ্ন তৈরি করুন</span>
+            </Button>
+          </div>
         )}
       </div>
     );

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { trpc } from "@/trpc/client"
@@ -37,6 +37,9 @@ import {
   Phone,
   Mail,
   GraduationCap,
+  Share2,
+  Inbox,
+  Sparkles,
 } from "lucide-react"
 
 type ProvisionStatus = "idle" | "pending" | "success" | "error"
@@ -71,7 +74,10 @@ const provisionSteps = [
 
 export function CreateTenantView() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const queryClient = useQueryClient()
+
+  const applicationId = searchParams.get("applicationId") || undefined
 
   const [currentStep, setCurrentStep] = useState(1)
   const [provisionStatus, setProvisionStatus] = useState<ProvisionStatus>("idle")
@@ -117,6 +123,7 @@ export function CreateTenantView() {
   const [customTeacherLimit, setCustomTeacherLimit] = useState<number | undefined>()
   const [customExamLimit, setCustomExamLimit] = useState<number | undefined>()
   const [customStorageLimit, setCustomStorageLimit] = useState<number | undefined>()
+  const [referralCode, setReferralCode] = useState("")
 
   // Cascading location queries
   const { data: divisions = [] } = useQuery(trpc.location.divisions.queryOptions())
@@ -132,6 +139,53 @@ export function CreateTenantView() {
 
   // Subscription plans
   const { data: plansData } = useQuery(trpc.subscriptionPlan.forSelection.queryOptions())
+
+  // Prefill from application query if applicationId is provided
+  const { data: applicationData } = useQuery({
+    ...trpc.tenantApplication.byId.queryOptions({ id: applicationId || "" }),
+    enabled: Boolean(applicationId),
+  })
+
+  useEffect(() => {
+    if (applicationData) {
+      if (applicationData.name) {
+        setName((prev) => prev || applicationData.name)
+        const generatedSlug = applicationData.name
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+        setSlug((prev) => prev || generatedSlug)
+      }
+      if (applicationData.type) {
+        setType((prev) => prev || applicationData.type)
+      }
+      if (applicationData.phone) {
+        setPhone((prev) => prev || applicationData.phone)
+      }
+      if (applicationData.user?.email) {
+        setEmail((prev) => prev || applicationData.user?.email || "")
+      }
+      if (applicationData.user?.name) {
+        setPrincipalName((prev) => prev || applicationData.user?.name || "")
+      }
+      if (applicationData.divisionId) {
+        setDivisionId((prev) => prev || applicationData.divisionId || "")
+        if (applicationData.division?.name) {
+          setDivisionName((prev) => prev || applicationData.division?.name || "")
+        }
+      }
+      if (applicationData.districtId) {
+        setDistrictId((prev) => prev || applicationData.districtId || "")
+        if (applicationData.district?.name) {
+          setDistrictName((prev) => prev || applicationData.district?.name || "")
+        }
+      }
+      if (applicationData.referralCode) {
+        setReferralCode((prev) => prev || applicationData.referralCode || "")
+      }
+    }
+  }, [applicationData])
 
   // Create mutation
   const createMutation = trpc.tenant.create.mutationOptions()
@@ -274,6 +328,8 @@ export function CreateTenantView() {
         customTeacherLimit: customTeacherLimit !== undefined ? Number(customTeacherLimit) : undefined,
         customExamLimit: customExamLimit !== undefined ? Number(customExamLimit) : undefined,
         customStorageLimit: customStorageLimit !== undefined ? Number(customStorageLimit) : undefined,
+        referralCode: referralCode.trim() || undefined,
+        applicationId,
       },
       {
         onSuccess: () => {
@@ -474,6 +530,29 @@ export function CreateTenantView() {
           </Link>
         </Button>
       </PageHeader>
+
+      {/* Prefill from Onboarding Application Banner */}
+      {applicationData && (
+        <div className="bg-indigo-50/90 border border-indigo-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
+          <div className="p-2.5 rounded-xl bg-indigo-600 text-white shrink-0 shadow-xs">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="space-y-1 text-sm">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-indigo-950">
+                অনবোর্ডিং আবেদনকারী: {applicationData.user?.name || "ব্যবহারকারী"}
+              </span>
+              <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 font-mono text-xs">
+                {applicationData.user?.email}
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-indigo-800 leading-relaxed">
+              এই প্রতিষ্ঠানটি প্রভিশন করার সাথে সাথেই আবেদনকারীকে স্বয়ংক্রিয়ভাবে প্রতিষ্ঠানটির &quot;ADMIN&quot; রোল প্রদান করা হবে।
+              {applicationData.referralCode ? ` ব্যবহৃত রেফারেল কোড (${applicationData.referralCode}) এর জন্য উভয় পক্ষকে নির্ধারিত বোনাস ক্রেডিট স্বয়ংক্রিয়ভাবে প্রদান করা হবে।` : ""}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 4-Step Indicator */}
       <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-xs relative">
@@ -1057,6 +1136,25 @@ export function CreateTenantView() {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Referral Code Linkage */}
+                <div className="space-y-2 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 p-4 bg-indigo-50/30 dark:bg-indigo-950/20">
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <Label className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      রেফারেল কোড (ঐচ্ছিক - যদি কোনো প্রতিষ্ঠান রেফার করে থাকে)
+                    </Label>
+                  </div>
+                  <Input
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="যেমন: SHIK-RAJUK-892"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 py-2.5 px-3.5 text-sm bg-white dark:bg-slate-950 focus-visible:ring-indigo-500 font-mono tracking-wider h-10 sm:h-11"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    রেফারেল কোড দেওয়া থাকলে, আমন্ত্রিত অ্যাডমিন যোগদানের সাথে সাথে রেফারার ও নতুন উভয় প্রতিষ্ঠানই বোনাস ক্রেডিট পাবে।
+                  </p>
                 </div>
 
                 <div className="flex items-center space-x-3 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-950/40">

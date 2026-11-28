@@ -1650,12 +1650,14 @@ export async function quickCreateQuestion(
   actorId?: string,
   tenantId?: string
 ) {
-  const paper = await tenantDb.questionPaper.findUnique({
-    where: { id: input.questionPaperId },
-  })
-  if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
-  if (paper.status === "Published") {
-    throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+  if (input.questionPaperId) {
+    const paper = await tenantDb.questionPaper.findUnique({
+      where: { id: input.questionPaperId },
+    })
+    if (!paper || paper.deletedAt) throw notFound("QuestionPaper")
+    if (paper.status === "Published") {
+      throw badRequest("পাবলিশড প্রশ্নপত্রে নতুন প্রশ্ন যোগ করা যাবে না।")
+    }
   }
 
   // 1. Resolve chapterId if not provided or "All"
@@ -1683,7 +1685,7 @@ export async function quickCreateQuestion(
 
   // 2. Resolve questionTypeId if not provided
   let resolvedTypeId = input.questionTypeId
-  if (!resolvedTypeId) {
+  if (!resolvedTypeId && input.distributionId) {
     const dist = await tenantDb.questionPaperSubjectMarkDistribution.findUnique({
       where: { id: input.distributionId },
       select: { questionTypeId: true },
@@ -1962,7 +1964,7 @@ export async function quickCreateQuestion(
   }
 
   // 4. Auto-assign to question paper if requested
-  if (input.autoAssign) {
+  if (input.autoAssign && input.questionPaperId && input.distributionId) {
     await bulkAssignQuestions(
       db,
       tenantDb,

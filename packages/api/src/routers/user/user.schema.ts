@@ -86,6 +86,12 @@ export const updateContactSchema = z.object({
 
 export type UpdateContactInput = z.infer<typeof updateContactSchema>
 
+export const devVerifyEmailSchema = z.object({
+  email: z.string().email(),
+})
+
+export type DevVerifyEmailInput = z.infer<typeof devVerifyEmailSchema>
+
 // ---------------------------------------------------------------------------
 // Output shapes (safe fields only — never include password hashes etc.)
 // ---------------------------------------------------------------------------
